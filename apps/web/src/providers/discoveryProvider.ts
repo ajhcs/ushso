@@ -31,12 +31,63 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string')
 }
 
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0
+}
+
+const evidenceStates = ['verified_first_party', 'source_asserted', 'inferred', 'unresolved', 'unavailable'] as const
+
+function hasExplicitVerification(value: Record<string, unknown>) {
+  const freshness = value.freshness_verification
+  if (!isObject(freshness) || !isNonEmptyString(freshness.metadata_observed_at)) return false
+  if (freshness.data_through !== null && typeof freshness.data_through !== 'string') return false
+  if (freshness.next_review_due !== null && typeof freshness.next_review_due !== 'string') return false
+  if (!['current_verified', 'stale', 'not_live_verified', 'unknown'].includes(String(freshness.verification_status))) return false
+  if (!['first_party_live', 'captured_evidence', 'offline_fixture', 'unknown'].includes(String(freshness.verification_method))) return false
+  if (!Array.isArray(value.provenance) || value.provenance.length === 0 || !Array.isArray(value.evidence) || value.evidence.length === 0) return false
+  const provenanceIds = new Set<string>()
+  for (const source of value.provenance) {
+    if (!isObject(source) || !isNonEmptyString(source.provenance_id) || !isNonEmptyString(source.locator) || !isNonEmptyString(source.observed_at)) return false
+    if (!['first_party_page', 'catalog_metadata', 'documentation', 'fixture_note', 'other'].includes(String(source.kind))) return false
+    if (!['captured_hashed', 'fixture_only', 'locator_only', 'unavailable'].includes(String(source.capture_state))) return false
+    if (source.content_sha256 !== null && typeof source.content_sha256 !== 'string') return false
+    provenanceIds.add(source.provenance_id)
+  }
+  for (const evidence of value.evidence) {
+    if (!isObject(evidence) || !isNonEmptyString(evidence.evidence_id) || !isNonEmptyString(evidence.claim)) return false
+    if (!evidenceStates.includes(String(evidence.state) as (typeof evidenceStates)[number])) return false
+    if (!isStringArray(evidence.provenance_ids) || evidence.provenance_ids.length === 0 || !isStringArray(evidence.limitations)) return false
+    if (!evidence.provenance_ids.every((id) => provenanceIds.has(id))) return false
+  }
+  return true
+}
+
+function isVariableDocumentation(value: unknown) {
+  if (!isObject(value)) return false
+  if (!['documented', 'partial', 'not_captured', 'unavailable', 'unknown'].includes(String(value.status))) return false
+  if (value.summary !== null && typeof value.summary !== 'string') return false
+  if (value.variable_count !== null && (typeof value.variable_count !== 'number' || value.variable_count < 0)) return false
+  if (!Array.isArray(value.variables) || !isStringArray(value.evidence_ids) || !isStringArray(value.limitations)) return false
+  if (!evidenceStates.includes(String(value.evidence_state) as (typeof evidenceStates)[number])) return false
+  if (value.codebook !== null && (!isObject(value.codebook) || typeof value.codebook.title !== 'string' || typeof value.codebook.url !== 'string')) return false
+  return value.variables.every((variable) => {
+    if (!isObject(variable) || typeof variable.name !== 'string' || typeof variable.description !== 'string') return false
+    if (variable.label !== null && typeof variable.label !== 'string') return false
+    if (variable.data_type !== null && typeof variable.data_type !== 'string') return false
+    if (variable.unit !== null && typeof variable.unit !== 'string') return false
+    return isStringArray(variable.allowed_values) && isStringArray(variable.evidence_ids)
+      && evidenceStates.includes(String(variable.evidence_state) as (typeof evidenceStates)[number])
+  })
+}
+
 function isCanonicalRecord(value: unknown, expectedRecordId: string) {
   if (!isObject(value)) return false
   if (value.schema_version !== 'observatory-record.v1.0.0' || value.record_id !== expectedRecordId || value.record_type !== 'dataset_asset') return false
   if (!isObject(value.identity) || !isObject(value.access) || !isObject(value.geography) || !isObject(value.time_coverage)) return false
   if (!isObject(value.capabilities) || !isObject(value.freshness_verification) || !isObject(value.retrieval) || !isObject(value.join_compatibility)) return false
   if (!Array.isArray(value.provenance) || !Array.isArray(value.evidence) || !Array.isArray(value.unit_of_analysis)) return false
+  if (!hasExplicitVerification(value)) return false
+  if (value.variable_documentation !== undefined && !isVariableDocumentation(value.variable_documentation)) return false
   return typeof value.title === 'string' && typeof value.description === 'string'
 }
 

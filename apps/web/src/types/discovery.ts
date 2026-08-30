@@ -42,6 +42,30 @@ export interface ObservatoryRetrievalStep {
   expected_result: string
 }
 
+export type VariableDocumentationStatus = 'documented' | 'partial' | 'not_captured' | 'unavailable' | 'unknown'
+
+export interface ObservatoryVariable {
+  name: string
+  label: string | null
+  description: string
+  data_type: string | null
+  unit: string | null
+  allowed_values: string[]
+  evidence_state: EvidenceState
+  evidence_ids: string[]
+}
+
+export interface ObservatoryVariableDocumentation {
+  status: VariableDocumentationStatus
+  summary: string | null
+  variable_count: number | null
+  variables: ObservatoryVariable[]
+  codebook: { title: string; url: string } | null
+  evidence_state: EvidenceState
+  evidence_ids: string[]
+  limitations: string[]
+}
+
 export interface ObservatoryRecord {
   schema_version: 'observatory-record.v1.0.0'
   record_id: string
@@ -96,6 +120,7 @@ export interface ObservatoryRecord {
     evidence_ids: string[]
   }
   unit_of_analysis: string[]
+  variable_documentation?: ObservatoryVariableDocumentation
   capabilities: { topics: ObservatoryCapability[]; use_cases: ObservatoryCapability[] }
   access: {
     status: 'public_direct' | 'public_catalog' | 'registration_required' | 'application_required' | 'dua_required' | 'licensed_paid' | 'controlled' | 'temporarily_unavailable' | 'unavailable' | 'unknown'

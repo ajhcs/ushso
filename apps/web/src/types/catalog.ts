@@ -1,4 +1,12 @@
-import type { DiscoveryJoinRoute, DiscoveryResult, DiscoveryResultItem } from './discovery'
+import type {
+  DiscoveryJoinRoute,
+  DiscoveryResult,
+  DiscoveryResultItem,
+  EvidenceState,
+  ObservatoryCapability,
+  ObservatoryVariable,
+  VariableDocumentationStatus,
+} from './discovery'
 
 export type Relevance = 'High' | 'Medium' | 'Low' | 'Browse'
 export type Relationship = 'Confirmed family' | 'Possible relation' | 'Standalone record'
@@ -14,6 +22,48 @@ export interface AccessOption {
   requirements: string[]
 }
 
+export interface DatasetEvidenceSource {
+  provenanceId: string
+  kind: 'first_party_page' | 'catalog_metadata' | 'documentation' | 'fixture_note' | 'other'
+  locator: string
+  observedAt: string
+  captureState: 'captured_hashed' | 'fixture_only' | 'locator_only' | 'unavailable'
+  contentSha256: string | null
+}
+
+export interface DatasetVerificationEvidence {
+  evidenceId: string
+  claim: string
+  state: EvidenceState
+  limitations: string[]
+  sources: DatasetEvidenceSource[]
+}
+
+export interface DatasetVerification {
+  status: 'current_verified' | 'stale' | 'not_live_verified' | 'unknown'
+  method: 'first_party_live' | 'captured_evidence' | 'offline_fixture' | 'unknown'
+  metadataObservedAt: string
+  dataThrough: string | null
+  nextReviewDue: string | null
+  liveVerified: boolean
+  evidence: DatasetVerificationEvidence[]
+}
+
+export interface DatasetVariableDetails {
+  status: VariableDocumentationStatus
+  summary: string | null
+  variableCount: number | null
+  variables: ObservatoryVariable[]
+  codebook: { title: string; url: string } | null
+  unitsOfAnalysis: string[]
+  topics: ObservatoryCapability[]
+  useCases: ObservatoryCapability[]
+  expectedArtifacts: string[]
+  evidenceState: EvidenceState
+  evidenceIds: string[]
+  limitations: string[]
+}
+
 export interface DatasetFamily {
   id: string
   rank: number
@@ -23,7 +73,6 @@ export interface DatasetFamily {
   familySiblingCount: number
   relevance: Relevance
   relationship: Relationship
-  whyMatched: string
   recordType: string
   geographicApplicability: string
   reportingUnit: string
@@ -31,6 +80,8 @@ export interface DatasetFamily {
   availableYears: string
   latestVerifiedRelease: string
   variablesCodebook: string
+  verification: DatasetVerification
+  variableDetails: DatasetVariableDetails
   accessOptions: AccessOption[]
   categories: string[]
   sourceName: string

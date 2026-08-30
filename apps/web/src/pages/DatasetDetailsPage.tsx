@@ -5,6 +5,15 @@ import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { findDatasetInResponse } from '../lib/catalogAdapter'
 import { useDatasetResult } from '../providers/DiscoveryProviderContext'
 
+function formatDate(value: string) {
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeStyle: 'short' }).format(date)
+}
+
+function sentenceCase(value: string) {
+  return value.replace(/[_-]+/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
 export function DatasetDetailsPage() {
   const { datasetId = '' } = useParams()
   const discovery = useDatasetResult(datasetId)
@@ -39,9 +48,11 @@ export function DatasetDetailsPage() {
   }
 
   const dataset = findDatasetInResponse(discovery.result, datasetId)
+
   if (!dataset) return null
 
   const record = dataset.canonicalResult.record
+  const verificationEvidence = dataset.verification.evidence.filter((item) => item.state === 'verified_first_party' && item.sources.length > 0)
   return (
     <div className="details-page">
       <ObservatoryHeader compact />
@@ -54,18 +65,15 @@ export function DatasetDetailsPage() {
         </div>
         <div className="details-grid">
           <section aria-labelledby="details-content-heading">
-            <h2 id="details-content-heading">What this source contains</h2>
+            <h2 id="details-content-heading">Content and coverage</h2>
             <dl className="details-list">
-              <div><dt>Why it matched</dt><dd>{dataset.whyMatched}</dd></div>
               <div><dt>Record type</dt><dd>{dataset.recordType}</dd></div>
               <div><dt>Geographic applicability</dt><dd>{dataset.geographicApplicability}</dd></div>
               <div><dt>Reporting unit</dt><dd>{dataset.reportingUnit}</dd></div>
               <div><dt>Population/facility scope</dt><dd>{dataset.populationFacilityScope}</dd></div>
               <div><dt>Available years</dt><dd>{dataset.availableYears}</dd></div>
-              <div><dt>Latest verified release</dt><dd>{dataset.latestVerifiedRelease}</dd></div>
-              <div><dt>Expected documentation</dt><dd>{dataset.variablesCodebook}</dd></div>
-              <div><dt>Metadata observed</dt><dd>{record.freshness_verification.metadata_observed_at}</dd></div>
-              <div><dt>Known limitations</dt><dd>{record.evidence.flatMap((item) => item.limitations).join(' · ') || 'No limitation statement was captured.'}</dd></div>
+              <div><dt>Data through</dt><dd>{dataset.verification.dataThrough ?? 'Not stated by the source metadata'}</dd></div>
+              <div><dt>Variable documentation</dt><dd>{sentenceCase(dataset.variableDetails.status)}{dataset.variableDetails.variableCount !== null ? ` · ${dataset.variableDetails.variableCount} fields` : ''}</dd></div>
             </dl>
           </section>
           <aside className="details-access" aria-labelledby="details-access-heading">
@@ -77,20 +85,81 @@ export function DatasetDetailsPage() {
                 <p>{option.description}</p>
                 {option.requirements.length > 0 && <p><b>Requirements:</b> {option.requirements.join(', ')}</p>}
                 {option.href ? (
-                  <a href={option.href} target="_blank" rel="noreferrer">Open this step at the authoritative source <ExternalLink aria-hidden="true" /></a>
+                  <a href={option.href} target="_blank" rel="noreferrer">Open authoritative source <ExternalLink aria-hidden="true" /></a>
                 ) : (
-                  <p className="unresolved-link"><Info aria-hidden="true" />This step has no verified direct URL.</p>
+                  <p className="unresolved-link"><Info aria-hidden="true" />Authoritative source URL pending verification.</p>
                 )}
               </div>
             ))}
           </aside>
         </div>
+        <div className="details-evidence-grid">
+          <section className="details-panel" aria-labelledby="verification-heading">
+            <div className="details-panel__heading">
+              <ShieldCheck aria-hidden="true" />
+              <div>
+                <p className="details-panel__eyebrow">{dataset.verification.liveVerified ? 'Live source check passed' : 'Verification incomplete'}</p>
+                <h2 id="verification-heading">Verification evidence</h2>
+              </div>
+            </div>
+            <dl className="details-list">
+              <div><dt>Metadata checked</dt><dd><time dateTime={dataset.verification.metadataObservedAt}>{formatDate(dataset.verification.metadataObservedAt)}</time></dd></div>
+              <div><dt>Method</dt><dd>{sentenceCase(dataset.verification.method)}</dd></div>
+              <div><dt>Data coverage</dt><dd>{dataset.verification.dataThrough ?? dataset.availableYears}</dd></div>
+            </dl>
+            <div className="evidence-claims">
+              {verificationEvidence.map((evidence) => (
+                <article key={evidence.evidenceId}>
+                  <p>{evidence.claim}</p>
+                  <ul>
+                    {evidence.sources.map((source) => (
+                      <li key={source.provenanceId}>
+                        <a href={source.locator} target="_blank" rel="noreferrer">
+                          {source.kind === 'first_party_page' ? 'Open first-party source' : 'Open supporting documentation'} <ExternalLink aria-hidden="true" />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                  {evidence.limitations.length > 0 && <p className="evidence-limit"><b>Boundary:</b> {evidence.limitations.join(' ')}</p>}
+                </article>
+              ))}
+            </div>
+          </section>
 
+          <section className="details-panel" aria-labelledby="variables-heading">
+            <div className="details-panel__heading">
+              <Info aria-hidden="true" />
+              <div>
+                <p className="details-panel__eyebrow">Backend-maintained field guide</p>
+                <h2 id="variables-heading">Variables and what they mean</h2>
+              </div>
+            </div>
+            {dataset.variableDetails.summary && <p className="variable-summary">{dataset.variableDetails.summary}</p>}
+            <dl className="variable-list">
+              {dataset.variableDetails.variables.map((variable) => (
+                <div key={variable.name}>
+                  <dt>{variable.label ?? variable.name}</dt>
+                  <dd>
+                    <p>{variable.description}</p>
+                    <small>{[variable.data_type, variable.unit].filter(Boolean).join(' · ') || 'Source-defined field'}</small>
+                    {variable.allowed_values.length > 0 && <small>Values: {variable.allowed_values.join(', ')}</small>}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            {dataset.variableDetails.codebook && (
+              <a className="codebook-link" href={dataset.variableDetails.codebook.url} target="_blank" rel="noreferrer">
+                Open {dataset.variableDetails.codebook.title} <ExternalLink aria-hidden="true" />
+              </a>
+            )}
+            {dataset.variableDetails.limitations.length > 0 && <p className="evidence-limit"><b>Interpretation limits:</b> {dataset.variableDetails.limitations.join(' ')}</p>}
+          </section>
+        </div>
         <section className="join-routes" aria-labelledby="join-routes-heading">
           <h2 id="join-routes-heading">Documented join routes</h2>
-          <p>Join routes are evidence-bearing candidates, not permission to merge identities. Check keys, cardinality, prerequisites, and caveats before analysis.</p>
+          <p>These routes describe published compatibility evidence. Candidate or ambiguous routes still require validation before analysis.</p>
           {dataset.joinRoutes.length === 0 ? (
-            <div className="join-route"><h3>No route returned for this record</h3><p>{record.join_compatibility.notes.join(' · ') || 'Join compatibility is unknown.'}</p></div>
+            <div className="join-route"><p>No join route is documented for this record.</p></div>
           ) : dataset.joinRoutes.map((route) => (
             <article className="join-route" key={route.route_id}>
               <h3>{route.entity}: {route.compatibility_state}</h3>
@@ -107,7 +176,6 @@ export function DatasetDetailsPage() {
             </article>
           ))}
         </section>
-
         <section className="canonical-evidence" aria-labelledby="canonical-evidence-heading">
           <ShieldCheck aria-hidden="true" />
           <div>
@@ -116,7 +184,7 @@ export function DatasetDetailsPage() {
             <dl>
               <div><dt>Asset ID</dt><dd>{dataset.canonicalResult.record_id}</dd></div>
               <div><dt>Evidence state</dt><dd>{[...new Set(record.evidence.map((item) => item.state))].join(', ')}</dd></div>
-              <div><dt>Freshness state</dt><dd>{record.freshness_verification.verification_status}</dd></div>
+              <div><dt>Verification state</dt><dd>{sentenceCase(record.freshness_verification.verification_status)}</dd></div>
               <div><dt>Retrieval interface</dt><dd>{record.retrieval.preferred_interface}</dd></div>
               <div><dt>Documented join routes</dt><dd>{dataset.joinRoutes.length}</dd></div>
             </dl>

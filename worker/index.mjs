@@ -1,7 +1,9 @@
-import { createRetrievalEngine } from '../packages/retrieval/tools/retrieval-core.mjs';
+import { createRetrievalEngine } from './retrieval-v1.1.0.mjs';
+import { applyLiveVerificationReceipt } from './live-verification.mjs';
 
 const MAX_REQUEST_BYTES = 20 * 1024;
 const CORPUS_BASE = '/corpus-v1.1.0';
+const LIVE_VERIFICATION_RECEIPT = '/verification-v0.1.0/live-verification-2026-08-30.json';
 const catalogByAssets = new WeakMap();
 const SPA_ROUTES = new Set(['/', '/search', '/agents', '/sources', '/about', '/privacy', '/terms', '/contact']);
 const STATIC_PATHS = new Set(['/favicon.svg', '/observatory-lighthouse.png', '/state-readiness-v0.1.0.json', '/_headers']);
@@ -66,14 +68,15 @@ export async function loadCatalogFromAssets(request, env) {
   if (!env?.ASSETS || typeof env.ASSETS.fetch !== 'function') throw new Error('STATIC_ASSET_BINDING_REQUIRED');
   if (!catalogByAssets.has(env.ASSETS)) {
     catalogByAssets.set(env.ASSETS, (async () => {
-      const [recordsText, searchDocumentsText, routesText, vocabularyText, corpusText] = await Promise.all([
+      const [recordsText, searchDocumentsText, routesText, vocabularyText, corpusText, verificationText] = await Promise.all([
         assetText(request, env, `${CORPUS_BASE}/records.jsonl`),
         assetText(request, env, `${CORPUS_BASE}/search-documents.jsonl`),
         assetText(request, env, `${CORPUS_BASE}/join-routes.jsonl`),
         assetText(request, env, `${CORPUS_BASE}/controlled-vocabulary.json`),
-        assetText(request, env, `${CORPUS_BASE}/corpus.json`)
+        assetText(request, env, `${CORPUS_BASE}/corpus.json`),
+        assetText(request, env, LIVE_VERIFICATION_RECEIPT)
       ]);
-      const records = parseJsonl(recordsText, 'records');
+      const records = applyLiveVerificationReceipt(parseJsonl(recordsText, 'records'), JSON.parse(verificationText));
       const searchDocuments = parseJsonl(searchDocumentsText, 'search-documents');
       const joinRoutes = parseJsonl(routesText, 'join-routes');
       const vocabulary = JSON.parse(vocabularyText);
@@ -210,7 +213,7 @@ function isSpaPath(pathname) {
 }
 
 function isStaticPath(pathname) {
-  return STATIC_PATHS.has(pathname) || pathname.startsWith('/assets/') || pathname.startsWith('/corpus/') || pathname.startsWith('/corpus-v1.1.0/');
+  return STATIC_PATHS.has(pathname) || pathname.startsWith('/assets/') || pathname.startsWith('/corpus/') || pathname.startsWith('/corpus-v1.1.0/') || pathname.startsWith('/verification-v0.1.0/');
 }
 
 function machineText(request, pathname) {
@@ -311,7 +314,7 @@ export function createWorker({ loadEngine = loadEngineFromAssets, loadCatalog = 
         return textResponse(machineBody, contentType, { cacheControl: 'public, max-age=300', head });
       }
 
-      if (url.pathname === '/favicon.ico') return Response.redirect(new URL('/favicon.svg', request.url), 308);
+      if (url.pathname === '/favicon.ico') return Response.redirect(new URL('/observatory-lighthouse.png', request.url), 308);
       if (isSpaPath(url.pathname) || isStaticPath(url.pathname)) return env.ASSETS.fetch(request);
 
       return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Not found | USHSO</title></head><body><main><h1>Page not found</h1><p>No page exists at this address.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 404 });

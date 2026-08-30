@@ -1,9 +1,11 @@
-import { buildFacetSections } from '../data/facets'
+import { buildFacetSections, normalizeFacetValue } from '../data/facets'
 import type {
   AccessOption,
   CatalogSearchResponse,
   DatasetFamily,
   DatasetRecord,
+  DatasetVariableDetails,
+  DatasetVerification,
   Relevance,
   Relationship,
 } from '../types/catalog'
@@ -68,7 +70,7 @@ function accessLabel(step: ObservatoryRetrievalStep) {
 }
 
 function accessOptions(record: ObservatoryRecord): AccessOption[] {
-  return record.retrieval.instructions.map((step) => ({
+  return record.retrieval.instructions.slice(0, 2).map((step) => ({
     id: `${record.record_id}:${step.sequence}`,
     label: accessLabel(step),
     description: step.instruction,
@@ -78,27 +80,81 @@ function accessOptions(record: ObservatoryRecord): AccessOption[] {
   }))
 }
 
+function verificationDetails(record: ObservatoryRecord): DatasetVerification {
+  const provenanceById = new Map(record.provenance.map((source) => [source.provenance_id, source]))
+  const evidence = record.evidence.map((item) => ({
+    evidenceId: item.evidence_id,
+    claim: item.claim,
+    state: item.state,
+    limitations: [...item.limitations],
+    sources: item.provenance_ids.flatMap((provenanceId) => {
+      const source = provenanceById.get(provenanceId)
+      if (!source) return []
+      return [{
+        provenanceId: source.provenance_id,
+        kind: source.kind,
+        locator: source.locator,
+        observedAt: source.observed_at,
+        captureState: source.capture_state,
+        contentSha256: source.content_sha256,
+      }]
+    }),
+  }))
+  const freshness = record.freshness_verification
+  return {
+    status: freshness.verification_status,
+    method: freshness.verification_method,
+    metadataObservedAt: freshness.metadata_observed_at,
+    dataThrough: freshness.data_through,
+    nextReviewDue: freshness.next_review_due,
+    liveVerified: freshness.verification_status === 'current_verified' && freshness.verification_method === 'first_party_live',
+    evidence,
+  }
+}
+
+function variableDetails(record: ObservatoryRecord): DatasetVariableDetails {
+  const documentation = record.variable_documentation
+  const relatedLimitations = record.evidence
+    .flatMap((item) => item.limitations)
+    .filter((limitation) => /variable|field|column|codebook|data dictionary/i.test(limitation))
+  const evidenceIds = new Set(documentation?.evidence_ids ?? [])
+  record.capabilities.topics.forEach((topic) => topic.evidence_ids.forEach((id) => evidenceIds.add(id)))
+  record.capabilities.use_cases.forEach((useCase) => useCase.evidence_ids.forEach((id) => evidenceIds.add(id)))
+
+  return {
+    status: documentation?.status ?? 'not_captured',
+    summary: documentation?.summary ?? relatedLimitations[0] ?? null,
+    variableCount: documentation?.variable_count ?? null,
+    variables: documentation ? structuredClone(documentation.variables) : [],
+    codebook: documentation?.codebook ? { ...documentation.codebook } : null,
+    unitsOfAnalysis: [...record.unit_of_analysis],
+    topics: structuredClone(record.capabilities.topics),
+    useCases: structuredClone(record.capabilities.use_cases),
+    expectedArtifacts: [...record.retrieval.expected_artifacts],
+    evidenceState: documentation?.evidence_state ?? 'unresolved',
+    evidenceIds: [...evidenceIds],
+    limitations: documentation ? [...documentation.limitations] : relatedLimitations,
+  }
+}
+
 function dataCategoryFacets(record: ObservatoryRecord) {
-  const joined = record.capabilities.topics.map((topic) => `${topic.id} ${topic.label}`).join(' ').toLowerCase()
-  const values = new Set<string>()
-  if (joined.includes('financial')) values.add('financial')
-  if (joined.includes('utilization')) values.add('utilization')
-  if (joined.includes('quality')) values.add('quality')
-  if (joined.includes('ownership')) values.add('ownership')
-  if (joined.includes('workforce') || joined.includes('staff')) values.add('workforce')
-  if (joined.includes('cost') || joined.includes('price') || joined.includes('charge')) values.add('costs-charges')
-  if (joined.includes('capacity') || joined.includes('provider') || joined.includes('facility')) values.add('hospital-characteristics')
-  return [...values]
+  return [...new Set(record.capabilities.topics
+    .map((topic) => normalizeFacetValue(topic.id || topic.label))
+    .filter(Boolean))]
 }
 
 function geographyFacets(record: ObservatoryRecord) {
   const values = new Set<string>()
-  if (record.geography.jurisdictions.includes('US-PA')) values.add('pennsylvania')
-  if (record.geography.jurisdictions.includes('US')) {
-    values.add('national')
-    values.add('other-states')
+  for (const jurisdiction of record.geography.jurisdictions) {
+    if (jurisdiction === 'US-PA') values.add('pennsylvania')
+    else if (jurisdiction === 'US') {
+      values.add('national')
+      values.add('other-states')
+    } else {
+      values.add(normalizeFacetValue(jurisdiction))
+    }
   }
-  return [...values]
+  return values.size > 0 ? [...values] : ['unknown']
 }
 
 function accessFacets(record: ObservatoryRecord) {
@@ -115,14 +171,26 @@ function accessFacets(record: ObservatoryRecord) {
 }
 
 function unitFacets(record: ObservatoryRecord) {
-  const values = new Set<string>()
-  record.unit_of_analysis.forEach((unit) => {
-    if (unit === 'hospital' || unit === 'facility') values.add('hospital')
-    if (unit === 'health_system') values.add('health-system')
-    if (unit === 'provider') values.add('provider')
-    if (unit === 'facility' && record.time_coverage.temporal_granularity !== 'not_applicable') values.add('facility-period')
-  })
-  return [...values]
+  const values = new Set(record.unit_of_analysis.map(normalizeFacetValue).filter(Boolean))
+  if (values.has('facility') && record.time_coverage.temporal_granularity !== 'not_applicable') values.add('facility-period')
+  return values.size > 0 ? [...values] : ['unknown']
+}
+
+function yearFacets(record: ObservatoryRecord) {
+  const start = Number(record.time_coverage.start?.match(/^\d{4}/)?.[0])
+  const end = Number(record.time_coverage.end?.match(/^\d{4}/)?.[0])
+  if (Number.isInteger(start) && Number.isInteger(end) && end >= start && end - start <= 200) {
+    return Array.from({ length: end - start + 1 }, (_, index) => String(start + index))
+  }
+  const years = [...new Set([start, end].filter(Number.isInteger).map(String))]
+  return years.length > 0 ? years : ['unknown']
+}
+
+function variableDocumentationFacets(record: ObservatoryRecord) {
+  const documentation = record.variable_documentation
+  if (documentation?.codebook) return ['codebook-linked']
+  if (documentation && documentation.status !== 'not_captured') return [normalizeFacetValue(documentation.status)]
+  return ['not-documented']
 }
 
 function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, familyCount: number): DatasetRecord {
@@ -134,6 +202,8 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
   const latestRelease = record.freshness_verification.data_through
     ? `${record.freshness_verification.data_through} (${sentenceCase(record.freshness_verification.verification_status)})`
     : sentenceCase(record.freshness_verification.verification_status)
+  const verification = verificationDetails(record)
+  const variables = variableDetails(record)
   const id = recordIdForRoute(record.record_id)
 
   return {
@@ -145,14 +215,15 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
     familySiblingCount: Math.max(0, familyCount - 1),
     relevance: response.query.filters.mode === 'catalog_browse' ? 'Browse' : presentationRelevance(result),
     relationship: relationshipLabel(record),
-    whyMatched: result.relevance.why_relevant[0] ?? 'Matched canonical discovery metadata',
     recordType: sentenceCase(record.identity.asset.asset_type),
     geographicApplicability: geographyDisplay(record),
     reportingUnit: units.join(', ') || 'Unit unresolved',
     populationFacilityScope: units.join(', ') || 'Scope unresolved',
     availableYears: timeDisplay(record),
     latestVerifiedRelease: latestRelease,
-    variablesCodebook: record.retrieval.expected_artifacts.join(' · ') || 'Documentation unresolved',
+    variablesCodebook: variables.summary ?? variables.expectedArtifacts.join(' · '),
+    verification,
+    variableDetails: variables,
     accessOptions: accessOptions(record),
     categories: topics,
     sourceName: record.identity.source.name,
@@ -163,6 +234,11 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
       geography: geographyFacets(record),
       access: accessFacets(record),
       'reporting-unit': unitFacets(record),
+      years: yearFacets(record),
+      'variables-codebook': variableDocumentationFacets(record),
+      'record-type': [normalizeFacetValue(record.identity.asset.asset_type)],
+      source: [normalizeFacetValue(record.identity.source.source_id)],
+      verification: [normalizeFacetValue(record.freshness_verification.verification_status)],
     },
     parentFamilyId: record.identity.family.family_id,
     canonicalResult: result,

@@ -89,12 +89,12 @@ export function SearchResultsPage() {
   }
 
   const filteredFamilies = useMemo(
-    () => orderCatalogViews(filterCatalog(catalog?.families ?? [], state.filters), state.sort),
-    [catalog, state.filters, state.sort],
+    () => orderCatalogViews(filterCatalog(catalog?.families ?? [], state.filters), state.sort, state.q),
+    [catalog, state.filters, state.q, state.sort],
   )
   const filteredRecords = useMemo(
-    () => orderCatalogViews(filterCatalog(catalog?.records ?? [], state.filters), state.sort),
-    [catalog, state.filters, state.sort],
+    () => orderCatalogViews(filterCatalog(catalog?.records ?? [], state.filters), state.sort, state.q),
+    [catalog, state.filters, state.q, state.sort],
   )
   const activeItems = state.group === 'family' ? filteredFamilies : filteredRecords
   const facetItems = state.group === 'family' ? catalog?.families ?? [] : catalog?.records ?? []
