@@ -11,7 +11,23 @@ This is a review of the current production website for **human** researchers and
 - Read the search, details, header/footer, facet, and provider code.
 - Probed production HTTP behavior (status codes, headers, robots, sitemap, favicon, CORS, HEAD vs GET).
 - Ran representative discovery queries against the live API.
-- A full visual walk (desktop + mobile, keyboard, empty/error paths) is recorded in the pull request walkthrough.
+- Walked the live site on desktop and a 375–414px phone: landing, suggestions, results (sort, group, facets, pagination), details, empty state, 404, and every stub page, plus the mobile menu and filter drawer.
+
+## Visual walk, reconciled with source
+
+The browser walk confirmed the core journey works: search suggestions and arrow keys, sort/group without reload, details sections, hamburger and filter drawer, and no horizontal scroll on a phone.
+
+It also confirmed several code findings and corrected two easy misreads:
+
+| Observation in the browser | What the source / HTTP actually show |
+| --- | --- |
+| Landing footer has no About / Privacy / Terms / Contact | True. Those links render only when `ObservatoryFooter` is passed `results` (search and successful details). `/about`, `/sources`, `/agents`, and other stubs use the same slim footer as home. |
+| “Refine results” on a phone shows a badge **1** with no obvious user filter | That badge is the silent `geography:pennsylvania` filter after a PA-interpreted question (finding 2). |
+| `/datasets/cms-hcris-hospital-cost-reports` loads without `?q=` | Coincidence. Missing `q` falls back to the Pennsylvania finance demo query, which includes HCRIS. A record that is not in that result set still 404s (finding 4). |
+| Empty state copy looks fine | The visible string is always “No returned results match these filters,” including genuine corpus zeros. The API warning is still hidden (finding 1). |
+| `/agents` “has an example” | It names `POST /api/discover` only. There is no request body, response, auth, or CORS note. Do **not** document “CORS enabled for all origins”: `OPTIONS` is 405 and there is no `Access-Control-Allow-Origin`. |
+| Body text “looks ≥14px” | Result cards, facets, footnotes, and pager are **9.2–11px** in CSS. Comfortable-looking navy-on-white still fails readable-size guidance. |
+| Non-PA query “Medicare hospital quality” does not check Pennsylvania | Correct. Auto-filter runs only when interpretation includes `US-PA`. |
 
 ## What works
 
@@ -97,7 +113,7 @@ Visiting `/search` with no `q` substitutes
 **Who:** H, A  
 **Where:** `DatasetDetailsPage.tsx`, `catalogAdapter.ts` `detailsUrl`
 
-Details URLs look like `/datasets/{id}?q=...`. The page re-runs discovery for `q` (or `DEMO_QUERY` if `q` is missing) and 404s the record if it was not in that result set. A shared or bookmarked asset URL is unstable. Agents cannot fetch a record by id.
+Details URLs look like `/datasets/{id}?q=...`. The page re-runs discovery for `q` (or `DEMO_QUERY` if `q` is missing) and 404s the record if it was not in that result set. Opening CMS HCRIS without `q` appears to work only because that asset is in the demo response. A shared or bookmarked asset URL is otherwise unstable. Agents cannot fetch an arbitrary record by id.
 
 **Fix**
 
@@ -174,7 +190,7 @@ Four cards per page (`PAGE_SIZE = 4`) plus this density forces pagination instea
 - Floor UI text at 14px (16px body). Raise card metadata to 13–14px.
 - Increase `PAGE_SIZE` to 8–10, or use a compact/comfortable density toggle.
 - Darken disabled facet text or mark disabled options as “0 — none in these results” with sufficient contrast.
-- Paginate with ellipses; do not render every page button.
+- Paginate with ellipses; do not render every page button. Add “Page X of Y” or “1–10 of N” (the live pager lists numbered buttons only).
 
 ### 8. Copy overpromises “public health data” and “open the data”
 
@@ -342,7 +358,7 @@ The information architecture is search-first, but the first nav item is Explore 
 - “Newest release” sorts the display string (`2022 (Verified)`), which is brittle.
 - Rank numbers restart per page correctly, but with 4 items the list feels like a carousel.
 
-**Fix:** Hide pager when `pageCount === 1`. Sort on `data_through` / a parsed date. Raise page size (see P1).
+**Fix:** Hide pager when `pageCount === 1`. Sort on `data_through` / a parsed date. Raise page size (see P1). Show “Page X of Y” next to the numbered buttons.
 
 ### 21. Logo image is not in the obvious public listing during some checkouts
 
@@ -360,6 +376,7 @@ Production serves `/observatory-lighthouse.png`. The file is tracked as `apps/we
 - `prefers-reduced-motion` is already honored; keep it when adding traps/overlays.
 - A small “corpus version” stamp in the footer for agents that only scrape HTML.
 - GET-able discovery URLs for the API (see P0).
+- Shorten the landing placeholder on narrow widths (“What data do you need?”) so it does not clip.
 
 ---
 
@@ -397,7 +414,7 @@ None of these require changing the retrieval engine. Items 1–3 are UI/Worker o
 
 - `/search` with no `q` does not run the Pennsylvania demo.
 - Nonsense query shows the API zero-result warning, not “clear filters.”
-- `/datasets/cms-hcris-hospital-cost-reports` works without `?q=`.
+- Any `/datasets/:id` in the corpus works without `?q=` (not only records that appear in the Pennsylvania demo).
 - `curl -I https://ushso.org/api/health` → 200.
 - `curl -s https://ushso.org/llms.txt` is text, not HTML.
 - `curl -sI https://ushso.org/not-a-page` → 404.
