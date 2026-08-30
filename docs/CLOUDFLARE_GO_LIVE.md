@@ -1,6 +1,8 @@
-# Cloudflare go-live checklist for USHSO.org
+# Cloudflare release and rollback record for USHSO.org
 
-The checked-in configuration is a deployment candidate, not production authorization. It has no custom-domain route and no account credentials.
+The checked-in configuration routes `ushso.org` to the `ushso` Cloudflare Worker.
+Credentials are never committed. The former origin remains intact so the custom-domain
+route can be removed without rebuilding the previous service.
 
 ## Already prepared
 
@@ -11,16 +13,28 @@ The checked-in configuration is a deployment candidate, not production authoriza
 - Bounded JSON request size, typed client errors, no LLM or external-source fetch from the request path.
 - Wrangler dry-run command and CI gate.
 
-## Required before production activation
+## Production gate
 
-1. Retrieval corpus validation receipt is `PASS`, and the 60-question evaluation report is reviewed.
-2. Frontend contract, accessibility, desktop, and mobile tests pass against the generated corpus response—not a handwritten source fixture.
-3. `npm audit` and repository secret/large-file scans are reviewed.
-4. `wrangler whoami` confirms the intended Cloudflare account and access to the `ushso.org` zone.
-5. A preview deployment passes `/`, deep-link SPA fallback, `/api/health`, `/api/contract`, and representative `/api/discover` smoke tests.
-6. Caching, observability retention, privacy copy, contact channel, terms, and the repository license decision are approved.
-7. The owner explicitly authorizes production deployment and DNS/custom-domain attachment.
+Before activation on 2026-08-30:
 
-## Production change held behind the gate
+- Retrieval corpus validation, all package tests, the 60-question evaluation run,
+  production build, dependency audit, and repository release audit passed.
+- Desktop and mobile browser QA passed against the accepted generated response.
+- `wrangler whoami` confirmed the intended account and access to the `ushso.org` zone.
+- The Worker preview passed root, deep-link fallback, health, contract, representative
+  discovery, zero-result, media-type, malformed-body, and request-size checks.
+- No application analytics or Worker observability are enabled. The application has
+  no accounts and deliberately persists no search questions.
+- Public privacy, terms, contact, security, and all-rights-reserved license notices are present.
+- The owner explicitly authorized production activation and replacement of the existing
+  `ushso.org` service.
 
-After approval, attach `ushso.org` as a Worker custom domain in a production-specific Wrangler configuration or the Cloudflare dashboard, verify the generated DNS record, then repeat the smoke tests against the public hostname. Do not reuse a preview token in production and do not commit Cloudflare credentials.
+## Rollback
+
+1. Remove the `ushso.org` custom-domain route from `wrangler.jsonc` and deploy the
+   prior known-good Worker configuration, or remove that route in the Cloudflare dashboard.
+2. Confirm the pre-existing origin/DNS path is active again.
+3. Repeat HTTP and application smoke tests against `https://ushso.org`.
+
+Do not delete or mutate the former origin as part of a Worker rollback. Cloudflare
+credentials and preview tokens must remain outside the repository.

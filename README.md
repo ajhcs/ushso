@@ -35,7 +35,9 @@ npm run build
 npm run cf:dry-run
 ```
 
-No command above performs a production deployment. The Cloudflare configuration has no `ushso.org` custom-domain route. See [Cloudflare go-live checklist](docs/CLOUDFLARE_GO_LIVE.md).
+The checked-in Cloudflare configuration serves the application at `ushso.org`. Only
+`npm run cf:deploy` mutates the deployed Worker; the verification commands above do
+not. See the [Cloudflare release and rollback record](docs/CLOUDFLARE_GO_LIVE.md).
 
 ## Access and safety
 
