@@ -120,18 +120,13 @@ export function SearchResultsPage() {
     updateState({ q: editQuery.trim(), page: 1, filters: [] })
   }
 
-  const familyCount = filteredFamilies.length
-  const sourceCount = new Set(activeItems.map((item) => item.sourceName)).size
   const bounds = discovery.status === 'ready' ? discoveryBounds(discovery.result) : null
   const countParts = bounds
     ? formatDiscoveryCountSummary({
       returnedCount: bounds.returnedCount,
       hasMore: bounds.hasMore,
-      familyCount,
-      sourceCount,
       filteredRecordCount: filteredRecords.length,
       filtersActive: state.filters.length > 0,
-      group: state.group,
     })
     : []
 

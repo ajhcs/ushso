@@ -50,16 +50,11 @@ describe('result count copy', () => {
     expect(formatDiscoveryCountSummary({
       returnedCount: 50,
       hasMore: true,
-      familyCount: 40,
-      sourceCount: 18,
       filteredRecordCount: 50,
       filtersActive: false,
-      group: 'family',
     })).toEqual([
       '50 returned records',
       'more matches exist',
-      '40 families in this response',
-      '18 sources in this response',
     ])
   })
 
@@ -67,14 +62,10 @@ describe('result count copy', () => {
     expect(formatDiscoveryCountSummary({
       returnedCount: 50,
       hasMore: true,
-      familyCount: 4,
-      sourceCount: 3,
       filteredRecordCount: 6,
       filtersActive: true,
-      group: 'record',
     })).toEqual([
       '6 of 50 returned records match these filters',
-      '3 sources in this response',
     ])
   })
 })
