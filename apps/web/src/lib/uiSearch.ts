@@ -1,18 +1,26 @@
 import type { DatasetFamily, SortMode } from '../types/catalog'
 
-export const DEMO_QUERY = 'hospital financial and utilization data for Pennsylvania'
-
-export const DEMO_SUGGESTIONS = [
-  'Pennsylvania hospital financial data',
-  'Pennsylvania hospital utilization data',
-  'CMS HCRIS cost reports',
-  'Pennsylvania hospital discharge data',
-  'Medicare provider and hospital datasets',
+const SUGGESTION_CATALOG = [
+  'Hospital financial and utilization data in California',
+  'CMS HCRIS hospital cost reports by state',
+  'Hospital ownership changes and enrollments in Texas',
+  'Rural hospital classifications and closures in Kansas',
+  'Hospital quality and workforce data in New York',
+  'Medicare provider enrollment data by state',
+  'Hospital capacity and service availability in Florida',
+  'Pennsylvania hospital discharge and utilization data',
+  'HRSA workforce shortage areas by state',
+  'Census geography crosswalks for hospital service areas',
 ]
 
 export function getSuggestions(query: string) {
-  if (!query.trim()) return []
-  return [...DEMO_SUGGESTIONS]
+  const tokens = [...new Set(query.toLowerCase().match(/[a-z0-9]+/g)?.filter((token) => token.length > 2) ?? [])]
+  if (!tokens.length) return []
+  return SUGGESTION_CATALOG
+    .map((suggestion, index) => ({ suggestion, index, score: tokens.filter((token) => suggestion.toLowerCase().includes(token)).length }))
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .slice(0, 5)
+    .map(({ suggestion }) => suggestion)
 }
 
 export function getGroupingDescription(group: 'family' | 'record') {

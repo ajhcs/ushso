@@ -8,6 +8,12 @@ describe('search URL state', () => {
     expect(state.filters).toEqual([])
   })
 
+  it('uses an honest browse state when no question is present', () => {
+    const state = readSearchState(new URLSearchParams())
+    expect(state.q).toBe('')
+    expect(writeSearchState(state).has('q')).toBe(false)
+  })
+
   it('round-trips explicit ungrouped and cleared-filter state', () => {
     const encoded = writeSearchState({ q: 'hospital data', group: 'record', sort: 'title', page: 3, filters: [] })
     expect(readSearchState(encoded)).toEqual({ q: 'hospital data', group: 'record', sort: 'title', page: 3, filters: [] })

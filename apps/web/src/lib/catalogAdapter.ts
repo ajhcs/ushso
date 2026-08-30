@@ -68,7 +68,7 @@ function accessLabel(step: ObservatoryRetrievalStep) {
 }
 
 function accessOptions(record: ObservatoryRecord): AccessOption[] {
-  return record.retrieval.instructions.slice(0, 2).map((step) => ({
+  return record.retrieval.instructions.map((step) => ({
     id: `${record.record_id}:${step.sequence}`,
     label: accessLabel(step),
     description: step.instruction,
@@ -95,7 +95,7 @@ function geographyFacets(record: ObservatoryRecord) {
   const values = new Set<string>()
   if (record.geography.jurisdictions.includes('US-PA')) values.add('pennsylvania')
   if (record.geography.jurisdictions.includes('US')) {
-    values.add('pennsylvania')
+    values.add('national')
     values.add('other-states')
   }
   return [...values]
@@ -142,7 +142,8 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
     title: record.title,
     description: record.description,
     familyStatus,
-    relevance: presentationRelevance(result),
+    familySiblingCount: Math.max(0, familyCount - 1),
+    relevance: response.query.filters.mode === 'catalog_browse' ? 'Browse' : presentationRelevance(result),
     relationship: relationshipLabel(record),
     whyMatched: result.relevance.why_relevant[0] ?? 'Matched canonical discovery metadata',
     recordType: sentenceCase(record.identity.asset.asset_type),
@@ -156,7 +157,7 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
     categories: topics,
     sourceName: record.identity.source.name,
     sourceUrl: record.authoritative_url,
-    detailsUrl: `/datasets/${encodeURIComponent(id)}?q=${encodeURIComponent(response.query.question)}`,
+    detailsUrl: `/datasets/${encodeURIComponent(id)}`,
     facetValues: {
       'data-category': dataCategoryFacets(record),
       geography: geographyFacets(record),
@@ -175,7 +176,12 @@ export function adaptDiscoveryResponse(response: DiscoveryResult): CatalogSearch
     counts.set(familyId, (counts.get(familyId) ?? 0) + 1)
     return counts
   }, new Map())
-  const records = response.results.map((result) => resultToView(result, response, familyCounts.get(result.record.identity.family.family_id) ?? 1))
+  const directSiblingCount = Number(response.query.filters.family_sibling_count)
+  const records = response.results.map((result) => {
+    const returnedFamilyCount = familyCounts.get(result.record.identity.family.family_id) ?? 1
+    const familyCount = Number.isInteger(directSiblingCount) && directSiblingCount >= 0 ? directSiblingCount + 1 : returnedFamilyCount
+    return resultToView(result, response, familyCount)
+  })
   const byFamily = new Map<string, DatasetFamily>()
   records.forEach((record) => {
     const familyId = record.canonicalResult.record.identity.family.family_id

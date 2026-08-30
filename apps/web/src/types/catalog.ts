@@ -1,6 +1,6 @@
 import type { DiscoveryJoinRoute, DiscoveryResult, DiscoveryResultItem } from './discovery'
 
-export type Relevance = 'High' | 'Medium' | 'Low'
+export type Relevance = 'High' | 'Medium' | 'Low' | 'Browse'
 export type Relationship = 'Confirmed family' | 'Possible relation' | 'Standalone record'
 export type GroupMode = 'family' | 'record'
 export type SortMode = 'best' | 'title' | 'newest'
@@ -20,6 +20,7 @@ export interface DatasetFamily {
   title: string
   description: string
   familyStatus: 'Family' | 'Single-record family'
+  familySiblingCount: number
   relevance: Relevance
   relationship: Relationship
   whyMatched: string

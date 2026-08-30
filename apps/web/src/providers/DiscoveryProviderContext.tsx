@@ -25,7 +25,10 @@ export function useDiscoveryResult(question: string): DiscoveryLoadState {
   useEffect(() => {
     const controller = new AbortController()
     setState({ status: 'loading', result: null, error: null })
-    provider.discover({ question, limit: 50 }, { signal: controller.signal }).then(
+    const request = question.trim()
+      ? provider.discover({ question, limit: 50 }, { signal: controller.signal })
+      : provider.browse({ signal: controller.signal })
+    request.then(
       (result) => setState({ status: 'ready', result, error: null }),
       (error: unknown) => {
         if (controller.signal.aborted) return
@@ -37,6 +40,29 @@ export function useDiscoveryResult(question: string): DiscoveryLoadState {
     )
     return () => controller.abort()
   }, [provider, question])
+
+  return state
+}
+
+export function useDatasetResult(datasetId: string): DiscoveryLoadState {
+  const provider = useDiscoveryProvider()
+  const [state, setState] = useState<DiscoveryLoadState>({ status: 'loading', result: null, error: null })
+
+  useEffect(() => {
+    const controller = new AbortController()
+    setState({ status: 'loading', result: null, error: null })
+    provider.dataset(datasetId, { signal: controller.signal }).then(
+      (result) => setState({ status: 'ready', result, error: null }),
+      (error: unknown) => {
+        if (controller.signal.aborted) return
+        const providerError = error instanceof DiscoveryProviderError
+          ? error
+          : new DiscoveryProviderError('invalid_contract', 'The discovery provider returned an unexpected error.')
+        setState({ status: 'error', result: null, error: providerError })
+      },
+    )
+    return () => controller.abort()
+  }, [datasetId, provider])
 
   return state
 }

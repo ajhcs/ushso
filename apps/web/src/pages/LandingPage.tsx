@@ -20,7 +20,7 @@ export function LandingPage() {
       <main id="main-content">
         <section className="landing-hero" aria-labelledby="landing-title">
           <div className="landing-hero__inner">
-            <h1 id="landing-title">Find the public health data<br />{' '}that answers your question.</h1>
+            <h1 id="landing-title">Find the health-systems data<br />{' '}that answers your question.</h1>
             <span className="gold-rule" aria-hidden="true" />
             <p>Discover what data exists, where it lives, what it contains,<br />and how to access it.</p>
             <SearchBox initialQuery={params.get('q') ?? ''} onSubmit={search} />

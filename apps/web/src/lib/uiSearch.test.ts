@@ -2,15 +2,20 @@ import { describe, expect, it } from 'vitest'
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
 import { assertDiscoveryResult } from '../providers/discoveryProvider'
 import { adaptDiscoveryResponse } from './catalogAdapter'
-import { DEMO_SUGGESTIONS, filterCatalog, getGroupingDescription, getSuggestions, orderCatalogViews } from './uiSearch'
+import { filterCatalog, getGroupingDescription, getSuggestions, orderCatalogViews } from './uiSearch'
 
 const acceptedResponse = await loadAcceptedDiscoveryFixture()
 assertDiscoveryResult(acceptedResponse)
 const catalog = adaptDiscoveryResponse(acceptedResponse)
 
 describe('local UI search helpers', () => {
-  it('returns the deterministic demo suggestions in the approved order', () => {
-    expect(getSuggestions('hospital financial Pennsylvania')).toEqual(DEMO_SUGGESTIONS)
+  it('returns deterministic suggestions that respond to the user input', () => {
+    const financial = getSuggestions('hospital financial Pennsylvania')
+    const workforce = getSuggestions('workforce shortage areas')
+    expect(financial).toHaveLength(5)
+    expect(financial[0]).toContain('financial')
+    expect(workforce[0]).toContain('workforce')
+    expect(workforce).not.toEqual(financial)
   })
 
   it('describes the active grouping mode accurately', () => {

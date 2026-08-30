@@ -14,7 +14,7 @@ export function readSearchState(params: URLSearchParams): SearchRouteState {
   const rawPage = Number.parseInt(params.get('page') ?? '1', 10)
   const filters = params.getAll('filter')
   return {
-    q: params.get('q')?.trim() || 'hospital financial and utilization data for Pennsylvania',
+    q: params.get('q')?.trim() ?? '',
     group: params.get('group') === 'record' ? 'record' : 'family',
     sort: validSorts.includes(params.get('sort') as SortMode) ? (params.get('sort') as SortMode) : 'best',
     page: Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1,
@@ -24,7 +24,7 @@ export function readSearchState(params: URLSearchParams): SearchRouteState {
 
 export function writeSearchState(state: SearchRouteState) {
   const params = new URLSearchParams()
-  params.set('q', state.q)
+  if (state.q.trim()) params.set('q', state.q.trim())
   params.set('group', state.group)
   params.set('sort', state.sort)
   params.set('page', String(state.page))

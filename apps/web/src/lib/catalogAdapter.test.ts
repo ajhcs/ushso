@@ -44,4 +44,17 @@ describe('canonical discovery response adapter', () => {
       sources: sourceIds.size,
     })
   })
+
+  it('builds stable details routes that do not depend on the discovery question', () => {
+    const adapted = adaptDiscoveryResponse(acceptedResponse)
+    expect(adapted.records.every((record) => !record.detailsUrl.includes('?q='))).toBe(true)
+  })
+
+  it('does not silently label national records as Pennsylvania records', () => {
+    const adapted = adaptDiscoveryResponse(acceptedResponse)
+    const national = adapted.records.find((record) => record.canonicalResult.record.geography.jurisdictions.includes('US'))
+    expect(national).toBeDefined()
+    expect(national?.facetValues.geography).toContain('national')
+    expect(national?.facetValues.geography).not.toContain('pennsylvania')
+  })
 })

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/retrieval/v1.0.0/discovery-query.schema.json",
+  "title": "Observatory deterministic discovery query",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["question"],
+  "properties": {
+    "question": {"type":"string","minLength":3,"maxLength":500},
+    "geography": {
+      "type":"object",
+      "additionalProperties":false,
+      "properties": {
+        "codes":{"type":"array","uniqueItems":true,"items":{"type":"string","minLength":2,"maxLength":20}},
+        "levels":{"type":"array","uniqueItems":true,"items":{"enum":["national","multi_state","state","county","facility","mixed","unknown"]}}
+      }
+    },
+    "subjects":{"type":"array","uniqueItems":true,"items":{"type":"string","minLength":1,"maxLength":80}},
+    "units_of_analysis":{"type":"array","uniqueItems":true,"items":{"type":"string","minLength":1,"maxLength":80}},
+    "access_statuses":{"type":"array","uniqueItems":true,"items":{"type":"string","minLength":1,"maxLength":80}},
+    "include_restricted":{"type":"boolean","default":true},
+    "time_window": {
+      "type":"object",
+      "additionalProperties":false,
+      "properties": {
+        "start_year":{"type":"integer","minimum":1800,"maximum":2200},
+        "end_year":{"type":"integer","minimum":1800,"maximum":2200}
+      }
+    },
+    "limit":{"type":"integer","minimum":1,"maximum":50,"default":10}
+  }
+}

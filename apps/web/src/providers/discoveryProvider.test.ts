@@ -43,6 +43,19 @@ describe('DiscoveryProvider contract', () => {
     }))
   })
 
+  it('uses dedicated catalog and stable-record GET routes', async () => {
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify(acceptedResponse), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    }))
+    const provider = new ApiDiscoveryProvider('/api/discover', fetchImpl)
+    await provider.browse()
+    await provider.dataset('obs:asset:example')
+
+    expect(fetchImpl).toHaveBeenNthCalledWith(1, '/api/catalog?limit=200&corpus=1.1.0', expect.objectContaining({ method: 'GET' }))
+    expect(fetchImpl).toHaveBeenNthCalledWith(2, '/api/datasets/obs%3Aasset%3Aexample', expect.objectContaining({ method: 'GET' }))
+  })
+
   it('rejects a response that does not preserve the canonical result contract', () => {
     expect(() => assertDiscoveryResult({ contract_version: 'invented-ui-contract' })).toThrowError(DiscoveryProviderError)
   })

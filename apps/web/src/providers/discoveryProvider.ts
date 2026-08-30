@@ -12,10 +12,12 @@ export interface DiscoveryProvider {
   readonly kind: DiscoveryProviderKind
   readonly promotionState: DiscoveryProviderPromotionState
   discover(query: DiscoveryQuery, options?: DiscoveryRequestOptions): Promise<DiscoveryResult>
+  browse(options?: DiscoveryRequestOptions): Promise<DiscoveryResult>
+  dataset(id: string, options?: DiscoveryRequestOptions): Promise<DiscoveryResult>
 }
 
 export class DiscoveryProviderError extends Error {
-  constructor(readonly code: 'aborted' | 'fixture_query_unavailable' | 'http_error' | 'invalid_contract', message: string) {
+  constructor(readonly code: 'aborted' | 'fixture_query_unavailable' | 'record_not_found' | 'http_error' | 'invalid_contract', message: string) {
     super(message)
     this.name = 'DiscoveryProviderError'
   }
@@ -122,6 +124,41 @@ export class FixtureDiscoveryProvider implements DiscoveryProvider {
     }
     return structuredClone(response)
   }
+
+  async browse(options: DiscoveryRequestOptions = {}) {
+    if (options.signal?.aborted) throw abortError()
+    const response = structuredClone(await this.load())
+    if (options.signal?.aborted) throw abortError()
+    response.query = {
+      question: 'Browse published health systems data',
+      normalized_question: 'browse published health systems data',
+      interpretation: {
+        ...response.query.interpretation,
+        geographies: [],
+        subjects: [],
+        units_of_analysis: [],
+        time_window: null,
+      },
+      filters: { mode: 'catalog_browse' },
+    }
+    response.warnings = ['Fixture browse mode lists the accepted published records; order does not imply relevance or quality.', ...response.warnings]
+    return response
+  }
+
+  async dataset(id: string, options: DiscoveryRequestOptions = {}) {
+    if (options.signal?.aborted) throw abortError()
+    const response = structuredClone(await this.load())
+    if (options.signal?.aborted) throw abortError()
+    const result = response.results.find((item) => item.record_id === id || item.record_id === `obs:asset:${id}` || item.record_id.replace(/^obs:asset:/, '') === id)
+    if (!result) throw new DiscoveryProviderError('record_not_found', 'No published record has this identifier.')
+    response.query.question = `Open dataset ${result.record_id}`
+    response.query.normalized_question = response.query.question.toLowerCase()
+    response.query.filters = { mode: 'stable_dataset_dereference', record_id: result.record_id, family_sibling_count: 0 }
+    response.results = [{ ...result, rank: 1 }]
+    response.result_count = 1
+    response.join_routes = response.join_routes.filter((route) => route.from_record_id === result.record_id || route.to_record_id === result.record_id)
+    return response
+  }
 }
 
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
@@ -135,25 +172,43 @@ export class ApiDiscoveryProvider implements DiscoveryProvider {
     private readonly fetchImpl: FetchLike = globalThis.fetch.bind(globalThis),
   ) {}
 
-  async discover(query: DiscoveryQuery, options: DiscoveryRequestOptions = {}) {
+  private apiPath(resource: string) {
+    return this.endpoint.endsWith('/discover')
+      ? `${this.endpoint.slice(0, -'/discover'.length)}/${resource}`
+      : `/api/${resource}`
+  }
+
+  private async requestJson(input: RequestInfo | URL, init: RequestInit, options: DiscoveryRequestOptions) {
     let response: Response
     try {
-      response = await this.fetchImpl(this.endpoint, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', accept: 'application/json' },
-        body: JSON.stringify(query),
-        signal: options.signal,
-      })
+      response = await this.fetchImpl(input, { ...init, signal: options.signal })
     } catch (error) {
       if (options.signal?.aborted || (error instanceof DOMException && error.name === 'AbortError')) throw abortError()
       throw new DiscoveryProviderError('http_error', 'The discovery service could not be reached.')
     }
     if (!response.ok) {
+      if (response.status === 404) throw new DiscoveryProviderError('record_not_found', 'No published record has this identifier.')
       throw new DiscoveryProviderError('http_error', `The discovery service returned HTTP ${response.status}.`)
     }
     const value: unknown = await response.json()
     assertDiscoveryResult(value)
     return structuredClone(value)
+  }
+
+  async discover(query: DiscoveryQuery, options: DiscoveryRequestOptions = {}) {
+    return this.requestJson(this.endpoint, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', accept: 'application/json' },
+        body: JSON.stringify(query),
+      }, options)
+  }
+
+  async browse(options: DiscoveryRequestOptions = {}) {
+    return this.requestJson(this.apiPath('catalog?limit=200&corpus=1.1.0'), { method: 'GET', headers: { accept: 'application/json' } }, options)
+  }
+
+  async dataset(id: string, options: DiscoveryRequestOptions = {}) {
+    return this.requestJson(this.apiPath(`datasets/${encodeURIComponent(id)}`), { method: 'GET', headers: { accept: 'application/json' } }, options)
   }
 }
 

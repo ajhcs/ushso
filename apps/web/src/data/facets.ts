@@ -21,6 +21,7 @@ const facetDefinitions: FacetSectionConfig[] = [
     id: 'geography',
     label: 'Geography',
     options: [
+      { value: 'national', label: 'National', count: 0 },
       { value: 'pennsylvania', label: 'Pennsylvania', count: 0 },
       { value: 'other-states', label: 'Other states', count: 0 },
     ],

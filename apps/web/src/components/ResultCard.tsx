@@ -62,7 +62,7 @@ export function ResultCard({ result, displayRank }: ResultCardProps) {
         <span className="result-card__rank">{displayRank}</span>
         <strong>{result.familyStatus}</strong>
         <div className="result-card__status-rule" />
-        <p><b>Relevance:</b> {result.relevance}</p>
+        <p><b>{result.relevance === 'Browse' ? 'Mode' : 'Relevance'}:</b> {result.relevance}</p>
         <p><b>Relationship:</b> {result.relationship}</p>
       </div>
       <div className="result-card__main">
@@ -85,7 +85,7 @@ export function ResultCard({ result, displayRank }: ResultCardProps) {
       <div className="result-card__access">
         <h3>Access and requirements <Info aria-hidden="true" /></h3>
         <div className="result-card__access-list">
-          {result.accessOptions.map((option) => <AccessItem key={option.id} option={option} />)}
+          {result.accessOptions.slice(0, 2).map((option) => <AccessItem key={option.id} option={option} />)}
         </div>
         <Link className="view-details" to={result.detailsUrl}>View details</Link>
       </div>

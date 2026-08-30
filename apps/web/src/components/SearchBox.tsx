@@ -77,6 +77,7 @@ export function SearchBox({ initialQuery = '', onSubmit }: SearchBoxProps) {
             updateOpen(Boolean(event.target.value.trim()))
           }}
           onFocus={() => updateOpen(Boolean(query.trim()))}
+          onBlur={() => window.setTimeout(() => updateOpen(false), 120)}
           onKeyDown={handleKeyDown}
           role="combobox"
           aria-autocomplete="list"
