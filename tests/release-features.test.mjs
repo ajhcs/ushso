@@ -37,3 +37,21 @@ test('production runtime retrieval recovers a bounded hospital title typo', () =
   assert.equal(result.results[0].record_id, 'obs:asset:unc-sheps-rural-hospital-closures');
   assert.ok(result.results[0].relevance.score_components.some(component => component.reason.includes('hopsital~hospital')));
 });
+
+test('bounded discovery reports returned_count separately from total_matches', () => {
+  const engine = createRetrievalEngine({
+    records: readJsonl('packages/retrieval/versions/v1.1.0/corpus/records.jsonl'),
+    searchDocuments: readJsonl('packages/retrieval/versions/v1.1.0/corpus/search-documents.jsonl'),
+    joinRoutes: readJsonl('packages/retrieval/versions/v1.1.0/corpus/join-routes.jsonl'),
+    vocabulary: readJson('packages/retrieval/versions/v1.1.0/fixtures/controlled-vocabulary.json'),
+    corpus: readJson('packages/retrieval/versions/v1.1.0/corpus/corpus.json')
+  });
+  const result = engine.retrieve({ question: 'hospital ownership changes in Texas', limit: 5 });
+
+  assert.equal(result.returned_count, result.results.length);
+  assert.equal(result.returned_count, 5);
+  assert.ok(result.total_matches >= 5);
+  assert.equal(result.has_more, result.total_matches > result.returned_count);
+  assert.equal(result.query.interpretation.geographies[0]?.id, 'US-TX');
+  assert.equal(typeof result.query.interpretation.geographies[0], 'object');
+});

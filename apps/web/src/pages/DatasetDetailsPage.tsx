@@ -59,7 +59,7 @@ export function DatasetDetailsPage() {
       <main id="main-content" className="details-page__main">
         <Link className="back-link" to="/search">← <span>Browse all published sources</span></Link>
         <div className="details-page__heading">
-          <p>{dataset.familyStatus} · {dataset.familySiblingCount} other published record{dataset.familySiblingCount === 1 ? '' : 's'} in this family · {dataset.relationship}</p>
+          <p>{dataset.familyStatus} · {dataset.familySiblingCount} other published record{dataset.familySiblingCount === 1 ? '' : 's'} in this family · {dataset.relationship}{dataset.relevance !== 'Browse' ? ` · ${dataset.relevance} relevance` : ''}</p>
           <h1>{dataset.title}</h1>
           <p>{dataset.description}</p>
         </div>

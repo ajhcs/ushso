@@ -340,12 +340,12 @@ export function createRetrievalEngine({ records, searchDocuments, joinRoutes = [
       if (signal?.aborted) throw signal.reason ?? new DOMException('Aborted', 'AbortError');
       const intent = compileDiscoveryIntent(rawQuery, frozenVocabulary);
       const parsed = { ...intent, raw: intent.filters };
-      const ranked = frozenRecords
+      const matches = frozenRecords
         .map(record => scoreRecord(record, parsed, frozenVocabulary, searchDocumentByRecord.get(record.record_id)?.search_text))
         .filter(Boolean)
         .filter(item => item.score > 0)
-        .sort((a, b) => b.score - a.score || a.record.record_id.localeCompare(b.record.record_id))
-        .slice(0, parsed.raw.limit);
+        .sort((a, b) => b.score - a.score || a.record.record_id.localeCompare(b.record.record_id));
+      const ranked = matches.slice(0, parsed.raw.limit);
       const selectedRecords = ranked.map(item => item.record);
       const warnings = [];
       if (!parsed.interpretation.subjects.length) warnings.push('No controlled subject concept matched; retrieval used explicit filters and bounded lexical matching only.');
@@ -371,6 +371,9 @@ export function createRetrievalEngine({ records, searchDocuments, joinRoutes = [
           }
         },
         result_count: ranked.length,
+        returned_count: ranked.length,
+        total_matches: matches.length,
+        has_more: matches.length > ranked.length,
         results: ranked.map((item, index) => ({
           rank: index + 1,
           score: item.score,

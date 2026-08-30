@@ -45,6 +45,14 @@ describe('canonical discovery response adapter', () => {
     })
   })
 
+  it('exposes scan-card grain and access status without inventing coverage', () => {
+    const adapted = adaptDiscoveryResponse(acceptedResponse)
+    const first = adapted.records[0]
+    expect(first.grain).toContain(first.reportingUnit)
+    expect(first.accessStatusLabel).toBeTruthy()
+    expect(first.categories.length).toBeGreaterThan(0)
+  })
+
   it('builds stable details routes that do not depend on the discovery question', () => {
     const adapted = adaptDiscoveryResponse(acceptedResponse)
     expect(adapted.records.every((record) => !record.detailsUrl.includes('?q='))).toBe(true)

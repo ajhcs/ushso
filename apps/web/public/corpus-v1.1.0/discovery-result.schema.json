@@ -56,7 +56,10 @@
         "filters":{"type":"object"}
       }
     },
-    "result_count":{"type":"integer","minimum":0},
+    "result_count":{"type":"integer","minimum":0,"description":"Returned result length. Prefer returned_count for new clients."},
+    "returned_count":{"type":"integer","minimum":0,"description":"Number of records included in this bounded response."},
+    "total_matches":{"type":"integer","minimum":0,"description":"Number of scored matches before the request limit was applied. This is not a claim that the Observatory contains only these records."},
+    "has_more":{"type":"boolean","description":"True when total_matches exceeds returned_count because discovery is bounded by limit."},
     "results":{
       "type":"array","items":{
         "type":"object","additionalProperties":false,

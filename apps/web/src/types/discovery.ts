@@ -249,6 +249,9 @@ export interface DiscoveryResult {
     filters: Record<string, unknown>
   }
   result_count: number
+  returned_count?: number
+  total_matches?: number
+  has_more?: boolean
   results: DiscoveryResultItem[]
   join_routes: DiscoveryJoinRoute[]
   warnings: string[]

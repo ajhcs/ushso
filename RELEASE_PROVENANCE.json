@@ -1,21 +1,24 @@
 {
   "schema": "ushso.release-provenance.v1",
-  "release": "ushso-observatory-alpha-0.1.0",
-  "released_at": "2026-08-30T16:43:33.333152Z",
+  "release": "ushso-observatory-national-federal-1.1.0",
+  "released_at": "2026-08-30T18:15:38.005896Z",
   "status": "LIVE",
   "source_repository": "https://github.com/ajhcs/ushso",
-  "source_commit": "77054aebe4a5c9c2fec473fd6d13fe7878f91b59",
+  "source_commit": "6eeca2a47d4dba7eee05e9b43b15fa03f231ac6a",
+  "note": "Verified against live ushso.org on 2026-08-30. This file documents the currently serving production Worker, not a later unreleased working-tree change. Cloudflare Workers Builds has no CI build history for this Worker; deploy is wrangler-based. Exact Cloudflare version/deployment IDs were not independently readable from this environment.",
   "github_actions": {
     "status": "success",
-    "run_id": 33323250337,
-    "url": "https://github.com/ajhcs/ushso/actions/runs/33323250337"
+    "run_id": 33327532184,
+    "url": "https://github.com/ajhcs/ushso/actions/runs/33327532184"
   },
   "cloudflare": {
     "account_id": "1e5f92087e779df50f3f3546a0eed22e",
     "zone_id": "2055535b187bf2c31209cecd90f38848",
     "worker": "ushso",
-    "deployment_id": "4a960898-8a38-472b-bfca-2de6cde21724",
-    "version_id": "af7eaedb-3b10-4b56-b42d-f80a866b9671",
+    "worker_id": "4ad6f3e881cf4633ab9f4438d75b3848",
+    "modified_on": "2026-08-30T18:15:38.005896Z",
+    "deployment_id": null,
+    "version_id": null,
     "routes": [
       "ushso.org/*",
       "www.ushso.org/*"
@@ -24,56 +27,41 @@
     "observability_enabled": false
   },
   "corpus": {
-    "id": "ushso-observatory-offline-mvp",
-    "version": "1.0.1",
-    "record_count": 143,
+    "id": "ushso-observatory-national-federal",
+    "version": "1.1.0",
+    "record_count": 157,
+    "search_document_count": 157,
     "join_route_count": 14,
-    "manifest_sha256": "5622272ded52b0cbf039da47114142f8cb35ba634e8a6bbb9ee55b0ecd70511c",
-    "content_fingerprint_sha256": "0e676ada3d601275083615a3f7804781eef1c183cb1b7efcf7ec8044fce33b3d"
+    "manifest_sha256": "adcfb56babc981a4c7dfc787af86d56f5fb2a31e84de02f9db8c93f0548b5d03",
+    "algorithm_fingerprint_sha256": "b17c49fcd3f5fd1a09c38902f8733437e366b75f1e764a92cadf3f9788116ae6",
+    "source_slices": {
+      "canonical_base": 4,
+      "pennsylvania_catalog": 22,
+      "lane_c_harvard_dataverse": 52,
+      "lane_c_datacite": 50,
+      "curated_authoritative_registry": 15,
+      "national_federal_backbone_live_validated": 14
+    }
   },
   "validation": {
-    "clean_install": "PASS",
-    "dependency_vulnerabilities": 0,
-    "release_audit": {
-      "status": "PASS",
-      "tracked_and_release_files": 243
-    },
-    "tests": {
-      "retrieval": {
-        "passed": 13,
-        "failed": 0
-      },
-      "web": {
-        "passed": 15,
-        "failed": 0
-      },
-      "worker": {
-        "passed": 4,
-        "failed": 0
-      },
-      "evaluation": {
-        "passed": 3,
-        "failed": 0
-      },
-      "frozen_questions_validated": 60
-    },
-    "production_build": "PASS",
-    "cloudflare_dry_run": "PASS",
-    "live_smoke": {
+    "github_actions": "PASS",
+    "live_probe": {
       "https://ushso.org": "PASS",
-      "https://www.ushso.org": "PASS",
-      "api_health": "ok",
+      "https://ushso.org/api/health": "ok",
       "discovery_contract": "observatory-webmcp-tool.v1.0.0",
-      "indexed_records": 143,
-      "benchmark_results": 15,
-      "benchmark_join_routes": 4,
-      "request_guards": {
-        "invalid_json": 400,
-        "wrong_media_type": 415,
-        "oversized": 413
+      "indexed_records": 157,
+      "post_api_discover": {
+        "question": "hospital ownership changes in Texas",
+        "http_status": 200,
+        "result_count": 10,
+        "geography_contract": "structured_concept_match",
+        "geography_id": "US-TX"
       },
-      "spa_deep_link": 200,
-      "browser_console_errors": 0
+      "get_api_catalog": {
+        "http_status": 200,
+        "corpus_version": "1.1.0",
+        "record_count": 157
+      }
     }
   },
   "acquisition_boundary": {
@@ -81,12 +69,10 @@
     "coverage_cells_executed": 0,
     "heavy_analysis_lock_touched": false,
     "llm_dependency": false,
-    "identity_merging": false
+    "identity_merging": false,
+    "accepted_upstream_metadata_requests": 14
   },
   "known_limitations": {
-    "evaluation_top_10_must_not_miss_recall": 0.5,
-    "evaluation_top_20_must_not_miss_recall": 0.547619,
-    "evaluation_top_20_acceptable_source_coverage": 0.533654,
-    "note": "This is an evidence-bound offline alpha, not a comprehensive nationwide catalog."
+    "note": "This is an evidence-bound offline catalog, not a comprehensive nationwide inventory. Discovery responses are bounded by limit; returned_count is not the size of the universe of matching health-systems data."
   }
 }
