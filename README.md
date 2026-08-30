@@ -21,8 +21,9 @@ source objects + evidence + assertions + relationships
 
 The current `observatory-record.v1.0.0` records are compatibility inputs and discovery views. They are not the final source-truth abstraction. Search documents are explicitly labeled as denormalized, non-authoritative projections.
 
-See [the four-layer architecture](docs/ARCHITECTURE.md) and the
-[published 60-question baseline](docs/EVALUATION.md).
+See [the four-layer architecture](docs/ARCHITECTURE.md), the
+[published 60-question baseline](docs/EVALUATION.md), and the
+[UI/UX review](docs/UI_UX_REVIEW.md) of the public website for people and agents.
 
 ## Local verification
 
