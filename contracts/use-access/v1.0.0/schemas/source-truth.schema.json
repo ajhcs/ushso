@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/use-access/v1.0.0/source-truth.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_truth_id", "record_id", "source_id", "family_id", "title", "description", "authoritative_url", "asset_type", "geography", "time_coverage", "units", "subjects", "access", "retrieval_urls", "limitations", "evidence"],
+  "properties": {
+    "schema_version": {"const": "source-truth-snapshot.v1.0.0"},
+    "source_truth_id": {"type": "string", "pattern": "^obs:truth:"},
+    "record_id": {"type": "string", "pattern": "^obs:asset:"},
+    "source_id": {"type": "string", "pattern": "^obs:source:"},
+    "family_id": {"type": "string", "pattern": "^obs:family:"},
+    "title": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 1},
+    "authoritative_url": {"type": "string", "format": "https-uri"},
+    "asset_type": {"enum": ["dataset", "catalog_record", "other"]},
+    "geography": {
+      "type": "object", "additionalProperties": false,
+      "required": ["coverage_level", "jurisdictions", "rurality_support"],
+      "properties": {
+        "coverage_level": {"enum": ["national", "state"]},
+        "jurisdictions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^US(-[A-Z]{2})?$"}},
+        "rurality_support": {"enum": ["direct", "derivable", "none", "unknown"]}
+      }
+    },
+    "time_coverage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "start", "end", "temporal_granularity", "data_through"],
+      "properties": {
+        "state": {"enum": ["bounded", "rolling", "unknown"]},
+        "start": {"type": ["string", "null"], "pattern": "^[0-9]{4}(-[0-9]{2})?$"},
+        "end": {"type": ["string", "null"], "pattern": "^[0-9]{4}(-[0-9]{2})?$"},
+        "temporal_granularity": {"enum": ["year", "quarter", "month", "release", "unknown"]},
+        "data_through": {"type": ["string", "null"]}
+      }
+    },
+    "units": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["hospital", "facility", "provider", "health_system", "state", "event"]}},
+    "subjects": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]+$"}},
+    "access": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "mechanisms", "requirements", "preferred_interface"],
+      "properties": {
+        "status": {"enum": ["public_direct", "application_required"]},
+        "mechanisms": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["bulk_download", "api", "data_portal", "web_download", "request_form", "contact_owner"]}},
+        "requirements": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["none", "application", "payment", "human_approval"]}},
+        "preferred_interface": {"enum": ["download", "portal", "request_workflow"]}
+      }
+    },
+    "retrieval_urls": {"type": "array", "uniqueItems": true, "items": {"type": "string", "format": "https-uri"}},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["evidence_state", "origin_path", "origin_sha256", "origin_locator", "captured_offline", "claim_scope"],
+      "properties": {
+        "evidence_state": {"const": "source_asserted"},
+        "origin_path": {"const": "observatory/retrieval/v1.0.0/fixtures/curated-assets.json"},
+        "origin_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "origin_locator": {"type": "string", "pattern": "^assets\\[record_id="},
+        "captured_offline": {"const": true},
+        "claim_scope": {"const": "frozen_curated_fixture_only_not_live_verification"}
+      }
+    }
+  }
+}

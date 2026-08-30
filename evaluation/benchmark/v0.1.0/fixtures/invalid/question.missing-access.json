@@ -1,0 +1,195 @@
+{
+  "question_id": "QTD-O3-001",
+  "natural_language_question": "I need hospital financial and utilization data for Pennsylvania.",
+  "user_persona": "health_services_researcher",
+  "research_intent": {
+    "task": "Assemble a Pennsylvania hospital/system finance and utilization study frame.",
+    "decision_context": "Support longitudinal health-services analysis without conflating facility reports with consolidated system finance."
+  },
+  "health_systems_concepts": [
+    "hospital financial condition",
+    "hospital utilization",
+    "Pennsylvania health systems"
+  ],
+  "required_measures": [
+    "income and expense measures",
+    "beds or service capacity",
+    "patient volume or utilization",
+    "reporting entity and period"
+  ],
+  "optional_measures": [
+    "payer mix",
+    "ownership status"
+  ],
+  "excluded_measures": [
+    "patient-level claims",
+    "daily profitability"
+  ],
+  "geography": {
+    "requested_scope": "Pennsylvania hospitals and health systems",
+    "jurisdictions": [
+      "US-PA"
+    ],
+    "rationale": "Pennsylvania is explicit; distinguish hospital, system, and facility coverage."
+  },
+  "geographic_granularity": "mixed",
+  "time_period": {
+    "requested": "Annual data since 2015",
+    "start": "2015",
+    "end": null,
+    "granularity": "year",
+    "semantics": "Fiscal/calendar period semantics must remain source-native."
+  },
+  "update_recency_requirement": {
+    "mode": "historical_series",
+    "max_age_days": null,
+    "rationale": "Need repeatable historical releases, not only a current snapshot."
+  },
+  "unit_of_analysis": {
+    "primary": "hospital_or_provider_period",
+    "acceptable": [
+      "hospital",
+      "facility",
+      "health_system"
+    ],
+    "forbidden": [
+      "county_only"
+    ]
+  },
+  "population": {
+    "in_scope": "Pennsylvania hospitals and health systems represented by public or state reporting",
+    "exclusions": [
+      "non-healthcare organizations",
+      "patient-level records"
+    ]
+  },
+  "preferred_formats": [
+    "CSV",
+    "XLSX",
+    "API_JSON",
+    "PDF"
+  ],
+  "preferred_interfaces": [
+    "API",
+    "download",
+    "state_report_portal"
+  ],
+  "authoritative_source_requirement": {
+    "required": true,
+    "publisher_scope": "Original Pennsylvania or federal reporting sources",
+    "reject_catalog_only": true,
+    "acceptable_evidence_states": [
+      "verified_first_party",
+      "source_asserted"
+    ],
+    "rationale": "Use first-party regulatory or government sources for the actual measures."
+  },
+  "expected_response_type": "multi_source_bundle",
+  "clarification_needed": false,
+  "clarification_question": null,
+  "supported_by_current_evidence": {
+    "status": "partial",
+    "rationale": "The current offline evidence supports a bounded discovery judgment, but not an unqualified claim of data availability or completeness.",
+    "evidence_references": [
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].contains",
+        "evidence_kind": "record_description"
+      },
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].coverage",
+        "evidence_kind": "record_coverage"
+      },
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].access",
+        "evidence_kind": "record_access"
+      },
+      {
+        "artifact_path": "discovery_financial_org/agents/healthcare-state-gaps-20260829/evidence.json",
+        "locator": "listed source-specific evidence file",
+        "evidence_kind": "supporting_evidence"
+      },
+      {
+        "artifact_path": "discovery_financial_org/agents/healthcare-state-gaps-20260829/findings.md",
+        "locator": "listed source-specific evidence file",
+        "evidence_kind": "supporting_evidence"
+      },
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].contains",
+        "evidence_kind": "record_description"
+      },
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].coverage",
+        "evidence_kind": "record_coverage"
+      },
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].access",
+        "evidence_kind": "record_access"
+      },
+      {
+        "artifact_path": "discovery_financial_org/agents/LANE/evidence.json",
+        "locator": "listed source-specific evidence file",
+        "evidence_kind": "supporting_evidence"
+      },
+      {
+        "artifact_path": "discovery_financial_org/agents/LANE/findings.md",
+        "locator": "listed source-specific evidence file",
+        "evidence_kind": "supporting_evidence"
+      },
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"cms_hospital_general_information\")].contains",
+        "evidence_kind": "record_description"
+      },
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"cms_hospital_general_information\")].coverage",
+        "evidence_kind": "record_coverage"
+      },
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"cms_hospital_general_information\")].access",
+        "evidence_kind": "record_access"
+      },
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"aha_annual_survey\")].contains",
+        "evidence_kind": "record_description"
+      },
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"aha_annual_survey\")].coverage",
+        "evidence_kind": "record_coverage"
+      },
+      {
+        "artifact_path": "discovery_financial_org/source_registry.json",
+        "locator": "$.sources[?(@.key==\"aha_annual_survey\")].access",
+        "evidence_kind": "record_access"
+      }
+    ]
+  },
+  "benchmark_difficulty": {
+    "level": "high",
+    "dimensions": [
+      "conjunction",
+      "geography",
+      "time",
+      "unit_of_analysis",
+      "public_metadata_private_data"
+    ],
+    "rationale": "Combines finance and utilization, state scope, annual history, and entity-grain distinctions."
+  },
+  "trap_types": [
+    "public_metadata_private_data",
+    "facility_vs_system_grain",
+    "stale_source"
+  ],
+  "geographic_composition": "pennsylvania",
+  "split": "development",
+  "topic_cluster": "pa-finance-utilization"
+}

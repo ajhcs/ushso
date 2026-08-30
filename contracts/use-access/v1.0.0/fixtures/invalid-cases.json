@@ -1,0 +1,14 @@
+{
+  "fixture_version": "use-access-invalid-cases.v1.0.0",
+  "cases": [
+    {"case_id": "invalid-use-card-llm-truth", "kind": "use_card", "base_id": "obs:use-card:cms-hcris-provider-financial-trends", "mutation": {"path": "truth_boundary.llm_generated_truth_allowed", "value": true}, "expected_code": "SCHEMA_INVALID"},
+    {"case_id": "invalid-use-card-no-evidence", "kind": "use_card", "base_id": "obs:use-card:phc4-public-financial-publications", "mutation": {"path": "evidence", "value": []}, "expected_code": "SCHEMA_INVALID"},
+    {"case_id": "invalid-use-card-source-truth-ref", "kind": "use_card", "base_id": "obs:use-card:phc4-custom-request-defined-analysis", "mutation": {"path": "source_truth_ids.0", "value": "obs:truth:missing"}, "expected_code": "UNKNOWN_SOURCE_TRUTH"},
+    {"case_id": "invalid-recipe-execution-allowed", "kind": "access_recipe", "base_id": "obs:access-recipe:cms-hcris-public-bulk-api", "mutation": {"path": "authorization.execution_allowed", "value": true}, "expected_code": "SCHEMA_INVALID"},
+    {"case_id": "invalid-recipe-not-found-translation", "kind": "access_recipe", "base_id": "obs:access-recipe:phc4-public-financial-publications", "mutation": {"path": "typed_failure_outcomes.0.translation_to_not_found", "value": true}, "expected_code": "SCHEMA_INVALID"},
+    {"case_id": "invalid-recipe-not-found-outcome", "kind": "access_recipe", "base_id": "obs:access-recipe:phc4-custom-application", "mutation": {"path": "typed_failure_outcomes.0.outcome", "value": "not_found"}, "expected_code": "SCHEMA_INVALID"},
+    {"case_id": "invalid-recipe-step-gap", "kind": "access_recipe", "base_id": "obs:access-recipe:cms-hcris-public-bulk-api", "mutation": {"path": "steps.2.sequence", "value": 9}, "expected_code": "NON_CONSECUTIVE_STEPS"},
+    {"case_id": "invalid-recipe-unknown-asset", "kind": "access_recipe", "base_id": "obs:access-recipe:phc4-custom-application", "mutation": {"path": "asset_id", "value": "obs:asset:missing"}, "expected_code": "UNKNOWN_ASSET"},
+    {"case_id": "invalid-recipe-extra-field", "kind": "access_recipe", "base_id": "obs:access-recipe:phc4-public-financial-publications", "mutation": {"path": "generated_guess", "value": true}, "expected_code": "SCHEMA_INVALID"}
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "O8 deterministic evaluation run report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["report_version", "run_id", "generated_at", "benchmark", "k_values", "question_count", "question_evaluations", "macro_metrics", "external_requests", "ranking_optimized", "llm_used", "identity_work_performed", "coverage_execution_performed", "heavy_analysis_lock_touched"],
+  "properties": {
+    "report_version": { "const": "o8-evaluation-run-report.v1" },
+    "run_id": { "type": "string", "minLength": 1 },
+    "generated_at": { "const": "2026-08-30T00:00:00.000Z" },
+    "benchmark": { "type": "object", "additionalProperties": false, "required": ["mode", "source"], "properties": { "mode": { "enum": ["published", "test_fixture"] }, "source": { "type": "string", "minLength": 1 } } },
+    "k_values": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "integer", "minimum": 1 } },
+    "question_count": { "type": "integer", "minimum": 1 },
+    "question_evaluations": { "type": "array", "minItems": 1, "items": { "type": "object" } },
+    "macro_metrics": {
+      "type": "object", "additionalProperties": false,
+      "required": ["top_k", "intent_compilation_accuracy", "important_restriction_coverage", "access_state_correctness", "provenance_completeness", "join_route_proposal_correctness", "join_route_coverage", "zero_result_cases", "zero_result_scoped_correctly"],
+      "properties": {
+        "top_k": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": false, "required": ["k", "must_not_miss_recall", "acceptable_source_coverage"], "properties": { "k": { "type": "integer", "minimum": 1 }, "must_not_miss_recall": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }, "acceptable_source_coverage": { "type": ["number", "null"], "minimum": 0, "maximum": 1 } } } },
+        "intent_compilation_accuracy": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "important_restriction_coverage": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "access_state_correctness": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "provenance_completeness": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "join_route_proposal_correctness": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "join_route_coverage": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "zero_result_cases": { "type": "integer", "minimum": 0 },
+        "zero_result_scoped_correctly": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "external_requests": { "const": 0 },
+    "ranking_optimized": { "const": false },
+    "llm_used": { "const": false },
+    "identity_work_performed": { "const": false },
+    "coverage_execution_performed": { "const": false },
+    "heavy_analysis_lock_touched": { "const": false }
+  }
+}

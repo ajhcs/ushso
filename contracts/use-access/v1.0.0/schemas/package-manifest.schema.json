@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/use-access/v1.0.0/package-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "package_name", "package_version", "mode", "offline", "manifest_excludes", "file_count", "payload_bytes", "files", "immutable"],
+  "properties": {
+    "manifest_version": {"const": "use-access-package-manifest.v1"},
+    "package_name": {"const": "observatory/use-access-contract"},
+    "package_version": {"const": "1.0.0"},
+    "mode": {"const": "fixture_offline"},
+    "offline": {"const": true},
+    "manifest_excludes": {"const": ["manifests/package-manifest.json", "validation/validation-receipt.json"]},
+    "file_count": {"type": "integer", "minimum": 1},
+    "payload_bytes": {"type": "integer", "minimum": 1},
+    "files": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["path", "bytes", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "bytes": {"type": "integer", "minimum": 0},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "immutable": {"const": true}
+  }
+}

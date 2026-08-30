@@ -1,0 +1,292 @@
+{
+  "$schema": "./schemas/validation-report.schema.json",
+  "validation_version": "question-to-data-validation.v1",
+  "benchmark_package": "ushso-question-to-data-v0.1.0",
+  "generated_at": "2026-08-30T00:00:00Z",
+  "status": "PASS",
+  "external_requests": 0,
+  "checks": [
+    {
+      "check_id": "schema:questions.jsonl",
+      "status": "PASS",
+      "detail": "60 records match question.schema.json."
+    },
+    {
+      "check_id": "schema:question_features.jsonl",
+      "status": "PASS",
+      "detail": "60 records match question-feature.schema.json."
+    },
+    {
+      "check_id": "schema:relevance_judgments.jsonl",
+      "status": "PASS",
+      "detail": "115 records match relevance-judgment.schema.json."
+    },
+    {
+      "check_id": "schema:negative_judgments.jsonl",
+      "status": "PASS",
+      "detail": "82 records match negative-judgment.schema.json."
+    },
+    {
+      "check_id": "schema:bundle_gold.jsonl",
+      "status": "PASS",
+      "detail": "24 records match bundle-gold.schema.json."
+    },
+    {
+      "check_id": "schema:answer_plans.jsonl",
+      "status": "PASS",
+      "detail": "60 records match answer-plan.schema.json."
+    },
+    {
+      "check_id": "schema:human_review_queue.jsonl",
+      "status": "PASS",
+      "detail": "10 records match human-review.schema.json."
+    },
+    {
+      "check_id": "schema:evaluation_metrics.json",
+      "status": "PASS",
+      "detail": "evaluation_metrics.json matches evaluation-metrics.schema.json."
+    },
+    {
+      "check_id": "schema:benchmark_splits.json",
+      "status": "PASS",
+      "detail": "benchmark_splits.json matches benchmark-splits.schema.json."
+    },
+    {
+      "check_id": "schema:benchmark_statistics.json",
+      "status": "PASS",
+      "detail": "benchmark_statistics.json matches benchmark-statistics.schema.json."
+    },
+    {
+      "check_id": "schema:source_reference_index.json",
+      "status": "PASS",
+      "detail": "source_reference_index.json matches source-reference-index.schema.json."
+    },
+    {
+      "check_id": "schema:package_manifest.json",
+      "status": "PASS",
+      "detail": "package_manifest.json matches package-manifest.schema.json."
+    },
+    {
+      "check_id": "schema:validation_report.json",
+      "status": "PASS",
+      "detail": "Validation report is written atomically after the current validation pass."
+    },
+    {
+      "check_id": "population:exact_question_count",
+      "status": "PASS",
+      "detail": "Expected 60 questions; found 60."
+    },
+    {
+      "check_id": "population:unique_question_ids",
+      "status": "PASS",
+      "detail": "Question IDs are unique."
+    },
+    {
+      "check_id": "population:question_id_format",
+      "status": "PASS",
+      "detail": "Question IDs use QTD-O3-NNN format."
+    },
+    {
+      "check_id": "composition:geography",
+      "status": "PASS",
+      "detail": "Expected 12 questions in each geography composition; found {\"pennsylvania\":12,\"national_federal\":12,\"comparative_multi_state\":12,\"other_state_locality\":12,\"geography_ambiguous_or_independent\":12}."
+    },
+    {
+      "check_id": "composition:response_types",
+      "status": "PASS",
+      "detail": "Expected response counts {\"single_source\":18,\"multi_source_bundle\":24,\"clarification_required\":10,\"unsupported_or_incomplete\":8}; found {\"multi_source_bundle\":24,\"clarification_required\":10,\"single_source\":18,\"unsupported_or_incomplete\":8}."
+    },
+    {
+      "check_id": "composition:splits",
+      "status": "PASS",
+      "detail": "Expected deterministic 20/20/20 splits; found {\"development\":20,\"validation\":20,\"held_out\":20}."
+    },
+    {
+      "check_id": "composition:split_geography",
+      "status": "PASS",
+      "detail": "Each split contains four questions from every geography composition."
+    },
+    {
+      "check_id": "questions:semantic_fields",
+      "status": "PASS",
+      "detail": "Question response and evidence states are internally consistent."
+    },
+    {
+      "check_id": "questions:unique_topic_clusters",
+      "status": "PASS",
+      "detail": "Topic clusters are unique and cannot leak paraphrases across splits."
+    },
+    {
+      "check_id": "splits:cross_split_near_duplicates",
+      "status": "PASS",
+      "detail": "No cross-split pair reaches the 0.72 token-Jaccard threshold."
+    },
+    {
+      "check_id": "splits:ids_reconcile",
+      "status": "PASS",
+      "detail": "benchmark_splits.json IDs reconcile to question records."
+    },
+    {
+      "check_id": "splits:counts_reconcile",
+      "status": "PASS",
+      "detail": "benchmark_splits.json counts reconcile to question records."
+    },
+    {
+      "check_id": "splits:leakage_controls",
+      "status": "PASS",
+      "detail": "Split artifact records deterministic leakage controls."
+    },
+    {
+      "check_id": "sources:nonempty",
+      "status": "PASS",
+      "detail": "At least one source reference is present."
+    },
+    {
+      "check_id": "sources:unique_record_ids",
+      "status": "PASS",
+      "detail": "Source record IDs are unique; no identity merge is performed."
+    },
+    {
+      "check_id": "sources:project_records_and_evidence",
+      "status": "PASS",
+      "detail": "36 source records resolve to existing project artifacts and evidence references."
+    },
+    {
+      "check_id": "sources:reference_count",
+      "status": "PASS",
+      "detail": "source_reference_index source_reference_count reconciles when present."
+    },
+    {
+      "check_id": "judgments:positive_integrity",
+      "status": "PASS",
+      "detail": "115 positive judgments resolve to sources/questions with evidence."
+    },
+    {
+      "check_id": "judgments:negative_integrity",
+      "status": "PASS",
+      "detail": "82 negative judgments resolve to sources/questions with evidence and explicit rejection reasons."
+    },
+    {
+      "check_id": "judgments:allowed_labels",
+      "status": "PASS",
+      "detail": "Judgment labels use the allowed positive/negative vocabularies."
+    },
+    {
+      "check_id": "judgments:negative_recommendation_gate",
+      "status": "PASS",
+      "detail": "Every negative judgment is prohibited from recommendation."
+    },
+    {
+      "check_id": "judgments:access_sensitive_cases",
+      "status": "PASS",
+      "detail": "Access restrictions materially influence relevance judgments."
+    },
+    {
+      "check_id": "plans:complete_and_consistent",
+      "status": "PASS",
+      "detail": "60 answer plans reconcile to question response types."
+    },
+    {
+      "check_id": "bundles:count_and_coherence",
+      "status": "PASS",
+      "detail": "24 coherent multi-source bundle records; no join_proven assertion."
+    },
+    {
+      "check_id": "bundles:join_status_vocab",
+      "status": "PASS",
+      "detail": "All bundle join statuses use the controlled vocabulary."
+    },
+    {
+      "check_id": "bundles:provenance_gate",
+      "status": "PASS",
+      "detail": "No bundle claims join_proven or actual join proof."
+    },
+    {
+      "check_id": "review:open_queue",
+      "status": "PASS",
+      "detail": "10 open human-review items resolve to current records."
+    },
+    {
+      "check_id": "metrics:required_groups",
+      "status": "PASS",
+      "detail": "All required evaluation metric groups are present."
+    },
+    {
+      "check_id": "metrics:required_names",
+      "status": "PASS",
+      "detail": "Required retrieval metrics are explicitly specified."
+    },
+    {
+      "check_id": "metrics:specification_only",
+      "status": "PASS",
+      "detail": "Metrics are specification-only and offline."
+    },
+    {
+      "check_id": "statistics:reconcile",
+      "status": "PASS",
+      "detail": "benchmark_statistics.json reconciles to generated artifacts."
+    },
+    {
+      "check_id": "statistics:seed_coverage",
+      "status": "PASS",
+      "detail": "All required seed questions are represented."
+    },
+    {
+      "check_id": "statistics:external_requests",
+      "status": "PASS",
+      "detail": "benchmark_statistics.json records external_requests=0."
+    },
+    {
+      "check_id": "fixtures:valid_invalid",
+      "status": "PASS",
+      "detail": "Valid fixtures pass shape checks and invalid fixtures fail their intended checks."
+    },
+    {
+      "check_id": "manifest:reconciliation",
+      "status": "PASS",
+      "detail": "39 payload files and 8 source pins match recorded hashes."
+    },
+    {
+      "check_id": "controls:no_retrieval_engine_or_network",
+      "status": "PASS",
+      "detail": "Package code contains no retrieval/network implementation."
+    },
+    {
+      "check_id": "controls:offline_attestation",
+      "status": "PASS",
+      "detail": "All package-level external request counters are zero."
+    },
+    {
+      "check_id": "controls:identity_and_full_data",
+      "status": "PASS",
+      "detail": "No identity merge, full-data job, or heavy-analysis lock is attested."
+    }
+  ],
+  "summary": {
+    "question_count": 60,
+    "positive_judgment_count": 115,
+    "negative_judgment_count": 82,
+    "bundle_count": 24,
+    "answer_plan_count": 60,
+    "human_review_count": 10,
+    "passed_checks": 51,
+    "failed_checks": 0,
+    "issue_count": 0
+  },
+  "manifest_reconciliation": {
+    "computed_file_count": 39,
+    "recorded_file_count": 39,
+    "computed_payload_bytes": 1716373,
+    "recorded_payload_bytes": 1716373,
+    "hashes_match": true
+  },
+  "prohibited_action_attestation": {
+    "external_requests": 0,
+    "retrieval_engine_implemented": false,
+    "identity_merge_performed": false,
+    "full_data_job_executed": false,
+    "heavy_analysis_lock_acquired": false,
+    "source_records_mutated": false,
+    "statement": "Offline benchmark construction and validation only; no retrieval, acquisition, identity merge, or full-data analysis was executed."
+  }
+}

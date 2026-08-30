@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/core-contract/v1.0.0/validation-report.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["report_version", "contract_version", "offline", "valid", "schema_count", "record_counts", "checks", "errors", "package_manifest_checked"],
+  "properties": {
+    "report_version": {"const": "observatory-core-validation.v1"},
+    "contract_version": {"const": "observatory-core-contract.v1.0.0"},
+    "offline": {"const": true},
+    "valid": {"type": "boolean"},
+    "schema_count": {"type": "integer", "minimum": 10},
+    "record_counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+    "checks": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "errors": {"type": "array", "items": {"type": "string"}},
+    "package_manifest_checked": {"type": "boolean"}
+  }
+}

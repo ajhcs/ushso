@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/use-access/v1.0.0/dependency-pin.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "dependency_id", "path", "sha256", "fixture_version", "record_ids", "verification_mode", "immutable"],
+  "properties": {
+    "schema_version": {"const": "use-access-dependency-pin.v1.0.0"},
+    "dependency_id": {"type": "string", "pattern": "^obs:dependency:"},
+    "path": {"const": "observatory/retrieval/v1.0.0/fixtures/curated-assets.json"},
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "fixture_version": {"const": "observatory-curated-assets.v1.0.0"},
+    "record_ids": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true, "items": {"type": "string", "pattern": "^obs:asset:"}},
+    "verification_mode": {"const": "offline_hash_and_record_match"},
+    "immutable": {"const": true}
+  }
+}

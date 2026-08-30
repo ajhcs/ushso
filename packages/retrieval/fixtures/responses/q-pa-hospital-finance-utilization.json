@@ -1,0 +1,4237 @@
+{
+  "contract_version": "observatory-discovery-result.v1.0.0",
+  "retrieval_id": "retrieval-1cf7c14ece5b96f4",
+  "evidence_mode": "published_offline_evidence",
+  "corpus": {
+    "corpus_id": "ushso-observatory-offline-mvp",
+    "corpus_version": "1.0.1",
+    "evidence_mode": "published_offline_evidence",
+    "manifest_sha256": "0e676ada3d601275083615a3f7804781eef1c183cb1b7efcf7ec8044fce33b3d",
+    "algorithm_fingerprint_sha256": "0316cf544da21a5b6790d91c126fa1d348c080b77fcbf5225d81cbe09bebefa2",
+    "record_count": 143,
+    "search_document_count": 143,
+    "join_route_count": 14,
+    "source_slices": {
+      "canonical_base": 4,
+      "pennsylvania_catalog": 22,
+      "lane_c_harvard_dataverse": 52,
+      "lane_c_datacite": 50,
+      "curated_authoritative_registry": 15
+    },
+    "build_boundary": {
+      "fixture_only": true,
+      "external_requests": 0,
+      "payload_downloads": 0,
+      "identity_index_queries": 0,
+      "heavy_analysis_lock_touched": false,
+      "coverage_cells_executed": 0
+    }
+  },
+  "query": {
+    "question": "I need hospital financial and utilization data for Pennsylvania",
+    "normalized_question": "i need hospital financial and utilization data for pennsylvania",
+    "interpretation": {
+      "geographies": [
+        {
+          "id": "US-PA",
+          "label": "Pennsylvania",
+          "kind": "geography",
+          "matched_aliases": [
+            "pennsylvania"
+          ],
+          "evidence": "controlled_vocabulary"
+        }
+      ],
+      "subjects": [
+        {
+          "id": "hospital_financials",
+          "label": "Hospital financials",
+          "kind": "subject",
+          "matched_aliases": [
+            "hospital financial"
+          ],
+          "evidence": "controlled_vocabulary"
+        },
+        {
+          "id": "utilization",
+          "label": "Hospital and provider utilization",
+          "kind": "subject",
+          "matched_aliases": [
+            "utilization"
+          ],
+          "evidence": "controlled_vocabulary"
+        }
+      ],
+      "units_of_analysis": [
+        {
+          "id": "hospital",
+          "label": "Hospital",
+          "kind": "unit",
+          "matched_aliases": [
+            "hospital"
+          ],
+          "evidence": "controlled_vocabulary"
+        },
+        {
+          "id": "facility",
+          "label": "Facility",
+          "kind": "unit",
+          "matched_aliases": [
+            "implied_by:hospital_financials"
+          ],
+          "evidence": "controlled_vocabulary"
+        },
+        {
+          "id": "provider",
+          "label": "Provider",
+          "kind": "unit",
+          "matched_aliases": [
+            "implied_by:utilization"
+          ],
+          "evidence": "controlled_vocabulary"
+        }
+      ],
+      "time_window": null,
+      "access_intent": {
+        "include_restricted": true,
+        "public_only": false,
+        "accepts_restricted": false,
+        "match_basis": "question_or_default"
+      }
+    },
+    "filters": {
+      "geography": {
+        "codes": [],
+        "levels": []
+      },
+      "subjects": [],
+      "units_of_analysis": [],
+      "access_statuses": [],
+      "include_restricted": true,
+      "time_window": null,
+      "limit": 15
+    }
+  },
+  "result_count": 15,
+  "results": [
+    {
+      "rank": 1,
+      "score": 170,
+      "record_id": "obs:asset:cms-hcris-hospital-cost-reports",
+      "relevance": {
+        "matched_subjects": [
+          "hospital_financials",
+          "utilization"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [
+          "hospital",
+          "facility",
+          "provider"
+        ],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_capability",
+            "value": 57,
+            "reason": "Hospital financials matches primary capability Hospital financials.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "subject_capability",
+            "value": 57,
+            "reason": "Hospital and provider utilization matches primary capability Hospital and provider utilization.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "geography_national_support",
+            "value": 13,
+            "reason": "National record may be filtered or joined for Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "unit_exact",
+            "value": 11,
+            "reason": "Record unit of analysis includes Hospital.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "unit_exact",
+            "value": 11,
+            "reason": "Record unit of analysis includes Facility.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "unit_exact",
+            "value": 11,
+            "reason": "Record unit of analysis includes Provider.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 10,
+            "reason": "Access status is public_direct.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Hospital financials matches primary capability Hospital financials.",
+          "Hospital and provider utilization matches primary capability Hospital and provider utilization.",
+          "National record may be filtered or joined for Pennsylvania.",
+          "Record unit of analysis includes Hospital.",
+          "Resolved subject concepts: hospital_financials, utilization."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "obs:asset:cms-hcris-hospital-cost-reports",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "obs:source:cms-hcris",
+            "name": "Centers for Medicare & Medicaid Services HCRIS"
+          },
+          "family": {
+            "family_id": "obs:family:cms-hcris-cost-reports",
+            "name": "CMS Healthcare Cost Report Information System",
+            "resolution_state": "source_asserted",
+            "evidence_ids": [
+              "ev:registry:cms-hcris-cost-reports"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "obs:asset:cms-hcris-hospital-cost-reports",
+            "name": "CMS HCRIS Hospital Cost Reports",
+            "asset_type": "dataset",
+            "version_state": "versioned",
+            "version_label": "fiscal-year releases through 2026 listed in captured evidence"
+          },
+          "match_fields": {
+            "normalized_url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports",
+            "canonical_url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports",
+            "doi": null,
+            "source_id": "cms_hcris_cost_reports",
+            "publisher": "Centers for Medicare & Medicaid Services",
+            "normalized_title": "cms hcris hospital cost reports",
+            "source_portal": "www.cms.gov"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "The offline adapter preserves the source-registry identity and does not query, write, or rebuild the shared identity index."
+          }
+        },
+        "title": "CMS HCRIS Hospital Cost Reports",
+        "description": "Provider-period Medicare cost reports with hospital financial-statement, cost-center, charge, settlement, and utilization fields. These are facility reports, not consolidated health-system financial statements.",
+        "authoritative_url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports",
+        "geography": {
+          "coverage_level": "national",
+          "jurisdictions": [
+            "US"
+          ],
+          "rurality_support": "derivable",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:cms-hcris-cost-reports"
+          ]
+        },
+        "time_coverage": {
+          "state": "bounded",
+          "start": "1996",
+          "end": "2026",
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:cms-hcris-cost-reports"
+          ]
+        },
+        "unit_of_analysis": [
+          "hospital",
+          "facility",
+          "provider"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic:hospital-financials",
+              "label": "Hospital financials",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital financials; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:cms-hcris-cost-reports"
+              ]
+            },
+            {
+              "id": "topic:utilization",
+              "label": "Hospital and provider utilization",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital and provider utilization; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:cms-hcris-cost-reports"
+              ]
+            },
+            {
+              "id": "topic:hospital-capacity",
+              "label": "Hospital capacity and operations",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital capacity and operations; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:cms-hcris-cost-reports"
+              ]
+            },
+            {
+              "id": "topic:costs-prices",
+              "label": "Costs, prices, and transparency",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for costs, prices, and transparency; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:cms-hcris-cost-reports"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case:question-to-source-discovery",
+              "label": "Question-to-source discovery and access routing",
+              "fitness": "supporting",
+              "rationale": "The asset record is intended for evidence-bound source discovery and retrieval routing, not as an assertion that data were acquired or are analytically sufficient.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "ev:registry:cms-hcris-cost-reports"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_direct",
+          "mechanisms": [
+            "bulk_download",
+            "api"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:cms-hcris-cost-reports"
+          ],
+          "restriction_note": "The source registry describes this route as public. Current endpoint availability and release metadata were not live tested in this offline build."
+        },
+        "provenance": [
+          {
+            "provenance_id": "prov:registry:cms-hcris-cost-reports",
+            "kind": "other",
+            "locator": "urn:sha256:62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd"
+          },
+          {
+            "provenance_id": "prov:first-party:cms-hcris-cost-reports",
+            "kind": "first_party_page",
+            "locator": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "locator_only",
+            "content_sha256": null
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "ev:registry:cms-hcris-cost-reports",
+            "claim": "The captured discovery source registry describes CMS Healthcare Cost Report Information System (HCRIS) at the authoritative first-party route and supports this asset-level discovery record.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "prov:registry:cms-hcris-cost-reports",
+              "prov:first-party:cms-hcris-cost-reports"
+            ],
+            "limitations": [
+              "Older extracts may be subsets.",
+              "Not every submitted form is guaranteed to be represented electronically.",
+              "Facility/provider-period scope is not consolidated parent-system finance.",
+              "This adapter performed no network request, payload acquisition, entity resolution, family merge, or live availability test.",
+              "Source-registry project status was catalog_metadata_only; discovery evidence is not acquisition proof."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T00:00:00Z",
+          "data_through": "2026",
+          "update_frequency": "annual",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "download",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports",
+              "requires_human": false,
+              "instruction": "Open the authoritative source route and confirm the selected asset, release, documentation, and access terms before requesting data.",
+              "expected_result": "A first-party asset page or a preserved typed access or infrastructure outcome."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports/cost-reports-fiscal-year",
+              "requires_human": false,
+              "instruction": "Inspect the published download, API, methodology, or documentation route; select and record a specific release before acquisition.",
+              "expected_result": "Versioned retrieval metadata or a preserved typed access or infrastructure outcome."
+            }
+          ],
+          "expected_artifacts": [
+            "versioned source metadata",
+            "typed access or infrastructure outcome",
+            "content hash if data are later acquired"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "unknown",
+          "keys": [],
+          "notes": [
+            "Use only separately published explicit join-route objects; do not infer identity or compatibility from titles, publishers, URLs, or family labels."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 2,
+      "score": 161,
+      "record_id": "obs:asset:pa-phc4-custom-data",
+      "relevance": {
+        "matched_subjects": [
+          "hospital_financials",
+          "utilization"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [
+          "hospital",
+          "facility"
+        ],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_capability",
+            "value": 57,
+            "reason": "Hospital financials matches primary capability Hospital financials.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "subject_capability",
+            "value": 57,
+            "reason": "Hospital and provider utilization matches primary capability Hospital and provider utilization.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "geography_exact",
+            "value": 24,
+            "reason": "Record explicitly covers Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "unit_exact",
+            "value": 11,
+            "reason": "Record unit of analysis includes Hospital.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "unit_exact",
+            "value": 11,
+            "reason": "Record unit of analysis includes Facility.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 1,
+            "reason": "Relevant but access is application_required; restrictions remain visible.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Hospital financials matches primary capability Hospital financials.",
+          "Hospital and provider utilization matches primary capability Hospital and provider utilization.",
+          "Record explicitly covers Pennsylvania.",
+          "Record unit of analysis includes Hospital.",
+          "Resolved subject concepts: hospital_financials, utilization.",
+          "Human action is required because access is application_required."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "obs:asset:pa-phc4-custom-data",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "obs:source:pa-phc4",
+            "name": "Pennsylvania Health Care Cost Containment Council"
+          },
+          "family": {
+            "family_id": "obs:family:pa-phc4-financial-ownership",
+            "name": "PHC4 hospital financial and ownership reporting",
+            "resolution_state": "source_asserted",
+            "evidence_ids": [
+              "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "obs:asset:pa-phc4-custom-data",
+            "name": "PHC4 Custom Record-Level Data Request",
+            "asset_type": "other",
+            "version_state": "unknown",
+            "version_label": null
+          },
+          "match_fields": {
+            "normalized_url": "https://www.phc4.org/request-custom-data/",
+            "canonical_url": "https://www.phc4.org/request-custom-data/",
+            "doi": null,
+            "source_id": "pa_phc4_financial_ownership",
+            "publisher": "Pennsylvania Health Care Cost Containment Council",
+            "normalized_title": "phc4 custom record level data request",
+            "source_portal": "www.phc4.org"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "The offline adapter preserves the source-registry identity and does not query, write, or rebuild the shared identity index."
+          }
+        },
+        "title": "PHC4 Custom Record-Level Data Request",
+        "description": "A distinct access route for Pennsylvania record-level or custom PHC4 datasets. Requests require an application, review, quote, payment, and controlled transfer; public report visibility is not data access.",
+        "authoritative_url": "https://www.phc4.org/request-custom-data/",
+        "geography": {
+          "coverage_level": "state",
+          "jurisdictions": [
+            "US-PA"
+          ],
+          "rurality_support": "derivable",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data"
+          ]
+        },
+        "time_coverage": {
+          "state": "bounded",
+          "start": "1996",
+          "end": "2024",
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data"
+          ]
+        },
+        "unit_of_analysis": [
+          "hospital",
+          "facility",
+          "health_system",
+          "event"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic:hospital-financials",
+              "label": "Hospital financials",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital financials; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data"
+              ]
+            },
+            {
+              "id": "topic:utilization",
+              "label": "Hospital and provider utilization",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital and provider utilization; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data"
+              ]
+            },
+            {
+              "id": "topic:ownership",
+              "label": "Ownership and organizational relationships",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for ownership and organizational relationships; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data"
+              ]
+            },
+            {
+              "id": "topic:quality",
+              "label": "Quality and outcomes",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for quality and outcomes; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data"
+              ]
+            },
+            {
+              "id": "topic:claims",
+              "label": "Claims and encounters",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for claims and encounters; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data"
+              ]
+            },
+            {
+              "id": "topic:hospital-capacity",
+              "label": "Hospital capacity and operations",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital capacity and operations; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case:question-to-source-discovery",
+              "label": "Question-to-source discovery and access routing",
+              "fitness": "supporting",
+              "rationale": "The asset record is intended for evidence-bound source discovery and retrieval routing, not as an assertion that data were acquired or are analytically sufficient.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "application_required",
+          "mechanisms": [
+            "request_form",
+            "contact_owner"
+          ],
+          "requirements": [
+            "application",
+            "payment",
+            "human_approval"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data"
+          ],
+          "restriction_note": "Public HTML/PDF reports; record-level/custom datasets require application, review, quote, payment and transfer. Current terms and availability were not live tested in this offline build."
+        },
+        "provenance": [
+          {
+            "provenance_id": "prov:registry:pa-phc4-financial-ownership:pa-phc4-custom-data",
+            "kind": "other",
+            "locator": "urn:sha256:62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd"
+          },
+          {
+            "provenance_id": "prov:first-party:pa-phc4-financial-ownership:pa-phc4-custom-data",
+            "kind": "first_party_page",
+            "locator": "https://www.phc4.org/request-custom-data/",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "locator_only",
+            "content_sha256": null
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "ev:registry:pa-phc4-financial-ownership:pa-phc4-custom-data",
+            "claim": "The captured discovery source registry describes Pennsylvania PHC4 hospital/system financial and ownership reporting at the authoritative first-party route and supports this asset-level discovery record.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "prov:registry:pa-phc4-financial-ownership:pa-phc4-custom-data",
+              "prov:first-party:pa-phc4-financial-ownership:pa-phc4-custom-data"
+            ],
+            "limitations": [
+              "Application, review, quote, payment, and transfer are material restrictions.",
+              "Available variables, permitted uses, and current terms require human review.",
+              "This adapter performed no network request, payload acquisition, entity resolution, family merge, or live availability test.",
+              "Source-registry project status was partial; discovery evidence is not acquisition proof."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T00:00:00Z",
+          "data_through": "2024",
+          "update_frequency": "annual",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": false,
+          "preferred_interface": "request_workflow",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://www.phc4.org/request-custom-data/",
+              "requires_human": false,
+              "instruction": "Open the authoritative source route and confirm the selected asset, release, documentation, and access terms before requesting data.",
+              "expected_result": "A first-party asset page or a preserved typed access or infrastructure outcome."
+            },
+            {
+              "sequence": 2,
+              "action": "stop_and_report",
+              "url": null,
+              "requires_human": true,
+              "instruction": "Stop before account creation, application submission, agreement acceptance, payment, or controlled transfer and obtain explicit human authorization.",
+              "expected_result": "A human decision on whether and how to proceed under the source-specific terms."
+            }
+          ],
+          "expected_artifacts": [
+            "source-specific access decision",
+            "typed restriction outcome",
+            "authorized retrieval receipt if later approved"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "unknown",
+          "keys": [],
+          "notes": [
+            "Use only separately published explicit join-route objects; do not infer identity or compatibility from titles, publishers, URLs, or family labels."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 3,
+      "score": 159,
+      "record_id": "obs:asset:pa-phc4-public-financial-reports",
+      "relevance": {
+        "matched_subjects": [
+          "hospital_financials",
+          "utilization"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [
+          "hospital"
+        ],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_capability",
+            "value": 57,
+            "reason": "Hospital financials matches primary capability Hospital financials.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "subject_capability",
+            "value": 57,
+            "reason": "Hospital and provider utilization matches primary capability Hospital and provider utilization.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "geography_exact",
+            "value": 24,
+            "reason": "Record explicitly covers Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "unit_exact",
+            "value": 11,
+            "reason": "Record unit of analysis includes Hospital.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 10,
+            "reason": "Access status is public_direct.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Hospital financials matches primary capability Hospital financials.",
+          "Hospital and provider utilization matches primary capability Hospital and provider utilization.",
+          "Record explicitly covers Pennsylvania.",
+          "Record unit of analysis includes Hospital.",
+          "Resolved subject concepts: hospital_financials, utilization."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "obs:asset:pa-phc4-public-financial-reports",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "obs:source:pa-phc4",
+            "name": "Pennsylvania Health Care Cost Containment Council"
+          },
+          "family": {
+            "family_id": "obs:family:pa-phc4-financial-ownership",
+            "name": "PHC4 hospital financial and ownership reporting",
+            "resolution_state": "source_asserted",
+            "evidence_ids": [
+              "ev:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "obs:asset:pa-phc4-public-financial-reports",
+            "name": "PHC4 Public Hospital Financial Reports",
+            "asset_type": "catalog_record",
+            "version_state": "versioned",
+            "version_label": "annual financial reports 1996-2024 evidenced"
+          },
+          "match_fields": {
+            "normalized_url": "https://www.phc4.org/report-focus/financial/",
+            "canonical_url": "https://www.phc4.org/report-focus/financial/",
+            "doi": null,
+            "source_id": "pa_phc4_financial_ownership",
+            "publisher": "Pennsylvania Health Care Cost Containment Council",
+            "normalized_title": "phc4 public hospital financial reports",
+            "source_portal": "www.phc4.org"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "The offline adapter preserves the source-registry identity and does not query, write, or rebuild the shared identity index."
+          }
+        },
+        "title": "PHC4 Public Hospital Financial Reports",
+        "description": "Public Pennsylvania hospital and health-system financial-condition, utilization, and annual financial report pages and PDF publications. This record does not imply access to PHC4 custom record-level files.",
+        "authoritative_url": "https://www.phc4.org/report-focus/financial/",
+        "geography": {
+          "coverage_level": "state",
+          "jurisdictions": [
+            "US-PA"
+          ],
+          "rurality_support": "derivable",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+          ]
+        },
+        "time_coverage": {
+          "state": "bounded",
+          "start": "1996",
+          "end": "2024",
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+          ]
+        },
+        "unit_of_analysis": [
+          "hospital",
+          "health_system",
+          "state"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic:hospital-financials",
+              "label": "Hospital financials",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital financials; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+              ]
+            },
+            {
+              "id": "topic:utilization",
+              "label": "Hospital and provider utilization",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital and provider utilization; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+              ]
+            },
+            {
+              "id": "topic:ownership",
+              "label": "Ownership and organizational relationships",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for ownership and organizational relationships; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+              ]
+            },
+            {
+              "id": "topic:hospital-capacity",
+              "label": "Hospital capacity and operations",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital capacity and operations; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case:question-to-source-discovery",
+              "label": "Question-to-source discovery and access routing",
+              "fitness": "supporting",
+              "rationale": "The asset record is intended for evidence-bound source discovery and retrieval routing, not as an assertion that data were acquired or are analytically sufficient.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "ev:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_direct",
+          "mechanisms": [
+            "data_portal",
+            "web_download"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+          ],
+          "restriction_note": "The source registry describes this route as public. Current endpoint availability and release metadata were not live tested in this offline build."
+        },
+        "provenance": [
+          {
+            "provenance_id": "prov:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports",
+            "kind": "other",
+            "locator": "urn:sha256:62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd"
+          },
+          {
+            "provenance_id": "prov:first-party:pa-phc4-financial-ownership:pa-phc4-public-financial-reports",
+            "kind": "first_party_page",
+            "locator": "https://www.phc4.org/report-focus/financial/",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "locator_only",
+            "content_sha256": null
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "ev:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports",
+            "claim": "The captured discovery source registry describes Pennsylvania PHC4 hospital/system financial and ownership reporting at the authoritative first-party route and supports this asset-level discovery record.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "prov:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports",
+              "prov:first-party:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+            ],
+            "limitations": [
+              "Public reports are largely publication-level HTML or PDF, not an established open record-level bulk asset.",
+              "Pennsylvania only; facility and system definitions must be retained by report year.",
+              "This adapter performed no network request, payload acquisition, entity resolution, family merge, or live availability test.",
+              "Source-registry project status was partial; discovery evidence is not acquisition proof."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T00:00:00Z",
+          "data_through": "2024",
+          "update_frequency": "annual",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "portal",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://www.phc4.org/report-focus/financial/",
+              "requires_human": false,
+              "instruction": "Open the authoritative source route and confirm the selected asset, release, documentation, and access terms before requesting data.",
+              "expected_result": "A first-party asset page or a preserved typed access or infrastructure outcome."
+            }
+          ],
+          "expected_artifacts": [
+            "versioned source metadata",
+            "typed access or infrastructure outcome",
+            "content hash if data are later acquired"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "unknown",
+          "keys": [],
+          "notes": [
+            "Use only separately published explicit join-route objects; do not infer identity or compatibility from titles, publishers, URLs, or family labels."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 4,
+      "score": 139,
+      "record_id": "obs:asset:hrsa-uds-sites",
+      "relevance": {
+        "matched_subjects": [
+          "hospital_financials",
+          "utilization"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [
+          "facility",
+          "provider"
+        ],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_capability",
+            "value": 37,
+            "reason": "Hospital financials matches supporting capability Hospital financials.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "subject_capability",
+            "value": 57,
+            "reason": "Hospital and provider utilization matches primary capability Hospital and provider utilization.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "geography_national_support",
+            "value": 13,
+            "reason": "National record may be filtered or joined for Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "unit_exact",
+            "value": 11,
+            "reason": "Record unit of analysis includes Facility.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "unit_exact",
+            "value": 11,
+            "reason": "Record unit of analysis includes Provider.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 10,
+            "reason": "Access status is public_direct.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Hospital and provider utilization matches primary capability Hospital and provider utilization.",
+          "Hospital financials matches supporting capability Hospital financials.",
+          "National record may be filtered or joined for Pennsylvania.",
+          "Record unit of analysis includes Facility.",
+          "Resolved subject concepts: hospital_financials, utilization."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "obs:asset:hrsa-uds-sites",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "obs:source:hrsa-data",
+            "name": "Health Resources and Services Administration"
+          },
+          "family": {
+            "family_id": "obs:family:hrsa-uds",
+            "name": "HRSA Uniform Data System",
+            "resolution_state": "source_asserted",
+            "evidence_ids": [
+              "ev:registry:hrsa-uds-sites"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "obs:asset:hrsa-uds-sites",
+            "name": "HRSA Uniform Data System and Health Center Sites",
+            "asset_type": "dataset",
+            "version_state": "versioned",
+            "version_label": "annual 2012-2025 files evidenced"
+          },
+          "match_fields": {
+            "normalized_url": "https://data.hrsa.gov/topics/health-centers/uds",
+            "canonical_url": "https://data.hrsa.gov/topics/health-centers/uds",
+            "doi": null,
+            "source_id": "hrsa_uds_sites",
+            "publisher": "Health Resources and Services Administration",
+            "normalized_title": "hrsa uniform data system and health center sites",
+            "source_portal": "data.hrsa.gov"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "The offline adapter preserves the source-registry identity and does not query, write, or rebuild the shared identity index."
+          }
+        },
+        "title": "HRSA Uniform Data System and Health Center Sites",
+        "description": "Annual health-center awardee and look-alike patients, services, staffing, costs, revenues, clinical measures, organizational measures, and site locations.",
+        "authoritative_url": "https://data.hrsa.gov/topics/health-centers/uds",
+        "geography": {
+          "coverage_level": "national",
+          "jurisdictions": [
+            "US"
+          ],
+          "rurality_support": "direct",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:hrsa-uds-sites"
+          ]
+        },
+        "time_coverage": {
+          "state": "bounded",
+          "start": "2012",
+          "end": "2025",
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:hrsa-uds-sites"
+          ]
+        },
+        "unit_of_analysis": [
+          "facility",
+          "provider",
+          "other"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic:utilization",
+              "label": "Hospital and provider utilization",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital and provider utilization; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:hrsa-uds-sites"
+              ]
+            },
+            {
+              "id": "topic:workforce",
+              "label": "Healthcare workforce",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for healthcare workforce; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:hrsa-uds-sites"
+              ]
+            },
+            {
+              "id": "topic:hospital-financials",
+              "label": "Hospital financials",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital financials; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:hrsa-uds-sites"
+              ]
+            },
+            {
+              "id": "topic:quality",
+              "label": "Quality and outcomes",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for quality and outcomes; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:hrsa-uds-sites"
+              ]
+            },
+            {
+              "id": "topic:public-health",
+              "label": "Public health surveillance",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for public health surveillance; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:hrsa-uds-sites"
+              ]
+            },
+            {
+              "id": "topic:provider-directory",
+              "label": "Provider and facility directories",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for provider and facility directories; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:hrsa-uds-sites"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case:question-to-source-discovery",
+              "label": "Question-to-source discovery and access routing",
+              "fitness": "supporting",
+              "rationale": "The asset record is intended for evidence-bound source discovery and retrieval routing, not as an assertion that data were acquired or are analytically sufficient.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "ev:registry:hrsa-uds-sites"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_direct",
+          "mechanisms": [
+            "bulk_download",
+            "web_download",
+            "api"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:hrsa-uds-sites"
+          ],
+          "restriction_note": "The source registry describes this route as public. Current endpoint availability and release metadata were not live tested in this offline build."
+        },
+        "provenance": [
+          {
+            "provenance_id": "prov:registry:hrsa-uds-sites",
+            "kind": "other",
+            "locator": "urn:sha256:62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd"
+          },
+          {
+            "provenance_id": "prov:first-party:hrsa-uds-sites",
+            "kind": "first_party_page",
+            "locator": "https://data.hrsa.gov/topics/health-centers/uds",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "locator_only",
+            "content_sha256": null
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "ev:registry:hrsa-uds-sites",
+            "claim": "The captured discovery source registry describes HRSA Uniform Data System and health-center site data at the authoritative first-party route and supports this asset-level discovery record.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "prov:registry:hrsa-uds-sites",
+              "prov:first-party:hrsa-uds-sites"
+            ],
+            "limitations": [
+              "Awardee and site are different levels.",
+              "The source covers the health-center program rather than all community providers.",
+              "Definitions and suppressed cells can vary by year.",
+              "This adapter performed no network request, payload acquisition, entity resolution, family merge, or live availability test.",
+              "Source-registry project status was catalog_metadata_only; discovery evidence is not acquisition proof."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T00:00:00Z",
+          "data_through": "2025",
+          "update_frequency": "annual",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "download",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://data.hrsa.gov/topics/health-centers/uds",
+              "requires_human": false,
+              "instruction": "Open the authoritative source route and confirm the selected asset, release, documentation, and access terms before requesting data.",
+              "expected_result": "A first-party asset page or a preserved typed access or infrastructure outcome."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://data.hrsa.gov/data/download?titleFilter=Uniform+Data+System",
+              "requires_human": false,
+              "instruction": "Inspect the published download, API, methodology, or documentation route; select and record a specific release before acquisition.",
+              "expected_result": "Versioned retrieval metadata or a preserved typed access or infrastructure outcome."
+            }
+          ],
+          "expected_artifacts": [
+            "versioned source metadata",
+            "typed access or infrastructure outcome",
+            "content hash if data are later acquired"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "unknown",
+          "keys": [],
+          "notes": [
+            "Use only separately published explicit join-route objects; do not infer identity or compatibility from titles, publishers, URLs, or family labels."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 5,
+      "score": 82,
+      "record_id": "obs:asset:irs-990-schedules-h-r",
+      "relevance": {
+        "matched_subjects": [
+          "hospital_financials"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [
+          "hospital",
+          "facility"
+        ],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_capability",
+            "value": 37,
+            "reason": "Hospital financials matches supporting capability Hospital financials.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "geography_national_support",
+            "value": 13,
+            "reason": "National record may be filtered or joined for Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "unit_exact",
+            "value": 11,
+            "reason": "Record unit of analysis includes Hospital.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "unit_exact",
+            "value": 11,
+            "reason": "Record unit of analysis includes Facility.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 10,
+            "reason": "Access status is public_direct.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Hospital financials matches supporting capability Hospital financials.",
+          "National record may be filtered or joined for Pennsylvania.",
+          "Record unit of analysis includes Hospital.",
+          "Record unit of analysis includes Facility.",
+          "Resolved subject concepts: hospital_financials."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "obs:asset:irs-990-schedules-h-r",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "obs:source:irs-exempt-organizations",
+            "name": "Internal Revenue Service Exempt Organizations"
+          },
+          "family": {
+            "family_id": "obs:family:irs-form-990-schedules",
+            "name": "IRS Form 990 schedules",
+            "resolution_state": "source_asserted",
+            "evidence_ids": [
+              "ev:registry:irs-990-schedules-h-r"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "obs:asset:irs-990-schedules-h-r",
+            "name": "IRS Form 990 Schedules H and R",
+            "asset_type": "catalog_record",
+            "version_state": "versioned",
+            "version_label": "tax-year form schedules"
+          },
+          "match_fields": {
+            "normalized_url": "https://www.irs.gov/instructions/i990sh",
+            "canonical_url": "https://www.irs.gov/instructions/i990sh",
+            "doi": null,
+            "source_id": "irs_990_schedules_h_r",
+            "publisher": "Internal Revenue Service",
+            "normalized_title": "irs form 990 schedules h and r",
+            "source_portal": "www.irs.gov"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "The offline adapter preserves the source-registry identity and does not query, write, or rebuild the shared identity index."
+          }
+        },
+        "title": "IRS Form 990 Schedules H and R",
+        "description": "Schedule H hospital facilities, community benefit, financial assistance and policies plus Schedule R related organizations and selected transactions, embedded in filed Form 990 XML returns.",
+        "authoritative_url": "https://www.irs.gov/instructions/i990sh",
+        "geography": {
+          "coverage_level": "national",
+          "jurisdictions": [
+            "US"
+          ],
+          "rurality_support": "derivable",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:irs-990-schedules-h-r"
+          ]
+        },
+        "time_coverage": {
+          "state": "bounded",
+          "start": "2017",
+          "end": "2026",
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:irs-990-schedules-h-r"
+          ]
+        },
+        "unit_of_analysis": [
+          "hospital",
+          "facility",
+          "other"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic:community-benefit",
+              "label": "Community benefit and tax exemption",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for community benefit and tax exemption; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:irs-990-schedules-h-r"
+              ]
+            },
+            {
+              "id": "topic:ownership",
+              "label": "Ownership and organizational relationships",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for ownership and organizational relationships; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:irs-990-schedules-h-r"
+              ]
+            },
+            {
+              "id": "topic:hospital-financials",
+              "label": "Hospital financials",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital financials; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:irs-990-schedules-h-r"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case:question-to-source-discovery",
+              "label": "Question-to-source discovery and access routing",
+              "fitness": "supporting",
+              "rationale": "The asset record is intended for evidence-bound source discovery and retrieval routing, not as an assertion that data were acquired or are analytically sufficient.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "ev:registry:irs-990-schedules-h-r"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_direct",
+          "mechanisms": [
+            "bulk_download",
+            "web_download"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:irs-990-schedules-h-r"
+          ],
+          "restriction_note": "The source registry describes this route as public. Current endpoint availability and release metadata were not live tested in this offline build."
+        },
+        "provenance": [
+          {
+            "provenance_id": "prov:registry:irs-990-schedules-h-r",
+            "kind": "other",
+            "locator": "urn:sha256:62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd"
+          },
+          {
+            "provenance_id": "prov:first-party:irs-990-schedules-h-r",
+            "kind": "first_party_page",
+            "locator": "https://www.irs.gov/instructions/i990sh",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "locator_only",
+            "content_sha256": null
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "ev:registry:irs-990-schedules-h-r",
+            "claim": "The captured discovery source registry describes IRS hospital community-benefit and related-organization schedules at the authoritative first-party route and supports this asset-level discovery record.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "prov:registry:irs-990-schedules-h-r",
+              "prov:first-party:irs-990-schedules-h-r"
+            ],
+            "limitations": [
+              "Schedule H may not cover separately incorporated affiliated facilities.",
+              "Schedule R is a relationship lead, not a resolved ownership graph.",
+              "This adapter performed no network request, payload acquisition, entity resolution, family merge, or live availability test.",
+              "Source-registry project status was uncovered; discovery evidence is not acquisition proof."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T00:00:00Z",
+          "data_through": "2026",
+          "update_frequency": "annual",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "download",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://www.irs.gov/instructions/i990sh",
+              "requires_human": false,
+              "instruction": "Open the authoritative source route and confirm the selected asset, release, documentation, and access terms before requesting data.",
+              "expected_result": "A first-party asset page or a preserved typed access or infrastructure outcome."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://www.irs.gov/instructions/i990sr",
+              "requires_human": false,
+              "instruction": "Inspect the published download, API, methodology, or documentation route; select and record a specific release before acquisition.",
+              "expected_result": "Versioned retrieval metadata or a preserved typed access or infrastructure outcome."
+            }
+          ],
+          "expected_artifacts": [
+            "versioned source metadata",
+            "typed access or infrastructure outcome",
+            "content hash if data are later acquired"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "unknown",
+          "keys": [],
+          "notes": [
+            "Use only separately published explicit join-route objects; do not infer identity or compatibility from titles, publishers, URLs, or family labels."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 6,
+      "score": 80,
+      "record_id": "obs:asset:federal-audit-clearinghouse",
+      "relevance": {
+        "matched_subjects": [
+          "hospital_financials"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_capability",
+            "value": 57,
+            "reason": "Hospital financials matches primary capability Hospital financials.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "geography_national_support",
+            "value": 13,
+            "reason": "National record may be filtered or joined for Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 10,
+            "reason": "Access status is public_direct.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Hospital financials matches primary capability Hospital financials.",
+          "National record may be filtered or joined for Pennsylvania.",
+          "Access status is public_direct.",
+          "Resolved subject concepts: hospital_financials."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "obs:asset:federal-audit-clearinghouse",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "obs:source:federal-audit-clearinghouse",
+            "name": "Federal Audit Clearinghouse"
+          },
+          "family": {
+            "family_id": "obs:family:federal-single-audits",
+            "name": "Federal Single Audit data",
+            "resolution_state": "source_asserted",
+            "evidence_ids": [
+              "ev:registry:federal-audit-clearinghouse"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "obs:asset:federal-audit-clearinghouse",
+            "name": "Federal Audit Clearinghouse Single Audit Data",
+            "asset_type": "dataset",
+            "version_state": "versioned",
+            "version_label": "audit-year files 2016-current"
+          },
+          "match_fields": {
+            "normalized_url": "https://www.fac.gov/data/",
+            "canonical_url": "https://www.fac.gov/data/",
+            "doi": null,
+            "source_id": "federal_audit_clearinghouse",
+            "publisher": "U.S. General Services Administration",
+            "normalized_title": "federal audit clearinghouse single audit data",
+            "source_portal": "www.fac.gov"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "The offline adapter preserves the source-registry identity and does not query, write, or rebuild the shared identity index."
+          }
+        },
+        "title": "Federal Audit Clearinghouse Single Audit Data",
+        "description": "Single Audit metadata, federal awards, findings, and audit packages for entities that meet federal-assistance audit thresholds, including healthcare organizations and governments.",
+        "authoritative_url": "https://www.fac.gov/data/",
+        "geography": {
+          "coverage_level": "national",
+          "jurisdictions": [
+            "US"
+          ],
+          "rurality_support": "derivable",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:federal-audit-clearinghouse"
+          ]
+        },
+        "time_coverage": {
+          "state": "bounded",
+          "start": "2016",
+          "end": "2026",
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:federal-audit-clearinghouse"
+          ]
+        },
+        "unit_of_analysis": [
+          "other"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic:hospital-financials",
+              "label": "Hospital financials",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital financials; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:federal-audit-clearinghouse"
+              ]
+            },
+            {
+              "id": "topic:ownership",
+              "label": "Ownership and organizational relationships",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for ownership and organizational relationships; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:federal-audit-clearinghouse"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case:question-to-source-discovery",
+              "label": "Question-to-source discovery and access routing",
+              "fitness": "supporting",
+              "rationale": "The asset record is intended for evidence-bound source discovery and retrieval routing, not as an assertion that data were acquired or are analytically sufficient.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "ev:registry:federal-audit-clearinghouse"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_direct",
+          "mechanisms": [
+            "bulk_download",
+            "api",
+            "web_download"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:federal-audit-clearinghouse"
+          ],
+          "restriction_note": "The source registry describes this route as public. Current endpoint availability and release metadata were not live tested in this offline build."
+        },
+        "provenance": [
+          {
+            "provenance_id": "prov:registry:federal-audit-clearinghouse",
+            "kind": "other",
+            "locator": "urn:sha256:62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd"
+          },
+          {
+            "provenance_id": "prov:first-party:federal-audit-clearinghouse",
+            "kind": "first_party_page",
+            "locator": "https://www.fac.gov/data/",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "locator_only",
+            "content_sha256": null
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "ev:registry:federal-audit-clearinghouse",
+            "claim": "The captured discovery source registry describes Federal Audit Clearinghouse Single Audit data at the authoritative first-party route and supports this asset-level discovery record.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "prov:registry:federal-audit-clearinghouse",
+              "prov:first-party:federal-audit-clearinghouse"
+            ],
+            "limitations": [
+              "Coverage is threshold-based and not a census of healthcare organizations.",
+              "Audit scope is not necessarily consolidated health-system finance.",
+              "This adapter performed no network request, payload acquisition, entity resolution, family merge, or live availability test.",
+              "Source-registry project status was uncovered; discovery evidence is not acquisition proof."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T00:00:00Z",
+          "data_through": "2026",
+          "update_frequency": "annual",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "download",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://www.fac.gov/data/",
+              "requires_human": false,
+              "instruction": "Open the authoritative source route and confirm the selected asset, release, documentation, and access terms before requesting data.",
+              "expected_result": "A first-party asset page or a preserved typed access or infrastructure outcome."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://www.fac.gov/api/",
+              "requires_human": false,
+              "instruction": "Inspect the published download, API, methodology, or documentation route; select and record a specific release before acquisition.",
+              "expected_result": "Versioned retrieval metadata or a preserved typed access or infrastructure outcome."
+            }
+          ],
+          "expected_artifacts": [
+            "versioned source metadata",
+            "typed access or infrastructure outcome",
+            "content hash if data are later acquired"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "unknown",
+          "keys": [],
+          "notes": [
+            "Use only separately published explicit join-route objects; do not infer identity or compatibility from titles, publishers, URLs, or family labels."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 7,
+      "score": 80,
+      "record_id": "obs:asset:irs-teos-990-xml",
+      "relevance": {
+        "matched_subjects": [
+          "hospital_financials"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_capability",
+            "value": 57,
+            "reason": "Hospital financials matches primary capability Hospital financials.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "geography_national_support",
+            "value": 13,
+            "reason": "National record may be filtered or joined for Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 10,
+            "reason": "Access status is public_direct.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Hospital financials matches primary capability Hospital financials.",
+          "National record may be filtered or joined for Pennsylvania.",
+          "Access status is public_direct.",
+          "Resolved subject concepts: hospital_financials."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "obs:asset:irs-teos-990-xml",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "obs:source:irs-exempt-organizations",
+            "name": "Internal Revenue Service Exempt Organizations"
+          },
+          "family": {
+            "family_id": "obs:family:irs-exempt-organization-bulk-data",
+            "name": "IRS exempt-organization bulk data",
+            "resolution_state": "source_asserted",
+            "evidence_ids": [
+              "ev:registry:irs-teos-990-xml"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "obs:asset:irs-teos-990-xml",
+            "name": "IRS TEOS Form 990 XML Bulk Data",
+            "asset_type": "dataset",
+            "version_state": "versioned",
+            "version_label": "2017-present search and bulk availability"
+          },
+          "match_fields": {
+            "normalized_url": "https://www.irs.gov/charities-non-profits/tax-exempt-organization-search-bulk-data-downloads",
+            "canonical_url": "https://www.irs.gov/charities-non-profits/tax-exempt-organization-search-bulk-data-downloads",
+            "doi": null,
+            "source_id": "irs_teos_990_xml",
+            "publisher": "Internal Revenue Service",
+            "normalized_title": "irs teos form 990 xml bulk data",
+            "source_portal": "www.irs.gov"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "The offline adapter preserves the source-registry identity and does not query, write, or rebuild the shared identity index."
+          }
+        },
+        "title": "IRS TEOS Form 990 XML Bulk Data",
+        "description": "Public Form 990-series e-file indexes and XML return packages with submission metadata and filed financial, organizational, and program information.",
+        "authoritative_url": "https://www.irs.gov/charities-non-profits/tax-exempt-organization-search-bulk-data-downloads",
+        "geography": {
+          "coverage_level": "national",
+          "jurisdictions": [
+            "US"
+          ],
+          "rurality_support": "derivable",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:irs-teos-990-xml"
+          ]
+        },
+        "time_coverage": {
+          "state": "bounded",
+          "start": "2017",
+          "end": "2026",
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:irs-teos-990-xml"
+          ]
+        },
+        "unit_of_analysis": [
+          "other"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic:hospital-financials",
+              "label": "Hospital financials",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital financials; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:irs-teos-990-xml"
+              ]
+            },
+            {
+              "id": "topic:community-benefit",
+              "label": "Community benefit and tax exemption",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for community benefit and tax exemption; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:irs-teos-990-xml"
+              ]
+            },
+            {
+              "id": "topic:ownership",
+              "label": "Ownership and organizational relationships",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for ownership and organizational relationships; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:irs-teos-990-xml"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case:question-to-source-discovery",
+              "label": "Question-to-source discovery and access routing",
+              "fitness": "supporting",
+              "rationale": "The asset record is intended for evidence-bound source discovery and retrieval routing, not as an assertion that data were acquired or are analytically sufficient.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "ev:registry:irs-teos-990-xml"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_direct",
+          "mechanisms": [
+            "bulk_download",
+            "web_download"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:irs-teos-990-xml"
+          ],
+          "restriction_note": "The source registry describes this route as public. Current endpoint availability and release metadata were not live tested in this offline build."
+        },
+        "provenance": [
+          {
+            "provenance_id": "prov:registry:irs-teos-990-xml",
+            "kind": "other",
+            "locator": "urn:sha256:62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd"
+          },
+          {
+            "provenance_id": "prov:first-party:irs-teos-990-xml",
+            "kind": "first_party_page",
+            "locator": "https://www.irs.gov/charities-non-profits/tax-exempt-organization-search-bulk-data-downloads",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "locator_only",
+            "content_sha256": null
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "ev:registry:irs-teos-990-xml",
+            "claim": "The captured discovery source registry describes IRS TEOS and Form 990-series public returns at the authoritative first-party route and supports this asset-level discovery record.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "prov:registry:irs-teos-990-xml",
+              "prov:first-party:irs-teos-990-xml"
+            ],
+            "limitations": [
+              "Legal-entity and filing-year scope is not consolidated health-system scope.",
+              "Amended and duplicate returns require provenance.",
+              "Bulk packages are large and need bounded processing.",
+              "This adapter performed no network request, payload acquisition, entity resolution, family merge, or live availability test.",
+              "Source-registry project status was uncovered; discovery evidence is not acquisition proof."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T00:00:00Z",
+          "data_through": "2026",
+          "update_frequency": "annual",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "download",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://www.irs.gov/charities-non-profits/tax-exempt-organization-search-bulk-data-downloads",
+              "requires_human": false,
+              "instruction": "Open the authoritative source route and confirm the selected asset, release, documentation, and access terms before requesting data.",
+              "expected_result": "A first-party asset page or a preserved typed access or infrastructure outcome."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://www.irs.gov/charities-non-profits/form-990-series-downloads",
+              "requires_human": false,
+              "instruction": "Inspect the published download, API, methodology, or documentation route; select and record a specific release before acquisition.",
+              "expected_result": "Versioned retrieval metadata or a preserved typed access or infrastructure outcome."
+            }
+          ],
+          "expected_artifacts": [
+            "versioned source metadata",
+            "typed access or infrastructure outcome",
+            "content hash if data are later acquired"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "unknown",
+          "keys": [],
+          "notes": [
+            "Use only separately published explicit join-route objects; do not infer identity or compatibility from titles, publishers, URLs, or family labels."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 8,
+      "score": 80,
+      "record_id": "obs:asset:medicaid-mcpar-mlr",
+      "relevance": {
+        "matched_subjects": [
+          "hospital_financials"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_capability",
+            "value": 57,
+            "reason": "Hospital financials matches primary capability Hospital financials.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "geography_national_support",
+            "value": 13,
+            "reason": "National record may be filtered or joined for Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 10,
+            "reason": "Access status is public_direct.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Hospital financials matches primary capability Hospital financials.",
+          "National record may be filtered or joined for Pennsylvania.",
+          "Access status is public_direct.",
+          "Resolved subject concepts: hospital_financials."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "obs:asset:medicaid-mcpar-mlr",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "obs:source:medicaid",
+            "name": "Medicaid.gov"
+          },
+          "family": {
+            "family_id": "obs:family:medicaid-managed-care-reporting",
+            "name": "Medicaid managed-care public reporting",
+            "resolution_state": "source_asserted",
+            "evidence_ids": [
+              "ev:registry:medicaid-mcpar-mlrs"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "obs:asset:medicaid-mcpar-mlr",
+            "name": "Medicaid MCPAR and Medical Loss Ratio Public Use Files",
+            "asset_type": "dataset",
+            "version_state": "versioned",
+            "version_label": "annual and semiannual public-use releases"
+          },
+          "match_fields": {
+            "normalized_url": "https://www.medicaid.gov/medicaid/managed-care/guidance/medicaid-and-chip-managed-care-reporting/public-access-state-submitted-mcpars",
+            "canonical_url": "https://www.medicaid.gov/medicaid/managed-care/guidance/medicaid-and-chip-managed-care-reporting/public-access-state-submitted-mcpars",
+            "doi": null,
+            "source_id": "medicaid_mcpar_mlrs",
+            "publisher": "Centers for Medicare & Medicaid Services",
+            "normalized_title": "medicaid mcpar and medical loss ratio public use files",
+            "source_portal": "www.medicaid.gov"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "The offline adapter preserves the source-registry identity and does not query, write, or rebuild the shared identity index."
+          }
+        },
+        "title": "Medicaid MCPAR and Medical Loss Ratio Public Use Files",
+        "description": "State Medicaid and CHIP managed-care program and plan characteristics, financial performance, medical loss ratio, network, sanctions, enrollment, and operating-authority information.",
+        "authoritative_url": "https://www.medicaid.gov/medicaid/managed-care/guidance/medicaid-and-chip-managed-care-reporting/public-access-state-submitted-mcpars",
+        "geography": {
+          "coverage_level": "multi_state",
+          "jurisdictions": [
+            "US"
+          ],
+          "rurality_support": "derivable",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:medicaid-mcpar-mlrs"
+          ]
+        },
+        "time_coverage": {
+          "state": "bounded",
+          "start": "2017",
+          "end": "2026",
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:medicaid-mcpar-mlrs"
+          ]
+        },
+        "unit_of_analysis": [
+          "state",
+          "other"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic:payer",
+              "label": "Payer and coverage",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for payer and coverage; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:medicaid-mcpar-mlrs"
+              ]
+            },
+            {
+              "id": "topic:hospital-financials",
+              "label": "Hospital financials",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital financials; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:medicaid-mcpar-mlrs"
+              ]
+            },
+            {
+              "id": "topic:provider-directory",
+              "label": "Provider and facility directories",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for provider and facility directories; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:medicaid-mcpar-mlrs"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case:question-to-source-discovery",
+              "label": "Question-to-source discovery and access routing",
+              "fitness": "supporting",
+              "rationale": "The asset record is intended for evidence-bound source discovery and retrieval routing, not as an assertion that data were acquired or are analytically sufficient.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "ev:registry:medicaid-mcpar-mlrs"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_direct",
+          "mechanisms": [
+            "web_download",
+            "data_portal"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:medicaid-mcpar-mlrs"
+          ],
+          "restriction_note": "The source registry describes this route as public. Current endpoint availability and release metadata were not live tested in this offline build."
+        },
+        "provenance": [
+          {
+            "provenance_id": "prov:registry:medicaid-mcpar-mlrs",
+            "kind": "other",
+            "locator": "urn:sha256:62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd"
+          },
+          {
+            "provenance_id": "prov:first-party:medicaid-mcpar-mlrs",
+            "kind": "first_party_page",
+            "locator": "https://www.medicaid.gov/medicaid/managed-care/guidance/medicaid-and-chip-managed-care-reporting/public-access-state-submitted-mcpars",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "locator_only",
+            "content_sha256": null
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "ev:registry:medicaid-mcpar-mlrs",
+            "claim": "The captured discovery source registry describes Medicaid managed-care plan reporting and medical-loss-ratio public use files at the authoritative first-party route and supports this asset-level discovery record.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "prov:registry:medicaid-mcpar-mlrs",
+              "prov:first-party:medicaid-mcpar-mlrs"
+            ],
+            "limitations": [
+              "Plan and program scope is not provider financial-statement scope.",
+              "State reporting completeness and MLR methodology can differ.",
+              "This adapter performed no network request, payload acquisition, entity resolution, family merge, or live availability test.",
+              "Source-registry project status was catalog_metadata_only; discovery evidence is not acquisition proof."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T00:00:00Z",
+          "data_through": "2026",
+          "update_frequency": "annual",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "download",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://www.medicaid.gov/medicaid/managed-care/guidance/medicaid-and-chip-managed-care-reporting/public-access-state-submitted-mcpars",
+              "requires_human": false,
+              "instruction": "Open the authoritative source route and confirm the selected asset, release, documentation, and access terms before requesting data.",
+              "expected_result": "A first-party asset page or a preserved typed access or infrastructure outcome."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://www.medicaid.gov/medicaid/managed-care/guidance/medical-loss-ratio",
+              "requires_human": false,
+              "instruction": "Inspect the published download, API, methodology, or documentation route; select and record a specific release before acquisition.",
+              "expected_result": "Versioned retrieval metadata or a preserved typed access or infrastructure outcome."
+            }
+          ],
+          "expected_artifacts": [
+            "versioned source metadata",
+            "typed access or infrastructure outcome",
+            "content hash if data are later acquired"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "unknown",
+          "keys": [],
+          "notes": [
+            "Use only separately published explicit join-route objects; do not infer identity or compatibility from titles, publishers, URLs, or family labels."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 9,
+      "score": 80,
+      "record_id": "obs:asset:usaspending-awards",
+      "relevance": {
+        "matched_subjects": [
+          "hospital_financials"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_capability",
+            "value": 57,
+            "reason": "Hospital financials matches primary capability Hospital financials.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "geography_national_support",
+            "value": 13,
+            "reason": "National record may be filtered or joined for Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 10,
+            "reason": "Access status is public_direct.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Hospital financials matches primary capability Hospital financials.",
+          "National record may be filtered or joined for Pennsylvania.",
+          "Access status is public_direct.",
+          "Resolved subject concepts: hospital_financials."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "obs:asset:usaspending-awards",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "obs:source:usaspending",
+            "name": "USAspending.gov"
+          },
+          "family": {
+            "family_id": "obs:family:usaspending-federal-awards",
+            "name": "USAspending federal awards",
+            "resolution_state": "source_asserted",
+            "evidence_ids": [
+              "ev:registry:usaspending-awards"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "obs:asset:usaspending-awards",
+            "name": "USAspending Federal Awards and Subawards",
+            "asset_type": "dataset",
+            "version_state": "rolling",
+            "version_label": "FY2001-present bulk context"
+          },
+          "match_fields": {
+            "normalized_url": "https://www.usaspending.gov/search",
+            "canonical_url": "https://www.usaspending.gov/search",
+            "doi": null,
+            "source_id": "usaspending_awards",
+            "publisher": "U.S. Department of the Treasury",
+            "normalized_title": "usaspending federal awards and subawards",
+            "source_portal": "www.usaspending.gov"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "The offline adapter preserves the source-registry identity and does not query, write, or rebuild the shared identity index."
+          }
+        },
+        "title": "USAspending Federal Awards and Subawards",
+        "description": "Government-wide grants, contracts, loans, direct payments, subawards, recipients, UEIs, award identifiers, obligations, outlays, and transaction history.",
+        "authoritative_url": "https://www.usaspending.gov/search",
+        "geography": {
+          "coverage_level": "national",
+          "jurisdictions": [
+            "US"
+          ],
+          "rurality_support": "derivable",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:usaspending-awards"
+          ]
+        },
+        "time_coverage": {
+          "state": "rolling",
+          "start": "2001",
+          "end": null,
+          "temporal_granularity": "event_date",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:usaspending-awards"
+          ]
+        },
+        "unit_of_analysis": [
+          "event",
+          "other"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic:hospital-financials",
+              "label": "Hospital financials",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital financials; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:usaspending-awards"
+              ]
+            },
+            {
+              "id": "topic:ownership",
+              "label": "Ownership and organizational relationships",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for ownership and organizational relationships; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:usaspending-awards"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case:question-to-source-discovery",
+              "label": "Question-to-source discovery and access routing",
+              "fitness": "supporting",
+              "rationale": "The asset record is intended for evidence-bound source discovery and retrieval routing, not as an assertion that data were acquired or are analytically sufficient.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "ev:registry:usaspending-awards"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_direct",
+          "mechanisms": [
+            "bulk_download",
+            "api"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:usaspending-awards"
+          ],
+          "restriction_note": "The source registry describes this route as public. Current endpoint availability and release metadata were not live tested in this offline build."
+        },
+        "provenance": [
+          {
+            "provenance_id": "prov:registry:usaspending-awards",
+            "kind": "other",
+            "locator": "urn:sha256:62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd"
+          },
+          {
+            "provenance_id": "prov:first-party:usaspending-awards",
+            "kind": "first_party_page",
+            "locator": "https://www.usaspending.gov/search",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "locator_only",
+            "content_sha256": null
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "ev:registry:usaspending-awards",
+            "claim": "The captured discovery source registry describes USAspending federal awards and subawards at the authoritative first-party route and supports this asset-level discovery record.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "prov:registry:usaspending-awards",
+              "prov:first-party:usaspending-awards"
+            ],
+            "limitations": [
+              "Award, transaction, subaward, recipient, and facility are distinct levels.",
+              "Recipient identity does not automatically establish health-system scope.",
+              "This adapter performed no network request, payload acquisition, entity resolution, family merge, or live availability test.",
+              "Source-registry project status was uncovered; discovery evidence is not acquisition proof."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T00:00:00Z",
+          "data_through": null,
+          "update_frequency": "continuous",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "api",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://www.usaspending.gov/search",
+              "requires_human": false,
+              "instruction": "Open the authoritative source route and confirm the selected asset, release, documentation, and access terms before requesting data.",
+              "expected_result": "A first-party asset page or a preserved typed access or infrastructure outcome."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://api.usaspending.gov/docs/endpoints",
+              "requires_human": false,
+              "instruction": "Inspect the published download, API, methodology, or documentation route; select and record a specific release before acquisition.",
+              "expected_result": "Versioned retrieval metadata or a preserved typed access or infrastructure outcome."
+            }
+          ],
+          "expected_artifacts": [
+            "versioned source metadata",
+            "typed access or infrastructure outcome",
+            "content hash if data are later acquired"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "unknown",
+          "keys": [],
+          "notes": [
+            "Use only separately published explicit join-route objects; do not infer identity or compatibility from titles, publishers, URLs, or family labels."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 10,
+      "score": 60,
+      "record_id": "obs:asset:irs-eo-bmf",
+      "relevance": {
+        "matched_subjects": [
+          "hospital_financials"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_capability",
+            "value": 37,
+            "reason": "Hospital financials matches supporting capability Hospital financials.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "geography_national_support",
+            "value": 13,
+            "reason": "National record may be filtered or joined for Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 10,
+            "reason": "Access status is public_direct.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Hospital financials matches supporting capability Hospital financials.",
+          "National record may be filtered or joined for Pennsylvania.",
+          "Access status is public_direct.",
+          "Resolved subject concepts: hospital_financials."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "obs:asset:irs-eo-bmf",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "obs:source:irs-exempt-organizations",
+            "name": "Internal Revenue Service Exempt Organizations"
+          },
+          "family": {
+            "family_id": "obs:family:irs-exempt-organization-bulk-data",
+            "name": "IRS exempt-organization bulk data",
+            "resolution_state": "source_asserted",
+            "evidence_ids": [
+              "ev:registry:irs-eo-bmf"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "obs:asset:irs-eo-bmf",
+            "name": "IRS Exempt Organizations Business Master File Extract",
+            "asset_type": "dataset",
+            "version_state": "rolling",
+            "version_label": "current cumulative snapshot"
+          },
+          "match_fields": {
+            "normalized_url": "https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf",
+            "canonical_url": "https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf",
+            "doi": null,
+            "source_id": "irs_eo_bmf",
+            "publisher": "Internal Revenue Service",
+            "normalized_title": "irs exempt organizations business master file extract",
+            "source_portal": "www.irs.gov"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "The offline adapter preserves the source-registry identity and does not query, write, or rebuild the shared identity index."
+          }
+        },
+        "title": "IRS Exempt Organizations Business Master File Extract",
+        "description": "Current tax-exempt organization identity, classification, status, NTEE, group or affiliation, address, and limited latest-return financial fields.",
+        "authoritative_url": "https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf",
+        "geography": {
+          "coverage_level": "national",
+          "jurisdictions": [
+            "US"
+          ],
+          "rurality_support": "derivable",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:irs-eo-bmf"
+          ]
+        },
+        "time_coverage": {
+          "state": "point_in_time",
+          "start": "2026-08-11",
+          "end": "2026-08-11",
+          "temporal_granularity": "release",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:irs-eo-bmf"
+          ]
+        },
+        "unit_of_analysis": [
+          "other"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic:community-benefit",
+              "label": "Community benefit and tax exemption",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for community benefit and tax exemption; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:irs-eo-bmf"
+              ]
+            },
+            {
+              "id": "topic:ownership",
+              "label": "Ownership and organizational relationships",
+              "fitness": "primary",
+              "rationale": "The captured source-registry description explicitly supports discovery for ownership and organizational relationships; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:irs-eo-bmf"
+              ]
+            },
+            {
+              "id": "topic:hospital-financials",
+              "label": "Hospital financials",
+              "fitness": "supporting",
+              "rationale": "The captured source-registry description explicitly supports discovery for hospital financials; analytic fitness still requires source-specific review.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "ev:registry:irs-eo-bmf"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case:question-to-source-discovery",
+              "label": "Question-to-source discovery and access routing",
+              "fitness": "supporting",
+              "rationale": "The asset record is intended for evidence-bound source discovery and retrieval routing, not as an assertion that data were acquired or are analytically sufficient.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "ev:registry:irs-eo-bmf"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_direct",
+          "mechanisms": [
+            "bulk_download",
+            "web_download"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "ev:registry:irs-eo-bmf"
+          ],
+          "restriction_note": "The source registry describes this route as public. Current endpoint availability and release metadata were not live tested in this offline build."
+        },
+        "provenance": [
+          {
+            "provenance_id": "prov:registry:irs-eo-bmf",
+            "kind": "other",
+            "locator": "urn:sha256:62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "62fa876afdbb3a3a9499cdea8e128f8f5d24cf294aa696226ed2e1ae9a117dcd"
+          },
+          {
+            "provenance_id": "prov:first-party:irs-eo-bmf",
+            "kind": "first_party_page",
+            "locator": "https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf",
+            "observed_at": "2026-08-29T00:00:00Z",
+            "capture_state": "locator_only",
+            "content_sha256": null
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "ev:registry:irs-eo-bmf",
+            "claim": "The captured discovery source registry describes IRS exempt-organization universe at the authoritative first-party route and supports this asset-level discovery record.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "prov:registry:irs-eo-bmf",
+              "prov:first-party:irs-eo-bmf"
+            ],
+            "limitations": [
+              "The BMF is not a consolidated health-system financial statement.",
+              "Filing address is not an operating footprint.",
+              "Some exempt or governmental organizations may be absent.",
+              "This adapter performed no network request, payload acquisition, entity resolution, family merge, or live availability test.",
+              "Source-registry project status was uncovered; discovery evidence is not acquisition proof."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T00:00:00Z",
+          "data_through": "2026-08-11",
+          "update_frequency": "continuous",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "download",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf",
+              "requires_human": false,
+              "instruction": "Open the authoritative source route and confirm the selected asset, release, documentation, and access terms before requesting data.",
+              "expected_result": "A first-party asset page or a preserved typed access or infrastructure outcome."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://www.irs.gov/pub/foia/ig/tege/eo-info.pdf",
+              "requires_human": false,
+              "instruction": "Inspect the published download, API, methodology, or documentation route; select and record a specific release before acquisition.",
+              "expected_result": "Versioned retrieval metadata or a preserved typed access or infrastructure outcome."
+            }
+          ],
+          "expected_artifacts": [
+            "versioned source metadata",
+            "typed access or infrastructure outcome",
+            "content hash if data are later acquired"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "unknown",
+          "keys": [],
+          "notes": [
+            "Use only separately published explicit join-route objects; do not infer identity or compatibility from titles, publishers, URLs, or family labels."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 11,
+      "score": 56,
+      "record_id": "eswt-bam9",
+      "relevance": {
+        "matched_subjects": [
+          "utilization"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [
+          "facility"
+        ],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_lexical",
+            "value": 14,
+            "reason": "Hospital and provider utilization matches evidence-bound record text.",
+            "evidence_state": "inferred"
+          },
+          {
+            "kind": "geography_exact",
+            "value": 24,
+            "reason": "Record explicitly covers Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "unit_exact",
+            "value": 11,
+            "reason": "Record unit of analysis includes Facility.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 7,
+            "reason": "Access status is public_catalog.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Record explicitly covers Pennsylvania.",
+          "Hospital and provider utilization matches evidence-bound record text.",
+          "Record unit of analysis includes Facility.",
+          "Access status is public_catalog.",
+          "Resolved subject concepts: utilization."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "eswt-bam9",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "pa-open-data",
+            "name": "Pennsylvania Open Data Portal (data.pa.gov)"
+          },
+          "family": {
+            "family_id": "pa-unresolved-family-eswt-bam9",
+            "name": "Unresolved source-family identity for Drug and Alcohol Treatment Facilities May 2018 County Drug and Alcohol Programs",
+            "resolution_state": "unresolved",
+            "evidence_ids": [
+              "evidence-pa-catalog-eswt-bam9"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "eswt-bam9",
+            "name": "Drug and Alcohol Treatment Facilities May 2018 County Drug and Alcohol Programs",
+            "asset_type": "catalog_record",
+            "version_state": "versioned",
+            "version_label": null
+          },
+          "match_fields": {
+            "normalized_url": "data.pa.gov/d/eswt-bam9",
+            "canonical_url": "https://data.pa.gov/d/eswt-bam9",
+            "doi": null,
+            "source_id": "eswt-bam9",
+            "publisher": "data.pa.gov",
+            "normalized_title": "drug and alcohol treatment facilities may 2018 county drug and alcohol programs",
+            "source_portal": "https://data.pa.gov/"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "This PA product fixture does not read, rebuild, or bind to the shared identity index; unresolved identity remains observable."
+          }
+        },
+        "title": "Drug and Alcohol Treatment Facilities May 2018 County Drug and Alcohol Programs",
+        "description": "This dataset reports the name, street address, city, county, zip code, telephone number, latitude, and longitude of Pennsylvania Department of Drug and Alcohol Programs (DDAP) drug and alcohol treatment facilities in Pennsylvania as of May 2018.\n\nThe primary difference between the three types of treatment facilities is their funding. Centers of Excellence (COEs) were grant funded by the Department of Human Services, PacMATs were grant funded by the Department of Health, and all other facilities are funded by either billing insurance or billing the county in the case of uninsured clients. \n \nProgrammatically, COEs differ from the other types because they are designed to serve as “health homes” for individuals with Opioid Use Disorder (OUD). This means that the care coordination staff at the COE is charged with coordinating all kinds of health care (physical and behavioral health) as well as recovery support services. They do this by developing hub-and-spoke networks with other healthcare providers and other sources for recovery supports, such as housing, transportation, education and training, etc. All COEs are required to accept Medicaid.\n \nPacMATs also operate in a hub-and-spoke model, but it is different from COEs. PacMATs endeavor to coordinate the provision of Medication Assisted Treatment (MAT) by identifying a core hub of physicians in a health system that work with other providers in the health system (spokes) to train them about the safe and effective provision of MAT so that there are more providers in a health system that are able to confidently prescribe various forms of MAT. I do not know whether all PacMATs are required to accept Medicaid as a term of their receipt of the grant, but I do know that all currently designated PacMATs are health systems that do accept Medicaid. PacMAT services have been advertised as being available to all people regardless of insurance type, so I assume this means they are required to serve Medicaid clients, commercially insured clients, and uninsured clients. In the PacMAT program the Hub is supported right now by grant funding (in the future funding such as a per patient/per month capitated rate) and the spokes bill insurance (both Medicaid and Commercial)  \n \nDDAP facilities may also be designated as COEs and/or PacMATs. If they are, it means they applied for a specific grant fund and have committed to carrying out the activities of the grant described above. To be clear, DDAP does not run any treatment facilities; they license them. These can be MAT providers such as methadone clinics, providers of outpatient levels of care (i.e., more traditional drug and alcohol counseling services) or inpatient levels of care, such as residential rehabilitation programs. Every facility is different in terms of the menu of services it provides.  Every facility also gets to decide what forms of payment they will accept. Many accept Medicaid, but not all do. Some only accept private commercial insurance. Some accept payment from the county on behalf of uninsured clients. And some charge their clients cash for services.",
+        "authoritative_url": "https://data.pa.gov/d/eswt-bam9",
+        "geography": {
+          "coverage_level": "county",
+          "jurisdictions": [
+            "US-PA"
+          ],
+          "rurality_support": "unknown",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-eswt-bam9"
+          ]
+        },
+        "time_coverage": {
+          "state": "point_in_time",
+          "start": "2018",
+          "end": "2018",
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-eswt-bam9"
+          ]
+        },
+        "unit_of_analysis": [
+          "county",
+          "facility"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic-opioid-related",
+              "label": "Opioid Related",
+              "fitness": "context_only",
+              "rationale": "Copied from the captured catalog theme field; no semantic usefulness or coverage judgment was performed.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "evidence-pa-catalog-eswt-bam9"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case-metadata-discovery",
+              "label": "Metadata discovery",
+              "fitness": "context_only",
+              "rationale": "The record is included to exercise deterministic Observatory discovery routing; inclusion is not a recommendation.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "evidence-pa-catalog-eswt-bam9"
+              ]
+            },
+            {
+              "id": "use-case-access-routing",
+              "label": "Access routing",
+              "fitness": "context_only",
+              "rationale": "The captured catalog supplies a first-party landing route; current access behavior was not live tested.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "evidence-pa-catalog-eswt-bam9"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_catalog",
+          "mechanisms": [
+            "data_portal",
+            "api"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-eswt-bam9"
+          ],
+          "restriction_note": "The captured catalog declares accessLevel=public; the landing page, metadata endpoint, restrictions, and current availability were not live verified."
+        },
+        "provenance": [
+          {
+            "provenance_id": "provenance-pa-catalog-eswt-bam9",
+            "kind": "catalog_metadata",
+            "locator": "https://data.pa.gov/data.json",
+            "observed_at": "2026-08-29T17:22:23.065Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "8f13009b71bd8fc69ee7427066561bcd2cc852164350ee7bf4af2d49f9a316eb"
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "evidence-pa-catalog-eswt-bam9",
+            "claim": "The captured Pennsylvania first-party catalog record eswt-bam9 lists the title and source-declared metadata for this asset; this is not a live verification or a dataset-payload capture.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "provenance-pa-catalog-eswt-bam9"
+            ],
+            "limitations": [
+              "Selected record hash is 8f13009b71bd8fc69ee7427066561bcd2cc852164350ee7bf4af2d49f9a316eb; the enclosing catalog snapshot hash is 4f24e059fdd528afd69ae222ad912ad1b0a3192a821142cf19510310164d9b55.",
+              "Current access, freshness, variables, codebooks, and analytic fitness require independent owner-approved review.",
+              "No source-family identity, merge, canonical identity, or cross-record join was assigned."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T17:22:23.065Z",
+          "data_through": null,
+          "update_frequency": "unknown",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "portal",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://data.pa.gov/d/eswt-bam9",
+              "requires_human": true,
+              "instruction": "In a later owner-authorized run, open the first-party landing page using only the accepted transport contract; this fixture did not open it.",
+              "expected_result": "Landing page or a preserved typed access/restriction observation."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://data.pa.gov/api/views/eswt-bam9",
+              "requires_human": true,
+              "instruction": "If separately authorized, inspect catalog metadata only. Do not request a dataset payload or bulk export.",
+              "expected_result": "Metadata receipt, or a typed refusal/access boundary."
+            },
+            {
+              "sequence": 3,
+              "action": "stop_and_report",
+              "url": null,
+              "requires_human": true,
+              "instruction": "Stop at login, account, form, agreement, payment, controlled-data, payload, or unknown-pagination boundaries.",
+              "expected_result": "Typed access or infrastructure outcome with no not_found translation."
+            }
+          ],
+          "expected_artifacts": [
+            "first-party metadata receipt",
+            "typed access observation",
+            "no dataset payload"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "none_known",
+          "keys": [],
+          "notes": [
+            "No join key was assigned in this fixture.",
+            "The shared identity index was not read or rebuilt.",
+            "Same title, same URL family, same publisher, or same custodian must not be treated as an identity merge."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 12,
+      "score": 45,
+      "record_id": "2ats-ttun",
+      "relevance": {
+        "matched_subjects": [
+          "utilization"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_lexical",
+            "value": 14,
+            "reason": "Hospital and provider utilization matches evidence-bound record text.",
+            "evidence_state": "inferred"
+          },
+          {
+            "kind": "geography_exact",
+            "value": 24,
+            "reason": "Record explicitly covers Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 7,
+            "reason": "Access status is public_catalog.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Record explicitly covers Pennsylvania.",
+          "Hospital and provider utilization matches evidence-bound record text.",
+          "Access status is public_catalog.",
+          "Resolved subject concepts: utilization."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "2ats-ttun",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "pa-open-data",
+            "name": "Pennsylvania Open Data Portal (data.pa.gov)"
+          },
+          "family": {
+            "family_id": "pa-unresolved-family-2ats-ttun",
+            "name": "Unresolved source-family identity for Rate of Neonatal Abstinence Syndrome per 1,000 Newborn Stays by County of Residence FYs 2016-2017 Health Care Cost Containment Council (PHC4)",
+            "resolution_state": "unresolved",
+            "evidence_ids": [
+              "evidence-pa-catalog-2ats-ttun"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "2ats-ttun",
+            "name": "Rate of Neonatal Abstinence Syndrome per 1,000 Newborn Stays by County of Residence FYs 2016-2017 Health Care Cost Containment Council (PHC4)",
+            "asset_type": "catalog_record",
+            "version_state": "versioned",
+            "version_label": null
+          },
+          "match_fields": {
+            "normalized_url": "data.pa.gov/d/2ats-ttun",
+            "canonical_url": "https://data.pa.gov/d/2ats-ttun",
+            "doi": null,
+            "source_id": "2ats-ttun",
+            "publisher": "data.pa.gov",
+            "normalized_title": "rate of neonatal abstinence syndrome per 1 000 newborn stays by county of residence fys 2016 2017 health care cost containment council phc4",
+            "source_portal": "https://data.pa.gov/"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "This PA product fixture does not read, rebuild, or bind to the shared identity index; unresolved identity remains observable."
+          }
+        },
+        "title": "Rate of Neonatal Abstinence Syndrome per 1,000 Newborn Stays by County of Residence FYs 2016-2017 Health Care Cost Containment Council (PHC4)",
+        "description": "Countywide counts of newborn hospital stays with Neonatal Abstinence Syndrome (NAS) and countywide rates of newborn hospital stays with (NAS) per 1,000 newborn stays.  Neonatal Abstinence Syndrome, or neonatal drug withdrawal, is an array of problems that develops shortly after birth in newborns who were exposed to addictive drugs, most often opioids, while in the mother’s womb. Withdrawal signs develop because these newborns are no longer exposed to the drug for which they have become physically dependent. This analysis is restricted to newborns with Pennsylvania-state residence who were hospitalized in Pennsylvania hospitals.\r\nDisclaimer: Pennsylvania Health Care Cost Containment Council (PHC4) database contains statewide hospital discharge data submitted to PHC4 by Pennsylvania hospitals.  Every reasonable effort has been made to ensure the accuracy of the information obtained from the Uniform Claims and Billing Form (UB-82/92/04) data elements. Computer collection edits and validation edits provide opportunity to correct specific errors that may have occurred prior to, during or after submission of data.  The ultimate responsibility for data accuracy lies with individual providers. PHC4 agents and staff make no representation, guarantee, or warranty, expressed or implied that the data received from the hospitals are error-free, or that the use of this data will prevent differences of opinion or disputes with those who use published reports or purchased data.  PHC4 will bear no responsibility or liability for the results or consequences of its use.",
+        "authoritative_url": "https://data.pa.gov/d/2ats-ttun",
+        "geography": {
+          "coverage_level": "county",
+          "jurisdictions": [
+            "US-PA"
+          ],
+          "rurality_support": "unknown",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-2ats-ttun"
+          ]
+        },
+        "time_coverage": {
+          "state": "bounded",
+          "start": "2016",
+          "end": "2017",
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-2ats-ttun"
+          ]
+        },
+        "unit_of_analysis": [
+          "county"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic-opioid-related",
+              "label": "Opioid Related",
+              "fitness": "context_only",
+              "rationale": "Copied from the captured catalog theme field; no semantic usefulness or coverage judgment was performed.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "evidence-pa-catalog-2ats-ttun"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case-metadata-discovery",
+              "label": "Metadata discovery",
+              "fitness": "context_only",
+              "rationale": "The record is included to exercise deterministic Observatory discovery routing; inclusion is not a recommendation.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "evidence-pa-catalog-2ats-ttun"
+              ]
+            },
+            {
+              "id": "use-case-access-routing",
+              "label": "Access routing",
+              "fitness": "context_only",
+              "rationale": "The captured catalog supplies a first-party landing route; current access behavior was not live tested.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "evidence-pa-catalog-2ats-ttun"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_catalog",
+          "mechanisms": [
+            "data_portal",
+            "api"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-2ats-ttun"
+          ],
+          "restriction_note": "The captured catalog declares accessLevel=public; the landing page, metadata endpoint, restrictions, and current availability were not live verified."
+        },
+        "provenance": [
+          {
+            "provenance_id": "provenance-pa-catalog-2ats-ttun",
+            "kind": "catalog_metadata",
+            "locator": "https://data.pa.gov/data.json",
+            "observed_at": "2026-08-29T17:22:23.065Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "d46535063a1bfae7032e2b030bfbddc81758fcccdbdf60a5d1f3f6deec68359f"
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "evidence-pa-catalog-2ats-ttun",
+            "claim": "The captured Pennsylvania first-party catalog record 2ats-ttun lists the title and source-declared metadata for this asset; this is not a live verification or a dataset-payload capture.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "provenance-pa-catalog-2ats-ttun"
+            ],
+            "limitations": [
+              "Selected record hash is d46535063a1bfae7032e2b030bfbddc81758fcccdbdf60a5d1f3f6deec68359f; the enclosing catalog snapshot hash is 4f24e059fdd528afd69ae222ad912ad1b0a3192a821142cf19510310164d9b55.",
+              "Current access, freshness, variables, codebooks, and analytic fitness require independent owner-approved review.",
+              "No source-family identity, merge, canonical identity, or cross-record join was assigned."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T17:22:23.065Z",
+          "data_through": null,
+          "update_frequency": "unknown",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "portal",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://data.pa.gov/d/2ats-ttun",
+              "requires_human": true,
+              "instruction": "In a later owner-authorized run, open the first-party landing page using only the accepted transport contract; this fixture did not open it.",
+              "expected_result": "Landing page or a preserved typed access/restriction observation."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://data.pa.gov/api/views/2ats-ttun",
+              "requires_human": true,
+              "instruction": "If separately authorized, inspect catalog metadata only. Do not request a dataset payload or bulk export.",
+              "expected_result": "Metadata receipt, or a typed refusal/access boundary."
+            },
+            {
+              "sequence": 3,
+              "action": "stop_and_report",
+              "url": null,
+              "requires_human": true,
+              "instruction": "Stop at login, account, form, agreement, payment, controlled-data, payload, or unknown-pagination boundaries.",
+              "expected_result": "Typed access or infrastructure outcome with no not_found translation."
+            }
+          ],
+          "expected_artifacts": [
+            "first-party metadata receipt",
+            "typed access observation",
+            "no dataset payload"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "none_known",
+          "keys": [],
+          "notes": [
+            "No join key was assigned in this fixture.",
+            "The shared identity index was not read or rebuilt.",
+            "Same title, same URL family, same publisher, or same custodian must not be treated as an identity merge."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 13,
+      "score": 45,
+      "record_id": "3pn6-bews",
+      "relevance": {
+        "matched_subjects": [
+          "utilization"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_lexical",
+            "value": 14,
+            "reason": "Hospital and provider utilization matches evidence-bound record text.",
+            "evidence_state": "inferred"
+          },
+          {
+            "kind": "geography_exact",
+            "value": 24,
+            "reason": "Record explicitly covers Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 7,
+            "reason": "Access status is public_catalog.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Record explicitly covers Pennsylvania.",
+          "Hospital and provider utilization matches evidence-bound record text.",
+          "Access status is public_catalog.",
+          "Resolved subject concepts: utilization."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "3pn6-bews",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "pa-open-data",
+            "name": "Pennsylvania Open Data Portal (data.pa.gov)"
+          },
+          "family": {
+            "family_id": "pa-unresolved-family-3pn6-bews",
+            "name": "Unresolved source-family identity for Statewide Delivery Stays Percent of Gestation Stages with or without Opioid Use 2016-2017 PA Health Care Cost Containment Council (PHC4)",
+            "resolution_state": "unresolved",
+            "evidence_ids": [
+              "evidence-pa-catalog-3pn6-bews"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "3pn6-bews",
+            "name": "Statewide Delivery Stays Percent of Gestation Stages with or without Opioid Use 2016-2017 PA Health Care Cost Containment Council (PHC4)",
+            "asset_type": "catalog_record",
+            "version_state": "versioned",
+            "version_label": null
+          },
+          "match_fields": {
+            "normalized_url": "data.pa.gov/d/3pn6-bews",
+            "canonical_url": "https://data.pa.gov/d/3pn6-bews",
+            "doi": null,
+            "source_id": "3pn6-bews",
+            "publisher": "data.pa.gov",
+            "normalized_title": "statewide delivery stays percent of gestation stages with or without opioid use 2016 2017 pa health care cost containment council phc4",
+            "source_portal": "https://data.pa.gov/"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "This PA product fixture does not read, rebuild, or bind to the shared identity index; unresolved identity remains observable."
+          }
+        },
+        "title": "Statewide Delivery Stays Percent of Gestation Stages with or without Opioid Use 2016-2017 PA Health Care Cost Containment Council (PHC4)",
+        "description": "Percent of Pennsylvania delivery hospital stays, categorized by the presence or absence of opioid use, that had reached specified gestation stages for the delivery stay.\n\nOpioid use, or opioid use disorder, is a diagnosis indicating opioid dependence, abuse, or use. Some opioid drugs may be prescribed as part of medication-assisted treatment to relieve withdrawal symptoms and psychological cravings often associated with opioid use disorders.  Opioid use during pregnancy can lead to Neonatal Abstinence Syndrome (NAS) for newborns.\n\nGestation stages specify the number of weeks of gestation at the time of the delivery stay.  “Premature” indicates that the delivery stay is at 36 weeks or less of gestation, “Early Term” indicates that the delivery stay is at 37-38 weeks of gestation, and “Full Term or Longer” indicates that the delivery stay is at 39 weeks of gestation or longer.\n \nThis analysis is restricted to delivery hospital stays for Pennsylvania-state residents who were hospitalized in Pennsylvania hospitals.\n\nDisclaimer:\nPHC4’s database contains statewide hospital discharge data submitted to PHC4 by Pennsylvania hospitals.  Every reasonable effort has been made to ensure the accuracy of the information obtained from the Uniform Claims and Billing Form (UB-82/92/04) data elements. Computer collection edits and validation edits provide opportunity to correct specific errors that may have occurred prior to, during or after submission of data.  The ultimate responsibility for data accuracy lies with individual providers.\n\nPHC4 agents and staff make no representation, guarantee, or warranty, expressed or implied that the data received from the hospitals are error-free, or that the use of this data will prevent differences of opinion or disputes with those who use published reports or purchased data.  PHC4 will bear no responsibility or liability for the results or consequences of its use.",
+        "authoritative_url": "https://data.pa.gov/d/3pn6-bews",
+        "geography": {
+          "coverage_level": "state",
+          "jurisdictions": [
+            "US-PA"
+          ],
+          "rurality_support": "unknown",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-3pn6-bews"
+          ]
+        },
+        "time_coverage": {
+          "state": "bounded",
+          "start": "2016",
+          "end": "2017",
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-3pn6-bews"
+          ]
+        },
+        "unit_of_analysis": [
+          "state"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic-opioid-related",
+              "label": "Opioid Related",
+              "fitness": "context_only",
+              "rationale": "Copied from the captured catalog theme field; no semantic usefulness or coverage judgment was performed.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "evidence-pa-catalog-3pn6-bews"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case-metadata-discovery",
+              "label": "Metadata discovery",
+              "fitness": "context_only",
+              "rationale": "The record is included to exercise deterministic Observatory discovery routing; inclusion is not a recommendation.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "evidence-pa-catalog-3pn6-bews"
+              ]
+            },
+            {
+              "id": "use-case-access-routing",
+              "label": "Access routing",
+              "fitness": "context_only",
+              "rationale": "The captured catalog supplies a first-party landing route; current access behavior was not live tested.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "evidence-pa-catalog-3pn6-bews"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_catalog",
+          "mechanisms": [
+            "data_portal",
+            "api"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-3pn6-bews"
+          ],
+          "restriction_note": "The captured catalog declares accessLevel=public; the landing page, metadata endpoint, restrictions, and current availability were not live verified."
+        },
+        "provenance": [
+          {
+            "provenance_id": "provenance-pa-catalog-3pn6-bews",
+            "kind": "catalog_metadata",
+            "locator": "https://data.pa.gov/data.json",
+            "observed_at": "2026-08-29T17:22:23.065Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "8f1881e21f13ba2d1305a0d7bca3e01b169c19656f4e05a1898fd22bcb4a27e2"
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "evidence-pa-catalog-3pn6-bews",
+            "claim": "The captured Pennsylvania first-party catalog record 3pn6-bews lists the title and source-declared metadata for this asset; this is not a live verification or a dataset-payload capture.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "provenance-pa-catalog-3pn6-bews"
+            ],
+            "limitations": [
+              "Selected record hash is 8f1881e21f13ba2d1305a0d7bca3e01b169c19656f4e05a1898fd22bcb4a27e2; the enclosing catalog snapshot hash is 4f24e059fdd528afd69ae222ad912ad1b0a3192a821142cf19510310164d9b55.",
+              "Current access, freshness, variables, codebooks, and analytic fitness require independent owner-approved review.",
+              "No source-family identity, merge, canonical identity, or cross-record join was assigned."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T17:22:23.065Z",
+          "data_through": null,
+          "update_frequency": "unknown",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "portal",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://data.pa.gov/d/3pn6-bews",
+              "requires_human": true,
+              "instruction": "In a later owner-authorized run, open the first-party landing page using only the accepted transport contract; this fixture did not open it.",
+              "expected_result": "Landing page or a preserved typed access/restriction observation."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://data.pa.gov/api/views/3pn6-bews",
+              "requires_human": true,
+              "instruction": "If separately authorized, inspect catalog metadata only. Do not request a dataset payload or bulk export.",
+              "expected_result": "Metadata receipt, or a typed refusal/access boundary."
+            },
+            {
+              "sequence": 3,
+              "action": "stop_and_report",
+              "url": null,
+              "requires_human": true,
+              "instruction": "Stop at login, account, form, agreement, payment, controlled-data, payload, or unknown-pagination boundaries.",
+              "expected_result": "Typed access or infrastructure outcome with no not_found translation."
+            }
+          ],
+          "expected_artifacts": [
+            "first-party metadata receipt",
+            "typed access observation",
+            "no dataset payload"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "none_known",
+          "keys": [],
+          "notes": [
+            "No join key was assigned in this fixture.",
+            "The shared identity index was not read or rebuilt.",
+            "Same title, same URL family, same publisher, or same custodian must not be treated as an identity merge."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 14,
+      "score": 45,
+      "record_id": "4y4s-y2hd",
+      "relevance": {
+        "matched_subjects": [
+          "utilization"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_lexical",
+            "value": 14,
+            "reason": "Hospital and provider utilization matches evidence-bound record text.",
+            "evidence_state": "inferred"
+          },
+          {
+            "kind": "geography_exact",
+            "value": 24,
+            "reason": "Record explicitly covers Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 7,
+            "reason": "Access status is public_catalog.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Record explicitly covers Pennsylvania.",
+          "Hospital and provider utilization matches evidence-bound record text.",
+          "Access status is public_catalog.",
+          "Resolved subject concepts: utilization."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "4y4s-y2hd",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "pa-open-data",
+            "name": "Pennsylvania Open Data Portal (data.pa.gov)"
+          },
+          "family": {
+            "family_id": "pa-unresolved-family-4y4s-y2hd",
+            "name": "Unresolved source-family identity for Rate of Women Diagnosed with Opioid Use Disorder (OUD) during Pregnancy CY 2016 - Current Statewide Health Care Cost Containment Council (PHC4)",
+            "resolution_state": "unresolved",
+            "evidence_ids": [
+              "evidence-pa-catalog-4y4s-y2hd"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "4y4s-y2hd",
+            "name": "Rate of Women Diagnosed with Opioid Use Disorder (OUD) during Pregnancy CY 2016 - Current Statewide Health Care Cost Containment Council (PHC4)",
+            "asset_type": "catalog_record",
+            "version_state": "rolling",
+            "version_label": null
+          },
+          "match_fields": {
+            "normalized_url": "data.pa.gov/d/4y4s-y2hd",
+            "canonical_url": "https://data.pa.gov/d/4y4s-y2hd",
+            "doi": null,
+            "source_id": "4y4s-y2hd",
+            "publisher": "data.pa.gov",
+            "normalized_title": "rate of women diagnosed with opioid use disorder oud during pregnancy cy 2016 current statewide health care cost containment council phc4",
+            "source_portal": "https://data.pa.gov/"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "This PA product fixture does not read, rebuild, or bind to the shared identity index; unresolved identity remains observable."
+          }
+        },
+        "title": "Rate of Women Diagnosed with Opioid Use Disorder (OUD) during Pregnancy CY 2016 - Current Statewide Health Care Cost Containment Council (PHC4)",
+        "description": "This dataset summarizes the number of women (12 to 55 years old) with a delivery and indicates how many of those women were diagnosed with opioid use disorder (OUD) during their pregnancy. Delivery includes live birth or stillbirth.  Data collection started in 2016 and will be updated quarterly as data becomes available.\n\nAnalyses were completed by the University of Pittsburgh using data from the PA Health Care Cost Containment Council and in cooperation with PA DOH. \nPHC4’s database contains statewide hospital discharge data submitted to PHC4 by Pennsylvania hospitals. Every reasonable effort has been made to ensure the accuracy of the information obtained from the Uniform Claims and Billing Form (UB-82/92/04) data elements. Computer collection edits and validation edits provide opportunity to correct specific errors that may have occurred prior to, during or after submission of data. The ultimate responsibility for data accuracy lies with individual providers.",
+        "authoritative_url": "https://data.pa.gov/d/4y4s-y2hd",
+        "geography": {
+          "coverage_level": "state",
+          "jurisdictions": [
+            "US-PA"
+          ],
+          "rurality_support": "unknown",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-4y4s-y2hd"
+          ]
+        },
+        "time_coverage": {
+          "state": "rolling",
+          "start": "2016",
+          "end": null,
+          "temporal_granularity": "year",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-4y4s-y2hd"
+          ]
+        },
+        "unit_of_analysis": [
+          "state"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic-opioid-related",
+              "label": "Opioid Related",
+              "fitness": "context_only",
+              "rationale": "Copied from the captured catalog theme field; no semantic usefulness or coverage judgment was performed.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "evidence-pa-catalog-4y4s-y2hd"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case-metadata-discovery",
+              "label": "Metadata discovery",
+              "fitness": "context_only",
+              "rationale": "The record is included to exercise deterministic Observatory discovery routing; inclusion is not a recommendation.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "evidence-pa-catalog-4y4s-y2hd"
+              ]
+            },
+            {
+              "id": "use-case-access-routing",
+              "label": "Access routing",
+              "fitness": "context_only",
+              "rationale": "The captured catalog supplies a first-party landing route; current access behavior was not live tested.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "evidence-pa-catalog-4y4s-y2hd"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_catalog",
+          "mechanisms": [
+            "data_portal",
+            "api"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-4y4s-y2hd"
+          ],
+          "restriction_note": "The captured catalog declares accessLevel=public; the landing page, metadata endpoint, restrictions, and current availability were not live verified."
+        },
+        "provenance": [
+          {
+            "provenance_id": "provenance-pa-catalog-4y4s-y2hd",
+            "kind": "catalog_metadata",
+            "locator": "https://data.pa.gov/data.json",
+            "observed_at": "2026-08-29T17:22:23.065Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "beb5fce8dc2f10eb5285e964a562720e7326fdcb16a3ea48cf62c1f039e8fd5d"
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "evidence-pa-catalog-4y4s-y2hd",
+            "claim": "The captured Pennsylvania first-party catalog record 4y4s-y2hd lists the title and source-declared metadata for this asset; this is not a live verification or a dataset-payload capture.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "provenance-pa-catalog-4y4s-y2hd"
+            ],
+            "limitations": [
+              "Selected record hash is beb5fce8dc2f10eb5285e964a562720e7326fdcb16a3ea48cf62c1f039e8fd5d; the enclosing catalog snapshot hash is 4f24e059fdd528afd69ae222ad912ad1b0a3192a821142cf19510310164d9b55.",
+              "Current access, freshness, variables, codebooks, and analytic fitness require independent owner-approved review.",
+              "No source-family identity, merge, canonical identity, or cross-record join was assigned."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T17:22:23.065Z",
+          "data_through": null,
+          "update_frequency": "irregular",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "portal",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://data.pa.gov/d/4y4s-y2hd",
+              "requires_human": true,
+              "instruction": "In a later owner-authorized run, open the first-party landing page using only the accepted transport contract; this fixture did not open it.",
+              "expected_result": "Landing page or a preserved typed access/restriction observation."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://data.pa.gov/api/views/4y4s-y2hd",
+              "requires_human": true,
+              "instruction": "If separately authorized, inspect catalog metadata only. Do not request a dataset payload or bulk export.",
+              "expected_result": "Metadata receipt, or a typed refusal/access boundary."
+            },
+            {
+              "sequence": 3,
+              "action": "stop_and_report",
+              "url": null,
+              "requires_human": true,
+              "instruction": "Stop at login, account, form, agreement, payment, controlled-data, payload, or unknown-pagination boundaries.",
+              "expected_result": "Typed access or infrastructure outcome with no not_found translation."
+            }
+          ],
+          "expected_artifacts": [
+            "first-party metadata receipt",
+            "typed access observation",
+            "no dataset payload"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "none_known",
+          "keys": [],
+          "notes": [
+            "No join key was assigned in this fixture.",
+            "The shared identity index was not read or rebuilt.",
+            "Same title, same URL family, same publisher, or same custodian must not be treated as an identity merge."
+          ]
+        }
+      }
+    },
+    {
+      "rank": 15,
+      "score": 45,
+      "record_id": "dcug-prfh",
+      "relevance": {
+        "matched_subjects": [
+          "utilization"
+        ],
+        "matched_geographies": [
+          "US-PA"
+        ],
+        "matched_units": [],
+        "matched_terms": [],
+        "score_components": [
+          {
+            "kind": "subject_lexical",
+            "value": 14,
+            "reason": "Hospital and provider utilization matches evidence-bound record text.",
+            "evidence_state": "inferred"
+          },
+          {
+            "kind": "geography_exact",
+            "value": 24,
+            "reason": "Record explicitly covers Pennsylvania.",
+            "evidence_state": "source_asserted"
+          },
+          {
+            "kind": "access",
+            "value": 7,
+            "reason": "Access status is public_catalog.",
+            "evidence_state": "source_asserted"
+          }
+        ],
+        "why_relevant": [
+          "Record explicitly covers Pennsylvania.",
+          "Hospital and provider utilization matches evidence-bound record text.",
+          "Access status is public_catalog.",
+          "Resolved subject concepts: utilization."
+        ]
+      },
+      "record": {
+        "schema_version": "observatory-record.v1.0.0",
+        "record_id": "dcug-prfh",
+        "record_type": "dataset_asset",
+        "identity": {
+          "source": {
+            "source_id": "pa-open-data",
+            "name": "Pennsylvania Open Data Portal (data.pa.gov)"
+          },
+          "family": {
+            "family_id": "pa-unresolved-family-dcug-prfh",
+            "name": "Unresolved source-family identity for Number of Hospitalizations for Opioid Overdose Statewide Health Care Cost Containment Council (PHC4)",
+            "resolution_state": "unresolved",
+            "evidence_ids": [
+              "evidence-pa-catalog-dcug-prfh"
+            ],
+            "candidate_family_ids": []
+          },
+          "asset": {
+            "asset_id": "dcug-prfh",
+            "name": "Number of Hospitalizations for Opioid Overdose Statewide Health Care Cost Containment Council (PHC4)",
+            "asset_type": "catalog_record",
+            "version_state": "unknown",
+            "version_label": null
+          },
+          "match_fields": {
+            "normalized_url": "data.pa.gov/d/dcug-prfh",
+            "canonical_url": "https://data.pa.gov/d/dcug-prfh",
+            "doi": null,
+            "source_id": "dcug-prfh",
+            "publisher": "data.pa.gov",
+            "normalized_title": "number of hospitalizations for opioid overdose statewide health care cost containment council phc4",
+            "source_portal": "https://data.pa.gov/"
+          },
+          "identity_index_binding": {
+            "state": "not_bound_fixture",
+            "identity_record_id": null,
+            "rationale": "This PA product fixture does not read, rebuild, or bind to the shared identity index; unresolved identity remains observable."
+          }
+        },
+        "title": "Number of Hospitalizations for Opioid Overdose Statewide Health Care Cost Containment Council (PHC4)",
+        "description": "Statewide number of hospitalizations for opioid overdose categorized by principal diagnosis of heroin or opioid pain medication overdose by year.  \n\nThis analysis is restricted to Pennsylvania residents age 15 and older who were hospitalized in Pennsylvania general acute care hospitals.\n\nDisclaimer: \nPHC4’s database contains statewide hospital discharge data submitted to PHC4 by Pennsylvania hospitals. Every reasonable effort has been made to ensure the accuracy of the information obtained from the Uniform Claims and Billing Form (UB-82/92/04) data elements. Computer collection edits and validation edits provide opportunity to correct specific errors that may have occurred prior to, during or after submission of data. The ultimate responsibility for data accuracy lies with individual providers.\n\nPHC4 agents and staff make no representation, guarantee, or warranty, expressed or implied that the data received from the hospitals are error-free, or that the use of this data will prevent differences of opinion or disputes with those who use published reports or purchased data. PHC4 will bear no responsibility or liability for the results or consequences of its use.",
+        "authoritative_url": "https://data.pa.gov/d/dcug-prfh",
+        "geography": {
+          "coverage_level": "state",
+          "jurisdictions": [
+            "US-PA"
+          ],
+          "rurality_support": "unknown",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-dcug-prfh"
+          ]
+        },
+        "time_coverage": {
+          "state": "unknown",
+          "start": null,
+          "end": null,
+          "temporal_granularity": "unknown",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-dcug-prfh"
+          ]
+        },
+        "unit_of_analysis": [
+          "state"
+        ],
+        "capabilities": {
+          "topics": [
+            {
+              "id": "topic-opioid-related",
+              "label": "Opioid Related",
+              "fitness": "context_only",
+              "rationale": "Copied from the captured catalog theme field; no semantic usefulness or coverage judgment was performed.",
+              "evidence_state": "source_asserted",
+              "evidence_ids": [
+                "evidence-pa-catalog-dcug-prfh"
+              ]
+            }
+          ],
+          "use_cases": [
+            {
+              "id": "use-case-metadata-discovery",
+              "label": "Metadata discovery",
+              "fitness": "context_only",
+              "rationale": "The record is included to exercise deterministic Observatory discovery routing; inclusion is not a recommendation.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "evidence-pa-catalog-dcug-prfh"
+              ]
+            },
+            {
+              "id": "use-case-access-routing",
+              "label": "Access routing",
+              "fitness": "context_only",
+              "rationale": "The captured catalog supplies a first-party landing route; current access behavior was not live tested.",
+              "evidence_state": "inferred",
+              "evidence_ids": [
+                "evidence-pa-catalog-dcug-prfh"
+              ]
+            }
+          ]
+        },
+        "access": {
+          "status": "public_catalog",
+          "mechanisms": [
+            "data_portal",
+            "api"
+          ],
+          "requirements": [
+            "none"
+          ],
+          "infrastructure_state": "not_tested_offline",
+          "evidence_state": "source_asserted",
+          "evidence_ids": [
+            "evidence-pa-catalog-dcug-prfh"
+          ],
+          "restriction_note": "The captured catalog declares accessLevel=public; the landing page, metadata endpoint, restrictions, and current availability were not live verified."
+        },
+        "provenance": [
+          {
+            "provenance_id": "provenance-pa-catalog-dcug-prfh",
+            "kind": "catalog_metadata",
+            "locator": "https://data.pa.gov/data.json",
+            "observed_at": "2026-08-29T17:22:23.065Z",
+            "capture_state": "captured_hashed",
+            "content_sha256": "60fcf5052a37d8e778f2e36e139297b7a7ca32cb90d775619f8c3c1348b1963f"
+          }
+        ],
+        "evidence": [
+          {
+            "evidence_id": "evidence-pa-catalog-dcug-prfh",
+            "claim": "The captured Pennsylvania first-party catalog record dcug-prfh lists the title and source-declared metadata for this asset; this is not a live verification or a dataset-payload capture.",
+            "state": "source_asserted",
+            "provenance_ids": [
+              "provenance-pa-catalog-dcug-prfh"
+            ],
+            "limitations": [
+              "Selected record hash is 60fcf5052a37d8e778f2e36e139297b7a7ca32cb90d775619f8c3c1348b1963f; the enclosing catalog snapshot hash is 4f24e059fdd528afd69ae222ad912ad1b0a3192a821142cf19510310164d9b55.",
+              "Current access, freshness, variables, codebooks, and analytic fitness require independent owner-approved review.",
+              "No source-family identity, merge, canonical identity, or cross-record join was assigned."
+            ]
+          }
+        ],
+        "freshness_verification": {
+          "metadata_observed_at": "2026-08-29T17:22:23.065Z",
+          "data_through": null,
+          "update_frequency": "unknown",
+          "verification_status": "not_live_verified",
+          "verification_method": "offline_fixture",
+          "next_review_due": null
+        },
+        "retrieval": {
+          "machine_actionable": true,
+          "preferred_interface": "portal",
+          "instructions": [
+            {
+              "sequence": 1,
+              "action": "open",
+              "url": "https://data.pa.gov/d/dcug-prfh",
+              "requires_human": true,
+              "instruction": "In a later owner-authorized run, open the first-party landing page using only the accepted transport contract; this fixture did not open it.",
+              "expected_result": "Landing page or a preserved typed access/restriction observation."
+            },
+            {
+              "sequence": 2,
+              "action": "inspect_metadata",
+              "url": "https://data.pa.gov/api/views/dcug-prfh",
+              "requires_human": true,
+              "instruction": "If separately authorized, inspect catalog metadata only. Do not request a dataset payload or bulk export.",
+              "expected_result": "Metadata receipt, or a typed refusal/access boundary."
+            },
+            {
+              "sequence": 3,
+              "action": "stop_and_report",
+              "url": null,
+              "requires_human": true,
+              "instruction": "Stop at login, account, form, agreement, payment, controlled-data, payload, or unknown-pagination boundaries.",
+              "expected_result": "Typed access or infrastructure outcome with no not_found translation."
+            }
+          ],
+          "expected_artifacts": [
+            "first-party metadata receipt",
+            "typed access observation",
+            "no dataset payload"
+          ],
+          "failure_policy": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."
+        },
+        "join_compatibility": {
+          "state": "none_known",
+          "keys": [],
+          "notes": [
+            "No join key was assigned in this fixture.",
+            "The shared identity index was not read or rebuilt.",
+            "Same title, same URL family, same publisher, or same custodian must not be treated as an identity merge."
+          ]
+        }
+      }
+    }
+  ],
+  "join_routes": [
+    {
+      "route_id": "join:fac:usaspending:uei",
+      "from_record_id": "obs:asset:federal-audit-clearinghouse",
+      "to_record_id": "obs:asset:usaspending-awards",
+      "direction": "bidirectional",
+      "entity": "other",
+      "match_strategy": "exact_key",
+      "key_pairs": [
+        {
+          "from_fields": [
+            "uei"
+          ],
+          "to_fields": [
+            "recipient_uei"
+          ],
+          "from_namespace": "SAM-UEI",
+          "to_namespace": "SAM-UEI",
+          "normalization_steps": [
+            "Retain source UEI values exactly",
+            "Align fiscal and audit years",
+            "Preserve recipient-name variants for review"
+          ]
+        }
+      ],
+      "cardinality": "one_to_many",
+      "compatibility_state": "candidate",
+      "confidence": "high",
+      "preconditions": [
+        "Use records with populated UEIs",
+        "Align FAC audit periods with USAspending award transactions"
+      ],
+      "caveats": [
+        "One recipient may have many awards and transactions.",
+        "Audit entity scope may differ from a facility or health-system perimeter.",
+        "Pre-UEI identifiers and historical name changes require separate handling."
+      ],
+      "evidence_refs": [
+        {
+          "record_id": "obs:asset:federal-audit-clearinghouse",
+          "evidence_ids": [
+            "ev:registry:federal-audit-clearinghouse"
+          ],
+          "provenance_ids": [
+            "prov:registry:federal-audit-clearinghouse"
+          ],
+          "state": "source_asserted"
+        },
+        {
+          "record_id": "obs:asset:usaspending-awards",
+          "evidence_ids": [
+            "ev:registry:usaspending-awards"
+          ],
+          "provenance_ids": [
+            "prov:registry:usaspending-awards"
+          ],
+          "state": "source_asserted"
+        }
+      ],
+      "blocked_reason": null
+    },
+    {
+      "route_id": "join:irs-schedules:irs-teos:return-object",
+      "from_record_id": "obs:asset:irs-990-schedules-h-r",
+      "to_record_id": "obs:asset:irs-teos-990-xml",
+      "direction": "bidirectional",
+      "entity": "other",
+      "match_strategy": "exact_key",
+      "key_pairs": [
+        {
+          "from_fields": [
+            "return_object_id"
+          ],
+          "to_fields": [
+            "return_object_id"
+          ],
+          "from_namespace": "IRS-TEOS-submission-object",
+          "to_namespace": "IRS-TEOS-submission-object",
+          "normalization_steps": [
+            "Retain the source return object ID exactly",
+            "Retain EIN and tax period as audit fields"
+          ]
+        }
+      ],
+      "cardinality": "one_to_one",
+      "compatibility_state": "candidate",
+      "confidence": "high",
+      "preconditions": [
+        "Parse schedule elements from the same immutable XML return object"
+      ],
+      "caveats": [
+        "A filer may omit a schedule or file an amendment.",
+        "Schedule presence does not establish a resolved health-system perimeter.",
+        "The schedule record describes a view over TEOS returns, not a separately downloaded corpus."
+      ],
+      "evidence_refs": [
+        {
+          "record_id": "obs:asset:irs-990-schedules-h-r",
+          "evidence_ids": [
+            "ev:registry:irs-990-schedules-h-r"
+          ],
+          "provenance_ids": [
+            "prov:registry:irs-990-schedules-h-r"
+          ],
+          "state": "source_asserted"
+        },
+        {
+          "record_id": "obs:asset:irs-teos-990-xml",
+          "evidence_ids": [
+            "ev:registry:irs-teos-990-xml"
+          ],
+          "provenance_ids": [
+            "prov:registry:irs-teos-990-xml"
+          ],
+          "state": "source_asserted"
+        }
+      ],
+      "blocked_reason": null
+    },
+    {
+      "route_id": "join:irs-teos:irs-bmf:ein",
+      "from_record_id": "obs:asset:irs-teos-990-xml",
+      "to_record_id": "obs:asset:irs-eo-bmf",
+      "direction": "bidirectional",
+      "entity": "other",
+      "match_strategy": "exact_key",
+      "key_pairs": [
+        {
+          "from_fields": [
+            "ein"
+          ],
+          "to_fields": [
+            "ein"
+          ],
+          "from_namespace": "IRS-EIN",
+          "to_namespace": "IRS-EIN",
+          "normalization_steps": [
+            "Retain source values",
+            "Remove display punctuation only",
+            "Left-pad to nine digits when source documentation requires it",
+            "Retain filing-year and snapshot context"
+          ]
+        }
+      ],
+      "cardinality": "many_to_one",
+      "compatibility_state": "candidate",
+      "confidence": "high",
+      "preconditions": [
+        "Preserve original EIN values and submission identifiers"
+      ],
+      "caveats": [
+        "Multiple returns, amendments, and tax periods can share an EIN.",
+        "An EIN is a legal-entity key, not a consolidated health-system key.",
+        "Group returns and reorganizations require separate interpretation."
+      ],
+      "evidence_refs": [
+        {
+          "record_id": "obs:asset:irs-teos-990-xml",
+          "evidence_ids": [
+            "ev:registry:irs-teos-990-xml"
+          ],
+          "provenance_ids": [
+            "prov:registry:irs-teos-990-xml"
+          ],
+          "state": "source_asserted"
+        },
+        {
+          "record_id": "obs:asset:irs-eo-bmf",
+          "evidence_ids": [
+            "ev:registry:irs-eo-bmf"
+          ],
+          "provenance_ids": [
+            "prov:registry:irs-eo-bmf"
+          ],
+          "state": "source_asserted"
+        }
+      ],
+      "blocked_reason": null
+    },
+    {
+      "route_id": "join:phc4-public:cms-hcris:report-level-incompatible",
+      "from_record_id": "obs:asset:pa-phc4-public-financial-reports",
+      "to_record_id": "obs:asset:cms-hcris-hospital-cost-reports",
+      "direction": "bidirectional",
+      "entity": "hospital",
+      "match_strategy": "incompatible_without_crosswalk",
+      "key_pairs": [
+        {
+          "from_fields": [
+            "published_report_row_or_label"
+          ],
+          "to_fields": [
+            "provider_ccn"
+          ],
+          "from_namespace": "PHC4-public-report-label",
+          "to_namespace": "CMS-HCRIS-CCN",
+          "normalization_steps": [
+            "Do not equate display labels with CCNs",
+            "Obtain a report-specific facility table or documented crosswalk",
+            "Version the crosswalk with both report releases"
+          ]
+        }
+      ],
+      "cardinality": "many_to_many",
+      "compatibility_state": "incompatible",
+      "confidence": "high",
+      "preconditions": [
+        "Obtain a documented PHC4 report-row to facility identifier mapping"
+      ],
+      "caveats": [
+        "Public report pages and PDFs are publication-level assets, not proven row-level datasets.",
+        "Facility labels are not a substitute for CCNs.",
+        "System and facility reporting scopes can differ between PHC4 and HCRIS."
+      ],
+      "evidence_refs": [
+        {
+          "record_id": "obs:asset:pa-phc4-public-financial-reports",
+          "evidence_ids": [
+            "ev:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+          ],
+          "provenance_ids": [
+            "prov:registry:pa-phc4-financial-ownership:pa-phc4-public-financial-reports"
+          ],
+          "state": "source_asserted"
+        },
+        {
+          "record_id": "obs:asset:cms-hcris-hospital-cost-reports",
+          "evidence_ids": [
+            "ev:registry:cms-hcris-cost-reports"
+          ],
+          "provenance_ids": [
+            "prov:registry:cms-hcris-cost-reports"
+          ],
+          "state": "source_asserted"
+        }
+      ],
+      "blocked_reason": "The offline evidence contains no report-specific PHC4 label-to-CCN crosswalk."
+    }
+  ],
+  "warnings": [
+    "Results describe indexed metadata and retrieval routes; they do not prove current endpoint availability or authorize access."
+  ]
+}

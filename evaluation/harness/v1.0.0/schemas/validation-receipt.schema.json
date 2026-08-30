@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receipt_version", "package_id", "validated_at", "status", "check_count", "failure_count", "package_manifest_sha256", "benchmark_binding", "fixture_evidence", "external_requests", "ranking_optimization_performed", "llm_used", "identity_work_performed", "coverage_execution_performed", "heavy_analysis_lock_touched"],
+  "properties": {
+    "receipt_version": { "const": "o8-evaluation-harness-validation-receipt.v1" },
+    "package_id": { "const": "o8-evaluation-harness-v1.0.0" },
+    "validated_at": { "type": "string", "minLength": 1 },
+    "status": { "const": "PASS" },
+    "check_count": { "type": "integer", "minimum": 1 },
+    "failure_count": { "const": 0 },
+    "package_manifest_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "benchmark_binding": { "type": "object" },
+    "fixture_evidence": { "type": "object" },
+    "external_requests": { "const": 0 }, "ranking_optimization_performed": { "const": false }, "llm_used": { "const": false }, "identity_work_performed": { "const": false }, "coverage_execution_performed": { "const": false }, "heavy_analysis_lock_touched": { "const": false }
+  }
+}

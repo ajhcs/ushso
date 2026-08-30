@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "O8 per-question evaluation output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["evaluation_version", "question_id", "gold_contract", "intent_compilation", "result_bundle", "top_k", "important_restriction_coverage", "access_state_correctness", "provenance_completeness", "join_route_correctness", "zero_result_not_absence", "gates"],
+  "properties": {
+    "evaluation_version": { "const": "o8-question-evaluation.v1" },
+    "question_id": { "type": "string", "minLength": 1 },
+    "gold_contract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["acceptable_sources", "must_not_miss_sources", "important_restrictions"],
+      "properties": {
+        "acceptable_sources": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "must_not_miss_sources": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "important_restrictions": { "type": "array", "uniqueItems": true, "items": { "type": "string" } }
+      }
+    },
+    "intent_compilation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["correct", "expected_digest", "actual_digest"],
+      "properties": { "correct": { "type": "boolean" }, "expected_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }, "actual_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" } }
+    },
+    "result_bundle": {
+      "type": "object", "additionalProperties": false,
+      "required": ["result_state", "result_count", "digest", "unacceptable_recommended_sources"],
+      "properties": {
+        "result_state": { "enum": ["results", "zero_results"] },
+        "result_count": { "type": "integer", "minimum": 0 },
+        "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "unacceptable_recommended_sources": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "top_k": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["k", "must_not_miss_hits", "must_not_miss_total", "must_not_miss_recall", "acceptable_source_hits", "acceptable_source_total", "acceptable_source_coverage"],
+        "properties": {
+          "k": { "type": "integer", "minimum": 1 },
+          "must_not_miss_hits": { "type": "integer", "minimum": 0 },
+          "must_not_miss_total": { "type": "integer", "minimum": 0 },
+          "must_not_miss_recall": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+          "acceptable_source_hits": { "type": "integer", "minimum": 0 },
+          "acceptable_source_total": { "type": "integer", "minimum": 0 },
+          "acceptable_source_coverage": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "important_restriction_coverage": { "type": "object", "additionalProperties": false, "required": ["matched", "expected", "score"], "properties": { "matched": { "type": "integer", "minimum": 0 }, "expected": { "type": "integer", "minimum": 0 }, "score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 } } },
+    "access_state_correctness": { "type": "object", "additionalProperties": false, "required": ["correct", "evaluated", "score"], "properties": { "correct": { "type": "integer", "minimum": 0 }, "evaluated": { "type": "integer", "minimum": 0 }, "score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 } } },
+    "provenance_completeness": { "type": "object", "additionalProperties": false, "required": ["matched_references", "expected_references", "score"], "properties": { "matched_references": { "type": "integer", "minimum": 0 }, "expected_references": { "type": "integer", "minimum": 0 }, "score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 } } },
+    "join_route_correctness": {
+      "type": "object", "additionalProperties": false,
+      "required": ["correct_proposals", "proposed_routes", "proposal_score", "covered_gold_routes", "gold_routes", "route_coverage", "required_crosswalks_matched", "required_crosswalks", "crosswalk_coverage"],
+      "properties": {
+        "correct_proposals": { "type": "integer", "minimum": 0 }, "proposed_routes": { "type": "integer", "minimum": 0 }, "proposal_score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "covered_gold_routes": { "type": "integer", "minimum": 0 }, "gold_routes": { "type": "integer", "minimum": 0 }, "route_coverage": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "required_crosswalks_matched": { "type": "integer", "minimum": 0 }, "required_crosswalks": { "type": "integer", "minimum": 0 }, "crosswalk_coverage": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+      }
+    },
+    "zero_result_not_absence": { "type": "object", "additionalProperties": false, "required": ["applicable", "valid", "corpus_absence_claimed", "statement"], "properties": { "applicable": { "type": "boolean" }, "valid": { "type": "boolean" }, "corpus_absence_claimed": { "type": "boolean" }, "statement": { "type": "string", "minLength": 1 } } },
+    "gates": {
+      "type": "object", "additionalProperties": false,
+      "required": ["intent_correct", "no_unacceptable_recommendations", "access_state_correct", "provenance_complete", "restrictions_complete", "joins_not_overstated", "required_join_routes_covered", "required_crosswalks_covered", "zero_result_scoped"],
+      "properties": {
+        "intent_correct": { "type": "boolean" }, "no_unacceptable_recommendations": { "type": "boolean" }, "access_state_correct": { "type": "boolean" }, "provenance_complete": { "type": "boolean" }, "restrictions_complete": { "type": "boolean" }, "joins_not_overstated": { "type": "boolean" }, "required_join_routes_covered": { "type": "boolean" }, "required_crosswalks_covered": { "type": "boolean" }, "zero_result_scoped": { "type": "boolean" }
+      }
+    }
+  }
+}

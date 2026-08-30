@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/core-contract/v1.0.0/fixture-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixture_manifest_version", "contract_version", "offline", "network_used", "payloads_included", "files"],
+  "properties": {
+    "fixture_manifest_version": {"const": "observatory-core-fixtures.v1"},
+    "contract_version": {"const": "observatory-core-contract.v1.0.0"},
+    "offline": {"const": true},
+    "network_used": {"const": false},
+    "payloads_included": {"const": false},
+    "files": {
+      "type": "array", "minItems": 5, "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["path", "entity_type", "schema"],
+        "properties": {
+          "path": {"type": "string", "pattern": "^[a-z0-9._/-]+\\.jsonl$"},
+          "entity_type": {"enum": ["ObservatoryObject", "Assertion", "AccessObservation", "Evidence", "Relationship"]},
+          "schema": {"type": "string", "pattern": "^[a-z-]+\\.schema\\.json$"}
+        }
+      }
+    }
+  }
+}

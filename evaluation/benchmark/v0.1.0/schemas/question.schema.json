@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Question-to-data benchmark question",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "question_id",
+    "natural_language_question",
+    "user_persona",
+    "research_intent",
+    "health_systems_concepts",
+    "required_measures",
+    "optional_measures",
+    "excluded_measures",
+    "geography",
+    "geographic_granularity",
+    "time_period",
+    "update_recency_requirement",
+    "unit_of_analysis",
+    "population",
+    "required_access",
+    "preferred_formats",
+    "preferred_interfaces",
+    "authoritative_source_requirement",
+    "expected_response_type",
+    "clarification_needed",
+    "clarification_question",
+    "supported_by_current_evidence",
+    "benchmark_difficulty",
+    "trap_types",
+    "geographic_composition",
+    "split",
+    "topic_cluster"
+  ],
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "pattern": "^QTD-O3-[0-9]{3}$"
+    },
+    "natural_language_question": {
+      "type": "string",
+      "minLength": 1
+    },
+    "user_persona": {
+      "type": "string",
+      "enum": [
+        "health_services_researcher",
+        "policy_analyst",
+        "journalist",
+        "hospital_health_system_finance_analyst",
+        "community_organization_patient_advocate",
+        "ai_research_agent",
+        "software_developer"
+      ]
+    },
+    "research_intent": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "health_systems_concepts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_measures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "optional_measures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "excluded_measures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "geography": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "geographic_granularity": {
+      "type": "string",
+      "minLength": 1
+    },
+    "time_period": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "update_recency_requirement": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "unit_of_analysis": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "population": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "required_access": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "preferred_formats": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "preferred_interfaces": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "authoritative_source_requirement": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "expected_response_type": {
+      "type": "string",
+      "enum": [
+        "single_source",
+        "multi_source_bundle",
+        "clarification_required",
+        "unsupported_or_incomplete"
+      ]
+    },
+    "clarification_needed": {
+      "type": "boolean"
+    },
+    "clarification_question": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "supported_by_current_evidence": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "benchmark_difficulty": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "trap_types": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "geographic_composition": {
+      "type": "string",
+      "enum": [
+        "pennsylvania",
+        "national_federal",
+        "comparative_multi_state",
+        "other_state_locality",
+        "geography_ambiguous_or_independent"
+      ]
+    },
+    "split": {
+      "type": "string",
+      "enum": [
+        "development",
+        "validation",
+        "held_out"
+      ]
+    },
+    "topic_cluster": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

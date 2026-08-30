@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/core-contract/v1.0.0/search-view-projection.schema.json",
+  "title": "Denormalized discovery/search view projection descriptor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["projection_version", "view_schema", "view_role", "source_of_truth", "record_id", "core_subject_ids", "assertion_ids", "access_observation_ids", "evidence_ids", "relationship_ids", "projection_limitations"],
+  "properties": {
+    "projection_version": {"const": "observatory-search-view-projection.v1"},
+    "view_schema": {"const": "observatory-record.v1.0.0"},
+    "view_role": {"const": "denormalized_discovery_search_view"},
+    "source_of_truth": {"const": false},
+    "record_id": {"type": "string", "minLength": 1},
+    "core_subject_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"}},
+    "assertion_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"}},
+    "access_observation_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"}},
+    "evidence_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"}},
+    "relationship_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"}},
+    "projection_limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  }
+}

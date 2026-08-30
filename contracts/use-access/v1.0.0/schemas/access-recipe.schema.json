@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/use-access/v1.0.0/access-recipe.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "recipe_id", "asset_id", "source_truth_id", "route_id", "route_kind", "title", "human_summary", "agent_summary", "authoritative_url", "source_urls", "mechanisms", "requirements", "restrictions", "authorization", "steps", "typed_failure_outcomes", "expected_artifacts", "failure_policy", "provenance", "immutable"],
+  "properties": {
+    "schema_version": {"const": "access-recipe.v1.0.0"},
+    "recipe_id": {"type": "string", "pattern": "^obs:access-recipe:"},
+    "asset_id": {"type": "string", "pattern": "^obs:asset:"},
+    "source_truth_id": {"type": "string", "pattern": "^obs:truth:"},
+    "route_id": {"type": "string", "pattern": "^obs:route:"},
+    "route_kind": {"enum": ["public_bulk_or_api", "public_report_publication", "custom_application_request"]},
+    "title": {"type": "string", "minLength": 1},
+    "human_summary": {"type": "string", "minLength": 20},
+    "agent_summary": {"type": "string", "minLength": 20},
+    "authoritative_url": {"type": "string", "format": "https-uri"},
+    "source_urls": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "format": "https-uri"}},
+    "mechanisms": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["bulk_download", "api", "web_download", "data_portal", "request_form", "contact_owner", "controlled_transfer"]}},
+    "requirements": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["type", "required", "state", "human_action_required", "detail"],
+        "properties": {
+          "type": {"enum": ["none", "owner_run_authorization", "application", "human_approval", "payment", "data_use_agreement", "license", "account", "registration", "identity_verification", "secure_transfer"]},
+          "required": {"type": "boolean"},
+          "state": {"enum": ["not_applicable", "not_present", "unknown", "required_unmet", "future_human_step"]},
+          "human_action_required": {"type": "boolean"},
+          "detail": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "restrictions": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["restriction_type", "state", "detail", "evidence_state"],
+        "properties": {
+          "restriction_type": {"enum": ["none_known", "terms", "application_review", "payment", "data_use", "license", "privacy", "publication_level_only", "controlled_transfer", "unknown"]},
+          "state": {"enum": ["not_applicable", "source_asserted", "unverified", "required", "unknown"]},
+          "detail": {"type": "string", "minLength": 1},
+          "evidence_state": {"enum": ["source_asserted", "curator_inferred", "unresolved"]}
+        }
+      }
+    },
+    "authorization": {
+      "type": "object", "additionalProperties": false,
+      "required": ["authorization_state", "execution_allowed", "network_allowed", "public_route_is_authorization", "required_before_execution", "gate_behavior"],
+      "properties": {
+        "authorization_state": {"const": "not_present_fixture"},
+        "execution_allowed": {"const": false},
+        "network_allowed": {"const": false},
+        "public_route_is_authorization": {"const": false},
+        "required_before_execution": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "gate_behavior": {"const": "stop_and_emit_typed_authorization_required"}
+      }
+    },
+    "steps": {
+      "type": "array", "minItems": 3,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["sequence", "actor", "action", "url", "authorization_gate", "instruction", "inputs", "expected_result", "stop_conditions", "network_action"],
+        "properties": {
+          "sequence": {"type": "integer", "minimum": 1},
+          "actor": {"enum": ["human", "agent", "human_or_agent"]},
+          "action": {"enum": ["inspect_offline_evidence", "request_authorization", "open_source", "inspect_metadata", "select_release", "download_bounded", "call_api_bounded", "define_request", "submit_application", "review_quote", "approve_terms_or_payment", "receive_controlled_transfer", "validate_artifact", "stop_and_report"]},
+          "url": {"type": ["string", "null"], "format": "https-uri"},
+          "authorization_gate": {"enum": ["none_offline", "owner_run_authorization", "human_application_authorization", "human_payment_or_terms_authorization", "controlled_transfer_authorization"]},
+          "instruction": {"type": "string", "minLength": 10},
+          "inputs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "expected_result": {"type": "string", "minLength": 5},
+          "stop_conditions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "network_action": {"type": "boolean"}
+        }
+      }
+    },
+    "typed_failure_outcomes": {
+      "type": "array", "minItems": 5,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["outcome", "terminal_class", "preserve_as", "translation_to_not_found", "agent_action", "human_message"],
+        "properties": {
+          "outcome": {"enum": ["authorization_required", "http_403", "authentication_required", "registration_required", "application_required", "dua_required", "payment_required", "license_required", "rate_limited", "timed_out", "transport_failure", "malformed_response", "cancelled", "unavailable", "unresolved"]},
+          "terminal_class": {"enum": ["authorization", "access", "restriction", "infrastructure", "content", "cancellation", "unresolved"]},
+          "preserve_as": {"type": "string", "minLength": 1},
+          "translation_to_not_found": {"const": false},
+          "agent_action": {"enum": ["stop", "retry_only_if_authorized", "request_human_action", "record_and_stop", "inspect_metadata_only"]},
+          "human_message": {"type": "string", "minLength": 10}
+        }
+      }
+    },
+    "expected_artifacts": {
+      "type": "array", "minItems": 2,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["artifact_type", "required", "content_state", "description"],
+        "properties": {
+          "artifact_type": {"enum": ["metadata_receipt", "source_landing_receipt", "request_specification", "application_receipt", "quote_or_terms", "authorization_receipt", "raw_object_reference", "checksum", "codebook_or_layout", "typed_failure_receipt", "publication_file", "controlled_data_reference", "no_payload_fixture_attestation"]},
+          "required": {"type": "boolean"},
+          "content_state": {"enum": ["fixture_only", "future_if_authorized", "human_provided", "typed_outcome_only"]},
+          "description": {"type": "string", "minLength": 5}
+        }
+      }
+    },
+    "failure_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["policy_id", "preserve_typed_outcomes", "no_not_found_translation", "rule"],
+      "properties": {
+        "policy_id": {"const": "obs:policy:use-access:v1.0.0"},
+        "preserve_typed_outcomes": {"const": true},
+        "no_not_found_translation": {"const": true},
+        "rule": {"const": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."}
+      }
+    },
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_truth_id", "evidence_state", "locator", "offline", "limitations"],
+      "properties": {
+        "source_truth_id": {"type": "string", "pattern": "^obs:truth:"},
+        "evidence_state": {"enum": ["source_asserted", "curator_inferred"]},
+        "locator": {"type": "string", "pattern": "^fixtures/source-truth\\.json#"},
+        "offline": {"const": true},
+        "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "immutable": {"const": true}
+  }
+}

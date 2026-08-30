@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Gold source bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "bundle_id",
+    "question_id",
+    "required_analytical_roles",
+    "minimum_viable_bundle",
+    "optional_enrichment_sources",
+    "candidate_join_fields",
+    "required_crosswalks",
+    "grain_compatibility",
+    "geography_compatibility",
+    "temporal_compatibility",
+    "access_compatibility",
+    "known_gaps",
+    "join_status",
+    "join_assessments",
+    "actual_join_proven",
+    "conditions_not_recommend",
+    "evidence_references"
+  ],
+  "properties": {
+    "bundle_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "question_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "required_analytical_roles": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "minimum_viable_bundle": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "optional_enrichment_sources": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "candidate_join_fields": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "required_crosswalks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "grain_compatibility": {
+      "type": "string",
+      "enum": [
+        "compatible",
+        "conditional",
+        "incompatible"
+      ]
+    },
+    "geography_compatibility": {
+      "type": "string",
+      "enum": [
+        "compatible",
+        "conditional",
+        "incompatible"
+      ]
+    },
+    "temporal_compatibility": {
+      "type": "string",
+      "enum": [
+        "compatible",
+        "conditional",
+        "incompatible"
+      ]
+    },
+    "access_compatibility": {
+      "type": "string",
+      "enum": [
+        "compatible",
+        "conditional",
+        "incompatible"
+      ]
+    },
+    "known_gaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "join_status": {
+      "type": "string",
+      "enum": [
+        "join_proven",
+        "join_documented",
+        "join_candidate",
+        "join_requires_crosswalk",
+        "incompatible_grain",
+        "incompatible_time",
+        "incompatible_geography",
+        "unknown"
+      ]
+    },
+    "join_assessments": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "actual_join_proven": {
+      "const": false
+    },
+    "conditions_not_recommend": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_references": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    }
+  }
+}

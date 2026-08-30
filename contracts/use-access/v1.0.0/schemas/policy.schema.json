@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/use-access/v1.0.0/policy.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_id", "mode", "use_card_policy", "access_recipe_policy", "identity_policy", "prohibited_actions", "immutable"],
+  "properties": {
+    "schema_version": {"const": "use-access-policy.v1.0.0"},
+    "policy_id": {"const": "obs:policy:use-access:v1.0.0"},
+    "mode": {"const": "fixture_offline"},
+    "use_card_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_truth_store", "assertion_store", "separation_required", "llm_generated_truth_allowed", "llm_suggestion_status", "promotion_requires", "rule"],
+      "properties": {
+        "source_truth_store": {"const": "fixtures/source-truth.json"},
+        "assertion_store": {"const": "fixtures/use-cards.json"},
+        "separation_required": {"const": true},
+        "llm_generated_truth_allowed": {"const": false},
+        "llm_suggestion_status": {"const": "draft_unverified"},
+        "promotion_requires": {"const": "human_or_deterministic_evidence_review"},
+        "rule": {"type": "string", "minLength": 40}
+      }
+    },
+    "access_recipe_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recipe_store", "execution_default", "public_route_is_authorization", "network_allowed_in_fixture", "no_not_found_translation", "rule"],
+      "properties": {
+        "recipe_store": {"const": "fixtures/access-recipes.json"},
+        "execution_default": {"const": "unauthorized"},
+        "public_route_is_authorization": {"const": false},
+        "network_allowed_in_fixture": {"const": false},
+        "no_not_found_translation": {"const": true},
+        "rule": {"type": "string", "minLength": 40}
+      }
+    },
+    "identity_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity_merge_allowed", "shared_identity_index_read", "rule"],
+      "properties": {
+        "identity_merge_allowed": {"const": false},
+        "shared_identity_index_read": {"const": false},
+        "rule": {"type": "string", "minLength": 20}
+      }
+    },
+    "prohibited_actions": {
+      "type": "array",
+      "minItems": 6,
+      "uniqueItems": true,
+      "contains": {"const": "public_network_request"},
+      "items": {"enum": ["public_network_request", "dataset_payload_download", "identity_merge", "coverage_execution", "heavy_analysis_lock_touch", "live_recipe_execution"]}
+    },
+    "immutable": {"const": true}
+  }
+}

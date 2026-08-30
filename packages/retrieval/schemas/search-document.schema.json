@@ -1,0 +1,32 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://hackyard.local/observatory/retrieval/v1.0.0/search-document.schema.json",
+  "title":"Non-authoritative Observatory search document projection",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema_version","search_document_id","resource_record_id","projection_role","authoritative_record","title","description","authoritative_url","identity","geography","time_coverage","units_of_analysis","capabilities","access","search_text","facets","projection_inputs","evidence_refs","provenance_refs","relationship_refs","projection_warning"],
+  "properties":{
+    "schema_version":{"const":"observatory-search-document.v1.0.0"},
+    "search_document_id":{"type":"string","pattern":"^search:[a-z0-9][a-z0-9._:-]{2,127}$"},
+    "resource_record_id":{"type":"string","minLength":3},
+    "projection_role":{"const":"discovery_view"},
+    "authoritative_record":{"const":false},
+    "title":{"type":"string","minLength":1},
+    "description":{"type":"string","minLength":1},
+    "authoritative_url":{"type":"string","format":"uri","pattern":"^https://"},
+    "identity":{"type":"object","additionalProperties":false,"required":["source_id","source_name","family_id","family_name","family_resolution_state","asset_id","asset_type","version_state","version_label"],"properties":{"source_id":{"type":"string"},"source_name":{"type":"string"},"family_id":{"type":"string"},"family_name":{"type":"string"},"family_resolution_state":{"type":"string"},"asset_id":{"type":"string"},"asset_type":{"type":"string"},"version_state":{"type":"string"},"version_label":{"type":["string","null"]}}},
+    "geography":{"type":"object","additionalProperties":false,"required":["coverage_level","jurisdictions","rurality_support"],"properties":{"coverage_level":{"type":"string"},"jurisdictions":{"type":"array","uniqueItems":true,"items":{"type":"string"}},"rurality_support":{"type":"string"}}},
+    "time_coverage":{"type":"object","additionalProperties":false,"required":["state","start","end","temporal_granularity"],"properties":{"state":{"type":"string"},"start":{"type":["string","null"]},"end":{"type":["string","null"]},"temporal_granularity":{"type":"string"}}},
+    "units_of_analysis":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+    "capabilities":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["id","label","fitness","evidence_state"],"properties":{"id":{"type":"string"},"label":{"type":"string"},"fitness":{"type":"string"},"evidence_state":{"type":"string"}}}},
+    "access":{"type":"object","additionalProperties":false,"required":["status","mechanisms","requirements","machine_actionable","preferred_interface"],"properties":{"status":{"type":"string"},"mechanisms":{"type":"array","uniqueItems":true,"items":{"type":"string"}},"requirements":{"type":"array","uniqueItems":true,"items":{"type":"string"}},"machine_actionable":{"type":"boolean"},"preferred_interface":{"type":"string"}}},
+    "search_text":{"type":"string","minLength":1},
+    "facets":{"type":"object","additionalProperties":false,"required":["geography","unit_of_analysis","capability","access_status","access_mechanism","source","family"],"properties":{"geography":{"$ref":"#/$defs/stringSet"},"unit_of_analysis":{"$ref":"#/$defs/stringSet"},"capability":{"$ref":"#/$defs/stringSet"},"access_status":{"$ref":"#/$defs/stringSet"},"access_mechanism":{"$ref":"#/$defs/stringSet"},"source":{"$ref":"#/$defs/stringSet"},"family":{"$ref":"#/$defs/stringSet"}}},
+    "projection_inputs":{"type":"array","minItems":1,"items":{"type":"object","additionalProperties":false,"required":["ref_id","ref_type","schema_version"],"properties":{"ref_id":{"type":"string"},"ref_type":{"enum":["observatory_object","legacy_discovery_record"]},"schema_version":{"type":"string"}}}},
+    "evidence_refs":{"$ref":"#/$defs/stringSet"},
+    "provenance_refs":{"$ref":"#/$defs/stringSet"},
+    "relationship_refs":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+    "projection_warning":{"const":"This search document is a denormalized retrieval view, not source truth. Resolve claims through referenced evidence, access observations, and relationships."}
+  },
+  "$defs":{"stringSet":{"type":"array","minItems":1,"uniqueItems":true,"items":{"type":"string","minLength":1}}}
+}

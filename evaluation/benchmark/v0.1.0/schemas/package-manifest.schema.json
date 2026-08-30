@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Question-to-data benchmark package manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_version",
+    "package_id",
+    "package_version",
+    "created_at",
+    "offline",
+    "external_requests",
+    "identity_merge_performed",
+    "retrieval_engine_implemented",
+    "manifest_excludes",
+    "source_pins",
+    "file_count",
+    "payload_bytes",
+    "files",
+    "immutable"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "manifest_version": {
+      "const": "question-to-data-package-manifest.v1"
+    },
+    "package_id": {
+      "const": "ushso-question-to-data-v0.1.0"
+    },
+    "package_version": {
+      "const": "0.1.0"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "offline": {
+      "const": true
+    },
+    "external_requests": {
+      "const": 0
+    },
+    "identity_merge_performed": {
+      "const": false
+    },
+    "retrieval_engine_implemented": {
+      "const": false
+    },
+    "manifest_excludes": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_pins": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "source_reference_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "file_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "payload_bytes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "immutable": {
+      "const": true
+    }
+  }
+}

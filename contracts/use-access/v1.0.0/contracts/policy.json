@@ -1,0 +1,36 @@
+{
+  "schema_version": "use-access-policy.v1.0.0",
+  "policy_id": "obs:policy:use-access:v1.0.0",
+  "mode": "fixture_offline",
+  "use_card_policy": {
+    "source_truth_store": "fixtures/source-truth.json",
+    "assertion_store": "fixtures/use-cards.json",
+    "separation_required": true,
+    "llm_generated_truth_allowed": false,
+    "llm_suggestion_status": "draft_unverified",
+    "promotion_requires": "human_or_deterministic_evidence_review",
+    "rule": "LLM output may propose a draft assertion but must never be stored, returned, or promoted as source truth without evidence-bound human or deterministic review."
+  },
+  "access_recipe_policy": {
+    "recipe_store": "fixtures/access-recipes.json",
+    "execution_default": "unauthorized",
+    "public_route_is_authorization": false,
+    "network_allowed_in_fixture": false,
+    "no_not_found_translation": true,
+    "rule": "Preserve every access, restriction, infrastructure, and unresolved outcome as its typed state; never translate it to not_found."
+  },
+  "identity_policy": {
+    "identity_merge_allowed": false,
+    "shared_identity_index_read": false,
+    "rule": "This contract references frozen asset identifiers and does not merge, resolve, or infer identities."
+  },
+  "prohibited_actions": [
+    "public_network_request",
+    "dataset_payload_download",
+    "identity_merge",
+    "coverage_execution",
+    "heavy_analysis_lock_touch",
+    "live_recipe_execution"
+  ],
+  "immutable": true
+}

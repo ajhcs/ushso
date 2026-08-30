@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Question-to-data validation report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "validation_version",
+    "benchmark_package",
+    "generated_at",
+    "status",
+    "external_requests",
+    "checks",
+    "summary",
+    "manifest_reconciliation",
+    "prohibited_action_attestation"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "validation_version": {
+      "const": "question-to-data-validation.v1"
+    },
+    "benchmark_package": {
+      "const": "ushso-question-to-data-v0.1.0"
+    },
+    "generated_at": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "PASS",
+        "FAIL"
+      ]
+    },
+    "external_requests": {
+      "const": 0
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "manifest_reconciliation": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "prohibited_action_attestation": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

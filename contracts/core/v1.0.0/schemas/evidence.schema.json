@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/core-contract/v1.0.0/evidence.schema.json",
+  "title": "Evidence",
+  "description": "Metadata-only evidence pointer. Raw response bodies and dataset payloads are prohibited from this core contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "entity_type", "evidence_id", "evidence_type", "locator", "content_sha256", "capture_object_id", "availability", "origin", "description", "observed_at", "offline_fixture"],
+  "properties": {
+    "contract_version": {"const": "observatory-core-contract.v1.0.0"},
+    "entity_type": {"const": "Evidence"},
+    "evidence_id": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"},
+    "evidence_type": {"enum": ["first_party_page", "catalog_metadata", "documentation", "capture_receipt", "checksum", "fixture_note", "other"]},
+    "locator": {"type": "string", "format": "uri-reference"},
+    "content_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "capture_object_id": {"type": ["string", "null"], "pattern": "^obs:"},
+    "availability": {"enum": ["captured_hashed", "locator_only", "fixture_only", "unavailable", "unknown"]},
+    "origin": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/origin"},
+    "description": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "offline_fixture": {"const": true}
+  }
+}

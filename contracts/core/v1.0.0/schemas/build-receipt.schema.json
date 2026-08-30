@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/core-contract/v1.0.0/build-receipt.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receipt_version", "contract_version", "mode", "offline", "network_used", "payloads_included", "fixture_manifest_sha256", "outputs", "immutable"],
+  "properties": {
+    "receipt_version": {"const": "observatory-core-build.v1"},
+    "contract_version": {"const": "observatory-core-contract.v1.0.0"},
+    "mode": {"const": "fixture"},
+    "offline": {"const": true},
+    "network_used": {"const": false},
+    "payloads_included": {"const": false},
+    "fixture_manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "outputs": {"type": "array", "minItems": 5, "items": {"type": "object", "additionalProperties": false, "required": ["path", "record_count", "sha256"], "properties": {"path": {"type": "string"}, "record_count": {"type": "integer", "minimum": 1}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}}},
+    "immutable": {"const": true}
+  }
+}

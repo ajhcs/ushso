@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Question-to-data benchmark feature record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "question_id",
+    "split",
+    "geographic_composition",
+    "expected_response_type",
+    "concept_features",
+    "constraint_features",
+    "difficulty_level",
+    "difficulty_dimensions",
+    "trap_types",
+    "abstention_expected"
+  ],
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "split": {
+      "type": "string",
+      "enum": [
+        "development",
+        "validation",
+        "held_out"
+      ]
+    },
+    "geographic_composition": {
+      "type": "string"
+    },
+    "expected_response_type": {
+      "type": "string",
+      "enum": [
+        "single_source",
+        "multi_source_bundle",
+        "clarification_required",
+        "unsupported_or_incomplete"
+      ]
+    },
+    "concept_features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "constraint_features": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "difficulty_level": {
+      "type": "string",
+      "enum": [
+        "medium",
+        "high"
+      ]
+    },
+    "difficulty_dimensions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "trap_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "abstention_expected": {
+      "type": "boolean"
+    }
+  }
+}

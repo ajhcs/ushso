@@ -1,0 +1,96 @@
+{
+  "fixture_version": "use-access-source-truth.v1.0.0",
+  "records": [
+    {
+      "schema_version": "source-truth-snapshot.v1.0.0",
+      "source_truth_id": "obs:truth:cms-hcris-hospital-cost-reports",
+      "record_id": "obs:asset:cms-hcris-hospital-cost-reports",
+      "source_id": "obs:source:cms-hcris",
+      "family_id": "obs:family:cms-hcris-cost-reports",
+      "title": "CMS HCRIS Hospital Cost Reports",
+      "description": "Provider-period Medicare cost reports with hospital financial-statement, cost-center, charge, settlement, and utilization fields. These are facility reports, not consolidated health-system financial statements.",
+      "authoritative_url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports",
+      "asset_type": "dataset",
+      "geography": {"coverage_level": "national", "jurisdictions": ["US"], "rurality_support": "derivable"},
+      "time_coverage": {"state": "bounded", "start": "1996", "end": "2026", "temporal_granularity": "year", "data_through": "2026"},
+      "units": ["hospital", "facility", "provider"],
+      "subjects": ["hospital_financials", "utilization", "hospital_capacity", "costs_prices"],
+      "access": {"status": "public_direct", "mechanisms": ["bulk_download", "api"], "requirements": ["none"], "preferred_interface": "download"},
+      "retrieval_urls": [
+        "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports/cost-reports-fiscal-year",
+        "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report/api-docs"
+      ],
+      "limitations": [
+        "Older extracts may be subsets.",
+        "Not every submitted form is guaranteed to be represented electronically.",
+        "Facility/provider-period scope is not consolidated parent-system finance."
+      ],
+      "evidence": {
+        "evidence_state": "source_asserted",
+        "origin_path": "observatory/retrieval/v1.0.0/fixtures/curated-assets.json",
+        "origin_sha256": "920eac8ba08008daa3f59d746f0c78ab9c3160e55675925c9c665bfc136eed57",
+        "origin_locator": "assets[record_id=obs:asset:cms-hcris-hospital-cost-reports]",
+        "captured_offline": true,
+        "claim_scope": "frozen_curated_fixture_only_not_live_verification"
+      }
+    },
+    {
+      "schema_version": "source-truth-snapshot.v1.0.0",
+      "source_truth_id": "obs:truth:pa-phc4-public-financial-reports",
+      "record_id": "obs:asset:pa-phc4-public-financial-reports",
+      "source_id": "obs:source:pa-phc4",
+      "family_id": "obs:family:pa-phc4-financial-ownership",
+      "title": "PHC4 Public Hospital Financial Reports",
+      "description": "Public Pennsylvania hospital and health-system financial-condition, utilization, and annual financial report pages and PDF publications. This record does not imply access to PHC4 custom record-level files.",
+      "authoritative_url": "https://www.phc4.org/report-focus/financial/",
+      "asset_type": "catalog_record",
+      "geography": {"coverage_level": "state", "jurisdictions": ["US-PA"], "rurality_support": "derivable"},
+      "time_coverage": {"state": "bounded", "start": "1996", "end": "2024", "temporal_granularity": "year", "data_through": "2024"},
+      "units": ["hospital", "health_system", "state"],
+      "subjects": ["hospital_financials", "utilization", "ownership", "hospital_capacity"],
+      "access": {"status": "public_direct", "mechanisms": ["data_portal", "web_download"], "requirements": ["none"], "preferred_interface": "portal"},
+      "retrieval_urls": [],
+      "limitations": [
+        "Public reports are largely publication-level HTML or PDF, not an established open record-level bulk asset.",
+        "Pennsylvania only; facility and system definitions must be retained by report year."
+      ],
+      "evidence": {
+        "evidence_state": "source_asserted",
+        "origin_path": "observatory/retrieval/v1.0.0/fixtures/curated-assets.json",
+        "origin_sha256": "920eac8ba08008daa3f59d746f0c78ab9c3160e55675925c9c665bfc136eed57",
+        "origin_locator": "assets[record_id=obs:asset:pa-phc4-public-financial-reports]",
+        "captured_offline": true,
+        "claim_scope": "frozen_curated_fixture_only_not_live_verification"
+      }
+    },
+    {
+      "schema_version": "source-truth-snapshot.v1.0.0",
+      "source_truth_id": "obs:truth:pa-phc4-custom-data",
+      "record_id": "obs:asset:pa-phc4-custom-data",
+      "source_id": "obs:source:pa-phc4",
+      "family_id": "obs:family:pa-phc4-financial-ownership",
+      "title": "PHC4 Custom Record-Level Data Request",
+      "description": "A distinct access route for Pennsylvania record-level or custom PHC4 datasets. Requests require an application, review, quote, payment, and controlled transfer; public report visibility is not data access.",
+      "authoritative_url": "https://www.phc4.org/request-custom-data/",
+      "asset_type": "other",
+      "geography": {"coverage_level": "state", "jurisdictions": ["US-PA"], "rurality_support": "derivable"},
+      "time_coverage": {"state": "bounded", "start": "1996", "end": "2024", "temporal_granularity": "year", "data_through": "2024"},
+      "units": ["hospital", "facility", "health_system", "event"],
+      "subjects": ["hospital_financials", "utilization", "ownership", "quality", "claims", "hospital_capacity"],
+      "access": {"status": "application_required", "mechanisms": ["request_form", "contact_owner"], "requirements": ["application", "payment", "human_approval"], "preferred_interface": "request_workflow"},
+      "retrieval_urls": ["https://www.phc4.org/request-custom-data/available-data/"],
+      "limitations": [
+        "Application, review, quote, payment, and transfer are material restrictions.",
+        "Available variables, permitted uses, and current terms require human review."
+      ],
+      "evidence": {
+        "evidence_state": "source_asserted",
+        "origin_path": "observatory/retrieval/v1.0.0/fixtures/curated-assets.json",
+        "origin_sha256": "920eac8ba08008daa3f59d746f0c78ab9c3160e55675925c9c665bfc136eed57",
+        "origin_locator": "assets[record_id=obs:asset:pa-phc4-custom-data]",
+        "captured_offline": true,
+        "claim_scope": "frozen_curated_fixture_only_not_live_verification"
+      }
+    }
+  ]
+}

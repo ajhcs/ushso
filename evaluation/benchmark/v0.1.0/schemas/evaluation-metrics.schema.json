@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Question-to-data evaluation metric specification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "metrics_version",
+    "status",
+    "external_requests",
+    "retrieval",
+    "constraint_handling",
+    "bundle_quality",
+    "explanation_and_trust",
+    "abstention"
+  ],
+  "properties": {
+    "metrics_version": {
+      "const": "question-to-data-evaluation.v1"
+    },
+    "status": {
+      "const": "specification_only"
+    },
+    "external_requests": {
+      "const": 0
+    },
+    "evaluation_unit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "retrieval": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "constraint_handling": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "bundle_quality": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "explanation_and_trust": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "abstention": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "scoring_rules": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

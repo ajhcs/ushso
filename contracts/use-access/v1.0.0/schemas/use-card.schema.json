@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/use-access/v1.0.0/use-card.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "use_card_id", "asset_id", "source_truth_ids", "question", "human_summary", "agent_summary", "assertion_type", "fitness", "measures", "compatible_units", "compatible_geographies", "time_needs", "join_guidance", "evidence", "confidence", "status", "limitations", "truth_boundary", "immutable"],
+  "properties": {
+    "schema_version": {"const": "use-card.v1.0.0"},
+    "use_card_id": {"type": "string", "pattern": "^obs:use-card:"},
+    "asset_id": {"type": "string", "pattern": "^obs:asset:"},
+    "source_truth_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^obs:truth:"}},
+    "question": {"type": "string", "minLength": 10},
+    "human_summary": {"type": "string", "minLength": 20},
+    "agent_summary": {"type": "string", "minLength": 20},
+    "assertion_type": {"const": "curated_analytical_fit_not_source_truth"},
+    "fitness": {"enum": ["primary", "supporting", "context_only", "conditional", "insufficient_evidence"]},
+    "measures": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["measure_id", "label", "availability", "role", "evidence_ids", "notes"],
+        "properties": {
+          "measure_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]+$"},
+          "label": {"type": "string", "minLength": 1},
+          "availability": {"enum": ["source_reported", "derivable", "proxy_only", "request_dependent", "unverified"]},
+          "role": {"enum": ["outcome", "exposure", "stratifier", "denominator", "context"]},
+          "evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^obs:evidence:"}},
+          "notes": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "compatible_units": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["unit", "fit", "notes"],
+        "properties": {
+          "unit": {"enum": ["hospital", "facility", "provider", "health_system", "state", "event"]},
+          "fit": {"enum": ["exact", "aggregate", "proxy", "conditional", "incompatible", "unknown"]},
+          "notes": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "compatible_geographies": {
+      "type": "object", "additionalProperties": false,
+      "required": ["levels", "jurisdictions", "rurality_use", "requirements", "evidence_ids"],
+      "properties": {
+        "levels": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["national", "state", "county", "facility"]}},
+        "jurisdictions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^US(-[A-Z]{2})?$"}},
+        "rurality_use": {"enum": ["direct", "requires_external_crosswalk", "unsupported", "unknown"]},
+        "requirements": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^obs:evidence:"}}
+      }
+    },
+    "time_needs": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_start", "source_end", "analysis_granularity", "longitudinal_fit", "alignment_requirements", "evidence_ids"],
+      "properties": {
+        "source_start": {"type": ["string", "null"], "pattern": "^[0-9]{4}(-[0-9]{2})?$"},
+        "source_end": {"type": ["string", "null"], "pattern": "^[0-9]{4}(-[0-9]{2})?$"},
+        "analysis_granularity": {"enum": ["year", "quarter", "month", "release", "request_defined", "unknown"]},
+        "longitudinal_fit": {"enum": ["strong", "moderate", "weak", "conditional", "unknown"]},
+        "alignment_requirements": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^obs:evidence:"}}
+      }
+    },
+    "join_guidance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "candidate_keys", "compatible_asset_ids", "requirements", "limitations"],
+      "properties": {
+        "state": {"enum": ["documented", "candidate", "conditional", "incompatible", "none_known", "unknown"]},
+        "candidate_keys": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "compatible_asset_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^obs:asset:"}},
+        "requirements": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "evidence": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["evidence_id", "source_truth_id", "claim", "state", "locator", "limitations"],
+        "properties": {
+          "evidence_id": {"type": "string", "pattern": "^obs:evidence:"},
+          "source_truth_id": {"type": "string", "pattern": "^obs:truth:"},
+          "claim": {"type": "string", "minLength": 20},
+          "state": {"enum": ["source_asserted", "curator_inferred", "unresolved"]},
+          "locator": {"type": "string", "pattern": "^fixtures/source-truth\\.json#"},
+          "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "confidence": {"enum": ["high", "medium", "low", "unknown"]},
+    "status": {"enum": ["draft_unverified", "fixture_review_candidate", "reviewed", "withdrawn", "unresolved"]},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "truth_boundary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_truth_separate", "llm_generated_truth_allowed", "promotion_requires", "policy_id"],
+      "properties": {
+        "source_truth_separate": {"const": true},
+        "llm_generated_truth_allowed": {"const": false},
+        "promotion_requires": {"const": "human_or_deterministic_evidence_review"},
+        "policy_id": {"const": "obs:policy:use-access:v1.0.0"}
+      }
+    },
+    "immutable": {"const": true}
+  }
+}

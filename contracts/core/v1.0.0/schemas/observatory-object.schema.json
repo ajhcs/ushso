@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/core-contract/v1.0.0/observatory-object.schema.json",
+  "title": "ObservatoryObject",
+  "description": "A durable node whose internal ID never replaces or rewrites its exact source-native identifiers.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "entity_type", "object_id", "object_class", "role", "label", "description", "authoritative_locator", "native_identifiers", "lifecycle_status", "evidence_ids", "created_at", "offline_fixture"],
+  "properties": {
+    "contract_version": {"const": "observatory-core-contract.v1.0.0"},
+    "entity_type": {"const": "ObservatoryObject"},
+    "object_id": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"},
+    "object_class": {"enum": ["ObservableResource", "Organization"]},
+    "role": {"enum": ["repository", "catalog", "source", "dataset", "distribution", "service", "documentation", "version", "capture", "organization"]},
+    "label": {"type": "string", "minLength": 1},
+    "description": {"type": ["string", "null"]},
+    "authoritative_locator": {"type": ["string", "null"], "format": "uri-reference"},
+    "native_identifiers": {"type": "array", "minItems": 1, "items": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/sourceNativeIdentifier"}},
+    "lifecycle_status": {"enum": ["active", "superseded", "withdrawn", "unavailable", "unknown"]},
+    "evidence_ids": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/evidenceIds"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "offline_fixture": {"const": true}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"object_class": {"const": "Organization"}}, "required": ["object_class"]},
+      "then": {"properties": {"role": {"const": "organization"}}},
+      "else": {"properties": {"role": {"enum": ["repository", "catalog", "source", "dataset", "distribution", "service", "documentation", "version", "capture"]}}}
+    }
+  ]
+}

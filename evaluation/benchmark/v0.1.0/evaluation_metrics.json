@@ -1,0 +1,293 @@
+{
+  "metrics_version": "question-to-data-evaluation.v1",
+  "status": "specification_only",
+  "external_requests": 0,
+  "evaluation_unit": "question_id; macro-average over questions and report stratified slices by split, geography composition, persona, response type, and difficulty.",
+  "retrieval": [
+    {
+      "metric_id": "recall_at_k",
+      "name": "Recall@k",
+      "ks": [
+        1,
+        3,
+        5,
+        10
+      ],
+      "formula": "For each question, count whether each gold essential source is retrieved in the first k; average the source-level indicator over essential sources and questions.",
+      "required_gold_fields": [
+        "source_record_id",
+        "label"
+      ],
+      "interpretation": "Measures coverage of essential sources; do not count contextual or negative judgments as required hits."
+    },
+    {
+      "metric_id": "precision_at_k",
+      "name": "Precision@k",
+      "ks": [
+        1,
+        3,
+        5,
+        10
+      ],
+      "formula": "Relevant retrieved items in top k divided by k, with graded gain reported separately for highly relevant/conditional/contextual items.",
+      "required_gold_fields": [
+        "label"
+      ],
+      "interpretation": "Report a strict essential/highly relevant view and a graded view."
+    },
+    {
+      "metric_id": "mrr",
+      "name": "MRR",
+      "formula": "Mean reciprocal rank of the first essential or highly relevant source; zero when no acceptable source is retrieved.",
+      "required_gold_fields": [
+        "label"
+      ],
+      "interpretation": "Use the first acceptable source, not the first near miss."
+    },
+    {
+      "metric_id": "ndcg_at_k",
+      "name": "nDCG@k",
+      "ks": [
+        1,
+        3,
+        5,
+        10
+      ],
+      "formula": "Discounted cumulative gain using gains essential=3, highly_relevant=2, conditionally_relevant=1, contextual=0.5, normalized by ideal DCG for that question.",
+      "required_gold_fields": [
+        "label"
+      ],
+      "interpretation": "Preserves graded relevance and ranking position."
+    },
+    {
+      "metric_id": "essential_source_recall",
+      "name": "Essential-source recall",
+      "formula": "Retrieved essential source count divided by gold essential source count, averaged by question.",
+      "required_gold_fields": [
+        "label"
+      ],
+      "interpretation": "Primary recall metric for single and bundle questions."
+    },
+    {
+      "metric_id": "near_miss_rejection",
+      "name": "Near-miss rejection",
+      "formula": "1 minus the proportion of gold near_miss/irrelevant/prohibited items presented as recommended.",
+      "required_gold_fields": [
+        "label",
+        "recommendation_allowed"
+      ],
+      "interpretation": "Evaluate recommendation state, not mere mention in an explanation."
+    }
+  ],
+  "constraint_handling": [
+    {
+      "metric_id": "geography_accuracy",
+      "name": "Geography accuracy",
+      "formula": "Exact match of requested jurisdictions and geographic granularity against the question gold fields, with partial credit only for an explicitly scoped subset.",
+      "required_gold_fields": [
+        "geography",
+        "geographic_granularity"
+      ]
+    },
+    {
+      "metric_id": "time_accuracy",
+      "name": "Time accuracy",
+      "formula": "Match requested start/end, cadence, and recency mode; penalize sources whose time boundary is overstated.",
+      "required_gold_fields": [
+        "time_period",
+        "update_recency_requirement"
+      ]
+    },
+    {
+      "metric_id": "unit_of_analysis_accuracy",
+      "name": "Unit-of-analysis accuracy",
+      "formula": "Match the predicted source grain to the required/forbidden unit fields.",
+      "required_gold_fields": [
+        "unit_of_analysis"
+      ]
+    },
+    {
+      "metric_id": "access_filter_accuracy",
+      "name": "Access-filter accuracy",
+      "formula": "Correctly include permitted access states and reject sources violating account/application/license/anonymous constraints.",
+      "required_gold_fields": [
+        "required_access",
+        "recommendation_allowed"
+      ]
+    },
+    {
+      "metric_id": "authoritative_source_accuracy",
+      "name": "Authoritative-source accuracy",
+      "formula": "Share of recommended sources satisfying the source-authority requirement and evidence-state rule.",
+      "required_gold_fields": [
+        "authoritative_source_requirement",
+        "evidence_references"
+      ]
+    },
+    {
+      "metric_id": "format_interface_accuracy",
+      "name": "Format/interface accuracy",
+      "formula": "Share of recommended sources whose observed interface/format is compatible with the requested alternatives.",
+      "required_gold_fields": [
+        "preferred_formats",
+        "preferred_interfaces"
+      ]
+    },
+    {
+      "metric_id": "negative_requirement_accuracy",
+      "name": "Negative-requirement accuracy",
+      "formula": "Share of explicitly excluded measures or source classes absent from the recommendation, with any mention labeled as a limitation/near miss.",
+      "required_gold_fields": [
+        "excluded_measures",
+        "negative_judgments"
+      ]
+    }
+  ],
+  "bundle_quality": [
+    {
+      "metric_id": "required_role_coverage",
+      "name": "Required-role coverage",
+      "formula": "Required analytical roles present in the proposed bundle divided by gold required roles.",
+      "required_gold_fields": [
+        "required_analytical_roles"
+      ]
+    },
+    {
+      "metric_id": "essential_component_recall",
+      "name": "Essential-component recall",
+      "formula": "Gold essential bundle components retrieved/recommended divided by all essential components.",
+      "required_gold_fields": [
+        "minimum_viable_bundle"
+      ]
+    },
+    {
+      "metric_id": "unnecessary_source_rate",
+      "name": "Unnecessary-source rate",
+      "formula": "Recommended sources not in the minimum bundle or optional enrichment set divided by all recommended sources.",
+      "required_gold_fields": [
+        "minimum_viable_bundle",
+        "optional_enrichment_sources"
+      ]
+    },
+    {
+      "metric_id": "incompatible_source_rate",
+      "name": "Incompatible-source rate",
+      "formula": "Recommended sources with a gold incompatible grain/time/geography/access condition divided by recommended sources.",
+      "required_gold_fields": [
+        "grain_compatibility",
+        "geography_compatibility",
+        "temporal_compatibility",
+        "access_compatibility"
+      ]
+    },
+    {
+      "metric_id": "unsupported_join_rate",
+      "name": "Unsupported-join rate",
+      "formula": "Proposed joins labeled join_proven without gold proof, or joins asserted as exact when gold status is candidate/crosswalk/unknown, divided by proposed joins.",
+      "required_gold_fields": [
+        "join_status",
+        "actual_join_proven"
+      ]
+    }
+  ],
+  "explanation_and_trust": [
+    {
+      "metric_id": "evidence_coverage",
+      "name": "Evidence coverage",
+      "formula": "Claims with at least one exact evidence reference divided by all auditable source/constraint claims.",
+      "required_gold_fields": [
+        "evidence_references"
+      ]
+    },
+    {
+      "metric_id": "unsupported_claim_rate",
+      "name": "Unsupported-claim rate",
+      "formula": "Claims contradicted by gold limitations or lacking evidence divided by audited claims.",
+      "required_gold_fields": [
+        "known_limitations",
+        "evidence_references"
+      ]
+    },
+    {
+      "metric_id": "access_state_preservation",
+      "name": "Access-state preservation",
+      "formula": "Recommended/mentioned source access states that exactly preserve the gold access state divided by all evaluated source mentions.",
+      "required_gold_fields": [
+        "access_implications",
+        "required_access"
+      ]
+    },
+    {
+      "metric_id": "unknown_preservation",
+      "name": "Unknown preservation",
+      "formula": "Gold unknown/unresolved fields retained as unknown or explicitly unresolved divided by gold unknown/unresolved fields.",
+      "required_gold_fields": [
+        "unresolved_gaps",
+        "known_limitations"
+      ]
+    },
+    {
+      "metric_id": "provenance_accuracy",
+      "name": "Provenance accuracy",
+      "formula": "Evidence references that resolve to the cited existing project artifact/record divided by all evidence references.",
+      "required_gold_fields": [
+        "evidence_references",
+        "source_reference_index"
+      ]
+    },
+    {
+      "metric_id": "limitation_coverage",
+      "name": "Limitation coverage",
+      "formula": "Gold material limitations surfaced in the plan divided by material limitations in the gold judgment/source record.",
+      "required_gold_fields": [
+        "important_limitations",
+        "known_limitations"
+      ]
+    }
+  ],
+  "abstention": [
+    {
+      "metric_id": "clarification_accuracy",
+      "name": "Clarification accuracy",
+      "formula": "Clarification-required questions for which the system asks for all material missing dimensions before ranking divided by clarification questions.",
+      "required_gold_fields": [
+        "clarification_needed",
+        "clarification_question"
+      ]
+    },
+    {
+      "metric_id": "unsupported_question_detection",
+      "name": "Unsupported-question detection",
+      "formula": "Unsupported/incomplete questions with explicit abstention divided by all unsupported/incomplete questions.",
+      "required_gold_fields": [
+        "expected_response_type",
+        "supported_by_current_evidence"
+      ]
+    },
+    {
+      "metric_id": "false_no_result_rate",
+      "name": "False no-result rate",
+      "formula": "Supported questions incorrectly abstained from divided by supported questions.",
+      "required_gold_fields": [
+        "expected_response_type",
+        "label"
+      ]
+    },
+    {
+      "metric_id": "unjustified_confident_answer_rate",
+      "name": "Unjustified confident-answer rate",
+      "formula": "Clarification/unsupported questions receiving a confident recommendation without the required clarification or gap statement divided by clarification/unsupported questions.",
+      "required_gold_fields": [
+        "recommendation",
+        "required_clarification",
+        "unresolved_gaps"
+      ]
+    }
+  ],
+  "scoring_rules": {
+    "access_and_provenance_are_gates": true,
+    "no_credit_for_unresolved_identity_as_exact": true,
+    "no_join_proven_credit_without_project_proof": true,
+    "abstention_is_not_a_zero_result": "Score abstention against clarification/unsupported gold labels, not against retrieval recall."
+  }
+}

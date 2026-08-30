@@ -1,0 +1,151 @@
+{
+  "fixture_version": "use-card-fixtures.v1.0.0",
+  "records": [
+    {
+      "schema_version": "use-card.v1.0.0",
+      "use_card_id": "obs:use-card:cms-hcris-provider-financial-trends",
+      "asset_id": "obs:asset:cms-hcris-hospital-cost-reports",
+      "source_truth_ids": ["obs:truth:cms-hcris-hospital-cost-reports"],
+      "question": "What could I use CMS HCRIS hospital cost reports for?",
+      "human_summary": "Use HCRIS as a primary facility/provider-period source for longitudinal hospital financial, cost-center, charge, settlement, capacity, and utilization analysis.",
+      "agent_summary": "Recommend for provider-period hospital financial and utilization questions; require release-year alignment and do not describe facility filings as consolidated health-system accounts.",
+      "assertion_type": "curated_analytical_fit_not_source_truth",
+      "fitness": "primary",
+      "measures": [
+        {"measure_id": "financial_statement_fields", "label": "Hospital financial-statement fields", "availability": "source_reported", "role": "outcome", "evidence_ids": ["obs:evidence:hcris-description"], "notes": "The frozen source description asserts financial-statement fields; exact worksheets and variables require release-specific inspection."},
+        {"measure_id": "cost_center_and_charges", "label": "Cost-center and charge fields", "availability": "source_reported", "role": "outcome", "evidence_ids": ["obs:evidence:hcris-description"], "notes": "Treat charges, costs, and cost-center amounts according to the selected HCRIS form and release documentation."},
+        {"measure_id": "utilization_and_capacity", "label": "Utilization and hospital-capacity fields", "availability": "source_reported", "role": "outcome", "evidence_ids": ["obs:evidence:hcris-description"], "notes": "Availability is source-asserted at the family level and must be verified in the selected file layout."}
+      ],
+      "compatible_units": [
+        {"unit": "hospital", "fit": "exact", "notes": "The source truth identifies hospital/provider-period reports."},
+        {"unit": "facility", "fit": "exact", "notes": "Facility-level interpretation is supported when the selected report and CCN context are retained."},
+        {"unit": "provider", "fit": "exact", "notes": "Provider-period is the source-native analytical grain described by the fixture."},
+        {"unit": "health_system", "fit": "incompatible", "notes": "Do not infer consolidated parent-system finance without an explicit, versioned consolidation method and evidence-bound crosswalk."}
+      ],
+      "compatible_geographies": {
+        "levels": ["national", "state", "facility"],
+        "jurisdictions": ["US"],
+        "rurality_use": "requires_external_crosswalk",
+        "requirements": ["Join a versioned rural classification using a documented geography or facility identifier; HCRIS does not make rurality direct in this fixture."],
+        "evidence_ids": ["obs:evidence:hcris-geography"]
+      },
+      "time_needs": {
+        "source_start": "1996", "source_end": "2026", "analysis_granularity": "year", "longitudinal_fit": "strong",
+        "alignment_requirements": ["Align fiscal/report periods rather than assuming calendar-year equivalence.", "Retain amended or repeated reports as versioned records."],
+        "evidence_ids": ["obs:evidence:hcris-time"]
+      },
+      "join_guidance": {
+        "state": "candidate",
+        "candidate_keys": ["provider_ccn"],
+        "compatible_asset_ids": ["obs:asset:cms-provider-of-services-hospital", "obs:asset:cms-hospital-general-information"],
+        "requirements": ["Normalize to the documented six-character CCN representation.", "Version both releases and align report periods to directory snapshots."],
+        "limitations": ["CCN continuity does not prove continuous ownership or health-system identity.", "Join guidance is candidate compatibility, not an identity merge."]
+      },
+      "evidence": [
+        {"evidence_id": "obs:evidence:hcris-description", "source_truth_id": "obs:truth:cms-hcris-hospital-cost-reports", "claim": "The frozen source description lists provider-period financial, cost-center, charge, settlement, utilization, and capacity fields.", "state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:cms-hcris-hospital-cost-reports/description", "limitations": ["No live file layout or payload was inspected in this package."]},
+        {"evidence_id": "obs:evidence:hcris-geography", "source_truth_id": "obs:truth:cms-hcris-hospital-cost-reports", "claim": "The frozen source record asserts national coverage and derivable rather than direct rurality support.", "state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:cms-hcris-hospital-cost-reports/geography", "limitations": ["The completeness of national coverage was not re-tested."]},
+        {"evidence_id": "obs:evidence:hcris-time", "source_truth_id": "obs:truth:cms-hcris-hospital-cost-reports", "claim": "The frozen source record describes annual releases spanning 1996 through 2026.", "state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:cms-hcris-hospital-cost-reports/time_coverage", "limitations": ["Older extracts may be subsets and electronic representation is not guaranteed for every submission."]}
+      ],
+      "confidence": "medium",
+      "status": "fixture_review_candidate",
+      "limitations": ["This is an analytical-fit assertion, not source truth.", "No current endpoint, payload, worksheet, variable, or completeness review occurred.", "HCRIS facility filings are not consolidated parent-system financial statements."],
+      "truth_boundary": {"source_truth_separate": true, "llm_generated_truth_allowed": false, "promotion_requires": "human_or_deterministic_evidence_review", "policy_id": "obs:policy:use-access:v1.0.0"},
+      "immutable": true
+    },
+    {
+      "schema_version": "use-card.v1.0.0",
+      "use_card_id": "obs:use-card:phc4-public-financial-publications",
+      "asset_id": "obs:asset:pa-phc4-public-financial-reports",
+      "source_truth_ids": ["obs:truth:pa-phc4-public-financial-reports"],
+      "question": "What could I use PHC4 public hospital financial reports for?",
+      "human_summary": "Use PHC4 public reports for Pennsylvania report-level hospital and health-system financial-condition, utilization, and annual trend review when publication-level evidence is sufficient.",
+      "agent_summary": "Return this route for Pennsylvania public financial-report questions, but label it publication-level and do not imply open record-level data or access to PHC4 custom files.",
+      "assertion_type": "curated_analytical_fit_not_source_truth",
+      "fitness": "primary",
+      "measures": [
+        {"measure_id": "published_financial_condition", "label": "Published financial-condition measures", "availability": "source_reported", "role": "outcome", "evidence_ids": ["obs:evidence:phc4-public-description"], "notes": "Measures are available as presented in specific annual HTML or PDF publications; preserve the report definition and year."},
+        {"measure_id": "published_utilization", "label": "Published utilization measures", "availability": "source_reported", "role": "outcome", "evidence_ids": ["obs:evidence:phc4-public-description"], "notes": "Do not assume a stable row-level table across report years."}
+      ],
+      "compatible_units": [
+        {"unit": "hospital", "fit": "exact", "notes": "Hospital is source-asserted as a report unit."},
+        {"unit": "health_system", "fit": "conditional", "notes": "System-level use is conditional on the definitions and groupings printed in the selected report year."},
+        {"unit": "state", "fit": "aggregate", "notes": "State-level summaries may be used only as published, without treating them as record-level microdata."}
+      ],
+      "compatible_geographies": {
+        "levels": ["state", "facility"], "jurisdictions": ["US-PA"], "rurality_use": "requires_external_crosswalk",
+        "requirements": ["Preserve report-year facility labels and use an independently documented rural crosswalk if rural stratification is needed."],
+        "evidence_ids": ["obs:evidence:phc4-public-geography"]
+      },
+      "time_needs": {
+        "source_start": "1996", "source_end": "2024", "analysis_granularity": "year", "longitudinal_fit": "moderate",
+        "alignment_requirements": ["Retain the exact report year and publication definition.", "Do not assume facility or system definitions are stable across years."],
+        "evidence_ids": ["obs:evidence:phc4-public-time"]
+      },
+      "join_guidance": {
+        "state": "incompatible",
+        "candidate_keys": [],
+        "compatible_asset_ids": ["obs:asset:cms-hcris-hospital-cost-reports"],
+        "requirements": ["Obtain a report-specific facility table or documented PHC4 label-to-CCN crosswalk before joining."],
+        "limitations": ["Publication labels are not CCNs.", "Public report pages and PDFs are not proven row-level datasets."]
+      },
+      "evidence": [
+        {"evidence_id": "obs:evidence:phc4-public-description", "source_truth_id": "obs:truth:pa-phc4-public-financial-reports", "claim": "The frozen source description identifies public Pennsylvania hospital and health-system financial-condition, utilization, and annual financial publications.", "state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:pa-phc4-public-financial-reports/description", "limitations": ["No publication payload or current page was opened in this package."]},
+        {"evidence_id": "obs:evidence:phc4-public-geography", "source_truth_id": "obs:truth:pa-phc4-public-financial-reports", "claim": "The frozen source record limits this asset to Pennsylvania and marks rurality as derivable.", "state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:pa-phc4-public-financial-reports/geography", "limitations": ["No rural crosswalk is included."]},
+        {"evidence_id": "obs:evidence:phc4-public-time", "source_truth_id": "obs:truth:pa-phc4-public-financial-reports", "claim": "The frozen source record describes annual public reports from 1996 through 2024.", "state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:pa-phc4-public-financial-reports/time_coverage", "limitations": ["Publication coverage and definitions may vary by year."]}
+      ],
+      "confidence": "medium",
+      "status": "fixture_review_candidate",
+      "limitations": ["This Use Card does not convert publication pages into a record-level dataset.", "Public report access does not imply access to custom PHC4 data.", "Current URLs and publication inventory were not live verified."],
+      "truth_boundary": {"source_truth_separate": true, "llm_generated_truth_allowed": false, "promotion_requires": "human_or_deterministic_evidence_review", "policy_id": "obs:policy:use-access:v1.0.0"},
+      "immutable": true
+    },
+    {
+      "schema_version": "use-card.v1.0.0",
+      "use_card_id": "obs:use-card:phc4-custom-request-defined-analysis",
+      "asset_id": "obs:asset:pa-phc4-custom-data",
+      "source_truth_ids": ["obs:truth:pa-phc4-custom-data"],
+      "question": "What could I use a PHC4 custom data request for?",
+      "human_summary": "Consider the custom route for Pennsylvania record-level or bespoke analyses whose required variables and grain are not available in public reports, subject to application, review, quote, payment, permitted-use, and transfer terms.",
+      "agent_summary": "Surface this route only as conditional access: ask the user to define variables, grain, period, purpose, approvals, and budget; never represent application eligibility as acquired data.",
+      "assertion_type": "curated_analytical_fit_not_source_truth",
+      "fitness": "conditional",
+      "measures": [
+        {"measure_id": "request_defined_variables", "label": "Request-defined variables", "availability": "request_dependent", "role": "outcome", "evidence_ids": ["obs:evidence:phc4-custom-description"], "notes": "Availability, definitions, cost, and permitted use require human confirmation with PHC4."},
+        {"measure_id": "record_level_events", "label": "Potential record-level events", "availability": "unverified", "role": "outcome", "evidence_ids": ["obs:evidence:phc4-custom-units"], "notes": "The frozen route lists event among potential units, but no payload, layout, or variable inventory was verified."}
+      ],
+      "compatible_units": [
+        {"unit": "event", "fit": "conditional", "notes": "Event grain depends on the approved request and available data product."},
+        {"unit": "hospital", "fit": "conditional", "notes": "Hospital use requires the approved product to include a stable facility representation."},
+        {"unit": "facility", "fit": "conditional", "notes": "Facility definition and identifiers must be specified in the request and documented in the delivered layout."},
+        {"unit": "health_system", "fit": "unknown", "notes": "Do not infer system identity from names; require a documented crosswalk and separate identity review."}
+      ],
+      "compatible_geographies": {
+        "levels": ["state", "facility"], "jurisdictions": ["US-PA"], "rurality_use": "requires_external_crosswalk",
+        "requirements": ["Specify whether geography is provider, patient, event, residence, or service location.", "Obtain approval for any requested geographic detail."],
+        "evidence_ids": ["obs:evidence:phc4-custom-geography"]
+      },
+      "time_needs": {
+        "source_start": "1996", "source_end": "2024", "analysis_granularity": "request_defined", "longitudinal_fit": "conditional",
+        "alignment_requirements": ["Specify the requested time period and expected event or reporting-date semantics.", "Confirm versioning, amendments, and delivery refresh terms in writing."],
+        "evidence_ids": ["obs:evidence:phc4-custom-time"]
+      },
+      "join_guidance": {
+        "state": "conditional", "candidate_keys": ["facility_name", "facility_address"],
+        "compatible_asset_ids": ["obs:asset:cms-provider-of-services-hospital"],
+        "requirements": ["Obtain the authorized custom asset first.", "Require human review for every name-and-address match unless PHC4 supplies a documented identifier crosswalk."],
+        "limitations": ["Name-and-address matching is heuristic and must not be promoted to exact identity.", "The custom asset is application- and payment-gated."]
+      },
+      "evidence": [
+        {"evidence_id": "obs:evidence:phc4-custom-description", "source_truth_id": "obs:truth:pa-phc4-custom-data", "claim": "The frozen source description represents this as a distinct custom record-level or bespoke request route requiring application, review, quote, payment, and controlled transfer.", "state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:pa-phc4-custom-data/description", "limitations": ["Current terms, eligibility, pricing, and available variables were not live verified."]},
+        {"evidence_id": "obs:evidence:phc4-custom-units", "source_truth_id": "obs:truth:pa-phc4-custom-data", "claim": "The frozen source record lists hospital, facility, health-system, and event units for this route.", "state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:pa-phc4-custom-data/units", "limitations": ["Listed potential units do not guarantee that an approved delivery contains every grain."]},
+        {"evidence_id": "obs:evidence:phc4-custom-geography", "source_truth_id": "obs:truth:pa-phc4-custom-data", "claim": "The frozen source record limits the route to Pennsylvania and marks rurality as derivable.", "state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:pa-phc4-custom-data/geography", "limitations": ["Patient and provider geography may differ and require request-specific definitions."]},
+        {"evidence_id": "obs:evidence:phc4-custom-time", "source_truth_id": "obs:truth:pa-phc4-custom-data", "claim": "The frozen source record describes a 1996 through 2024 time boundary for the custom route.", "state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:pa-phc4-custom-data/time_coverage", "limitations": ["Actual availability is request-dependent."]}
+      ],
+      "confidence": "low",
+      "status": "fixture_review_candidate",
+      "limitations": ["This Use Card is conditional and does not establish eligibility, availability, price, permitted use, or delivery.", "No application was submitted and no custom asset was acquired.", "Identity and join guidance remains heuristic unless documented identifiers are delivered."],
+      "truth_boundary": {"source_truth_separate": true, "llm_generated_truth_allowed": false, "promotion_requires": "human_or_deterministic_evidence_review", "policy_id": "obs:policy:use-access:v1.0.0"},
+      "immutable": true
+    }
+  ]
+}

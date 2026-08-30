@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/core-contract/v1.0.0/relationship.schema.json",
+  "title": "Typed Relationship",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "entity_type", "relationship_id", "subject_id", "predicate", "object_id", "origin", "evidence_ids", "confidence", "verifier", "observed_at", "status", "supersession", "offline_fixture"],
+  "properties": {
+    "contract_version": {"const": "observatory-core-contract.v1.0.0"},
+    "entity_type": {"const": "Relationship"},
+    "relationship_id": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"},
+    "subject_id": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"},
+    "predicate": {"enum": ["operated_by", "contains", "catalogs", "describes", "has_distribution", "served_by", "documented_by", "version_of", "captured_from", "derived_from", "accesses", "identity_candidate_for", "join_candidate_with", "supersedes"]},
+    "object_id": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"},
+    "origin": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/origin"},
+    "evidence_ids": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/evidenceIds"},
+    "confidence": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/confidence"},
+    "verifier": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/verifier"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "status": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/recordStatus"},
+    "supersession": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/supersession"},
+    "offline_fixture": {"const": true}
+  }
+}

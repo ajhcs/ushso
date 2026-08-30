@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/core-contract/v1.0.0/assertion.schema.json",
+  "title": "Assertion",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "entity_type", "assertion_id", "subject_id", "predicate", "value", "origin", "evidence_ids", "confidence", "verifier", "observed_at", "status", "supersession", "offline_fixture"],
+  "properties": {
+    "contract_version": {"const": "observatory-core-contract.v1.0.0"},
+    "entity_type": {"const": "Assertion"},
+    "assertion_id": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"},
+    "subject_id": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"},
+    "predicate": {"type": "string", "pattern": "^obs:[a-z][a-z0-9_-]*:[a-z0-9][a-z0-9._-]*$"},
+    "value": {
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["value_type", "value"], "properties": {"value_type": {"const": "string"}, "value": {"type": "string"}}},
+        {"type": "object", "additionalProperties": false, "required": ["value_type", "value"], "properties": {"value_type": {"const": "number"}, "value": {"type": "number"}}},
+        {"type": "object", "additionalProperties": false, "required": ["value_type", "value"], "properties": {"value_type": {"const": "boolean"}, "value": {"type": "boolean"}}},
+        {"type": "object", "additionalProperties": false, "required": ["value_type", "value"], "properties": {"value_type": {"const": "date"}, "value": {"type": "string", "format": "date"}}},
+        {"type": "object", "additionalProperties": false, "required": ["value_type", "value"], "properties": {"value_type": {"const": "object_reference"}, "value": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/id"}}},
+        {"type": "object", "additionalProperties": false, "required": ["value_type", "value"], "properties": {"value_type": {"const": "term"}, "value": {"type": "object", "additionalProperties": false, "required": ["term_id", "label"], "properties": {"term_id": {"type": "string", "minLength": 1}, "label": {"type": "string", "minLength": 1}}}}},
+        {"type": "object", "additionalProperties": false, "required": ["value_type", "value"], "properties": {"value_type": {"const": "interval"}, "value": {"type": "object", "additionalProperties": false, "required": ["start", "end"], "properties": {"start": {"type": ["string", "null"]}, "end": {"type": ["string", "null"]}}}}},
+        {"type": "object", "additionalProperties": false, "required": ["value_type", "value"], "properties": {"value_type": {"const": "unknown"}, "value": {"type": "null"}}}
+      ]
+    },
+    "origin": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/origin"},
+    "evidence_ids": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/evidenceIds"},
+    "confidence": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/confidence"},
+    "verifier": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/verifier"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "status": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/recordStatus"},
+    "supersession": {"$ref": "https://hackyard.local/observatory/core-contract/v1.0.0/common.schema.json#/$defs/supersession"},
+    "offline_fixture": {"const": true}
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "fixture_version": "access-recipe-fixtures.v1.0.0",
+  "records": [
+    {
+      "schema_version": "access-recipe.v1.0.0",
+      "recipe_id": "obs:access-recipe:cms-hcris-public-bulk-api",
+      "asset_id": "obs:asset:cms-hcris-hospital-cost-reports",
+      "source_truth_id": "obs:truth:cms-hcris-hospital-cost-reports",
+      "route_id": "obs:route:cms-hcris-public-bulk-api",
+      "route_kind": "public_bulk_or_api",
+      "title": "CMS HCRIS public fiscal-year download or API route",
+      "human_summary": "Select a documented HCRIS fiscal-year release or API surface, preserve the selected release and layout, and acquire only through a separately authorized bounded capture.",
+      "agent_summary": "Inspect fixture evidence offline first. Stop until owner run authorization exists, then resolve one exact release or API query and preserve metadata, hashes, layouts, and typed failures.",
+      "authoritative_url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports",
+      "source_urls": [
+        "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports",
+        "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports/cost-reports-fiscal-year",
+        "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report/api-docs"
+      ],
+      "mechanisms": ["bulk_download", "api"],
+      "requirements": [
+        {"type": "none", "required": false, "state": "not_applicable", "human_action_required": false, "detail": "The frozen source fixture asserts no account, application, or payment requirement for the public route."},
+        {"type": "owner_run_authorization", "required": true, "state": "required_unmet", "human_action_required": true, "detail": "The package itself grants no permission to open endpoints or download a release."}
+      ],
+      "restrictions": [
+        {"restriction_type": "terms", "state": "unverified", "detail": "Current endpoint terms, file inventory, size, availability, and request behavior require a later authorized verification.", "evidence_state": "unresolved"}
+      ],
+      "authorization": {
+        "authorization_state": "not_present_fixture", "execution_allowed": false, "network_allowed": false, "public_route_is_authorization": false,
+        "required_before_execution": ["Owner authorizes the exact route, release or query, bounds, and destination.", "The applicable acquisition adapter and resource policy pass their own gate."],
+        "gate_behavior": "stop_and_emit_typed_authorization_required"
+      },
+      "steps": [
+        {"sequence": 1, "actor": "human_or_agent", "action": "inspect_offline_evidence", "url": null, "authorization_gate": "none_offline", "instruction": "Read the frozen source-truth record and Use Card without opening any URL.", "inputs": ["obs:truth:cms-hcris-hospital-cost-reports", "obs:use-card:cms-hcris-provider-financial-trends"], "expected_result": "A proposed fiscal year, form family, grain, measures, and bounded acquisition need.", "stop_conditions": ["The question requires consolidated system finance rather than provider-period filings.", "The required worksheet or variable is unresolved."], "network_action": false},
+        {"sequence": 2, "actor": "human", "action": "request_authorization", "url": null, "authorization_gate": "owner_run_authorization", "instruction": "Authorize the exact CMS route and bounded acquisition plan before any network action.", "inputs": ["selected fiscal year or API query", "estimated artifact size", "destination namespace"], "expected_result": "An explicit authorization receipt or a typed authorization_required outcome.", "stop_conditions": ["Authorization is absent, ambiguous, expired, or does not cover payload acquisition."], "network_action": false},
+        {"sequence": 3, "actor": "human_or_agent", "action": "open_source", "url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports/cost-reports-fiscal-year", "authorization_gate": "owner_run_authorization", "instruction": "Open the first-party fiscal-year inventory only after authorization and capture the page metadata before choosing a release.", "inputs": ["authorization receipt"], "expected_result": "A first-party inventory receipt or typed access/infrastructure outcome.", "stop_conditions": ["403 or authentication boundary", "Malformed or non-first-party content", "Unknown or unbounded inventory"], "network_action": true},
+        {"sequence": 4, "actor": "human_or_agent", "action": "select_release", "url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports/cost-reports-fiscal-year", "authorization_gate": "owner_run_authorization", "instruction": "Resolve exactly one fiscal-year release and its documentation or choose a bounded API query; do not treat the family landing page as the payload.", "inputs": ["inventory receipt", "requested time period", "form family"], "expected_result": "A versioned release descriptor with URL, label, expected type, and stated size when available.", "stop_conditions": ["Release identity is ambiguous", "Artifact size is unknown and policy forbids unknown size", "Selected release is outside authorization"], "network_action": true},
+        {"sequence": 5, "actor": "agent", "action": "download_bounded", "url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports/cost-reports-fiscal-year", "authorization_gate": "owner_run_authorization", "instruction": "Use the approved acquisition adapter to capture the exact selected object with byte, timeout, redirect, and destination bounds.", "inputs": ["release descriptor", "authorization receipt", "resource policy"], "expected_result": "A content-addressed raw-object reference and capture receipt, or a typed terminal failure.", "stop_conditions": ["Size exceeds cap", "Redirect escapes the allowed origin policy", "Any credential or secret is requested", "Partial body cannot be completed"], "network_action": true},
+        {"sequence": 6, "actor": "human_or_agent", "action": "validate_artifact", "url": null, "authorization_gate": "none_offline", "instruction": "Verify checksum, content type, completeness, release label, and layout references offline before any analytical use.", "inputs": ["capture receipt", "raw-object reference", "release descriptor"], "expected_result": "A validated immutable artifact/version receipt or typed malformed, partial, or unresolved outcome.", "stop_conditions": ["Checksum mismatch", "Unexpected HTML", "Missing layout", "Incomplete or partial body"], "network_action": false}
+      ],
+      "typed_failure_outcomes": [
+        {"outcome": "authorization_required", "terminal_class": "authorization", "preserve_as": "authorization_required", "translation_to_not_found": false, "agent_action": "stop", "human_message": "No exact owner authorization covers this HCRIS action."},
+        {"outcome": "http_403", "terminal_class": "access", "preserve_as": "http_403", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "The first-party route returned HTTP 403; this is blocked access, not absence."},
+        {"outcome": "rate_limited", "terminal_class": "infrastructure", "preserve_as": "rate_limited", "translation_to_not_found": false, "agent_action": "retry_only_if_authorized", "human_message": "The route throttled the authorized request; retain timing and retry evidence."},
+        {"outcome": "timed_out", "terminal_class": "infrastructure", "preserve_as": "timed_out", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "The bounded request timed out before a complete object was captured."},
+        {"outcome": "transport_failure", "terminal_class": "infrastructure", "preserve_as": "transport_failure", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "Transport failed; do not infer that the release does not exist."},
+        {"outcome": "malformed_response", "terminal_class": "content", "preserve_as": "malformed_response", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "The response did not match the expected content or layout."},
+        {"outcome": "unresolved", "terminal_class": "unresolved", "preserve_as": "unresolved", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "Release identity, layout, or completeness remains unresolved."}
+      ],
+      "expected_artifacts": [
+        {"artifact_type": "metadata_receipt", "required": true, "content_state": "future_if_authorized", "description": "First-party inventory and selected release metadata."},
+        {"artifact_type": "raw_object_reference", "required": true, "content_state": "future_if_authorized", "description": "Content-addressed complete release or bounded API response reference."},
+        {"artifact_type": "checksum", "required": true, "content_state": "future_if_authorized", "description": "SHA-256 for every acquired complete object."},
+        {"artifact_type": "codebook_or_layout", "required": true, "content_state": "future_if_authorized", "description": "Version-matched record layout, form documentation, or API schema."},
+        {"artifact_type": "typed_failure_receipt", "required": true, "content_state": "typed_outcome_only", "description": "Terminal typed receipt when a complete artifact is not produced."},
+        {"artifact_type": "no_payload_fixture_attestation", "required": true, "content_state": "fixture_only", "description": "This package generated no request or dataset payload."}
+      ],
+      "failure_policy": {"policy_id": "obs:policy:use-access:v1.0.0", "preserve_typed_outcomes": true, "no_not_found_translation": true, "rule": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."},
+      "provenance": {"source_truth_id": "obs:truth:cms-hcris-hospital-cost-reports", "evidence_state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:cms-hcris-hospital-cost-reports", "offline": true, "limitations": ["No CMS URL was opened and no current release inventory was verified."]},
+      "immutable": true
+    },
+    {
+      "schema_version": "access-recipe.v1.0.0",
+      "recipe_id": "obs:access-recipe:phc4-public-financial-publications",
+      "asset_id": "obs:asset:pa-phc4-public-financial-reports",
+      "source_truth_id": "obs:truth:pa-phc4-public-financial-reports",
+      "route_id": "obs:route:phc4-public-financial-publications",
+      "route_kind": "public_report_publication",
+      "title": "PHC4 public hospital financial report publication route",
+      "human_summary": "Locate one first-party PHC4 financial publication, retain its report year and definitions, and treat the resulting HTML or PDF as a publication—not as custom record-level data.",
+      "agent_summary": "After authorization, select an exact PHC4 report-year publication and preserve its page/PDF metadata. Never route this public-report asset through the PHC4 custom request identity.",
+      "authoritative_url": "https://www.phc4.org/report-focus/financial/",
+      "source_urls": ["https://www.phc4.org/report-focus/financial/"],
+      "mechanisms": ["data_portal", "web_download"],
+      "requirements": [
+        {"type": "none", "required": false, "state": "not_applicable", "human_action_required": false, "detail": "The frozen fixture characterizes the publication route as public direct."},
+        {"type": "owner_run_authorization", "required": true, "state": "required_unmet", "human_action_required": true, "detail": "A later run still needs exact authorization before opening or downloading from the public route."}
+      ],
+      "restrictions": [
+        {"restriction_type": "publication_level_only", "state": "required", "detail": "The asset is a publication-level HTML/PDF route and must not be represented as an open row-level bulk dataset.", "evidence_state": "source_asserted"},
+        {"restriction_type": "terms", "state": "unverified", "detail": "Current page behavior, report inventory, and publication terms were not live verified.", "evidence_state": "unresolved"}
+      ],
+      "authorization": {
+        "authorization_state": "not_present_fixture", "execution_allowed": false, "network_allowed": false, "public_route_is_authorization": false,
+        "required_before_execution": ["Owner authorizes the exact PHC4 report page and report-year publication.", "The run is bounded to page/PDF capture and excludes custom-data submission."],
+        "gate_behavior": "stop_and_emit_typed_authorization_required"
+      },
+      "steps": [
+        {"sequence": 1, "actor": "human_or_agent", "action": "inspect_offline_evidence", "url": null, "authorization_gate": "none_offline", "instruction": "Read the PHC4 public-report source truth and Use Card; keep the public and custom assets separate.", "inputs": ["obs:truth:pa-phc4-public-financial-reports", "obs:use-card:phc4-public-financial-publications"], "expected_result": "A target report topic/year and a publication-level evidence need.", "stop_conditions": ["The request needs row-level microdata or custom variables.", "The desired year or report definition is unresolved."], "network_action": false},
+        {"sequence": 2, "actor": "human", "action": "request_authorization", "url": null, "authorization_gate": "owner_run_authorization", "instruction": "Authorize the exact first-party report page and publication capture; exclude any custom request submission.", "inputs": ["target report year", "target topic", "capture bounds"], "expected_result": "An authorization receipt or typed authorization_required outcome.", "stop_conditions": ["Authorization is absent or includes a different asset/route."], "network_action": false},
+        {"sequence": 3, "actor": "human_or_agent", "action": "open_source", "url": "https://www.phc4.org/report-focus/financial/", "authorization_gate": "owner_run_authorization", "instruction": "Open the first-party financial-report page and preserve its metadata and links before selecting a publication.", "inputs": ["authorization receipt"], "expected_result": "A landing-page receipt or typed access/infrastructure outcome.", "stop_conditions": ["The page is not first-party", "The route crosses into an application or payment workflow", "Current report inventory is ambiguous"], "network_action": true},
+        {"sequence": 4, "actor": "human_or_agent", "action": "select_release", "url": "https://www.phc4.org/report-focus/financial/", "authorization_gate": "owner_run_authorization", "instruction": "Select one report-year HTML or PDF publication and record its title, year, definitions, facility/system scope, and exact URL.", "inputs": ["landing-page receipt", "target report year"], "expected_result": "A versioned publication descriptor.", "stop_conditions": ["Report year is ambiguous", "Facility/system scope is unclear", "Link is outside the authorized first-party route"], "network_action": true},
+        {"sequence": 5, "actor": "agent", "action": "download_bounded", "url": "https://www.phc4.org/report-focus/financial/", "authorization_gate": "owner_run_authorization", "instruction": "Capture only the selected publication under the approved byte, timeout, redirect, and destination bounds.", "inputs": ["publication descriptor", "authorization receipt", "resource policy"], "expected_result": "A content-addressed publication reference or typed terminal failure.", "stop_conditions": ["Unexpected application/payment page", "Artifact exceeds bounds", "Partial body", "Unexpected content type"], "network_action": true},
+        {"sequence": 6, "actor": "human_or_agent", "action": "validate_artifact", "url": null, "authorization_gate": "none_offline", "instruction": "Verify checksum, report year, title, definitions, scope, completeness, and content type offline.", "inputs": ["publication descriptor", "capture receipt", "publication file reference"], "expected_result": "A validated publication receipt or typed malformed/unresolved outcome.", "stop_conditions": ["Checksum mismatch", "Missing report definitions", "Facility/system scope cannot be retained"], "network_action": false}
+      ],
+      "typed_failure_outcomes": [
+        {"outcome": "authorization_required", "terminal_class": "authorization", "preserve_as": "authorization_required", "translation_to_not_found": false, "agent_action": "stop", "human_message": "No exact authorization covers this PHC4 public-report action."},
+        {"outcome": "http_403", "terminal_class": "access", "preserve_as": "http_403", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "The public report route returned HTTP 403; preserve blocked access."},
+        {"outcome": "timed_out", "terminal_class": "infrastructure", "preserve_as": "timed_out", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "The report request timed out without a complete publication."},
+        {"outcome": "transport_failure", "terminal_class": "infrastructure", "preserve_as": "transport_failure", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "Transport failed; the report must not be classified as absent."},
+        {"outcome": "malformed_response", "terminal_class": "content", "preserve_as": "malformed_response", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "The retrieved body was not the expected complete report publication."},
+        {"outcome": "unavailable", "terminal_class": "access", "preserve_as": "unavailable", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "The selected publication route is currently unavailable; retain the locator and evidence."},
+        {"outcome": "unresolved", "terminal_class": "unresolved", "preserve_as": "unresolved", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "Report identity, year, or scope remains unresolved."}
+      ],
+      "expected_artifacts": [
+        {"artifact_type": "source_landing_receipt", "required": true, "content_state": "future_if_authorized", "description": "First-party PHC4 financial-report landing-page evidence."},
+        {"artifact_type": "publication_file", "required": true, "content_state": "future_if_authorized", "description": "Selected complete HTML/PDF publication reference."},
+        {"artifact_type": "checksum", "required": true, "content_state": "future_if_authorized", "description": "SHA-256 for the selected publication."},
+        {"artifact_type": "typed_failure_receipt", "required": true, "content_state": "typed_outcome_only", "description": "Terminal typed receipt if the publication cannot be captured and verified."},
+        {"artifact_type": "no_payload_fixture_attestation", "required": true, "content_state": "fixture_only", "description": "No report or data payload was requested by this package."}
+      ],
+      "failure_policy": {"policy_id": "obs:policy:use-access:v1.0.0", "preserve_typed_outcomes": true, "no_not_found_translation": true, "rule": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."},
+      "provenance": {"source_truth_id": "obs:truth:pa-phc4-public-financial-reports", "evidence_state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:pa-phc4-public-financial-reports", "offline": true, "limitations": ["No PHC4 URL or publication was opened in this package.", "This recipe excludes the distinct custom request route."]},
+      "immutable": true
+    },
+    {
+      "schema_version": "access-recipe.v1.0.0",
+      "recipe_id": "obs:access-recipe:phc4-custom-application",
+      "asset_id": "obs:asset:pa-phc4-custom-data",
+      "source_truth_id": "obs:truth:pa-phc4-custom-data",
+      "route_id": "obs:route:phc4-custom-application",
+      "route_kind": "custom_application_request",
+      "title": "PHC4 custom data application, quote, payment, and controlled-transfer route",
+      "human_summary": "Define the requested variables, grain, period, purpose, and outputs; then use a human-led application, review, quote, payment/terms, and controlled-transfer workflow under separate authorization at each material gate.",
+      "agent_summary": "This is not an automatic download. Prepare a request specification, stop for human application authorization, preserve quote/terms/payment/DUA states, and never claim acquisition until a controlled delivery is authorized and verified.",
+      "authoritative_url": "https://www.phc4.org/request-custom-data/",
+      "source_urls": ["https://www.phc4.org/request-custom-data/", "https://www.phc4.org/request-custom-data/available-data/"],
+      "mechanisms": ["request_form", "contact_owner", "controlled_transfer"],
+      "requirements": [
+        {"type": "application", "required": true, "state": "future_human_step", "human_action_required": true, "detail": "A human must submit and stand behind the exact custom-data application."},
+        {"type": "human_approval", "required": true, "state": "required_unmet", "human_action_required": true, "detail": "Owner approval is required before submission and again before accepting material terms, price, or delivery."},
+        {"type": "payment", "required": true, "state": "future_human_step", "human_action_required": true, "detail": "The frozen source record asserts quote and payment as material access requirements."},
+        {"type": "data_use_agreement", "required": false, "state": "unknown", "human_action_required": true, "detail": "Current DUA, license, privacy, or publication terms must be reviewed if PHC4 presents them."},
+        {"type": "secure_transfer", "required": true, "state": "future_human_step", "human_action_required": true, "detail": "Any approved delivery must use the transfer mechanism and handling controls specified in the accepted terms."},
+        {"type": "owner_run_authorization", "required": true, "state": "required_unmet", "human_action_required": true, "detail": "No network, form submission, payment, agreement, or transfer is authorized by this fixture."}
+      ],
+      "restrictions": [
+        {"restriction_type": "application_review", "state": "required", "detail": "PHC4 reviews the custom request; submission does not guarantee approval or availability.", "evidence_state": "source_asserted"},
+        {"restriction_type": "payment", "state": "required", "detail": "A quote and payment are material route requirements in the frozen source description.", "evidence_state": "source_asserted"},
+        {"restriction_type": "data_use", "state": "unknown", "detail": "Permitted uses and any DUA or publication terms require current human review.", "evidence_state": "unresolved"},
+        {"restriction_type": "controlled_transfer", "state": "required", "detail": "Any future delivery must remain a controlled route and must not be treated as public-report access.", "evidence_state": "source_asserted"}
+      ],
+      "authorization": {
+        "authorization_state": "not_present_fixture", "execution_allowed": false, "network_allowed": false, "public_route_is_authorization": false,
+        "required_before_execution": ["Owner authorizes viewing current application guidance.", "A human authorizes the exact application submission.", "A human separately approves quote, payment, agreements, and controlled transfer.", "A later acquisition authorization covers the exact delivered asset and destination."],
+        "gate_behavior": "stop_and_emit_typed_authorization_required"
+      },
+      "steps": [
+        {"sequence": 1, "actor": "human_or_agent", "action": "inspect_offline_evidence", "url": null, "authorization_gate": "none_offline", "instruction": "Read the custom-route source truth and conditional Use Card without opening the PHC4 pages.", "inputs": ["obs:truth:pa-phc4-custom-data", "obs:use-card:phc4-custom-request-defined-analysis"], "expected_result": "A statement of why public reports are insufficient and which unknowns require PHC4 confirmation.", "stop_conditions": ["A public PHC4 report already satisfies the need.", "The user has not defined the analysis purpose or permissible handling context."], "network_action": false},
+        {"sequence": 2, "actor": "human_or_agent", "action": "define_request", "url": null, "authorization_gate": "none_offline", "instruction": "Draft a request specification with variables, grain, geography semantics, dates, population, linkages, outputs, permitted use, retention, and budget constraints.", "inputs": ["research question", "minimum necessary variables", "time and geography requirements", "security and retention constraints"], "expected_result": "A human-readable and agent-readable request specification marked draft and unsubmitted.", "stop_conditions": ["Minimum necessary scope cannot be defined", "Requested identity or linkage semantics are unresolved", "No responsible human request owner exists"], "network_action": false},
+        {"sequence": 3, "actor": "human", "action": "request_authorization", "url": null, "authorization_gate": "human_application_authorization", "instruction": "Approve viewing current guidance and preparing the exact custom-data application; do not authorize payment or agreement acceptance implicitly.", "inputs": ["draft request specification", "responsible requester", "purpose and budget ceiling"], "expected_result": "A scoped application authorization receipt or typed authorization_required outcome.", "stop_conditions": ["Authorization does not identify the requester, scope, or allowed actions."], "network_action": false},
+        {"sequence": 4, "actor": "human_or_agent", "action": "open_source", "url": "https://www.phc4.org/request-custom-data/available-data/", "authorization_gate": "human_application_authorization", "instruction": "Inspect the first-party available-data guidance and application instructions; capture metadata and restrictions without submitting the form.", "inputs": ["application authorization receipt", "draft request specification"], "expected_result": "Current guidance and application metadata, or a typed access/restriction outcome.", "stop_conditions": ["Login, identity verification, terms acceptance, payment, or form submission is required", "Current guidance conflicts with the draft request"], "network_action": true},
+        {"sequence": 5, "actor": "human", "action": "submit_application", "url": "https://www.phc4.org/request-custom-data/", "authorization_gate": "human_application_authorization", "instruction": "A human submits only the approved request specification and preserves the submitted copy and confirmation.", "inputs": ["approved request specification", "current application form", "scoped submission authorization"], "expected_result": "An application receipt or typed application/access outcome; never an acquired-data claim.", "stop_conditions": ["Form asks for unapproved information", "Terms or payment require acceptance", "Submission scope differs from the approved request"], "network_action": true},
+        {"sequence": 6, "actor": "human", "action": "review_quote", "url": null, "authorization_gate": "human_payment_or_terms_authorization", "instruction": "Review PHC4's response, variable availability, quote, schedule, restrictions, DUA/license terms, and delivery method against the approved purpose.", "inputs": ["application receipt", "PHC4 response", "quote or terms"], "expected_result": "A decision record separating approved, rejected, modified, and unresolved terms.", "stop_conditions": ["Price exceeds the approved ceiling", "Variables or grain do not meet the minimum need", "Use, publication, linkage, security, or retention terms are unacceptable or unresolved"], "network_action": false},
+        {"sequence": 7, "actor": "human", "action": "approve_terms_or_payment", "url": null, "authorization_gate": "human_payment_or_terms_authorization", "instruction": "Obtain explicit human approval before accepting any quote, payment, DUA, license, or material delivery term.", "inputs": ["decision record", "final quote", "final terms", "payment authority"], "expected_result": "A payment/terms authorization receipt or typed payment, DUA, license, or unresolved outcome.", "stop_conditions": ["Any material term changed", "Payment authority is absent", "Required institutional or legal review is incomplete"], "network_action": false},
+        {"sequence": 8, "actor": "human_or_agent", "action": "receive_controlled_transfer", "url": null, "authorization_gate": "controlled_transfer_authorization", "instruction": "Receive the exact approved delivery only through the specified controlled mechanism and into the authorized destination; preserve transfer and checksum receipts.", "inputs": ["controlled-transfer authorization", "accepted terms", "delivery notice", "authorized destination"], "expected_result": "A controlled data reference and transfer receipt, or a typed transfer/access failure.", "stop_conditions": ["Delivery differs from the approved specification", "Destination or controls are not ready", "Checksum or completeness cannot be verified"], "network_action": true},
+        {"sequence": 9, "actor": "human_or_agent", "action": "validate_artifact", "url": null, "authorization_gate": "none_offline", "instruction": "Validate the delivered file inventory, checksums, layouts, variable definitions, date/grain semantics, restrictions, and retention obligations offline.", "inputs": ["controlled data reference", "transfer receipt", "codebook/layout", "accepted terms"], "expected_result": "A validated restricted-asset receipt or typed malformed, incomplete, or unresolved outcome.", "stop_conditions": ["File inventory or checksum mismatch", "Codebook/layout is missing", "Restrictions cannot be enforced", "Identity or join semantics remain ambiguous"], "network_action": false}
+      ],
+      "typed_failure_outcomes": [
+        {"outcome": "authorization_required", "terminal_class": "authorization", "preserve_as": "authorization_required", "translation_to_not_found": false, "agent_action": "stop", "human_message": "The next PHC4 custom-route action lacks the required scoped human authorization."},
+        {"outcome": "application_required", "terminal_class": "restriction", "preserve_as": "application_required", "translation_to_not_found": false, "agent_action": "request_human_action", "human_message": "A human application is required; no data were acquired."},
+        {"outcome": "payment_required", "terminal_class": "restriction", "preserve_as": "payment_required", "translation_to_not_found": false, "agent_action": "request_human_action", "human_message": "Payment or a quote decision is required before this route can continue."},
+        {"outcome": "dua_required", "terminal_class": "restriction", "preserve_as": "dua_required", "translation_to_not_found": false, "agent_action": "request_human_action", "human_message": "A data-use agreement requires human and possibly institutional review."},
+        {"outcome": "license_required", "terminal_class": "restriction", "preserve_as": "license_required", "translation_to_not_found": false, "agent_action": "request_human_action", "human_message": "A license or material use term requires explicit human approval."},
+        {"outcome": "authentication_required", "terminal_class": "access", "preserve_as": "authentication_required", "translation_to_not_found": false, "agent_action": "request_human_action", "human_message": "Authentication is required and must not be bypassed or inferred."},
+        {"outcome": "http_403", "terminal_class": "access", "preserve_as": "http_403", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "The application or transfer route returned HTTP 403; preserve blocked access."},
+        {"outcome": "timed_out", "terminal_class": "infrastructure", "preserve_as": "timed_out", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "The authorized route timed out before a complete response or delivery."},
+        {"outcome": "transport_failure", "terminal_class": "infrastructure", "preserve_as": "transport_failure", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "Transport failed; do not infer request rejection or data absence."},
+        {"outcome": "cancelled", "terminal_class": "cancellation", "preserve_as": "cancelled", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "The request or transfer was cancelled; retain who cancelled and at which gate."},
+        {"outcome": "unavailable", "terminal_class": "access", "preserve_as": "unavailable", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "The requested variables, period, or route are unavailable under the observed terms."},
+        {"outcome": "unresolved", "terminal_class": "unresolved", "preserve_as": "unresolved", "translation_to_not_found": false, "agent_action": "record_and_stop", "human_message": "Eligibility, variables, pricing, terms, identity, or delivery remain unresolved."}
+      ],
+      "expected_artifacts": [
+        {"artifact_type": "request_specification", "required": true, "content_state": "fixture_only", "description": "Draft minimum-necessary variable, grain, period, purpose, and handling specification."},
+        {"artifact_type": "application_receipt", "required": true, "content_state": "future_if_authorized", "description": "Exact submitted application and confirmation."},
+        {"artifact_type": "quote_or_terms", "required": true, "content_state": "human_provided", "description": "PHC4 quote, available-variable response, schedule, and material terms."},
+        {"artifact_type": "authorization_receipt", "required": true, "content_state": "human_provided", "description": "Separate receipts for application, payment/terms, and controlled transfer."},
+        {"artifact_type": "controlled_data_reference", "required": true, "content_state": "future_if_authorized", "description": "Reference to the approved controlled delivery without embedding payload in the recipe."},
+        {"artifact_type": "checksum", "required": true, "content_state": "future_if_authorized", "description": "Checksums for every delivered complete file."},
+        {"artifact_type": "codebook_or_layout", "required": true, "content_state": "future_if_authorized", "description": "Version-matched layout, variable definitions, geography, time, and identity semantics."},
+        {"artifact_type": "typed_failure_receipt", "required": true, "content_state": "typed_outcome_only", "description": "Typed terminal receipt at any blocked or unresolved gate."},
+        {"artifact_type": "no_payload_fixture_attestation", "required": true, "content_state": "fixture_only", "description": "This package submitted no application, accepted no terms, paid nothing, and received no data."}
+      ],
+      "failure_policy": {"policy_id": "obs:policy:use-access:v1.0.0", "preserve_typed_outcomes": true, "no_not_found_translation": true, "rule": "Preserve typed access and infrastructure failure; never convert failure or unresolved state to not_found."},
+      "provenance": {"source_truth_id": "obs:truth:pa-phc4-custom-data", "evidence_state": "source_asserted", "locator": "fixtures/source-truth.json#obs:truth:pa-phc4-custom-data", "offline": true, "limitations": ["No guidance page was opened, no application was submitted, no quote or terms were obtained, no payment was made, and no custom data were received.", "Current terms and available variables remain unresolved."]},
+      "immutable": true
+    }
+  ]
+}

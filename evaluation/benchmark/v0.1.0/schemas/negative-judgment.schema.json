@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Negative gold relevance judgment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "judgment_id",
+    "question_id",
+    "source_record_id",
+    "source_family_id",
+    "source_title",
+    "label",
+    "recommendation_allowed",
+    "reason_not_recommended",
+    "relevant_geography",
+    "relevant_time",
+    "relevant_unit",
+    "access_implications",
+    "known_limitations",
+    "evidence_references"
+  ],
+  "properties": {
+    "judgment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "question_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_record_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_family_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_record_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "label": {
+      "type": "string",
+      "enum": [
+        "near_miss",
+        "irrelevant",
+        "prohibited_by_access_constraint",
+        "insufficient_evidence",
+        "unresolved_identity",
+        "unavailable_in_current_index"
+      ]
+    },
+    "recommendation_allowed": {
+      "const": false
+    },
+    "reason_not_recommended": {
+      "type": "string",
+      "minLength": 1
+    },
+    "relevant_geography": {
+      "type": "string",
+      "minLength": 1
+    },
+    "relevant_time": {
+      "type": "string",
+      "minLength": 1
+    },
+    "relevant_unit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "access_implications": {
+      "type": "string",
+      "minLength": 1
+    },
+    "known_limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_references": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    }
+  }
+}

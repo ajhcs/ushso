@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Gold answer plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "question_id",
+    "interpreted_need",
+    "required_clarification",
+    "recommendation",
+    "source_roles",
+    "access_summary",
+    "important_limitations",
+    "authoritative_locations",
+    "unresolved_gaps",
+    "evidence_references"
+  ],
+  "properties": {
+    "question_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "interpreted_need": {
+      "type": "string",
+      "minLength": 1
+    },
+    "required_clarification": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "source_roles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "access_summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "important_limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "authoritative_locations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "unresolved_gaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_references": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    }
+  }
+}

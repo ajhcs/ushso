@@ -1,0 +1,152 @@
+{
+  "question_id": "QTD-O3-001",
+  "interpreted_need": "I need hospital financial and utilization data for Pennsylvania.",
+  "required_clarification": {
+    "needed": false,
+    "question": null,
+    "rationale": "No clarification is required for the gold response type."
+  },
+  "recommendation": {
+    "mode": "multi_source_bundle",
+    "decision": "recommend_with_constraints",
+    "source_record_ids": [
+      "pa_phc4_financial_ownership",
+      "cms_hcris_cost_reports"
+    ],
+    "candidate_source_record_ids": [],
+    "bundle_id": "BUNDLE-QTD-O3-001"
+  },
+  "source_roles": [
+    {
+      "source_record_id": "pa_phc4_financial_ownership",
+      "source_family_id": "family:pa_phc4_financial_ownership",
+      "label": "essential",
+      "role": "Pennsylvania financial and utilization anchor",
+      "recommendation_state": "recommended"
+    },
+    {
+      "source_record_id": "cms_hcris_cost_reports",
+      "source_family_id": "family:cms_hcris_cost_reports",
+      "label": "essential",
+      "role": "Facility/provider-period finance and utilization complement",
+      "recommendation_state": "recommended"
+    },
+    {
+      "source_record_id": "cms_hospital_general_information",
+      "source_family_id": "family:cms_hospital_general_information",
+      "label": "highly_relevant",
+      "role": "Facility frame and identity crosswalk input",
+      "recommendation_state": "context_or_not_minimum"
+    }
+  ],
+  "access_summary": "Public HTML/PDF reports; record-level/custom datasets require application, review, quote, payment and transfer. | Public CMS fiscal-year ZIPs containing Rpt/Nmrc/Alphnmrc and rollup files, plus CMS Data API versions. | Public CMS data download/API. | Commercial/licensed database or participation access; no public API/bulk history established.",
+  "important_limitations": [
+    "No actual PHC4-to-HCRIS join is proven in the current project artifacts.",
+    "The desired annual series and comparable metric definitions need field-level review.",
+    "The record is partial and does not establish that every desired field is freely downloadable.",
+    "Reporting perimeter and system aggregation must be retained.",
+    "Not a parent-system consolidated statement.",
+    "Older extracts and electronic submission coverage may be incomplete.",
+    "Facility IDs are not system IDs.",
+    "It is not a finance source.",
+    "This is a near miss or evidence gap, not evidence that no other source exists."
+  ],
+  "authoritative_locations": [
+    {
+      "source_record_id": "pa_phc4_financial_ownership",
+      "url": "https://www.phc4.org/report-focus/financial/",
+      "usage": "recommended_authoritative_location"
+    },
+    {
+      "source_record_id": "cms_hcris_cost_reports",
+      "url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports",
+      "usage": "recommended_authoritative_location"
+    }
+  ],
+  "unresolved_gaps": [
+    "No actual PHC4-to-HCRIS join is proven in the current project artifacts.",
+    "The desired annual series and comparable metric definitions need field-level review."
+  ],
+  "evidence_references": [
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].contains",
+      "evidence_kind": "record_description"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].coverage",
+      "evidence_kind": "record_coverage"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].access",
+      "evidence_kind": "record_access"
+    },
+    {
+      "artifact_path": "discovery_financial_org/agents/healthcare-state-gaps-20260829/evidence.json",
+      "locator": "listed source-specific evidence file",
+      "evidence_kind": "supporting_evidence"
+    },
+    {
+      "artifact_path": "discovery_financial_org/agents/healthcare-state-gaps-20260829/findings.md",
+      "locator": "listed source-specific evidence file",
+      "evidence_kind": "supporting_evidence"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].contains",
+      "evidence_kind": "record_description"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].coverage",
+      "evidence_kind": "record_coverage"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].access",
+      "evidence_kind": "record_access"
+    },
+    {
+      "artifact_path": "discovery_financial_org/agents/LANE/evidence.json",
+      "locator": "listed source-specific evidence file",
+      "evidence_kind": "supporting_evidence"
+    },
+    {
+      "artifact_path": "discovery_financial_org/agents/LANE/findings.md",
+      "locator": "listed source-specific evidence file",
+      "evidence_kind": "supporting_evidence"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hospital_general_information\")].contains",
+      "evidence_kind": "record_description"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hospital_general_information\")].coverage",
+      "evidence_kind": "record_coverage"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hospital_general_information\")].access",
+      "evidence_kind": "record_access"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"aha_annual_survey\")].contains",
+      "evidence_kind": "record_description"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"aha_annual_survey\")].coverage",
+      "evidence_kind": "record_coverage"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"aha_annual_survey\")].access",
+      "evidence_kind": "record_access"
+    }
+  ]
+}

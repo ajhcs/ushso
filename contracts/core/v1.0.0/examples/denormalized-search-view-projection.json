@@ -1,0 +1,17 @@
+{
+  "projection_version": "observatory-search-view-projection.v1",
+  "view_schema": "observatory-record.v1.0.0",
+  "view_role": "denormalized_discovery_search_view",
+  "source_of_truth": false,
+  "record_id": "obs:asset:cms-provider-of-services-hospital",
+  "core_subject_ids": ["obs:object:dataset.pos"],
+  "assertion_ids": ["obs:assertion:pos-title", "obs:assertion:pos-rurality-support", "obs:assertion:pos-data-through-2026"],
+  "access_observation_ids": ["obs:access:pos-public-direct-v2"],
+  "evidence_ids": ["obs:evidence:cms-catalog-fixture", "obs:evidence:access-semantics-fixture"],
+  "relationship_ids": ["obs:relationship:catalog-catalogs-pos", "obs:relationship:pos-has-distribution"],
+  "projection_limitations": [
+    "This record is a replaceable denormalized search view and is not canonical source truth.",
+    "Projection fields must retain pointers to the core assertion, access, evidence, and relationship rows from which they were derived.",
+    "A projection refresh may replace the view row but must not destroy superseded core facts."
+  ]
+}

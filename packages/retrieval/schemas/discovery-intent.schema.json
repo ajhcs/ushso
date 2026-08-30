@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/retrieval/v1.0.0/discovery-intent.schema.json",
+  "title": "Deterministic Observatory question intent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["intent_version","original_question","normalized_question","interpretation","filters","compiler"],
+  "properties": {
+    "intent_version": {"const":"observatory-discovery-intent.v1.0.0"},
+    "original_question": {"type":"string","minLength":3,"maxLength":500},
+    "normalized_question": {"type":"string","minLength":1},
+    "interpretation": {
+      "type":"object",
+      "additionalProperties":false,
+      "required":["geographies","subjects","units_of_analysis","time_window","access_intent"],
+      "properties": {
+        "geographies":{"$ref":"#/$defs/conceptMatches"},
+        "subjects":{"$ref":"#/$defs/conceptMatches"},
+        "units_of_analysis":{"$ref":"#/$defs/conceptMatches"},
+        "time_window":{"type":["object","null"]},
+        "access_intent":{"type":"object"}
+      }
+    },
+    "filters":{"type":"object"},
+    "compiler":{
+      "type":"object",
+      "additionalProperties":false,
+      "required":["mode","vocabulary_version","llm_used","external_requests","unknowns"],
+      "properties":{
+        "mode":{"const":"deterministic_controlled_vocabulary"},
+        "vocabulary_version":{"type":"string","minLength":1},
+        "llm_used":{"const":false},
+        "external_requests":{"const":0},
+        "unknowns":{"type":"array","uniqueItems":true,"items":{"enum":["geography_not_resolved","subject_not_resolved","unit_of_analysis_not_resolved","time_window_not_specified"]}}
+      }
+    }
+  },
+  "$defs":{
+    "conceptMatches":{
+      "type":"array","items":{
+        "type":"object","additionalProperties":false,
+        "required":["id","label","kind","matched_aliases","evidence"],
+        "properties":{
+          "id":{"type":"string","minLength":1},
+          "label":{"type":"string","minLength":1},
+          "kind":{"type":"string","minLength":1},
+          "matched_aliases":{"type":"array","uniqueItems":true,"items":{"type":"string","minLength":1}},
+          "evidence":{"enum":["controlled_vocabulary","explicit_filter"]}
+        }
+      }
+    }
+  }
+}

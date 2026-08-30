@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Deterministic benchmark splits",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "splits_version",
+    "algorithm",
+    "seed",
+    "external_requests",
+    "splits",
+    "counts",
+    "leakage_controls"
+  ],
+  "properties": {
+    "splits_version": {
+      "const": "question-to-data-splits.v1"
+    },
+    "algorithm": {
+      "type": "string"
+    },
+    "seed": {
+      "type": "string"
+    },
+    "external_requests": {
+      "const": 0
+    },
+    "splits": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "leakage_controls": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

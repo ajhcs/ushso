@@ -1,0 +1,195 @@
+{
+  "bundle_id": "BUNDLE-QTD-O3-001",
+  "question_id": "QTD-O3-001",
+  "required_analytical_roles": [
+    {
+      "role_id": "role:QTD-O3-001:01",
+      "role": "Pennsylvania financial and utilization anchor",
+      "description": "PHC4 is the project record explicitly covering Pennsylvania hospital/system financial condition and utilization.",
+      "required": true,
+      "source_record_ids": [
+        "pa_phc4_financial_ownership"
+      ]
+    },
+    {
+      "role_id": "role:QTD-O3-001:02",
+      "role": "Facility/provider-period finance and utilization complement",
+      "description": "HCRIS provides a federal facility/provider-period frame with utilization, cost, charges, and financial statement fields that complement Pennsylvania reporting.",
+      "required": true,
+      "source_record_ids": [
+        "cms_hcris_cost_reports"
+      ]
+    }
+  ],
+  "minimum_viable_bundle": [
+    "pa_phc4_financial_ownership",
+    "cms_hcris_cost_reports"
+  ],
+  "optional_enrichment_sources": [
+    "cms_hospital_general_information"
+  ],
+  "candidate_join_fields": [
+    {
+      "entity": "facility",
+      "fields": [
+        "cms_certification_number",
+        "facility_name",
+        "state"
+      ],
+      "namespace": "CMS/provider-native plus retained source text",
+      "normalization": "Preserve source values; normalize only in a documented crosswalk.",
+      "cardinality": "many_to_many",
+      "evidence_basis": "Candidate facility linkage; no cross-source identity merge."
+    }
+  ],
+  "required_crosswalks": [
+    {
+      "crosswalk_id": "cw:QTD-O3-001:facility",
+      "description": "Retain CMS CCN/NPI and PHC4 source-native facility/system identifiers; document facility-to-system roll-up separately.",
+      "required": true
+    }
+  ],
+  "grain_compatibility": "conditional",
+  "geography_compatibility": "conditional",
+  "temporal_compatibility": "conditional",
+  "access_compatibility": "conditional",
+  "known_gaps": [
+    "No actual PHC4-to-HCRIS join is proven in the current project artifacts.",
+    "The desired annual series and comparable metric definitions need field-level review."
+  ],
+  "join_status": "join_requires_crosswalk",
+  "join_assessments": [
+    {
+      "assessment_id": "join:QTD-O3-001:01",
+      "source_record_ids": [
+        "pa_phc4_financial_ownership",
+        "cms_hcris_cost_reports"
+      ],
+      "status": "join_requires_crosswalk",
+      "evidence_references": [
+        {
+          "artifact_path": "discovery_financial_org/source_registry.json",
+          "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].contains",
+          "evidence_kind": "record_description"
+        },
+        {
+          "artifact_path": "discovery_financial_org/source_registry.json",
+          "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].coverage",
+          "evidence_kind": "record_coverage"
+        },
+        {
+          "artifact_path": "discovery_financial_org/source_registry.json",
+          "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].access",
+          "evidence_kind": "record_access"
+        },
+        {
+          "artifact_path": "discovery_financial_org/agents/healthcare-state-gaps-20260829/evidence.json",
+          "locator": "listed source-specific evidence file",
+          "evidence_kind": "supporting_evidence"
+        },
+        {
+          "artifact_path": "discovery_financial_org/agents/healthcare-state-gaps-20260829/findings.md",
+          "locator": "listed source-specific evidence file",
+          "evidence_kind": "supporting_evidence"
+        },
+        {
+          "artifact_path": "discovery_financial_org/source_registry.json",
+          "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].contains",
+          "evidence_kind": "record_description"
+        },
+        {
+          "artifact_path": "discovery_financial_org/source_registry.json",
+          "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].coverage",
+          "evidence_kind": "record_coverage"
+        },
+        {
+          "artifact_path": "discovery_financial_org/source_registry.json",
+          "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].access",
+          "evidence_kind": "record_access"
+        },
+        {
+          "artifact_path": "discovery_financial_org/agents/LANE/evidence.json",
+          "locator": "listed source-specific evidence file",
+          "evidence_kind": "supporting_evidence"
+        },
+        {
+          "artifact_path": "discovery_financial_org/agents/LANE/findings.md",
+          "locator": "listed source-specific evidence file",
+          "evidence_kind": "supporting_evidence"
+        }
+      ],
+      "note": "Status is intentionally conservative; this benchmark does not create an identity merge."
+    }
+  ],
+  "actual_join_proven": false,
+  "conditions_not_recommend": [
+    "Do not promote the bundle until source definitions, versions, access state, and source-native identifiers are rechecked."
+  ],
+  "evidence_references": [
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].contains",
+      "evidence_kind": "record_description"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].coverage",
+      "evidence_kind": "record_coverage"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"pa_phc4_financial_ownership\")].access",
+      "evidence_kind": "record_access"
+    },
+    {
+      "artifact_path": "discovery_financial_org/agents/healthcare-state-gaps-20260829/evidence.json",
+      "locator": "listed source-specific evidence file",
+      "evidence_kind": "supporting_evidence"
+    },
+    {
+      "artifact_path": "discovery_financial_org/agents/healthcare-state-gaps-20260829/findings.md",
+      "locator": "listed source-specific evidence file",
+      "evidence_kind": "supporting_evidence"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].contains",
+      "evidence_kind": "record_description"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].coverage",
+      "evidence_kind": "record_coverage"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hcris_cost_reports\")].access",
+      "evidence_kind": "record_access"
+    },
+    {
+      "artifact_path": "discovery_financial_org/agents/LANE/evidence.json",
+      "locator": "listed source-specific evidence file",
+      "evidence_kind": "supporting_evidence"
+    },
+    {
+      "artifact_path": "discovery_financial_org/agents/LANE/findings.md",
+      "locator": "listed source-specific evidence file",
+      "evidence_kind": "supporting_evidence"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hospital_general_information\")].contains",
+      "evidence_kind": "record_description"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hospital_general_information\")].coverage",
+      "evidence_kind": "record_coverage"
+    },
+    {
+      "artifact_path": "discovery_financial_org/source_registry.json",
+      "locator": "$.sources[?(@.key==\"cms_hospital_general_information\")].access",
+      "evidence_kind": "record_access"
+    }
+  ]
+}
