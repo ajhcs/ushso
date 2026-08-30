@@ -47,6 +47,33 @@ function geographyDisplay(record: ObservatoryRecord) {
   return jurisdictions.map((value) => value.replace(/^US-/, '')).join(', ') || 'Geography unresolved'
 }
 
+function grainDisplay(record: ObservatoryRecord) {
+  const units = record.unit_of_analysis.map(sentenceCase).filter(Boolean)
+  const granularity = record.time_coverage.temporal_granularity
+  const grain = units.join(', ') || 'Unit unresolved'
+  if (granularity && granularity !== 'unknown' && granularity !== 'not_applicable') {
+    return `${grain} · ${sentenceCase(granularity)}`
+  }
+  return grain
+}
+
+const ACCESS_STATUS_LABELS: Record<ObservatoryRecord['access']['status'], string> = {
+  public_direct: 'Public direct',
+  public_catalog: 'Public catalog',
+  registration_required: 'Registration required',
+  application_required: 'Application required',
+  dua_required: 'Data-use agreement required',
+  licensed_paid: 'Licensed / paid',
+  controlled: 'Controlled access',
+  temporarily_unavailable: 'Temporarily unavailable',
+  unavailable: 'Unavailable',
+  unknown: 'Access unresolved',
+}
+
+function accessStatusLabel(record: ObservatoryRecord) {
+  return ACCESS_STATUS_LABELS[record.access.status] ?? sentenceCase(record.access.status)
+}
+
 function accessKind(step: ObservatoryRetrievalStep): AccessOption['kind'] {
   if (step.action === 'call_api') return 'api'
   if (step.action === 'download') return 'download'
@@ -217,7 +244,9 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
     relationship: relationshipLabel(record),
     recordType: sentenceCase(record.identity.asset.asset_type),
     geographicApplicability: geographyDisplay(record),
+    grain: grainDisplay(record),
     reportingUnit: units.join(', ') || 'Unit unresolved',
+    accessStatusLabel: accessStatusLabel(record),
     populationFacilityScope: units.join(', ') || 'Scope unresolved',
     availableYears: timeDisplay(record),
     latestVerifiedRelease: latestRelease,

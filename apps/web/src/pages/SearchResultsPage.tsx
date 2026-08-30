@@ -9,6 +9,7 @@ import { ResultCard } from '../components/ResultCard'
 import { buildFacetSections } from '../data/facets'
 import { adaptDiscoveryResponse } from '../lib/catalogAdapter'
 import { readSearchState, writeSearchState, type SearchRouteState } from '../lib/searchParams'
+import { discoveryBounds, formatDiscoveryCountSummary } from '../lib/resultCounts'
 import { filterCatalog, getGroupingDescription, orderCatalogViews } from '../lib/uiSearch'
 import { useDiscoveryResult } from '../providers/DiscoveryProviderContext'
 
@@ -119,9 +120,15 @@ export function SearchResultsPage() {
     updateState({ q: editQuery.trim(), page: 1, filters: [] })
   }
 
-  const familyCount = filteredFamilies.length
-  const recordCount = filteredRecords.length
-  const sourceCount = new Set(activeItems.map((item) => item.sourceName)).size
+  const bounds = discovery.status === 'ready' ? discoveryBounds(discovery.result) : null
+  const countParts = bounds
+    ? formatDiscoveryCountSummary({
+      returnedCount: bounds.returnedCount,
+      hasMore: bounds.hasMore,
+      filteredRecordCount: filteredRecords.length,
+      filtersActive: state.filters.length > 0,
+    })
+    : []
 
   return (
     <div className="results-page">
@@ -142,7 +149,9 @@ export function SearchResultsPage() {
             <>
               <div className="results-overview">
                 <div>
-                  <p className="results-count"><strong>{familyCount} dataset families</strong><span>·</span><strong>{recordCount} records</strong><span>·</span><strong>{sourceCount} sources</strong></p>
+                  <p className="results-count">{countParts.map((part, index) => (
+                    <span key={part}>{index > 0 && <span aria-hidden="true">·</span>}<strong>{part}</strong></span>
+                  ))}</p>
                   <p>{getGroupingDescription(state.group)}</p>
                   <p className="facet-helper"><Info aria-hidden="true" />Facet counts show {state.group === 'family' ? 'families' : 'records'} while grouping is {state.group === 'family' ? 'enabled' : 'disabled'}. Counts overlap and will not sum to the total.</p>
                 </div>
@@ -190,8 +199,8 @@ export function SearchResultsPage() {
                 <p>{discovery.error.message}</p>
                 <Link className="button-link" to="/">Revise search</Link>
               </div>
-            ) : visibleItems.length > 0 ? visibleItems.map((result, index) => (
-              <ResultCard key={result.id} result={result} displayRank={(safePage - 1) * PAGE_SIZE + index + 1} />
+            ) : visibleItems.length > 0 ? visibleItems.map((result) => (
+              <ResultCard key={result.id} result={result} />
             )) : state.filters.length > 0 ? (
               <div className="empty-results">
                 <h2>No returned results match these filters.</h2>

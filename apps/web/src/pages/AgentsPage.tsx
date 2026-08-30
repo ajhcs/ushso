@@ -1,18 +1,11 @@
 import { Code2 } from 'lucide-react'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
+import agentsExampleSource from '../data/agents-discovery-example.json'
+import { agentsCurlExample } from '../data/agentsDiscoveryExample'
 
-const curlExample = `curl -sS https://ushso.org/api/discover \\
-  -H "content-type: application/json" \\
-  --data '{"question":"hospital ownership changes in Texas","limit":10}'`
-
-const jsonExample = `{
-  "contract_version": "observatory-discovery-result.v1.0.0",
-  "query": { "interpretation": { "geographies": ["US-TX"] } },
-  "result_count": 3,
-  "results": [{ "record_id": "obs:asset:…", "record": { "authoritative_url": "…" } }],
-  "warnings": ["Results describe indexed metadata and retrieval routes…"]
-}`
+const curlExample = agentsCurlExample(agentsExampleSource.question, agentsExampleSource.limit)
+const jsonExample = JSON.stringify(agentsExampleSource.example, null, 2)
 
 export function AgentsPage() {
   return (
@@ -27,7 +20,7 @@ export function AgentsPage() {
 
         <section className="api-guide" aria-labelledby="api-quick-start">
           <h2 id="api-quick-start">Quick start</h2>
-          <p>Send a JSON question to the discovery endpoint. Requests are limited to 20 KiB.</p>
+          <p>Send a JSON question to the discovery endpoint. Requests are limited to 20 KiB. The response excerpt below is generated from the accepted published fixture, not a hand-maintained sketch.</p>
           <pre><code>{curlExample}</code></pre>
           <h3>Response shape</h3>
           <pre><code>{jsonExample}</code></pre>
@@ -37,7 +30,7 @@ export function AgentsPage() {
           <h2 id="api-routes">Routes and behavior</h2>
           <dl>
             <div><dt><a href="/api/contract">GET /api/contract</a></dt><dd>Canonical machine-readable request and result contract.</dd></div>
-            <div><dt>POST /api/discover</dt><dd>Question-to-source discovery. A zero-result response is not evidence that no source exists.</dd></div>
+            <div><dt>POST /api/discover</dt><dd>Question-to-source discovery. A zero-result response is not evidence that no source exists. <code>returned_count</code>, <code>total_matches</code>, and <code>has_more</code> describe the bounded response; they do not claim a complete catalog.</dd></div>
             <div><dt><a href="/api/catalog">GET /api/catalog</a></dt><dd>Browse the published catalog without inventing a question.</dd></div>
             <div><dt>GET /api/datasets/{'{record_id}'}</dt><dd>Dereference one published record independently of search results.</dd></div>
             <div><dt><a href="/api/health">GET or HEAD /api/health</a></dt><dd>Bounded service and corpus readiness check.</dd></div>

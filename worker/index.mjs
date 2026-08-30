@@ -156,19 +156,28 @@ function directResult(record, whyRelevant) {
   };
 }
 
+function resultBounds(totalMatches, returnedCount) {
+  return {
+    result_count: returnedCount,
+    returned_count: returnedCount,
+    total_matches: totalMatches,
+    has_more: totalMatches > returnedCount
+  };
+}
+
 function browseResponse(bundle, limit) {
   const question = 'Browse published health systems data';
   const intent = bundle.engine.interpret({ question, limit: Math.min(limit, 50) });
-  const records = [...bundle.records]
-    .sort((left, right) => Number(right.record_id.startsWith('us-federal:')) - Number(left.record_id.startsWith('us-federal:')) || left.record_id.localeCompare(right.record_id))
-    .slice(0, limit);
+  const sorted = [...bundle.records]
+    .sort((left, right) => Number(right.record_id.startsWith('us-federal:')) - Number(left.record_id.startsWith('us-federal:')) || left.record_id.localeCompare(right.record_id));
+  const records = sorted.slice(0, limit);
   return {
     contract_version: 'observatory-discovery-result.v1.0.0',
     retrieval_id: retrievalId(`browse:${bundle.corpus.corpus_id}:${bundle.corpus.corpus_version}:${limit}`),
     evidence_mode: 'published_offline_evidence',
     corpus: corpusSummary(bundle),
     query: queryFromIntent(intent, { mode: 'catalog_browse', limit }),
-    result_count: records.length,
+    ...resultBounds(sorted.length, records.length),
     results: records.map((record, index) => ({
       ...directResult(record, 'Included in the published catalog browse view.'),
       rank: index + 1
@@ -195,7 +204,7 @@ function datasetResponse(bundle, record) {
       record_id: record.record_id,
       family_sibling_count: Math.max(0, siblingCount - 1)
     }),
-    result_count: 1,
+    ...resultBounds(1, 1),
     results: [directResult(record, 'Opened by its stable published record identifier.')],
     join_routes: routesForRecord(bundle, record.record_id),
     warnings: ['This page describes indexed metadata and retrieval routes; it does not prove current endpoint availability or authorize access.']
