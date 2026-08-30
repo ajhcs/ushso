@@ -1,8 +1,9 @@
 # Cloudflare release and rollback record for USHSO.org
 
-The checked-in configuration routes `ushso.org` to the `ushso` Cloudflare Worker.
-Credentials are never committed. The former origin remains intact so the custom-domain
-route can be removed without rebuilding the previous service.
+The checked-in configuration routes `ushso.org/*` and `www.ushso.org/*` to the
+`ushso` Cloudflare Worker. Credentials are never committed. The proxied DNS records
+and former origin remain intact, so the Worker routes can be removed without
+rebuilding the previous service.
 
 ## Already prepared
 
@@ -31,10 +32,12 @@ Before activation on 2026-08-30:
 
 ## Rollback
 
-1. Remove the `ushso.org` custom-domain route from `wrangler.jsonc` and deploy the
-   prior known-good Worker configuration, or remove that route in the Cloudflare dashboard.
+1. Remove the `ushso.org/*` and `www.ushso.org/*` Worker routes from `wrangler.jsonc`
+   and deploy the prior known-good Worker configuration, or remove those routes in
+   the Cloudflare dashboard.
 2. Confirm the pre-existing origin/DNS path is active again.
 3. Repeat HTTP and application smoke tests against `https://ushso.org`.
 
-Do not delete or mutate the former origin as part of a Worker rollback. Cloudflare
-credentials and preview tokens must remain outside the repository.
+Do not delete or mutate the retained apex tunnel, `www` CNAME, or former origin as
+part of a Worker rollback. Cloudflare credentials and preview tokens must remain
+outside the repository.

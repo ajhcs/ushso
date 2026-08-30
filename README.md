@@ -35,9 +35,10 @@ npm run build
 npm run cf:dry-run
 ```
 
-The checked-in Cloudflare configuration serves the application at `ushso.org`. Only
-`npm run cf:deploy` mutates the deployed Worker; the verification commands above do
-not. See the [Cloudflare release and rollback record](docs/CLOUDFLARE_GO_LIVE.md).
+The checked-in Cloudflare configuration serves the application at `ushso.org` and
+`www.ushso.org` through zone-level Worker routes. Only `npm run cf:deploy` mutates
+the deployed Worker; the verification commands above do not. See the
+[Cloudflare release and rollback record](docs/CLOUDFLARE_GO_LIVE.md).
 
 ## Access and safety
 
