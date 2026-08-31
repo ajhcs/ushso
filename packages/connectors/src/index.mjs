@@ -6,6 +6,16 @@ export { ConnectorFailure, failureRecord } from './errors.mjs';
 export { classifyIpAddress, assertPublicAddressSet, assertConnectedAddress, assertNoDnsRebinding } from './network-policy.mjs';
 export { MemoryOriginGovernor } from './origin-governor.mjs';
 export { compileManifestRequest, matchManifestRedirect, redactedLocator, routeManifestInventory, validateDescriptor } from './route-manifest.mjs';
+export {
+  SECRET_QUERY_DENYLIST_ACTIVE,
+  SOURCE_METADATA_ROUTE_ALLOWLIST,
+  assertPositiveMetadataRouteAllowlist,
+} from './source-route-allowlist.mjs';
+export {
+  assertPinnedTransportRequest,
+  createPinnedStreamingTransport,
+  readLimitedBody,
+} from './pinned-streaming-transport.mjs';
 export { DeterministicConnectorRunner, connectorRequestKey } from './runner.mjs';
 export { DcatDataJsonConnector } from './adapters/dcat-data-json.mjs';
 export { CkanCatalogConnector } from './adapters/ckan.mjs';

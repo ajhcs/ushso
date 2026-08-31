@@ -1,6 +1,7 @@
 import { Buffer } from 'node:buffer';
 import { Client as PgClient } from 'pg';
 
+import { resolveAuditActor } from './audit-principal.mjs';
 import { canonicalJson, deterministicOpaqueId, invariant, sha256Hex } from './common.mjs';
 import { STAGE_POLICIES } from './failure-policy.mjs';
 import { createNullLogger } from './redaction.mjs';
@@ -190,7 +191,7 @@ function assertConnectionString(value) {
   return value;
 }
 
-function createStore(client, { logger }) {
+function createStore(client, { logger, trustedPrincipalSource = null }) {
   let closed = false;
   let transactionDepth = 0;
 
@@ -1988,18 +1989,18 @@ function createStore(client, { logger }) {
 
     async appendAudit(event) {
       invariant(typeof event.auditEventId === 'string' && typeof event.action === 'string' && typeof event.recordedAt === 'string', 'AUDIT_EVENT_INVALID');
+      const principal = resolveAuditActor(event, trustedPrincipalSource);
       const [objectType, objectId] = auditObject(event);
       const traceId = event.traceId ?? traceFor('trace_audit', event.auditEventId);
       const decision = event.action.includes('requested') || ['pause', 'replay'].includes(event.action) ? 'requested' : 'completed';
-      const actorType = event.operatorId ? 'maintenance_identity' : 'system_reconciler';
       await query('append-audit', `
         insert into ops.audit_events(
           audit_event_id,action,actor_id,actor_type,object_type,object_id,
           decision,details,trace_id,occurred_at
         ) values ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,$10::timestamptz)
         on conflict (audit_event_id,occurred_at) do nothing
-      `, [event.auditEventId, event.action, event.operatorId ?? 'ushso-ingestion-control-store',
-        actorType, objectType, objectId, decision, JSON.stringify(auditDetails(event)), traceId, event.recordedAt]);
+      `, [event.auditEventId, event.action, principal.actorId,
+        principal.actorType, objectType, objectId, decision, JSON.stringify(auditDetails(event)), traceId, event.recordedAt]);
       const receipt = exactOne(await query('verify-audit', `
         select * from ops.audit_events where audit_event_id=$1 and occurred_at=$2::timestamptz
       `, [event.auditEventId, event.recordedAt]), 'AUDIT_EVENT_RECEIPT_MISSING', event.auditEventId);
@@ -2026,17 +2027,19 @@ export function createPostgresControlStoreFactory({
   connectionString,
   Client = PgClient,
   applicationName = 'ushso-ingestion',
-  logger = createNullLogger()
+  logger = createNullLogger(),
+  trustedPrincipalSource = null,
 }) {
   const resolvedConnectionString = assertConnectionString(connectionString);
   invariant(typeof Client === 'function', 'POSTGRES_CLIENT_CONSTRUCTOR_MISSING');
   invariant(typeof applicationName === 'string' && /^[A-Za-z0-9._-]{3,64}$/.test(applicationName), 'POSTGRES_APPLICATION_NAME_INVALID');
   invariant(logger && typeof logger.emit === 'function', 'POSTGRES_LOGGER_INVALID');
+  invariant(trustedPrincipalSource == null || typeof trustedPrincipalSource === 'function', 'PRIVILEGED_PRINCIPAL_SOURCE_INVALID');
   return async function openDatabase() {
     const client = new Client({ connectionString: resolvedConnectionString, application_name: applicationName });
     try {
       await client.connect();
-      return createStore(client, { logger });
+      return createStore(client, { logger, trustedPrincipalSource });
     } catch (error) {
       try { await client.end(); } catch { /* best-effort cleanup of a failed connect */ }
       throw wrapDatabaseError(error, 'connect');
@@ -2044,12 +2047,13 @@ export function createPostgresControlStoreFactory({
   };
 }
 
-export function createHyperdriveOpenDatabase({ hyperdrive, Client = PgClient, applicationName, logger } = {}) {
+export function createHyperdriveOpenDatabase({ hyperdrive, Client = PgClient, applicationName, logger, trustedPrincipalSource } = {}) {
   invariant(hyperdrive && typeof hyperdrive.connectionString === 'string', 'HYPERDRIVE_BINDING_MISSING');
   return createPostgresControlStoreFactory({
     connectionString: hyperdrive.connectionString,
     Client,
     applicationName: applicationName ?? 'ushso-ingestion',
-    logger: logger ?? createNullLogger()
+    logger: logger ?? createNullLogger(),
+    trustedPrincipalSource: trustedPrincipalSource ?? null,
   });
 }

@@ -111,10 +111,13 @@ export function validateDatabaseReceipts() {
   assert.deepEqual(migrationReceipt.migrations, manifest.migrations, 'migration receipt must seal the current manifest');
   assert.equal(migrationReceipt.forward_only, manifest.forward_only);
   assert.equal(migrationReceipt.destructive_down_migrations, manifest.destructive_down_migrations);
+  const sealedInventory = `${manifest.migrations.at(0).id}-${manifest.migrations.at(-1).id}`;
+  assert.equal(migrationReceipt.local_harness_through, '0003', 'WP3 local docker harness applies through 0003');
+  assert.equal(migrationReceipt.sealed_migration_inventory, sealedInventory, 'migration receipt must name the sealed inventory');
   assert.equal(
     migrationReceipt.control,
-    `WP3 migrations ${manifest.migrations.at(0).id}-${manifest.migrations.at(-1).id}`,
-    'migration receipt scope must name the current migration range',
+    `WP3 local harness 0001-0003; sealed inventory ${sealedInventory}`,
+    'migration receipt must distinguish the local harness from the sealed inventory',
   );
 
   const expectedWorkerRoles = [

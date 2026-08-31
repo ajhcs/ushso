@@ -3,6 +3,8 @@ import test from 'node:test';
 import {
   BoundedHttpClient, DcatDataJsonConnector, HtmlReleaseInventoryConnector,
   MemoryOriginGovernor, SocrataCatalogConnector, classifyIpAddress, compileManifestRequest, matchManifestRedirect, redactedLocator, routeManifestInventory,
+  SECRET_QUERY_DENYLIST_ACTIVE, SOURCE_METADATA_ROUTE_ALLOWLIST, assertPositiveMetadataRouteAllowlist,
+  assertPinnedTransportRequest, createPinnedStreamingTransport, readLimitedBody, validateDescriptor,
 } from '../src/index.mjs';
 import { DEFAULT_RESPONSE_LIMITS } from '../src/route-manifest.mjs';
 import {
@@ -599,4 +601,58 @@ test('later-clock refetch after capture-reference commit reuses content but pres
   assert.notEqual(second.captured_at, first.captured_at);
   assert.equal(harness.objectStore.objects.size, 1);
   assert.equal(resumed.seal.observations[0].sourceLocator.captureRefId, second.capture_ref_id);
+});
+
+test('source descriptors must match the frozen positive metadata-route allowlist', async () => {
+  assert.equal(SECRET_QUERY_DENYLIST_ACTIVE, true);
+  const { CDC_SOCRATA_DESCRIPTOR } = await import('../src/descriptors.mjs');
+  assert.doesNotThrow(() => assertPositiveMetadataRouteAllowlist(CDC_SOCRATA_DESCRIPTOR));
+  const mutated = structuredClone(CDC_SOCRATA_DESCRIPTOR);
+  mutated.endpoints[0].routes[0].path_template = '/api/views/metadata/v2';
+  assert.throws(() => validateDescriptor(mutated), /positive allowlist/);
+  const unknown = structuredClone(makeFixtureDescriptor());
+  unknown.source_id = 'source_unknown_live';
+  unknown.legal_review = { state: 'approved', reviewed_at: '2026-08-30T00:00:00.000Z', reviewer_role: 'connector-owner', terms_locator: 'https://catalog.example.gov/terms' };
+  assert.throws(() => validateDescriptor(unknown), /No positive metadata-route allowlist/);
+  assert.ok(Object.keys(SOURCE_METADATA_ROUTE_ALLOWLIST).length >= 18);
+});
+
+test('transport requests pin approved addresses before connect and stream response limits', async () => {
+  assert.throws(() => assertPinnedTransportRequest({ approvedAddresses: ['93.184.216.34'] }), /TRANSPORT_PIN_REQUIRED/);
+  const chunks = [new Uint8Array(8), new Uint8Array(8)];
+  async function* oversized() {
+    yield chunks[0];
+    yield chunks[1];
+  }
+  await assert.rejects(
+    readLimitedBody(oversized(), { maximumBytes: 10, targetClass: 'collection' }),
+    (error) => error.safeDetailCode === 'RESPONSE_SIZE_BOUND_EXCEEDED',
+  );
+  const pinned = createPinnedStreamingTransport(async (request) => {
+    assert.equal(request.pinBeforeConnect, true);
+    assert.deepEqual(request.approvedAddresses, ['93.184.216.34']);
+    return { ok: true };
+  });
+  const wrapped = await pinned.send({
+    url: 'https://catalog.example.gov/data.json',
+    method: 'GET',
+    headers: new Headers(),
+    redirect: 'manual',
+    approvedAddresses: ['93.184.216.34'],
+    pinBeforeConnect: true,
+    maximumCompressedBytes: 1000,
+    maximumDecompressedBytes: 2000,
+  });
+  assert.equal(wrapped.ok, true);
+
+  const descriptor = makeFixtureDescriptor();
+  const harness = makeHarness({ descriptor });
+  harness.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse({ dataset: [] }));
+  const result = await harness.client.execute({
+    descriptor, runId: 'run_pin_stream', jobId: 'job_pin_stream', request: REQUEST,
+    responseProfile: new DcatDataJsonConnector({ descriptor, endpointId: 'endpoint_fixture_catalog', templateId: 'route_fixture_catalog' }).responseProfile(),
+  });
+  assert.equal(result.outcome, 'captured');
+  assert.equal(harness.transport.calls[0].pinBeforeConnect, true);
+  assert.deepEqual(harness.transport.calls[0].approvedAddresses, ['93.184.216.34']);
 });

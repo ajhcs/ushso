@@ -76,13 +76,19 @@ export function automaticAssessmentIsBound(candidate, assessment, authorizedEnab
 }
 
 function acceptedBasis(candidate, decisions, assessmentByCandidate, authorizedEnablementReceiptIds) {
+  const decision = decisions.get(candidate.candidate_id);
+  // A later human decision always outranks automatic acceptance. Only an
+  // explicit current same_identity decision may collapse identity; defer,
+  // not_same_identity, and every other current review outcome fail closed.
+  if (decision) {
+    if (decision.decision === "same_identity") return { kind: "review_decision", reference_id: decision.decision_id };
+    return null;
+  }
   if (candidate.state === "accepted" && candidate.resolution_mode === "automatic_exact_policy") {
     const assessment = assessmentByCandidate.get(candidate.candidate_id);
     if (!automaticAssessmentIsBound(candidate, assessment, authorizedEnablementReceiptIds)) return null;
     return { kind: "exact_authority_policy", reference_id: candidate.candidate_id };
   }
-  const decision = decisions.get(candidate.candidate_id);
-  if (decision?.decision === "same_identity") return { kind: "review_decision", reference_id: decision.decision_id };
   return null;
 }
 

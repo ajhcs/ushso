@@ -154,9 +154,11 @@ export function createMachineToolkit({
         candidate_snapshot_id: null
       };
       if (response.ok) {
+        if (capability === 'plan_research') {
+          throw new Error('MACHINE_TOOLKIT_PLANNER_SUCCESS_FORBIDDEN');
+        }
         const digest = await snapshotDigest(response, cryptoProvider);
-        if (capability === 'plan_research') response.candidate_snapshot_id = digest;
-        else response.result_snapshot_id = digest;
+        response.result_snapshot_id = digest;
       }
       return response;
     }

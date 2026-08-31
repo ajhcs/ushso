@@ -149,6 +149,80 @@ test("automatic candidate state alone cannot collapse search without its authori
   assert.equal(authorizedQueue.some((item) => item.candidate_id === candidates[0].candidate_id), false);
 });
 
+test("load path fails closed on duplicate current decisions instead of silently keeping one", () => {
+  const { candidates } = generateIdentityCandidates({
+    assertions: [assertionFixture("alpha"), assertionFixture("beta")],
+    namespaces: [namespaceFixture()],
+    createdAt: RECORDED_AT,
+  });
+  const candidateId = candidates[0].candidate_id;
+  const first = decision("decision:controlled.first", candidateId, "same_identity");
+  const second = decision("decision:controlled.second", candidateId, "not_same_identity");
+  assert.throws(
+    () => currentDecisionByCandidate([first, second], { includeControlledFixtures: true }),
+    { code: "duplicate_current_decision" },
+  );
+  assert.throws(
+    () => buildProjectionInputs({
+      objects: identityObjects(),
+      candidates,
+      reviewEvents: [first, second],
+      graphRevisionId: "graph-revision:duplicate-current",
+      projectedAt: RECORDED_AT,
+      includeControlledFixtures: true,
+    }),
+    { code: "duplicate_current_decision" },
+  );
+});
+
+test("a later human not_same_identity or defer decision reverses automatic identity collapse", () => {
+  const namespace = enabledControlledNamespaceFixture();
+  const { candidates, assessments } = generateIdentityCandidates({
+    assertions: [assertionFixture("alpha"), assertionFixture("beta")],
+    namespaces: [namespace],
+    authorizedEnablementReceiptIds: [namespace.benchmark_gate.enablement_receipt_id],
+    createdAt: RECORDED_AT,
+  });
+  const automatic = candidates.find((candidate) => candidate.resolution_mode === "automatic_exact_policy");
+  const merged = buildProjectionInputs({
+    objects: identityObjects(),
+    candidates,
+    policyAssessments: assessments,
+    authorizedEnablementReceiptIds: [namespace.benchmark_gate.enablement_receipt_id],
+    graphRevisionId: "graph-revision:auto-before-reversal",
+    projectedAt: RECORDED_AT,
+  });
+  assert.equal(merged.identity_clusters.length, 2);
+
+  for (const outcome of ["not_same_identity", "defer"]) {
+    const events = appendReviewDecision([], decision(`decision:controlled.${outcome}`, automatic.candidate_id, outcome), {
+      status: "controlled_fixture_not_adjudication_evidence",
+    });
+    const reversed = buildProjectionInputs({
+      objects: identityObjects(),
+      candidates,
+      reviewEvents: events,
+      policyAssessments: assessments,
+      authorizedEnablementReceiptIds: [namespace.benchmark_gate.enablement_receipt_id],
+      graphRevisionId: `graph-revision:auto-reversed-${outcome}`,
+      projectedAt: RECORDED_AT,
+      includeControlledFixtures: true,
+    });
+    assert.equal(reversed.identity_clusters.length, 3, `${outcome} must unmerge automatic identity`);
+    assert(reversed.relationship_projections.every((projection) => projection.object_a_id !== automatic.object_a_id || projection.object_b_id !== automatic.object_b_id));
+    const queue = buildReviewQueue(candidates, {
+      assessments,
+      authorizedEnablementReceiptIds: [namespace.benchmark_gate.enablement_receipt_id],
+      currentDecisions: currentDecisionByCandidate(events, { includeControlledFixtures: true }),
+    });
+    assert.equal(
+      queue.some((item) => item.candidate_id === automatic.candidate_id),
+      outcome === "defer",
+      `${outcome} review-queue membership`,
+    );
+  }
+});
+
 test("automatic projection requires a candidate-bound, authorized, complete policy assessment", () => {
   const namespace = enabledControlledNamespaceFixture();
   const { candidates, assessments } = generateIdentityCandidates({

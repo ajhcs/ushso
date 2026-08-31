@@ -27,6 +27,9 @@ function runHost(command, args) {
 const listenerPreflight = runHost('ss', ['-tlnp']);
 const staticOutput = run([path.join(root, 'tools/validate-static.mjs')]);
 const testOutput = run(['--test', '--test-concurrency=1', path.join(root, 'tests/wp6-database.test.mjs')]);
+if (/WP6 database evidence unavailable|WP6_LOCAL_POSTGRES_UNAVAILABLE|# skip/i.test(testOutput)) {
+  throw new Error('WP6_RECEIPT_REFUSED_PREFLIGHT_UNAVAILABLE: will not write a pass receipt when the database suite skipped');
+}
 const remainingContainers = runHost('docker', [
   'ps', '--filter', 'label=org.ushso.owner=wp6-local-test', '--format', '{{.Names}}'
 ]).trim();

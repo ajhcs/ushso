@@ -95,7 +95,8 @@ test('GC rejects every correctness dependency and commits proof, audit, and dele
     'active_replay_count', 'unexpired_idempotency_key_count', 'nonterminal_workflow_count',
     'rollback_reference_count', 'evidence_lineage_reference_count', 'audit_dependency_count'
   ];
-  const plane = createInMemoryControlPlane();
+  const trustedPrincipalSource = () => ({ actorId: 'operator_fixture', actorType: 'maintenance_identity' });
+  const plane = createInMemoryControlPlane({ trustedPrincipalSource });
   const gc = createRetentionGcService({ openDatabase: plane.openDatabase });
   for (const [index, field] of blockers.entries()) {
     const partitionId = `partition_blocked_${index}`;
@@ -113,7 +114,7 @@ test('GC rejects every correctness dependency and commits proof, audit, and dele
   assert.equal(plane.inspect().gcPartitions.get(partitionId).deleted, false);
 
   const faulted = new FaultInjector();
-  const faultPlane = createInMemoryControlPlane({ faults: faulted });
+  const faultPlane = createInMemoryControlPlane({ faults: faulted, trustedPrincipalSource });
   faultPlane.seedGcPartition(gcPartition('partition_fault'), zeroGcDependencies());
   const faultGc = createRetentionGcService({ openDatabase: faultPlane.openDatabase, faults: faulted });
   faulted.arm('gc.after_proof_before_delete');
@@ -128,6 +129,15 @@ test('GC rejects every correctness dependency and commits proof, audit, and dele
   assert.equal(final.gcPartitions.get(partitionId).deleted, true);
   assert.equal(final.gcProofs.get(executed.proof.proof_digest).eligible, true);
   assert.ok(final.audits.some(audit => audit.proofDigest === executed.proof.proof_digest));
+  assert.ok(final.audits.every(audit => audit.actor_id === 'operator_fixture' && audit.actor_type === 'maintenance_identity'));
+
+  const unboundPlane = createInMemoryControlPlane();
+  unboundPlane.seedGcPartition(gcPartition('partition_unbound'), zeroGcDependencies());
+  const unboundGc = createRetentionGcService({ openDatabase: unboundPlane.openDatabase });
+  await assert.rejects(
+    unboundGc.collect({ partitionId: 'partition_unbound', auditEventId: 'audit_gc_unbound', operatorId: 'operator_fixture', now: SLOT, execute: true }),
+    /PRIVILEGED_PRINCIPAL_BINDING_REQUIRED/,
+  );
 });
 
 test('structured observability strips unexpected payload fields, credentials, and signed URL components', () => {

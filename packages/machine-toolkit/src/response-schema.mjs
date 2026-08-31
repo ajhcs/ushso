@@ -24,7 +24,7 @@ const RESULT_STATE_BY_CAPABILITY = Object.freeze({
   get_join_routes: new Set(['complete', 'partial', 'empty']),
   compare_assets: new Set(['complete']),
   get_coverage_status: new Set(['complete', 'partial', 'empty']),
-  plan_research: new Set(['complete']),
+  plan_research: new Set([]),
 });
 const ERROR_STATES = new Set(['unknown', 'unavailable', 'gated', 'disabled']);
 const ERROR_CODES = new Set([
@@ -182,11 +182,30 @@ function enumValue(value, path, issues, values) {
   string(value, path, issues, { enumValues: values, min: 1 });
 }
 
+function isPrivateHost(hostname) {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/gu, '').replace(/\.$/u, '');
+  if (host === 'localhost' || host === 'metadata.google.internal' || /\.(?:localhost|local|internal|home\.arpa|onion)$/u.test(host)) return true;
+  const octets = host.split('.');
+  if (octets.length === 4 && octets.every((part) => /^\d{1,3}$/u.test(part) && Number(part) <= 255)) {
+    const [first, second] = octets.map(Number);
+    return first === 0 || first === 10 || first === 127 || first >= 224
+      || (first === 100 && second >= 64 && second <= 127)
+      || (first === 169 && second === 254)
+      || (first === 172 && second >= 16 && second <= 31)
+      || (first === 192 && [0, 168].includes(second))
+      || (first === 198 && [18, 19].includes(second));
+  }
+  if (host === '::' || host === '::1' || /^[fd][0-9a-f]{1,3}:/u.test(host) || /^fe[89ab][0-9a-f]:/u.test(host)) return true;
+  const mapped = /^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/u.exec(host);
+  return mapped ? isPrivateHost(mapped[1]) : false;
+}
+
 function uri(value, path, issues) {
   if (!string(value, path, issues, { min: 1, max: 2048 })) return;
   try {
     const parsed = new URL(value);
     if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password) issue(issues, path, 'public HTTP(S) URI without credentials required');
+    if (isPrivateHost(parsed.hostname)) issue(issues, path, 'private or non-public locator is not permitted');
   } catch {
     issue(issues, path, 'valid URI required');
   }
@@ -700,9 +719,12 @@ function truthBoundary(value, path, issues) {
 }
 
 function responseResult(value, capability, path, issues) {
+  if (capability === 'plan_research') {
+    issue(issues, path, 'planner success responses are not enabled');
+    return;
+  }
   if (!RESULT_VALIDATORS[capability]) {
-    if (capability === 'plan_research') issue(issues, path, 'planner success responses are not enabled');
-    else issue(issues, path, 'capability result schema is unavailable');
+    issue(issues, path, 'capability result schema is unavailable');
     return;
   }
   RESULT_VALIDATORS[capability](value, path, issues);
@@ -739,6 +761,7 @@ export function responseSchemaIssues(core, capability) {
   nullableStableId(core.coverage_snapshot_id, '/coverage_snapshot_id', issues);
   enumValue(core.result_state, '/result_state', issues, RESULT_STATES);
   if (core.ok === true) {
+    if (capability === 'plan_research') issue(issues, '/ok', 'planner success responses are not enabled');
     if (core.result === null || !isObject(core.result)) issue(issues, '/result', 'successful responses require an object result');
     else if (RESULT_STATE_BY_CAPABILITY[capability] && !RESULT_STATE_BY_CAPABILITY[capability].has(core.result_state)) issue(issues, '/result_state', 'success result state is not valid for this capability');
     else responseResult(core.result, capability, '/result', issues);

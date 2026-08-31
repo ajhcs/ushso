@@ -1,3 +1,4 @@
+import { resolveAuditActor } from './audit-principal.mjs';
 import { canonicalJson, clone, deterministicOpaqueId, FaultInjector, invariant, iso, parseTimestamp, sha256Hex } from './common.mjs';
 import { STAGE_POLICIES } from './failure-policy.mjs';
 
@@ -40,7 +41,7 @@ const DEFAULT_TARGET_BY_JOB = Object.freeze({
   access_check: 'exact_distribution', project_index: 'exact_item'
 });
 
-export function createInMemoryControlPlane({ faults = new FaultInjector() } = {}) {
+export function createInMemoryControlPlane({ faults = new FaultInjector(), trustedPrincipalSource = null } = {}) {
   let state = initialState();
   let clientSequence = 0;
   let transactionTail = Promise.resolve();
@@ -1344,7 +1345,11 @@ export function createInMemoryControlPlane({ faults = new FaultInjector() } = {}
         partition.deleted = true; partition.deleted_at = deletedAt; partition.proof_digest = proofDigest;
         return { deleted_count: partition.row_count };
       },
-      async appendAudit(event) { state.audits.push(clone(event)); return { recorded: true }; },
+      async appendAudit(event) {
+        const principal = resolveAuditActor(event, trustedPrincipalSource);
+        state.audits.push({ ...clone(event), actor_id: principal.actorId, actor_type: principal.actorType });
+        return { recorded: true };
+      },
       async close() {
         const lifecycle = state.clientLifecycle.find(item => item.client_id === clientId);
         if (lifecycle) lifecycle.closed = true;

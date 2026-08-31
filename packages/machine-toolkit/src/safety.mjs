@@ -91,25 +91,34 @@ function visit(value, callback, path = '') {
   else for (const [key, entry] of Object.entries(value)) visit(entry, callback, `${path}/${key.replaceAll('~', '~0').replaceAll('/', '~1')}`);
 }
 
+function locatorIssues(text, path) {
+  const issues = [];
+  if (SECRET_STRING.test(text)) issues.push(issue('SECRET_VALUE_PROHIBITED', path));
+  const expression = /(?:https?:\\?\/\\?\/|\\?\/\\?\/|[a-z][a-z0-9+.-]*:\/\/)[^\s"'<>]+/giu;
+  for (const match of text.matchAll(expression)) {
+    const normalized = match[0].replace(/\\\//g, '/').replace(/&amp;/gi, '&').replace(/[),.;]+$/u, '');
+    let locator;
+    try {
+      locator = new URL(normalized.startsWith('//') ? `https:${normalized}` : normalized);
+    } catch {
+      continue;
+    }
+    if (!['http:', 'https:'].includes(locator.protocol)) issues.push(issue('URL_PROTOCOL_PROHIBITED', path));
+    for (const name of locator.searchParams.keys()) {
+      const key = name.toLowerCase().replaceAll('-', '_');
+      if (SECRET_QUERY_NAMES.has(key)) issues.push(issue('SECRET_QUERY_PROHIBITED', path));
+    }
+    if (locator.username || locator.password) issues.push(issue('URL_CREDENTIAL_PROHIBITED', path));
+    if (isPrivateHost(locator.hostname)) issues.push(issue('PRIVATE_LOCATOR_PROHIBITED', path));
+  }
+  return issues;
+}
+
 export function prohibitedOutputIssues(value) {
   const issues = [];
   visit(value, (entry, path) => {
     if (typeof entry === 'string') {
-      if (SECRET_STRING.test(entry)) issues.push(issue('SECRET_VALUE_PROHIBITED', path));
-      if (/^[a-z][a-z0-9+.-]*:\/\//iu.test(entry)) {
-        try {
-          const url = new URL(entry);
-          if (!['http:', 'https:'].includes(url.protocol)) issues.push(issue('URL_PROTOCOL_PROHIBITED', path));
-          for (const name of url.searchParams.keys()) {
-            const normalized = name.toLowerCase().replaceAll('-', '_');
-            if (SECRET_QUERY_NAMES.has(normalized)) issues.push(issue('SECRET_QUERY_PROHIBITED', path));
-          }
-          if (url.username || url.password) issues.push(issue('URL_CREDENTIAL_PROHIBITED', path));
-          if (isPrivateHost(url.hostname)) issues.push(issue('PRIVATE_LOCATOR_PROHIBITED', path));
-        } catch {
-          // URI syntax is enforced by the canonical service schema boundary.
-        }
-      }
+      issues.push(...locatorIssues(entry, path));
       return;
     }
     if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return;

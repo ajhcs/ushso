@@ -7,6 +7,7 @@ import {
   assertControlStore,
   createHyperdriveOpenDatabase,
   createPostgresControlStoreFactory,
+  resolveAuditActor,
   withFreshDatabaseClient
 } from '../src/index.mjs';
 
@@ -154,6 +155,70 @@ test('invalid factory configuration fails before any connection attempt', () => 
   assert.throws(() => createPostgresControlStoreFactory({ connectionString: '', Client: RecordingClient }), error => error.code === 'POSTGRES_CONNECTION_STRING_MISSING');
   assert.throws(() => createHyperdriveOpenDatabase({ hyperdrive: {}, Client: RecordingClient }), error => error.code === 'HYPERDRIVE_BINDING_MISSING');
   assert.equal(RecordingClient.instances.length, 0);
+});
+
+test('audit identity is derived from trusted context and caller-supplied operator IDs fail closed', async () => {
+  assert.deepEqual(
+    resolveAuditActor({ auditEventId: 'audit_system', action: 'source_pause_requested' }),
+    { actorId: 'ushso-ingestion-control-store', actorType: 'system_reconciler' },
+  );
+  assert.throws(
+    () => resolveAuditActor({ auditEventId: 'audit_forged', action: 'correctness_ledger_gc', operatorId: 'operator_forged' }),
+    error => error.code === 'PRIVILEGED_PRINCIPAL_BINDING_REQUIRED',
+  );
+  assert.throws(
+    () => resolveAuditActor(
+      { auditEventId: 'audit_mismatch', action: 'correctness_ledger_gc', operatorId: 'operator_forged' },
+      () => ({ actorId: 'operator_trusted', actorType: 'maintenance_identity' }),
+    ),
+    error => error.code === 'PRIVILEGED_PRINCIPAL_BINDING_MISMATCH',
+  );
+  assert.deepEqual(
+    resolveAuditActor(
+      { auditEventId: 'audit_bound', action: 'correctness_ledger_gc', operatorId: 'operator_trusted' },
+      () => ({ actorId: 'operator_trusted', actorType: 'maintenance_identity' }),
+    ),
+    { actorId: 'operator_trusted', actorType: 'maintenance_identity' },
+  );
+
+  resetClient();
+  RecordingClient.responder = ({ text }) => {
+    if (text.includes('insert into ops.audit_events')) return { rows: [] };
+    if (text.includes('select * from ops.audit_events')) {
+      return { rows: [{
+        audit_event_id: 'audit_bound', action: 'correctness_ledger_gc', actor_id: 'operator_trusted',
+        actor_type: 'maintenance_identity', object_type: 'partition', object_id: 'partition_eligible',
+      }] };
+    }
+    return { rows: [] };
+  };
+  const database = await createPostgresControlStoreFactory({
+    connectionString: 'postgres://example.invalid/ushso',
+    Client: RecordingClient,
+    trustedPrincipalSource: () => ({ actorId: 'operator_trusted', actorType: 'maintenance_identity' }),
+  })();
+  await database.appendAudit({
+    auditEventId: 'audit_bound', action: 'correctness_ledger_gc', operatorId: 'operator_trusted',
+    partitionId: 'partition_eligible', recordedAt: '2026-08-30T00:00:00.000Z',
+  });
+  const insert = RecordingClient.instances[0].calls.find(call => call.text.includes('insert into ops.audit_events'));
+  assert.equal(insert.values[2], 'operator_trusted');
+  assert.equal(insert.values[3], 'maintenance_identity');
+  await database.close();
+
+  resetClient();
+  const unbound = await createPostgresControlStoreFactory({
+    connectionString: 'postgres://example.invalid/ushso', Client: RecordingClient,
+  })();
+  await assert.rejects(
+    unbound.appendAudit({
+      auditEventId: 'audit_forged', action: 'correctness_ledger_gc', operatorId: 'operator_forged',
+      partitionId: 'partition_eligible', recordedAt: '2026-08-30T00:00:00.000Z',
+    }),
+    error => error.code === 'PRIVILEGED_PRINCIPAL_BINDING_REQUIRED',
+  );
+  assert.equal(RecordingClient.instances[0].calls.some(call => call.text.includes('insert into ops.audit_events')), false);
+  await unbound.close();
 });
 
 test('normalization success artifacts are written only after the job reaches succeeded', () => {

@@ -1,5 +1,6 @@
 import { asBytes, canonicalJson, deterministicId, sha256 } from '../canonical.mjs';
 import { classifyDeletionEvidence } from '../deletion-policy.mjs';
+import { assertPinnedTransportRequest } from '../pinned-streaming-transport.mjs';
 
 export class FixtureDnsResolver {
   constructor(records = {}, defaultAddresses = ['93.184.216.34']) {
@@ -31,6 +32,7 @@ export class FixtureTransport {
   }
 
   async send(request) {
+    assertPinnedTransportRequest(request, 'collection');
     this.calls.push(structuredClone({ ...request, headers: Object.fromEntries(request.headers) }));
     const key = `${request.method} ${request.url}`;
     const queue = this.routes.get(key);

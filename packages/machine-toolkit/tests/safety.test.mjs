@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createMachineToolkit, prohibitedOutputIssues, serializedBytes } from '../src/index.mjs';
+import { createMachineToolkit, prohibitedOutputIssues, serializedBytes, validateCanonicalCore } from '../src/index.mjs';
 import { contextFrom, fixtureBundle, responseCore, serviceReturning } from './helpers.mjs';
 
 let bundle;
@@ -235,4 +235,37 @@ test('plan_research remains disabled and never reaches the injected compiler', a
   assert.equal(response.result_state, 'disabled');
   assert.equal(response.error.code, 'planner_unavailable');
   assert.equal(calls.length, 0);
+});
+
+test('embedded private and secret-bearing locators fail closed even inside prose', async () => {
+  const { toolkit } = harness(search, (core) => {
+    core.result.summaries[0].why_relevant = [
+      'See http://127.0.0.1/admin and https://example.gov/file?access_token=secret before using this source.',
+    ];
+    return core;
+  });
+  const response = await toolkit.invokeJsonApi('search_assets', search.input);
+  assert.equal(response.ok, false);
+  assert.equal(response.error.code, 'service_unavailable');
+  assert.equal(prohibitedOutputIssues({
+    text: 'mirror at http://169.254.169.254/latest/meta-data with https://bucket.example/a?X-Amz-Signature=secret',
+  }).some((entry) => ['PRIVATE_LOCATOR_PROHIBITED', 'SECRET_QUERY_PROHIBITED'].includes(entry.code)), true);
+});
+
+test('planner success envelopes are rejected as a no-action boundary', async () => {
+  const row = bundle.conformance_cases.find((entry) => entry.case_id === 'planner.disabled');
+  const { toolkit, calls } = harness(row);
+  const response = await toolkit.invokeJsonApi('plan_research', row.input);
+  assert.equal(response.ok, false);
+  assert.equal(response.error.code, 'planner_unavailable');
+  assert.equal(response.candidate_snapshot_id, null);
+  assert.equal(calls.length, 0);
+
+  const forged = responseCore(row.json_api.response);
+  forged.ok = true;
+  forged.result_state = 'complete';
+  forged.error = null;
+  forged.result = { plan: { title: 'should never publish' }, clarification_token: null, clarification_expires_at: null, questions: [] };
+  const issues = validateCanonicalCore(forged, 'plan_research', row.input);
+  assert.ok(issues.some((entry) => entry.message === 'planner success responses are not enabled' || entry.code === 'PLANNER_MUST_REMAIN_UNAVAILABLE'));
 });

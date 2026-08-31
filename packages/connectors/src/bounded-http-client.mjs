@@ -2,6 +2,7 @@ import { deterministicId, asBytes } from './canonical.mjs';
 import { classifyResponse, mediaTypeFromHeaders } from './content-classifier.mjs';
 import { ConnectorFailure, failureRecord } from './errors.mjs';
 import { assertConnectedAddress, assertNoDnsRebinding, assertPublicAddressSet } from './network-policy.mjs';
+import { assertPinnedTransportRequest } from './pinned-streaming-transport.mjs';
 import { compileManifestRequest, matchManifestRedirect, redactedLocator, responseLimitsForDescriptor } from './route-manifest.mjs';
 
 const TRANSIENT_NETWORK_CODES = new Map([
@@ -231,14 +232,17 @@ export class BoundedHttpClient {
             requestHeaders.set(name, value);
           }
         }
-        transportInvoked = true;
-        response = await this.transport.send({
+        const transportRequest = {
           url: currentUrl.toString(), method: compiled.method, headers: requestHeaders,
           redirect: 'manual', approvedAddresses: [...approvedAddresses],
+          pinBeforeConnect: true,
           timeoutMs: Math.min(this.requestTimeoutMs, context.descriptor.bounds.maximum_run_seconds * 1000),
           maximumCompressedBytes: context.descriptor.bounds.maximum_response_bytes,
           maximumDecompressedBytes: context.descriptor.bounds.maximum_decompressed_bytes,
-        });
+        };
+        assertPinnedTransportRequest(transportRequest, compiled.targetClass);
+        transportInvoked = true;
+        response = await this.transport.send(transportRequest);
         response.headers = makeHeaders(response.headers);
         assertConnectedAddress(response.connectedAddress, approvedAddresses, compiled.targetClass);
         const rechecked = assertPublicAddressSet(await this.resolver.resolve(currentUrl.hostname), compiled.targetClass);

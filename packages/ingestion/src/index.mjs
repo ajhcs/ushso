@@ -1,3 +1,4 @@
+export * from './audit-principal.mjs';
 export * from './common.mjs';
 export * from './ports.mjs';
 export * from './failure-policy.mjs';

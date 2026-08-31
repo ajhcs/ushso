@@ -51,20 +51,31 @@ export function materializeReviewDecisions(events) {
   for (const event of events) {
     if (event.supersedes_decision_id) supersededBy.set(event.supersedes_decision_id, event.decision_id);
   }
-  return [...events]
+  const materialized = [...events]
     .map((event) => ({
       ...clone(event),
       state: supersededBy.has(event.decision_id) ? "superseded" : "current",
       superseded_by_decision_id: supersededBy.get(event.decision_id) ?? null,
     }))
     .sort((left, right) => left.decision_id.localeCompare(right.decision_id));
+  const currentByCandidate = new Map();
+  for (const event of materialized) {
+    if (event.state !== "current") continue;
+    assert(!currentByCandidate.has(event.candidate_id), "Review history must have at most one current decision per candidate", "duplicate_current_decision");
+    currentByCandidate.set(event.candidate_id, event);
+  }
+  return materialized;
 }
 
 export function currentDecisionByCandidate(events, { includeControlledFixtures = false } = {}) {
   const current = materializeReviewDecisions(events).filter((decision) => decision.state === "current");
-  return new Map(current
-    .filter((decision) => includeControlledFixtures || decision.review_evidence_status === "externally_verified_human_review")
-    .map((decision) => [decision.candidate_id, decision]));
+  const byCandidate = new Map();
+  for (const decision of current) {
+    if (!includeControlledFixtures && decision.review_evidence_status !== "externally_verified_human_review") continue;
+    assert(!byCandidate.has(decision.candidate_id), "Review history must have at most one current decision per candidate", "duplicate_current_decision");
+    byCandidate.set(decision.candidate_id, decision);
+  }
+  return byCandidate;
 }
 
 export function toContractReviewDecision(event) {

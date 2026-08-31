@@ -107,41 +107,48 @@ separate attestation:
   with portable `jsonb_object_keys` counts and refreshes the affected package
   and WP8 receipts.
 
-The final bounded Grok review independently rechecked these surfaces and made
-only that portable SQL correction. It did not silently close the remaining
-blockers: WP3 restore/privilege and role-reconciliation concerns, identity
-reversal and load-path fail-closed behavior, the connector's positive
-source-specific allowlist and transport pre-connect/streaming contract, and
-toolkit schema/no-action-boundary gaps. The deferred principal-binding issue
-remains AP-01.
+A later bounded Grok review completed additional local fail-closed work
+without authorizing any AP packet, contacting live sources, applying
+migrations, or executing a release gate:
+
+- Identity load now fails closed on duplicate current decisions instead of
+  keeping one Map entry. A later human `not_same_identity` or `defer`
+  decision outranks automatic exact-policy collapse and unmerges projection
+  clusters. Write-path uniqueness remains in force.
+- Connector descriptors now match a frozen source-specific metadata-route
+  allowlist. Transport requests require `pinBeforeConnect` plus approved
+  addresses and explicit streaming size bounds; the secret-query denylist is
+  explicitly active. Fixture sources remain structurally gated; live
+  manifests remain paused/fixture-only.
+- Machine-toolkit `plan_research` success envelopes are rejected at both the
+  schema and invoke boundaries. Embedded private or secret-bearing locators
+  inside prose fail closed. Public capability flags remain all-false and the
+  Worker still does not import the candidate router.
+- Privileged control-plane `appendAudit` no longer stores a caller-supplied
+  `operatorId` as `actor_id`. Operator-attributed events require an injected
+  trusted principal source and fail closed on mismatch; system events use a
+  fixed store identity. This is a local derivation guard, not AP-01
+  disposition.
+- WP3's migration receipt now distinguishes the local harness (`0001-0003`)
+  from the sealed inventory (`0001-0007`). WP6 refuses to write a pass
+  receipt when the database suite skipped for preflight unavailability.
 
 The reviews also leave explicit blockers for human disposition rather than
 turning local synthetic evidence into production claims:
 
-- WP3 requires focused review of managed authorization binding, direct outbox
-  updates and worker privileges, operator-forgeable recovery/archive/GC/job
-  evidence, archive/restore proof, role reconciliation, and the mismatch
-  between the local migration harness (through `0003`) and receipt wording
-  that names `0001-0007`.
-- The connector design still needs a positive source-specific metadata-route
-  allowlist, a production transport contract that pins addresses before
-  connect and streams response limits, and a bounded policy for embedded
-  hostnames. Residual secret-key denylist coverage also needs an explicit
-  activation decision. Current source manifests remain paused/fixture-only, so
-  these are activation blockers, not evidence of live exploitation.
-- The machine-toolkit planner is not wired into the public runtime, but its
-  contract still needs to reconcile the disabled planner state with the
-  successful response branch. Runtime/semantic response scanning also needs
-  explicit coverage for embedded private or secret-bearing URLs and adapter
-  error-envelope shape. These remain publication blockers while the toolkit is
-  unwired.
-- Identity still needs a fail-closed reversal rule for a later human
-  `not_same_identity` or `defer` decision and a load-path check for duplicate
-  current decisions. These remain distinct from the already-fixed write-path
-  uniqueness guard.
+- WP3 still requires focused review of managed authorization binding, direct
+  outbox updates and worker privileges, operator-forgeable
+  recovery/archive/GC/job evidence, archive/restore proof against an isolated
+  managed target, and role reconciliation on a live catalog. Those remain
+  AP-08/AUTH-01/02/03/05/11.
+- Connector live activation still needs a production HTTP transport that
+  actually pins before TCP connect against approved sources, plus AUTH-04
+  canary evidence. Current source manifests remain paused/fixture-only.
 - The deferred `privileged-control-plane-principal-binding` issue remains
-  AP-01. No production eligibility, full attribution, live source activation,
-  or managed migration authorization is implied by the local receipts.
+  AP-01. There is still no authenticated control-plane principal source,
+  handler-inventory disposition, or owner residual-risk acceptance. No
+  production eligibility, full attribution, live source activation, or
+  managed migration authorization is implied by the local receipts.
 
 ## Packet rules
 

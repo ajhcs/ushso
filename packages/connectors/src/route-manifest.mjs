@@ -1,5 +1,6 @@
 import { deepClone } from './canonical.mjs';
 import { policyFailure } from './errors.mjs';
+import { SECRET_QUERY_DENYLIST_ACTIVE, assertPositiveMetadataRouteAllowlist } from './source-route-allowlist.mjs';
 
 export const ALLOWED_PURPOSES = new Set(['catalog_metadata', 'documentation', 'schema', 'access_probe']);
 export const REQUIRED_FORBIDDEN_ROUTE_CLASSES = Object.freeze([
@@ -128,7 +129,7 @@ function assertSafeRouteTemplate(pathTemplate, label) {
 }
 
 function isSecretParameterName(name) {
-  if (typeof name !== 'string') return false;
+  if (!SECRET_QUERY_DENYLIST_ACTIVE || typeof name !== 'string') return false;
   if (SECRET_PARAMETER_PATTERN.test(name)) return true;
   return [...name.matchAll(BRACKET_PARAMETER_PATTERN)].some(([, innerName]) => SECRET_PARAMETER_PATTERN.test(innerName));
 }
@@ -244,6 +245,7 @@ export function validateDescriptor(descriptor) {
     }
   }
   if (endpointIds.size !== descriptor.endpoints.length) throw new TypeError('Endpoint IDs must be unique.');
+  assertPositiveMetadataRouteAllowlist(descriptor);
   for (const scope of descriptor.scopes) {
     assertExactKeys(scope, SCOPE_KEYS, `Scope ${scope.scope_id ?? '(unknown)'}`);
     assertExactKeys(scope.denominator, DENOMINATOR_KEYS, `Scope denominator ${scope.scope_id ?? '(unknown)'}`);

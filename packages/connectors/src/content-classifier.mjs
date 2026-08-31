@@ -39,6 +39,7 @@ function privateLocatorInText(text) {
     try { locator = new URL(normalized.startsWith('//') ? `https:${normalized}` : normalized); } catch { continue; }
     if (locator.username || locator.password) return true;
     const hostname = locator.hostname.replace(/^\[|\]$/g, '').replace(/\.$/, '').toLowerCase();
+    if (/%2e/i.test(match[0]) || hostname.includes('..') || hostname.startsWith('.') || hostname.endsWith('.localhost')) return true;
     const address = classifyIpAddress(hostname);
     if (address.family !== null && !address.allowed) return true;
     if (!hostname.includes('.') || PRIVATE_HOST_SUFFIX.test(hostname)) return true;
