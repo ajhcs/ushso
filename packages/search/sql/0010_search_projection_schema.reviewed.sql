@@ -328,10 +328,158 @@ create table if not exists ushso_search.promotion_gates (
     'performance', 'coverage'
   )),
   status text not null check (status in ('passed', 'failed', 'not_run')),
+  -- The text IDs remain an audit index. Promotion also requires the complete,
+  -- generation-bound receipts below; opaque IDs alone are not evidence.
   evidence_refs text[] not null check (cardinality(evidence_refs) > 0),
+  evidence_receipts jsonb not null check (case when jsonb_typeof(evidence_receipts) = 'array' then jsonb_array_length(evidence_receipts) > 0 else false end),
   verified_at timestamptz not null,
   primary key (publication_id, gate_name)
 );
+
+create or replace function ushso_search.promotion_gate_evidence_is_bound(
+  p_publication_id text,
+  p_gate_name text,
+  p_publication_sha256 text,
+  p_occurred_at timestamptz,
+  p_evidence_refs text[],
+  p_evidence_receipts jsonb
+)
+returns boolean
+language plpgsql
+stable
+set search_path = pg_catalog, ushso_search
+as $$
+declare
+  evidence jsonb;
+  evidence_id text;
+  expected_generation_ids text[];
+  receipt_generation_ids text[];
+  issued_at timestamptz;
+  expires_at timestamptz;
+begin
+  if p_evidence_refs is null or cardinality(p_evidence_refs) < 1
+      or p_publication_sha256 is null then
+    return false;
+  end if;
+  if jsonb_typeof(p_evidence_receipts) <> 'array' then
+    return false;
+  end if;
+  if jsonb_array_length(p_evidence_receipts) < 1
+      or jsonb_array_length(p_evidence_receipts) <> cardinality(p_evidence_refs) then
+    return false;
+  end if;
+  if (select count(*) from unnest(p_evidence_refs) as ref(value) where value is null) > 0
+      or (select count(distinct value) from unnest(p_evidence_refs) as ref(value)) <> cardinality(p_evidence_refs) then
+    return false;
+  end if;
+
+  select coalesce(array_agg(component.generation_id order by component.generation_id), '{}'::text[])
+    into expected_generation_ids
+  from ushso_search.publication_components component
+  where component.publication_id = p_publication_id;
+  if cardinality(expected_generation_ids) < 1 then
+    return false;
+  end if;
+
+  for evidence in
+    select item.value
+    from jsonb_array_elements(p_evidence_receipts) as item(value)
+  loop
+    if jsonb_typeof(evidence) <> 'object' then
+      return false;
+    end if;
+    if jsonb_object_length(evidence) <> 11
+        or not (evidence ?& array[
+          'receipt_version', 'evidence_id', 'gate', 'publication_id',
+          'publication_digest', 'generation_ids', 'status',
+          'verification_state', 'issued_at', 'expires_at', 'evidence_digest'
+        ]) then
+      return false;
+    end if;
+    evidence_id := evidence ->> 'evidence_id';
+    if evidence_id is null or evidence_id !~ '^[a-z][a-z0-9_.:-]{2,191}$'
+        or (select count(*) from unnest(p_evidence_refs) as ref(value) where value = evidence_id) <> 1 then
+      return false;
+    end if;
+    if evidence ->> 'receipt_version' <> 'promotion-gate-evidence.v1'
+        or evidence ->> 'gate' <> p_gate_name
+        or evidence ->> 'publication_id' <> p_publication_id
+        or evidence ->> 'status' <> 'passed'
+        or evidence ->> 'verification_state' <> 'verified' then
+      return false;
+    end if;
+    if jsonb_typeof(evidence -> 'publication_digest') <> 'object' then
+      return false;
+    end if;
+    if jsonb_object_length(evidence -> 'publication_digest') <> 4
+        or not (evidence -> 'publication_digest' ?& array['algorithm', 'canonicalization', 'domain', 'value'])
+        or evidence #>> '{publication_digest,algorithm}' <> 'sha256'
+        or evidence #>> '{publication_digest,canonicalization}' <> 'ushso-canonical-json-v1'
+        or evidence #>> '{publication_digest,domain}' <> 'publication_manifest'
+        or evidence #>> '{publication_digest,value}' <> p_publication_sha256 then
+      return false;
+    end if;
+    if jsonb_typeof(evidence -> 'evidence_digest') <> 'object' then
+      return false;
+    end if;
+    if jsonb_object_length(evidence -> 'evidence_digest') <> 3
+        or not (evidence -> 'evidence_digest' ?& array['digest_type', 'algorithm', 'value'])
+        or evidence #>> '{evidence_digest,digest_type}' <> 'canonical_json_sha256'
+        or evidence #>> '{evidence_digest,algorithm}' <> 'sha256'
+        or evidence #>> '{evidence_digest,value}' !~ '^[a-f0-9]{64}$' then
+      return false;
+    end if;
+    if jsonb_typeof(evidence -> 'generation_ids') <> 'array' then
+      return false;
+    end if;
+    if jsonb_array_length(evidence -> 'generation_ids') <> cardinality(expected_generation_ids)
+        or exists (
+          select 1
+          from jsonb_array_elements(evidence -> 'generation_ids') as generation(value)
+          where jsonb_typeof(generation.value) <> 'string'
+        ) then
+      return false;
+    end if;
+    select array_agg(generation.value order by generation.value)
+      into receipt_generation_ids
+    from jsonb_array_elements_text(evidence -> 'generation_ids') as generation(value);
+    if (select count(distinct generation.value) from jsonb_array_elements_text(evidence -> 'generation_ids') as generation(value)) <> cardinality(receipt_generation_ids)
+        or receipt_generation_ids <> expected_generation_ids then
+      return false;
+    end if;
+    if evidence ->> 'issued_at' is null
+        or evidence ->> 'issued_at' !~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]{1,9})?Z$'
+        or evidence ->> 'expires_at' is null
+        or evidence ->> 'expires_at' !~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]{1,9})?Z$' then
+      return false;
+    end if;
+    begin
+      issued_at := (evidence ->> 'issued_at')::timestamptz;
+      expires_at := (evidence ->> 'expires_at')::timestamptz;
+    exception when others then
+      return false;
+    end;
+    if issued_at > p_occurred_at or expires_at <= p_occurred_at or expires_at <= issued_at then
+      return false;
+    end if;
+  end loop;
+
+  if (select count(distinct item.value ->> 'evidence_id')
+      from jsonb_array_elements(p_evidence_receipts) as item(value)) <> jsonb_array_length(p_evidence_receipts)
+      or exists (
+        select 1
+        from unnest(p_evidence_refs) as ref(value)
+        where not exists (
+          select 1
+          from jsonb_array_elements(p_evidence_receipts) as item(value)
+          where item.value ->> 'evidence_id' = ref.value
+        )
+      ) then
+    return false;
+  end if;
+  return true;
+end
+$$;
 
 create table if not exists ushso_search.publication_pointer (
   pointer_id text primary key check (pointer_id = 'ushso:publication:active'),
@@ -1351,6 +1499,21 @@ begin
     raise exception using errcode = '23514', message = 'publication component is not a validated W1 match';
   end if;
   if exists (
+    select 1
+    from ushso_search.promotion_gates gate
+    where gate.publication_id = p_publication_id
+      and not ushso_search.promotion_gate_evidence_is_bound(
+        p_publication_id,
+        gate.gate_name,
+        candidate.publication_sha256,
+        p_occurred_at,
+        gate.evidence_refs,
+        gate.evidence_receipts
+      )
+  ) then
+    raise exception using errcode = '23514', message = 'publication gate evidence is not bound to this publication';
+  end if;
+  if exists (
     select required.gate_name
     from unnest(array[
       'complete_sealed_enumeration', 'membership_checkpoint_committed', 'terminal_normalized_or_excluded',
@@ -1494,6 +1657,7 @@ begin
   grant insert on ushso_search.retention_audit to ushso_ops;
   grant execute on function ushso_search.promote_publication(text,text,timestamptz) to ushso_ops;
   grant execute on function ushso_search.rollback_publication(text,text,timestamptz) to ushso_ops;
+  grant execute on function ushso_search.promotion_gate_evidence_is_bound(text,text,text,timestamptz,text[],jsonb) to ushso_ops;
   grant execute on function ushso_search.safety_revoke_generation(text,text,text,timestamptz) to ushso_ops;
   grant select on ushso_search.projection_generations, ushso_search.publication_pointer,
     ushso_search.publication_components to ushso_maintenance;

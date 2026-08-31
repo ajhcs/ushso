@@ -86,8 +86,11 @@ test('pointer promotion, rollback, failure containment, revocation, and retentio
   assert.ok(promote.indexOf('for update') < promote.indexOf('insert into ushso_search.publication_history'));
   assert.ok(promote.indexOf('insert into ushso_search.publication_history') < promote.indexOf('update ushso_search.publication_pointer'));
   assert.match(promote, /publication gates are incomplete/);
+  assert.match(promote, /publication gate evidence is not bound to this publication/);
   assert.match(promote, /publication does not match its validated build receipt/);
   assert.match(promote, /public_cutover_authorization_ref is null/);
+  assert.match(sql, /evidence_receipts jsonb not null/);
+  assert.match(sql, /create or replace function ushso_search\.promotion_gate_evidence_is_bound/);
   assert.match(rollback, /retained n-1 publication/);
   assert.match(rollback, /g\.safety_revoked_at is not null/);
   assert.match(expire, /active or n-1 pointer/);
