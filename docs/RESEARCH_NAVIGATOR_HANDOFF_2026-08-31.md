@@ -8,7 +8,7 @@ This is a safe, resumable checkpoint, not a Definition-of-Done declaration.
 - All subagents are stopped. No background implementation or validation process is expected to be running.
 - No production deployment, remote push, paid-infrastructure action, live connector harvest, or irreversible external action was performed.
 - The worktree is intentionally dirty and uncommitted. Preserve it as the implementation checkpoint.
-- Local `HEAD` is `6eeca2a47d4dba7eee05e9b43b15fa03f231ac6a` (`Make Observatory discovery backend-driven and verifiable`). The local `origin/main` ref is one commit ahead at `e93ac2b5ad66cc6528182cced7e95fb3929841a9` (`Tighten result cards, bounded counts, and live provenance (#2)`). Do not pull or rebase this large dirty tree without first reviewing the upstream delta and protecting the checkpoint.
+- The implementation checkpoint was created as commit `3ee4392e85f563eabe322b25b443ed9658c2db9f` on `codex/research-navigator-handoff`. The newer `main` commit `e93ac2b5ad66cc6528182cced7e95fb3929841a9` (`Tighten result cards, bounded counts, and live provenance (#2)`) was integrated in merge commit `d61ada1fac0141e4dc7603a43da762258fdcef4f`. Draft PR [#3](https://github.com/ajhcs/ushso/pull/3) is open and mergeable. The merge retained the six-region researcher card, adopted the bounded-result-count contract, and implemented browse/dataset count fields at the shared public-query-service boundary.
 - `RELEASE_PROVENANCE.json` and `.serena/` predated this program's edits and must continue to be treated as user-owned/unrelated unless proven otherwise.
 
 The authoritative specification remains `docs/RESEARCH_NAVIGATOR_IMPLEMENTATION_PLAN.md`. The product boundary is unchanged: USHSO recommends, explains, and compiles evidence-bound research plans; it does not execute analyses, calculate market share, produce financial benchmarks, or become a general analytics application.
@@ -55,6 +55,7 @@ Known green at the time recorded:
 - Core v1, core v2, machine-toolkit, research-plan, and use-access contract test/validation pairs passed after excluding `node_modules` and `.git` from deterministic manifest walkers.
 - CI verification previously passed with 11 contract packages, 19 verification suites, and 47 test files before later workspace and source drift.
 - Web tests previously passed 17 files/91 tests and the web build completed before the later WP13 repairs.
+- After synchronizing `main` into the PR branch, focused merge tests passed: the Result Card and bounded-count Vitest targets passed 2 files/5 tests, and `tests/worker-contract.test.mjs` plus `tests/release-features.test.mjs` passed 2/2.
 
 Known red, stale, or intentionally unrun:
 
@@ -70,7 +71,7 @@ Known red, stale, or intentionally unrun:
 
 ## Safe resume order
 
-1. Protect this checkpoint first. Review `git status --short --branch`, the upstream one-commit delta, and user-owned changes. Do not use destructive reset/checkout commands.
+1. Protect this checkpoint first. Confirm PR #3 still points at or descends from `d61ada1fac0141e4dc7603a43da762258fdcef4f`, review `git status --short --branch`, and preserve user-owned changes. Do not use destructive reset/checkout commands.
 2. Audit the interrupted agent changes in `packages/connectors`, `db`, `services`, `verification/testing`, `verification/wp13`, and `verification/wp14`. Treat every existing receipt as stale until its bound source set is recomputed.
 3. Resolve the legacy retrieval-schema provenance issue honestly. Preserve the historical `2d778a...` pin; if exact bytes remain unavailable, write an ADR and create a versioned compatibility successor with its own schema and receipt rather than mutating the historical claim.
 4. Freeze all workspace descriptors, run `npm install --ignore-scripts --no-audit --no-fund` to regenerate workspace links, and rerun the worker/package-inventory tests.
