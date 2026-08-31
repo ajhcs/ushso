@@ -51,11 +51,14 @@ export class CmsProviderDataCatalogConnector extends CatalogConnectorBase {
   }
 
   responseProfile() {
+    const maximumRecords = this.responseLimits().maximum_records;
     return {
-      metadataCollectionPaths: ['/data'],
+      metadataCollectionPaths: ['', '/data'],
       validateJson(value) {
         const records = providerItems(value);
-        return records && records.every(validProviderItem)
+        if (!records) return { accepted: false, reasonCode: 'CMS_PROVIDER_METASTORE_SCHEMA_DRIFT', classification: 'schema_drift' };
+        if (records.length > maximumRecords) return { accepted: false, reasonCode: 'RECORD_CARDINALITY_EXCEEDED', classification: 'resource_limit' };
+        return records.every(validProviderItem)
           ? { accepted: true, classification: 'catalog_metadata' }
           : { accepted: false, reasonCode: 'CMS_PROVIDER_METASTORE_SCHEMA_DRIFT', classification: 'schema_drift' };
       },
@@ -63,7 +66,7 @@ export class CmsProviderDataCatalogConnector extends CatalogConnectorBase {
   }
 
   parsePage({ parsed, capture }) {
-    const records = providerItems(parsed);
+    const records = this.assertRecordCount(providerItems(parsed));
     const pointerRoot = Array.isArray(parsed) ? '' : '/data';
     return {
       observations: records.map((item, index) => {

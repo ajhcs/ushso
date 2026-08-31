@@ -74,6 +74,7 @@ function databaseWorkset() {
     job_id: `job_normalize_${item.capture_sha256}_${VERSION.replaceAll('.', '_')}`,
     run_id: runId,
     job_type: 'normalize_record',
+    state: 'pending',
     idempotency_key: `normalize:${item.capture_sha256}:${VERSION}`,
     identity_payload: { capture_sha256: item.capture_sha256, normalizer_version: VERSION },
     outbox_event_id: `event_normalize_${item.capture_sha256}_${VERSION.replaceAll('.', '_')}`
@@ -112,6 +113,60 @@ function databaseWorkset() {
   };
 }
 
+function databaseWorksetForSatisfaction(satisfaction) {
+  const workset = databaseWorkset();
+  const oldRunId = 'run:wp6:owner';
+  const item = workset.manifestItems[0];
+  const requirement = workset.requirements[0];
+  const job = workset.jobs[0];
+  if (satisfaction === 'existing_pending' || satisfaction === 'already_succeeded') {
+    job.run_id = oldRunId;
+    requirement.satisfaction = satisfaction;
+    if (satisfaction === 'already_succeeded') job.state = 'succeeded';
+    workset.outbox[0].references_payload.run_id = oldRunId;
+  } else if (satisfaction === 'replay_created') {
+    const replayJobId = `${job.job_id}_replay`;
+    const replayEventId = `${job.outbox_event_id}_replay`;
+    job.job_id = replayJobId;
+    job.idempotency_key = `${job.idempotency_key}:replay:${workset.manifest.run_id}`;
+    job.outbox_event_id = replayEventId;
+    job.identity_payload.logical_idempotency_key = `normalize:${item.capture_sha256}:${VERSION}`;
+    job.identity_payload.replay_of_job_id = `job_normalize_${item.capture_sha256}_${VERSION.replaceAll('.', '_')}`;
+    requirement.job_id = replayJobId;
+    requirement.outbox_event_id = replayEventId;
+    requirement.satisfaction = satisfaction;
+    workset.outbox[0].event_id = replayEventId;
+    workset.outbox[0].idempotency_key = `event:normalize_requested:${replayJobId}`;
+    workset.outbox[0].references_payload.job_id = replayJobId;
+  }
+  return workset;
+}
+
+test('database reconciliation accepts each explicit same-run or cross-run satisfaction state', () => {
+  for (const satisfaction of ['created', 'replay_created', 'existing_pending', 'already_succeeded']) {
+    const workset = satisfaction === 'created' ? databaseWorkset() : databaseWorksetForSatisfaction(satisfaction);
+    assert.equal(reconcileNormalizationDatabaseWorkset(workset).status, 'reconciled_database_workset', satisfaction);
+  }
+});
+
+test('database reconciliation binds reused jobs and events to their owning run', () => {
+  for (const satisfaction of ['existing_pending', 'already_succeeded']) {
+    const workset = databaseWorksetForSatisfaction(satisfaction);
+    workset.outbox[0].references_payload.run_id = workset.manifest.run_id;
+    assert.throws(() => reconcileNormalizationDatabaseWorkset(workset), error => error.code === 'NORMALIZATION_DATABASE_OUTBOX_LINEAGE_MISMATCH');
+  }
+});
+
+test('created satisfaction cannot claim a job owned by another run', () => {
+  const workset = databaseWorkset();
+  workset.jobs[0].run_id = 'run:wp6:other';
+  workset.outbox[0].references_payload.run_id = 'run:wp6:other';
+  assert.throws(
+    () => reconcileNormalizationDatabaseWorkset(workset),
+    error => error.code === 'NORMALIZATION_DATABASE_REQUIREMENT_FENCE_MISMATCH'
+  );
+});
+
 test('actual WP4 relational field shapes reconcile manifest, requirements, jobs, and outbox', () => {
   const workset = databaseWorkset();
   const receipt = reconcileNormalizationDatabaseWorkset(workset);
@@ -127,6 +182,8 @@ test('actual WP4 relational field shapes reconcile manifest, requirements, jobs,
     value => { value.jobs[0].idempotency_key = 'normalize:run:aggregate'; },
     value => { value.requirements.pop(); },
     value => { value.requirements.push(structuredClone(value.requirements[0])); },
+    value => { value.requirements[0].satisfaction = 'replay_created'; },
+    value => { value.jobs[0].state = 'succeeded'; },
     value => { value.outbox[0].references_payload.capture_ref_id = 'wrong-capture'; },
     value => { value.manifestItems[1].ordinal = 1; }
   ];

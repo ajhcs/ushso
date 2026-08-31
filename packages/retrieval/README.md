@@ -16,6 +16,22 @@ npm run example
 
 No command performs network discovery, payload acquisition, coverage execution, identity resolution, or deployment. Generated corpus outputs are immutable: changed inputs or code require another versioned successor.
 
+## Historical record-schema compatibility
+
+The v1.0.1 corpus manifest intentionally preserves the historical pin
+`observatory/index/v1.0.0/schemas/observatory-record.schema.json` at SHA-256
+`2d778a3125ba03c7504aad92e7154fdedf686db66619e439a6259ba883e162d9`. Those
+exact historical bytes are not present in this checkout, so the pin is not
+treated as recovered or byte-equivalent. Local record validation uses the
+strict, separately versioned successor
+[`schemas/observatory-record-compatibility.v1.0.1.schema.json`](schemas/observatory-record-compatibility.v1.0.1.schema.json),
+with provenance, adversarial tests, and a dedicated receipt in
+[`validation/legacy-schema-compatibility-receipt.json`](validation/legacy-schema-compatibility-receipt.json).
+
+The record wire value remains `observatory-record.v1.0.0`; the successor is a
+validation compatibility boundary, not a claim that the historical schema was
+recovered.
+
 ## Analytical-use guidance
 
 [`analysis-use/v1.0.0/README.md`](analysis-use/v1.0.0/README.md) describes the separately versioned Use Card compiler. It consumes a pinned `hc-metrics` requirements catalog and evidence-reviewed dataset mappings to report analytical fit without calculating metrics or changing the Observatory discovery UI.

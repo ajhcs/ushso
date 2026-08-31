@@ -16,8 +16,8 @@ import { validateIngestionRecord as validateV10IngestionRecord } from '../../v1.
 
 const PREDECESSOR_ROOT = path.resolve(PACKAGE_ROOT, '../v1.0.0');
 const PREDECESSOR_PINS = Object.freeze({
-  'manifests/package-manifest.json': '071b06d4fa03fd38c5bb1c522493a66d59f767b51f4bea9d26edd596858f929d',
-  'validation/validation-receipt.json': 'be197529eb1e1714b0756fe5cca40543f1234cc553112ff33e45817ed13969b6',
+  'manifests/package-manifest.json': '842888bae6092da9d00982bed4186a43ceb6aeace9f837947c5a4eb6e0da9886',
+  'validation/validation-receipt.json': '665174c8ec848ae93fdb8034010f03892b2771aa67b777b361526dd6f396f8e8',
   'schemas/harvest-run.schema.json': '9ff550bc27f9e70e418c8a586b0798eeafa122357ec8e9d99c4dc2a4b566f959',
   'tools/semantics.mjs': '26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639',
 });
@@ -35,7 +35,7 @@ test('all JSON Schemas compile in strict 2020-12 mode and all positive fixtures 
 test('every adversarial fixture is rejected by its pinned stable reason code', async () => {
   const { report, adversarialResults } = await validatePackage({ checkStoredReceipt: false });
   assert.equal(report.valid, true, report.errors.join('\n'));
-  assert.equal(adversarialResults.length, 28);
+  assert.equal(adversarialResults.length, 33);
   assert.ok(adversarialResults.every(result => result.passed), JSON.stringify(adversarialResults.filter(result => !result.passed), null, 2));
 });
 
@@ -132,6 +132,14 @@ test('strict capture and event schemas reject source payload bodies and embedded
   source.credential_secret_locator = 'plain-text-secret';
   const sourceSchema = await validatorForFile('source-descriptor.schema.json');
   assert.equal(sourceSchema(source), false);
+});
+
+test('provider query parameters accept one balanced bracket segment only', async () => {
+  const fixtures = await readJson(path.join(PACKAGE_ROOT, 'fixtures', 'valid-fixtures.json'));
+  const source = structuredClone(fixtures.records.find(record => record.fixture_id === 'valid_source_descriptor').value);
+  source.endpoints[0].routes[0].allowed_parameters = ['page[number]', 'page[size]'];
+  const sourceSchema = await validatorForFile('source-descriptor.schema.json');
+  assert.equal(sourceSchema(source), true);
 });
 
 test('canonical JSON digest is key-order independent and explicitly distinct from raw file-byte hashing', async () => {

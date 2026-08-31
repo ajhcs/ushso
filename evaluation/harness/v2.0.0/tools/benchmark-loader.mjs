@@ -3,6 +3,12 @@ import path from 'node:path';
 import { PACKAGE_ROOT, PROJECT_ROOT, readJson, sha256 } from './integrity.mjs';
 
 export const DEFAULT_BENCHMARK_ROOT = path.join(PROJECT_ROOT, 'evaluation/benchmark/v0.1.0');
+export const CURRENT_GENERATION_ROOT = path.join(PROJECT_ROOT, 'packages/retrieval/versions/v1.1.0');
+export const HISTORICAL_GENERATION_ROOT = path.join(PROJECT_ROOT, 'packages/retrieval');
+
+const KNOWN_UNMANIFESTED_FILE_PINS = Object.freeze({
+  '1.0.1:fixtures/controlled-vocabulary.json': Object.freeze({ bytes: 11268, sha256: 'e3cf00dc343b74428948276c0206a05f35ea06c0ea61788019ce727bb4720642' }),
+});
 
 function parseJsonl(bytes, label) {
   return bytes.toString('utf8').split(/\r?\n/).filter(line => line.trim()).map((line, index) => {
@@ -24,8 +30,70 @@ function uniqueMap(rows, key, label) {
   return output;
 }
 
+async function loadGeneration(generationRoot, benchmarkPinSha256) {
+  const manifestPath = path.join(generationRoot, 'manifests/corpus-manifest.json');
+  const manifestBytes = await fs.readFile(manifestPath);
+  const manifest = JSON.parse(manifestBytes.toString('utf8'));
+  const expectedPaths = [
+    'corpus/corpus.json',
+    'corpus/records.jsonl',
+    'corpus/search-documents.jsonl',
+    'fixtures/controlled-vocabulary.json',
+  ];
+  const bytesByPath = new Map();
+  for (const relative of expectedPaths) {
+    const expected = manifest.files.find((entry) => entry.path === relative)
+      ?? KNOWN_UNMANIFESTED_FILE_PINS[`${manifest.corpus_version}:${relative}`];
+    const bytes = await fs.readFile(path.join(generationRoot, relative));
+    if (!expected || bytes.length !== expected.bytes || sha256(bytes) !== expected.sha256) {
+      throw new Error(`CURRENT_GENERATION_ARTIFACT_MISMATCH:${relative}`);
+    }
+    bytesByPath.set(relative, bytes);
+  }
+  const corpus = JSON.parse(bytesByPath.get('corpus/corpus.json').toString('utf8'));
+  const records = parseJsonl(bytesByPath.get('corpus/records.jsonl'), `${manifest.corpus_version} records.jsonl`);
+  const searchDocuments = parseJsonl(bytesByPath.get('corpus/search-documents.jsonl'), `${manifest.corpus_version} search-documents.jsonl`);
+  const recordIds = new Set();
+  const searchDocumentIds = new Set();
+  const recordIdsBySource = new Map();
+  for (const record of records) {
+    if (typeof record.record_id !== 'string' || recordIds.has(record.record_id)) throw new Error(`CORPUS_GENERATION_RECORD_ID_INVALID:${record.record_id}`);
+    recordIds.add(record.record_id);
+    const sourceIds = [record.record_id, record.identity?.match_fields?.source_id, record.identity?.source_id].filter((value) => typeof value === 'string' && value);
+    for (const sourceId of sourceIds) {
+      const values = recordIdsBySource.get(sourceId) ?? [];
+      values.push(record.record_id);
+      recordIdsBySource.set(sourceId, values);
+    }
+  }
+  for (const document of searchDocuments) {
+    if (typeof document.resource_record_id !== 'string' || searchDocumentIds.has(document.resource_record_id)) throw new Error(`CORPUS_GENERATION_SEARCH_DOCUMENT_ID_INVALID:${document.resource_record_id}`);
+    searchDocumentIds.add(document.resource_record_id);
+  }
+  if (corpus.record_count !== records.length || corpus.search_document_count !== searchDocuments.length || recordIds.size !== searchDocumentIds.size) throw new Error('CORPUS_GENERATION_CARDINALITY_INVALID');
+  if (corpus.manifest_sha256 !== manifest.content_fingerprint_sha256 || corpus.algorithm_fingerprint_sha256 !== manifest.algorithm_fingerprint_sha256) throw new Error('CORPUS_GENERATION_FINGERPRINT_INVALID');
+  const manifestEntry = (relative) => manifest.files.find((entry) => entry.path === relative)?.sha256
+    ?? KNOWN_UNMANIFESTED_FILE_PINS[`${manifest.corpus_version}:${relative}`]?.sha256;
+  return Object.freeze({
+    corpus_id: corpus.corpus_id,
+    corpus_version: corpus.corpus_version,
+    record_count: records.length,
+    corpus_manifest_sha256: sha256(manifestBytes),
+    content_fingerprint_sha256: manifest.content_fingerprint_sha256,
+    algorithm_fingerprint_sha256: manifest.algorithm_fingerprint_sha256,
+    records_sha256: manifestEntry('corpus/records.jsonl'),
+    search_documents_sha256: manifestEntry('corpus/search-documents.jsonl'),
+    vocabulary_sha256: manifestEntry('fixtures/controlled-vocabulary.json'),
+    benchmark_pin_sha256: benchmarkPinSha256,
+    recordIds,
+    searchDocumentIds,
+    recordIdsBySource,
+  });
+}
+
 export async function loadBenchmark({ benchmarkRoot = DEFAULT_BENCHMARK_ROOT } = {}) {
   const pin = await readJson(path.join(PACKAGE_ROOT, 'benchmark-pin.json'));
+  const benchmarkPinSha256 = sha256(await fs.readFile(path.join(PACKAGE_ROOT, 'benchmark-pin.json')));
   const bytesByPath = new Map();
   for (const expected of pin.files) {
     const bytes = await fs.readFile(path.join(benchmarkRoot, expected.path));
@@ -44,6 +112,10 @@ export async function loadBenchmark({ benchmarkRoot = DEFAULT_BENCHMARK_ROOT } =
   const sourceIndex = JSON.parse(bytesByPath.get('source_reference_index.json').toString('utf8'));
   const splits = JSON.parse(bytesByPath.get('benchmark_splits.json').toString('utf8'));
   const statistics = JSON.parse(bytesByPath.get('benchmark_statistics.json').toString('utf8'));
+  const [currentGeneration, historicalGeneration] = await Promise.all([
+    loadGeneration(CURRENT_GENERATION_ROOT, benchmarkPinSha256),
+    loadGeneration(HISTORICAL_GENERATION_ROOT, benchmarkPinSha256),
+  ]);
 
   const observed = {
     questions: questions.length,
@@ -69,7 +141,12 @@ export async function loadBenchmark({ benchmarkRoot = DEFAULT_BENCHMARK_ROOT } =
 
   return Object.freeze({
     pin,
-    pin_sha256: sha256(await fs.readFile(path.join(PACKAGE_ROOT, 'benchmark-pin.json'))),
+    pin_sha256: benchmarkPinSha256,
+    currentGeneration,
+    generations: new Map([
+      [currentGeneration.corpus_manifest_sha256, currentGeneration],
+      [historicalGeneration.corpus_manifest_sha256, historicalGeneration],
+    ]),
     benchmark_root: benchmarkRoot,
     questions,
     features,

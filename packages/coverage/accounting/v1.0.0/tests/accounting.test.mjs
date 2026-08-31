@@ -128,6 +128,23 @@ test('incomplete, failed, or unknown enumeration cannot support an absence claim
   );
 });
 
+test('numerator membership must be a subset of the declared denominator', async () => {
+  const definitions = await repo('contracts/coverage/v1.0.0/contracts/metric-definitions.json');
+  const sourceScopes = await pkg('artifacts/source-scopes.json');
+  const stageFacts = await pkg('artifacts/stage-facts.json');
+  const snapshot = await pkg('artifacts/coverage-snapshot.json');
+  const matrix = await pkg('artifacts/coverage-matrix.json');
+  const tampered = structuredClone(snapshot);
+  const manifest = tampered.membership_manifests.find(item => item.metric_id === 'coverage.configured_scope_status/v1');
+  manifest.members[0].denominator_membership = 'outside_conditional_cohort';
+  assert.ok(validateCoverageBundle(definitions, {
+    source_scopes: sourceScopes,
+    stage_facts: stageFacts,
+    snapshot: tampered,
+    matrix
+  }).some(error => error.code === 'NUMERATOR_OUTSIDE_DENOMINATOR'));
+});
+
 test('51, 14, 306, and 157 remain distinct non-additive concepts', async () => {
   const view = await pkg('artifacts/public-coverage-view.json');
   assert.deepEqual(view.concepts.map(concept => [concept.count, concept.unit]), [

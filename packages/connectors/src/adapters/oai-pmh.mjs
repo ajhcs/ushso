@@ -1,4 +1,5 @@
 import { CatalogConnectorBase, validOptionalSourceTimestamp } from './base.mjs';
+import { ConnectorResponseLimitError, DEFAULT_RESPONSE_LIMITS } from '../route-manifest.mjs';
 
 const ACTIVE_XML = /<!DOCTYPE|<!ENTITY|<script\b|<form\b/i;
 
@@ -11,7 +12,7 @@ function element(value, name) {
   return match ? decodeXml(match[1].replace(/<[^>]+>/g, ' ')) : null;
 }
 
-function parseRecords(xml) {
+function parseRecords(xml, maximumRecords = DEFAULT_RESPONSE_LIMITS.maximum_records) {
   const records = [];
   for (const match of xml.matchAll(/<record\b[^>]*>([\s\S]*?)<\/record>/gi)) {
     const block = match[1];
@@ -22,6 +23,7 @@ function parseRecords(xml) {
     const datestamp = element(header, 'datestamp');
     const setSpecs = [...header.matchAll(/<setSpec(?:\s[^>]*)?>([\s\S]*?)<\/setSpec>/gi)].map((entry) => decodeXml(entry[1]));
     const deleted = /\bstatus\s*=\s*["']deleted["']/i.test(headerMatch[1]);
+    if (records.length >= maximumRecords) throw new ConnectorResponseLimitError('RECORD_CARDINALITY_EXCEEDED', 'OAI-PMH records exceed their permitted cardinality.');
     records.push({
       identifier, datestamp, set_specs: setSpecs, deleted,
       title: element(block, '(?:dc:)?title'),
@@ -36,9 +38,9 @@ function resumptionToken(xml) {
   return match ? decodeXml(match[1]) : null;
 }
 
-function validateXml(xml) {
+function validateXml(xml, maximumRecords = DEFAULT_RESPONSE_LIMITS.maximum_records) {
   if (ACTIVE_XML.test(xml) || !/<OAI-PMH\b/i.test(xml) || !/<ListRecords\b/i.test(xml)) return false;
-  const records = parseRecords(xml);
+  const records = parseRecords(xml, maximumRecords);
   return records.every((item) => typeof item.identifier === 'string' && item.identifier.length > 0 && item.identifier.length <= 500 &&
     validOptionalSourceTimestamp(item.datestamp));
 }
@@ -61,20 +63,26 @@ export class OaiPmhCatalogConnector extends CatalogConnectorBase {
   }
 
   responseProfile() {
+    const maximumRecords = this.responseLimits().maximum_records;
     return {
       allowXmlCatalogMetadata: true,
       validateText(value) {
-        return validateXml(value)
-          ? { accepted: true, classification: 'catalog_metadata' }
-          : { accepted: false, reasonCode: 'OAI_PMH_SCHEMA_DRIFT', classification: 'schema_drift' };
+        try {
+          return validateXml(value, maximumRecords)
+            ? { accepted: true, classification: 'catalog_metadata' }
+            : { accepted: false, reasonCode: 'OAI_PMH_SCHEMA_DRIFT', classification: 'schema_drift' };
+        } catch (error) {
+          return { accepted: false, reasonCode: error.reasonCode ?? 'OAI_PMH_SCHEMA_DRIFT', classification: 'schema_drift' };
+        }
       },
     };
   }
 
   parsePage({ bodyBytes, capture }) {
     const xml = new TextDecoder().decode(bodyBytes);
-    if (!validateXml(xml)) throw new TypeError('OAI-PMH response failed the adapter schema.');
-    const records = parseRecords(xml);
+    const maximumRecords = this.responseLimits().maximum_records;
+    if (!validateXml(xml, maximumRecords)) throw new TypeError('OAI-PMH response failed the adapter schema.');
+    const records = this.assertRecordCount(parseRecords(xml, maximumRecords));
     const token = resumptionToken(xml);
     return {
       observations: records.map((item, index) => this.nativeObservation(item, index, capture)),

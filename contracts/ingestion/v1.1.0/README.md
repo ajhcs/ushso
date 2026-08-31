@@ -1,11 +1,12 @@
 # USHSO ingestion contract v1.1.0
 
 This immutable successor preserves the v1.0 metadata-only source registry and
-ingestion-control semantics while correcting one provider-bound invariant:
+ingestion-control semantics while correcting two provider-bound invariants:
 Cloudflare Workflow instance IDs are at most 100 characters and contain only
 ASCII letters, digits, underscores, and hyphens, with the first character
-restricted to a letter, digit, or underscore. It is a wire/domain contract, not
-a database schema and not permission to contact a source.
+restricted to a letter, digit, or underscore; provider-specific query keys may
+use one balanced bracket segment such as `page[number]`. It is a wire/domain
+contract, not a database schema and not permission to contact a source.
 
 The package implements the decisions in the Research Navigator plan §§5–9,
 WP2/WP4, and the accepted PostgreSQL/Cloudflare publication ADR. Every schema is
@@ -33,11 +34,15 @@ break the workflow-attempt identity fence. New WP4 runs use
 contract. `await upgradeHarvestRunV10ToV11(record)` validates the complete
 predecessor and successor records while enforcing this no-remap rule.
 
-All other state machines, semantic validators, product/data boundaries, retry
-rules, clocks, idempotency, and publication barriers are unchanged. The
-deterministic receipt byte-pins the v1.0 manifest, receipt, harvest-run schema,
-and semantic implementation; it also requires the v1.1 semantic implementation
-to retain the exact v1.0 byte hash.
+The v1.1 source-descriptor schema is the second explicit provider erratum: it
+accepts only a safe base parameter name with at most one non-empty bracketed
+segment, and rejects empty, unbalanced, nested, control-character, and
+oversized names. The v1.0 descriptor schema remains unchanged and is still the
+truthful envelope for v1.0 records. All other state machines, semantic
+validators, product/data boundaries, retry rules, clocks, idempotency, and
+publication barriers are unchanged. The deterministic receipt byte-pins the
+v1.0 manifest, receipt, harvest-run schema, and semantic implementation while
+checking every non-erratum schema for structural equivalence.
 
 ## Product and data boundary
 

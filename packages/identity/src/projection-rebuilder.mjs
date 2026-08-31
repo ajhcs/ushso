@@ -1,6 +1,27 @@
 import { REBUILD_TARGETS, assert, canonicalJson, sha256, stableId, uniqueSorted } from "./common.mjs";
 import { currentDecisionByCandidate } from "./review-ledger.mjs";
 
+const AUTOMATIC_CHECKS = Object.freeze([
+  "different_objects",
+  "same_namespace",
+  "normalized_values_match",
+  "normalization_verified",
+  "registered_check_rule_passed",
+  "check_passed",
+  "active_assertions",
+  "entity_type_compatible",
+  "grain_compatible",
+  "complete_intervals",
+  "intervals_overlap",
+  "uniqueness_known",
+  "reuse_safe",
+  "authority_eligible",
+  "source_scope_eligible",
+  "no_authoritative_conflict",
+  "benchmark_gate",
+  "enablement_receipt_authorized",
+]);
+
 class DisjointSet {
   constructor(ids) {
     this.parent = new Map(ids.map((id) => [id, id]));
@@ -28,10 +49,36 @@ class DisjointSet {
   }
 }
 
-function acceptedBasis(candidate, decisions, assessmentByCandidate) {
+function automaticAssessmentIsBound(candidate, assessment, authorizedEnablementReceiptIds) {
+  if (candidate.state !== "accepted" || candidate.resolution_mode !== "automatic_exact_policy") return false;
+  if (candidate.object_a_id.localeCompare(candidate.object_b_id) >= 0
+    || candidate.candidate_type !== "same_identity"
+    || candidate.match_score !== 1
+    || candidate.features?.length !== 1
+    || candidate.features[0]?.feature_kind !== "exact_identifier"
+    || candidate.conflicting_assertion_ids?.length !== 0
+    || candidate.epistemic_confidence?.level !== "high") return false;
+  if (candidate.candidate_id !== stableId("identity-candidate", {
+    objectA: candidate.object_a_id,
+    objectB: candidate.object_b_id,
+    candidateType: candidate.candidate_type,
+    algorithmVersion: candidate.algorithm_version,
+    feature: candidate.features[0],
+  })) return false;
+  if (!assessment || assessment.candidate_id !== candidate.candidate_id
+    || assessment.automatic_resolution_eligible !== true
+    || typeof assessment.enablement_receipt_id !== "string"
+    || !authorizedEnablementReceiptIds.includes(assessment.enablement_receipt_id)
+    || !Array.isArray(assessment.reasons)
+    || assessment.reasons.length !== 0) return false;
+  return AUTOMATIC_CHECKS.every((name) => assessment.checks?.[name] === true)
+    && Object.keys(assessment.checks ?? {}).every((name) => AUTOMATIC_CHECKS.includes(name));
+}
+
+function acceptedBasis(candidate, decisions, assessmentByCandidate, authorizedEnablementReceiptIds) {
   if (candidate.state === "accepted" && candidate.resolution_mode === "automatic_exact_policy") {
     const assessment = assessmentByCandidate.get(candidate.candidate_id);
-    if (!assessment?.automatic_resolution_eligible || !assessment.enablement_receipt_id) return null;
+    if (!automaticAssessmentIsBound(candidate, assessment, authorizedEnablementReceiptIds)) return null;
     return { kind: "exact_authority_policy", reference_id: candidate.candidate_id };
   }
   const decision = decisions.get(candidate.candidate_id);
@@ -47,6 +94,7 @@ export function buildProjectionInputs({
   projectedAt,
   includeControlledFixtures = false,
   policyAssessments = [],
+  authorizedEnablementReceiptIds = [],
   joinRouteIds = [],
   plannerFixtureIds = [],
 }) {
@@ -54,14 +102,20 @@ export function buildProjectionInputs({
   assert(objectIds.length === objects.length, "Identity object IDs must be unique", "duplicate_object");
   const objectById = new Map(objects.map((object) => [object.object_id, object]));
   const decisions = currentDecisionByCandidate(reviewEvents, { includeControlledFixtures });
-  const assessmentByCandidate = new Map(policyAssessments.map((assessment) => [assessment.candidate_id, assessment]));
+  const candidateIds = new Set(candidates.map((candidate) => candidate.candidate_id));
+  const assessmentByCandidate = new Map();
+  for (const assessment of policyAssessments) {
+    assert(!assessmentByCandidate.has(assessment.candidate_id), "Policy assessments must be unique by candidate", "duplicate_policy_assessment");
+    assert(candidateIds.has(assessment.candidate_id), "Policy assessment must reference an existing candidate", "unknown_policy_assessment");
+    assessmentByCandidate.set(assessment.candidate_id, assessment);
+  }
   const sets = new DisjointSet(objectIds);
   const acceptedEdges = [];
   const unresolvedByObject = new Map(objectIds.map((id) => [id, []]));
 
   for (const candidate of [...candidates].sort((left, right) => left.candidate_id.localeCompare(right.candidate_id))) {
     assert(objectById.has(candidate.object_a_id) && objectById.has(candidate.object_b_id), "Candidate endpoint does not exist", "unknown_candidate_endpoint");
-    const basis = acceptedBasis(candidate, decisions, assessmentByCandidate);
+    const basis = acceptedBasis(candidate, decisions, assessmentByCandidate, authorizedEnablementReceiptIds);
     if (basis) {
       sets.union(candidate.object_a_id, candidate.object_b_id);
       acceptedEdges.push({ candidate, basis });

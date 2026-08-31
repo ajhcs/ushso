@@ -12,6 +12,7 @@ export {
 export { canonicalJson, serializedBytes, snapshotBody, snapshotDigest } from './json.mjs';
 export { validateInput, validateLegacyInput } from './input-validation.mjs';
 export { FALSE_TRUTH_BOUNDARY, prohibitedOutputIssues, validateCanonicalCore } from './safety.mjs';
+export { responseSchemaIssues } from './response-schema.mjs';
 export { assertCanonicalService, createDomainErrorCore, createMachineToolkit } from './service.mjs';
 export {
   createWebMcpToolset,

@@ -231,6 +231,15 @@ create table catalog.object_revision_heads (
   selected_at timestamptz not null
 );
 
+-- All revision-head-changing functions lock this singleton row before reading
+-- eligibility or writing a head.  This keeps the serialization primitive in
+-- the database row-lock domain required by the Hyperdrive contract; it does
+-- not depend on advisory locks or LISTEN/NOTIFY.
+create table catalog.revision_head_serialization (
+  singleton boolean primary key default true check (singleton)
+);
+insert into catalog.revision_head_serialization(singleton) values (true);
+
 create table catalog.object_revision_unavailability_events (
   unavailability_event_id bigint generated always as identity primary key,
   entity_id text not null references catalog.objects(entity_id) on delete restrict,
@@ -427,7 +436,7 @@ declare
   v_audit_event_occurred_at timestamptz;
   v_audit_event_count integer;
 begin
-  perform pg_advisory_xact_lock(hashtextextended('ushso-catalog-revision-head-ledger-v1', 0));
+  perform 1 from catalog.revision_head_serialization where singleton for update;
   if p_action not in ('import_initial', 'select', 'revert')
      or length(trim(p_reason)) < 3 or length(trim(p_audit_event_id)) < 3 then
     raise exception using errcode = '22023', message = 'invalid revision selection request';
@@ -1219,10 +1228,10 @@ declare
   v_import_transaction_at timestamptz := clock_timestamp();
 begin
   -- Serialize the entire validation-and-publication transaction with head
-  -- selection and rejection.  Acquiring this before any reference eligibility
+  -- selection and rejection. Acquiring this before any reference eligibility
   -- read prevents a concurrent rollback from invalidating a just-validated
   -- dependency before this import publishes its heads.
-  perform pg_advisory_xact_lock(hashtextextended('ushso-catalog-revision-head-ledger-v1', 0));
+  perform 1 from catalog.revision_head_serialization where singleton for update;
   if jsonb_typeof(p_document) <> 'object'
      or p_document->>'contract_version' <> 'ushso-normalization-import.v1.0.0'
      or v_import_id !~ '^urn:ushso:import:[A-Za-z0-9._~-]+$'
@@ -1705,7 +1714,7 @@ declare
   v_unavailable_entity_ids text[] := array[]::text[];
   v_dependency_violation record;
 begin
-  perform pg_advisory_xact_lock(hashtextextended('ushso-catalog-revision-head-ledger-v1', 0));
+  perform 1 from catalog.revision_head_serialization where singleton for update;
   if length(trim(p_reason)) < 3 or length(trim(p_audit_event_id)) < 3 then
     raise exception using errcode = '22023', message = 'rejection reason and audit event ID are required';
   end if;
@@ -1927,6 +1936,9 @@ end
 $function$;
 
 revoke all on function catalog.apply_normalization_import(jsonb) from public;
+-- Keep the validator private to the SECURITY DEFINER import implementation;
+-- callers must use the environment-fenced guarded entry point.
+revoke all on function catalog.validate_normalization_bundle(jsonb, text) from public;
 revoke all on function catalog.reject_import_batch(text, text, text, timestamptz) from public;
 revoke all on function catalog.apply_normalization_import_guarded(jsonb, text, text) from public;
 revoke all on function catalog.reject_import_batch_guarded(text, text, text, timestamptz, text, text) from public;
@@ -1940,6 +1952,7 @@ grant usage on schema catalog to ushso_normalize, ushso_maintenance;
 revoke all on all tables in schema catalog from ushso_projector;
 revoke execute on function catalog.reject_import_batch(text, text, text, timestamptz) from ushso_ops;
 revoke execute on function catalog.select_object_revision(text, text, text, text, text, text, timestamptz) from ushso_ops;
+grant execute on function catalog.reject_import_batch(text, text, text, timestamptz) to ushso_maintenance;
 grant execute on function catalog.apply_normalization_import_guarded(jsonb, text, text) to ushso_normalize, ushso_maintenance;
 grant execute on function catalog.reject_import_batch_guarded(text, text, text, timestamptz, text, text) to ushso_maintenance;
 grant execute on function catalog.legacy_v1_projection(text) to ushso_projector, ushso_ops;

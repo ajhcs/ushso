@@ -9,10 +9,15 @@ export class CkanCatalogConnector extends CatalogConnectorBase {
   }
 
   responseProfile() {
+    const maximumRecords = this.responseLimits().maximum_records;
     return {
+      metadataCollectionPaths: ['/result/results'],
       validateJson(value) {
-        const valid = value?.success === true && Number.isInteger(value?.result?.count) && Array.isArray(value?.result?.results) &&
-          value.result.count >= 0 && value.result.results.every((item) => item && typeof item === 'object' &&
+        if (value?.success !== true || !Number.isInteger(value?.result?.count) || !Array.isArray(value?.result?.results)) {
+          return { accepted: false, reasonCode: 'CKAN_PACKAGE_SEARCH_SCHEMA_DRIFT', classification: 'schema_drift' };
+        }
+        if (value.result.results.length > maximumRecords) return { accepted: false, reasonCode: 'RECORD_CARDINALITY_EXCEEDED', classification: 'resource_limit' };
+        const valid = value.result.count >= 0 && value.result.results.every((item) => item && typeof item === 'object' &&
             typeof item.id === 'string' && item.id.length > 0 && item.id.length <= 500 &&
             typeof item.name === 'string' && item.name.length > 0 &&
             validOptionalSourceTimestamp(item.metadata_modified ?? item.metadata_created ?? null));
@@ -24,7 +29,7 @@ export class CkanCatalogConnector extends CatalogConnectorBase {
   }
 
   parsePage({ parsed, capture, request }) {
-    const items = parsed.result.results;
+    const items = this.assertRecordCount(parsed.result.results);
     const start = Number(request.query?.start ?? 0);
     const rows = Number(request.query?.rows ?? this.pageSize);
     const nextStart = start + items.length;

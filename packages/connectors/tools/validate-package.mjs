@@ -83,7 +83,7 @@ assert.ok(Object.values(matrix.zero_external_actions).every((value) => value ===
 const deliveryWaveMatrix = await runDeliveryWaveFixtureMatrix();
 assert.equal(deliveryWaveMatrix.status, 'PASS');
 assert.equal(deliveryWaveMatrix.totals.scenarios, 10);
-assert.equal(deliveryWaveMatrix.totals.assertions, 61);
+assert.equal(deliveryWaveMatrix.totals.assertions, 64);
 assert.ok(Object.values(deliveryWaveMatrix.zero_external_actions).every((value) => value === 0));
 assert.equal(validateDeliveryWaveRegistry().source_instances, APPROVED_SOURCE_DESCRIPTOR_TEMPLATES.length);
 assert.equal(validateRegulatorApcdRegistry().entries, 8);

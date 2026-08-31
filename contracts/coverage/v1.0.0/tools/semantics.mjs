@@ -206,6 +206,9 @@ function validateManifestShape(manifest, definition, path, errors) {
   if (!unique(manifest.members.map(member => canonicalJson(member.member_key)))) push(errors, 'DUPLICATE_MEMBER_KEY', `${path}/members`, manifest.manifest_id);
   for (const [memberIndex, member] of manifest.members.entries()) {
     const memberPath = `${path}/members/${memberIndex}`;
+    if (member.in_numerator === true && member.denominator_membership !== 'included') {
+      push(errors, 'NUMERATOR_OUTSIDE_DENOMINATOR', `${memberPath}/in_numerator`, manifest.metric_id);
+    }
     if (member.member_key.unit !== manifest.unit) push(errors, 'UNIT_MIXING', `${memberPath}/member_key/unit`, `${member.member_key.unit} != ${manifest.unit}`);
     if (member.state === 'excluded') {
       if (definition.exclusions_remain_in_upstream_denominator && member.denominator_membership !== 'included') {

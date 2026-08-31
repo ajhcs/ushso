@@ -1,5 +1,5 @@
 import { canonicalJson, deepClone, deterministicId, sha256 } from '../canonical.mjs';
-import { validateDescriptor } from '../route-manifest.mjs';
+import { assertResponseCardinality, responseLimitsForDescriptor, validateDescriptor } from '../route-manifest.mjs';
 
 function tupleCompare(a, b) {
   const time = String(a.publisherModifiedAt ?? '').localeCompare(String(b.publisherModifiedAt ?? ''));
@@ -30,6 +30,22 @@ export class CatalogConnectorBase {
 
   descriptor() {
     return deepClone(this._descriptor);
+  }
+
+  responseLimits() {
+    return responseLimitsForDescriptor(this._descriptor);
+  }
+
+  assertRecordCount(records) {
+    return assertResponseCardinality(records, this.responseLimits().maximum_records, 'records', 'RECORD_CARDINALITY_EXCEEDED');
+  }
+
+  assertLinkCount(links) {
+    return assertResponseCardinality(links, this.responseLimits().maximum_links, 'links', 'LINK_CARDINALITY_EXCEEDED');
+  }
+
+  assertObservationCount(observations) {
+    return assertResponseCardinality(observations, this.responseLimits().maximum_observations, 'observations', 'OBSERVATION_CARDINALITY_EXCEEDED');
   }
 
   async plan(checkpoint, {

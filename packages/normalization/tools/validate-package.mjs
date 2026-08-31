@@ -90,7 +90,7 @@ export async function validateNormalizationPackage({ writeReceipt = false } = {}
   }));
   const databaseJobs = databaseManifestItems.map(item => ({
     job_id: `job_normalize_${item.capture_sha256}_${NORMALIZER_VERSION.replaceAll('.', '_')}`,
-    run_id: databaseRunId, job_type: 'normalize_record',
+    run_id: databaseRunId, job_type: 'normalize_record', state: 'pending',
     idempotency_key: `normalize:${item.capture_sha256}:${NORMALIZER_VERSION}`,
     identity_payload: { capture_sha256: item.capture_sha256, normalizer_version: NORMALIZER_VERSION },
     outbox_event_id: `event_normalize_${item.capture_sha256}_${NORMALIZER_VERSION.replaceAll('.', '_')}`

@@ -5,7 +5,7 @@ import responseExample from '../data/generatedAgentsResponseExample.json'
 
 const curlExample = `curl -sS https://ushso.org/api/discover \\
   -H "content-type: application/json" \\
-  --data '{"question":"hospital ownership changes in Texas","limit":10}'`
+  --data '{"question":"I need hospital financial and utilization data for Pennsylvania","limit":15}'`
 
 const jsonExample = JSON.stringify(responseExample, null, 2)
 

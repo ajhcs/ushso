@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   canonicalJson,
@@ -14,13 +14,22 @@ import {
 export const RELEASE_GATE_PLAN_FINGERPRINT = "886170d2355e59531b1647795b298eeb7d503eaa0b22ee487a4be26bd5c3b0fc";
 
 function resolveHeadCommit() {
-  const gitDir = resolve(repoRoot, ".git");
+  const gitEntry = resolve(repoRoot, ".git");
+  const gitDir = statSync(gitEntry).isDirectory()
+    ? gitEntry
+    : resolve(repoRoot, readFileSync(gitEntry, "utf8").trim().replace(/^gitdir:\s*/u, ""));
+  // Linked worktrees keep HEAD in the worktree git dir and the branch/packed
+  // refs in the common dir named by commondir.
+  const commondirFile = resolve(gitDir, "commondir");
+  const commonDir = existsSync(commondirFile)
+    ? resolve(gitDir, readFileSync(commondirFile, "utf8").trim())
+    : gitDir;
   const head = readFileSync(resolve(gitDir, "HEAD"), "utf8").trim();
   if (!head.startsWith("ref: ")) return head;
   const ref = head.slice(5);
-  const looseRef = resolve(gitDir, ref);
+  const looseRef = resolve(commonDir, ref);
   if (existsSync(looseRef)) return readFileSync(looseRef, "utf8").trim();
-  const packed = readFileSync(resolve(gitDir, "packed-refs"), "utf8")
+  const packed = readFileSync(resolve(commonDir, "packed-refs"), "utf8")
     .split("\n")
     .find((line) => line.endsWith(` ${ref}`));
   if (!packed) throw new Error(`cannot resolve Git HEAD ref ${ref}`);

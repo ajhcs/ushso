@@ -2,7 +2,7 @@ import { deterministicId, asBytes } from './canonical.mjs';
 import { classifyResponse, mediaTypeFromHeaders } from './content-classifier.mjs';
 import { ConnectorFailure, failureRecord } from './errors.mjs';
 import { assertConnectedAddress, assertNoDnsRebinding, assertPublicAddressSet } from './network-policy.mjs';
-import { compileManifestRequest, matchManifestRedirect, redactedLocator } from './route-manifest.mjs';
+import { compileManifestRequest, matchManifestRedirect, redactedLocator, responseLimitsForDescriptor } from './route-manifest.mjs';
 
 const TRANSIENT_NETWORK_CODES = new Map([
   ['ETIMEDOUT', ['timeout', 'UPSTREAM_TIMEOUT']],
@@ -376,13 +376,24 @@ export class BoundedHttpClient {
         };
       }
 
-      const classification = classifyResponse({
-        purpose: compiled.purpose,
-        expectedContentClasses: compiled.route.expected_content_classes,
-        headers: response.headers,
-        bodyBytes,
-        profile: context.responseProfile,
-      });
+      let classification;
+      try {
+        classification = classifyResponse({
+          purpose: compiled.purpose,
+          expectedContentClasses: compiled.route.expected_content_classes,
+          headers: response.headers,
+          bodyBytes,
+          profile: context.responseProfile,
+          limits: responseLimitsForDescriptor(context.descriptor),
+        });
+      } catch (error) {
+        lease.release({ success: false, consumeFailureBudget: false });
+        return this.#quarantine(
+          context, compiled, initialCompiled, currentUrl, requestId, observedAt, redirects,
+          totalCompressedBytes, totalDecompressedBytes, 'policy_blocked',
+          error?.reasonCode ?? 'RESPONSE_CLASSIFICATION_FAILED', status,
+        );
+      }
       if (!classification.accepted) {
         lease.release({ success: false, consumeFailureBudget: false });
         const failureType = classification.reasonCode === 'UNEXPECTED_CONTENT_TYPE' || classification.reasonCode.startsWith('MISLEADING') ? 'unexpected_content_type' : classification.reasonCode.includes('PARSE') ? 'parse_failure' : 'policy_blocked';

@@ -1,8 +1,8 @@
 {
   "receipt_version": "ushso-wp3-receipt.v1",
   "evidence_scope": "local_synthetic",
-  "generated_at": "2026-08-30T22:04:39.031Z",
-  "local_suite_sha256": "9b0deaa5d0cfcfaf11fca83ce82745173d1a5279d5e7c51806a70b8c924a8a0d",
+  "generated_at": "2026-08-31T17:20:19.672Z",
+  "local_suite_sha256": "c5e73941d89e9ad8d90a92339cd886b6b76eb911e0026f7a3175980ddfd3c312",
   "managed_resource_evidence": {
     "status": "pending_external_authorization",
     "provider_capability_verified": false,
@@ -18,7 +18,7 @@
     "managed_mutations": 0,
     "secrets_emitted": 0
   },
-  "control": "WP3 migrations 0001-0003",
+  "control": "WP3 migrations 0001-0007",
   "status": "pass_local",
   "forward_only": true,
   "destructive_down_migrations": false,
@@ -32,7 +32,7 @@
     {
       "id": "0002",
       "file": "0002_ingest_runs_jobs_captures.sql",
-      "byte_sha256": "6dd918098537e6b61d6f9bfc17cf9bdf824c8bac444f9817338e4825d25a77ad",
+      "byte_sha256": "d503c3c2283d4c1edc34ae8688a8586197ca55af950575fdc0f49c6b83c26c97",
       "depends_on": [
         "0001"
       ]
@@ -40,9 +40,41 @@
     {
       "id": "0003",
       "file": "0003_ops_outbox_processed_events_dead_letters.sql",
-      "byte_sha256": "56aa2f5ab893d8a6294b5255cd8646bad084bfa0986e92c4774cf262643a703b",
+      "byte_sha256": "89e5957af56d41ea2e75be3531e1151cd530c2fc4476e9801556be30b0f8d922",
       "depends_on": [
         "0002"
+      ]
+    },
+    {
+      "id": "0004",
+      "file": "0004_catalog_objects_identifiers_evidence.sql",
+      "byte_sha256": "2079548259b5ce5fefe13018e6209f651e7a058103acb9a2f2be029cc24171ba",
+      "depends_on": [
+        "0003"
+      ]
+    },
+    {
+      "id": "0005",
+      "file": "0005_assets_releases_distributions_documentation.sql",
+      "byte_sha256": "208a45f81b5a419818b043e9f5f03fa694e52407432add224c0543e6e85ef133",
+      "depends_on": [
+        "0004"
+      ]
+    },
+    {
+      "id": "0006",
+      "file": "0006_schema_snapshots_fields_access.sql",
+      "byte_sha256": "efe96713385de8461559a51b58a131c0ce7897bbe23cfb7e60656d3b77015725",
+      "depends_on": [
+        "0005"
+      ]
+    },
+    {
+      "id": "0007",
+      "file": "0007_assertions_relationships_temporal_history.sql",
+      "byte_sha256": "52e9d0bc81bcdc19be1f3e1f8571f0fe3bb8bf9f8de9ae164b1bc9f169454e7d",
+      "depends_on": [
+        "0006"
       ]
     }
   ],

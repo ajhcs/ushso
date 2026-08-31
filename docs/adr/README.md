@@ -16,6 +16,7 @@ replace a plan invariant.
 | [0003](0003-identity-family-and-join-semantics.md) | Accepted | Identity, family, and join semantics | WP0, WP2, WP6–WP8, WP10–WP12 |
 | [0004](0004-postgresql-cloudflare-and-immutable-publication.md) | Accepted | PostgreSQL, Cloudflare, and immutable publication | WP0, WP3–WP4, WP8, WP14 |
 | [0005](0005-postgresql-search-backend-and-benchmark-escalation.md) | Accepted | PostgreSQL search and benchmark escalation | WP0–WP2, WP8, WP14 |
+| [0006](0006-retrieval-historical-schema-compatibility.md) | Accepted | Retrieval historical-schema compatibility boundary | WP0, WP2, WP8 |
 
 ADRs 0004 and 0005 are maintained by their respective WP0 decision owners.
 

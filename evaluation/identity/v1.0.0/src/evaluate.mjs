@@ -11,15 +11,37 @@ function acceptedExternalReviews(adjudications, authorizedReviewReceiptIds) {
     && authorizedReviewReceiptIds.includes(item.review_receipt_id));
 }
 
+function independentReviews(reviews) {
+  const byReviewer = new Map();
+  for (const review of reviews
+    .filter((item) => item.review_role !== "adjudicator" && typeof item.reviewer_id === "string")
+    .sort((left, right) => String(left.review_role ?? "").localeCompare(String(right.review_role ?? "")) || left.reviewer_id.localeCompare(right.reviewer_id))) {
+    if (!byReviewer.has(review.reviewer_id)) byReviewer.set(review.reviewer_id, review);
+  }
+  return [...byReviewer.values()];
+}
+
+function validatePredictions(cases, predictions) {
+  if (!Array.isArray(predictions) || predictions.length !== cases.length) throw new Error("IDENTITY_PREDICTION_CASE_COVERAGE_INVALID");
+  const caseIds = new Set(cases.map((item) => item.benchmark_case_id));
+  const predictionIds = new Set();
+  for (const prediction of predictions) {
+    if (!prediction || typeof prediction.benchmark_case_id !== "string" || !caseIds.has(prediction.benchmark_case_id)) throw new Error("IDENTITY_PREDICTION_CASE_ID_INVALID");
+    if (predictionIds.has(prediction.benchmark_case_id)) throw new Error(`IDENTITY_PREDICTION_CASE_DUPLICATE:${prediction.benchmark_case_id}`);
+    predictionIds.add(prediction.benchmark_case_id);
+  }
+  if (predictionIds.size !== caseIds.size) throw new Error("IDENTITY_PREDICTION_CASE_SET_INVALID");
+}
+
 function agreementMetrics(cases, adjudications, authorizedReviewReceiptIds) {
   const caseIds = new Set(cases.map((item) => item.benchmark_case_id));
   const byCase = new Map();
   for (const review of acceptedExternalReviews(adjudications, authorizedReviewReceiptIds)) {
     if (!caseIds.has(review.benchmark_case_id)) continue;
     if (!byCase.has(review.benchmark_case_id)) byCase.set(review.benchmark_case_id, []);
-    if (!byCase.get(review.benchmark_case_id).some((item) => item.reviewer_id === review.reviewer_id)) byCase.get(review.benchmark_case_id).push(review);
+    byCase.get(review.benchmark_case_id).push(review);
   }
-  const pairs = [...byCase.values()].filter((reviews) => reviews.length >= 2).map((reviews) => reviews.slice(0, 2));
+  const pairs = [...byCase.values()].map(independentReviews).filter((reviews) => reviews.length >= 2).map((reviews) => reviews.slice(0, 2));
   const agreements = pairs.filter(([left, right]) => left.decision === right.decision).length;
   const observedAgreement = ratio(agreements, pairs.length);
   const decisions = ["same_identity", "not_same_identity", "needs_more_evidence"];
@@ -39,24 +61,36 @@ function consensusByCase(adjudications, authorizedReviewReceiptIds) {
   const grouped = new Map();
   for (const review of acceptedExternalReviews(adjudications, authorizedReviewReceiptIds)) {
     if (!grouped.has(review.benchmark_case_id)) grouped.set(review.benchmark_case_id, []);
-    grouped.get(review.benchmark_case_id).push(review.decision);
+    grouped.get(review.benchmark_case_id).push(review);
   }
   const consensus = new Map();
-  for (const [caseId, decisions] of grouped) {
-    if (decisions.length < 2 || decisions[0] !== decisions[1]) continue;
-    consensus.set(caseId, decisions[0]);
+  for (const [caseId, reviews] of grouped) {
+    const independent = independentReviews(reviews);
+    if (independent.length < 2) continue;
+    const [primary, secondary] = independent;
+    const adjudicators = reviews.filter((review) => review.review_role === "adjudicator")
+      .filter((review, index, all) => typeof review.reviewer_id === "string"
+        && all.findIndex((candidate) => candidate.reviewer_id === review.reviewer_id) === index);
+    if (primary.decision === secondary.decision) {
+      if (independent.some((review) => review.decision !== primary.decision)
+        || adjudicators.some((review) => review.decision !== primary.decision)) continue;
+      consensus.set(caseId, primary.decision);
+    } else if (adjudicators.length === 1) {
+      consensus.set(caseId, adjudicators[0].decision);
+    }
   }
   return consensus;
 }
 
 export function evaluateIdentityBenchmark({ cases, predictions, adjudications = [], authorizedReviewReceiptIds = [], reversalChecks = [], explicitEnablementReceiptId = null, authorizedEnablementReceiptIds = [] }) {
+  validatePredictions(cases, predictions);
   const predictionById = new Map(predictions.map((item) => [item.benchmark_case_id, item]));
   const syntheticPositives = cases.filter((item) => item.synthetic_expected_relationship === "same_identity");
   const syntheticNonMatches = cases.filter((item) => item.synthetic_expected_relationship !== "same_identity");
   const candidateHits = syntheticPositives.filter((item) => predictionById.get(item.benchmark_case_id)?.candidate_generated).length;
   const falseAutomatic = syntheticNonMatches.filter((item) => predictionById.get(item.benchmark_case_id)?.automatic_resolution === true).length;
   const reviewRequired = predictions.filter((item) => item.review_required).length;
-  const unresolved = predictions.filter((item) => item.resolution_state === "open" || item.resolution_state === "deferred").length;
+  const unresolved = predictions.filter((item) => ["no_candidate", "open", "deferred", "review_pending", "candidate", "ambiguous"].includes(item.resolution_state)).length;
   const agreement = agreementMetrics(cases, adjudications, authorizedReviewReceiptIds);
   const consensus = consensusByCase(adjudications, authorizedReviewReceiptIds);
   const agreementFloorMet = agreement.double_reviewed_cases >= Math.min(100, cases.length) && agreement.percent_agreement >= 0.9 && agreement.cohens_kappa >= 0.8;

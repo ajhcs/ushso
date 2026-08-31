@@ -28,18 +28,14 @@ function adapter(row, mutate = (core) => core) {
   };
 }
 
-function growPermittedString(capability, result) {
-  const huge = 'x'.repeat(270_000);
-  switch (capability) {
-    case 'search_assets': result.scoped_zero_statement = huge; break;
-    case 'get_asset': result.asset.title = huge; break;
-    case 'get_access_plan': result.human_process = huge; break;
-    case 'get_retrieval_recipe': result.update_behavior = huge; break;
-    case 'get_variables': result.fields[0].label = huge; break;
-    case 'get_join_routes': result.routes[0].normalization = huge; break;
-    case 'compare_assets': result.dimensions[0].explanation = huge; break;
-    case 'get_coverage_status': result.scope_interpretation = huge; break;
-  }
+function growPermittedString(core) {
+  const message = 'x'.repeat(4000);
+  core.warnings = Array.from({ length: 50 }, (_, index) => ({
+    code: `warning:oversized:${index}`,
+    message,
+    evidence_ids: [],
+    copy_policy_version: 'policy:v1'
+  }));
 }
 
 function exceedCardinality(capability, input, result) {
@@ -85,7 +81,7 @@ for (const [capability, caseId] of Object.entries(successCases)) {
     const cardinality = adapter(row, (core) => { exceedCardinality(capability, row.input, core.result); return core; });
     assert.equal((await cardinality.toolkit.invokeJsonApi(capability, row.input)).error.code, 'service_unavailable');
 
-    const oversized = adapter(row, (core) => { growPermittedString(capability, core.result); return core; });
+    const oversized = adapter(row, (core) => { growPermittedString(core); return core; });
     const bounded = await oversized.toolkit.invokeWebMcp(capability, row.input);
     assert.equal(bounded.error.code, 'response_limit_exceeded');
     assert.equal(bounded.result, null);

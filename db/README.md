@@ -34,6 +34,10 @@ grant.
 1. `0001_registry_sources_endpoints_scopes.sql`
 2. `0002_ingest_runs_jobs_captures.sql`
 3. `0003_ops_outbox_processed_events_dead_letters.sql`
+4. `0004_catalog_objects_identifiers_evidence.sql`
+5. `0005_assets_releases_distributions_documentation.sql`
+6. `0006_schema_snapshots_fields_access.sql`
+7. `0007_assertions_relationships_temporal_history.sql`
 
 `db/tools/migrate.mjs` validates the migration manifest, acquires a row lock
 through the direct maintenance connection, checks the immutable environment

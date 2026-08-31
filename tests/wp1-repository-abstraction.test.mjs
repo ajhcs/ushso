@@ -84,6 +84,9 @@ function legacyBrowse(limit) {
     corpus: corpusSummary(),
     query: queryFromIntent(intent, { mode: 'catalog_browse', limit }),
     result_count: selected.length,
+    returned_count: selected.length,
+    total_matches: records.length,
+    has_more: records.length > selected.length,
     results: selected.map((record, index) => ({ ...directResult(record, 'Included in the published catalog browse view.'), rank: index + 1 })),
     join_routes: joinRoutes,
     warnings: [
@@ -104,6 +107,9 @@ function legacyDataset(record) {
     corpus: corpusSummary(),
     query: queryFromIntent(intent, { mode: 'stable_dataset_dereference', record_id: record.record_id, family_sibling_count: Math.max(0, siblingCount - 1) }),
     result_count: 1,
+    returned_count: 1,
+    total_matches: 1,
+    has_more: false,
     results: [directResult(record, 'Opened by its stable published record identifier.')],
     join_routes: joinRoutes.filter(route => route.from_record_id === record.record_id || route.to_record_id === record.record_id),
     warnings: ['This page describes indexed metadata and retrieval routes; it does not prove current endpoint availability or authorize access.']
@@ -217,7 +223,7 @@ test('explicit static rollback entry requires only the ASSETS binding', async ()
 test('static SearchBackend remains pinned to the promoted production retrieval module', async () => {
   const runtime = await fs.readFile(path.join(root, 'worker/retrieval-v1.1.0.mjs'));
   const digest = createHash('sha256').update(runtime).digest('hex');
-  assert.equal(digest, 'b1e104055dc5e00b66769773ee33fe8c364aa7d3c7c872367145666bcb06dd5b');
+  assert.equal(digest, 'fe6228e911f9d6d2ec0160f7d5eecdcaf571465f783515195f4e768a3b7f7363');
   const workerSource = await fs.readFile(path.join(root, 'worker/index.mjs'), 'utf8');
   assert.match(workerSource, /from ['"]\.\/retrieval-v1\.1\.0\.mjs['"]/);
   assert.doesNotMatch(workerSource, /packages\/retrieval\/tools\/retrieval-core/);

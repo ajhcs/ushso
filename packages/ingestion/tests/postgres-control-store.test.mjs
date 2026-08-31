@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import {
@@ -153,4 +154,11 @@ test('invalid factory configuration fails before any connection attempt', () => 
   assert.throws(() => createPostgresControlStoreFactory({ connectionString: '', Client: RecordingClient }), error => error.code === 'POSTGRES_CONNECTION_STRING_MISSING');
   assert.throws(() => createHyperdriveOpenDatabase({ hyperdrive: {}, Client: RecordingClient }), error => error.code === 'HYPERDRIVE_BINDING_MISSING');
   assert.equal(RecordingClient.instances.length, 0);
+});
+
+test('normalization success artifacts are written only after the job reaches succeeded', () => {
+  const source = readFileSync(new URL('../src/postgres-control-store.mjs', import.meta.url), 'utf8');
+  const completed = source.indexOf("query('complete-processed-job'");
+  const artifact = source.indexOf("query('record-normalization-success-artifact'");
+  assert.ok(completed >= 0 && artifact > completed, 'artifact authorization must follow the job state transition');
 });

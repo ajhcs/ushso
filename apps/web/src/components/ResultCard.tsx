@@ -10,6 +10,7 @@ import type { DatasetFamily } from '../types/catalog'
 
 interface ResultCardProps {
   result: DatasetFamily
+  displayRank: number
 }
 
 export function ResultCard({ result, displayRank }: ResultCardProps) {

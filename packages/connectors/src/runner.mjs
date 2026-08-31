@@ -1,4 +1,5 @@
 import { canonicalJson, deterministicId, sha256 } from './canonical.mjs';
+import { assertResponseCardinality, responseLimitsForDescriptor } from './route-manifest.mjs';
 
 function requestKey(request) {
   return sha256(canonicalJson(request));
@@ -21,6 +22,7 @@ export class DeterministicConnectorRunner {
 
   async run({ connector, checkpoint = null, runId, scheduledSlot, mode, attempt = 1 }) {
     const descriptor = connector.descriptor();
+    const responseLimits = responseLimitsForDescriptor(descriptor);
     const plan = await connector.plan(checkpoint, { scheduledSlot, mode, createdAt: scheduledSlot });
     const runState = await this.runRepository.beginRun({ runId, attempt, descriptor, plan, checkpoint });
     if (runState.failed) {
@@ -90,10 +92,12 @@ export class DeterministicConnectorRunner {
             capture: fetch.capture,
             request,
           });
-        } catch {
+          assertResponseCardinality(parsedPage?.observations, responseLimits.maximum_observations, 'observations', 'OBSERVATION_CARDINALITY_EXCEEDED');
+        } catch (error) {
           const failure = {
-            failure_type: 'schema_drift', retry_class: 'quarantine', target_class: request.targetClass,
-            safe_detail_code: 'ADAPTER_PAGE_PARSE_FAILED', http_status: 200, observed_at: this.clock().toISOString(),
+            failure_type: error?.reasonCode === 'OBSERVATION_CARDINALITY_EXCEEDED' ? 'policy_blocked' : 'schema_drift',
+            retry_class: 'quarantine', target_class: request.targetClass,
+            safe_detail_code: error?.reasonCode ?? 'ADAPTER_PAGE_PARSE_FAILED', http_status: 200, observed_at: this.clock().toISOString(),
           };
           await this.runRepository.failRun(runId, failure);
           return { outcome: 'partial_unpublished', sealed: false, checkpointCommitted: false, failure };

@@ -8,7 +8,6 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { DiscoveryProviderBoundary } from './providers/DiscoveryProviderContext'
-import { registerAvailableWebMcp } from './providers/registerWebMcp'
 import './styles.css'
 
 createRoot(document.getElementById('root')!).render(
@@ -20,7 +19,3 @@ createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </StrictMode>,
 )
-
-void registerAvailableWebMcp().catch((error: unknown) => {
-  console.warn('USHSO WebMCP registration failed.', error)
-})

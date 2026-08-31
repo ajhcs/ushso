@@ -113,8 +113,8 @@ function membersFor(definition) {
   }
   if (id === 'coverage.discovered_inventory/v1') {
     return [
-      member(unit, 'native:item:1', 'observed', true, 'unknown', { overlap_group_ids: ['overlap:aggregator-member'] }),
-      member(unit, 'native:item:2', 'observed', true, 'unknown', { overlap_group_ids: ['overlap:aggregator-member'] })
+      member(unit, 'native:item:1', 'observed', true, 'included', { overlap_group_ids: ['overlap:aggregator-member'] }),
+      member(unit, 'native:item:2', 'observed', true, 'included', { overlap_group_ids: ['overlap:aggregator-member'] })
     ];
   }
   const stateByMetric = {
@@ -134,9 +134,8 @@ function membersFor(definition) {
     'coverage.excluded_native_items/v1': 'excluded',
     'coverage.excluded_canonical_assets/v1': 'excluded'
   };
-  const unknownDenominator = definition.kind === 'absolute_count';
   const options = id === 'coverage.revision_ingestion/v1' ? { unclassified_dimensions: ['jurisdiction'] } : {};
-  return [member(unit, `${id}:member:1`, stateByMetric[id], true, unknownDenominator ? 'unknown' : 'included', options)];
+  return [member(unit, `${id}:member:1`, stateByMetric[id], true, 'included', options)];
 }
 
 function cohortFilters(definition) {

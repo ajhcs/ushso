@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  BoundedHttpClient, DcatDataJsonConnector, MemoryOriginGovernor, SocrataCatalogConnector,
-  classifyIpAddress, compileManifestRequest, routeManifestInventory,
+  BoundedHttpClient, DcatDataJsonConnector, HtmlReleaseInventoryConnector,
+  MemoryOriginGovernor, SocrataCatalogConnector, classifyIpAddress, compileManifestRequest, routeManifestInventory,
 } from '../src/index.mjs';
+import { DEFAULT_RESPONSE_LIMITS } from '../src/route-manifest.mjs';
 import {
   FixtureDnsResolver, FixtureTransport, MemoryRunRepository, jsonResponse, makeFixtureDescriptor, makeHarness,
 } from '../src/testing/index.mjs';
@@ -11,6 +12,14 @@ import {
 const REQUEST = {
   endpointId: 'endpoint_fixture_catalog', templateId: 'route_fixture_catalog', purpose: 'catalog_metadata',
   method: 'GET', targetClass: 'collection', pathParameters: {}, query: {},
+};
+const DOC_REQUEST = {
+  endpointId: 'endpoint_fixture_docs', templateId: 'route_fixture_docs', purpose: 'documentation',
+  method: 'GET', targetClass: 'documentation', pathParameters: { slug: 'plain-row' }, query: {},
+};
+const SCHEMA_REQUEST = {
+  endpointId: 'endpoint_fixture_schema', templateId: 'route_fixture_schema', purpose: 'schema',
+  method: 'GET', targetClass: 'exact_item', pathParameters: { id: 'short-csv' }, query: {},
 };
 
 test('IP policy rejects private, loopback, link-local, metadata, multicast, reserved, and mapped ranges', () => {
@@ -97,10 +106,38 @@ test('nested row containers, plain-text challenges, and length mismatches quaran
   const descriptor = makeFixtureDescriptor({ connectorName: 'socrata-catalog' });
   const socrata = new SocrataCatalogConnector({ descriptor, endpointId: 'endpoint_fixture_catalog', templateId: 'route_fixture_catalog' });
   const nested = makeHarness({ descriptor });
-  nested.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse([{ id: 'abcd-1234', name: 'metadata wrapper', rows: [{ amount: 12 }] }]));
+  nested.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse([{ id: 'abcd-1234', name: 'metadata wrapper', rows: [{ id: 'row-1', value: 12 }], samples: [{ id: 'sample-1', value: 12 }] }]));
   const nestedResult = await nested.client.execute({ descriptor, runId: 'run_nested_rows', jobId: 'job_nested_rows', request: REQUEST, responseProfile: socrata.responseProfile() });
   assert.equal(nestedResult.failure.safe_detail_code, 'ROW_SHAPED_RESPONSE_QUARANTINED');
   assert.equal(nested.objectStore.objects.size, 0);
+
+  const nestedRowObject = makeHarness({ descriptor });
+  nestedRowObject.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse([{ id: 'abcd-1234', name: 'metadata wrapper', details: { record_id: 'row-2', value: 12 } }]));
+  const nestedRowObjectResult = await nestedRowObject.client.execute({ descriptor, runId: 'run_nested_row_object', jobId: 'job_nested_row_object', request: REQUEST, responseProfile: socrata.responseProfile() });
+  assert.equal(nestedRowObjectResult.failure.safe_detail_code, 'ROW_SHAPED_RESPONSE_QUARANTINED');
+  assert.equal(nestedRowObject.objectStore.objects.size, 0);
+
+  const plainRows = makeHarness({ descriptor });
+  plainRows.transport.add('GET', 'https://catalog.example.gov/docs/plain-row', jsonResponse({}, {
+    bodyBytes: 'id,name\nrow-1,untrusted', contentType: 'text/plain',
+  }));
+  const plainRowsResult = await plainRows.client.execute({
+    descriptor, runId: 'run_plain_rows', jobId: 'job_plain_rows', request: DOC_REQUEST,
+    responseProfile: new DcatDataJsonConnector({ descriptor, endpointId: 'endpoint_fixture_catalog', templateId: 'route_fixture_catalog' }).responseProfile(),
+  });
+  assert.equal(plainRowsResult.failure.safe_detail_code, 'TEXT_ROW_PAYLOAD_QUARANTINED');
+  assert.equal(plainRows.objectStore.objects.size, 0);
+
+  const shortCsv = makeHarness({ descriptor });
+  shortCsv.transport.add('GET', 'https://catalog.example.gov/schemas/short-csv', jsonResponse({}, {
+    bodyBytes: 'id,name\nrow-1,untrusted', contentType: 'text/csv',
+  }));
+  const shortCsvResult = await shortCsv.client.execute({
+    descriptor, runId: 'run_short_csv', jobId: 'job_short_csv', request: SCHEMA_REQUEST,
+    responseProfile: new DcatDataJsonConnector({ descriptor, endpointId: 'endpoint_fixture_catalog', templateId: 'route_fixture_catalog' }).responseProfile(),
+  });
+  assert.equal(shortCsvResult.failure.safe_detail_code, 'CSV_ROW_PAYLOAD_QUARANTINED');
+  assert.equal(shortCsv.objectStore.objects.size, 0);
 
   const challenge = makeHarness({ descriptor });
   challenge.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse({}, { bodyBytes: 'Verify you are human: CAPTCHA', contentType: 'text/plain' }));
@@ -137,6 +174,87 @@ test('nested row containers, plain-text challenges, and length mismatches quaran
   const unsupportedEncodingResult = await unsupportedEncoding.client.execute({ descriptor, runId: 'run_unsupported_encoding', jobId: 'job_unsupported_encoding', request: REQUEST, responseProfile: socrata.responseProfile() });
   assert.equal(unsupportedEncodingResult.failure.safe_detail_code, 'CONTENT_ENCODING_UNSUPPORTED');
   assert.equal(unsupportedEncoding.objectStore.objects.size, 0);
+});
+
+test('response structure and cardinality limits fail before capture or page persistence', async () => {
+  const descriptor = makeFixtureDescriptor({ maximumResponseBytes: 1_000_000, maximumDecompressedBytes: 1_000_000 });
+  const dcat = new DcatDataJsonConnector({ descriptor, endpointId: 'endpoint_fixture_catalog', templateId: 'route_fixture_catalog' });
+
+  let deep = { value: 'bounded' };
+  for (let index = 0; index <= DEFAULT_RESPONSE_LIMITS.maximum_response_depth; index += 1) deep = { nested: deep };
+  const deepHarness = makeHarness({ descriptor });
+  deepHarness.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse([{ identifier: 'deep-1', title: 'Deep metadata', nested: deep }]));
+  const deepResult = await deepHarness.client.execute({
+    descriptor, runId: 'run_response_depth', jobId: 'job_response_depth', request: REQUEST, responseProfile: dcat.responseProfile(),
+  });
+  assert.equal(deepResult.failure.safe_detail_code, 'RESPONSE_STRUCTURE_LIMIT_EXCEEDED');
+  assert.equal(deepHarness.objectStore.objects.size, 0);
+
+  const nodeValue = { identifier: 'node-1', title: 'Node metadata' };
+  for (let index = 0; index <= DEFAULT_RESPONSE_LIMITS.maximum_response_nodes; index += 1) nodeValue[`field_${index}`] = index;
+  const nodeHarness = makeHarness({ descriptor });
+  nodeHarness.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse([nodeValue]));
+  const nodeResult = await nodeHarness.client.execute({
+    descriptor, runId: 'run_response_nodes', jobId: 'job_response_nodes', request: REQUEST, responseProfile: dcat.responseProfile(),
+  });
+  assert.equal(nodeResult.failure.safe_detail_code, 'RESPONSE_STRUCTURE_LIMIT_EXCEEDED');
+  assert.equal(nodeHarness.objectStore.objects.size, 0);
+
+  const records = Array.from({ length: DEFAULT_RESPONSE_LIMITS.maximum_records + 1 }, (_, index) => ({ identifier: `record-${index}`, title: 'Metadata record' }));
+  const recordHarness = makeHarness({ descriptor });
+  recordHarness.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse({ dataset: records }));
+  const recordResult = await recordHarness.client.execute({
+    descriptor, runId: 'run_record_cardinality', jobId: 'job_record_cardinality', request: REQUEST, responseProfile: dcat.responseProfile(),
+  });
+  assert.equal(recordResult.failure.safe_detail_code, 'RECORD_CARDINALITY_EXCEEDED');
+  assert.equal(recordHarness.objectStore.objects.size, 0);
+});
+
+test('HTML links and runner observations are bounded before mapping and persistence', async () => {
+  const descriptor = makeFixtureDescriptor({ connectorName: 'html-release-inventory', maximumResponseBytes: 1_000_000, maximumDecompressedBytes: 1_000_000 });
+  const connector = new HtmlReleaseInventoryConnector({ descriptor, endpointId: 'endpoint_fixture_html_inventory', templateId: 'route_fixture_html_inventory' });
+  const html = Array.from({ length: DEFAULT_RESPONSE_LIMITS.maximum_links + 1 }, (_, index) => `<a data-release-id="release-${index}" href="/releases/${index}">Release ${index}</a>`).join('');
+  const linksHarness = makeHarness({ descriptor });
+  linksHarness.transport.add('GET', 'https://catalog.example.gov/inventory', jsonResponse({}, { bodyBytes: `<html><body>${html}</body></html>`, contentType: 'text/html' }));
+  const linksResult = await linksHarness.client.execute({
+    descriptor, runId: 'run_link_cardinality', jobId: 'job_link_cardinality',
+    request: { endpointId: 'endpoint_fixture_html_inventory', templateId: 'route_fixture_html_inventory', purpose: 'documentation', method: 'GET', targetClass: 'collection', pathParameters: {}, query: {} },
+    responseProfile: connector.responseProfile(),
+  });
+  assert.equal(linksResult.failure.safe_detail_code, 'LINK_CARDINALITY_EXCEEDED');
+  assert.equal(linksHarness.objectStore.objects.size, 0);
+
+  class OverProducingConnector extends DcatDataJsonConnector {
+    parsePage({ capture }) {
+      return {
+        observations: Array.from({ length: DEFAULT_RESPONSE_LIMITS.maximum_observations + 1 }, (_, index) => this.nativeObservation({ identifier: `observation-${index}`, title: 'Metadata' }, index, capture)),
+        nextRequest: null,
+        cursor: null,
+      };
+    }
+  }
+  const observationDescriptor = makeFixtureDescriptor();
+  const observationConnector = new OverProducingConnector({ descriptor: observationDescriptor, endpointId: 'endpoint_fixture_catalog', templateId: 'route_fixture_catalog' });
+  const observationHarness = makeHarness({ descriptor: observationDescriptor });
+  observationHarness.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse({ dataset: [{ identifier: 'one', title: 'One' }] }));
+  const observationResult = await observationHarness.runner.run({
+    connector: observationConnector, runId: 'run_observation_cardinality', scheduledSlot: '2026-08-30T00:00:00.000Z', mode: 'full_membership',
+  });
+  assert.equal(observationResult.failure.safe_detail_code, 'OBSERVATION_CARDINALITY_EXCEEDED');
+  assert.equal(observationHarness.runRepository.runs.get('run_observation_cardinality').pages.size, 0);
+});
+
+test('classification exceptions release the origin lease and quarantine without capture', async () => {
+  const descriptor = makeFixtureDescriptor();
+  const harness = makeHarness({ descriptor });
+  harness.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse([]));
+  const result = await harness.client.execute({
+    descriptor, runId: 'run_classifier_exception', jobId: 'job_classifier_exception', request: REQUEST,
+    responseProfile: { metadataCollectionPaths: [''], validateJson() { throw new Error('validator failure'); } },
+  });
+  assert.equal(result.failure.safe_detail_code, 'RESPONSE_CLASSIFICATION_FAILED');
+  assert.equal(harness.objectStore.objects.size, 0);
+  assert.equal(harness.governor.snapshot('https://catalog.example.gov', descriptor.origin_policy).inFlight, 0);
 });
 
 test('unmanifested hosts, routes, methods, parameters, and secret query names fail closed', () => {

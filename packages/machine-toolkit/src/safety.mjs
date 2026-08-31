@@ -1,4 +1,5 @@
 import { serializedBytes } from './json.mjs';
+import { responseSchemaIssues } from './response-schema.mjs';
 
 export const FALSE_TRUTH_BOUNDARY = Object.freeze({
   source_requests_made: false,
@@ -38,7 +39,26 @@ const SECRET_KEYS = new Set(['authorization_header', 'authorization', 'cookie', 
 const SOURCE_PAYLOAD_KEYS = new Set(['source_rows', 'dataset_rows', 'payload_excerpt', 'payload_body', 'response_body', 'sample_response', 'sample_responses', 'sample_response_rows']);
 const ANALYSIS_KEYS = new Set(['market_share', 'financial_benchmark', 'analytical_ranking', 'computed_statistics', 'benchmark_result', 'analysis_results']);
 const SOURCE_CONTROL_KEYS = new Set(['tool_name', 'toolname', 'input_schema', 'inputschema', 'annotations', 'system_prompt', 'systemprompt']);
-const SECRET_QUERY_NAMES = new Set(['token', 'access_token', 'api_key', 'key', 'signature', 'sig', 'x-amz-credential', 'x-amz-signature', 'x-goog-signature']);
+const SECRET_QUERY_NAMES = new Set([
+  'token',
+  'access_token',
+  'api_key',
+  'key',
+  'signature',
+  'sig',
+  'x_amz_credential',
+  'x_amz_signature',
+  'x_amz_security_token',
+  'x_goog_signature',
+  'x_goog_credential',
+  'x_goog_security_token',
+  'oauth_token',
+  'refresh_token',
+  'id_token',
+  'session_token',
+  'client_secret',
+  'private_key'
+]);
 const SAFE_ERROR_PRIVACY = /\b(?:quarantined|excluded|withdrawn|private|never existed|internal reason|suppressed)\b/iu;
 const SECRET_STRING = /(?:\bBearer\s+[A-Za-z0-9._~+/=-]{8,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bAKIA[A-Z0-9]{16}\b|\b(?:api[_-]?key|access[_-]?token|password)\s*[:=]\s*[^\s,;]{4,})/iu;
 
@@ -80,7 +100,10 @@ export function prohibitedOutputIssues(value) {
         try {
           const url = new URL(entry);
           if (!['http:', 'https:'].includes(url.protocol)) issues.push(issue('URL_PROTOCOL_PROHIBITED', path));
-          for (const name of url.searchParams.keys()) if (SECRET_QUERY_NAMES.has(name.toLowerCase())) issues.push(issue('SECRET_QUERY_PROHIBITED', path));
+          for (const name of url.searchParams.keys()) {
+            const normalized = name.toLowerCase().replaceAll('-', '_');
+            if (SECRET_QUERY_NAMES.has(normalized)) issues.push(issue('SECRET_QUERY_PROHIBITED', path));
+          }
           if (url.username || url.password) issues.push(issue('URL_CREDENTIAL_PROHIBITED', path));
           if (isPrivateHost(url.hostname)) issues.push(issue('PRIVATE_LOCATOR_PROHIBITED', path));
         } catch {
@@ -263,7 +286,7 @@ export function validateCanonicalCore(core, capability, input, options = {}) {
   if (core.capability !== capability) issues.push(issue('CAPABILITY_MISMATCH', '/capability'));
   if (!Array.isArray(core.evidence_references) || core.evidence_references.length > (capability === 'plan_research' ? 200 : 100)) issues.push(issue('EVIDENCE_CARDINALITY_EXCEEDED', '/evidence_references'));
   if (!Array.isArray(core.warnings) || core.warnings.length > 50) issues.push(issue('WARNING_CARDINALITY_EXCEEDED', '/warnings'));
-  issues.push(...structuralIssues(core, capability), ...truthIssues(core), ...paginationIssues(core, options.responseGeneratedAt), ...semanticIssues(core, input), ...countIssues(core, input), ...prohibitedOutputIssues(core));
+  issues.push(...responseSchemaIssues(core, capability), ...structuralIssues(core, capability), ...truthIssues(core), ...paginationIssues(core, options.responseGeneratedAt), ...semanticIssues(core, input), ...countIssues(core, input), ...prohibitedOutputIssues(core));
   return issues;
 }
 

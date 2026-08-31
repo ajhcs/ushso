@@ -33,11 +33,14 @@ export class DataGovV4CatalogConnector extends CatalogConnectorBase {
   }
 
   responseProfile() {
+    const maximumRecords = this.responseLimits().maximum_records;
     return {
-      metadataCollectionPaths: ['/data'],
+      metadataCollectionPaths: ['/data', '/results'],
       validateJson(value) {
         const records = items(value);
-        const valid = records && records.every(validItem) &&
+        if (!records) return { accepted: false, reasonCode: 'DATA_GOV_V4_SCHEMA_DRIFT', classification: 'schema_drift' };
+        if (records.length > maximumRecords) return { accepted: false, reasonCode: 'RECORD_CARDINALITY_EXCEEDED', classification: 'resource_limit' };
+        const valid = records.every(validItem) &&
           (value?.meta?.after == null || typeof value.meta.after === 'string') &&
           (value?.pagination?.after == null || typeof value.pagination.after === 'string');
         return valid
@@ -48,7 +51,7 @@ export class DataGovV4CatalogConnector extends CatalogConnectorBase {
   }
 
   parsePage({ parsed, capture }) {
-    const records = items(parsed);
+    const records = this.assertRecordCount(items(parsed));
     const after = parsed?.meta?.after ?? parsed?.pagination?.after ?? null;
     const pointerRoot = Array.isArray(parsed?.data) ? '/data' : '/results';
     return {

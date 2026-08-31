@@ -10,6 +10,8 @@ const result = JSON.parse(await readFile(resultPath, 'utf8'));
 if (result.status !== 'pass' || result.scope !== 'local_synthetic') throw new Error('passing local suite result required');
 const resultSha = await sha256File(resultPath);
 const manifest = JSON.parse(await readFile(path.join(repositoryRoot, 'db/migrations/manifest.json'), 'utf8'));
+const migrationIds = manifest.migrations.map((migration) => migration.id);
+const migrationRange = `${migrationIds.at(0)}-${migrationIds.at(-1)}`;
 const common = {
   receipt_version: 'ushso-wp3-receipt.v1',
   evidence_scope: 'local_synthetic',
@@ -30,7 +32,7 @@ const common = {
 const receipts = {
   'migration-suite.json': {
     ...common,
-    control: 'WP3 migrations 0001-0003',
+    control: `WP3 migrations ${migrationRange}`,
     status: 'pass_local',
     forward_only: true,
     destructive_down_migrations: false,

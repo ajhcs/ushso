@@ -66,7 +66,7 @@ export function buildVerificationReceipt() {
       {
         command: "npm run verify --prefix verification/wp14/v1.0.0",
         status: "PASS",
-        result: "44 deterministic package, boundary, gate, receipt, rehearsal, and no-action checks passed; 0 failed",
+        result: "50 deterministic package, boundary, gate, receipt, rehearsal, and no-action checks passed; 0 failed",
       },
       {
         command: "npm run validate --prefix verification/wp14/v1.0.0",

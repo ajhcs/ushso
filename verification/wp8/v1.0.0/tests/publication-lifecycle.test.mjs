@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import { digest } from '../../../../contracts/publication/v1.0.0/tools/common.mjs';
 import {
+  buildPromotionEvidenceReceipt,
   InMemoryPublicationLedger,
   REQUIRED_PROMOTION_GATES,
   buildPublicationManifest,
@@ -16,11 +17,17 @@ import {
 
 const AUTHORIZATION = Object.freeze({ scope: 'offline_rehearsal', external_cutover_authorized: false });
 
-function gates() {
+function gates(publication) {
   return REQUIRED_PROMOTION_GATES.map(gate => ({
     gate,
     status: 'passed',
-    evidence_refs: [`fixture-evidence:${gate}`],
+    evidence_refs: [buildPromotionEvidenceReceipt({
+      evidenceId: `fixture:evidence:${gate}:${publication.publication_id}`,
+      gate,
+      publication,
+      issuedAt: '2026-08-30T22:00:00.000Z',
+      expiresAt: '2026-10-01T00:00:00.000Z',
+    })],
   }));
 }
 
@@ -88,7 +95,7 @@ test('atomic promotion writes history, generation states, and singleton pointer 
   ledger.registerPublication(publication);
   const pointer = ledger.promote({
     publicationId: publication.publication_id,
-    gates: gates(),
+    gates: gates(publication),
     authorization: AUTHORIZATION,
     occurredAt: '2026-08-30T22:02:00.000Z',
     transactionId: 'transaction:promote:a',
@@ -103,6 +110,36 @@ test('atomic promotion writes history, generation states, and singleton pointer 
   assert.ok([...snapshot.generations.values()].every(generation => generation.lifecycle.at(-1).transaction_id === pointer.transaction_id));
 });
 
+test('promotion rejects opaque or cross-publication gate evidence', () => {
+  const ledger = new InMemoryPublicationLedger();
+  const { fixture, components } = registerComponents(ledger, 'evidence');
+  const publication = createPublication({ fixture, components, suffix: 'evidence' });
+  ledger.registerPublication(publication);
+
+  const opaque = gates(publication);
+  opaque[0].evidence_refs = ['legacy:opaque-evidence'];
+  assert.throws(() => ledger.promote({
+    publicationId: publication.publication_id,
+    gates: opaque,
+    authorization: AUTHORIZATION,
+    occurredAt: '2026-08-30T22:02:00.000Z',
+    transactionId: 'transaction:promote:opaque',
+  }), error => error.code === 'PROMOTION_EVIDENCE_RECEIPT_INVALID');
+
+  const crossPublication = gates(publication);
+  crossPublication[0].evidence_refs = [{
+    ...crossPublication[0].evidence_refs[0],
+    publication_id: 'publication:other-candidate',
+  }];
+  assert.throws(() => ledger.promote({
+    publicationId: publication.publication_id,
+    gates: crossPublication,
+    authorization: AUTHORIZATION,
+    occurredAt: '2026-08-30T22:02:00.000Z',
+    transactionId: 'transaction:promote:cross-publication',
+  }), error => error.code === 'PROMOTION_EVIDENCE_BINDING_MISMATCH');
+});
+
 test('injected failures roll back history, state transitions, and pointer together', () => {
   const ledger = new InMemoryPublicationLedger();
   const first = registerComponents(ledger, 'a');
@@ -110,7 +147,7 @@ test('injected failures roll back history, state transitions, and pointer togeth
   ledger.registerPublication(publicationA);
   ledger.promote({
     publicationId: publicationA.publication_id,
-    gates: gates(),
+    gates: gates(publicationA),
     authorization: AUTHORIZATION,
     occurredAt: '2026-08-30T22:02:00.000Z',
     transactionId: 'transaction:promote:a',
@@ -121,7 +158,7 @@ test('injected failures roll back history, state transitions, and pointer togeth
   const before = ledger.snapshot();
   assert.throws(() => ledger.promote({
     publicationId: publicationB.publication_id,
-    gates: gates(),
+    gates: gates(publicationB),
     authorization: AUTHORIZATION,
     occurredAt: '2026-08-30T22:03:00.000Z',
     transactionId: 'transaction:promote:b:fault',
@@ -140,7 +177,7 @@ test('rejected builds cannot become publication candidates and preserve the live
   ledger.registerPublication(publicationA);
   ledger.promote({
     publicationId: publicationA.publication_id,
-    gates: gates(),
+    gates: gates(publicationA),
     authorization: AUTHORIZATION,
     occurredAt: '2026-08-30T22:02:00.000Z',
     transactionId: 'transaction:promote:a',
@@ -167,15 +204,15 @@ test('N-1 pointer rollback restores retained generations without changing canoni
   const first = registerComponents(ledger, 'a');
   const publicationA = createPublication({ ...first, suffix: 'a' });
   ledger.registerPublication(publicationA);
-  ledger.promote({ publicationId: publicationA.publication_id, gates: gates(), authorization: AUTHORIZATION, occurredAt: '2026-08-30T22:02:00.000Z', transactionId: 'transaction:promote:a' });
+  ledger.promote({ publicationId: publicationA.publication_id, gates: gates(publicationA), authorization: AUTHORIZATION, occurredAt: '2026-08-30T22:02:00.000Z', transactionId: 'transaction:promote:a' });
   const second = registerComponents(ledger, 'b');
   const publicationB = createPublication({ ...second, suffix: 'b', previous: publicationRef(publicationA) });
   ledger.registerPublication(publicationB);
-  ledger.promote({ publicationId: publicationB.publication_id, gates: gates(), authorization: AUTHORIZATION, occurredAt: '2026-08-30T22:03:00.000Z', transactionId: 'transaction:promote:b' });
+  ledger.promote({ publicationId: publicationB.publication_id, gates: gates(publicationB), authorization: AUTHORIZATION, occurredAt: '2026-08-30T22:03:00.000Z', transactionId: 'transaction:promote:b' });
   const third = registerComponents(ledger, 'c');
   const publicationC = createPublication({ ...third, suffix: 'c', previous: publicationRef(publicationB) });
   ledger.registerPublication(publicationC);
-  ledger.promote({ publicationId: publicationC.publication_id, gates: gates(), authorization: AUTHORIZATION, occurredAt: '2026-08-30T22:04:00.000Z', transactionId: 'transaction:promote:c' });
+  ledger.promote({ publicationId: publicationC.publication_id, gates: gates(publicationC), authorization: AUTHORIZATION, occurredAt: '2026-08-30T22:04:00.000Z', transactionId: 'transaction:promote:c' });
   assert.equal(ledger.resolveActivePointer().active_publication_ref.publication_id, publicationC.publication_id);
   assert.throws(() => ledger.rollback({
     targetPublicationId: publicationA.publication_id,
@@ -203,7 +240,7 @@ test('generation pins are served only while retained and non-revoked', () => {
   const first = registerComponents(ledger, 'a');
   const publication = createPublication({ ...first, suffix: 'a' });
   ledger.registerPublication(publication);
-  ledger.promote({ publicationId: publication.publication_id, gates: gates(), authorization: AUTHORIZATION, occurredAt: '2026-08-30T22:02:00.000Z', transactionId: 'transaction:promote:a' });
+  ledger.promote({ publicationId: publication.publication_id, gates: gates(publication), authorization: AUTHORIZATION, occurredAt: '2026-08-30T22:02:00.000Z', transactionId: 'transaction:promote:a' });
   const generationId = first.components[0].generation_id;
   assert.equal(ledger.resolveGenerationPin({ generationId, observedAt: '2026-09-01T00:00:00.000Z' }).pin_behavior, 'serve_pinned');
   ledger.revokeGeneration({ generationId, auditRef: 'audit:generation-safety-revocation' });
@@ -214,7 +251,7 @@ test('production mode refuses offline rehearsal authorization', () => {
   const ledger = new InMemoryPublicationLedger({ mode: 'production' });
   assert.throws(() => ledger.promote({
     publicationId: 'publication:not-registered',
-    gates: gates(),
+    gates: [],
     authorization: AUTHORIZATION,
     occurredAt: '2026-08-30T22:02:00.000Z',
     transactionId: 'transaction:unauthorized',

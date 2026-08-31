@@ -43,6 +43,37 @@ const SUPPORTED_OBJECT_ROLES = new Set(['asset', 'release', 'distribution', 'doc
 const OPAQUE_ID_PATTERN = /^[a-z][a-z0-9_]{1,31}_[A-Za-z0-9][A-Za-z0-9._:-]{1,126}$/;
 const ROUTE_PAYLOAD_PATTERN = /\/(?:resource|datastore_search|rows?|query|download)(?:\/|$)|\.(?:csv|tsv|parquet|zip|gz|xlsx?|sas7bdat|dta)(?:$|\/)/i;
 
+// These limits are deliberately code-level defaults so existing descriptor and
+// deployment manifests remain compatible while every connector path still has
+// an explicit structural and cardinality ceiling.
+export const DEFAULT_RESPONSE_LIMITS = Object.freeze({
+  maximum_response_depth: 32,
+  maximum_response_nodes: 20_000,
+  maximum_records: 1_000,
+  maximum_links: 1_000,
+  maximum_observations: 1_000,
+});
+
+export class ConnectorResponseLimitError extends TypeError {
+  constructor(reasonCode, message) {
+    super(message);
+    this.name = 'ConnectorResponseLimitError';
+    this.reasonCode = reasonCode;
+  }
+}
+
+export function responseLimitsForDescriptor() {
+  return DEFAULT_RESPONSE_LIMITS;
+}
+
+export function assertResponseCardinality(value, maximum, label, reasonCode = 'RESPONSE_CARDINALITY_EXCEEDED') {
+  if (!Array.isArray(value)) throw new TypeError(`${label} must be an array.`);
+  if (value.length > maximum) {
+    throw new ConnectorResponseLimitError(reasonCode, `${label} exceeds its permitted cardinality.`);
+  }
+  return value;
+}
+
 function assertExactKeys(value, allowed, label) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError(`${label} must be an object.`);
   const unexpected = Object.keys(value).filter((key) => !allowed.has(key));

@@ -1,4 +1,10 @@
 import { CANONICAL_COVERAGE_CELL_STATES, TRUTH_BOUNDARY } from './constants.mjs';
+import {
+  canonicalDigest,
+  canonicalJson,
+  matrixMembershipPayload,
+  snapshotDigest
+} from '../../../../../contracts/coverage/v1.0.0/tools/common.mjs';
 
 const DEFAULT_LIMIT = 25;
 const MAX_MATRIX_LIMIT = 100;
@@ -80,6 +86,32 @@ function envelope(service, capability, result, warnings = []) {
   });
 }
 
+function validateArtifactSet({ snapshot, matrix, cellRegistry, publicView, federalRegistry }) {
+  if (snapshot.immutability?.canonical_digest !== snapshotDigest(snapshot)) fail('ARTIFACT_DIGEST_MISMATCH', 'The coverage snapshot digest is not reproducible.');
+  if (matrix.denominator?.membership_manifest_hash !== canonicalDigest('ushso:coverage-membership-manifest:v1\n', matrixMembershipPayload(matrix))) fail('ARTIFACT_DIGEST_MISMATCH', 'The coverage matrix membership digest is not reproducible.');
+  if (matrix.coverage_snapshot_id !== snapshot.coverage_snapshot_id || snapshot.matrix_id !== matrix.matrix_id) fail('ARTIFACT_PIN_MISMATCH', 'The coverage snapshot and matrix do not share immutable pins.');
+  if (canonicalJson(matrix.revision_pins) !== canonicalJson(snapshot.revision_pins)) fail('ARTIFACT_PIN_MISMATCH', 'The coverage matrix revision pins do not match the snapshot.');
+  const registryRevision = snapshot.revision_pins?.registry_revision?.value;
+  if (cellRegistry.registry_revision !== registryRevision || cellRegistry.jurisdiction_registry_revision !== registryRevision || federalRegistry.registry_revision !== registryRevision) fail('ARTIFACT_PIN_MISMATCH', 'Registry artifacts do not share the snapshot registry revision.');
+  if (publicView.coverage_snapshot_id !== snapshot.coverage_snapshot_id || publicView.coverage_snapshot_digest !== snapshot.immutability.canonical_digest || publicView.matrix_id !== matrix.matrix_id || canonicalJson(publicView.revisions) !== canonicalJson(snapshot.revision_pins)) fail('ARTIFACT_PIN_MISMATCH', 'The public coverage view is not bound to the snapshot and matrix.');
+  if (publicView.matrix_summary?.membership_manifest_hash !== matrix.denominator.membership_manifest_hash) fail('ARTIFACT_PIN_MISMATCH', 'The public coverage view has a different matrix membership digest.');
+  if (cellRegistry.configured_cell_count !== matrix.cells.length || cellRegistry.cells.length !== matrix.cells.length) fail('ARTIFACT_PIN_MISMATCH', 'The coverage cell registry does not cover the matrix.');
+  const detailByCell = new Map();
+  for (const detail of cellRegistry.cells) {
+    if (detailByCell.has(detail.cell_id)) fail('ARTIFACT_PIN_MISMATCH', `The coverage cell registry repeats ${detail.cell_id}.`);
+    detailByCell.set(detail.cell_id, detail);
+  }
+  const stateDistribution = Object.fromEntries(CANONICAL_COVERAGE_CELL_STATES.map(state => [state, 0]));
+  for (const cell of matrix.cells) {
+    const detail = detailByCell.get(cell.cell_id);
+    if (!detail || detail.jurisdiction_id !== cell.jurisdiction_id || detail.source_class_id !== cell.source_class_id || detail.coverage_cell_state !== cell.coverage_cell_state) fail('ARTIFACT_PIN_MISMATCH', `The coverage cell detail does not match ${cell.cell_id}.`);
+    if (!Object.hasOwn(stateDistribution, cell.coverage_cell_state)) fail('ARTIFACT_PIN_MISMATCH', `The matrix has an unknown state for ${cell.cell_id}.`);
+    stateDistribution[cell.coverage_cell_state] += 1;
+  }
+  if (canonicalJson(publicView.matrix_summary?.coverage_cell_state_distribution) !== canonicalJson(stateDistribution)) fail('ARTIFACT_PIN_MISMATCH', 'The public coverage state distribution does not match the matrix.');
+  if (!Array.isArray(federalRegistry.sources) || federalRegistry.source_count !== federalRegistry.sources.length || new Set(federalRegistry.sources.map(source => source.record_id)).size !== federalRegistry.sources.length) fail('ARTIFACT_PIN_MISMATCH', 'The federal source registry is not a unique, counted artifact.');
+}
+
 export class CoverageAccountingServiceError extends Error {
   constructor(code, message, details = null) {
     super(message);
@@ -94,9 +126,7 @@ export class CoverageAccountingService {
     if (!snapshot || !matrix || !cellRegistry || !publicView || !federalRegistry) {
       fail('INVALID_ARTIFACT_SET', 'CoverageAccountingService requires one complete immutable artifact set.');
     }
-    if (snapshot.coverage_snapshot_id !== matrix.coverage_snapshot_id || snapshot.matrix_id !== matrix.matrix_id) {
-      fail('ARTIFACT_PIN_MISMATCH', 'The coverage snapshot and matrix do not share immutable pins.');
-    }
+    validateArtifactSet({ snapshot, matrix, cellRegistry, publicView, federalRegistry });
     this.snapshot = clone(snapshot);
     this.matrix = clone(matrix);
     this.cellRegistry = clone(cellRegistry);

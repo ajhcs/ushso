@@ -18,7 +18,7 @@ test('Waves 2-6 recorded fixture matrix passes with no external action', async (
   const result = await runDeliveryWaveFixtureMatrix();
   assert.equal(result.status, 'PASS');
   assert.equal(result.totals.scenarios, 10);
-  assert.equal(result.totals.assertions, 61);
+  assert.equal(result.totals.assertions, 64);
   assert.equal(result.recorded_fixtures, 18);
   assert.ok(Object.values(result.zero_external_actions).every((value) => value === 0));
 });

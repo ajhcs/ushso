@@ -1,4 +1,5 @@
 import { canonicalizeJson } from '../../contracts/tooling/v1.0.0/src/canonical-json.mjs';
+import { assertTypedDigest, canonicalJsonDigest } from '../../contracts/tooling/v1.0.0/src/digests.mjs';
 import { digest, publicationMaterial } from '../../contracts/publication/v1.0.0/tools/common.mjs';
 import { PUBLICATION_COMPONENT_TYPES } from './projection-v2.mjs';
 
@@ -33,6 +34,20 @@ const ALLOWED_TRANSITIONS = new Set([
 const ID = /^[a-z][a-z0-9_.:-]{2,191}$/u;
 const SHA256 = /^[a-f0-9]{64}$/u;
 const UTC = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,9})?Z$/u;
+const PROMOTION_EVIDENCE_RECEIPT_VERSION = 'promotion-gate-evidence.v1';
+const PROMOTION_EVIDENCE_RECEIPT_KEYS = Object.freeze([
+  'receipt_version',
+  'evidence_id',
+  'gate',
+  'publication_id',
+  'publication_digest',
+  'generation_ids',
+  'status',
+  'verification_state',
+  'issued_at',
+  'expires_at',
+  'evidence_digest',
+].sort());
 
 export class PublicationLifecycleError extends Error {
   constructor(code, detail, { retryable = false } = {}) {
@@ -72,6 +87,55 @@ function deepFreeze(value) {
 
 function same(left, right) {
   return canonicalizeJson(left) === canonicalizeJson(right);
+}
+
+function evidenceMaterial(receipt) {
+  const { evidence_digest: ignoredDigest, ...material } = receipt;
+  return material;
+}
+
+function sortedGenerationIds(publication) {
+  return publication.component_generation_refs
+    .map(reference => reference.generation_id)
+    .sort();
+}
+
+export function buildPromotionEvidenceReceipt({
+  evidenceId,
+  gate,
+  publication,
+  issuedAt,
+  expiresAt,
+  generationIds = null,
+}) {
+  assertId(evidenceId, 'evidence_id');
+  if (!REQUIRED_PROMOTION_GATES.includes(gate)) fail('PROMOTION_GATE_UNKNOWN', gate);
+  if (!publication || typeof publication !== 'object') fail('PROMOTION_EVIDENCE_PUBLICATION_REQUIRED');
+  assertId(publication.publication_id, 'publication_id');
+  assertTimestamp(issuedAt, 'evidence_issued_at');
+  assertTimestamp(expiresAt, 'evidence_expires_at');
+  if (Date.parse(expiresAt) <= Date.parse(issuedAt)) fail('PROMOTION_EVIDENCE_EXPIRY_INVALID', evidenceId);
+  generationIds ??= sortedGenerationIds(publication);
+  if (!Array.isArray(generationIds) || generationIds.length === 0) fail('PROMOTION_EVIDENCE_GENERATIONS_REQUIRED', evidenceId);
+  const normalizedGenerationIds = [...new Set(generationIds)].sort();
+  if (normalizedGenerationIds.length !== generationIds.length || normalizedGenerationIds.some(id => !ID.test(id))) {
+    fail('PROMOTION_EVIDENCE_GENERATIONS_INVALID', evidenceId);
+  }
+  const receipt = {
+    receipt_version: PROMOTION_EVIDENCE_RECEIPT_VERSION,
+    evidence_id: evidenceId,
+    gate,
+    publication_id: publication.publication_id,
+    publication_digest: clone(publication.publication_digest),
+    generation_ids: normalizedGenerationIds,
+    status: 'passed',
+    verification_state: 'verified',
+    issued_at: issuedAt,
+    expires_at: expiresAt,
+    evidence_digest: null,
+  };
+  receipt.evidence_digest = canonicalJsonDigest(evidenceMaterial(receipt));
+  return deepFreeze(receipt);
 }
 
 function publicationRef(publication) {
@@ -263,17 +327,54 @@ export class InMemoryPublicationLedger {
     return manifest;
   }
 
-  #assertGates(gates) {
+  #assertGates(gates, { publication, observedAt }) {
     if (!Array.isArray(gates)) fail('PROMOTION_GATES_REQUIRED');
     const byName = new Map();
     for (const gate of gates) {
-      if (byName.has(gate.gate)) fail('PROMOTION_GATE_DUPLICATE', gate.gate);
+      if (!gate || typeof gate !== 'object' || byName.has(gate.gate)) fail('PROMOTION_GATE_DUPLICATE', gate?.gate);
       byName.set(gate.gate, gate);
     }
+    const expectedGenerationIds = sortedGenerationIds(publication);
+    const evidenceIds = new Set();
     for (const name of REQUIRED_PROMOTION_GATES) {
       const gate = byName.get(name);
       if (!gate || gate.status !== 'passed' || !Array.isArray(gate.evidence_refs) || gate.evidence_refs.length === 0) {
         fail('PROMOTION_GATE_NOT_PASSED', name);
+      }
+      for (const evidence of gate.evidence_refs) {
+        if (!evidence || typeof evidence !== 'object'
+            || canonicalizeJson(Object.keys(evidence).sort()) !== canonicalizeJson(PROMOTION_EVIDENCE_RECEIPT_KEYS)) {
+          fail('PROMOTION_EVIDENCE_RECEIPT_INVALID', name);
+        }
+        assertId(evidence.evidence_id, 'evidence_id');
+        if (evidenceIds.has(evidence.evidence_id)) fail('PROMOTION_EVIDENCE_DUPLICATE', evidence.evidence_id);
+        evidenceIds.add(evidence.evidence_id);
+        if (evidence.receipt_version !== PROMOTION_EVIDENCE_RECEIPT_VERSION
+            || evidence.gate !== name
+            || evidence.publication_id !== publication.publication_id
+            || !same(evidence.publication_digest, publication.publication_digest)
+            || evidence.status !== 'passed'
+            || evidence.verification_state !== 'verified') {
+          fail('PROMOTION_EVIDENCE_BINDING_MISMATCH', evidence.evidence_id);
+        }
+        if (!Array.isArray(evidence.generation_ids)
+            || canonicalizeJson([...evidence.generation_ids].sort()) !== canonicalizeJson(expectedGenerationIds)) {
+          fail('PROMOTION_EVIDENCE_GENERATION_BINDING_MISMATCH', evidence.evidence_id);
+        }
+        assertTimestamp(evidence.issued_at, 'evidence_issued_at');
+        assertTimestamp(evidence.expires_at, 'evidence_expires_at');
+        if (Date.parse(evidence.issued_at) > Date.parse(observedAt)
+            || Date.parse(evidence.expires_at) <= Date.parse(observedAt)
+            || Date.parse(evidence.expires_at) <= Date.parse(evidence.issued_at)) {
+          fail('PROMOTION_EVIDENCE_EXPIRED', evidence.evidence_id);
+        }
+        try {
+          assertTypedDigest(evidence.evidence_digest, 'canonical_json_sha256');
+        } catch {
+          fail('PROMOTION_EVIDENCE_DIGEST_INVALID', evidence.evidence_id);
+        }
+        const expectedDigest = canonicalJsonDigest(evidenceMaterial(evidence));
+        if (expectedDigest.value !== evidence.evidence_digest.value) fail('PROMOTION_EVIDENCE_DIGEST_MISMATCH', evidence.evidence_id);
       }
     }
     if ([...byName.keys()].some(name => !REQUIRED_PROMOTION_GATES.includes(name))) fail('PROMOTION_GATE_UNKNOWN');
@@ -301,15 +402,12 @@ export class InMemoryPublicationLedger {
   #assertAuthorizationBinding(authorization, publication) {
     if (this.mode !== 'production') return;
     if (authorization.publication_id !== publication.publication_id
-        || authorization.publication_digest?.digest_type !== publication.publication_digest.digest_type
-        || authorization.publication_digest?.algorithm !== publication.publication_digest.algorithm
-        || authorization.publication_digest?.value !== publication.publication_digest.value) {
+        || !same(authorization.publication_digest, publication.publication_digest)) {
       fail('PRODUCTION_CUTOVER_AUTHORIZATION_BINDING_MISMATCH');
     }
   }
 
   promote({ publicationId, gates, authorization, occurredAt, transactionId, actorKind = 'projector', injectFaultAt = null }) {
-    this.#assertGates(gates);
     assertTimestamp(occurredAt, 'occurred_at');
     this.#assertAuthorizationPolicy(authorization, { action: 'promote', observedAt: occurredAt });
     assertId(transactionId, 'transaction_id');
@@ -317,6 +415,7 @@ export class InMemoryPublicationLedger {
     return this.#atomic(() => {
       const publication = this.state.publications.get(publicationId);
       if (!publication) fail('PUBLICATION_UNKNOWN', publicationId);
+      this.#assertGates(gates, { publication, observedAt: occurredAt });
       this.#assertAuthorizationBinding(authorization, publication);
       const priorPointer = this.state.pointer;
       const priorPublication = priorPointer ? this.state.publications.get(priorPointer.active_publication_ref.publication_id) : null;

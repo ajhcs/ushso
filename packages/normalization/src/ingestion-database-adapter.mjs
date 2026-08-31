@@ -27,13 +27,25 @@ export function readNormalizationDatabaseWorkset({
       ), '[]'::jsonb),
       'jobs', coalesce((
         select jsonb_agg(to_jsonb(job) order by job.job_id)
-        from ingest.jobs job where job.run_id='${runId}' and job.job_type='normalize_record'
+        from ingest.jobs job
+        where job.job_type='normalize_record'
+          and exists (
+            select 1
+            from ingest.normalization_job_requirements requirement
+            where requirement.run_id='${runId}'
+              and requirement.job_id=job.job_id
+          )
       ), '[]'::jsonb),
       'outbox', coalesce((
         select jsonb_agg(to_jsonb(event) order by event.event_id)
         from ops.outbox event
         where event.event_type='normalize_requested'
-          and event.references_payload->>'run_id'='${runId}'
+          and exists (
+            select 1
+            from ingest.normalization_job_requirements requirement
+            where requirement.run_id='${runId}'
+              and requirement.outbox_event_id=event.event_id
+          )
       ), '[]'::jsonb),
       'manifestDigestVerified', coalesce((
         select manifest.manifest_sha256 = encode(sha256(convert_to(coalesce((
@@ -55,4 +67,3 @@ export function readNormalizationDatabaseWorkset({
 export function reconcileNormalizationRun(options) {
   return reconcileNormalizationDatabaseWorkset(readNormalizationDatabaseWorkset(options));
 }
-

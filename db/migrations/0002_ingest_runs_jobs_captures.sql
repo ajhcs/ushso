@@ -181,6 +181,7 @@ create table ingest.harvest_runs (
   terminal_at timestamptz,
   created_at timestamptz not null,
   updated_at timestamptz not null,
+  unique (run_id, source_id),
   unique (endpoint_id, scheduled_slot, mode, source_configuration_revision),
   check (updated_at >= created_at),
   check (deadline_at > scheduled_slot),
@@ -658,6 +659,7 @@ create table ingest.capture_references (
   capture_reference_id text primary key check (capture_reference_id ~ '^[A-Za-z0-9][A-Za-z0-9._:-]{2,127}$'),
   source_id text not null references registry.sources(source_id) on delete restrict,
   run_id text not null references ingest.harvest_runs(run_id) on delete restrict,
+  foreign key (run_id, source_id) references ingest.harvest_runs(run_id, source_id) on delete restrict,
   classification text not null check (classification in ('catalog_metadata', 'documentation', 'schema_description', 'access_observation_metadata')),
   endpoint_id text not null references registry.endpoints(endpoint_id) on delete restrict,
   redacted_locator text not null check (redacted_locator ~ '^https://' and redacted_locator !~ '[?&](token|key|secret|signature|auth)='),
@@ -676,7 +678,9 @@ create table ingest.capture_references (
   recorded_at timestamptz not null,
   captured_at timestamptz not null,
   check (recorded_at >= observed_at),
-  check (captured_at >= observed_at)
+  check (captured_at >= observed_at),
+  unique (run_id, capture_reference_id),
+  unique (run_id, source_id, capture_reference_id)
 );
 
 create index capture_references_run_idx on ingest.capture_references (run_id, captured_at);
@@ -692,6 +696,8 @@ create table ingest.discoveries (
   source_revision text not null,
   capture_reference_id text not null references ingest.capture_references(capture_reference_id) on delete restrict,
   discovered_at timestamptz not null,
+  foreign key (run_id, source_id, capture_reference_id)
+    references ingest.capture_references(run_id, source_id, capture_reference_id) on delete restrict,
   unique (source_id, source_native_namespace, source_native_id, source_revision)
 );
 
@@ -749,7 +755,9 @@ create table ingest.normalization_manifest_items (
   ordinal integer not null check (ordinal > 0),
   primary key (run_id, capture_reference_id),
   unique (run_id, ordinal),
-  unique (run_id, capture_sha256, normalizer_version)
+  unique (run_id, capture_sha256, normalizer_version),
+  foreign key (run_id, capture_reference_id)
+    references ingest.capture_references(run_id, capture_reference_id) on delete restrict
 );
 
 create table ingest.normalization_job_requirements (
@@ -778,6 +786,36 @@ create table ingest.normalization_success_artifacts (
   recorded_at timestamptz not null,
   primary key (capture_sha256, normalizer_version)
 );
+
+-- A success artifact is a cross-run authorization capability. Bind it to the
+-- exact normalize job and require the job to have reached the terminal success
+-- state before the artifact can be written. The application completes the job
+-- in the same transaction immediately before inserting this row, so a failed
+-- artifact insert rolls the completion back with the business effect.
+create function ingest.assert_normalization_success_artifact_job()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, ingest
+as $function$
+declare
+  job_row ingest.jobs%rowtype;
+begin
+  select * into job_row from ingest.jobs where job_id = new.job_id;
+  if not found
+     or job_row.job_type <> 'normalize_record'
+     or job_row.state <> 'succeeded'
+     or job_row.identity_payload->>'capture_sha256' is distinct from new.capture_sha256
+     or job_row.identity_payload->>'normalizer_version' is distinct from new.normalizer_version then
+    raise exception using errcode = '23514', message = 'normalization success artifact job binding rejected';
+  end if;
+  return new;
+end
+$function$;
+
+create trigger normalization_success_artifacts_bind_job
+before insert or update on ingest.normalization_success_artifacts
+for each row execute function ingest.assert_normalization_success_artifact_job();
 
 create trigger normalization_success_artifacts_append_only
 before update or delete on ingest.normalization_success_artifacts
@@ -846,6 +884,8 @@ begin
     from ingest.discoveries discovery
     join ingest.capture_references capture
       on capture.capture_reference_id = discovery.capture_reference_id
+     and capture.run_id = discovery.run_id
+     and capture.source_id = discovery.source_id
     where discovery.run_id = p_run_id
       and capture.r2_conditional_write_confirmed
       and capture.classification in ('catalog_metadata', 'documentation')
@@ -860,6 +900,8 @@ begin
   from ingest.discoveries discovery
   join ingest.capture_references capture
     on capture.capture_reference_id = discovery.capture_reference_id
+   and capture.run_id = discovery.run_id
+   and capture.source_id = discovery.source_id
   where discovery.run_id = p_run_id
     and capture.r2_conditional_write_confirmed
     and capture.classification in ('catalog_metadata', 'documentation');
@@ -881,6 +923,7 @@ begin
   ) required
   join ingest.capture_references capture
     on capture.capture_reference_id = required.capture_reference_id
+   and capture.run_id = p_run_id
   where capture.r2_conditional_write_confirmed
     and capture.classification in ('catalog_metadata', 'documentation')
   order by capture.raw_sha256, capture.capture_reference_id;

@@ -343,6 +343,9 @@ export function compileMetric(definition, {
   overlapDisclosure = overlap(),
   cohortFilters = []
 }) {
+  if (members.some(member => member.in_numerator === true && member.denominator_membership !== 'included')) {
+    throw new Error(`NUMERATOR_OUTSIDE_DENOMINATOR:${definition.metric_id}`);
+  }
   const metricSlug = definition.metric_id.replaceAll('/', ':').replaceAll('.', '-');
   const manifest = {
     manifest_id: `coverage-membership:${metricSlug}:wp9:v1.0.0`,

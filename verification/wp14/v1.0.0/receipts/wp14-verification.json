@@ -6,17 +6,17 @@
   "work_package_acceptance_status": "BLOCKED_EXTERNAL_AND_PREDECESSOR_GATES",
   "evidence_class": "fixture_only_local_zero_traffic",
   "exact_candidate": {
-    "candidate_digest_sha256": "sha256:8713af5c2ecebbde81b2e672c5ab363d3a112e158e87ad8e2af90d0c99cc0a4e",
-    "candidate_content_manifest_sha256": "sha256:010325b9a9a8ed677d875976127ea1d7df4fb5a6e65a77b016ae140b1b78b394",
-    "git_head_commit": "6eeca2a47d4dba7eee05e9b43b15fa03f231ac6a",
-    "git_head_tree_oid": "a0161ea861ed0173d11aaac7cc5410c5c891976f",
+    "candidate_digest_sha256": "sha256:b426f8c7970f714f15dd4fdb3dc7e066a0a29ba4dea641ea9b1ca1d89ded8709",
+    "candidate_content_manifest_sha256": "sha256:62618ab112abee51c07d59f5c63bf277368c25d7444d88d5d5791ac70101a32c",
+    "git_head_commit": "40f44fc9f586d1cae6d75292731382229df2278e",
+    "git_head_tree_oid": "c1fb2ccf4d8186388902bfaae8ea01f611efae88",
     "exact_candidate_tree_sealed": false,
     "production_eligibility": false
   },
   "deterministic_seals": {
-    "candidate_envelope_sha256": "sha256:8713af5c2ecebbde81b2e672c5ab363d3a112e158e87ad8e2af90d0c99cc0a4e",
-    "zero_traffic_rehearsal_sha256": "sha256:3188db0376bfda7982179932c85465bd2d818cfa8318730ec3c9cbc989832547",
-    "implementation_manifest_sha256": "sha256:1998ad24103d3fd404bb0d69db03a39458cc8fe99179c3ba055e80defe954a54",
+    "candidate_envelope_sha256": "sha256:b426f8c7970f714f15dd4fdb3dc7e066a0a29ba4dea641ea9b1ca1d89ded8709",
+    "zero_traffic_rehearsal_sha256": "sha256:f1206279a7422734f26a3831dfa1ea2d64b13efc05e9c987ccd768ac7f91f544",
+    "implementation_manifest_sha256": "sha256:37a5f06929a9fd6eea93fe41194c6eeb7b58aeb71f921c74c43a550502d6d60a",
     "release_gate_plan_fingerprint_sha256": "sha256:886170d2355e59531b1647795b298eeb7d503eaa0b22ee487a4be26bd5c3b0fc",
     "wp13_seo_artifact_seal_sha256": "sha256:c823baab000811e3b7ba39d3f110b9be25203fb017d30266ca9a84ddb0d1dcd9"
   },
@@ -36,9 +36,10 @@
     "generation_pointer_rollback_rehearsed": true,
     "worker_and_asset_rollback_rehearsed": true,
     "static_fallback_rehearsed": true,
+    "pointer_changes_non_noop": true,
     "n_minus_one_rollback_bundle_pass": true,
     "cross_version_asset_404_count": 0,
-    "failure_injection_cases": 25,
+    "failure_injection_cases": 30,
     "failure_injection_pass": true,
     "final_public_traffic_percent": 0,
     "final_public_backend": "immutable_static_jsonl",
@@ -48,12 +49,12 @@
     {
       "command": "npm test --prefix verification/wp14/v1.0.0",
       "status": "PASS",
-      "result": "14 discovered Node tests passed; 0 failed"
+      "result": "All discovered WP14 Node tests passed; see the separately captured command receipt for the exact count."
     },
     {
       "command": "npm run verify --prefix verification/wp14/v1.0.0",
       "status": "PASS",
-      "result": "44 deterministic package, boundary, gate, receipt, rehearsal, and no-action checks passed; 0 failed"
+      "result": "50 deterministic package, boundary, gate, receipt, rehearsal, and no-action checks passed; 0 failed"
     },
     {
       "command": "npm run validate --prefix verification/wp14/v1.0.0",
@@ -122,6 +123,7 @@
   },
   "residual_gates": [
     "Integrate a stable clean candidate and run the exact-candidate release gate once.",
+    "Compose and review an authoritative transactional durable-store implementation; the checked-in transition tool intentionally uses only an ephemeral fixture adapter and rejects production state.",
     "Complete WP8 retrieval/final-holdout and production-like search/query-plan gates.",
     "Complete AUTH-12 planner governance, WP10B compiler, and planner release evaluation.",
     "Complete AUTH-15 coverage wording approval and relevant identity/toolkit/SEO public gates.",
@@ -139,6 +141,5 @@
     "database_path": "Activate the pinned immutable database-independent static artifact for every public surface.",
     "migrations": "Keep additive schema; never use a destructive down migration as operational rollback."
   },
-  "receipt_sha256": "sha256:3498f4147ac16c3521e5031b3bd33e6b351e651f4729bc69198e30ecfbe47662"
+  "receipt_sha256": "sha256:c0aaa367953418fd78e56f12d440e466fc61e92358ca7c09f72f98aa234fe6ef"
 }
-

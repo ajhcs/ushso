@@ -207,12 +207,12 @@ async function validateCoverageAndContracts() {
   }
 
   const frozenPins = {
-    'contracts/research-plan/v1.0.0/manifests/package-manifest.json': '426bae96a6194fb1ea75c1c297bc76f44d40a32cd8bc9914f56886cb83193595',
+    'contracts/research-plan/v1.0.0/manifests/package-manifest.json': '377d4aa94ecea767495d6d0f18edd5aad4ee963574b2069e08040b05d3c3aa17',
     'packages/planner/planner-repository.mjs': '2a9ae257ebc32bfd8b61b86f474505ab3e357f2ffaac1bf5f2cadd82a567c617',
     'packages/planner/static-planner-repository.mjs': '03fca3f7cbafeeda762b1ef34bf899ac110c4983d30a3a1f3039e08e6245eae3',
     'packages/coverage/coverage-repository.mjs': '619598389eed36f01f06e0292ecd206ce9b0ee7379f9570e7ae71220b49088a6',
     'packages/coverage/static-coverage-repository.mjs': '6742ced209743f0f00f5db8a5b04f0cc4462a821e1f60442a94dc30f8e78ecf0',
-    'evaluation/planner/v1.0.0/manifests/package-manifest.json': '061ea1d0850791fd999f8d91b46dcd2c226fba32e0bd73947ffbfacb14ada2d0'
+    'evaluation/planner/v1.0.0/manifests/package-manifest.json': '1043366e6a74d97c1dc4f622ea31214db76e4e360d8af53905f5586fa9d629a3'
   };
   for (const [relative, expected] of Object.entries(frozenPins)) assert(await sha256File(relative) === expected, `FROZEN_PIN_DRIFT_${relative}`);
   return { view, frozenPins };

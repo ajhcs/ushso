@@ -26,11 +26,17 @@ export class ArcGisCatalogConnector extends CatalogConnectorBase {
   }
 
   responseProfile() {
+    const maximumRecords = this.responseLimits().maximum_records;
     return {
+      metadataCollectionPaths: ['/results'],
       validateJson(value) {
-        const valid = value && typeof value === 'object' && Number.isInteger(value.total) && value.total >= 0 &&
+        if (!(value && typeof value === 'object' && Number.isInteger(value.total) && value.total >= 0 &&
           Number.isInteger(value.start) && value.start >= 1 && Number.isInteger(value.num) && value.num >= 0 &&
-          Number.isInteger(value.nextStart) && Array.isArray(value.results) && value.results.every(isArcGisItem);
+          Number.isInteger(value.nextStart) && Array.isArray(value.results))) {
+          return { accepted: false, reasonCode: 'ARCGIS_SEARCH_SCHEMA_DRIFT', classification: 'schema_drift' };
+        }
+        if (value.results.length > maximumRecords) return { accepted: false, reasonCode: 'RECORD_CARDINALITY_EXCEEDED', classification: 'resource_limit' };
+        const valid = value.results.every(isArcGisItem);
         return valid
           ? { accepted: true, classification: 'catalog_metadata' }
           : { accepted: false, reasonCode: 'ARCGIS_SEARCH_SCHEMA_DRIFT', classification: 'schema_drift' };
@@ -39,10 +45,11 @@ export class ArcGisCatalogConnector extends CatalogConnectorBase {
   }
 
   parsePage({ parsed, capture }) {
+    const records = this.assertRecordCount(parsed.results);
     const nextStart = parsed.nextStart;
-    const hasNext = nextStart > 0 && nextStart <= parsed.total && parsed.results.length > 0;
+    const hasNext = nextStart > 0 && nextStart <= parsed.total && records.length > 0;
     return {
-      observations: parsed.results.map((item, index) => this.nativeObservation(item, index, capture)),
+      observations: records.map((item, index) => this.nativeObservation(item, index, capture)),
       nextRequest: hasNext ? {
         endpointId: this.endpointId, templateId: this.templateId, purpose: 'catalog_metadata',
         method: 'GET', targetClass: 'pagination_cursor', pathParameters: {},

@@ -1,6 +1,6 @@
 import Ajv2020 from 'ajv/dist/2020.js';
 import path from 'node:path';
-import { PACKAGE_ROOT, PROJECT_ROOT, readJson } from './package-common.mjs';
+import { PACKAGE_ROOT, readJson } from './package-common.mjs';
 
 function addFormats(ajv) {
   ajv.addFormat('date-time', value => typeof value === 'string' && value.includes('T') && !Number.isNaN(Date.parse(value)));
@@ -11,7 +11,10 @@ function addFormats(ajv) {
 
 export async function loadRetrievalValidators() {
   const schemaPaths = {
-    record: path.join(PROJECT_ROOT, 'observatory/index/v1.0.0/schemas/observatory-record.schema.json'),
+    // The exact historical record schema is not vendored in this checkout. The
+    // package keeps its path/digest pin in the immutable corpus manifest and
+    // validates records with the separately versioned strict successor.
+    record: path.join(PACKAGE_ROOT, 'schemas/observatory-record-compatibility.v1.0.1.schema.json'),
     query: path.join(PACKAGE_ROOT, 'schemas/discovery-query.schema.json'),
     intent: path.join(PACKAGE_ROOT, 'schemas/discovery-intent.schema.json'),
     route: path.join(PACKAGE_ROOT, 'schemas/join-route.schema.json'),

@@ -1209,6 +1209,13 @@ function createStore(client, { logger }) {
       await insertAttemptOutcome({ job, eventId, deliveryAttempt: logicalAttempt, retryPolicyVersion,
         startedAt, finishedAt: committedAt, outcome: 'committed', databaseTransactionCommitted: true,
         transportAction: 'ack_after_commit' });
+      const updated = exactOne(await query('complete-processed-job', `
+        update ingest.jobs set state='succeeded',lease_owner=null,lease_expires_at=null,
+          next_eligible_at=null,updated_at=$5::timestamptz
+        where job_id=$1 and state='leased' and lease_owner=$2 and lease_epoch=$3 and attempt_count=$4
+        returning *
+      `, [jobId, lease.ownerId, lease.leaseEpoch, logicalAttempt, committedAt]), 'JOB_LEASE_FENCE_REJECTED', jobId);
+      invariant(updated.state === 'succeeded', 'JOB_COMMIT_STATE_INVALID', jobId);
       if (job.job_type === 'normalize_record') {
         const captureSha256 = job.identity_payload?.capture_sha256;
         const normalizerVersion = job.identity_payload?.normalizer_version;
@@ -1226,13 +1233,6 @@ function createStore(client, { logger }) {
         invariant(artifact.job_id === jobId && artifact.result_sha256 === digest,
           'NORMALIZATION_SUCCESS_ARTIFACT_CONFLICT', jobId);
       }
-      const updated = exactOne(await query('complete-processed-job', `
-        update ingest.jobs set state='succeeded',lease_owner=null,lease_expires_at=null,
-          next_eligible_at=null,updated_at=$5::timestamptz
-        where job_id=$1 and state='leased' and lease_owner=$2 and lease_epoch=$3 and attempt_count=$4
-        returning *
-      `, [jobId, lease.ownerId, lease.leaseEpoch, logicalAttempt, committedAt]), 'JOB_LEASE_FENCE_REJECTED', jobId);
-      invariant(updated.state === 'succeeded', 'JOB_COMMIT_STATE_INVALID', jobId);
       return { duplicate: false, business_effect_digest: digest };
     },
 

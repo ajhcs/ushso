@@ -153,7 +153,11 @@ test('WP3 local PostgreSQL foundation', async (t) => {
       const outboxPlan = runPsql({
         container, database: 'ushso',
         variables: { lease_limit: '25', lease_owner: 'test-dispatcher', lease_seconds: '30' },
-        sql: `set enable_seqscan=off; explain (costs off) ${outboxSql}`,
+        // The small synthetic fixture can prefer the older created_at index
+        // solely to avoid a cheap sort.  Disable that cost-based shortcut so
+        // this assertion verifies that the due-time index is available for
+        // the production-shaped access path.
+        sql: `set enable_seqscan=off; set enable_sort=off; explain (costs off) ${outboxSql}`,
       }).stdout;
       assert.match(outboxPlan, /outbox_lease_due_idx/);
 

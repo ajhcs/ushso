@@ -35,8 +35,8 @@ test('every WP1 receipt source remains byte-for-byte pinned', async () => {
 
 test('WP2 evaluator semantics remain frozen and WP8 remains explicitly pre-tuning', async () => {
   const frozen = [
-    ['evaluation/harness/v2.0.0/validation/validation-receipt.json', '49a4ba8d12563ee74c2f63a33e6e2ef6a353d1d3d381315e6c35a24b4278cf40'],
-    ['evaluation/bridge/v1.0.0/receipts/bridge-receipt.json', 'ba35902ca6618c4afde1d8364d6831a35d98c1bb21a06ae147e02956ece14be7'],
+    ['evaluation/harness/v2.0.0/validation/validation-receipt.json', '864b234a65de2358d888368cbdae9009c7aaeb0f2749693f2ebe6974b73d8e8b'],
+    ['evaluation/bridge/v1.0.0/receipts/bridge-receipt.json', '9f42e7a26555cb6ce1465a15ac9afa1913869039e01557778c768ee1120251b5'],
     ['evaluation/harness/v2.0.0/metric-contract.json', '32c826571c7e9d44dc567664030eed67c49ae60a3574850d9bd0209fa6498cda'],
     ['evaluation/harness/v2.0.0/benchmark-pin.json', '89804a56123cb19fff40468e5fcdc05a2753ff0b4b38541386bda239cd2de398'],
   ];

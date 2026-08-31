@@ -43,8 +43,9 @@ capture, or access workflow; it is not forced into a generic `Dataset` class.
 
 The Cloudflare Worker and browser use the same immutable retrieval modules and
 the same staged corpus. `POST /api/discover` returns exactly the canonical
-discovery-result contract used by the frontend provider. WebMCP registers a
-read-only discovery tool over the same engine when the browser surface exists.
+discovery-result contract used by the frontend provider. The successor
+machine-toolkit and legacy WebMCP providers remain unwired while their release
+and compatibility gates are pending.
 
 The production runtime makes no source-discovery requests and invokes no LLM.
 The indexed records contain authoritative locators and retrieval recipes, but

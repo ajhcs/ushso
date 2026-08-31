@@ -10,9 +10,10 @@ const MANIFEST_PATH = path.join(PACKAGE_ROOT, 'manifests', 'package-manifest.jso
 const RECEIPT_PATH = path.join(PACKAGE_ROOT, 'validation', 'validation-receipt.json');
 const PREDECESSOR_ROOT = path.resolve(PACKAGE_ROOT, '../v1.0.0');
 const EXCLUDED = new Set(['manifests/package-manifest.json', 'validation/validation-receipt.json']);
+const PROVIDER_ERRATUM_SCHEMAS = new Set(['common.schema.json', 'harvest-run.schema.json', 'source-descriptor.schema.json']);
 const PREDECESSOR_PINS = Object.freeze({
-  'manifests/package-manifest.json': '071b06d4fa03fd38c5bb1c522493a66d59f767b51f4bea9d26edd596858f929d',
-  'validation/validation-receipt.json': 'be197529eb1e1714b0756fe5cca40543f1234cc553112ff33e45817ed13969b6',
+  'manifests/package-manifest.json': '842888bae6092da9d00982bed4186a43ceb6aeace9f837947c5a4eb6e0da9886',
+  'validation/validation-receipt.json': '665174c8ec848ae93fdb8034010f03892b2771aa67b777b361526dd6f396f8e8',
   'schemas/harvest-run.schema.json': '9ff550bc27f9e70e418c8a586b0798eeafa122357ec8e9d99c4dc2a4b566f959',
   'tools/semantics.mjs': '26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639',
 });
@@ -120,7 +121,7 @@ async function validatePredecessor(errors) {
     .filter(name => name.endsWith('.schema.json'))
     .sort();
   const expectedVersionOnly = predecessorSchemaNames.filter(name => ![
-    'common.schema.json', 'harvest-run.schema.json', 'package-manifest.schema.json', 'validation-receipt.schema.json'
+    ...PROVIDER_ERRATUM_SCHEMAS, 'package-manifest.schema.json', 'validation-receipt.schema.json'
   ].includes(name));
   let nonErratumSchemasMatch = true;
   for (const name of expectedVersionOnly) {

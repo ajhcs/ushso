@@ -31,10 +31,15 @@ export class DataCiteCatalogConnector extends CatalogConnectorBase {
   }
 
   responseProfile() {
+    const maximumRecords = this.responseLimits().maximum_records;
     return {
       metadataCollectionPaths: ['/data'],
       validateJson(value) {
-        const valid = value && typeof value === 'object' && Array.isArray(value.data) && value.data.every(validItem) &&
+        if (!(value && typeof value === 'object' && Array.isArray(value.data))) {
+          return { accepted: false, reasonCode: 'DATACITE_DOIS_SCHEMA_DRIFT', classification: 'schema_drift' };
+        }
+        if (value.data.length > maximumRecords) return { accepted: false, reasonCode: 'RECORD_CARDINALITY_EXCEEDED', classification: 'resource_limit' };
+        const valid = value.data.every(validItem) &&
           value.links && typeof value.links === 'object' && (value.links.next == null || typeof value.links.next === 'string');
         return valid
           ? { accepted: true, classification: 'catalog_metadata' }
@@ -44,11 +49,12 @@ export class DataCiteCatalogConnector extends CatalogConnectorBase {
   }
 
   parsePage({ parsed, capture, request }) {
+    const records = this.assertRecordCount(parsed.data);
     const currentPage = Number(request.query?.['page[number]'] ?? 1);
     const endpoint = this._descriptor.endpoints.find((candidate) => candidate.endpoint_id === this.endpointId);
     const next = nextPage.call(this, parsed, currentPage, endpoint);
     return {
-      observations: parsed.data.map((item, index) => this.nativeObservation(item, index, capture)),
+      observations: records.map((item, index) => this.nativeObservation(item, index, capture)),
       nextRequest: next ? {
         endpointId: this.endpointId, templateId: this.templateId, purpose: 'catalog_metadata',
         method: 'GET', targetClass: 'pagination_cursor', pathParameters: {},

@@ -129,7 +129,37 @@ test("automatic candidate state alone cannot collapse search without its authori
   assert.equal(candidates[0].resolution_mode, "automatic_exact_policy");
   const withoutAssessment = buildProjectionInputs({ objects: identityObjects(), candidates, graphRevisionId: "graph-revision:auto-untrusted", projectedAt: RECORDED_AT });
   assert.equal(withoutAssessment.identity_clusters.length, 3);
-  const withAssessment = buildProjectionInputs({ objects: identityObjects(), candidates, policyAssessments: assessments, graphRevisionId: "graph-revision:auto-authorized", projectedAt: RECORDED_AT });
+  const withAssessment = buildProjectionInputs({ objects: identityObjects(), candidates, policyAssessments: assessments, authorizedEnablementReceiptIds: [namespace.benchmark_gate.enablement_receipt_id], graphRevisionId: "graph-revision:auto-authorized", projectedAt: RECORDED_AT });
   assert.equal(withAssessment.identity_clusters.length, 2);
   assert(withAssessment.search_projections.some((projection) => projection.member_object_ids.length === 2 && projection.separately_searchable === false));
+});
+
+test("automatic projection requires a candidate-bound, authorized, complete policy assessment", () => {
+  const namespace = enabledControlledNamespaceFixture();
+  const { candidates, assessments } = generateIdentityCandidates({
+    assertions: [assertionFixture("alpha"), assertionFixture("beta")],
+    namespaces: [namespace],
+    authorizedEnablementReceiptIds: [namespace.benchmark_gate.enablement_receipt_id],
+    createdAt: RECORDED_AT,
+  });
+  const forged = structuredClone(assessments);
+  forged[0].checks = {};
+  const projection = buildProjectionInputs({
+    objects: identityObjects(),
+    candidates,
+    policyAssessments: forged,
+    authorizedEnablementReceiptIds: [namespace.benchmark_gate.enablement_receipt_id],
+    graphRevisionId: "graph-revision:auto-forged",
+    projectedAt: RECORDED_AT,
+  });
+  assert.equal(projection.identity_clusters.length, 3);
+  const unauthorized = buildProjectionInputs({
+    objects: identityObjects(),
+    candidates,
+    policyAssessments: assessments,
+    authorizedEnablementReceiptIds: ["enablement-receipt:forged"],
+    graphRevisionId: "graph-revision:auto-forged-receipt",
+    projectedAt: RECORDED_AT,
+  });
+  assert.equal(unauthorized.identity_clusters.length, 3);
 });

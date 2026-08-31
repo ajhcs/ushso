@@ -1,0 +1,41 @@
+{
+  "receipt_version": "observatory-retrieval-legacy-schema-compatibility.v1.0.1",
+  "validated_at": "2026-08-31T00:00:00Z",
+  "status": "PASS_LOCAL_COMPATIBILITY",
+  "scope": "strict local validation of the frozen retrieval record corpus",
+  "historical_schema": {
+    "path": "observatory/index/v1.0.0/schemas/observatory-record.schema.json",
+    "sha256": "2d778a3125ba03c7504aad92e7154fdedf686db66619e439a6259ba883e162d9",
+    "exact_bytes_recovered": false,
+    "locally_present": false,
+    "pin_preserved": true,
+    "equivalence_claim": false,
+    "search_scope": "repository working tree and locally available Git object history"
+  },
+  "compatibility_successor": {
+    "path": "packages/retrieval/schemas/observatory-record-compatibility.v1.0.1.schema.json",
+    "sha256": "3454d8dd6165f6e37350b66bb27a41c63b10ca14b8b81361a026bd170cfad508",
+    "dialect": "https://json-schema.org/draft/2020-12/schema",
+    "strict_unknown_property_policy": "reject",
+    "wire_schema_version_validated": "observatory-record.v1.0.0"
+  },
+  "corpus": {
+    "path": "packages/retrieval/corpus/records.jsonl",
+    "record_count": 143,
+    "all_records_valid": true,
+    "all_records_retain_wire_schema_version": true
+  },
+  "adversarial_case": {
+    "case": "unknown nested property at /identity/asset/unexpected_property",
+    "result": "rejected"
+  },
+  "commands": [
+    "npm test --prefix packages/retrieval",
+    "npm run validate --prefix packages/retrieval"
+  ],
+  "external_requests": 0,
+  "payload_downloads": 0,
+  "identity_index_queries": 0,
+  "analysis_executed": false,
+  "production_or_staging_actions": 0
+}

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { buildCandidateSnapshot, RELEASE_GATE_PLAN_FINGERPRINT } from "../src/candidate-snapshot.mjs";
-import { packageRoot, repoPath, sha256File, verifyCanonicalDigest } from "../src/common.mjs";
+import { packageRoot, readJson, repoPath, sha256File, verifyCanonicalDigest } from "../src/common.mjs";
 import { loadAuthorizationRegister, loadPolicy } from "../src/rehearsal.mjs";
 import { validateCandidate } from "../src/release-state-machine.mjs";
 
@@ -21,8 +21,9 @@ test("candidate envelope binds every required WP14 semantic artifact role and ex
   assert.equal(validateCandidate(candidate, policy), true);
   assert.equal(verifyCanonicalDigest(candidate, "candidate_digest_sha256").ok, true);
   assert.equal(candidate.release_gate.plan_fingerprint_sha256, `sha256:${RELEASE_GATE_PLAN_FINGERPRINT}`);
-  assert.equal(candidate.git.head_commit, "6eeca2a47d4dba7eee05e9b43b15fa03f231ac6a");
-  assert.equal(candidate.git.head_tree_oid, "a0161ea861ed0173d11aaac7cc5410c5c891976f");
+  const repositoryPin = readJson(resolve(packageRoot, "policy/repository-base-pin.v1.0.0.json"));
+  assert.equal(candidate.git.head_commit, repositoryPin.head_commit);
+  assert.equal(candidate.git.head_tree_oid, repositoryPin.head_tree_oid);
   assert.equal(candidate.git.exact_candidate_tree_sealed, false);
   assert.equal(candidate.production_eligibility, false);
 

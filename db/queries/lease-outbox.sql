@@ -4,7 +4,9 @@ with candidates as (
   where state in ('pending', 'retry_wait')
     and event_type <> 'workflow_start_requested'
     and attempt_count < maximum_delivery_attempts
-    and coalesce(next_eligible_at, '-infinity'::timestamptz) <= clock_timestamp()
+    -- Use the transaction-stable clock so PostgreSQL can apply the due-time
+    -- predicate through outbox_lease_due_idx.
+    and coalesce(next_eligible_at, '-infinity'::timestamptz) <= current_timestamp
   order by coalesce(next_eligible_at, '-infinity'::timestamptz), created_at, event_id
   for update skip locked
   limit :'lease_limit'

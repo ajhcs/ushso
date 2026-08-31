@@ -1,5 +1,7 @@
 const SHA256 = /^[a-f0-9]{64}$/u;
 const VERSION = /^[0-9]+\.[0-9]+\.[0-9]+$/u;
+const ACTIVE_JOB_STATES = new Set(['pending', 'retry_wait', 'leased']);
+const REQUIREMENT_SATISFACTIONS = new Set(['created', 'replay_created', 'existing_pending', 'already_succeeded']);
 
 export class NormalizationWorksetError extends Error {
   constructor(code, details = {}) {
@@ -164,20 +166,24 @@ export function reconcileNormalizationDatabaseWorkset({
   for (const [captureReferenceId, item] of itemsByReference) {
     const requirement = requirementsByReference.get(captureReferenceId);
     if (!requirement) fail('NORMALIZATION_JOB_MISSING_CAPTURE', { capture_reference_id: captureReferenceId });
-    if (requirement.run_id !== manifest.run_id
-        || !['created', 'existing_pending', 'already_succeeded'].includes(requirement.satisfaction)) {
+    if (requirement.run_id !== manifest.run_id || !REQUIREMENT_SATISFACTIONS.has(requirement.satisfaction)) {
       fail('NORMALIZATION_DATABASE_REQUIREMENT_FENCE_MISMATCH', { capture_reference_id: captureReferenceId });
     }
     const job = jobsById.get(requirement.job_id);
-    if (!job || job.run_id !== manifest.run_id || job.job_type !== 'normalize_record') {
+    if (!job || job.job_type !== 'normalize_record' || typeof job.run_id !== 'string') {
       fail('NORMALIZATION_JOB_TYPE_INVALID', { capture_reference_id: captureReferenceId });
     }
     const identity = job.identity_payload;
     const captureSha256 = requiredCaptureSha(identity, 'jobs.identity_payload');
-    const expectedKey = `normalize:${item.capture_sha256}:${manifest.normalizer_version}`;
+    const logicalKey = `normalize:${item.capture_sha256}:${manifest.normalizer_version}`;
+    const replayKey = `${logicalKey}:replay:${job.run_id}`;
+    const expectedKeys = requirement.satisfaction === 'replay_created'
+      ? [replayKey]
+      : [logicalKey, ...(requirement.satisfaction === 'already_succeeded' ? [replayKey] : [])];
+    const expectedKey = expectedKeys[0];
     if (captureSha256 !== item.capture_sha256
         || identity.normalizer_version !== manifest.normalizer_version
-        || job.idempotency_key !== expectedKey) {
+        || !expectedKeys.includes(job.idempotency_key)) {
       const aggregate = typeof job.idempotency_key === 'string'
         && job.idempotency_key.startsWith('normalize:')
         && !job.idempotency_key.includes(item.capture_sha256);
@@ -185,13 +191,33 @@ export function reconcileNormalizationDatabaseWorkset({
         capture_reference_id: captureReferenceId, expected: expectedKey, actual: job.idempotency_key ?? null
       });
     }
+    const jobIsReplay = job.idempotency_key === replayKey;
+    if (requirement.satisfaction === 'replay_created' && !jobIsReplay) {
+      fail('NORMALIZATION_DATABASE_REQUIREMENT_FENCE_MISMATCH', { capture_reference_id: captureReferenceId });
+    }
+    if (requirement.satisfaction === 'existing_pending' && jobIsReplay) {
+      fail('NORMALIZATION_DATABASE_REQUIREMENT_FENCE_MISMATCH', { capture_reference_id: captureReferenceId });
+    }
+    if ((requirement.satisfaction === 'created' || requirement.satisfaction === 'replay_created')
+        && job.run_id !== manifest.run_id) {
+      fail('NORMALIZATION_DATABASE_REQUIREMENT_FENCE_MISMATCH', { capture_reference_id: captureReferenceId });
+    }
+    if (requirement.satisfaction === 'already_succeeded') {
+      if (job.state !== 'succeeded') fail('NORMALIZATION_DATABASE_REQUIREMENT_FENCE_MISMATCH', { capture_reference_id: captureReferenceId });
+    } else if (!ACTIVE_JOB_STATES.has(job.state)) {
+      fail('NORMALIZATION_DATABASE_REQUIREMENT_FENCE_MISMATCH', { capture_reference_id: captureReferenceId });
+    }
+    if (jobIsReplay && (identity.logical_idempotency_key !== logicalKey
+      || typeof identity.replay_of_job_id !== 'string' || identity.replay_of_job_id.length === 0)) {
+      fail('NORMALIZATION_DATABASE_REQUIREMENT_FENCE_MISMATCH', { capture_reference_id: captureReferenceId });
+    }
     if (acceptedCaptures.has(captureSha256)) fail('NORMALIZATION_JOB_DUPLICATE_CAPTURE', { capture_sha256: captureSha256 });
     acceptedCaptures.add(captureSha256);
     const event = outboxById.get(requirement.outbox_event_id);
     if (!event || job.outbox_event_id !== event.event_id
         || event.event_type !== 'normalize_requested'
         || event.idempotency_key !== `event:normalize_requested:${job.job_id}`
-        || event.references_payload?.run_id !== manifest.run_id
+        || event.references_payload?.run_id !== job.run_id
         || event.references_payload?.job_id !== job.job_id
         || event.references_payload?.capture_ref_id !== captureReferenceId) {
       fail('NORMALIZATION_DATABASE_OUTBOX_LINEAGE_MISMATCH', { capture_reference_id: captureReferenceId });

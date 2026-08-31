@@ -1,0 +1,75 @@
+{
+  "receipt_version": "ushso-wp6-verification-receipt.v1.0.0",
+  "status": "pass",
+  "scope": "local-isolated-postgresql-and-offline-corpus",
+  "source": {
+    "corpus_version": "1.1.0",
+    "records": 157,
+    "search_documents": 157,
+    "join_routes": 14,
+    "manifest_file_sha256": "23f704ce3e421a6eb26c2b3677d616a1ae6b4f45226233257b9a1ff676caba2b"
+  },
+  "migration_ids": [
+    "0004",
+    "0005",
+    "0006",
+    "0007"
+  ],
+  "checks": [
+    "strict core v2 schema and semantic validation",
+    "explicit 157/14 reconciliation",
+    "deterministic IDs and revisions",
+    "zero automatic identity merges",
+    "clean and N-1 migrations",
+    "six-role least privilege",
+    "atomic import and exact replay idempotency",
+    "database canonical digest and sealed authority verification",
+    "collection/type and dangling-reference adversarial failures",
+    "database v1 projection parity",
+    "join evidence non-upgrade",
+    "transaction failure rollback and recovery",
+    "backup/restore parity",
+    "immutable revision head N+1/cycle/revert behavior",
+    "non-destructive audited rejection fallback and explicit unavailable-head state"
+  ],
+  "harness": {
+    "listener_preflight_command": "ss -tlnp",
+    "listener_preflight_output_sha256": "1ce02dfcff5e5cbbd39fe7170419fba51783732a95ae14ab373d2eacb568baf8",
+    "postgres_image": "postgres:16-alpine",
+    "network_mode": "none",
+    "host_ports_published": 0,
+    "storage": "tmpfs",
+    "owner_label": "org.ushso.owner=wp6-local-test",
+    "cleanup_verified": true,
+    "remaining_labelled_containers": 0
+  },
+  "safety": {
+    "external_requests": 0,
+    "host_ports_bound": 0,
+    "production_databases_touched": 0,
+    "payloads_acquired": 0,
+    "analyses_executed": 0,
+    "destructive_rollbacks": 0
+  },
+  "artifacts": {
+    "import_plan_sha256": "c7dbc0e283403acac42a63550c7e04cd1f21e30d2d28ddc7346158a497ee9e3a",
+    "migration_manifest_sha256": "845a3fd5c526eb01b76ca0cdd9b216f4cd555b70e39616f5bd895a73cfca3dee",
+    "normalization_package_manifest_sha256": "1c12259bfe93b145e9b6727f943eafc0f6118fc5cd8333c2fb2a709c95e709d4",
+    "evidence_ledger_sha256": "3028a2ad50e6691e3aef02f2df61fd16da59672b2356af2f3d39c57409f34012",
+    "static_output_sha256": "2107ea6bbce3b585ab64b5e4b092157a7e7b3d18914ecb88699c14e0a66c8127",
+    "test_output_sha256": "c561c1bd0f267107aa01e8dc6ee5ec585cb50daaf230449a57228644b76c20f1"
+  },
+  "managed_execution": {
+    "status": "pending_external_authorization",
+    "staging_applied": false,
+    "production_applied": false
+  },
+  "rollback": {
+    "action": "catalog.reject_import_batch",
+    "deletes_shared_state": false,
+    "selected_successor_reverts_to_eligible_predecessor": true,
+    "no_predecessor_state_is_explicit": true,
+    "later_heads_unchanged": true,
+    "static_public_path_unchanged": true
+  }
+}

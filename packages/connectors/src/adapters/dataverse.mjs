@@ -17,12 +17,18 @@ export class DataverseCatalogConnector extends CatalogConnectorBase {
   }
 
   responseProfile() {
+    const maximumRecords = this.responseLimits().maximum_records;
     return {
+      metadataCollectionPaths: ['/data/items'],
       validateJson(value) {
         const data = value?.data;
-        const valid = value?.status === 'OK' && data && typeof data === 'object' &&
+        if (!(value?.status === 'OK' && data && typeof data === 'object' &&
           Number.isInteger(data.total_count) && data.total_count >= 0 &&
-          Number.isInteger(data.start) && data.start >= 0 && Array.isArray(data.items) && data.items.every(validItem);
+          Number.isInteger(data.start) && data.start >= 0 && Array.isArray(data.items))) {
+          return { accepted: false, reasonCode: 'DATAVERSE_SEARCH_SCHEMA_DRIFT', classification: 'schema_drift' };
+        }
+        if (data.items.length > maximumRecords) return { accepted: false, reasonCode: 'RECORD_CARDINALITY_EXCEEDED', classification: 'resource_limit' };
+        const valid = data.items.every(validItem);
         return valid
           ? { accepted: true, classification: 'catalog_metadata' }
           : { accepted: false, reasonCode: 'DATAVERSE_SEARCH_SCHEMA_DRIFT', classification: 'schema_drift' };
@@ -31,11 +37,12 @@ export class DataverseCatalogConnector extends CatalogConnectorBase {
   }
 
   parsePage({ parsed, capture, request }) {
+    const items = this.assertRecordCount(parsed.data.items);
     const start = Number(request.query?.start ?? parsed.data.start);
-    const nextStart = start + parsed.data.items.length;
-    const hasNext = parsed.data.items.length > 0 && nextStart < parsed.data.total_count;
+    const nextStart = start + items.length;
+    const hasNext = items.length > 0 && nextStart < parsed.data.total_count;
     return {
-      observations: parsed.data.items.map((item, index) => this.nativeObservation(item, index, capture)),
+      observations: items.map((item, index) => this.nativeObservation(item, index, capture)),
       nextRequest: hasNext ? {
         endpointId: this.endpointId, templateId: this.templateId, purpose: 'catalog_metadata',
         method: 'GET', targetClass: 'pagination_cursor', pathParameters: {},

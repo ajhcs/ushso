@@ -41,6 +41,10 @@ test('fails closed on credentials, signed locators, source payloads, and analysi
   const cases = [
     ['credential key', (core) => { core.result.authorization = 'Bearer secretsecret'; }],
     ['signed locator', (core) => { core.evidence_references[0].public_locator = 'https://example.gov/a?X-Amz-Signature=secret'; }],
+    ['AWS session-token locator', (core) => { core.evidence_references[0].public_locator = 'https://example.gov/a?X-Amz-Security-Token=secret'; }],
+    ['Google credential locator', (core) => { core.evidence_references[0].public_locator = 'https://example.gov/a?X-Goog-Credential=secret'; }],
+    ['OAuth token locator', (core) => { core.evidence_references[0].public_locator = 'https://example.gov/a?oauth_token=secret'; }],
+    ['client secret locator', (core) => { core.evidence_references[0].public_locator = 'https://example.gov/a?client_secret=secret'; }],
     ['private locator', (core) => { core.evidence_references[0].public_locator = 'http://169.254.169.254/latest/meta-data'; }],
     ['source rows', (core) => { core.result.source_rows = [{ value: 1 }]; }],
     ['analysis field', (core) => { core.result.market_share = 0.7; }],
@@ -116,7 +120,12 @@ test('never prefix-truncates safety-atomic responses', async () => {
 
 test('turns oversized complete output into an atomic response_limit_exceeded error', async () => {
   const { toolkit } = harness(search, (core) => {
-    core.result.scoped_zero_statement = 'x'.repeat(70_000);
+    core.warnings = Array.from({ length: 50 }, (_, index) => ({
+      code: `warning:oversized:${index}`,
+      message: 'x'.repeat(4000),
+      evidence_ids: [],
+      copy_policy_version: 'policy:v1'
+    }));
     return core;
   });
   const response = await toolkit.invokeJsonApi('search_assets', search.input);
@@ -136,6 +145,20 @@ test('fails closed when returned cardinality exceeds the caller bound', async ()
   const response = await toolkit.invokeJsonApi('search_assets', search.input);
   assert.equal(response.error.code, 'service_unavailable');
   assert.equal(response.result, null);
+});
+
+test('fails closed when a nested result violates the capability schema', async (t) => {
+  const cases = [
+    ['wrong nested type', (core) => { core.result.summaries[0].title = { untrusted: true }; }],
+    ['missing nested required field', (core) => { delete core.result.summaries[0].asset_id; }],
+  ];
+  for (const [name, mutate] of cases) await t.test(name, async () => {
+    const { toolkit } = harness(search, (core) => { mutate(core); return core; });
+    const response = await toolkit.invokeJsonApi('search_assets', search.input);
+    assert.equal(response.ok, false);
+    assert.equal(response.error.code, 'service_unavailable');
+    assert.equal(response.result, null);
+  });
 });
 
 test('accepts only generation-pinned continuations within 30 minutes and retention', async (t) => {

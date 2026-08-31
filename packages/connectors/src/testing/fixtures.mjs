@@ -106,6 +106,7 @@ export function makeHarness({
   captureCrashInjector = null,
   runnerCrashInjector = null,
   credentialProvider = null,
+  governor = new MemoryOriginGovernor({ clock: () => clock().getTime() }),
 } = {}) {
   const objectStore = new MemoryObjectStore();
   const referenceStore = new MemoryCaptureReferenceStore();
@@ -113,8 +114,8 @@ export function makeHarness({
   const captureProtocol = new R2CaptureProtocol({ objectStore, referenceStore, clock, crashInjector: captureCrashInjector });
   const client = new BoundedHttpClient({
     transport, resolver, captureProtocol, requestLedger, clock,
-    governor: new MemoryOriginGovernor({ clock: () => clock().getTime() }), credentialProvider,
+    governor, credentialProvider,
   });
   const runner = new DeterministicConnectorRunner({ httpClient: client, runRepository, clock, crashInjector: runnerCrashInjector });
-  return { descriptor, transport, resolver, runRepository, objectStore, referenceStore, requestLedger, captureProtocol, client, runner, clock };
+  return { descriptor, transport, resolver, runRepository, objectStore, referenceStore, requestLedger, captureProtocol, client, runner, clock, governor };
 }

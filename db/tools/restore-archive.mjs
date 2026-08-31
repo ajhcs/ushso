@@ -12,7 +12,11 @@ export async function restoreArchive(options) {
   if (!args.input || !args.container || !args.database) throw new Error('--input, --container, and --database are required');
   if (fence.environment !== 'local') throw new Error('managed restore remains pending_external_authorization');
   const bytes = await readFile(path.resolve(args.input));
-  const restored = spawnSync('docker', ['exec', '-i', args.container, 'pg_restore', '-U', 'postgres', '-d', args.database, '--data-only', '--exit-on-error'], {
+  // The archive is a data-only partition snapshot.  Its rows can reference
+  // live control-plane rows that are intentionally absent from an isolated
+  // restore target, so replay the dump with triggers disabled; the source
+  // partition was already validated before it was archived.
+  const restored = spawnSync('docker', ['exec', '-i', args.container, 'pg_restore', '-U', 'postgres', '-d', args.database, '--data-only', '--disable-triggers', '--exit-on-error'], {
     input: bytes,
     encoding: null,
     maxBuffer: 128 * 1024 * 1024,

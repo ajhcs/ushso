@@ -15,6 +15,7 @@ async function walkFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const files = [];
   for (const entry of entries.sort((left, right) => left.name.localeCompare(right.name))) {
+    if (entry.name === 'node_modules' || entry.name === '.git') continue;
     const absolute = path.join(directory, entry.name);
     if (entry.isDirectory()) files.push(...await walkFiles(absolute));
     else if (entry.isFile()) files.push(absolute);

@@ -13,6 +13,7 @@ const adrFiles = [
   '0003-identity-family-and-join-semantics.md',
   '0004-postgresql-cloudflare-and-immutable-publication.md',
   '0005-postgresql-search-backend-and-benchmark-escalation.md',
+  '0006-retrieval-historical-schema-compatibility.md',
 ]
 const requiredHeadings = [
   'Mapped requirements and tests',

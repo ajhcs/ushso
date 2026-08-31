@@ -54,6 +54,7 @@ async function walk(relativeRoot, relativeDirectory = relativeRoot) {
   const output = [];
   for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
     const relative = `${relativeDirectory}/${entry.name}`;
+    if (entry.name === 'node_modules') continue;
     if (entry.isDirectory()) output.push(...await walk(relativeRoot, relative));
     else if (entry.isFile()) output.push(relative);
   }
@@ -258,6 +259,7 @@ const ADR_PATHS = [
   'docs/adr/0003-identity-family-and-join-semantics.md',
   'docs/adr/0004-postgresql-cloudflare-and-immutable-publication.md',
   'docs/adr/0005-postgresql-search-backend-and-benchmark-escalation.md',
+  'docs/adr/0006-retrieval-historical-schema-compatibility.md',
   'docs/adr/README.md'
 ];
 
@@ -277,8 +279,8 @@ async function checkAdrs() {
     }
   }
   requireCondition(digest(Buffer.from(`${JSON.stringify(receipt.files)}\n`)) === receipt.content_digest_sha256, 'ADR content digest is stale');
-  return makeCheck('accepted-adrs', 'All six required decisions plus the ADR policy/index remain accepted and byte-pinned.', await pins([receiptPath, 'verification/wp0/v1.0.0/tools/validate-adrs.mjs', ...ADR_PATHS]), {
-    accepted_adrs: 6,
+  return makeCheck('accepted-adrs', 'All seven required decisions plus the ADR policy/index remain accepted and byte-pinned.', await pins([receiptPath, 'verification/wp0/v1.0.0/tools/validate-adrs.mjs', ...ADR_PATHS]), {
+    accepted_adrs: 7,
     files_audited: receipt.file_count,
     content_digest_sha256: receipt.content_digest_sha256
   });
@@ -347,6 +349,7 @@ async function walkAbsolute(directory) {
   const output = [];
   for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
     const absolute = path.join(directory, entry.name);
+    if (entry.name === 'node_modules' || entry.name === '.git') continue;
     if (entry.isDirectory()) output.push(...await walkAbsolute(absolute));
     else if (entry.isFile()) output.push(absolute);
   }

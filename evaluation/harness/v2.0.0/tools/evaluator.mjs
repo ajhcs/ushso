@@ -42,13 +42,34 @@ function requireString(value, label) {
 
 function validateCohort(cohort, benchmark) {
   if (cohort?.manifest_version !== 'ushso-retrieval-present-source-cohort.v1') throw new Error('COHORT_VERSION_INVALID');
+  const current = cohort.current_generation;
+  const expected = benchmark.currentGeneration;
+  if (!current || typeof current !== 'object') throw new Error('COHORT_CURRENT_GENERATION_REQUIRED');
+  for (const [key, expectedValue] of Object.entries({
+    corpus_id: expected.corpus_id,
+    corpus_version: expected.corpus_version,
+    record_count: expected.record_count,
+    corpus_manifest_sha256: expected.corpus_manifest_sha256,
+    content_fingerprint_sha256: expected.content_fingerprint_sha256,
+    benchmark_pin_sha256: expected.benchmark_pin_sha256,
+  })) {
+    if (current[key] !== expectedValue) throw new Error(`COHORT_CURRENT_GENERATION_PIN_MISMATCH:${key}`);
+  }
   const benchmarkSources = new Set(benchmark.sourceIndex.sources.map(source => source.source_record_id));
   const classifications = new Map();
+  const recordOwners = new Map();
   for (const item of cohort.source_classifications ?? []) {
     requireString(item.source_record_id, 'cohort.source_record_id');
     if (!benchmarkSources.has(item.source_record_id)) throw new Error(`COHORT_UNKNOWN_SOURCE:${item.source_record_id}`);
     if (!VALID_COHORT_STATUSES.has(item.status)) throw new Error(`COHORT_STATUS_INVALID:${item.source_record_id}`);
     if (classifications.has(item.source_record_id)) throw new Error(`COHORT_SOURCE_DUPLICATE:${item.source_record_id}`);
+    if (!Array.isArray(item.record_ids)) throw new Error(`COHORT_RECORD_LIST_INVALID:${item.source_record_id}`);
+    if (item.status === 'missing' && item.record_ids.length > 0) throw new Error(`COHORT_MISSING_SOURCE_HAS_RECORDS:${item.source_record_id}`);
+    for (const recordId of item.record_ids) {
+      if (!expected.recordIds.has(recordId) || !expected.searchDocumentIds.has(recordId)) throw new Error(`COHORT_RECORD_NOT_IN_PINNED_GENERATION:${recordId}`);
+      if (recordOwners.has(recordId)) throw new Error(`COHORT_RECORD_OWNER_DUPLICATE:${recordId}`);
+      recordOwners.set(recordId, item.source_record_id);
+    }
     classifications.set(item.source_record_id, item);
   }
   if (classifications.size !== benchmarkSources.size) throw new Error(`COHORT_SOURCE_COVERAGE_INVALID:${classifications.size}:${benchmarkSources.size}`);
@@ -70,19 +91,25 @@ function validateCohort(cohort, benchmark) {
     requireString(item.record_id, 'cohort.asset_binding.record_id');
     if (!benchmarkSources.has(item.canonical_source_id)) throw new Error(`COHORT_BINDING_UNKNOWN_SOURCE:${item.record_id}`);
     if (classifications.get(item.canonical_source_id)?.status !== 'present_search_eligible') throw new Error(`COHORT_BINDING_TO_INELIGIBLE_SOURCE:${item.record_id}`);
+    if (item.search_eligible !== true || !expected.recordIds.has(item.record_id) || !expected.searchDocumentIds.has(item.record_id)) throw new Error(`COHORT_BINDING_NOT_IN_PINNED_GENERATION:${item.record_id}`);
+    if (recordOwners.get(item.record_id) !== item.canonical_source_id) throw new Error(`COHORT_BINDING_OWNER_MISMATCH:${item.record_id}`);
     if (bindings.has(item.record_id)) throw new Error(`COHORT_BINDING_DUPLICATE:${item.record_id}`);
     bindings.set(item.record_id, item);
   }
   return { classifications, requirements, bindings };
 }
 
-function validateInput(input, metricContract, expectedPins) {
+function validateInput(input, metricContract, expectedPins, expectedQuestionIds = null) {
   if (input?.input_version !== 'ushso-retrieval-evaluator-input.v2.0.0') throw new Error('EVALUATOR_INPUT_VERSION_INVALID');
   requireString(input.run_id, 'run_id');
   requireString(input.lane_id, 'lane_id');
   if (JSON.stringify(input.k_values) !== JSON.stringify(metricContract.k_values)) throw new Error('EVALUATOR_K_VALUES_NOT_FROZEN');
   if (!Array.isArray(input.cases) || input.cases.length < 1 || input.cases.length > 60) throw new Error('EVALUATOR_CASE_COUNT_INVALID');
   if (new Set(input.cases.map(item => item.question_id)).size !== input.cases.length) throw new Error('EVALUATOR_CASE_DUPLICATE');
+  if (expectedQuestionIds) {
+    const actualQuestionIds = new Set(input.cases.map(item => item.question_id));
+    if (actualQuestionIds.size !== expectedQuestionIds.size || [...expectedQuestionIds].some((questionId) => !actualQuestionIds.has(questionId))) throw new Error('EVALUATOR_CASE_SET_NOT_FROZEN');
+  }
   for (const key of REQUIRED_PIN_KEYS) {
     if (!/^[a-f0-9]{64}$/.test(input.pins?.[key] ?? '')) throw new Error(`EVALUATOR_PIN_INVALID:${key}`);
   }
@@ -101,6 +128,12 @@ function validateInput(input, metricContract, expectedPins) {
     } else if (bundle.results.length === 0 || bundle.zero_result !== null) {
       throw new Error(`EVALUATOR_NONZERO_RESULT_INVALID:${item.question_id}`);
     }
+  }
+}
+
+function validateGenerationPins(inputPins, currentGeneration) {
+  for (const key of ['corpus_manifest_sha256', 'content_fingerprint_sha256', 'records_sha256', 'search_documents_sha256', 'vocabulary_sha256', 'benchmark_pin_sha256']) {
+    if (inputPins?.[key] !== currentGeneration[key]) throw new Error(`EVALUATOR_CURRENT_GENERATION_PIN_MISMATCH:${key}`);
   }
 }
 
@@ -273,16 +306,22 @@ function aggregateCohort(questionEvaluations, kValues, cohortName) {
   };
 }
 
-export async function evaluateRun(input, { benchmark, cohort, metricContract, expectedPins } = {}) {
+export async function evaluateRun(input, { benchmark, cohort, metricContract, expectedPins, requireCompleteBenchmark = false } = {}) {
   const resolvedBenchmark = benchmark ?? await loadBenchmark();
   const resolvedMetricContract = metricContract ?? await readJson(path.join(PACKAGE_ROOT, 'metric-contract.json'));
   if (!cohort) throw new Error('COHORT_REQUIRED');
   const cohortState = validateCohort(cohort, resolvedBenchmark);
-  validateInput(input, resolvedMetricContract, expectedPins ?? {});
+  validateInput(input, resolvedMetricContract, expectedPins ?? {}, requireCompleteBenchmark ? new Set(resolvedBenchmark.questions.map((question) => question.question_id)) : null);
+  const evaluatedGeneration = resolvedBenchmark.generations.get(input.pins.corpus_manifest_sha256);
+  if (!evaluatedGeneration) throw new Error(`EVALUATOR_CORPUS_PIN_UNKNOWN:${input.pins.corpus_manifest_sha256}`);
+  validateGenerationPins(input.pins, evaluatedGeneration);
 
   const gains = resolvedMetricContract.graded_acceptable_precision.normalized_gains;
   const questionEvaluations = [...input.cases].sort((a, b) => a.question_id.localeCompare(b.question_id)).map(item => {
     if (!resolvedBenchmark.questionById.has(item.question_id)) throw new Error(`QUESTION_NOT_IN_BENCHMARK:${item.question_id}`);
+    for (const result of item.result_bundle.results) {
+      if (!evaluatedGeneration.searchDocumentIds.has(result.record_id)) throw new Error(`EVALUATOR_RECORD_NOT_IN_PINNED_SEARCH_DOCUMENT:${result.record_id}`);
+    }
     const positives = resolvedBenchmark.positivesByQuestion.get(item.question_id) ?? [];
     const bundle = resolvedBenchmark.bundleByQuestion.get(item.question_id) ?? null;
     const fullGold = goldSets(positives, cohortState.requirements, null);

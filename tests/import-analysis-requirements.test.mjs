@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
+import { once } from 'node:events';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -104,6 +105,28 @@ function importerArguments(fixture, outputRoot, options = {}) {
     '--output-root',
     outputRoot,
   ];
+}
+
+async function runImporterCli(fixture, outputRoot) {
+  const outputPath = path.join(fixture.root, 'cli-output.json');
+  const outputHandle = await fs.open(outputPath, 'w');
+  const child = spawn(process.execPath, [scriptPath, ...importerArguments(fixture, outputRoot)], {
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      GIT_CONFIG_COUNT: '1',
+      GIT_CONFIG_KEY_0: 'invalid',
+      GIT_CONFIG_VALUE_0: 'must-not-reach-git',
+      GIT_NO_REPLACE_OBJECTS: '0',
+    },
+    stdio: ['ignore', outputHandle.fd, 'pipe'],
+  });
+  let stderr = '';
+  child.stderr.on('data', (chunk) => { stderr += chunk; });
+  const [status, signal] = await once(child, 'close');
+  await outputHandle.close();
+  if (status !== 0 || signal) throw new Error(`Importer CLI failed: exit=${status ?? 'null'} signal=${signal ?? 'null'} ${stderr}`);
+  return JSON.parse(await fs.readFile(outputPath, 'utf8'));
 }
 
 function sortedJson(value) {
@@ -327,22 +350,7 @@ test('bypasses Git replacement objects and caller-supplied Git config environmen
   ]));
   assert.ok(replacedView.requirements[0].question_patterns.includes(marker));
 
-  const { stdout } = await execFileAsync(
-    process.execPath,
-    [scriptPath, ...importerArguments(fixture, outputRoot)],
-    {
-      encoding: 'utf8',
-      env: {
-        ...process.env,
-        GIT_CONFIG_COUNT: '1',
-        GIT_CONFIG_KEY_0: 'invalid',
-        GIT_CONFIG_VALUE_0: 'must-not-reach-git',
-        GIT_NO_REPLACE_OBJECTS: '0',
-      },
-      maxBuffer: 8 * 1024 * 1024,
-    },
-  );
-  const result = JSON.parse(stdout);
+  const result = await runImporterCli(fixture, outputRoot);
   const publishedCatalog = JSON.parse(
     await fs.readFile(path.join(outputRoot, 'analysis-requirements.v1.0.0.json'), 'utf8'),
   );

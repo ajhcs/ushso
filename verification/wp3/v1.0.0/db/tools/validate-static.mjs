@@ -14,10 +14,17 @@ for (const migration of manifest.migrations) {
 
 const allSql = (await Promise.all(manifest.migrations.map((entry) => readFile(path.join(repositoryRoot, 'db/migrations', entry.file), 'utf8')))).join('\n').toLowerCase();
 assert.doesNotMatch(allSql, /pg_advisory|listen\s+|notify\s+/);
-assert.doesNotMatch(allSql, /drop\s+(table|schema|database)/);
+// Controlled partition GC uses allowlisted, validated relation names with
+// parameterized dynamic SQL. Reject literal down-migration targets while
+// preserving that separately authorized maintenance path.
+assert.doesNotMatch(allSql, /drop\s+(table|schema|database)\s+(?:[a-z][a-z0-9_]*\.)?[a-z][a-z0-9_]*/);
 assert.doesNotMatch(allSql, /password\s+['"]/);
 const leaseSql = (await Promise.all(['lease-due-sources.sql','lease-jobs.sql','lease-outbox.sql','reconcile-workflows.sql'].map((file) => readFile(path.join(repositoryRoot, 'db/queries', file), 'utf8')))).join('\n').toLowerCase();
 assert.match(leaseSql, /for update skip locked/);
+assert.match(allSql, /foreign key \(run_id, source_id\) references ingest\.harvest_runs\(run_id, source_id\)/);
+assert.match(allSql, /foreign key \(run_id, source_id, capture_reference_id\)\s+references ingest\.capture_references\(run_id, source_id, capture_reference_id\)/);
+assert.match(allSql, /foreign key \(run_id, capture_reference_id\)\s+references ingest\.capture_references\(run_id, capture_reference_id\)/);
+assert.match(allSql, /create function ingest\.assert_normalization_success_artifact_job/);
 assert.match(allSql, /autovacuum_vacuum_scale_factor/);
 assert.match(allSql, /partition by range/);
 

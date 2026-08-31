@@ -11,6 +11,7 @@ async function filesUnder(directory) {
   const entries = await readdir(directory, { withFileTypes: true })
   const files = []
   for (const entry of entries) {
+    if (entry.name === 'node_modules' || entry.name === '.git') continue
     const path = resolve(directory, entry.name)
     if (entry.isDirectory()) files.push(...await filesUnder(path))
     else if (entry.isFile()) files.push(path)

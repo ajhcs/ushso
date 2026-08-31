@@ -84,6 +84,16 @@ test('returned values cannot mutate the immutable service snapshot', async () =>
   assert.ok(second.result.values.every(cell => cell.coverage_cell_state === 'not_assessed'));
 });
 
+test('constructor rejects cross-artifact snapshot digest drift', async () => {
+  const snapshot = await read('artifacts/coverage-snapshot.json');
+  const matrix = await read('artifacts/coverage-matrix.json');
+  const cellRegistry = await read('artifacts/state-source-class-cell-registry.json');
+  const federalRegistry = await read('artifacts/federal-source-registry.json');
+  const publicView = await read('artifacts/public-coverage-view.json');
+  publicView.coverage_snapshot_digest = 'f'.repeat(64);
+  assert.throws(() => new CoverageAccountingService({ snapshot, matrix, cellRegistry, publicView, federalRegistry }), expectCode('ARTIFACT_PIN_MISMATCH'));
+});
+
 test('metric and federal-source views are bounded and explicit about applicability', async () => {
   const api = await service();
   const metrics = api.getMetrics({ limit: 18 });

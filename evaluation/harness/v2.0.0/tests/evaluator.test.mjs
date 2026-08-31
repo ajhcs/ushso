@@ -3,27 +3,42 @@ import test from 'node:test';
 import { loadBenchmark } from '../tools/benchmark-loader.mjs';
 import { evaluateRun, loadMetricContract } from '../tools/evaluator.mjs';
 
-const HASH = 'a'.repeat(64);
-const PIN_KEYS = [
-  'corpus_manifest_sha256',
-  'content_fingerprint_sha256',
-  'records_sha256',
-  'search_documents_sha256',
-  'vocabulary_sha256',
-  'algorithm_fingerprint_sha256',
-  'benchmark_pin_sha256',
-  'cohort_manifest_sha256',
-  'metric_contract_sha256'
-];
-const PINS = Object.fromEntries(PIN_KEYS.map(key => [key, HASH]));
+const PINS = {
+  corpus_manifest_sha256: '23f704ce3e421a6eb26c2b3677d616a1ae6b4f45226233257b9a1ff676caba2b',
+  content_fingerprint_sha256: 'adcfb56babc981a4c7dfc787af86d56f5fb2a31e84de02f9db8c93f0548b5d03',
+  records_sha256: '458c8e7ec15e059e60bc908fc98f6b94f8deafd9bd1862d1dc0b576ac830f046',
+  search_documents_sha256: '8c7913596353d4ea2c6f5b763d3711aa77d97a457bb91b4cbce990bbf301e633',
+  vocabulary_sha256: '2907709f3805744a57d395554f911981e5e3e3c7a25af40419ec2c2b26954151',
+  algorithm_fingerprint_sha256: 'b30376f8819d5335dab0f914f18bdbb540b67af9475267db1a6f9230479184e1',
+  benchmark_pin_sha256: '89804a56123cb19fff40468e5fcdc05a2753ff0b4b38541386bda239cd2de398',
+  cohort_manifest_sha256: 'a'.repeat(64),
+  metric_contract_sha256: '32c826571c7e9d44dc567664030eed67c49ae60a3574850d9bd0209fa6498cda'
+};
 
 function testCohort(benchmark, aliases = []) {
+  const current = benchmark.currentGeneration;
+  const direct = benchmark.sourceIndex.sources.flatMap(source => {
+    const recordId = current.recordIdsBySource.get(source.source_record_id)?.[0];
+    return recordId ? [{
+      record_id: recordId,
+      source_native_id: source.source_record_id,
+      canonical_source_id: source.source_record_id,
+      basis: 'record_id_exact',
+      evidence: 'Test fixture exact identity.',
+      search_eligible: true
+    }] : [];
+  });
+  const bindings = [...direct, ...aliases];
+  const statusBySource = new Map(benchmark.sourceIndex.sources.map(source => [
+    source.source_record_id,
+    bindings.some(binding => binding.canonical_source_id === source.source_record_id) ? 'present_search_eligible' : 'missing'
+  ]));
   const sourceClassifications = benchmark.sourceIndex.sources.map(source => ({
     source_record_id: source.source_record_id,
     source_family_id: source.source_family_id,
-    status: 'present_search_eligible',
-    reason: 'Test fixture: all frozen sources are eligible.',
-    record_ids: [source.source_record_id, ...aliases.filter(alias => alias.canonical_source_id === source.source_record_id).map(alias => alias.record_id)]
+    status: bindings.some(binding => binding.canonical_source_id === source.source_record_id) ? 'present_search_eligible' : 'missing',
+    reason: bindings.some(binding => binding.canonical_source_id === source.source_record_id) ? 'Test fixture: a pinned current-generation binding exists.' : 'Test fixture: no pinned current-generation binding exists.',
+    record_ids: bindings.filter(binding => binding.canonical_source_id === source.source_record_id).map(binding => binding.record_id)
   }));
   const requirements = benchmark.positives.map(judgment => ({
     judgment_id: judgment.judgment_id,
@@ -31,25 +46,24 @@ function testCohort(benchmark, aliases = []) {
     source_record_id: judgment.source_record_id,
     analytical_role: judgment.analytical_role,
     label: judgment.label,
-    status: 'present_search_eligible',
-    reason: 'Test fixture: source is eligible.'
-  }));
-  const direct = benchmark.sourceIndex.sources.map(source => ({
-    record_id: source.source_record_id,
-    source_native_id: source.source_record_id,
-    canonical_source_id: source.source_record_id,
-    basis: 'record_id_exact',
-    evidence: 'Test fixture exact identity.',
-    search_eligible: true
+    status: statusBySource.get(judgment.source_record_id),
+    reason: 'Test fixture: status is derived from the pinned binding set.'
   }));
   return {
     manifest_version: 'ushso-retrieval-present-source-cohort.v1',
     generated_at: '2026-08-30T00:00:00.000Z',
-    current_generation: {},
+    current_generation: {
+      corpus_id: current.corpus_id,
+      corpus_version: current.corpus_version,
+      record_count: current.record_count,
+      corpus_manifest_sha256: current.corpus_manifest_sha256,
+      content_fingerprint_sha256: current.content_fingerprint_sha256,
+      benchmark_pin_sha256: current.benchmark_pin_sha256
+    },
     status_vocabulary: ['present_search_eligible', 'present_but_excluded', 'missing'],
     source_classifications: sourceClassifications,
     requirements,
-    asset_bindings: [...direct, ...aliases],
+    asset_bindings: bindings,
     counts: {},
     review: {}
   };
@@ -104,7 +118,7 @@ test('duplicate equivalents earn credit once, consume rank slots, and short list
   const { benchmark, metricContract } = await fixture();
   const canonical = 'pa_phc4_financial_ownership';
   const alias = {
-    record_id: 'fixture:pa-phc4-equivalent',
+    record_id: 'obs:asset:pa-phc4-public-financial-reports',
     source_native_id: null,
     canonical_source_id: canonical,
     basis: 'reviewed_fixture_equivalence',
@@ -112,7 +126,7 @@ test('duplicate equivalents earn credit once, consume rank slots, and short list
     search_eligible: true
   };
   const cohort = testCohort(benchmark, [alias]);
-  const run = input('QTD-O3-001', [rankedResult(canonical, 1), rankedResult(alias.record_id, 2)]);
+  const run = input('QTD-O3-001', [rankedResult('obs:asset:pa-phc4-custom-data', 1), rankedResult(alias.record_id, 2)]);
   const report = await evaluateRun(run, { benchmark, metricContract, cohort });
   const at3 = report.metrics.full_benchmark.top_k.find(metric => metric.k === 3);
   assert.deepEqual(at3.essential_recall.macro, { numerator: 0.5, denominator: 1, score: 0.5 });
@@ -158,20 +172,20 @@ test('access, identity, and explanation safety violations are independently visi
 test('pins and cohort classifications are fail closed', async () => {
   const { benchmark, metricContract } = await fixture();
   const cohort = testCohort(benchmark);
-  const run = input('QTD-O3-001', [rankedResult('pa_phc4_financial_ownership', 1)]);
+  const run = input('QTD-O3-001', [rankedResult('obs:asset:pa-phc4-custom-data', 1)]);
   delete run.pins.records_sha256;
   await assert.rejects(() => evaluateRun(run, { benchmark, metricContract, cohort }), /EVALUATOR_PIN_INVALID:records_sha256/);
 
   const drifted = structuredClone(cohort);
   drifted.source_classifications.find(item => item.source_record_id === 'pa_phc4_financial_ownership').status = 'missing';
-  const validRun = input('QTD-O3-001', [rankedResult('pa_phc4_financial_ownership', 1)]);
-  await assert.rejects(() => evaluateRun(validRun, { benchmark, metricContract, cohort: drifted }), /COHORT_REQUIREMENT_SOURCE_STATUS_DRIFT/);
+  const validRun = input('QTD-O3-001', [rankedResult('obs:asset:pa-phc4-custom-data', 1)]);
+  await assert.rejects(() => evaluateRun(validRun, { benchmark, metricContract, cohort: drifted }), /COHORT_MISSING_SOURCE_HAS_RECORDS|COHORT_REQUIREMENT_SOURCE_STATUS_DRIFT/);
 });
 
 test('the canonical report is deterministic', async () => {
   const { benchmark, metricContract } = await fixture();
   const cohort = testCohort(benchmark);
-  const run = input('QTD-O3-001', [rankedResult('pa_phc4_financial_ownership', 1)]);
+  const run = input('QTD-O3-001', [rankedResult('obs:asset:pa-phc4-custom-data', 1)]);
   const first = await evaluateRun(run, { benchmark, metricContract, cohort });
   const second = await evaluateRun(structuredClone(run), { benchmark, metricContract, cohort: structuredClone(cohort) });
   assert.deepEqual(first, second);

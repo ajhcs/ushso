@@ -71,3 +71,35 @@ test("reversal integrity is reported separately as mechanical fixture evidence",
   assert.equal(result.reversal_integrity.evidence_class, "controlled_fixture_mechanical_integrity");
 });
 
+test("prediction evaluation requires one unique prediction for every sealed case", () => {
+  const cases = buildBenchmarkCases(manifest);
+  const predictions = runConformancePredictions(cases);
+  predictions[predictions.length - 1] = structuredClone(predictions[0]);
+  assert.throws(() => evaluateIdentityBenchmark({ cases, predictions }), /IDENTITY_PREDICTION_CASE_DUPLICATE/u);
+});
+
+test("consensus does not ignore a conflicting third independent review", () => {
+  const cases = buildBenchmarkCases(manifest);
+  const caseId = cases[0].benchmark_case_id;
+  const adjudications = [
+    ["reviewer:a", "not_same_identity", "review-receipt:a"],
+    ["reviewer:b", "not_same_identity", "review-receipt:b"],
+    ["reviewer:c", "same_identity", "review-receipt:c"],
+  ].map(([reviewer_id, decision, review_receipt_id]) => ({
+    benchmark_case_id: caseId,
+    reviewer_id,
+    decision,
+    review_receipt_id,
+    human: true,
+    review_evidence_status: "externally_verified_human_review",
+  }));
+  const result = evaluateIdentityBenchmark({
+    cases,
+    predictions: runConformancePredictions(cases),
+    adjudications,
+    authorizedReviewReceiptIds: ["review-receipt:a", "review-receipt:b", "review-receipt:c"],
+  });
+  assert.equal(result.external_adjudication.external_reviews, 3);
+  assert.equal(result.external_adjudication.double_reviewed_cases, 1);
+  assert.equal(result.automatic_rules[0].metrics.adjudicated_positive_pairs, 0);
+});

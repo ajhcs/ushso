@@ -11,6 +11,51 @@
       "expected_code": "SCHEMA_INVALID"
     },
     {
+      "case_id": "query_parameter_empty_bracket_rejected",
+      "kind": "record",
+      "base_fixture_id": "valid_source_descriptor",
+      "mutations": [{ "op": "set", "path": "/endpoints/0/routes/0/allowed_parameters/0", "value": "page[]" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "query_parameter_unbalanced_bracket_rejected",
+      "kind": "record",
+      "base_fixture_id": "valid_source_descriptor",
+      "mutations": [{ "op": "set", "path": "/endpoints/0/routes/0/allowed_parameters/0", "value": "page[number" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "query_parameter_nested_bracket_rejected",
+      "kind": "record",
+      "base_fixture_id": "valid_source_descriptor",
+      "mutations": [{ "op": "set", "path": "/endpoints/0/routes/0/allowed_parameters/0", "value": "page[[number]]" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "query_parameter_control_character_rejected",
+      "kind": "record",
+      "base_fixture_id": "valid_source_descriptor",
+      "mutations": [{ "op": "set", "path": "/endpoints/0/routes/0/allowed_parameters/0", "value": "page[\u0000]" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "query_parameter_oversized_name_rejected",
+      "kind": "record",
+      "base_fixture_id": "valid_source_descriptor",
+      "mutations": [{ "op": "set", "path": "/endpoints/0/routes/0/allowed_parameters/0", "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
       "case_id": "workflow_instance_dot_rejected_by_provider_contract",
       "kind": "record",
       "base_fixture_id": "valid_harvest_run",

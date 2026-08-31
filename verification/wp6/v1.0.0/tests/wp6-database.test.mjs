@@ -334,7 +334,7 @@ test('WP6 isolated PostgreSQL canonical import and parity suite', async (t) => {
     await t.test('identity and joins stay unresolved without silent upgrade', () => {
       assert.equal(scalar(container, 'ushso', "select count(distinct asset_id) from catalog.assets;"), '157');
       assert.equal(scalar(container, 'ushso', "select count(*) from catalog.relationships where relationship_kind='same_identity';"), '0');
-      assert.equal(scalar(container, 'ushso', "select count(*) from catalog.relationships where relationship_kind='same_identity_candidate' and identity_semantics->>'state'='candidate';"), String(normalized.plan.identity_review_candidates.length));
+      assert.equal(scalar(container, 'ushso', "select count(*) from catalog.relationships where relationship_kind='same_identity_candidate' and identity_semantics->>'state'='candidate';"), String(normalized.plan.identity_review_candidates.length + normalized.plan.source_identity_review_candidates.length));
       assert.equal(scalar(container, 'ushso', "select count(*) from catalog.relationships where relationship_domain='join';"), '14');
       assert.equal(scalar(container, 'ushso', "select count(*) from catalog.relationships where relationship_domain='join' and join_semantics->>'evidence_state' <> 'candidate';"), '0');
       assert.equal(scalar(container, 'ushso', "select count(*) from catalog.relationships where relationship_domain='join' and join_semantics->>'compatibility'='compatible';"), '0');

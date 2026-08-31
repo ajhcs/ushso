@@ -1,5 +1,6 @@
 import { asBytes } from './canonical.mjs';
 import { classifyIpAddress } from './network-policy.mjs';
+import { ConnectorResponseLimitError, DEFAULT_RESPONSE_LIMITS } from './route-manifest.mjs';
 
 const ARCHIVE_MEDIA = new Set([
   'application/zip', 'application/x-zip-compressed', 'application/x-tar',
@@ -24,6 +25,9 @@ const METADATA_KEYS = new Set([
   'distribution', 'dataset', 'theme', 'keyword', 'contactpoint', 'license',
   'columns', 'metadata', 'resource', 'resources', 'organization', 'type',
 ]);
+const ROW_COLLECTION_KEYS = new Set(['rows', 'data', 'records', 'observations', 'results', 'items', 'features', 'measurements', 'values']);
+const ROW_VALUE_KEYS = new Set(['value', 'values', 'amount', 'measure', 'measurement', 'measure_value', 'metric', 'count', 'code', 'category', 'year', 'month', 'quarter']);
+const PRESENTATION_KEYS = new Set(['title', 'name', 'description', 'label', 'publisher', 'organization', 'metadata', 'landingpage', 'accessurl', 'downloadurl', 'url']);
 const PRIVATE_HOST_SUFFIX = /(?:^|\.)(?:localhost|local|internal|home|lan|intranet)$/i;
 
 function privateLocatorInText(text) {
@@ -42,13 +46,6 @@ function privateLocatorInText(text) {
   return false;
 }
 
-function privateLocatorShape(value) {
-  if (typeof value === 'string') return privateLocatorInText(value);
-  if (Array.isArray(value)) return value.some(privateLocatorShape);
-  if (!value || typeof value !== 'object') return false;
-  return Object.values(value).some(privateLocatorShape);
-}
-
 export function mediaTypeFromHeaders(headers) {
   const raw = headers.get('content-type') ?? '';
   return raw.split(';', 1)[0].trim().toLowerCase();
@@ -61,27 +58,80 @@ function hasArchiveMagic(bytes) {
     (body[0] === 0x37 && body[1] === 0x7a && body[2] === 0xbc && body[3] === 0xaf);
 }
 
-function healthcareRowShape(value) {
-  if (Array.isArray(value)) return value.some(healthcareRowShape);
-  if (!value || typeof value !== 'object') return false;
-  const keys = Object.keys(value).map((key) => key.toLowerCase());
-  const sensitiveCount = keys.filter((key) => HEALTHCARE_ROW_KEYS.has(key)).length;
-  if (sensitiveCount >= 2 || (sensitiveCount === 1 && keys.length >= 3 && keys.length <= 100)) return true;
-  return Object.values(value).some(healthcareRowShape);
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
-function genericRowShape(value, allowedMetadataCollectionKeys = new Set(), path = '') {
-  if (Array.isArray(value) && value.length > 0 && value.every((item) => item && typeof item === 'object' && !Array.isArray(item))) {
-    const metadataLike = value.every((item) => Object.keys(item).some((key) => METADATA_KEYS.has(key.toLowerCase())));
-    if (!metadataLike) return true;
-    return value.some((item) => Object.entries(item).some(([key, child]) => genericRowShape(child, allowedMetadataCollectionKeys, `${path}/${key}`)));
+function rowLikeObject(value) {
+  const keys = Object.keys(value).map((key) => key.toLowerCase());
+  const hasIdentity = keys.some((key) => key === 'id' || key === 'identifier' || key === 'record_id');
+  const hasRowValue = keys.some((key) => ROW_VALUE_KEYS.has(key));
+  const hasPresentation = keys.some((key) => PRESENTATION_KEYS.has(key));
+  return hasIdentity && hasRowValue && !hasPresentation;
+}
+
+function inspectJsonShape(value, allowedMetadataCollectionKeys, limits) {
+  const stack = [{ value, path: '', depth: 0 }];
+  let nodes = 0;
+  let privateLocator = false;
+  let healthcareRows = false;
+  let genericRows = false;
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+    nodes += 1;
+    if (current.depth > limits.maximum_response_depth || nodes > limits.maximum_response_nodes) {
+      throw new ConnectorResponseLimitError('RESPONSE_STRUCTURE_LIMIT_EXCEEDED', 'Response structure exceeds its permitted depth or node count.');
+    }
+
+    if (typeof current.value === 'string') {
+      if (privateLocatorInText(current.value)) privateLocator = true;
+      continue;
+    }
+    if (Array.isArray(current.value)) {
+      const objectItems = current.value.length > 0 && current.value.every(isPlainObject);
+      if (objectItems && (current.path === '' || allowedMetadataCollectionKeys.has(current.path)) && current.value.length > limits.maximum_records) {
+        throw new ConnectorResponseLimitError('RECORD_CARDINALITY_EXCEEDED', 'Response records exceed their permitted cardinality.');
+      }
+      if (objectItems && !allowedMetadataCollectionKeys.has(current.path)) {
+        const metadataLike = current.value.every((item) => Object.keys(item).some((key) => METADATA_KEYS.has(key.toLowerCase())));
+        if (!metadataLike || current.value.every(rowLikeObject)) genericRows = true;
+      }
+      if (current.value.length > 0 && current.depth >= limits.maximum_response_depth) {
+        throw new ConnectorResponseLimitError('RESPONSE_STRUCTURE_LIMIT_EXCEEDED', 'Response structure exceeds its permitted depth or node count.');
+      }
+      if (nodes + stack.length + current.value.length > limits.maximum_response_nodes) {
+        throw new ConnectorResponseLimitError('RESPONSE_STRUCTURE_LIMIT_EXCEEDED', 'Response structure exceeds its permitted depth or node count.');
+      }
+      for (let index = current.value.length - 1; index >= 0; index -= 1) {
+        stack.push({ value: current.value[index], path: `${current.path}/${index}`, depth: current.depth + 1 });
+      }
+      continue;
+    }
+    if (!isPlainObject(current.value)) continue;
+
+    const keys = Object.keys(current.value).map((key) => key.toLowerCase());
+    const sensitiveCount = keys.filter((key) => HEALTHCARE_ROW_KEYS.has(key)).length;
+    if (sensitiveCount >= 2 || (sensitiveCount === 1 && keys.length >= 3 && keys.length <= 100)) healthcareRows = true;
+    if (current.path !== '' && rowLikeObject(current.value)) genericRows = true;
+    const entries = Object.entries(current.value);
+    if (entries.length > 0 && current.depth >= limits.maximum_response_depth) {
+      throw new ConnectorResponseLimitError('RESPONSE_STRUCTURE_LIMIT_EXCEEDED', 'Response structure exceeds its permitted depth or node count.');
+    }
+    if (nodes + stack.length + entries.length > limits.maximum_response_nodes) {
+      throw new ConnectorResponseLimitError('RESPONSE_STRUCTURE_LIMIT_EXCEEDED', 'Response structure exceeds its permitted depth or node count.');
+    }
+    for (let index = entries.length - 1; index >= 0; index -= 1) {
+      const [key, child] = entries[index];
+      const childPath = `${current.path}/${key}`;
+      if (Array.isArray(child) && child.length > 0 && ROW_COLLECTION_KEYS.has(key.toLowerCase()) && !allowedMetadataCollectionKeys.has(childPath)) {
+        genericRows = true;
+      }
+      stack.push({ value: child, path: childPath, depth: current.depth + 1 });
+    }
   }
-  if (Array.isArray(value)) return value.some((child) => genericRowShape(child, allowedMetadataCollectionKeys, path));
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
-  for (const name of ['rows', 'data', 'records', 'observations']) {
-    if (Array.isArray(value[name]) && value[name].length > 0 && !allowedMetadataCollectionKeys.has(`${path}/${name}`)) return true;
-  }
-  return Object.entries(value).some(([key, child]) => genericRowShape(child, allowedMetadataCollectionKeys, `${path}/${key}`));
+
+  return { privateLocator, healthcareRows, genericRows };
 }
 
 function accepted(classification, parsed = null) {
@@ -92,7 +142,7 @@ function rejected(reasonCode, suspectedClassification) {
   return { accepted: false, classification: suspectedClassification, reasonCode, parsed: null };
 }
 
-export function classifyResponse({ purpose, expectedContentClasses, headers, bodyBytes, profile }) {
+export function classifyResponse({ purpose, expectedContentClasses, headers, bodyBytes, profile, limits = DEFAULT_RESPONSE_LIMITS }) {
   const bytes = asBytes(bodyBytes);
   const mediaType = mediaTypeFromHeaders(headers);
   if (bytes.byteLength === 0) return rejected('EMPTY_METADATA_BODY', 'schema_drift');
@@ -125,10 +175,11 @@ export function classifyResponse({ purpose, expectedContentClasses, headers, bod
     } catch {
       return rejected('JSON_PARSE_FAILURE', 'parse_failure');
     }
-    if (privateLocatorShape(parsed)) return rejected('PRIVATE_LOCATOR_QUARANTINED', 'private_locator');
-    if (healthcareRowShape(parsed)) return rejected('HEALTHCARE_ROW_SHAPE_QUARANTINED', 'healthcare_rows');
     const permittedMetadataCollections = new Set(Array.isArray(profile?.metadataCollectionPaths) ? profile.metadataCollectionPaths : []);
-    if (genericRowShape(parsed, permittedMetadataCollections)) return rejected('ROW_SHAPED_RESPONSE_QUARANTINED', 'source_data_payload');
+    const shape = inspectJsonShape(parsed, permittedMetadataCollections, limits);
+    if (shape.privateLocator) return rejected('PRIVATE_LOCATOR_QUARANTINED', 'private_locator');
+    if (shape.healthcareRows) return rejected('HEALTHCARE_ROW_SHAPE_QUARANTINED', 'healthcare_rows');
+    if (shape.genericRows) return rejected('ROW_SHAPED_RESPONSE_QUARANTINED', 'source_data_payload');
     if (typeof profile?.validateJson === 'function') {
       const result = profile.validateJson(parsed, { purpose, expectedContentClasses });
       if (!result?.accepted) return rejected(result?.reasonCode ?? 'ADAPTER_SCHEMA_DRIFT', result?.classification ?? 'schema_drift');
@@ -154,8 +205,18 @@ export function classifyResponse({ purpose, expectedContentClasses, headers, bod
 
   if (mediaType === 'text/csv') {
     const lines = text.split(/\r?\n/).filter(Boolean);
-    if (lines.length > 2) return rejected('CSV_ROW_PAYLOAD_QUARANTINED', 'source_data_payload');
+    if (lines.length > 1) return rejected('CSV_ROW_PAYLOAD_QUARANTINED', 'source_data_payload');
     return accepted(purpose === 'schema' ? 'schema_metadata' : 'documentation', null);
+  }
+
+  if (mediaType === 'text/plain') {
+    const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    const delimiters = [',', '\t', '|'];
+    const tabular = lines.length > 1 && delimiters.some((delimiter) => {
+      const widths = lines.map((line) => line.split(delimiter).length);
+      return widths[0] > 1 && widths.every((width) => width === widths[0]);
+    });
+    if (tabular) return rejected('TEXT_ROW_PAYLOAD_QUARANTINED', 'source_data_payload');
   }
 
   if (mediaType === 'application/xml' && xmlCatalogMetadata) {

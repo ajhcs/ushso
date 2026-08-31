@@ -35,7 +35,10 @@ const paths = {
   vocabulary: path.join(PACKAGE_ROOT, 'fixtures/controlled-vocabulary.json'),
   baseRoutes: path.join(PACKAGE_ROOT, 'fixtures/base-join-routes.jsonl'),
   extendedRoutes: path.join(PACKAGE_ROOT, 'fixtures/extended-join-routes.jsonl'),
-  recordSchema: path.join(PROJECT_ROOT, 'observatory/index/v1.0.0/schemas/observatory-record.schema.json'),
+  // The historical schema is unavailable locally. Keep its exact path/digest
+  // pin in the generated manifest, while local validation uses the strict,
+  // versioned compatibility successor.
+  recordSchema: path.join(PACKAGE_ROOT, 'schemas/observatory-record-compatibility.v1.0.1.schema.json'),
   joinSchema: path.join(PACKAGE_ROOT, 'schemas/join-route.schema.json'),
   querySchema: path.join(PACKAGE_ROOT, 'schemas/discovery-query.schema.json'),
   intentSchema: path.join(PACKAGE_ROOT, 'schemas/discovery-intent.schema.json'),
@@ -214,8 +217,13 @@ const payloadFiles = [...payloads].map(([relativePath, content]) => ({
   bytes: Buffer.byteLength(content),
   sha256: sha256Bytes(content)
 })).sort((a, b) => a.path.localeCompare(b.path));
-const schemaPins = {};
-for (const [name, filePath] of Object.entries({ observatory_record: paths.recordSchema, discovery_query: paths.querySchema, discovery_intent: paths.intentSchema, discovery_result: paths.resultSchema, search_document: paths.searchDocumentSchema, join_route: paths.joinSchema })) {
+const schemaPins = {
+  observatory_record: {
+    path: 'observatory/index/v1.0.0/schemas/observatory-record.schema.json',
+    sha256: '2d778a3125ba03c7504aad92e7154fdedf686db66619e439a6259ba883e162d9'
+  }
+};
+for (const [name, filePath] of Object.entries({ discovery_query: paths.querySchema, discovery_intent: paths.intentSchema, discovery_result: paths.resultSchema, search_document: paths.searchDocumentSchema, join_route: paths.joinSchema })) {
   schemaPins[name] = { path: projectRelative(filePath), sha256: await sha256File(filePath) };
 }
 const corpusManifest = {
