@@ -37,7 +37,7 @@ for environment in staging production; do
       sed -n '1,200p' "${output_file}" >&2
       exit 1
     fi
-    if ! rg -q -- "--dry-run: exiting now\." "${output_file}"; then
+    if ! grep -Fq -- "--dry-run: exiting now." "${output_file}"; then
       echo "FAIL ${label}: Wrangler did not confirm dry-run" >&2
       sed -n '1,200p' "${output_file}" >&2
       exit 1

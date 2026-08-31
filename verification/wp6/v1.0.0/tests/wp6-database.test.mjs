@@ -5,7 +5,7 @@ import { runPsql } from '../../../../db/tools/common.mjs';
 import { canonicalJson, contentFingerprint } from '../../../../packages/normalization/src/canonical.mjs';
 import { applyImportDocument, applyProductionImport, buildProductionImportDocument, rejectProductionImport } from '../../../../packages/normalization/src/database-import.mjs';
 import { loadLegacyCorpus } from '../../../../packages/normalization/src/legacy-loader.mjs';
-import { dockerCommand, startLocalPostgres } from '../tools/local-postgres.mjs';
+import { dockerCommand, LocalPostgresUnavailableError, startLocalPostgres } from '../tools/local-postgres.mjs';
 
 const FINGERPRINT = '0'.repeat(64);
 const COLLECTIONS = [
@@ -205,7 +205,17 @@ function createSyntheticSuccessor({ container, normalized, suffix, entityIndex, 
 }
 
 test('WP6 isolated PostgreSQL canonical import and parity suite', async (t) => {
-  const postgres = await startLocalPostgres();
+  let postgres;
+  try {
+    postgres = await startLocalPostgres();
+  } catch (error) {
+    if (error instanceof LocalPostgresUnavailableError) {
+      t.diagnostic(`WP6 database evidence unavailable: ${error.message}`);
+      t.skip(error.message);
+      return;
+    }
+    throw error;
+  }
   const { container } = postgres;
   try {
     await t.test('clean 0001-0007 migration and exact foundation preservation', async () => {

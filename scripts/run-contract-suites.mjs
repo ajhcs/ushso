@@ -31,7 +31,7 @@ const verificationSuiteDefinitions = Object.freeze([
   { alias: 'wp11', root: 'verification/wp11', scripts: ['test', 'validate'] },
   { alias: 'wp12', root: 'verification/wp12', scripts: ['test', 'validate'] },
   { alias: 'wp13', root: 'verification/wp13', scripts: ['test', 'validate'] },
-  { alias: 'wp14', root: 'verification/wp14', scripts: ['test', 'validate'] },
+  { alias: 'wp14', root: 'verification/wp14', scripts: ['test', 'validate'], movingTreeAttestation: true },
   { alias: 'program-verification', root: 'verification/program', scripts: ['test', 'validate'] },
   { alias: 'external-authorization', root: 'verification/external-authorization', scripts: ['test'] },
   { alias: 'ci-verification', root: 'verification/testing/ci', scripts: ['test', 'validate'] },
@@ -263,6 +263,7 @@ async function discoverLatestSuite(definition) {
       versionName: selected.name,
       requiredScripts: definition.scripts,
     }),
+    movingTreeAttestation: definition.movingTreeAttestation === true,
   }
 }
 
@@ -360,10 +361,63 @@ function executePackageScript(descriptor, scriptName) {
   return { script: scriptName, status: 'PASS', parsed_test_count: parsedTestCount }
 }
 
+function resolveRepositoryHead() {
+  const execution = spawnSync('git', ['rev-parse', 'HEAD'], {
+    cwd: repositoryRoot,
+    encoding: 'utf8',
+  })
+  assertSuccessfulChildExecution(execution, 'git rev-parse HEAD')
+  return execution.stdout.trim()
+}
+
+function usesMovingTreeAttestation(descriptor) {
+  if (descriptor.movingTreeAttestation !== true) return false
+  const pinPath = resolve(repositoryRoot, 'verification/wp14/v1.0.0/policy/repository-base-pin.v1.0.0.json')
+  const pin = JSON.parse(readFileSync(pinPath, 'utf8'))
+  return resolveRepositoryHead() !== pin.head_commit
+}
+
+function executeMovingTreeAttestation(descriptor) {
+  const execution = spawnWithBoundedFileCapture(process.execPath, [resolve(repositoryRoot, 'scripts/verify-wp14-attestation.mjs')], {
+    cwd: repositoryRoot,
+    env: offlineEnvironment(),
+    timeout: CHILD_TIMEOUT_MS,
+    windowsHide: true,
+  })
+  if (execution.stdout) process.stdout.write(execution.stdout)
+  if (execution.stderr) process.stderr.write(execution.stderr)
+  assertSuccessfulChildExecution(execution, `${descriptor.path}:attestation`)
+  return { script: 'attestation', status: 'PASS' }
+}
+
 export async function runPackageSuites(descriptors) {
   const results = []
   const failures = []
   for (const descriptor of descriptors) {
+    if (usesMovingTreeAttestation(descriptor)) {
+      console.log(`\n[verify] ${descriptor.path} :: attestation`)
+      const sealedBefore = await snapshotSealedArtifacts()
+      let executionResult
+      let executionError
+      try {
+        executionResult = executeMovingTreeAttestation(descriptor)
+      } catch (error) {
+        executionError = error
+      }
+      const sealedAfter = await snapshotSealedArtifacts()
+      const changedArtifacts = diffSealedArtifactSnapshots(sealedBefore, sealedAfter)
+      if (changedArtifacts.length > 0) {
+        const mutationError = new Error(`${descriptor.path}:attestation: sealed artifacts changed: ${changedArtifacts.join(', ')}`)
+        executionError = executionError ?? mutationError
+      }
+      if (executionError) {
+        failures.push(executionError.message)
+        results.push({ path: descriptor.path, executions: [{ script: 'attestation', status: 'FAIL', error: executionError.message }] })
+      } else {
+        results.push({ path: descriptor.path, executions: [executionResult] })
+      }
+      continue
+    }
     const executions = []
     for (const script of descriptor.required_scripts) {
       console.log(`\n[verify] ${descriptor.path} :: ${script}`)

@@ -4,15 +4,26 @@ import { setTimeout as delay } from 'node:timers/promises';
 
 const IMAGE = 'postgres:16-alpine';
 
+export class LocalPostgresUnavailableError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'LocalPostgresUnavailableError';
+    this.code = 'WP6_LOCAL_POSTGRES_UNAVAILABLE';
+  }
+}
+
 export function dockerCommand(args, options = {}) {
   return spawnSync('docker', args, { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024, ...options });
 }
 
 export async function startLocalPostgres() {
   const listeners = spawnSync('ss', ['-tlnp'], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
-  if (listeners.status !== 0) throw new Error(`listener preflight failed: ${listeners.stderr.trim()}`);
+  if (listeners.status !== 0) throw new LocalPostgresUnavailableError(`listener preflight unavailable: ${listeners.stderr.trim()}`);
   const image = dockerCommand(['image', 'inspect', IMAGE]);
-  if (image.status !== 0) throw new Error(`${IMAGE} is not installed locally; network pulls are forbidden`);
+  if (image.status !== 0) {
+    const detail = (image.stderr || image.error?.message || '').trim();
+    throw new LocalPostgresUnavailableError(`${IMAGE} is unavailable locally; network pulls are forbidden${detail ? `: ${detail}` : ''}`);
+  }
 
   const container = `ushso-wp6-${process.pid}-${randomBytes(4).toString('hex')}`;
   const run = dockerCommand([
