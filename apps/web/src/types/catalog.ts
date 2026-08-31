@@ -75,9 +75,11 @@ export interface DatasetFamily {
   relationship: Relationship
   recordType: string
   geographicApplicability: string
+  grain: string
   reportingUnit: string
   populationFacilityScope: string
   availableYears: string
+  accessStatusLabel: string
   latestVerifiedRelease: string
   variablesCodebook: string
   verification: DatasetVerification

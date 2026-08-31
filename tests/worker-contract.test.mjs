@@ -75,6 +75,9 @@ test('catalog browsing and dataset dereferencing do not depend on a question', a
   const direct = await worker.fetch(new Request(`https://ushso.org/api/datasets/${encodeURIComponent(firstRecord.record_id)}`), env);
   assert.equal(browse.status, 200);
   assert.equal(browseResult.result_count, 1);
+  assert.equal(browseResult.returned_count, 1);
+  assert.equal(browseResult.total_matches, 1);
+  assert.equal(browseResult.has_more, false);
   assert.equal(direct.status, 200);
   assert.equal((await direct.json()).results[0].record_id, firstRecord.record_id);
   assert.equal((await worker.fetch(new Request('https://ushso.org/api/datasets/not-present'), env)).status, 404);

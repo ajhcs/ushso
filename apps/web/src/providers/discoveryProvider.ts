@@ -133,6 +133,20 @@ export function assertDiscoveryResult(value: unknown): asserts value is Discover
   if (!Array.isArray(value.results) || typeof value.result_count !== 'number' || value.result_count !== value.results.length) {
     throw new DiscoveryProviderError('invalid_contract', 'Discovery response result count does not match its records.')
   }
+  if (value.returned_count !== undefined && (typeof value.returned_count !== 'number' || value.returned_count !== value.results.length)) {
+    throw new DiscoveryProviderError('invalid_contract', 'Discovery response returned_count does not match its records.')
+  }
+  if (value.total_matches !== undefined && (typeof value.total_matches !== 'number' || value.total_matches < value.results.length)) {
+    throw new DiscoveryProviderError('invalid_contract', 'Discovery response total_matches is smaller than the returned records.')
+  }
+  if (value.has_more !== undefined) {
+    if (typeof value.has_more !== 'boolean') {
+      throw new DiscoveryProviderError('invalid_contract', 'Discovery response has_more must be a boolean.')
+    }
+    if (typeof value.total_matches === 'number' && value.has_more !== value.total_matches > value.results.length) {
+      throw new DiscoveryProviderError('invalid_contract', 'Discovery response has_more does not match total_matches and returned records.')
+    }
+  }
   for (const item of value.results) {
     if (!isObject(item) || typeof item.rank !== 'number' || typeof item.score !== 'number' || typeof item.record_id !== 'string' || !isObject(item.relevance)) {
       throw new DiscoveryProviderError('invalid_contract', 'Discovery response contains an invalid ranked result.')
@@ -226,6 +240,9 @@ export class FixtureDiscoveryProvider implements DiscoveryProvider {
     response.query.filters = { mode: 'stable_dataset_dereference', record_id: result.record_id, family_sibling_count: 0 }
     response.results = [{ ...result, rank: 1 }]
     response.result_count = 1
+    response.returned_count = 1
+    response.total_matches = 1
+    response.has_more = false
     response.join_routes = response.join_routes.filter((route) => route.from_record_id === result.record_id || route.to_record_id === result.record_id)
     return response
   }

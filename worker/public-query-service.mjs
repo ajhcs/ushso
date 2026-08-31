@@ -49,6 +49,15 @@ function directResult(record, whyRelevant) {
   };
 }
 
+function resultBounds(totalMatches, returnedCount) {
+  return {
+    result_count: returnedCount,
+    returned_count: returnedCount,
+    total_matches: totalMatches,
+    has_more: totalMatches > returnedCount
+  };
+}
+
 export class PublicQueryService {
   constructor({ publicationResolver, catalogRepository, searchBackend, coverageRepository, plannerRepository }) {
     if (!publicationResolver || typeof publicationResolver.resolve !== 'function') throw new TypeError('publicationResolver.resolve() is required');
@@ -95,7 +104,7 @@ export class PublicQueryService {
       evidence_mode: 'published_offline_evidence',
       corpus,
       query: queryFromIntent(intent, { mode: 'catalog_browse', limit }),
-      result_count: records.length,
+      ...resultBounds(corpus.record_count, records.length),
       results: records.map((record, index) => ({
         ...directResult(record, 'Included in the published catalog browse view.'),
         rank: index + 1
@@ -134,7 +143,7 @@ export class PublicQueryService {
         record_id: record.record_id,
         family_sibling_count: Math.max(0, familySize - 1)
       }),
-      result_count: 1,
+      ...resultBounds(1, 1),
       results: [directResult(record, 'Opened by its stable published record identifier.')],
       join_routes: joinRoutes,
       warnings: ['This page describes indexed metadata and retrieval routes; it does not prove current endpoint availability or authorize access.']
