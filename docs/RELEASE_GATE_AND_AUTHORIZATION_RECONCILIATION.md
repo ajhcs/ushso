@@ -133,6 +133,26 @@ migrations, or executing a release gate:
   from the sealed inventory (`0001-0007`). WP6 refuses to write a pass
   receipt when the database suite skipped for preflight unavailability.
 
+A final-head Grok delegation was later deadline-cancelled without a normal
+completion receipt. Its late review surfaced additional local defects; the
+bounded fixes were manually inspected, integrated, and verified without
+authorizing any external action:
+
+- Identity projection now drops the complete automatic union when it would
+  transitively violate a current non-merge decision. Review load paths reject
+  cross-candidate supersession and duplicate policy assessments.
+- Connector allowlisting no longer accepts a forged `fixture-reviewer` role
+  as a fixture-source bypass. Archive restore now requires an allowlisted
+  partition, exact archive checksum, and an isolated target database.
+- In-memory and PostgreSQL audit detail projections strip caller-supplied
+  actor/operator fields after trusted principal resolution. WP5, WP7, and the
+  program ledger were refreshed to the resulting exact evidence.
+- WP7 aggregate event digests now use repository-relative POSIX test paths, so
+  the receipt is stable across checkout locations.
+
+The cancelled delegation is not represented as an independent approval or as
+a release-gate execution.
+
 The reviews also leave explicit blockers for human disposition rather than
 turning local synthetic evidence into production claims:
 
