@@ -47,9 +47,19 @@ export function appendReviewDecision(events, input, reviewEvidence) {
 }
 
 export function materializeReviewDecisions(events) {
+  const byId = new Map();
+  for (const event of events) {
+    assert(!byId.has(event.decision_id), "Decision IDs are immutable and unique", "duplicate_decision");
+    byId.set(event.decision_id, event);
+  }
   const supersededBy = new Map();
   for (const event of events) {
-    if (event.supersedes_decision_id) supersededBy.set(event.supersedes_decision_id, event.decision_id);
+    if (!event.supersedes_decision_id) continue;
+    const previous = byId.get(event.supersedes_decision_id);
+    assert(previous, "A superseding decision must reference an existing decision", "missing_superseded_decision");
+    assert(previous.candidate_id === event.candidate_id, "A decision may only supersede a decision for the same candidate", "candidate_mismatch");
+    assert(!supersededBy.has(event.supersedes_decision_id), "Only the current decision may be superseded", "decision_not_current");
+    supersededBy.set(event.supersedes_decision_id, event.decision_id);
   }
   const materialized = [...events]
     .map((event) => ({

@@ -614,6 +614,10 @@ test('source descriptors must match the frozen positive metadata-route allowlist
   unknown.source_id = 'source_unknown_live';
   unknown.legal_review = { state: 'approved', reviewed_at: '2026-08-30T00:00:00.000Z', reviewer_role: 'connector-owner', terms_locator: 'https://catalog.example.gov/terms' };
   assert.throws(() => validateDescriptor(unknown), /No positive metadata-route allowlist/);
+  const spoofedReviewer = structuredClone(CDC_SOCRATA_DESCRIPTOR);
+  spoofedReviewer.legal_review = { ...spoofedReviewer.legal_review, state: 'approved', reviewer_role: 'fixture-reviewer' };
+  spoofedReviewer.endpoints[0].routes[0].path_template = '/api/views/metadata/v2';
+  assert.throws(() => validateDescriptor(spoofedReviewer), /positive allowlist/);
   assert.ok(Object.keys(SOURCE_METADATA_ROUTE_ALLOWLIST).length >= 18);
 });
 

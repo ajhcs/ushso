@@ -130,6 +130,7 @@ test('GC rejects every correctness dependency and commits proof, audit, and dele
   assert.equal(final.gcProofs.get(executed.proof.proof_digest).eligible, true);
   assert.ok(final.audits.some(audit => audit.proofDigest === executed.proof.proof_digest));
   assert.ok(final.audits.every(audit => audit.actor_id === 'operator_fixture' && audit.actor_type === 'maintenance_identity'));
+  assert.ok(final.audits.every(audit => audit.operatorId == null && audit.actorId == null));
 
   const unboundPlane = createInMemoryControlPlane();
   unboundPlane.seedGcPartition(gcPartition('partition_unbound'), zeroGcDependencies());

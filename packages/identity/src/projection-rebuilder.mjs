@@ -1,4 +1,4 @@
-import { REBUILD_TARGETS, assert, canonicalJson, sha256, stableId, uniqueSorted } from "./common.mjs";
+import { REBUILD_TARGETS, assert, canonicalJson, orderedPair, sha256, stableId, uniqueSorted } from "./common.mjs";
 import { currentDecisionByCandidate } from "./review-ledger.mjs";
 
 const AUTOMATIC_CHECKS = Object.freeze([
@@ -92,6 +92,33 @@ function acceptedBasis(candidate, decisions, assessmentByCandidate, authorizedEn
   return null;
 }
 
+function pairKey(left, right) {
+  return orderedPair(left, right).join("\u0000");
+}
+
+function forbiddenEqualityPairs(candidates, decisions) {
+  const forbidden = new Set();
+  for (const candidate of candidates) {
+    const decision = decisions.get(candidate.candidate_id);
+    if (decision && decision.decision !== "same_identity") forbidden.add(pairKey(candidate.object_a_id, candidate.object_b_id));
+  }
+  return forbidden;
+}
+
+function applyUnions(objectIds, edges) {
+  const sets = new DisjointSet(objectIds);
+  for (const { candidate } of edges) sets.union(candidate.object_a_id, candidate.object_b_id);
+  return sets;
+}
+
+function forbiddenPairSharesCluster(sets, forbidden) {
+  for (const pair of forbidden) {
+    const [left, right] = pair.split("\u0000");
+    if (sets.find(left) === sets.find(right)) return true;
+  }
+  return false;
+}
+
 export function buildProjectionInputs({
   objects,
   candidates,
@@ -115,22 +142,34 @@ export function buildProjectionInputs({
     assert(candidateIds.has(assessment.candidate_id), "Policy assessment must reference an existing candidate", "unknown_policy_assessment");
     assessmentByCandidate.set(assessment.candidate_id, assessment);
   }
-  const sets = new DisjointSet(objectIds);
-  const acceptedEdges = [];
+  const forbidden = forbiddenEqualityPairs(candidates, decisions);
+  const reviewEdges = [];
+  const automaticEdges = [];
   const unresolvedByObject = new Map(objectIds.map((id) => [id, []]));
 
   for (const candidate of [...candidates].sort((left, right) => left.candidate_id.localeCompare(right.candidate_id))) {
     assert(objectById.has(candidate.object_a_id) && objectById.has(candidate.object_b_id), "Candidate endpoint does not exist", "unknown_candidate_endpoint");
     const basis = acceptedBasis(candidate, decisions, assessmentByCandidate, authorizedEnablementReceiptIds);
-    if (basis) {
-      sets.union(candidate.object_a_id, candidate.object_b_id);
-      acceptedEdges.push({ candidate, basis });
-    } else if (["open", "deferred", "rejected"].includes(candidate.state)
+    if (basis?.kind === "review_decision") reviewEdges.push({ candidate, basis });
+    else if (basis) automaticEdges.push({ candidate, basis });
+    else if (["open", "deferred", "rejected"].includes(candidate.state)
       || (candidate.state === "accepted" && candidate.resolution_mode === "automatic_exact_policy")) {
       unresolvedByObject.get(candidate.object_a_id).push(candidate.candidate_id);
       unresolvedByObject.get(candidate.object_b_id).push(candidate.candidate_id);
     }
   }
+
+  const reviewSets = applyUnions(objectIds, reviewEdges);
+  assert(!forbiddenPairSharesCluster(reviewSets, forbidden), "A current non-merge review decision cannot share an identity cluster", "conflicting_identity_collapse");
+  // Automatic unions are all-or-nothing inside a constraint conflict: if the
+  // complete automatic set would make a forbidden pair equal, drop every
+  // automatic edge rather than choosing an order-dependent spanning tree.
+  const proposedAutomatic = forbiddenPairSharesCluster(applyUnions(objectIds, [...reviewEdges, ...automaticEdges]), forbidden)
+    ? []
+    : automaticEdges;
+  const sets = applyUnions(objectIds, [...reviewEdges, ...proposedAutomatic]);
+  assert(!forbiddenPairSharesCluster(sets, forbidden), "A current non-merge review decision cannot share an identity cluster", "conflicting_identity_collapse");
+  const acceptedEdges = [...reviewEdges, ...proposedAutomatic];
 
   const memberGroups = new Map();
   for (const id of objectIds) {

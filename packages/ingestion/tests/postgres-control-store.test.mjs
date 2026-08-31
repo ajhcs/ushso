@@ -204,6 +204,9 @@ test('audit identity is derived from trusted context and caller-supplied operato
   const insert = RecordingClient.instances[0].calls.find(call => call.text.includes('insert into ops.audit_events'));
   assert.equal(insert.values[2], 'operator_trusted');
   assert.equal(insert.values[3], 'maintenance_identity');
+  const details = JSON.parse(insert.values[7]);
+  assert.equal(details.operator_id, undefined);
+  assert.equal(details.actor_id, undefined);
   await database.close();
 
   resetClient();

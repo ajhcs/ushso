@@ -157,7 +157,7 @@ function traceFor(prefix, id) {
 function auditDetails(event) {
   const details = {};
   for (const [key, value] of Object.entries(event)) {
-    if (['auditEventId', 'action', 'recordedAt', 'operatorId'].includes(key) || value === undefined) continue;
+    if (['auditEventId', 'action', 'recordedAt', 'operatorId', 'actorId'].includes(key) || value === undefined) continue;
     const snake = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
     details[snake] = value;
   }

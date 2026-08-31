@@ -252,3 +252,80 @@ test("automatic projection requires a candidate-bound, authorized, complete poli
   });
   assert.equal(unauthorized.identity_clusters.length, 3);
 });
+
+test("a current non-merge decision blocks transitive automatic collapse of the same pair", () => {
+  const namespace = enabledControlledNamespaceFixture();
+  const enablement = namespace.benchmark_gate.enablement_receipt_id;
+  const { candidates, assessments } = generateIdentityCandidates({
+    assertions: ["alpha", "beta", "gamma"].map((suffix) => assertionFixture(suffix)),
+    namespaces: [namespace],
+    authorizedEnablementReceiptIds: [enablement],
+    createdAt: RECORDED_AT,
+  });
+  const automatic = candidates.filter((candidate) => candidate.resolution_mode === "automatic_exact_policy");
+  assert.equal(automatic.length, 3);
+  const alphaGamma = automatic.find((candidate) => candidate.object_a_id === "object:facility.alpha" && candidate.object_b_id === "object:facility.gamma");
+  const unconstrained = buildProjectionInputs({
+    objects: identityObjects(),
+    candidates,
+    policyAssessments: assessments,
+    authorizedEnablementReceiptIds: [enablement],
+    graphRevisionId: "graph-revision:auto-three",
+    projectedAt: RECORDED_AT,
+  });
+  assert.equal(unconstrained.identity_clusters.length, 1);
+
+  for (const outcome of ["not_same_identity", "defer"]) {
+    const events = appendReviewDecision([], decision(`decision:controlled.ac.${outcome}`, alphaGamma.candidate_id, outcome), {
+      status: "controlled_fixture_not_adjudication_evidence",
+    });
+    const constrained = buildProjectionInputs({
+      objects: identityObjects(),
+      candidates,
+      reviewEvents: events,
+      policyAssessments: assessments,
+      authorizedEnablementReceiptIds: [enablement],
+      graphRevisionId: `graph-revision:auto-three-${outcome}`,
+      projectedAt: RECORDED_AT,
+      includeControlledFixtures: true,
+    });
+    assert.equal(constrained.identity_clusters.some((cluster) => (
+      cluster.member_object_ids.includes("object:facility.alpha")
+      && cluster.member_object_ids.includes("object:facility.gamma")
+    )), false, `${outcome} must not allow alpha and gamma to share a cluster`);
+    assert.equal(constrained.identity_clusters.length, 3, `${outcome} drops conflicting automatic transitivity`);
+  }
+});
+
+test("load path fails closed on cross-candidate supersession instead of dropping the current decision", () => {
+  const { candidates } = generateIdentityCandidates({
+    assertions: [assertionFixture("alpha"), assertionFixture("beta")],
+    namespaces: [namespaceFixture()],
+    createdAt: RECORDED_AT,
+  });
+  const first = decision("decision:controlled.keep", candidates[0].candidate_id, "not_same_identity");
+  const forged = decision("decision:controlled.forged", "candidate:missing", "same_identity", "decision:controlled.keep");
+  assert.throws(
+    () => materializeReviewDecisions([first, forged]),
+    { code: "candidate_mismatch" },
+  );
+  assert.throws(
+    () => currentDecisionByCandidate([first, forged], { includeControlledFixtures: true }),
+    { code: "candidate_mismatch" },
+  );
+});
+
+test("review queue fails closed on duplicate policy assessments", () => {
+  const namespace = enabledControlledNamespaceFixture();
+  const { candidates, assessments } = generateIdentityCandidates({
+    assertions: [assertionFixture("alpha"), assertionFixture("beta")],
+    namespaces: [namespace],
+    createdAt: RECORDED_AT,
+  });
+  const duplicate = structuredClone(assessments[0]);
+  duplicate.automatic_resolution_eligible = true;
+  assert.throws(
+    () => buildReviewQueue(candidates, { assessments: [...assessments, duplicate] }),
+    { code: "duplicate_policy_assessment" },
+  );
+});

@@ -1,4 +1,4 @@
-import { uniqueSorted } from "./common.mjs";
+import { assert, uniqueSorted } from "./common.mjs";
 import { automaticAssessmentIsBound } from "./projection-rebuilder.mjs";
 
 const TERMINAL_DECISIONS = new Set(["same_identity", "not_same_identity", "family_member", "mirror_of", "successor_of"]);
@@ -25,7 +25,11 @@ function classify(candidate, policyReasons) {
 }
 
 export function buildReviewQueue(candidates, { currentDecisions = new Map(), assessments = [], authorizedEnablementReceiptIds = [] } = {}) {
-  const assessmentByCandidate = new Map(assessments.map((assessment) => [assessment.candidate_id, assessment]));
+  const assessmentByCandidate = new Map();
+  for (const assessment of assessments) {
+    assert(!assessmentByCandidate.has(assessment.candidate_id), "Policy assessments must be unique by candidate", "duplicate_policy_assessment");
+    assessmentByCandidate.set(assessment.candidate_id, assessment);
+  }
   return candidates
     .filter((candidate) => {
       const currentDecision = currentDecisions.get(candidate.candidate_id);

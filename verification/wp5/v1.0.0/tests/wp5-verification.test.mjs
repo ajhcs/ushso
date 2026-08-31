@@ -10,7 +10,7 @@ import { runDeliveryWaveFixtureMatrix } from '../../../../packages/connectors/sr
 import { connectorFingerprint, readJson, repositoryRoot, verificationRoot } from '../tools/common.mjs';
 
 test('pinned implementation fingerprint matches current connector bytes', async () => {
-  const expected = 'c7003d55c10826f1eaa2f6e7e5172657c7594474d3913a4966bc4bcc7d7e40e2';
+  const expected = 'd03bc9986c768dc16ad6bc96191bee9fea691ee8803af4311c4e1ec945944003';
   assert.equal(await connectorFingerprint(), expected);
   const receipts = await Promise.all([
     'receipts/fixture-matrix.json', 'receipts/request-capture-reconciliation.json',

@@ -237,6 +237,7 @@ test('WP3 local PostgreSQL foundation', async (t) => {
       await restoreArchive({
         container, database: 'ushso_restore', environment: 'local',
         'deployment-fingerprint': localFingerprint, input: archivePath,
+        partition, 'isolated-target': true, 'expected-sha256': archive.archive_object_sha256,
       });
       assert.equal(scalar(container, 'ushso_restore', `select count(*) from ${partition};`), String(archive.row_count));
 

@@ -1,12 +1,26 @@
+import { createHash } from "node:crypto";
+import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { validateStoredArtifactSeal } from "../src/artifact-seal.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const repositoryRoot = path.resolve(packageRoot, "../..");
+
+async function assertFrozenContractDependencies(manifest) {
+  for (const dependency of manifest.frozen_contract_dependencies ?? []) {
+    const bytes = await fs.readFile(path.join(repositoryRoot, "contracts", dependency.contract, "manifests/package-manifest.json"));
+    const digest = createHash("sha256").update(bytes).digest("hex");
+    if (digest !== dependency.manifest_byte_sha256) {
+      throw new Error(`IDENTITY_FROZEN_CONTRACT_DRIFT:${dependency.contract}:expected=${dependency.manifest_byte_sha256}:actual=${digest}`);
+    }
+  }
+}
 
 export async function validateIdentityPackage() {
   const result = await validateStoredArtifactSeal(packageRoot, "@ushso/identity");
+  await assertFrozenContractDependencies(result.manifest);
   const receipt = result.receipt;
   if (receipt.automatic_rule_state !== "disabled_candidate_only" || receipt.externally_verified_human_reviews !== 0 || receipt.double_reviewed_cases !== 0 || receipt.percent_agreement !== null || receipt.cohens_kappa !== null) throw new Error("IDENTITY_EXTERNAL_REVIEW_BOUNDARY_INVALID");
   if (receipt.automatic_rule_enablement_required_for_candidate_only_release !== false) throw new Error("IDENTITY_CANDIDATE_ONLY_RELEASE_POLICY_INVALID");

@@ -1347,7 +1347,8 @@ export function createInMemoryControlPlane({ faults = new FaultInjector(), trust
       },
       async appendAudit(event) {
         const principal = resolveAuditActor(event, trustedPrincipalSource);
-        state.audits.push({ ...clone(event), actor_id: principal.actorId, actor_type: principal.actorType });
+        const { operatorId: _operatorId, actorId: _actorId, ...rest } = clone(event);
+        state.audits.push({ ...rest, actor_id: principal.actorId, actor_type: principal.actorType });
         return { recorded: true };
       },
       async close() {

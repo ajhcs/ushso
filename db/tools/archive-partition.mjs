@@ -6,14 +6,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs, requireEnvironmentFence, runPsql, verifyManagedAuthorization } from './common.mjs';
 
-const partitionPattern = /^(ingest\.(run_state_events|job_attempts|workflow_reconciliation_events)|ops\.(outbox_attempt_events|processed_event_history|dead_letter_events|audit_events))_\d{4}_\d{2}$/;
+export const PARTITION_PATTERN = /^(ingest\.(run_state_events|job_attempts|workflow_reconciliation_events)|ops\.(outbox_attempt_events|processed_event_history|dead_letter_events|audit_events))_\d{4}_\d{2}$/;
 
 export async function archivePartition(options) {
   const args = options ?? parseArgs();
   const fence = requireEnvironmentFence(args);
   await verifyManagedAuthorization(fence);
   const partition = args.partition;
-  if (!partitionPattern.test(partition || '')) throw new Error('partition is not an allowlisted monthly correctness-ledger relation');
+  if (!PARTITION_PATTERN.test(partition || '')) throw new Error('partition is not an allowlisted monthly correctness-ledger relation');
   if (!args.output) throw new Error('--output is required');
   const database = args.database || 'ushso';
   const container = args.container || null;

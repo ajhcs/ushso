@@ -268,14 +268,14 @@ export function isFixtureSourceId(sourceId) {
 }
 
 export function allowlistedRoutesFor(descriptor) {
-  if (isFixtureSourceId(descriptor.source_id) || descriptor.legal_review?.reviewer_role === 'fixture-reviewer') {
+  if (isFixtureSourceId(descriptor.source_id)) {
     return FIXTURE_METADATA_ROUTE_ALLOWLIST;
   }
   return SOURCE_METADATA_ROUTE_ALLOWLIST[descriptor.source_id] ?? null;
 }
 
 export function assertPositiveMetadataRouteAllowlist(descriptor) {
-  if (isFixtureSourceId(descriptor.source_id) || descriptor.legal_review?.reviewer_role === 'fixture-reviewer') {
+  if (isFixtureSourceId(descriptor.source_id)) {
     return;
   }
   const expected = SOURCE_METADATA_ROUTE_ALLOWLIST[descriptor.source_id];
