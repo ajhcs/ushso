@@ -75,11 +75,17 @@ Commit `e790121` addresses those discrepancies by using the supported Node 22
 test-concurrency flag, POSIX `grep -Fq`, an explicit WP6 preflight-unavailable
 classification that still fails real database errors, and a read-only
 moving-checkout verifier that rechecks the five WP14 receipts against
-`f6edbb0` and the attested tree. It does not relabel the attestation, modify
-sealed artifacts, or turn the historical attestation into a release-gate
-receipt. Remote CI must rerun against the pushed HEAD; any remaining local/CI
-receipt discrepancy reopens the affected receipt rather than being silently
-accepted.
+`f6edbb0` and the attested tree. The generated receipt refresh is `e153bc3`.
+It does not relabel the attestation, modify attestation-bound files, or turn
+the historical attestation into a release-gate receipt.
+
+Remote CI run `33436494328` passed at `e153bc3`: the Node 22 compatibility
+job (`99634093033`) passed the full root test sequence and release audit, and
+the dependent build/artifact-only Wrangler dry-run job (`99635181925`) passed.
+The CI environment still lacks an available local PostgreSQL image, so WP6's
+database evidence remains an explicit preflight-unavailable condition rather
+than production-like database evidence. Any future local/CI receipt
+discrepancy reopens the affected receipt rather than being silently accepted.
 
 ## Focused review disposition
 
