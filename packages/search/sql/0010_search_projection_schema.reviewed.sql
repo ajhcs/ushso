@@ -388,7 +388,7 @@ begin
     if jsonb_typeof(evidence) <> 'object' then
       return false;
     end if;
-    if jsonb_object_length(evidence) <> 11
+    if (select count(*) from jsonb_object_keys(evidence)) <> 11
         or not (evidence ?& array[
           'receipt_version', 'evidence_id', 'gate', 'publication_id',
           'publication_digest', 'generation_ids', 'status',
@@ -411,7 +411,7 @@ begin
     if jsonb_typeof(evidence -> 'publication_digest') <> 'object' then
       return false;
     end if;
-    if jsonb_object_length(evidence -> 'publication_digest') <> 4
+    if (select count(*) from jsonb_object_keys(evidence -> 'publication_digest')) <> 4
         or not (evidence -> 'publication_digest' ?& array['algorithm', 'canonicalization', 'domain', 'value'])
         or evidence #>> '{publication_digest,algorithm}' <> 'sha256'
         or evidence #>> '{publication_digest,canonicalization}' <> 'ushso-canonical-json-v1'
@@ -422,7 +422,7 @@ begin
     if jsonb_typeof(evidence -> 'evidence_digest') <> 'object' then
       return false;
     end if;
-    if jsonb_object_length(evidence -> 'evidence_digest') <> 3
+    if (select count(*) from jsonb_object_keys(evidence -> 'evidence_digest')) <> 3
         or not (evidence -> 'evidence_digest' ?& array['digest_type', 'algorithm', 'value'])
         or evidence #>> '{evidence_digest,digest_type}' <> 'canonical_json_sha256'
         or evidence #>> '{evidence_digest,algorithm}' <> 'sha256'

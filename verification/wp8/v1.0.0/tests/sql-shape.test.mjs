@@ -91,6 +91,10 @@ test('pointer promotion, rollback, failure containment, revocation, and retentio
   assert.match(promote, /public_cutover_authorization_ref is null/);
   assert.match(sql, /evidence_receipts jsonb not null/);
   assert.match(sql, /create or replace function ushso_search\.promotion_gate_evidence_is_bound/);
+  assert.doesNotMatch(sql, /jsonb_object_length\s*\(/);
+  assert.match(sql, /\(select count\(\*\) from jsonb_object_keys\(evidence\)\) <> 11/);
+  assert.match(sql, /\(select count\(\*\) from jsonb_object_keys\(evidence -> 'publication_digest'\)\) <> 4/);
+  assert.match(sql, /\(select count\(\*\) from jsonb_object_keys\(evidence -> 'evidence_digest'\)\) <> 3/);
   assert.match(rollback, /retained n-1 publication/);
   assert.match(rollback, /g\.safety_revoked_at is not null/);
   assert.match(expire, /active or n-1 pointer/);
