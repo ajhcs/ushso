@@ -22,6 +22,13 @@ export function appendReviewDecision(events, input, reviewEvidence) {
     assert(reviewEvidence.reviewer_roster_receipt_id && reviewEvidence.review_attestation_receipt_id, "External human review requires authorized roster and attestation receipts", "external_review_receipts_required");
   }
 
+  const currentForCandidate = materializeReviewDecisions(priorEvents)
+    .filter((event) => event.candidate_id === input.candidate_id && event.state === "current");
+  assert(currentForCandidate.length <= 1, "Review history must have at most one current decision per candidate", "decision_not_current");
+  if (currentForCandidate.length === 1) {
+    assert(input.supersedes_decision_id === currentForCandidate[0].decision_id, "A current decision must be explicitly superseded before appending another", "decision_not_current");
+  }
+
   if (input.supersedes_decision_id) {
     const previous = priorEvents.find((event) => event.decision_id === input.supersedes_decision_id);
     assert(previous, "A superseding decision must reference an existing decision", "missing_superseded_decision");

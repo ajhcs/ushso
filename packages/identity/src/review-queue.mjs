@@ -1,4 +1,7 @@
 import { uniqueSorted } from "./common.mjs";
+import { automaticAssessmentIsBound } from "./projection-rebuilder.mjs";
+
+const TERMINAL_DECISIONS = new Set(["same_identity", "not_same_identity", "family_member", "mirror_of", "successor_of"]);
 
 const PRIORITY = Object.freeze({
   authoritative_conflict: 100,
@@ -21,10 +24,18 @@ function classify(candidate, policyReasons) {
   return "fuzzy_candidate";
 }
 
-export function buildReviewQueue(candidates, { currentDecisions = new Map(), assessments = [] } = {}) {
+export function buildReviewQueue(candidates, { currentDecisions = new Map(), assessments = [], authorizedEnablementReceiptIds = [] } = {}) {
   const assessmentByCandidate = new Map(assessments.map((assessment) => [assessment.candidate_id, assessment]));
   return candidates
-    .filter((candidate) => ["open", "deferred"].includes(candidate.state) && !currentDecisions.has(candidate.candidate_id))
+    .filter((candidate) => {
+      const currentDecision = currentDecisions.get(candidate.candidate_id);
+      if (currentDecision && !TERMINAL_DECISIONS.has(currentDecision.decision)) return true;
+      if (currentDecision) return false;
+      if (["open", "deferred"].includes(candidate.state)) return true;
+      return candidate.state === "accepted"
+        && candidate.resolution_mode === "automatic_exact_policy"
+        && !automaticAssessmentIsBound(candidate, assessmentByCandidate.get(candidate.candidate_id), authorizedEnablementReceiptIds);
+    })
     .map((candidate) => {
       const policyReasons = assessmentByCandidate.get(candidate.candidate_id)?.reasons ?? [];
       const reason = classify(candidate, policyReasons);

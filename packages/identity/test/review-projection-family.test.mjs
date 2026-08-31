@@ -7,6 +7,7 @@ import {
   buildProjectionInputs,
   buildReversalPlan,
   buildReviewQueue,
+  currentDecisionByCandidate,
   generateIdentityCandidates,
   materializeReviewDecisions,
   toContractReviewDecision,
@@ -37,6 +38,7 @@ test("review events append, supersede reciprocally, and controlled fixtures cann
   });
   const candidateId = candidates[0].candidate_id;
   let events = appendReviewDecision([], decision("decision:controlled.accept", candidateId, "same_identity"), { status: "controlled_fixture_not_adjudication_evidence" });
+  assert.throws(() => appendReviewDecision(events, decision("decision:controlled.duplicate", candidateId, "same_identity"), { status: "controlled_fixture_not_adjudication_evidence" }), { code: "decision_not_current" });
   events = appendReviewDecision(events, decision("decision:controlled.reverse", candidateId, "not_same_identity", "decision:controlled.accept"), { status: "controlled_fixture_not_adjudication_evidence" });
   const materialized = materializeReviewDecisions(events);
   assert.equal(materialized.find((item) => item.decision_id === "decision:controlled.accept").state, "superseded");
@@ -78,6 +80,14 @@ test("projection rebuild is deterministic, reversible, non-destructive, and keep
   const queue = buildReviewQueue(candidates, { assessments });
   assert(queue.length >= 2);
   assert(queue.every((item) => item.state === "pending_external_review"));
+
+  const deferredCandidate = candidates.find((candidate) => candidate.state === "open");
+  const deferredEvents = appendReviewDecision([], decision("decision:controlled.defer", deferredCandidate.candidate_id, "defer"), { status: "controlled_fixture_not_adjudication_evidence" });
+  const deferredQueue = buildReviewQueue(candidates, {
+    assessments,
+    currentDecisions: currentDecisionByCandidate(deferredEvents, { includeControlledFixtures: true }),
+  });
+  assert(deferredQueue.some((item) => item.candidate_id === deferredCandidate.candidate_id));
 });
 
 test("family relationships never collapse identity and unresolved members remain explicit", () => {
@@ -129,9 +139,14 @@ test("automatic candidate state alone cannot collapse search without its authori
   assert.equal(candidates[0].resolution_mode, "automatic_exact_policy");
   const withoutAssessment = buildProjectionInputs({ objects: identityObjects(), candidates, graphRevisionId: "graph-revision:auto-untrusted", projectedAt: RECORDED_AT });
   assert.equal(withoutAssessment.identity_clusters.length, 3);
+  assert(withoutAssessment.search_projections.some((projection) => projection.unresolved_candidate_ids.includes(candidates[0].candidate_id)));
   const withAssessment = buildProjectionInputs({ objects: identityObjects(), candidates, policyAssessments: assessments, authorizedEnablementReceiptIds: [namespace.benchmark_gate.enablement_receipt_id], graphRevisionId: "graph-revision:auto-authorized", projectedAt: RECORDED_AT });
   assert.equal(withAssessment.identity_clusters.length, 2);
   assert(withAssessment.search_projections.some((projection) => projection.member_object_ids.length === 2 && projection.separately_searchable === false));
+  const unboundQueue = buildReviewQueue(candidates, { assessments });
+  assert(unboundQueue.some((item) => item.candidate_id === candidates[0].candidate_id));
+  const authorizedQueue = buildReviewQueue(candidates, { assessments, authorizedEnablementReceiptIds: [namespace.benchmark_gate.enablement_receipt_id] });
+  assert.equal(authorizedQueue.some((item) => item.candidate_id === candidates[0].candidate_id), false);
 });
 
 test("automatic projection requires a candidate-bound, authorized, complete policy assessment", () => {

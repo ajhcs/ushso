@@ -49,7 +49,7 @@ class DisjointSet {
   }
 }
 
-function automaticAssessmentIsBound(candidate, assessment, authorizedEnablementReceiptIds) {
+export function automaticAssessmentIsBound(candidate, assessment, authorizedEnablementReceiptIds) {
   if (candidate.state !== "accepted" || candidate.resolution_mode !== "automatic_exact_policy") return false;
   if (candidate.object_a_id.localeCompare(candidate.object_b_id) >= 0
     || candidate.candidate_type !== "same_identity"
@@ -119,7 +119,8 @@ export function buildProjectionInputs({
     if (basis) {
       sets.union(candidate.object_a_id, candidate.object_b_id);
       acceptedEdges.push({ candidate, basis });
-    } else if (["open", "deferred", "rejected"].includes(candidate.state)) {
+    } else if (["open", "deferred", "rejected"].includes(candidate.state)
+      || (candidate.state === "accepted" && candidate.resolution_mode === "automatic_exact_policy")) {
       unresolvedByObject.get(candidate.object_a_id).push(candidate.candidate_id);
       unresolvedByObject.get(candidate.object_b_id).push(candidate.candidate_id);
     }
