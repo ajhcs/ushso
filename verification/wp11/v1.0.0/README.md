@@ -13,4 +13,4 @@ npm test --prefix verification/wp11/v1.0.0
 npm run validate --prefix verification/wp11/v1.0.0
 ```
 
-`AUTH-12` must become authorized before WP10B compiler work or either reserved endpoint can be activated. `AUTH-15` must become authorized before the WP9-derived coverage preview can be represented as approved public wording. The two governance packets remain pending until independently reviewable aggregate-only human study receipts exist.
+`AUTH-12` must become authorized before WP10B compiler work or either reserved endpoint can be activated. `AUTH-15` must become authorized before the WP9-derived coverage preview can be represented as approved public wording. `AUTH-16` tracks the researcher usability study and `AUTH-17` tracks the expert asset review; both remain pending until independently reviewable aggregate-only human study receipts exist.

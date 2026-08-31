@@ -156,8 +156,9 @@ record, at minimum:
 
 The central register at
 `verification/external-authorization/v1.0.0/register.json` remains the
-authoritative blocker register. Its entries remain `not_requested` and
-`authorized: false`; a packet never self-authorizes an action.
+authoritative blocker register. Its entries `AUTH-01` through `AUTH-17` remain
+`not_requested` and `authorized: false`; a packet never self-authorizes an
+action.
 
 ## Ordered authorization packets
 
@@ -187,6 +188,7 @@ authoritative blocker register. Its entries remain `not_requested` and
 
 ### AP-03 — Researcher usability study
 
+- Register entry: `AUTH-16`.
 - Decision owner: Research UX/Product owner.
 - Scope: at least five representative health-services researchers perform the
   result-card source-choice task.
@@ -199,6 +201,7 @@ authoritative blocker register. Its entries remain `not_requested` and
 
 ### AP-04 — Expert asset and Use-Card review
 
+- Register entry: `AUTH-17`.
 - Decision owner: Research-methods/Product owner.
 - Scope: two independent reviewers assess 12 stratified assets.
 - Required evidence: reviewer independence/conflict record, review rubric,

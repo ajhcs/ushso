@@ -59,7 +59,9 @@ npm run verify --prefix verification/wp11/v1.0.0
 
 The component and route suite verifies coverage parity, all five plan statuses, eight-section order, operation-field orthogonality, bounded JSON round trips, disabled adapter no-egress, browse/search separation, six ResultCard regions, semantic landmarks, and tablet/phone collapse rules. Browser Plugin tooling is not available in this environment; no live browser session or device emulation was claimed.
 
-Two human gates remain pending and block beta claims:
+Two human gates remain pending and block beta claims. They are tracked in the
+central register as `AUTH-16` (researcher usability) and `AUTH-17` (expert
+asset review):
 
 1. Five representative researchers must select the intended ResultCard within 30 seconds at least 80% of the time and must not interpret the card as an analytics result.
 2. Two reviewers must assess a stratified 12-asset decision-summary sample with 100% critical-field accuracy and zero unsupported access, coverage, compatibility, or analysis claims.

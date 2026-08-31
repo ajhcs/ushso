@@ -222,7 +222,9 @@ async function validateGovernance() {
   const register = await readJson('verification/external-authorization/v1.0.0/register.json');
   const auth12 = register.entries.find(entry => entry.id === 'AUTH-12');
   const auth15 = register.entries.find(entry => entry.id === 'AUTH-15');
-  for (const authorization of [auth12, auth15]) {
+  const auth16 = register.entries.find(entry => entry.id === 'AUTH-16');
+  const auth17 = register.entries.find(entry => entry.id === 'AUTH-17');
+  for (const authorization of [auth12, auth15, auth16, auth17]) {
     assert(authorization && authorization.status === 'not_requested' && authorization.authorized === false, `${authorization?.id ?? 'AUTH'}_UNEXPECTEDLY_AUTHORIZED`);
   }
   const resultStudy = await readJson('verification/wp11/v1.0.0/governance/result-card-researcher-study.json');
@@ -233,14 +235,14 @@ async function validateGovernance() {
   assert(summaryReview.asset_floor === 12 && summaryReview.reviewer_floor === 2 && summaryReview.acceptance.critical_field_accuracy === 1, 'SUMMARY_REVIEW_TARGET_DRIFT');
   assert(!await exists('verification/wp11/v1.0.0/governance/result-card-researcher-study.receipt.json'), 'UNEXPECTED_RESULT_STUDY_RECEIPT');
   assert(!await exists('verification/wp11/v1.0.0/governance/decision-summary-review.receipt.json'), 'UNEXPECTED_SUMMARY_REVIEW_RECEIPT');
-  return { auth12, auth15, resultStudy, summaryReview };
+  return { auth12, auth15, auth16, auth17, resultStudy, summaryReview };
 }
 
 async function main() {
   for (const flag of ['--web-tests-passed', '--web-typecheck-passed', '--web-build-passed']) assert(process.argv.includes(flag), `ATTESTATION_REQUIRED_${flag}`);
   await validateSources();
   const { view, frozenPins } = await validateCoverageAndContracts();
-  const { auth12, auth15 } = await validateGovernance();
+  const { auth12, auth15, auth16, auth17 } = await validateGovernance();
   const ledger = await readJson('verification/wp11/v1.0.0/evidence-ledger.json');
   assert(new Set(ledger.entries.map(entry => entry.requirement_id)).size === ledger.entries.length, 'DUPLICATE_LEDGER_ID');
   assert(ledger.entries.every(entry => entry.implementation.length > 0 && entry.verification.length > 0), 'INCOMPLETE_LEDGER_ENTRY');
@@ -312,6 +314,8 @@ async function main() {
     external_gates: [
       { authorization_id: 'AUTH-12', status: auth12.status, authorized: auth12.authorized, blocks: ['WP10B compiler implementation', '/api/plan activation', 'research-plan contract endpoint activation', 'live compiled-plan UI injection'] },
       { authorization_id: 'AUTH-15', status: auth15.status, authorized: auth15.authorized, blocks: ['approved/public WP9 coverage wording claim'] },
+      { authorization_id: 'AUTH-16', status: auth16.status, authorized: auth16.authorized, blocks: ['WP11 beta usability claim', 'WP11 ResultCard comprehension claim'] },
+      { authorization_id: 'AUTH-17', status: auth17.status, authorized: auth17.authorized, blocks: ['WP11 expert-reviewed decision-summary claim', 'WP11 Use-Card and Access Plan approval claims'] },
       { gate_id: 'WP11-RESULT-CARD-RESEARCHER-STUDY-01', status: 'pending_external_researcher_study', blocks: ['beta ResultCard comprehension claim'] },
       { gate_id: 'WP11-DECISION-SUMMARY-REVIEW-01', status: 'pending_external_reviewer_study', blocks: ['beta decision-summary critical-field claim'] }
     ],

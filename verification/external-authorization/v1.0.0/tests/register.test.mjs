@@ -41,7 +41,7 @@ function authorizationClaims(value, path = '$', claims = []) {
 }
 
 test('external actions remain explicitly unauthorized and prerequisite-bound', () => {
-  const expectedIds = Array.from({ length: 15 }, (_, index) => `AUTH-${String(index + 1).padStart(2, '0')}`)
+  const expectedIds = Array.from({ length: 17 }, (_, index) => `AUTH-${String(index + 1).padStart(2, '0')}`)
   assert.deepEqual(register.entries.map((entry) => entry.id), expectedIds)
   assert.equal(new Set(register.entries.map((entry) => entry.id)).size, expectedIds.length)
   assert.ok(register.entries.some((entry) => entry.id === 'AUTH-11' && entry.environment === 'production_foundation_no_traffic'))
@@ -49,6 +49,8 @@ test('external actions remain explicitly unauthorized and prerequisite-bound', (
   assert.ok(register.entries.some((entry) => entry.id === 'AUTH-13' && entry.environment === 'retrieval_evaluation_governance'))
   assert.ok(register.entries.some((entry) => entry.id === 'AUTH-14' && entry.environment === 'identity_evaluation_governance'))
   assert.ok(register.entries.some((entry) => entry.id === 'AUTH-15' && entry.environment === 'coverage_product_governance'))
+  assert.ok(register.entries.some((entry) => entry.id === 'AUTH-16' && entry.environment === 'researcher_usability_governance'))
+  assert.ok(register.entries.some((entry) => entry.id === 'AUTH-17' && entry.environment === 'researcher_asset_review_governance'))
   for (const entry of register.entries) {
     assert.equal(entry.authorized, false, entry.id)
     assert.equal(entry.status, 'not_requested', entry.id)

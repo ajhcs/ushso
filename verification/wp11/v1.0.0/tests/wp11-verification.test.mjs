@@ -74,9 +74,9 @@ test('coverage projection carries sealed WP9 truth and pending AUTH-15 state', a
   assert.match(projection, /authorizationRequirementId: 'AUTH-15'/);
 });
 
-test('AUTH-12, AUTH-15, and both human studies remain pending with no fabricated receipts', async () => {
+test('AUTH-12, AUTH-15, AUTH-16, AUTH-17, and both human studies remain pending with no fabricated receipts', async () => {
   const register = JSON.parse(await fs.readFile(path.join(REPO, 'verification/external-authorization/v1.0.0/register.json'), 'utf8'));
-  for (const id of ['AUTH-12', 'AUTH-15']) {
+  for (const id of ['AUTH-12', 'AUTH-15', 'AUTH-16', 'AUTH-17']) {
     const entry = register.entries.find(candidate => candidate.id === id);
     assert.equal(entry.status, 'not_requested');
     assert.equal(entry.authorized, false);
@@ -98,4 +98,6 @@ test('evidence ledger maps every requirement to implementation and verification'
   assert.ok(ledger.entries.length >= 20);
   assert.ok(ledger.entries.every(entry => entry.implementation.length > 0 && entry.verification.length > 0));
   for (const id of ['WP11-RESULT-CARD-SIX-REGIONS', 'WP11-USE-CARD', 'WP11-ACCESS-PLAN', 'WP11-RETRIEVAL-RECIPE', 'WP11-PLAN-SECTION-ORDER', 'WP11-BROWSE-NEVER-PLANS', 'WP11-ADAPTER-GATE', 'WP11-WP9-COVERAGE-PARITY', 'WP11-EXTERNAL-URL-TRUST-BOUNDARY', 'WP11-A11Y-RESPONSIVE', 'WP11-AUTH-12', 'WP11-AUTH-15']) assert.ok(ledger.entries.some(entry => entry.requirement_id === id), id);
+  assert.equal(ledger.entries.find(entry => entry.requirement_id === 'WP11-RESULT-CARD-HUMAN-STUDY')?.authorization_reference, 'AUTH-16');
+  assert.equal(ledger.entries.find(entry => entry.requirement_id === 'WP11-DECISION-SUMMARY-HUMAN-REVIEW')?.authorization_reference, 'AUTH-17');
 });
