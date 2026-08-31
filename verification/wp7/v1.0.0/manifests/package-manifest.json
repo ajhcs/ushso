@@ -1,0 +1,27 @@
+{
+  "manifest_version": "ushso.artifact-tree-manifest.v1.0.0",
+  "package_name": "@ushso/verification-wp7-v1",
+  "package_version": "1.0.0",
+  "mode": "local_verification_short_of_external_authorization",
+  "offline": true,
+  "manifest_excludes": ["manifests/package-manifest.json", "validation/validation-receipt.json"],
+  "digest_contract": {
+    "file_digest": "sha256_exact_bytes",
+    "tree_digest": "sha256_canonical_json_of_path_bytes_byte_sha256_sorted_by_path",
+    "path_encoding": "repository_relative_posix_utf8"
+  },
+  "file_count": 16,
+  "payload_bytes": 45483,
+  "package_payload_digest_sha256": "ef7e6806bb57cd3fa3314e26abfa849edf21c733b25792a53a1cf3953567f336",
+  "dependencies": [
+    {"package": "@ushso/identity", "package_payload_digest_sha256": "37d13d6993764b27febc372aa9be12a97fd0102a7ee17396d71e5376fa812993"},
+    {"package": "@ushso/evaluation-identity-v1", "package_payload_digest_sha256": "f524aa853a82c971fbed76eea8f5eacd8ba783d40d224308ba0c1f74625c3cc6"},
+    {"register": "verification/external-authorization/v1.0.0/register.json", "byte_sha256": "442070d0ce612301ad450491862b168830475876b711ae9fb1c14da3ddc0e830", "entry": "AUTH-14", "status": "not_requested", "authorized": false}
+  ],
+  "release_blockers": [
+    {"gate_id": "identity-human-double-review", "authorization_reference": "AUTH-14", "authorization_status": "not_requested", "authorized": false},
+    {"gate_id": "wp7-migrations-0008-0009", "authorization_reference": null}
+  ],
+  "non_blocking_disabled_capability": {"gate_id": "identity-rule-enablement", "status": "not_required_for_candidate_only_release", "rule_state": "disabled_candidate_only"},
+  "immutable": true
+}

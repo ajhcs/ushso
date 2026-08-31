@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/publication/v1.0.0/legacy-static-compatibility-manifest.schema.json",
+  "title": "Legacy static rollback compatibility manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "manifest_id", "mode", "contract_version", "worker_version", "worker_artifact_sha256", "static_corpus", "capabilities", "truth_boundary", "verified_at", "manifest_digest", "immutable"],
+  "properties": {
+    "manifest_version": {"const": "legacy-static-compatibility-manifest.v1"},
+    "manifest_id": {"$ref": "common.schema.json#/$defs/id"},
+    "mode": {"const": "emergency_static_rollback_only"},
+    "contract_version": {"const": "1.0.0"},
+    "worker_version": {"$ref": "common.schema.json#/$defs/version"},
+    "worker_artifact_sha256": {"$ref": "common.schema.json#/$defs/sha256"},
+    "static_corpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["corpus_version", "record_count", "join_route_count", "manifest_path", "manifest_sha256", "content_fingerprint", "as_of"],
+      "properties": {
+        "corpus_version": {"const": "1.1.0"},
+        "record_count": {"const": 157},
+        "join_route_count": {"const": 14},
+        "manifest_path": {"const": "packages/retrieval/versions/v1.1.0/corpus/corpus.json"},
+        "manifest_sha256": {"$ref": "common.schema.json#/$defs/sha256"},
+        "content_fingerprint": {"$ref": "common.schema.json#/$defs/sha256"},
+        "as_of": {"$ref": "common.schema.json#/$defs/utcTimestamp"}
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["search", "seo", "coverage", "planner"],
+      "properties": {
+        "search": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["availability", "scope", "absence_claim_permitted"],
+          "properties": {
+            "availability": {"const": "available"},
+            "scope": {"const": "pinned_static_corpus_only"},
+            "absence_claim_permitted": {"const": false}
+          }
+        },
+        "seo": {"$ref": "#/$defs/unknownCapability"},
+        "coverage": {"$ref": "#/$defs/unknownCapability"},
+        "planner": {"$ref": "#/$defs/unknownCapability"}
+      }
+    },
+    "truth_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_of_truth", "analytics_execution", "source_data_retrieval", "identity_merge", "coverage_completeness_claim"],
+      "properties": {
+        "source_of_truth": {"const": false},
+        "analytics_execution": {"const": false},
+        "source_data_retrieval": {"const": false},
+        "identity_merge": {"const": false},
+        "coverage_completeness_claim": {"const": false}
+      }
+    },
+    "verified_at": {"$ref": "common.schema.json#/$defs/utcTimestamp"},
+    "manifest_digest": {
+      "allOf": [
+        {"$ref": "common.schema.json#/$defs/digest"},
+        {"type": "object", "properties": {"domain": {"const": "legacy_static_compatibility"}}}
+      ]
+    },
+    "immutable": {"const": true}
+  },
+  "$defs": {
+    "unknownCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["availability", "reason_code", "absence_claim_permitted"],
+      "properties": {
+        "availability": {"const": "unknown"},
+        "reason_code": {"const": "legacy_static_component_unavailable"},
+        "absence_claim_permitted": {"const": false}
+      }
+    }
+  }
+}

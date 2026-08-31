@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/wp14/rollback-bundle.v1.0.0.schema.json",
+  "title": "WP14 complete N and N-1 rollback bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "bundle_id", "candidate_digest_sha256", "prepared_at", "support_window_anchor_at", "support_window_days", "support_expires_at", "old_worker_version_id", "new_worker_version_id", "database_compatibility_watermark", "old_publication_manifest_id", "new_publication_manifest_id", "old_search_generation_id", "new_search_generation_id", "old_asset_bundle_sha256", "new_asset_bundle_sha256", "static_export_sha256", "resources", "reason", "operator", "verification_receipt_sha256", "n_minus_one_current_schema_compatible", "cross_version_asset_404_count", "storage_rollback_claimed", "destructive_down_migration_included", "bundle_sha256"],
+  "properties": {
+    "schema_version": {"const": "ushso-wp14-rollback-bundle.v1.0.0"},
+    "bundle_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,159}$"},
+    "candidate_digest_sha256": {"$ref": "#/$defs/sha256"},
+    "prepared_at": {"$ref": "#/$defs/timestamp"},
+    "support_window_anchor_at": {"$ref": "#/$defs/timestamp"},
+    "support_window_days": {"type": "integer", "minimum": 30, "maximum": 365},
+    "support_expires_at": {"$ref": "#/$defs/timestamp"},
+    "old_worker_version_id": {"type": "string", "minLength": 1},
+    "new_worker_version_id": {"type": "string", "minLength": 1},
+    "database_compatibility_watermark": {"type": "string", "minLength": 1},
+    "old_publication_manifest_id": {"type": "string", "minLength": 1},
+    "new_publication_manifest_id": {"type": "string", "minLength": 1},
+    "old_search_generation_id": {"type": "string", "minLength": 1},
+    "new_search_generation_id": {"type": "string", "minLength": 1},
+    "old_asset_bundle_sha256": {"$ref": "#/$defs/sha256"},
+    "new_asset_bundle_sha256": {"$ref": "#/$defs/sha256"},
+    "static_export_sha256": {"$ref": "#/$defs/sha256"},
+    "resources": {
+      "type": "array",
+      "minItems": 16,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "resource_id", "binding_name"],
+        "properties": {
+          "role": {"$ref": "#/$defs/resourceRole"},
+          "resource_id": {"type": "string", "minLength": 1, "maxLength": 240},
+          "binding_name": {"anyOf": [{"type": "string", "minLength": 1, "maxLength": 160}, {"type": "null"}]}
+        }
+      }
+    },
+    "reason": {"type": "string", "minLength": 1},
+    "operator": {"type": "string", "minLength": 1},
+    "incident_link": {"type": "string", "minLength": 1},
+    "verification_receipt_sha256": {"$ref": "#/$defs/sha256"},
+    "n_minus_one_current_schema_compatible": {"const": true},
+    "cross_version_asset_404_count": {"const": 0},
+    "storage_rollback_claimed": {"const": false},
+    "destructive_down_migration_included": {"const": false},
+    "bundle_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"},
+    "resourceRole": {"enum": ["worker_n_minus_one", "worker_n", "hyperdrive_correctness", "hyperdrive_immutable_read", "r2_capture", "r2_archive", "queue_primary", "queue_dlq", "workflow", "publication_manifest_n_minus_one", "publication_manifest_n", "search_generation_n_minus_one", "search_generation_n", "asset_bundle_n_minus_one", "asset_bundle_n", "static_emergency_artifact"]}
+  }
+}

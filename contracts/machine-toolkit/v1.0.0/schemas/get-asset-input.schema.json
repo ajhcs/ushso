@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-asset-input.schema.json",
+  "title": "observatory.get_asset input",
+  "type": "object",
+  "additionalProperties": false,
+  "maxProperties": 5,
+  "required": ["contract_version", "record_id", "expected_generation", "collection_limits", "collection_cursors"],
+  "properties": {
+    "contract_version": { "const": "observatory.machine.get-asset.input.v1.0.0" },
+    "record_id": { "$ref": "common.schema.json#/$defs/stableId" },
+    "expected_generation": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+    "collection_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 4,
+      "required": ["releases", "distributions", "documentation", "schemas"],
+      "properties": {
+        "releases": { "type": "integer", "minimum": 1, "maximum": 50, "default": 20 },
+        "distributions": { "type": "integer", "minimum": 1, "maximum": 50, "default": 20 },
+        "documentation": { "type": "integer", "minimum": 1, "maximum": 50, "default": 20 },
+        "schemas": { "type": "integer", "minimum": 1, "maximum": 50, "default": 20 }
+      }
+    },
+    "collection_cursors": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 4,
+      "required": ["releases", "distributions", "documentation", "schemas"],
+      "properties": {
+        "releases": { "$ref": "common.schema.json#/$defs/nullableCursor" },
+        "distributions": { "$ref": "common.schema.json#/$defs/nullableCursor" },
+        "documentation": { "$ref": "common.schema.json#/$defs/nullableCursor" },
+        "schemas": { "$ref": "common.schema.json#/$defs/nullableCursor" }
+      }
+    }
+  }
+}

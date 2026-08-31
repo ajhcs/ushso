@@ -1,0 +1,45 @@
+{
+  "schema_version": "ushso-access-policy.v1.0.0",
+  "environment": "${environment}",
+  "application_name": "ushso-${environment}-ops",
+  "hostname": "${ops_hostname}",
+  "application_type": "self_hosted",
+  "session_duration": "1h",
+  "http_only_cookie": true,
+  "same_site_cookie": "strict",
+  "policies": [
+    {
+      "precedence": 1,
+      "name": "dedicated-operations-role",
+      "decision": "allow",
+      "include": [{ "group_id": "${ops_group_id}" }],
+      "require": [{ "authentication_method": "mfa" }],
+      "exclude": []
+    },
+    {
+      "precedence": 2,
+      "name": "automation-service-token",
+      "decision": "non_identity",
+      "include": [{ "service_token_id": "${ops_service_token_id}" }],
+      "require": [],
+      "exclude": []
+    },
+    {
+      "precedence": 999,
+      "name": "deny-everyone-else",
+      "decision": "deny",
+      "include": [{ "everyone": true }],
+      "require": [],
+      "exclude": []
+    }
+  ],
+  "required_audit_actions": [
+    "pause",
+    "replay",
+    "review",
+    "promotion",
+    "rollback",
+    "retention_override",
+    "deletion"
+  ]
+}

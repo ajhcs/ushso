@@ -1,0 +1,63 @@
+{
+  "$schema": "../../../../node_modules/wrangler/config-schema.json",
+  "name": "ushso-staging-scheduler",
+  "main": "../../templates/foundation-placeholder.mjs",
+  "compatibility_date": "2026-08-30",
+  "compatibility_flags": [
+    "nodejs_compat_v2"
+  ],
+  "workers_dev": false,
+  "routes": [],
+  "vars": {
+    "USHSO_ENVIRONMENT": "staging",
+    "USHSO_WORKER_ROLE": "scheduler",
+    "FOUNDATION_INERT": "true",
+    "CONFIG_SCHEMA_VERSION": "ushso-worker-binding-manifest.v1.0.0"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 0.25,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.1
+    }
+  },
+  "hyperdrive": [
+    {
+      "binding": "HD_CORRECTNESS",
+      "id": "REPLACE_STAGING_SCHEDULER_HD_CORRECTNESS_ID"
+    }
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "HARVEST_PAGE_QUEUE",
+        "queue": "ushso-staging-harvest-page"
+      }
+    ],
+    "consumers": []
+  },
+  "workflows": [
+    {
+      "binding": "HARVEST_WORKFLOW",
+      "name": "ushso-staging-harvest",
+      "class_name": "HarvestWorkflow",
+      "concurrency": {
+        "limit": 2
+      },
+      "default_retention": {
+        "success_retention": "30 days",
+        "error_retention": "30 days"
+      }
+    }
+  ],
+  "triggers": {
+    "crons": [
+      "*/5 * * * *"
+    ]
+  }
+}

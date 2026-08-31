@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/verification/wp6/v1.0.0/schemas/evidence-ledger.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ledger_version", "work_package", "status", "plan_sources", "requirements", "managed_execution", "product_boundary"],
+  "properties": {
+    "ledger_version": { "const": "ushso-wp6-evidence-ledger.v1.0.0" },
+    "work_package": { "const": "WP6" },
+    "status": { "const": "implemented_local_pending_managed_execution" },
+    "plan_sources": { "type": "array", "minItems": 5, "uniqueItems": true, "items": { "type": "string", "minLength": 3 } },
+    "requirements": {
+      "type": "array", "minItems": 11,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "source", "statement", "implementation_paths", "verification", "status"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^WP6-[0-9]{2}$" },
+          "source": { "type": "string", "minLength": 3 },
+          "statement": { "type": "string", "minLength": 10 },
+          "implementation_paths": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
+          "verification": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 3 } },
+          "status": { "const": "verified_local" }
+        }
+      }
+    },
+    "managed_execution": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "required_actions"],
+      "properties": {
+        "status": { "const": "pending_external_authorization" },
+        "required_actions": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "type": "string", "minLength": 10 } }
+      }
+    },
+    "product_boundary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_payloads_acquired", "analyses_executed", "market_share_calculated", "financial_benchmarks_produced"],
+      "properties": {
+        "source_payloads_acquired": { "const": false },
+        "analyses_executed": { "const": false },
+        "market_share_calculated": { "const": false },
+        "financial_benchmarks_produced": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "path": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+" }
+  }
+}

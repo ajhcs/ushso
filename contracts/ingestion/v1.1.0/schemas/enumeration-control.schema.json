@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.1.0/enumeration-control.schema.json",
+  "title": "Enumeration sealing, publication barrier, and pause/drain control",
+  "oneOf": [
+    { "$ref": "#/$defs/EnumerationSeal" },
+    { "$ref": "#/$defs/PublicationBarrier" },
+    { "$ref": "#/$defs/SourceControl" }
+  ],
+  "$defs": {
+    "EnumerationSeal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract_version", "record_kind", "enumeration_seal_id", "run_id", "source_id", "scope_id", "status", "pages_discovered", "pages_committed", "items_discovered", "discoveries_committed", "page_dead_letter_count", "cursor_expired", "population_digest", "completeness_evidence_ref_id", "sealed_at"],
+      "properties": {
+        "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+        "record_kind": { "const": "enumeration_seal" },
+        "enumeration_seal_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "source_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "scope_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "status": { "enum": ["open", "sealed", "failed", "cursor_expired"] },
+        "pages_discovered": { "type": "integer", "minimum": 0 },
+        "pages_committed": { "type": "integer", "minimum": 0 },
+        "items_discovered": { "type": "integer", "minimum": 0 },
+        "discoveries_committed": { "type": "integer", "minimum": 0 },
+        "page_dead_letter_count": { "type": "integer", "minimum": 0 },
+        "cursor_expired": { "type": "boolean" },
+        "population_digest": { "anyOf": [{ "$ref": "common.schema.json#/$defs/Sha256" }, { "type": "null" }] },
+        "completeness_evidence_ref_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+        "sealed_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" }
+      }
+    },
+    "PublicationBarrier": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract_version", "record_kind", "barrier_id", "run_id", "run_outcome", "enumerations_complete_and_sealed", "membership_checkpoint_committed", "normalization_terminal_count", "observed_revision_count", "w1_revision_manifest_sealed", "eligible_projection_count", "projection_acknowledgement_count", "references_resolved", "checksums_verified", "visibility_verified", "coverage_reconciled", "required_dead_letter_count", "optional_degradations", "candidate_publication_id", "last_known_good_publication_id", "active_publication_id", "evaluated_at"],
+      "properties": {
+        "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+        "record_kind": { "const": "publication_barrier" },
+        "barrier_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "run_outcome": { "enum": ["published", "succeeded", "succeeded_with_optional_degradation", "partial_unpublished", "failed", "cancelled"] },
+        "enumerations_complete_and_sealed": { "type": "boolean" },
+        "membership_checkpoint_committed": { "type": "boolean" },
+        "normalization_terminal_count": { "type": "integer", "minimum": 0 },
+        "observed_revision_count": { "type": "integer", "minimum": 0 },
+        "w1_revision_manifest_sealed": { "type": "boolean" },
+        "eligible_projection_count": { "type": "integer", "minimum": 0 },
+        "projection_acknowledgement_count": { "type": "integer", "minimum": 0 },
+        "references_resolved": { "type": "boolean" },
+        "checksums_verified": { "type": "boolean" },
+        "visibility_verified": { "type": "boolean" },
+        "coverage_reconciled": { "type": "boolean" },
+        "required_dead_letter_count": { "type": "integer", "minimum": 0 },
+        "optional_degradations": {
+          "type": "array", "uniqueItems": true,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["stage", "affected_id", "result_state", "authorizing_policy_version"],
+            "properties": {
+              "stage": { "enum": ["schema_field_enrichment", "supplementary_documentation", "scheduled_access_reprobe", "candidate_identity_scoring"] },
+              "affected_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+              "result_state": { "enum": ["inherited", "stale", "unknown", "quarantined"] },
+              "authorizing_policy_version": { "type": "string", "pattern": "^[a-z0-9._-]{3,64}$" }
+            }
+          }
+        },
+        "candidate_publication_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+        "last_known_good_publication_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "active_publication_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "evaluated_at": { "$ref": "common.schema.json#/$defs/Timestamp" }
+      }
+    },
+    "SourceControl": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract_version", "record_kind", "source_control_id", "source_id", "previous_state", "state", "configuration_revision", "requested_by_audit_event_id", "remediation_evidence_ref_id", "pause_requested_at", "drain_started_at", "drain_completed_at", "in_flight_work_count", "durably_reledgered_work_count", "new_fetches_after_pause_effective", "updated_at"],
+      "properties": {
+        "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+        "record_kind": { "const": "source_control" },
+        "source_control_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "source_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "previous_state": { "enum": ["active", "pause_requested", "draining", "paused", "auth_blocked", "schema_drift", "retired"] },
+        "state": { "enum": ["active", "pause_requested", "draining", "paused", "auth_blocked", "schema_drift", "retired"] },
+        "configuration_revision": { "type": "integer", "minimum": 1 },
+        "requested_by_audit_event_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+        "remediation_evidence_ref_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+        "pause_requested_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+        "drain_started_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+        "drain_completed_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+        "in_flight_work_count": { "type": "integer", "minimum": 0 },
+        "durably_reledgered_work_count": { "type": "integer", "minimum": 0 },
+        "new_fetches_after_pause_effective": { "type": "integer", "minimum": 0 },
+        "updated_at": { "$ref": "common.schema.json#/$defs/Timestamp" }
+      }
+    }
+  }
+}

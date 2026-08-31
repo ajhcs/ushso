@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.1.0/harvest-run.schema.json",
+  "title": "Harvest run",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "run_id", "plan_id", "source_id", "endpoint_id", "source_configuration_revision", "scheduled_slot", "mode", "run_idempotency_key", "state", "active_attempt", "workflow", "replay_of_run_id", "state_changed_at", "terminal_at", "enumeration_seal_id", "candidate_publication_id", "last_known_good_publication_id"],
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+    "run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "plan_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "source_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "endpoint_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "source_configuration_revision": { "type": "integer", "minimum": 1 },
+    "scheduled_slot": { "$ref": "common.schema.json#/$defs/Timestamp" },
+    "mode": { "enum": ["incremental", "full_membership", "operator_replay"] },
+    "run_idempotency_key": { "type": "string", "pattern": "^run:[A-Za-z0-9._:-]+:[0-9TZ:.-]+:(incremental|full_membership|operator_replay):r[1-9][0-9]*$", "maxLength": 400 },
+    "state": { "enum": ["scheduled", "starting", "enumerating", "enumerated", "normalizing", "projecting", "published", "succeeded", "succeeded_with_optional_degradation", "partial_unpublished", "failed", "cancelled"] },
+    "active_attempt": { "type": "integer", "minimum": 1 },
+    "workflow": {
+      "type": "object", "additionalProperties": false,
+      "required": ["instance_id", "workflow_version", "platform_state", "created_at", "retention_expires_at"],
+      "properties": {
+        "instance_id": {
+          "allOf": [
+            { "$ref": "common.schema.json#/$defs/CloudflareWorkflowInstanceId" },
+            { "type": "string", "pattern": "^harvest-[A-Za-z0-9_][A-Za-z0-9_-]*-[1-9][0-9]*$" }
+          ]
+        },
+        "workflow_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "platform_state": { "enum": ["requested", "running", "waiting", "complete", "errored", "unknown"] },
+        "created_at": { "$ref": "common.schema.json#/$defs/Timestamp" },
+        "retention_expires_at": { "$ref": "common.schema.json#/$defs/Timestamp" }
+      }
+    },
+    "replay_of_run_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+    "state_changed_at": { "$ref": "common.schema.json#/$defs/Timestamp" },
+    "terminal_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+    "enumeration_seal_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+    "candidate_publication_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+    "last_known_good_publication_id": { "$ref": "common.schema.json#/$defs/OpaqueId" }
+  }
+}

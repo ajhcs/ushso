@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/identity/v1.0.0/relationship-projection.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "projection_id",
+    "graph_kind",
+    "relationship_type",
+    "object_a_id",
+    "object_b_id",
+    "basis",
+    "effective_interval",
+    "evidence_ids",
+    "graph_revision_id",
+    "projected_at",
+    "state",
+    "supersedes_projection_id",
+    "superseded_by_projection_id"
+  ],
+  "properties": {
+    "schema_version": {"const": "identity.relationship-projection.v1.0.0"},
+    "projection_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "graph_kind": {"enum": ["identity", "family"]},
+    "relationship_type": {"enum": ["same_identity", "family_member", "mirror_of", "successor_of", "version_of", "format_variant_of", "collection_member"]},
+    "object_a_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "object_b_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reference_id"],
+      "properties": {
+        "kind": {"enum": ["review_decision", "exact_authority_policy"]},
+        "reference_id": {"$ref": "common.schema.json#/$defs/opaqueId"}
+      }
+    },
+    "effective_interval": {"$ref": "common.schema.json#/$defs/effectiveInterval"},
+    "evidence_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "graph_revision_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "projected_at": {"$ref": "common.schema.json#/$defs/dateTime"},
+    "state": {"enum": ["active", "superseded"]},
+    "supersedes_projection_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]},
+    "superseded_by_projection_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]}
+  }
+}

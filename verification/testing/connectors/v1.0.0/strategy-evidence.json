@@ -1,0 +1,23 @@
+{
+  "schema_version": "ushso-test-strategy-evidence.v1.0.0",
+  "strategy_key": "connectors",
+  "plan_section": "§22.2",
+  "structural_status": "PASS",
+  "release_readiness": "BLOCKED",
+  "release_blockers": [
+    "authorization:AUTH-04",
+    "live:metadata-smoke",
+    "live:shadow-and-canary"
+  ],
+  "execution_policy": { "offline": true, "repository_writes": 0, "receipt_writes": 0, "network_calls": 0, "external_actions": 0 },
+  "controls": [
+    { "id": "T22.2-01", "statement": "Pure parser/normalizer/checkpoint unit tests.", "evidence_status": "implemented_local", "evidence_scope": "local_unit", "evidence": [{ "kind": "test", "path": "packages/connectors/tests/adapters.test.mjs", "sha256": "fb2c3e43e75729d3ebe6826fd9755ffe6bc0e8a97bc6e0047cd24777208d7728" }] },
+    { "id": "T22.2-02", "statement": "Common adapter contract suite.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "test", "path": "packages/connectors/tests/contracts.test.mjs", "sha256": "15d409f0f99acc44d5ffb2891737db96d03e873ef9525e7b55420c88baecfd69" }] },
+    { "id": "T22.2-03", "statement": "Recorded HTTP playback with exact request matching.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "test", "path": "packages/connectors/tests/fixture-matrix.test.mjs", "sha256": "42e0ada3bf0b35d1838375cb9c9debe86a306f26ec21f65e49f051be8e283c66" }] },
+    { "id": "T22.2-04", "statement": "Duplicate, out-of-order, clock-skew, and crash-point property tests.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "receipt", "path": "verification/wp5/v1.0.0/receipts/fixture-matrix.json", "sha256": "62de86c0e7e6feebe11722708654a1135477cf1452ffd4328473d26692f4f27b" }] },
+    { "id": "T22.2-05", "statement": "304, pagination, cursor expiry, 429, transient failure, schema drift, redirect, auth, size, and deletion fixtures.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "receipt", "path": "verification/wp5/v1.0.0/receipts/fixture-matrix.json", "sha256": "62de86c0e7e6feebe11722708654a1135477cf1452ffd4328473d26692f4f27b" }] },
+    { "id": "T22.2-06", "statement": "Separate 404/410 fixtures for catalog root, collection/list, pagination cursor, exact item, distribution, and documentation targets, including checkpoint/seal assertions.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "receipt", "path": "verification/wp5/v1.0.0/receipts/fixture-matrix.json", "sha256": "62de86c0e7e6feebe11722708654a1135477cf1452ffd4328473d26692f4f27b" }] },
+    { "id": "T22.2-07", "statement": "Bounded live metadata-only smoke outside PR CI.", "evidence_status": "pending_authorization", "evidence_scope": "external_gate_record", "evidence": [{ "kind": "receipt", "path": "verification/wp5/v1.0.0/receipts/activation-status.json", "sha256": "21551f9f08a76de3ab307bf7eecceb98da9a64524d10c831514741b66f30be1b" }] },
+    { "id": "T22.2-08", "statement": "Live shadow and source-by-source canary promotion.", "evidence_status": "pending_authorization", "evidence_scope": "external_gate_record", "evidence": [{ "kind": "receipt", "path": "verification/wp5/v1.0.0/receipts/activation-status.json", "sha256": "21551f9f08a76de3ab307bf7eecceb98da9a64524d10c831514741b66f30be1b" }] }
+  ]
+}

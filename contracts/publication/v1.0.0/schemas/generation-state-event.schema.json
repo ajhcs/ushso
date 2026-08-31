@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/publication/v1.0.0/generation-state-event.schema.json",
+  "title": "Append-only generation lifecycle event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_version", "event_id", "generation_id", "component_kind", "from_state", "to_state", "occurred_at", "reason_code", "transaction_id", "pin_behavior", "append_only"],
+  "properties": {
+    "event_version": {"const": "generation-state-event.v1"},
+    "event_id": {"$ref": "common.schema.json#/$defs/id"},
+    "generation_id": {"$ref": "common.schema.json#/$defs/id"},
+    "component_kind": {"$ref": "common.schema.json#/$defs/componentKind"},
+    "from_state": {
+      "oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/generationState"}]
+    },
+    "to_state": {"$ref": "common.schema.json#/$defs/generationState"},
+    "occurred_at": {"$ref": "common.schema.json#/$defs/utcTimestamp"},
+    "reason_code": {"type": "string", "enum": ["build_started", "validation_passed", "validation_failed", "atomic_promotion", "superseded", "rollback_restored", "retention_expired"]},
+    "transaction_id": {"$ref": "common.schema.json#/$defs/id"},
+    "pin_behavior": {"type": "string", "enum": ["unavailable", "serve_pinned", "restart_required"]},
+    "append_only": {"const": true}
+  }
+}

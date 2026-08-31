@@ -15,3 +15,23 @@ npm run example
 ```
 
 No command performs network discovery, payload acquisition, coverage execution, identity resolution, or deployment. Generated corpus outputs are immutable: changed inputs or code require another versioned successor.
+
+## Analytical-use guidance
+
+[`analysis-use/v1.0.0/README.md`](analysis-use/v1.0.0/README.md) describes the separately versioned Use Card compiler. It consumes a pinned `hc-metrics` requirements catalog and evidence-reviewed dataset mappings to report analytical fit without calculating metrics or changing the Observatory discovery UI.
+
+The pin's `source.project_id` is an asserted logical project identifier, not an
+attestation of repository origin. `source.origin_verified` is therefore fixed to
+`false`. The importer reads an exact commit and blob paths from a local Git
+object database with Git replacement objects and caller-supplied Git
+configuration environment variables disabled, then publishes canonical bytes
+without overwriting an existing complete, partial, or raced target. The verified
+loader checks the locally published byte lengths and SHA-256 digests, validates
+the catalog against its pinned schema, and applies the Observatory's semantic
+and fail-closed authority checks.
+
+That local verification does not prove who supplied the Git object database,
+authenticate a remote, verify a signed commit or tag, or independently anchor
+the revision and blob IDs. A production import must add an independently
+trusted revision or artifact-signature anchor before treating upstream origin
+as attested.

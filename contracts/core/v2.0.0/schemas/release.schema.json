@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/release.schema.json",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/truthEnvelope" },
+    {
+      "type": "object",
+      "required": ["release_id", "asset_id", "release_label", "release_kind", "publisher_version", "cadence", "immutable"],
+      "properties": {
+        "entity_type": { "const": "Release" },
+        "release_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "asset_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "release_label": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "release_kind": { "enum": ["edition", "vintage", "snapshot", "filing_period", "api_version", "rolling_current", "other"] },
+        "publisher_version": {
+          "oneOf": [
+            { "type": "string", "minLength": 1, "maxLength": 300 },
+            { "type": "null" }
+          ]
+        },
+        "cadence": { "enum": ["continuous", "daily", "weekly", "monthly", "quarterly", "annual", "irregular", "one_time", "unknown"] },
+        "immutable": { "const": true },
+        "native_identifiers": { "type": "array", "minItems": 1 },
+        "evidence_refs": { "type": "array", "minItems": 1 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

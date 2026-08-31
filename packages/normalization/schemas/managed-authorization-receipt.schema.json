@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/normalization/v1.0.0/schemas/managed-authorization-receipt.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receipt_version", "authorization_id", "authorized", "environment", "database", "deployment_fingerprint", "action", "parameters", "reviewer", "approved_at", "expires_at"],
+  "properties": {
+    "receipt_version": { "const": "ushso-normalization-managed-authorization.v1.0.0" },
+    "authorization_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@/-]{7,239}$" },
+    "authorized": { "const": true },
+    "environment": { "enum": ["staging", "production"] },
+    "database": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_-]{0,62}$" },
+    "deployment_fingerprint": { "$ref": "#/$defs/bareSha256" },
+    "action": { "enum": ["normalization_import_v1_1_0", "normalization_import_reject"] },
+    "parameters": {
+      "oneOf": [
+        { "$ref": "#/$defs/importParameters" },
+        { "$ref": "#/$defs/rejectParameters" }
+      ]
+    },
+    "reviewer": { "type": "string", "minLength": 3, "maxLength": 240 },
+    "approved_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "bareSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "sha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "opaqueId": { "type": "string", "pattern": "^urn:ushso:[a-z][a-z0-9-]*:[A-Za-z0-9._~-]+$" },
+    "importParameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["import_id", "document_fingerprint", "bundle_fingerprint", "projection_fingerprint", "normalizer_name", "normalizer_version"],
+      "properties": {
+        "import_id": { "$ref": "#/$defs/opaqueId" },
+        "document_fingerprint": { "$ref": "#/$defs/sha256" },
+        "bundle_fingerprint": { "$ref": "#/$defs/sha256" },
+        "projection_fingerprint": { "$ref": "#/$defs/sha256" },
+        "normalizer_name": { "const": "legacy-corpus-normalizer" },
+        "normalizer_version": { "const": "1.0.0" }
+      }
+    },
+    "rejectParameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["import_id", "reason", "audit_event_id", "recorded_at"],
+      "properties": {
+        "import_id": { "$ref": "#/$defs/opaqueId" },
+        "reason": { "type": "string", "minLength": 3, "maxLength": 1000 },
+        "audit_event_id": { "type": "string", "minLength": 3, "maxLength": 240 },
+        "recorded_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

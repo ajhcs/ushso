@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/coverage/v1.0.0/schemas/metric-definitions.schema.json",
+  "title": "Coverage metric definition registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "digest_taxonomy_ref", "definitions"],
+  "properties": {
+    "contract_version": { "const": "1.0.0" },
+    "digest_taxonomy_ref": { "const": "contracts/digest-taxonomy.json" },
+    "definitions": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": { "$ref": "#/$defs/MetricDefinition" }
+    }
+  },
+  "$defs": {
+    "MetricDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "metric_id",
+        "metric_version",
+        "label",
+        "allowed_units",
+        "kind",
+        "measured_stage",
+        "numerator_definition",
+        "numerator_definition_version",
+        "denominator_definition",
+        "denominator_definition_version",
+        "allowed_denominator_status",
+        "allow_estimated_rate",
+        "required_revision_pins",
+        "filters_known_by_stage",
+        "partition",
+        "exclusions_remain_in_upstream_denominator",
+        "absence_sensitive",
+        "overlap_policy"
+      ],
+      "properties": {
+        "metric_id": { "$ref": "common.schema.json#/$defs/MetricId" },
+        "metric_version": { "const": "1.0.0" },
+        "label": { "type": "string", "minLength": 3, "maxLength": 120 },
+        "allowed_units": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/CountingUnit" }
+        },
+        "kind": {
+          "enum": [
+            "partition",
+            "conditional_rate",
+            "rate",
+            "absolute_count",
+            "absolute_or_authoritative_total"
+          ]
+        },
+        "measured_stage": {
+          "enum": [
+            "registry",
+            "enumeration",
+            "capture",
+            "normalization",
+            "canonical",
+            "schema_index",
+            "search_index",
+            "access_check",
+            "freshness",
+            "pipeline",
+            "exclusion"
+          ]
+        },
+        "numerator_definition": { "type": "string", "minLength": 12, "maxLength": 1000 },
+        "numerator_definition_version": { "$ref": "common.schema.json#/$defs/Id" },
+        "denominator_definition": {
+          "oneOf": [
+            { "type": "string", "minLength": 12, "maxLength": 1200 },
+            { "type": "null" }
+          ]
+        },
+        "denominator_definition_version": {
+          "oneOf": [
+            { "$ref": "common.schema.json#/$defs/Id" },
+            { "type": "null" }
+          ]
+        },
+        "allowed_denominator_status": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["known", "estimated", "unknown"] }
+        },
+        "allow_estimated_rate": { "type": "boolean" },
+        "required_revision_pins": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "registry_revision",
+              "source_scope_revision",
+              "policy_revision",
+              "connector_revision",
+              "connector_configuration_revision",
+              "canonical_revision",
+              "coverage_contract_version",
+              "index_generation"
+            ]
+          }
+        },
+        "filters_known_by_stage": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/CohortDimension" }
+        },
+        "partition": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["states", "equation", "numerator_states"],
+              "properties": {
+                "states": {
+                  "type": "array",
+                  "minItems": 2,
+                  "uniqueItems": true,
+                  "items": { "type": "string", "minLength": 2, "maxLength": 80 }
+                },
+                "equation": { "type": "string", "minLength": 10, "maxLength": 240 },
+                "numerator_states": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": { "type": "string", "minLength": 2, "maxLength": 80 }
+                }
+              }
+            }
+          ]
+        },
+        "exclusions_remain_in_upstream_denominator": { "type": "boolean" },
+        "absence_sensitive": { "type": "boolean" },
+        "overlap_policy": {
+          "enum": ["disjoint_required", "non_additive_disclosure", "single_global_inventory"]
+        }
+      }
+    }
+  }
+}

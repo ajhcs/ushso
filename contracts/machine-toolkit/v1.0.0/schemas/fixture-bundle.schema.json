@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/fixture-bundle.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "manifest_id", "conformance_cases", "legacy_compatibility_cases", "gate_cases"],
+  "properties": {
+    "contract_version": { "const": "observatory-machine-toolkit-fixtures.v1.0.0" },
+    "manifest_id": { "const": "machine-toolkit.manifest.v1.0.0" },
+    "conformance_cases": {
+      "type": "array",
+      "minItems": 13,
+      "maxItems": 40,
+      "items": { "$ref": "#/$defs/conformanceCase" }
+    },
+    "legacy_compatibility_cases": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 10,
+      "items": { "$ref": "#/$defs/legacyCase" }
+    },
+    "gate_cases": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/gateCase" }
+    }
+  },
+  "$defs": {
+    "input": {
+      "oneOf": [
+        { "$ref": "search-assets-input.schema.json" },
+        { "$ref": "get-asset-input.schema.json" },
+        { "$ref": "get-access-plan-input.schema.json" },
+        { "$ref": "get-retrieval-recipe-input.schema.json" },
+        { "$ref": "get-variables-input.schema.json" },
+        { "$ref": "get-join-routes-input.schema.json" },
+        { "$ref": "compare-assets-input.schema.json" },
+        { "$ref": "get-coverage-status-input.schema.json" },
+        { "$ref": "plan-research-input.schema.json" }
+      ]
+    },
+    "response": {
+      "oneOf": [
+        { "$ref": "search-assets-response.schema.json" },
+        { "$ref": "get-asset-response.schema.json" },
+        { "$ref": "get-access-plan-response.schema.json" },
+        { "$ref": "get-retrieval-recipe-response.schema.json" },
+        { "$ref": "get-variables-response.schema.json" },
+        { "$ref": "get-join-routes-response.schema.json" },
+        { "$ref": "compare-assets-response.schema.json" },
+        { "$ref": "get-coverage-status-response.schema.json" },
+        { "$ref": "plan-research-response.schema.json" }
+      ]
+    },
+    "conformanceCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "case_kind", "capability", "input_schema_id", "response_schema_id", "input", "json_api", "webmcp"],
+      "properties": {
+        "case_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "case_kind": { "enum": ["success", "empty", "domain_error", "rate_limited", "planner_gated", "planner_disabled"] },
+        "capability": { "enum": ["search_assets", "get_asset", "get_access_plan", "get_retrieval_recipe", "get_variables", "get_join_routes", "compare_assets", "get_coverage_status", "plan_research"] },
+        "input_schema_id": { "$ref": "common.schema.json#/$defs/uri" },
+        "response_schema_id": { "$ref": "common.schema.json#/$defs/uri" },
+        "input": { "$ref": "#/$defs/input" },
+        "json_api": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method", "route", "response"],
+          "properties": {
+            "method": { "enum": ["GET", "POST"] },
+            "route": { "type": "string", "minLength": 1, "maxLength": 256 },
+            "response": { "$ref": "#/$defs/response" }
+          }
+        },
+        "webmcp": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tool_name", "response"],
+          "properties": {
+            "tool_name": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "response": { "$ref": "#/$defs/response" }
+          }
+        }
+      }
+    },
+    "legacyCase": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["case_id", "legacy_input", "translated_input", "expected_outcome"],
+          "properties": {
+            "case_id": { "$ref": "common.schema.json#/$defs/stableId" },
+            "legacy_input": { "$ref": "legacy-discover-sources-input.schema.json" },
+            "translated_input": { "$ref": "search-assets-input.schema.json" },
+            "expected_outcome": { "const": "translated" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["case_id", "legacy_input", "translated_input", "expected_outcome"],
+          "properties": {
+            "case_id": { "$ref": "common.schema.json#/$defs/stableId" },
+            "legacy_input": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["question", "limit"],
+              "properties": {
+                "question": { "type": "string", "minLength": 3, "maxLength": 500 },
+                "limit": { "type": "integer", "minimum": 21, "maximum": 1000000 }
+              }
+            },
+            "translated_input": { "type": "null" },
+            "expected_outcome": { "const": "invalid_input_never_clip" }
+          }
+        }
+      ]
+    },
+    "gateCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "capability", "required_gates", "gate_receipts", "expected_registration_state"],
+      "properties": {
+        "case_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "capability": { "enum": ["search_assets", "plan_research"] },
+        "required_gates": { "type": "array", "minItems": 3, "maxItems": 10, "uniqueItems": true, "items": { "$ref": "common.schema.json#/$defs/stableId" } },
+        "gate_receipts": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["gate", "passed"],
+            "properties": {
+              "gate": { "$ref": "common.schema.json#/$defs/stableId" },
+              "passed": { "type": "boolean" }
+            }
+          }
+        },
+        "expected_registration_state": { "enum": ["enabled", "gated", "disabled"] }
+      }
+    }
+  }
+}

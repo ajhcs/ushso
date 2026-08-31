@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import { AgentsPage } from './pages/AgentsPage'
 import { DatasetDetailsPage } from './pages/DatasetDetailsPage'
 import { LandingPage } from './pages/LandingPage'
+import { PlanPage } from './pages/PlanPage'
 import { SearchResultsPage } from './pages/SearchResultsPage'
 import { SourcesPage } from './pages/SourcesPage'
 import { StandardPage } from './pages/StandardPage'
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/search" element={<SearchResultsPage />} />
         <Route path="/agents" element={<AgentsPage />} />
+        <Route path="/plan" element={<PlanPage />} />
         <Route path="/datasets/:datasetId" element={<DatasetDetailsPage />} />
         <Route path="/sources" element={<SourcesPage />} />
         <Route path="/about" element={<StandardPage title="About the Observatory" copy="A free discovery and routing layer for the nation’s health systems data." />} />

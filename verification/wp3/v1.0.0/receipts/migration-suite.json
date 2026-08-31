@@ -1,0 +1,57 @@
+{
+  "receipt_version": "ushso-wp3-receipt.v1",
+  "evidence_scope": "local_synthetic",
+  "generated_at": "2026-08-30T22:04:39.031Z",
+  "local_suite_sha256": "9b0deaa5d0cfcfaf11fca83ce82745173d1a5279d5e7c51806a70b8c924a8a0d",
+  "managed_resource_evidence": {
+    "status": "pending_external_authorization",
+    "provider_capability_verified": false,
+    "hyperdrive_verified": false,
+    "staging_applied": false,
+    "production_applied": false,
+    "failover_measured": false,
+    "pitr_measured": false
+  },
+  "zero_action": {
+    "network_calls": 0,
+    "deployments": 0,
+    "managed_mutations": 0,
+    "secrets_emitted": 0
+  },
+  "control": "WP3 migrations 0001-0003",
+  "status": "pass_local",
+  "forward_only": true,
+  "destructive_down_migrations": false,
+  "migrations": [
+    {
+      "id": "0001",
+      "file": "0001_registry_sources_endpoints_scopes.sql",
+      "byte_sha256": "7cd5d8cf2fbdb5a87d9344ad5218329c3d793b093ba674ffd00c4660c491a1f6",
+      "depends_on": []
+    },
+    {
+      "id": "0002",
+      "file": "0002_ingest_runs_jobs_captures.sql",
+      "byte_sha256": "6dd918098537e6b61d6f9bfc17cf9bdf824c8bac444f9817338e4825d25a77ad",
+      "depends_on": [
+        "0001"
+      ]
+    },
+    {
+      "id": "0003",
+      "file": "0003_ops_outbox_processed_events_dead_letters.sql",
+      "byte_sha256": "56aa2f5ab893d8a6294b5255cd8646bad084bfa0986e92c4774cf262643a703b",
+      "depends_on": [
+        "0002"
+      ]
+    }
+  ],
+  "checks": [
+    "clean apply",
+    "N-1 upgrade",
+    "exact checksum",
+    "idempotent rerun",
+    "environment fence",
+    "connection rollback"
+  ]
+}

@@ -1,18 +1,13 @@
 import { Code2 } from 'lucide-react'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
+import responseExample from '../data/generatedAgentsResponseExample.json'
 
 const curlExample = `curl -sS https://ushso.org/api/discover \\
   -H "content-type: application/json" \\
   --data '{"question":"hospital ownership changes in Texas","limit":10}'`
 
-const jsonExample = `{
-  "contract_version": "observatory-discovery-result.v1.0.0",
-  "query": { "interpretation": { "geographies": ["US-TX"] } },
-  "result_count": 3,
-  "results": [{ "record_id": "obs:asset:…", "record": { "authoritative_url": "…" } }],
-  "warnings": ["Results describe indexed metadata and retrieval routes…"]
-}`
+const jsonExample = JSON.stringify(responseExample, null, 2)
 
 export function AgentsPage() {
   return (

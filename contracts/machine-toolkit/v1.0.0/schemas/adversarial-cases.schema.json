@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/adversarial-cases.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "cases"],
+  "properties": {
+    "contract_version": { "const": "observatory-machine-toolkit-adversarial.v1.0.0" },
+    "cases": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["case_id", "base_case_id", "mutation", "expected_failure_code", "expected_layer"],
+        "properties": {
+          "case_id": { "$ref": "common.schema.json#/$defs/stableId" },
+          "base_case_id": { "$ref": "common.schema.json#/$defs/stableId" },
+          "mutation": { "enum": ["input_unknown_property", "input_over_20k", "output_over_cap", "truth_boundary_flip", "transport_parity_drift", "snapshot_digest_drift", "generation_pin_drift", "cursor_without_truncation", "cursor_ttl_over_30m", "cursor_beyond_generation_retention", "cursor_expired_without_restart", "silent_generation_repin", "missing_evidence", "duplicate_evidence_id", "credential_field", "secret_query_parameter", "source_payload_field", "analysis_payload_field", "access_eligibility_overclaim", "access_submission_overclaim", "retrieval_execution_overclaim", "sample_response_payload", "join_documented_as_executed", "compare_ranking", "compare_source_values", "coverage_absence_without_complete_denominator", "coverage_unknown_collapsed", "planner_truth_overclaim", "planner_disabled_advertised_active", "legacy_limit_silently_clipped", "unsafe_record_error_leak", "rate_limit_inconsistent", "partial_safety_atomic_response" ] },
+          "expected_failure_code": { "$ref": "common.schema.json#/$defs/stableId" },
+          "expected_layer": { "enum": ["schema", "semantic", "parity", "manifest"] }
+        }
+      }
+    }
+  }
+}

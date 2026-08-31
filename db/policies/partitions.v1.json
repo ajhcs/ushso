@@ -1,0 +1,21 @@
+{
+  "schema_version": "ushso-partition-policy.v1",
+  "timezone": "UTC",
+  "granularity": "month",
+  "precreate_previous_months": 1,
+  "precreate_future_months": 3,
+  "allow_default_partition": false,
+  "parents": [
+    "ingest.run_state_events",
+    "ingest.job_attempts",
+    "ingest.workflow_reconciliation_events",
+    "ops.outbox_attempt_events",
+    "ops.processed_event_history",
+    "ops.dead_letter_events",
+    "ops.audit_events"
+  ],
+  "planned_parent": "search.publication_history",
+  "missing_partition_behavior": "transaction_rollback_and_alert",
+  "managed_status": "pending_external_authorization"
+}
+

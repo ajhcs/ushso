@@ -1,0 +1,154 @@
+{
+  "receipt_version": "wp12.machine-toolkit-candidate-validation.v1.0.0",
+  "recorded_at": "2026-08-30T22:50:26Z",
+  "repository_revision": "6eeca2a47d4dba7eee05e9b43b15fa03f231ac6a",
+  "scope": "protected_candidate_foundation",
+  "work_package_acceptance": "NOT_ACCEPTED_PUBLIC_GATES_AND_ACTIVATION_PENDING",
+  "evidence_class": "fixture_only_local_integration",
+  "contract_version": "observatory-machine-toolkit.v1.0.0",
+  "webmcp_pin": {
+    "snapshot_date": "2026-08-26",
+    "commit": "41d12f057167ccf5954dbcf49d99502cb6c84491",
+    "surface": "document.modelContext.registerTool"
+  },
+  "artifact_seal": {
+    "algorithm": "sha256_of_ordered_path_and_file_sha256_rows",
+    "excluded": ["verification/wp12/v1.0.0/receipts/candidate-validation.json"],
+    "file_count": 26,
+    "digest": "sha256:cf9da5cf47295446046efd63acf5c876dc67208eed9fb1536eb2cb86b34e604a"
+  },
+  "implementation": {
+    "canonical_service_methods": 9,
+    "inspection_capabilities": 8,
+    "planner_behavior": "code_enforced_unavailable",
+    "json_api_adapter": "implemented_candidate_unwired",
+    "webmcp_adapter": "implemented_candidate_unwired",
+    "browser_successor": "implemented_not_imported_by_main",
+    "worker_router": "implemented_not_imported_by_worker_entry",
+    "authoritative_source_clients": 0,
+    "storage_or_mutation_ports": 0
+  },
+  "coverage": {
+    "frozen_conformance_cases": 14,
+    "frozen_capabilities": 9,
+    "frozen_adversarial_cases": 33,
+    "runtime_per_tool_adversarial_matrix": {
+      "inspection_tools": 8,
+      "dimensions": ["decoded_input_bytes", "serialized_output_bytes", "cardinality", "secret_redaction", "zero_action_truth"],
+      "planner": ["decoded_input_bytes", "serialized_disabled_envelope", "no_service_invocation"]
+    },
+    "transport_parity": ["result", "evidence", "warnings", "decisions", "generation_pins", "truth_boundary", "semantic_snapshot"],
+    "security": ["credentials", "authorization", "signed_query", "source_payload", "analysis_result", "prompt_control_field", "privacy_error", "cross_origin", "compressed_input", "misleading_content_type"]
+  },
+  "verification": [
+    {
+      "command": "npm test --prefix packages/machine-toolkit",
+      "status": "PASS",
+      "result": "5 test files passed; frozen-schema parity plus per-tool adversarial, lifecycle, legacy, and Worker-router suites"
+    },
+    {
+      "command": "npm test --prefix apps/web -- src/providers/registerObservatoryToolkit.test.ts",
+      "status": "PASS",
+      "result": "1 file and 4 tests passed"
+    },
+    {
+      "command": "npm run typecheck --prefix apps/web",
+      "status": "PASS",
+      "result": "Full web TypeScript project check exited 0"
+    },
+    {
+      "command": "npm test --prefix contracts/machine-toolkit/v1.0.0",
+      "status": "PASS",
+      "result": "17 frozen contract tests passed, including 33 adversarial mutations and package integrity"
+    },
+    {
+      "command": "npm run verify --prefix packages/machine-toolkit",
+      "status": "PASS",
+      "result": "manifest/pin/static portability/zero-network/unwired/public-disable/ledger receipt checks passed"
+    },
+    {
+      "command": "npm test --prefix verification/wp12/v1.0.0",
+      "status": "PASS",
+      "result": "1 discovered Node verification test passed"
+    },
+    {
+      "command": "npm run validate --prefix verification/wp12/v1.0.0",
+      "status": "PASS",
+      "result": "1 discovered Node validation test passed"
+    }
+  ],
+  "public_activation": {
+    "enabled_tool_count": 0,
+    "inspection_tools": "gated",
+    "plan_research": "disabled",
+    "legacy_discover_sources_alias": "disabled_pending_legacy_audit",
+    "live_canary": "pending_external_authorization_and_release_gates",
+    "authorization_dependencies": [
+      {
+        "id": "AUTH-12",
+        "register": "verification/external-authorization/v1.0.0/register.json",
+        "environment": "planner_governance",
+        "status": "not_requested",
+        "authorized": false,
+        "required_before": "planner implementation or plan_research activation"
+      },
+      {
+        "id": "AUTH-06",
+        "register": "verification/external-authorization/v1.0.0/register.json",
+        "environment": "production_internal_canary",
+        "status": "not_requested",
+        "authorized": false,
+        "required_before": "Access-protected production internal candidate traffic"
+      },
+      {
+        "id": "AUTH-07",
+        "register": "verification/external-authorization/v1.0.0/register.json",
+        "environment": "production_public",
+        "status": "not_requested",
+        "authorized": false,
+        "required_before": "public deployment or gradual cutover"
+      },
+      {
+        "id": "AUTH-13",
+        "register": "verification/external-authorization/v1.0.0/register.json",
+        "environment": "retrieval_evaluation_governance",
+        "status": "not_requested",
+        "authorized": false,
+        "required_before": "retrieval-gated search_assets or plan_research activation"
+      },
+      {
+        "id": "AUTH-14",
+        "register": "verification/external-authorization/v1.0.0/register.json",
+        "environment": "identity_evaluation_governance",
+        "status": "not_requested",
+        "authorized": false,
+        "required_before": "identity-gated get_join_routes or plan_research activation"
+      },
+      {
+        "id": "AUTH-15",
+        "register": "verification/external-authorization/v1.0.0/register.json",
+        "environment": "coverage_product_governance",
+        "status": "not_requested",
+        "authorized": false,
+        "required_before": "coverage-gated get_coverage_status or plan_research activation"
+      }
+    ],
+    "deployment_performed": false,
+    "remote_changes_pushed": false
+  },
+  "pending_external_steps": [
+    "Obtain AUTH-12 digest-bound planner-governance ratification before WP10B planner implementation or any plan_research activation.",
+    "Complete AUTH-13 retrieval, AUTH-14 identity, and AUTH-15 coverage governance before activating the capabilities each gate blocks.",
+    "Complete and approve all capability-specific WP10B and section 15.6.8 prerequisite receipts.",
+    "Obtain AUTH-06 before Access-protected release-candidate browser/Worker traffic against a pinned production-like generation.",
+    "Authorize and review application/Worker entry-point wiring and capability-manifest promotion; obtain AUTH-07 before public deployment or cutover.",
+    "Run live/canary zero-egress, role/binding, rate/abuse, observability, pointer-flip, TTL, rollback, and soak gates.",
+    "Only after promotion, reconcile /agents, llms.txt, human docs, UI, JSON API, and WebMCP active-capability claims."
+  ],
+  "rollback": {
+    "current_candidate": "No runtime rollback is required because no entry point imports the additive candidate and every public flag is false.",
+    "future_composition": "Abort the registration lifecycle, remove the additive imports from the browser/Worker composition, restore all public flags to false, and retain the prior JSON/API and legacy provider paths.",
+    "data_migration": "none",
+    "external_state_changed": false
+  }
+}

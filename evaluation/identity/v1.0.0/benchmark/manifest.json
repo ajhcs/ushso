@@ -1,0 +1,44 @@
+{
+  "schema_version": "identity.benchmark-manifest.v1.0.0",
+  "benchmark_id": "identity-benchmark:wp7.conformance.v1",
+  "status": "sealed_shape_pending_external_authorization",
+  "immutable": true,
+  "generator_version": "1.0.0",
+  "launch_critical_strata": [
+    {"stratum_id": "stratum:cms.ccn.facility", "namespace_kind": "ccn", "entity_type": "hospital_facility", "grain": "facility"},
+    {"stratum_id": "stratum:nppes.npi.provider", "namespace_kind": "npi", "entity_type": "provider_organization", "grain": "provider_organization"},
+    {"stratum_id": "stratum:irs.ein.filer", "namespace_kind": "ein", "entity_type": "legal_filer", "grain": "filing_entity"},
+    {"stratum_id": "stratum:census.fips.county", "namespace_kind": "fips", "entity_type": "geography", "grain": "county"},
+    {"stratum_id": "stratum:state.license.facility", "namespace_kind": "state_license", "entity_type": "hospital_facility", "grain": "facility"},
+    {"stratum_id": "stratum:parent-campus-system.boundary", "namespace_kind": "organizational_boundary", "entity_type": "hospital_facility", "grain": "facility"}
+  ],
+  "per_stratum_case_floors": {
+    "adjudicated_positive_pairs": 50,
+    "hard_negative_pairs": 50,
+    "temporal_reuse_conflict_cases": 20
+  },
+  "quality_floors": {
+    "false_automatic_merges": 0,
+    "candidate_recall": 0.95,
+    "reviewer_percent_agreement": 0.9,
+    "reviewer_cohens_kappa": 0.8,
+    "double_reviewed_cases": 100,
+    "reversal_integrity": 1
+  },
+  "expected_case_count": 720,
+  "expected_case_sha256": "475d3cce5e712eb24f6d937b1f5aff69e192e67860f81474fa0fe9a926fdeb35",
+  "label_policy": {
+    "synthetic_expectations_are_adjudication": false,
+    "human_labels_present": false,
+    "case_lifecycle_status": "pending_external_double_review",
+    "authorization_status": "pending_external_authorization",
+    "authorization_reference": "AUTH-14",
+    "authorization_granted": false
+  },
+  "automatic_rule_policy": {
+    "default_state": "disabled_candidate_only",
+    "explicit_enablement_receipt_required": true,
+    "required_for_candidate_only_release": false,
+    "current_enablement_receipt_id": null
+  }
+}

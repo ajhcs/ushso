@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/publication/v1.0.0/publication-pointer.schema.json",
+  "title": "Singleton active publication pointer",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pointer_version", "pointer_id", "sequence", "active_publication_ref", "previous_publication_ref", "switched_at", "history_event_id", "transaction_id", "atomic_commit", "cache_policy"],
+  "properties": {
+    "pointer_version": {"const": "publication-pointer.v1"},
+    "pointer_id": {"const": "ushso:publication:active"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "active_publication_ref": {"$ref": "common.schema.json#/$defs/publicationRef"},
+    "previous_publication_ref": {"oneOf": [{"type": "null"}, {"$ref": "common.schema.json#/$defs/publicationRef"}]},
+    "switched_at": {"$ref": "common.schema.json#/$defs/utcTimestamp"},
+    "history_event_id": {"$ref": "common.schema.json#/$defs/id"},
+    "transaction_id": {"$ref": "common.schema.json#/$defs/id"},
+    "atomic_commit": {"const": true},
+    "cache_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pointer_lookup", "immutable_generation_reads", "cache_key_includes_all_publication_ids"],
+      "properties": {
+        "pointer_lookup": {"const": "cache_disabled"},
+        "immutable_generation_reads": {"const": "cache_allowed"},
+        "cache_key_includes_all_publication_ids": {"const": true}
+      }
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import type { DiscoveryResult, ObservatoryRecord, ObservatoryVariable } from '../types/discovery'
+import { safeExternalHttpsUrl } from '../lib/externalUrls'
 
 interface LiveVerificationVariable extends Omit<ObservatoryVariable, 'evidence_state' | 'evidence_ids'> {}
 
@@ -64,15 +65,15 @@ function validateReceipt(value: unknown): asserts value is LiveVerificationRecei
   }
   if (!Array.isArray(value.records)) fail('records must be an array')
   for (const record of value.records) {
-    if (!isObject(record) || typeof record.record_id !== 'string' || typeof record.authoritative_url !== 'string' || typeof record.claim !== 'string' || !record.claim) fail('record identity, URL, or claim is missing')
+    if (!isObject(record) || typeof record.record_id !== 'string' || safeExternalHttpsUrl(record.authoritative_url) === null || typeof record.claim !== 'string' || !record.claim) fail('record identity, safe HTTPS URL, or claim is missing')
     if (record.verification_status !== 'current_verified' || record.verification_method !== 'first_party_live' || record.http_status !== 200) fail(`${record.record_id} is not a successful current first-party verification`)
-    if (record.additional_evidence_urls !== undefined && !isStringArray(record.additional_evidence_urls)) fail(`${record.record_id} has invalid additional evidence URLs`)
+    if (record.additional_evidence_urls !== undefined && (!isStringArray(record.additional_evidence_urls) || record.additional_evidence_urls.some((url) => safeExternalHttpsUrl(url) === null))) fail(`${record.record_id} has invalid additional evidence URLs`)
     const documentation = record.variable_documentation
     if (!isObject(documentation) || !['documented', 'partial', 'not_captured', 'unavailable', 'unknown'].includes(String(documentation.status))) fail(`${record.record_id} has invalid variable documentation`)
     if (documentation.summary !== null && typeof documentation.summary !== 'string') fail(`${record.record_id} has an invalid variable summary`)
     if (documentation.variable_count !== null && (typeof documentation.variable_count !== 'number' || documentation.variable_count < 0)) fail(`${record.record_id} has an invalid variable count`)
     if (!Array.isArray(documentation.variables) || !isStringArray(documentation.limitations)) fail(`${record.record_id} has invalid variables or limitations`)
-    if (documentation.codebook !== null && (!isObject(documentation.codebook) || typeof documentation.codebook.title !== 'string' || typeof documentation.codebook.url !== 'string')) fail(`${record.record_id} has an invalid codebook`)
+    if (documentation.codebook !== null && (!isObject(documentation.codebook) || typeof documentation.codebook.title !== 'string' || safeExternalHttpsUrl(documentation.codebook.url) === null)) fail(`${record.record_id} has an invalid codebook`)
     documentation.variables.forEach(validateVariable)
   }
 }

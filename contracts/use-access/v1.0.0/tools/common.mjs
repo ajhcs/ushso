@@ -27,7 +27,7 @@ export async function pathExists(file) {
 export async function walkFiles(dir, prefix = '') {
   const out = [];
   for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
-    if (entry.name.startsWith('.')) continue;
+    if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
     const relative = prefix ? path.join(prefix, entry.name) : entry.name;
     if (entry.isDirectory()) out.push(...await walkFiles(path.join(dir, entry.name), relative));
     else if (entry.isFile()) out.push(relative.split(path.sep).join('/'));

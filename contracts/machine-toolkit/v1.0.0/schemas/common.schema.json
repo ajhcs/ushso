@@ -1,0 +1,366 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/common.schema.json",
+  "$defs": {
+    "stableId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._~:/-]*$"
+    },
+    "digest": {
+      "type": "string",
+      "maxLength": 71,
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "date": {
+      "type": "string",
+      "maxLength": 10,
+      "format": "date"
+    },
+    "dateTime": {
+      "type": "string",
+      "maxLength": 35,
+      "format": "date-time"
+    },
+    "nullableDateTime": {
+      "oneOf": [
+        { "$ref": "#/$defs/dateTime" },
+        { "type": "null" }
+      ]
+    },
+    "nullableStableId": {
+      "oneOf": [
+        { "$ref": "#/$defs/stableId" },
+        { "type": "null" }
+      ]
+    },
+    "cursor": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 2048,
+      "pattern": "^[A-Za-z0-9._~-]+$"
+    },
+    "nullableCursor": {
+      "oneOf": [
+        { "$ref": "#/$defs/cursor" },
+        { "type": "null" }
+      ]
+    },
+    "maintainedText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "sourceExcerpt": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "shortText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "uri": {
+      "type": "string",
+      "maxLength": 2048,
+      "format": "uri"
+    },
+    "nullableUri": {
+      "oneOf": [
+        { "$ref": "#/$defs/uri" },
+        { "type": "null" }
+      ]
+    },
+    "coverage_cell_state": {
+      "enum": ["integrated", "candidate", "navigation_only", "evidence_gap", "inaccessible", "unknown", "not_assessed"]
+    },
+    "plan_status": {
+      "enum": ["unsupported", "clarification_required", "incomplete", "ready_with_constraints", "ready"]
+    },
+    "timePeriod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end", "period_kind", "precision"],
+      "properties": {
+        "start": {
+          "oneOf": [
+            { "$ref": "#/$defs/date" },
+            { "type": "null" }
+          ]
+        },
+        "end": {
+          "oneOf": [
+            { "$ref": "#/$defs/date" },
+            { "type": "null" }
+          ]
+        },
+        "period_kind": { "enum": ["calendar", "fiscal", "rolling", "point_in_time", "mixed", "unknown"] },
+        "precision": { "enum": ["day", "month", "quarter", "year", "interval", "unknown"] }
+      }
+    },
+    "structuredFilters": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 9,
+      "required": ["geography_ids", "subject_ids", "grain", "access_classes", "authority_levels", "machine_readiness", "time_period", "negative_constraints", "dimensions"],
+      "properties": {
+        "geography_ids": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/stableId" }
+        },
+        "subject_ids": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/stableId" }
+        },
+        "grain": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "enum": ["facility", "campus", "organization", "system", "county", "state", "national", "mixed", "unknown"] }
+        },
+        "access_classes": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "enum": ["public", "registration", "application", "dua", "licensed", "paid", "report_only", "unknown"] }
+        },
+        "authority_levels": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "enum": ["authoritative", "official_mirror", "maintainer", "secondary", "candidate", "unknown"] }
+        },
+        "machine_readiness": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "enum": ["human_only", "downloadable", "api_documented", "schema_indexed", "retrieval_ready", "join_ready", "unknown"] }
+        },
+        "time_period": {
+          "oneOf": [
+            { "$ref": "#/$defs/timePeriod" },
+            { "type": "null" }
+          ]
+        },
+        "negative_constraints": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/sourceExcerpt" }
+        },
+        "dimensions": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["dimension", "values"],
+            "properties": {
+              "dimension": { "$ref": "#/$defs/stableId" },
+              "values": {
+                "type": "array",
+                "maxItems": 20,
+                "uniqueItems": true,
+                "items": { "$ref": "#/$defs/stableId" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "evidence_class", "public_locator", "observed_at", "evidence_state", "staleness_state", "derivation_reference", "policy_reference"],
+      "properties": {
+        "evidence_id": { "$ref": "#/$defs/stableId" },
+        "evidence_class": { "enum": ["authoritative_identifier", "publisher_metadata", "catalog_record", "documentation", "schema_observation", "access_check", "review_decision", "controlled_test", "external_execution_record", "maintained_policy"] },
+        "public_locator": { "$ref": "#/$defs/nullableUri" },
+        "observed_at": { "$ref": "#/$defs/dateTime" },
+        "evidence_state": { "enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven"] },
+        "staleness_state": { "enum": ["current", "stale", "unknown", "not_applicable"] },
+        "derivation_reference": { "$ref": "#/$defs/stableId" },
+        "policy_reference": { "$ref": "#/$defs/nullableStableId" }
+      }
+    },
+    "evidenceIds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/stableId" }
+    },
+    "warning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "evidence_ids", "copy_policy_version"],
+      "properties": {
+        "code": { "$ref": "#/$defs/stableId" },
+        "message": { "$ref": "#/$defs/maintainedText" },
+        "evidence_ids": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/stableId" }
+        },
+        "copy_policy_version": { "$ref": "#/$defs/stableId" }
+      }
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "safe_message", "retryable", "generation", "scope", "corrective_guidance", "retry_after_seconds"],
+      "properties": {
+        "code": { "enum": ["invalid_input", "record_unavailable_in_generation", "schema_context_required", "generation_mismatch", "generation_unavailable", "cursor_expired", "clarification_token_invalid", "clarification_expired", "coverage_unknown", "route_not_documented", "comparison_limit_exceeded", "response_limit_exceeded", "planner_unavailable", "rate_limited", "service_unavailable"] },
+        "safe_message": { "$ref": "#/$defs/maintainedText" },
+        "retryable": { "type": "boolean" },
+        "generation": { "$ref": "#/$defs/nullableStableId" },
+        "scope": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["capability", "record_id", "query_scope_id"],
+              "properties": {
+                "capability": { "$ref": "#/$defs/stableId" },
+                "record_id": { "$ref": "#/$defs/nullableStableId" },
+                "query_scope_id": { "$ref": "#/$defs/nullableStableId" }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "corrective_guidance": { "$ref": "#/$defs/maintainedText" },
+        "retry_after_seconds": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0, "maximum": 86400 },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "rateLimit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_id", "limit", "remaining", "reset_at", "retry_after_seconds"],
+      "properties": {
+        "policy_id": { "$ref": "#/$defs/stableId" },
+        "limit": { "type": "integer", "minimum": 1, "maximum": 100000 },
+        "remaining": { "type": "integer", "minimum": 0, "maximum": 100000 },
+        "reset_at": { "$ref": "#/$defs/dateTime" },
+        "retry_after_seconds": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0, "maximum": 86400 },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "truthBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_requests_made", "execution_authorized_by_ushso", "retrieval_executed", "payloads_acquired", "analysis_executed", "identity_merges_performed"],
+      "properties": {
+        "source_requests_made": { "const": false },
+        "execution_authorized_by_ushso": { "const": false },
+        "retrieval_executed": { "const": false },
+        "payloads_acquired": { "const": false },
+        "analysis_executed": { "const": false },
+        "identity_merges_performed": { "const": false }
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "kind", "state", "description", "human_gate", "evidence_ids"],
+      "properties": {
+        "requirement_id": { "$ref": "#/$defs/stableId" },
+        "kind": { "enum": ["registration", "application", "dua", "fee", "license", "institutional_approval", "identity_verification", "crosswalk", "aggregation", "normalization", "authorization", "temporal_alignment", "measure_harmonization", "other"] },
+        "state": { "enum": ["satisfied", "unsatisfied", "external", "not_applicable", "unknown"] },
+        "description": { "$ref": "#/$defs/maintainedText" },
+        "human_gate": { "type": "boolean" },
+        "evidence_ids": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "blocker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blocker_id", "kind", "state", "description", "evidence_ids"],
+      "properties": {
+        "blocker_id": { "$ref": "#/$defs/stableId" },
+        "kind": { "enum": ["missing_crosswalk", "identity_uncertain", "coverage_gap", "authorization_required", "incompatible_grain", "evidence_missing", "evidence_stale", "other"] },
+        "state": { "enum": ["open", "resolved", "external", "unknown"] },
+        "description": { "$ref": "#/$defs/maintainedText" },
+        "evidence_ids": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "responseEnvelope": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "required": ["tool_contract_version", "capability", "transport_adapter", "request_id", "response_generated_at", "ok", "result_snapshot_id", "candidate_snapshot_id", "registry_revision", "index_generation", "publication_manifest_id", "canonical_as_of", "coverage_snapshot_id", "result_state", "result", "error", "evidence_references", "warnings", "truncated", "omitted_sections", "next_cursor", "continuation_expires_at", "generation_retention_expires_at", "restart_required", "rate_limit", "truth_boundary"],
+      "properties": {
+        "tool_contract_version": { "const": "observatory-machine-toolkit.v1.0.0" },
+        "capability": { "enum": ["search_assets", "get_asset", "get_access_plan", "get_retrieval_recipe", "get_variables", "get_join_routes", "compare_assets", "get_coverage_status", "plan_research"] },
+        "transport_adapter": { "enum": ["json_api", "webmcp"] },
+        "request_id": { "$ref": "#/$defs/stableId" },
+        "response_generated_at": { "$ref": "#/$defs/dateTime" },
+        "ok": { "type": "boolean" },
+        "result_snapshot_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/digest" },
+            { "type": "null" }
+          ]
+        },
+        "candidate_snapshot_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/digest" },
+            { "type": "null" }
+          ]
+        },
+        "registry_revision": { "$ref": "#/$defs/stableId" },
+        "index_generation": { "$ref": "#/$defs/stableId" },
+        "publication_manifest_id": { "$ref": "#/$defs/stableId" },
+        "canonical_as_of": { "$ref": "#/$defs/dateTime" },
+        "coverage_snapshot_id": { "$ref": "#/$defs/nullableStableId" },
+        "result_state": { "enum": ["complete", "partial", "empty", "unknown", "unavailable", "gated", "disabled"] },
+        "result": {},
+        "error": {
+          "oneOf": [
+            { "$ref": "#/$defs/error" },
+            { "type": "null" }
+          ]
+        },
+        "evidence_references": {
+          "type": "array",
+          "maxItems": 200,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/evidenceReference" }
+        },
+        "warnings": {
+          "type": "array",
+          "maxItems": 50,
+          "items": { "$ref": "#/$defs/warning" }
+        },
+        "truncated": { "type": "boolean" },
+        "omitted_sections": {
+          "type": "array",
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/stableId" }
+        },
+        "next_cursor": { "$ref": "#/$defs/nullableCursor" },
+        "continuation_expires_at": { "$ref": "#/$defs/nullableDateTime" },
+        "generation_retention_expires_at": { "$ref": "#/$defs/nullableDateTime" },
+        "restart_required": { "type": "boolean" },
+        "rate_limit": { "$ref": "#/$defs/rateLimit" },
+        "truth_boundary": { "$ref": "#/$defs/truthBoundary" }
+      }
+    }
+  }
+}

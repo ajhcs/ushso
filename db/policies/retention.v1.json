@@ -1,0 +1,24 @@
+{
+  "schema_version": "ushso-retention-policy.v1",
+  "policy_version": "1.0.0",
+  "minimum_online_days": 90,
+  "workflow_retention_days": 30,
+  "reconciliation_grace_days": 2,
+  "queue_redelivery_days": 14,
+  "dlq_replay_days": 30,
+  "operator_replay_days": 90,
+  "publication_rollback_days": 90,
+  "security_and_audit_receipt_days": 365,
+  "online_until_formula": "max(created+90d, queue+dlq, workflow+grace, operator replay, publication rollback, audit/legal)",
+  "archive_requirements": [
+    "no active work, lease, outbox, workflow, DLQ, or replay reference",
+    "no unexpired idempotency key",
+    "no retained publication, rollback, evidence, or review dependency",
+    "checksum-verified access-controlled archive",
+    "isolated restore verification",
+    "backup/PITR and legal compatibility",
+    "audited GC watermark"
+  ],
+  "managed_status": "pending_external_authorization"
+}
+

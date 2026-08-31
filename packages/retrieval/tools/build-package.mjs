@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { semanticErrors } from '../../../index/v1.0.0/tools/semantics.mjs';
+import { semanticErrors } from './record-semantics.mjs';
 import { adaptCuratedAssets } from './curated-adapter.mjs';
 import { validateJoinRoute } from './join-routes.mjs';
 import {

@@ -1,0 +1,22 @@
+{
+  "schema_version": "ushso-wp14-requirements-dod-mapping.v1.0.0",
+  "work_package": "WP14",
+  "as_of": "2026-08-30T00:00:00.000Z",
+  "overall_wp14_acceptance": "BLOCKED_EXTERNAL_AND_PREDECESSOR_GATES",
+  "items": [
+    {"id": "WP14-AC-01", "text": "Shadow comparison and internal canary control", "local_result": "fixture parity and fail-closed Access/server-injection guard pass", "production_result": "pending AUTH-03/AUTH-06", "satisfied": false},
+    {"id": "WP14-AC-02", "text": "Gradual public promotion", "local_result": "0/1/5/25/50/100 transition and abort rules pass in memory", "production_result": "pending AUTH-07 and all quality/recovery/load gates", "satisfied": false},
+    {"id": "WP14-AC-03", "text": "Rollback receipts", "local_result": "generation, Worker+asset, static fallback, and bundle verification pass on fixtures", "production_result": "exact managed candidate receipts pending", "satisfied": false},
+    {"id": "WP14-AC-04", "text": "At least two connector refresh cycles", "local_result": "2 fixture cycles; production denominator contribution 0", "production_result": "2 live cycles pending", "satisfied": false},
+    {"id": "WP14-AC-05", "text": "At least two full rebuild/promotion cycles", "local_result": "2 fixture rebuild/promote/rollback cycles; production denominator contribution 0", "production_result": "2 live cycles pending", "satisfied": false},
+    {"id": "WP14-AC-06", "text": "Static fallback and generation rollback rehearsed", "local_result": "fixture pass", "production_result": "AUTH-05 measured rehearsal pending", "satisfied": false},
+    {"id": "WP14-AC-07", "text": "Coverage and search gates under production-like load", "local_result": "not run and not claimed", "production_result": "AUTH-03, retrieval final gate, coverage approval, and 30-minute 2x load pending", "satisfied": false},
+    {"id": "WP14-AC-08", "text": "Static JSONL becomes fixture/export instead of production store", "local_result": "explicitly denied; runtime files byte-pinned and active", "production_result": "AUTH-08 window then AUTH-09 and separate removal pending", "satisfied": false},
+    {"id": "ORDER-HAZARD-01", "text": "Do not combine DB/search cutover and retrieval algorithm change without measurement", "local_result": "promotion requires frozen exact candidate plus search quality/load gates", "production_result": "pending exact receipts", "satisfied": true},
+    {"id": "ORDER-HAZARD-02", "text": "Do not retire static before generation rollback and static fallback", "local_result": "state ordering and tests enforce it", "production_result": "live drills still pending", "satisfied": true},
+    {"id": "DOD-SEARCH-RUNTIME", "text": "Search no longer loads every record in the Worker", "local_result": "candidate SQL shape says zero JSONL loads but active Worker remains static", "production_result": "pending cutover", "satisfied": false},
+    {"id": "DOD-COMPAT-ROLLBACK", "text": "v1 compatibility, rollback, release, security, privacy, and performance gates pass", "local_result": "guards and local security/privacy/failure tests pass", "production_result": "external/performance/recovery/held-out gates pending", "satisfied": false},
+    {"id": "DOD-JSONL-RETIREMENT", "text": "Runtime JSONL retired only after soak and rollback window", "local_result": "retirement is fail-closed and JSONL remains intact", "production_result": "30 days, two live cycles, AUTH-08, and AUTH-09 pending", "satisfied": false}
+  ],
+  "truth_statement": "The WP14 technical foundation is locally implemented and verified. WP14 acceptance and the plan Definition of Done are not satisfied because live authorization, predecessor quality gates, production-like load, managed recovery, canary/cutover, elapsed soak, qualifying live cycles, and runtime retirement remain outstanding."
+}

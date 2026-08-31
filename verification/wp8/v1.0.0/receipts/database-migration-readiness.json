@@ -1,0 +1,29 @@
+{
+  "receipt_version": "ushso-wp8-database-migration-readiness.v1.0.0",
+  "receipt_id": "verification:wp8:database-migration-readiness:2026-08-30",
+  "status": "REVIEWED_SQL_ONLY_PENDING_0010_SEQUENCE",
+  "migration_applied": false,
+  "database_files_modified": false,
+  "reviewed_sql": "packages/search/sql/0010_search_projection_schema.reviewed.sql",
+  "required_predecessors": ["0004", "0005", "0006", "0007", "0008", "0009"],
+  "predecessors_frozen": false,
+  "static_shape_pass": true,
+  "local_postgresql": {
+    "ss_preflight_attempted": true,
+    "ss_preflight_result": "sandbox could not open the netlink socket; no server was bound",
+    "psql_client_available": true,
+    "initdb_available": false,
+    "postgres_server_available": false,
+    "temporary_cluster_started": false,
+    "external_database_contacted": false
+  },
+  "required_after_sequence_freeze": [
+    "review final 0010 numbering and predecessor assumptions",
+    "integrate reviewed SQL into db migration format",
+    "run clean PostgreSQL 16+ migration",
+    "run N-1 upgrade and rollback rehearsal",
+    "run role/grant and migration failure-injection tests",
+    "capture runtime query plans and transactional promotion/rollback receipts"
+  ],
+  "recorded_at": "2026-08-30T00:00:00.000Z"
+}

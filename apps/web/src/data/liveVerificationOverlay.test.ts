@@ -46,7 +46,25 @@ describe('live verification overlay', () => {
     expect(() => applyLiveVerificationOverlay(base, wrongRecord)).toThrow(/outside the response/)
 
     const wrongUrl = structuredClone(receiptModule.default)
-    wrongUrl.records[0].authoritative_url = 'https://example.test/not-the-source'
+    wrongUrl.records[0].authoritative_url = 'https://www.cdc.gov/not-the-source'
     expect(() => applyLiveVerificationOverlay(base, wrongUrl)).toThrow(/does not exactly match/)
+  })
+
+  it('rejects active-content URLs in every externally navigable receipt field', () => {
+    const unsafeEvidence = structuredClone(receiptModule.default)
+    unsafeEvidence.records[0].additional_evidence_urls = ['javascript:alert(1)']
+    expect(() => applyLiveVerificationOverlay(base, unsafeEvidence)).toThrow(/invalid additional evidence URLs/)
+
+    const unsafeCodebook = structuredClone(receiptModule.default)
+    unsafeCodebook.records[0].variable_documentation.codebook = { title: 'Unsafe', url: 'data:text/html,unsafe' }
+    expect(() => applyLiveVerificationOverlay(base, unsafeCodebook)).toThrow(/invalid codebook/)
+
+    const signedEvidence = structuredClone(receiptModule.default)
+    signedEvidence.records[0].additional_evidence_urls = ['https://data.cms.gov/source?X-Amz-Signature=secret']
+    expect(() => applyLiveVerificationOverlay(base, signedEvidence)).toThrow(/invalid additional evidence URLs/)
+
+    const privateCodebook = structuredClone(receiptModule.default)
+    privateCodebook.records[0].variable_documentation.codebook = { title: 'Unsafe', url: 'https://127.0.0.1/codebook' }
+    expect(() => applyLiveVerificationOverlay(base, privateCodebook)).toThrow(/invalid codebook/)
   })
 })

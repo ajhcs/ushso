@@ -1,0 +1,495 @@
+[
+  {
+    "schema_version": "observatory-analysis-use-card.v1.0.0",
+    "use_card_id": "obs:analysis-use-card:market_concentration_hhi:040277a1d6499b8a",
+    "compiler_version": "observatory-analysis-use-compiler.v1.0.0",
+    "analysis_id": "market_concentration_hhi",
+    "analysis_family": "market_position",
+    "label": "Hospital market concentration (HHI)",
+    "methodology": "hc-metrics:hhi:1.0.0",
+    "implementation_methodology": "hhi",
+    "question_patterns": [
+      "How concentrated is the hospital market?",
+      "What is the HHI for this service line?",
+      "I want to compare hospital market concentration."
+    ],
+    "acceptable_grains": [
+      "facility"
+    ],
+    "upstream_analysis_ids": [
+      "market_share"
+    ],
+    "requirement_catalog_sha256": "sha256:7f5c77645c8609021cc15ff7dd8a78d6d1edda75d79fa1d0753ed4534406b33c",
+    "requirement_sha256": "sha256:78037d84f591b493b8c36897648e1172b774615b9d716cc964ce29413df9d2b6",
+    "evidence_sha256": "sha256:d9cb0f8a39419e10dc59ac4849346e5acadf3e49c898e14d066463dfc31a40b1",
+    "support_status": "partial",
+    "research_set": [
+      {
+        "record_id": "example:dataset:pa-inpatient-utilization",
+        "profile_id": "example:analysis-input-profile:pa-inpatient-utilization:hhi",
+        "supplied_input_ids": [
+          "facility_id",
+          "period",
+          "service_line",
+          "utilization_volume"
+        ],
+        "limitations": [
+          "Outpatient and other unobserved market activity are not represented.",
+          "Synthetic conformance fixture; it is not an assertion about a currently cataloged source."
+        ]
+      }
+    ],
+    "input_coverage": {
+      "required_count": 5,
+      "covered_count": 4,
+      "covered_input_ids": [
+        "facility_id",
+        "service_line",
+        "period",
+        "utilization_volume"
+      ],
+      "missing_input_ids": [
+        "system_id"
+      ],
+      "unverified_input_ids": [
+        "system_id"
+      ],
+      "bindings": [
+        {
+          "input_id": "facility_id",
+          "record_id": "example:dataset:pa-inpatient-utilization",
+          "profile_id": "example:analysis-input-profile:pa-inpatient-utilization:hhi",
+          "availability": "source_reported",
+          "field_refs": [
+            "facility_id"
+          ],
+          "observation_grain": "facility",
+          "value_kind": "identifier",
+          "measurement_unit": "identifier",
+          "domain_compatibility": "documented",
+          "domain_constraints": {
+            "allowed_values": [],
+            "conditional_ranges": []
+          },
+          "derivation": null,
+          "evidence_ids": [
+            "example:evidence:utilization-data-dictionary"
+          ],
+          "limitations": []
+        },
+        {
+          "input_id": "service_line",
+          "record_id": "example:dataset:pa-inpatient-utilization",
+          "profile_id": "example:analysis-input-profile:pa-inpatient-utilization:hhi",
+          "availability": "source_reported",
+          "field_refs": [
+            "service_line"
+          ],
+          "observation_grain": "facility",
+          "value_kind": "category",
+          "measurement_unit": "category",
+          "domain_compatibility": "documented",
+          "domain_constraints": {
+            "allowed_values": [],
+            "conditional_ranges": []
+          },
+          "derivation": null,
+          "evidence_ids": [
+            "example:evidence:utilization-data-dictionary"
+          ],
+          "limitations": []
+        },
+        {
+          "input_id": "period",
+          "record_id": "example:dataset:pa-inpatient-utilization",
+          "profile_id": "example:analysis-input-profile:pa-inpatient-utilization:hhi",
+          "availability": "source_reported",
+          "field_refs": [
+            "reporting_year"
+          ],
+          "observation_grain": "facility",
+          "value_kind": "period",
+          "measurement_unit": "calendar_year",
+          "domain_compatibility": "documented",
+          "domain_constraints": {
+            "allowed_values": [],
+            "conditional_ranges": []
+          },
+          "derivation": null,
+          "evidence_ids": [
+            "example:evidence:utilization-data-dictionary"
+          ],
+          "limitations": []
+        },
+        {
+          "input_id": "utilization_volume",
+          "record_id": "example:dataset:pa-inpatient-utilization",
+          "profile_id": "example:analysis-input-profile:pa-inpatient-utilization:hhi",
+          "availability": "source_reported",
+          "field_refs": [
+            "inpatient_discharges"
+          ],
+          "observation_grain": "facility",
+          "value_kind": "integer",
+          "measurement_unit": "discharges",
+          "domain_compatibility": "documented",
+          "domain_constraints": {
+            "allowed_values": [],
+            "conditional_ranges": []
+          },
+          "derivation": null,
+          "evidence_ids": [
+            "example:evidence:utilization-data-dictionary"
+          ],
+          "limitations": [
+            "The example volume represents inpatient discharges only."
+          ]
+        }
+      ]
+    },
+    "property_coverage": [
+      {
+        "property_id": "consistent_market_definition",
+        "state": "documented",
+        "evidence_ids": [
+          "example:evidence:hhi-review-protocol"
+        ],
+        "limitations": [
+          "The market definition still requires an analyst-selected geography and service line."
+        ]
+      },
+      {
+        "property_id": "same_period",
+        "state": "documented",
+        "evidence_ids": [
+          "example:evidence:utilization-data-dictionary"
+        ],
+        "limitations": [
+          "Use one reporting year per comparison."
+        ]
+      },
+      {
+        "property_id": "complete_competitor_observation",
+        "state": "documented",
+        "evidence_ids": [
+          "example:evidence:hhi-review-protocol"
+        ],
+        "limitations": [
+          "Completeness applies to the synthetic inpatient competitor universe only."
+        ]
+      }
+    ],
+    "join_coverage": [
+      {
+        "join_id": "facility_to_health_system",
+        "state": "missing",
+        "supporting_edges": [],
+        "route_ids": [],
+        "evidence_ids": [],
+        "limitations": [
+          "A documented, period-aware facility-to-system relationship must connect every contributing asset."
+        ]
+      }
+    ],
+    "temporal_requirements": {
+      "period_input_ids": [
+        "period"
+      ],
+      "same_period_required": true
+    },
+    "limitations": [
+      "A documented, period-aware facility-to-system relationship must connect every contributing asset.",
+      "Completeness applies to the synthetic inpatient competitor universe only.",
+      "Discharge-based HHI excludes outpatient and other unobserved market activity.",
+      "HHI is only as complete as the observed competitor universe and market definition.",
+      "Outpatient and other unobserved market activity are not represented.",
+      "Synthetic conformance fixture; it is not an assertion about a currently cataloged source.",
+      "The example volume represents inpatient discharges only.",
+      "The market definition still requires an analyst-selected geography and service line.",
+      "Use one reporting year per comparison."
+    ],
+    "truth_boundary": {
+      "assertion_type": "requirement_derived_analytical_fit_not_source_truth",
+      "source_truth_separate": true,
+      "field_inference_allowed": false,
+      "data_access_authorized": false,
+      "calculation_authorized": false,
+      "persistence_authorized": false,
+      "publication_authorized": false
+    }
+  },
+  {
+    "schema_version": "observatory-analysis-use-card.v1.0.0",
+    "use_card_id": "obs:analysis-use-card:market_concentration_hhi:ef30b896ea225d88",
+    "compiler_version": "observatory-analysis-use-compiler.v1.0.0",
+    "analysis_id": "market_concentration_hhi",
+    "analysis_family": "market_position",
+    "label": "Hospital market concentration (HHI)",
+    "methodology": "hc-metrics:hhi:1.0.0",
+    "implementation_methodology": "hhi",
+    "question_patterns": [
+      "How concentrated is the hospital market?",
+      "What is the HHI for this service line?",
+      "I want to compare hospital market concentration."
+    ],
+    "acceptable_grains": [
+      "facility"
+    ],
+    "upstream_analysis_ids": [
+      "market_share"
+    ],
+    "requirement_catalog_sha256": "sha256:7f5c77645c8609021cc15ff7dd8a78d6d1edda75d79fa1d0753ed4534406b33c",
+    "requirement_sha256": "sha256:78037d84f591b493b8c36897648e1172b774615b9d716cc964ce29413df9d2b6",
+    "evidence_sha256": "sha256:4a65163aed05774fbd8f0008992c94a632bba49617de93b891938ea7fe670a59",
+    "support_status": "supported",
+    "research_set": [
+      {
+        "record_id": "example:dataset:facility-system-crosswalk",
+        "profile_id": "example:analysis-input-profile:facility-system-crosswalk:hhi",
+        "supplied_input_ids": [
+          "system_id"
+        ],
+        "limitations": [
+          "Organizational relationships may change over time.",
+          "Synthetic conformance fixture; it is not an assertion about a currently cataloged source."
+        ]
+      },
+      {
+        "record_id": "example:dataset:pa-inpatient-utilization",
+        "profile_id": "example:analysis-input-profile:pa-inpatient-utilization:hhi",
+        "supplied_input_ids": [
+          "facility_id",
+          "period",
+          "service_line",
+          "utilization_volume"
+        ],
+        "limitations": [
+          "Outpatient and other unobserved market activity are not represented.",
+          "Synthetic conformance fixture; it is not an assertion about a currently cataloged source."
+        ]
+      }
+    ],
+    "input_coverage": {
+      "required_count": 5,
+      "covered_count": 5,
+      "covered_input_ids": [
+        "facility_id",
+        "system_id",
+        "service_line",
+        "period",
+        "utilization_volume"
+      ],
+      "missing_input_ids": [],
+      "unverified_input_ids": [],
+      "bindings": [
+        {
+          "input_id": "facility_id",
+          "record_id": "example:dataset:pa-inpatient-utilization",
+          "profile_id": "example:analysis-input-profile:pa-inpatient-utilization:hhi",
+          "availability": "source_reported",
+          "field_refs": [
+            "facility_id"
+          ],
+          "observation_grain": "facility",
+          "value_kind": "identifier",
+          "measurement_unit": "identifier",
+          "domain_compatibility": "documented",
+          "domain_constraints": {
+            "allowed_values": [],
+            "conditional_ranges": []
+          },
+          "derivation": null,
+          "evidence_ids": [
+            "example:evidence:utilization-data-dictionary"
+          ],
+          "limitations": []
+        },
+        {
+          "input_id": "system_id",
+          "record_id": "example:dataset:facility-system-crosswalk",
+          "profile_id": "example:analysis-input-profile:facility-system-crosswalk:hhi",
+          "availability": "source_reported",
+          "field_refs": [
+            "health_system_id"
+          ],
+          "observation_grain": "facility",
+          "value_kind": "identifier",
+          "measurement_unit": "identifier",
+          "domain_compatibility": "documented",
+          "domain_constraints": {
+            "allowed_values": [],
+            "conditional_ranges": []
+          },
+          "derivation": null,
+          "evidence_ids": [
+            "example:evidence:crosswalk-data-dictionary"
+          ],
+          "limitations": [
+            "Membership must be evaluated for the selected reporting year."
+          ]
+        },
+        {
+          "input_id": "service_line",
+          "record_id": "example:dataset:pa-inpatient-utilization",
+          "profile_id": "example:analysis-input-profile:pa-inpatient-utilization:hhi",
+          "availability": "source_reported",
+          "field_refs": [
+            "service_line"
+          ],
+          "observation_grain": "facility",
+          "value_kind": "category",
+          "measurement_unit": "category",
+          "domain_compatibility": "documented",
+          "domain_constraints": {
+            "allowed_values": [],
+            "conditional_ranges": []
+          },
+          "derivation": null,
+          "evidence_ids": [
+            "example:evidence:utilization-data-dictionary"
+          ],
+          "limitations": []
+        },
+        {
+          "input_id": "period",
+          "record_id": "example:dataset:pa-inpatient-utilization",
+          "profile_id": "example:analysis-input-profile:pa-inpatient-utilization:hhi",
+          "availability": "source_reported",
+          "field_refs": [
+            "reporting_year"
+          ],
+          "observation_grain": "facility",
+          "value_kind": "period",
+          "measurement_unit": "calendar_year",
+          "domain_compatibility": "documented",
+          "domain_constraints": {
+            "allowed_values": [],
+            "conditional_ranges": []
+          },
+          "derivation": null,
+          "evidence_ids": [
+            "example:evidence:utilization-data-dictionary"
+          ],
+          "limitations": []
+        },
+        {
+          "input_id": "utilization_volume",
+          "record_id": "example:dataset:pa-inpatient-utilization",
+          "profile_id": "example:analysis-input-profile:pa-inpatient-utilization:hhi",
+          "availability": "source_reported",
+          "field_refs": [
+            "inpatient_discharges"
+          ],
+          "observation_grain": "facility",
+          "value_kind": "integer",
+          "measurement_unit": "discharges",
+          "domain_compatibility": "documented",
+          "domain_constraints": {
+            "allowed_values": [],
+            "conditional_ranges": []
+          },
+          "derivation": null,
+          "evidence_ids": [
+            "example:evidence:utilization-data-dictionary"
+          ],
+          "limitations": [
+            "The example volume represents inpatient discharges only."
+          ]
+        }
+      ]
+    },
+    "property_coverage": [
+      {
+        "property_id": "consistent_market_definition",
+        "state": "documented",
+        "evidence_ids": [
+          "example:evidence:hhi-review-protocol"
+        ],
+        "limitations": [
+          "The documented market definition covers the synthetic inpatient example only."
+        ]
+      },
+      {
+        "property_id": "same_period",
+        "state": "documented",
+        "evidence_ids": [
+          "example:evidence:period-alignment-review"
+        ],
+        "limitations": [
+          "The utilization year and relationship effective year must match."
+        ]
+      },
+      {
+        "property_id": "complete_competitor_observation",
+        "state": "documented",
+        "evidence_ids": [
+          "example:evidence:hhi-review-protocol"
+        ],
+        "limitations": [
+          "Completeness does not extend beyond the synthetic inpatient competitor universe."
+        ]
+      }
+    ],
+    "join_coverage": [
+      {
+        "join_id": "facility_to_health_system",
+        "state": "documented",
+        "supporting_edges": [
+          {
+            "route_id": "example:join:pa-utilization:facility-system:facility-id",
+            "alternative_id": "facility_utilization_to_system_membership_many_to_one",
+            "from_record_id": "example:dataset:pa-inpatient-utilization",
+            "to_record_id": "example:dataset:facility-system-crosswalk"
+          }
+        ],
+        "route_ids": [
+          "example:join:pa-utilization:facility-system:facility-id"
+        ],
+        "evidence_ids": [
+          "example:evidence:crosswalk-data-dictionary",
+          "example:evidence:period-alignment-review",
+          "example:evidence:utilization-data-dictionary"
+        ],
+        "limitations": [
+          "Organizational relationships may change between reporting years.",
+          "Require equal utilization and relationship years",
+          "The route is valid only when facility identity and membership effective year pass review.",
+          "This route is synthetic and makes no claim about a live Observatory source.",
+          "Use only the synthetic conformance records"
+        ]
+      }
+    ],
+    "temporal_requirements": {
+      "period_input_ids": [
+        "period"
+      ],
+      "same_period_required": true
+    },
+    "limitations": [
+      "Completeness does not extend beyond the synthetic inpatient competitor universe.",
+      "Discharge-based HHI excludes outpatient and other unobserved market activity.",
+      "HHI is only as complete as the observed competitor universe and market definition.",
+      "Membership must be evaluated for the selected reporting year.",
+      "Organizational relationships may change between reporting years.",
+      "Organizational relationships may change over time.",
+      "Outpatient and other unobserved market activity are not represented.",
+      "Require equal utilization and relationship years",
+      "Synthetic conformance fixture; it is not an assertion about a currently cataloged source.",
+      "The documented market definition covers the synthetic inpatient example only.",
+      "The example volume represents inpatient discharges only.",
+      "The route is valid only when facility identity and membership effective year pass review.",
+      "The utilization year and relationship effective year must match.",
+      "This route is synthetic and makes no claim about a live Observatory source.",
+      "Use only the synthetic conformance records"
+    ],
+    "truth_boundary": {
+      "assertion_type": "requirement_derived_analytical_fit_not_source_truth",
+      "source_truth_separate": true,
+      "field_inference_allowed": false,
+      "data_access_authorized": false,
+      "calculation_authorized": false,
+      "persistence_authorized": false,
+      "publication_authorized": false
+    }
+  }
+]

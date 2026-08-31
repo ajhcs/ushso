@@ -59,4 +59,16 @@ describe('DiscoveryProvider contract', () => {
   it('rejects a response that does not preserve the canonical result contract', () => {
     expect(() => assertDiscoveryResult({ contract_version: 'invented-ui-contract' })).toThrowError(DiscoveryProviderError)
   })
+
+  it.each([
+    ['retrieval route', (response: typeof acceptedResponse) => { response.results[0].record.retrieval.instructions[0].url = 'javascript:alert(1)' }],
+    ['authoritative URL', (response: typeof acceptedResponse) => { response.results[0].record.authoritative_url = 'data:text/html,unsafe' }],
+    ['provenance locator', (response: typeof acceptedResponse) => { response.results[0].record.provenance[0].locator = 'javascript:alert(1)' }],
+    ['signed authoritative URL', (response: typeof acceptedResponse) => { response.results[0].record.authoritative_url = 'https://data.cms.gov/source?token=secret' }],
+    ['private retrieval route', (response: typeof acceptedResponse) => { response.results[0].record.retrieval.instructions[0].url = 'https://2130706433/source' }],
+  ])('rejects an unsafe external %s at the canonical response boundary', (_label, mutate) => {
+    const unsafe = structuredClone(acceptedResponse)
+    mutate(unsafe)
+    expect(() => assertDiscoveryResult(unsafe)).toThrowError(DiscoveryProviderError)
+  })
 })

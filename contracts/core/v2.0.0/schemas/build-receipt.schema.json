@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/build-receipt.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receipt_version", "contract_version", "offline", "network_used", "source_data_included", "fixture_manifest_file_sha256", "bundle_file_sha256", "bundle_content_fingerprint", "record_counts", "canonical_json_algorithm"],
+  "properties": {
+    "receipt_version": { "const": "observatory-core-fixture-build.v2.0.0" },
+    "contract_version": { "const": "observatory-core.v2.0.0" },
+    "offline": { "const": true },
+    "network_used": { "const": false },
+    "source_data_included": { "const": false },
+    "fixture_manifest_file_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "bundle_file_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "bundle_content_fingerprint": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/sha256" },
+    "record_counts": {
+      "type": "object",
+      "minProperties": 13,
+      "maxProperties": 13,
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "canonical_json_algorithm": { "const": "ushso-canonical-json-v1" }
+  }
+}

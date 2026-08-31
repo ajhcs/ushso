@@ -1,0 +1,59 @@
+\set ON_ERROR_STOP on
+
+-- Supply every identifier and generated password with psql -v from the
+-- approved ephemeral secret channel. This template contains no value and must
+-- run only as the API-created bootstrap owner over the direct Neon endpoint.
+-- SQL-created roles do not receive Neon's automatic neon_superuser membership.
+BEGIN;
+
+SELECT format(
+  'CREATE ROLE %I LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD %L',
+  :'public_login', :'public_password'
+) WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'public_login') \gexec
+SELECT format(
+  'CREATE ROLE %I LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD %L',
+  :'scheduler_login', :'scheduler_password'
+) WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'scheduler_login') \gexec
+SELECT format(
+  'CREATE ROLE %I LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD %L',
+  :'harvest_login', :'harvest_password'
+) WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'harvest_login') \gexec
+SELECT format(
+  'CREATE ROLE %I LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD %L',
+  :'normalize_login', :'normalize_password'
+) WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'normalize_login') \gexec
+SELECT format(
+  'CREATE ROLE %I LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD %L',
+  :'projector_login', :'projector_password'
+) WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'projector_login') \gexec
+SELECT format(
+  'CREATE ROLE %I LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD %L',
+  :'ops_login', :'ops_password'
+) WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'ops_login') \gexec
+
+ALTER ROLE :"public_login" NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD :'public_password';
+ALTER ROLE :"scheduler_login" NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD :'scheduler_password';
+ALTER ROLE :"harvest_login" NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD :'harvest_password';
+ALTER ROLE :"normalize_login" NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD :'normalize_password';
+ALTER ROLE :"projector_login" NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD :'projector_password';
+ALTER ROLE :"ops_login" NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT NOREPLICATION NOBYPASSRLS PASSWORD :'ops_password';
+
+REVOKE neon_superuser FROM :"public_login";
+REVOKE neon_superuser FROM :"scheduler_login";
+REVOKE neon_superuser FROM :"harvest_login";
+REVOKE neon_superuser FROM :"normalize_login";
+REVOKE neon_superuser FROM :"projector_login";
+REVOKE neon_superuser FROM :"ops_login";
+
+GRANT ushso_public TO :"public_login";
+GRANT ushso_scheduler TO :"scheduler_login";
+GRANT ushso_harvest TO :"harvest_login";
+GRANT ushso_normalize TO :"normalize_login";
+GRANT ushso_projector TO :"projector_login";
+GRANT ushso_ops TO :"ops_login";
+GRANT ushso_maintenance TO :"bootstrap_login";
+COMMIT;
+
+-- The bootstrap identity then uses SET ROLE ushso_maintenance for migration,
+-- repair, restore, and bootstrap work. It is never a Worker binding. Run the
+-- prebinding attestation next; do not plan Hyperdrive before it passes.

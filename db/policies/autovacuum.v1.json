@@ -1,0 +1,18 @@
+{
+  "schema_version": "ushso-autovacuum-policy.v1",
+  "basis": "provisional local policy pending managed production-volume measurement",
+  "hot_tables": {
+    "ingest.harvest_runs": {"fillfactor":80,"vacuum_scale_factor":0.02,"vacuum_threshold":200,"analyze_scale_factor":0.01,"analyze_threshold":100},
+    "ingest.jobs": {"fillfactor":75,"vacuum_scale_factor":0.02,"vacuum_threshold":200,"analyze_scale_factor":0.01,"analyze_threshold":100},
+    "ops.outbox": {"fillfactor":75,"vacuum_scale_factor":0.02,"vacuum_threshold":200,"analyze_scale_factor":0.01,"analyze_threshold":100},
+    "ops.processed_event_keys": {"fillfactor":90,"vacuum_scale_factor":0.05,"analyze_scale_factor":0.02}
+  },
+  "append_only_partitions": {"analyze_scale_factor":0.02,"analyze_threshold":100},
+  "release_gate": {
+    "requires_managed_churn_test": true,
+    "requires_dead_tuple_budget": true,
+    "requires_write_amplification_budget": true,
+    "status": "pending_external_authorization"
+  }
+}
+

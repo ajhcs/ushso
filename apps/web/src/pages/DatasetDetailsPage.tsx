@@ -2,7 +2,9 @@ import { ExternalLink, Info, ShieldCheck } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
+import { ResearcherDecisionSummary } from '../components/ResearcherDecisionSummary'
 import { findDatasetInResponse } from '../lib/catalogAdapter'
+import { safeExternalHttpsUrl } from '../lib/externalUrls'
 import { useDatasetResult } from '../providers/DiscoveryProviderContext'
 
 function formatDate(value: string) {
@@ -53,6 +55,9 @@ export function DatasetDetailsPage() {
 
   const record = dataset.canonicalResult.record
   const verificationEvidence = dataset.verification.evidence.filter((item) => item.state === 'verified_first_party' && item.sources.length > 0)
+  const codebookUrl = dataset.variableDetails.codebook
+    ? safeExternalHttpsUrl(dataset.variableDetails.codebook.url)
+    : null
   return (
     <div className="details-page">
       <ObservatoryHeader compact />
@@ -63,6 +68,7 @@ export function DatasetDetailsPage() {
           <h1>{dataset.title}</h1>
           <p>{dataset.description}</p>
         </div>
+        <ResearcherDecisionSummary dataset={dataset} />
         <div className="details-grid">
           <section aria-labelledby="details-content-heading">
             <h2 id="details-content-heading">Content and coverage</h2>
@@ -98,7 +104,7 @@ export function DatasetDetailsPage() {
             <div className="details-panel__heading">
               <ShieldCheck aria-hidden="true" />
               <div>
-                <p className="details-panel__eyebrow">{dataset.verification.liveVerified ? 'Live source check passed' : 'Verification incomplete'}</p>
+                <p className="details-panel__eyebrow">{dataset.verification.liveVerified ? 'Scoped metadata route checked' : 'Scoped metadata route not live checked'}</p>
                 <h2 id="verification-heading">Verification evidence</h2>
               </div>
             </div>
@@ -112,13 +118,18 @@ export function DatasetDetailsPage() {
                 <article key={evidence.evidenceId}>
                   <p>{evidence.claim}</p>
                   <ul>
-                    {evidence.sources.map((source) => (
-                      <li key={source.provenanceId}>
-                        <a href={source.locator} target="_blank" rel="noreferrer">
-                          {source.kind === 'first_party_page' ? 'Open first-party source' : 'Open supporting documentation'} <ExternalLink aria-hidden="true" />
-                        </a>
-                      </li>
-                    ))}
+                    {evidence.sources.map((source) => {
+                      const canonicalLocator = safeExternalHttpsUrl(source.locator)
+                      return (
+                        <li key={source.provenanceId}>
+                          {canonicalLocator ? (
+                            <a href={canonicalLocator} target="_blank" rel="noreferrer">
+                            {source.kind === 'first_party_page' ? 'Open first-party source' : 'Open supporting documentation'} <ExternalLink aria-hidden="true" />
+                            </a>
+                          ) : <span>Non-navigable evidence locator retained: {source.locator}</span>}
+                        </li>
+                      )
+                    })}
                   </ul>
                   {evidence.limitations.length > 0 && <p className="evidence-limit"><b>Boundary:</b> {evidence.limitations.join(' ')}</p>}
                 </article>
@@ -147,8 +158,8 @@ export function DatasetDetailsPage() {
                 </div>
               ))}
             </dl>
-            {dataset.variableDetails.codebook && (
-              <a className="codebook-link" href={dataset.variableDetails.codebook.url} target="_blank" rel="noreferrer">
+            {dataset.variableDetails.codebook && codebookUrl && (
+              <a className="codebook-link" href={codebookUrl} target="_blank" rel="noreferrer">
                 Open {dataset.variableDetails.codebook.title} <ExternalLink aria-hidden="true" />
               </a>
             )}

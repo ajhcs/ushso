@@ -1,0 +1,246 @@
+{
+  "fixture_version": "ingestion-adversarial-fixtures.v1.0.0",
+  "cases": [
+    {
+      "case_id": "unexpected_property_rejected",
+      "kind": "record",
+      "base_fixture_id": "valid_source_descriptor",
+      "mutations": [{ "op": "set", "path": "/undeclared_extension", "value": true }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "secret_value_not_a_locator",
+      "kind": "record",
+      "base_fixture_id": "valid_source_descriptor",
+      "mutations": [{ "op": "set", "path": "/credential_secret_locator", "value": "https://secrets.example/token?api_key=not-a-locator" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "raw_healthcare_row_payload_sentinel",
+      "kind": "record",
+      "base_fixture_id": "valid_capture_reference",
+      "mutations": [{ "op": "set", "path": "/source_data_payload", "value": { "synthetic_patient_id": "PAYLOAD_SENTINEL_DO_NOT_CAPTURE", "measure_value": 42 } }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "payload_route_purpose_forbidden",
+      "kind": "record",
+      "base_fixture_id": "valid_source_descriptor",
+      "mutations": [{ "op": "set", "path": "/endpoints/0/routes/0/purpose", "value": "source_data_payload" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "missing_capture_evidence",
+      "kind": "record",
+      "base_fixture_id": "valid_capture_reference",
+      "mutations": [{ "op": "delete", "path": "/evidence_ref_id", "value": null }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "stale_lease_epoch_fenced",
+      "kind": "record",
+      "base_fixture_id": "valid_page_job_leased",
+      "mutations": [{ "op": "set", "path": "/delivery_fence/lease_epoch", "value": 2 }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "STALE_LEASE_EPOCH"
+    },
+    {
+      "case_id": "stale_run_attempt_fenced",
+      "kind": "record",
+      "base_fixture_id": "valid_page_job_leased",
+      "mutations": [{ "op": "set", "path": "/delivery_fence/run_attempt", "value": 2 }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "STALE_RUN_ATTEMPT"
+    },
+    {
+      "case_id": "partial_run_keeps_last_known_good",
+      "kind": "record",
+      "base_fixture_id": "valid_publication_barrier",
+      "mutations": [
+        { "op": "set", "path": "/run_outcome", "value": "partial_unpublished" },
+        { "op": "set", "path": "/enumerations_complete_and_sealed", "value": false },
+        { "op": "set", "path": "/candidate_publication_id", "value": null }
+      ],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "LAST_KNOWN_GOOD_REPLACED_BY_INCOMPLETE_RUN"
+    },
+    {
+      "case_id": "publication_barrier_missing_enumeration",
+      "kind": "record",
+      "base_fixture_id": "valid_publication_barrier",
+      "mutations": [{ "op": "set", "path": "/enumerations_complete_and_sealed", "value": false }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "PUBLICATION_BARRIER_INCOMPLETE"
+    },
+    {
+      "case_id": "cursor_expiry_cannot_seal",
+      "kind": "record",
+      "base_fixture_id": "valid_enumeration_seal",
+      "mutations": [{ "op": "set", "path": "/cursor_expired", "value": true }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "ENUMERATION_SEAL_INCOMPLETE"
+    },
+    {
+      "case_id": "checkpoint_cannot_advance_without_seal",
+      "kind": "record_set",
+      "base_fixture_id": "valid_checkpoint",
+      "mutations": [{ "op": "set", "path": "/enumeration_seal_id", "value": "seal_missing_or_failed" }],
+      "semantic_rule": "record_set",
+      "context": {},
+      "expected_code": "CHECKPOINT_ADVANCES_WITHOUT_SEALED_ENUMERATION"
+    },
+    {
+      "case_id": "duplicate_delivery_conflicting_effect",
+      "kind": "record_set",
+      "base_fixture_id": "valid_processed_event",
+      "mutations": [
+        { "op": "set", "path": "/processed_event_id", "value": "processed_page_duplicate" },
+        { "op": "set", "path": "/business_effect_digest", "value": "3333333333333333333333333333333333333333333333333333333333333333" }
+      ],
+      "semantic_rule": "duplicate_delivery",
+      "context": {},
+      "expected_code": "DUPLICATE_DELIVERY_EFFECT_CONFLICT"
+    },
+    {
+      "case_id": "dlq_replay_must_allocate_new_lineage",
+      "kind": "record",
+      "base_fixture_id": "valid_replay_lineage",
+      "mutations": [{ "op": "set", "path": "/new_run_id", "value": "run_cms_failed_20260829" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "DLQ_REPLAY_RESETS_HISTORY"
+    },
+    {
+      "case_id": "dlq_replay_preserves_original_policy",
+      "kind": "record_set",
+      "base_fixture_id": "valid_replay_lineage",
+      "mutations": [{ "op": "set", "path": "/original_retry_policy_version", "value": "retry.other" }],
+      "semantic_rule": "record_set",
+      "context": {},
+      "expected_code": "DLQ_REPLAY_LINEAGE_UNRESOLVED"
+    },
+    {
+      "case_id": "conditional_304_requires_reused_capture",
+      "kind": "record",
+      "base_fixture_id": "valid_fetch_not_modified",
+      "mutations": [{ "op": "set", "path": "/reused_capture_ref_id", "value": null }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "CONDITIONAL_304_INVALID"
+    },
+    {
+      "case_id": "four_clocks_system_before_observation",
+      "kind": "record",
+      "base_fixture_id": "valid_capture_reference",
+      "mutations": [{ "op": "set", "path": "/clocks/recorded_at", "value": "2026-08-30T00:01:02.000Z" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "FOUR_CLOCK_SYSTEM_BEFORE_OBSERVATION"
+    },
+    {
+      "case_id": "four_clocks_unknown_not_inferred",
+      "kind": "record",
+      "base_fixture_id": "valid_capture_reference",
+      "mutations": [
+        { "op": "set", "path": "/clocks/data_coverage/state", "value": "unknown" },
+        { "op": "set", "path": "/clocks/data_coverage/semantics", "value": "unknown" }
+      ],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "FOUR_CLOCK_COVERAGE_STATE_MISMATCH"
+    },
+    {
+      "case_id": "bad_terminal_run_transition",
+      "kind": "transition",
+      "base_fixture_id": null,
+      "mutations": [],
+      "semantic_rule": "transition",
+      "context": { "machine": "run", "from": "failed", "to": "starting" },
+      "expected_code": "STATE_TRANSITION_INVALID"
+    },
+    {
+      "case_id": "pause_requires_complete_drain",
+      "kind": "record",
+      "base_fixture_id": "valid_source_paused",
+      "mutations": [{ "op": "set", "path": "/in_flight_work_count", "value": 1 }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "PAUSE_DRAIN_INCOMPLETE"
+    },
+    {
+      "case_id": "retry_cannot_ack_before_reledger_commit",
+      "kind": "record",
+      "base_fixture_id": "valid_attempt_reledgered",
+      "mutations": [{ "op": "set", "path": "/database_transaction_committed", "value": false }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "RELEDGER_RETRY_NOT_DURABLE"
+    },
+    {
+      "case_id": "cursor_404_is_enumeration_failure",
+      "kind": "record",
+      "base_fixture_id": "valid_fetch_not_modified",
+      "mutations": [
+        { "op": "set", "path": "/target_class", "value": "pagination_cursor" },
+        { "op": "set", "path": "/response_status", "value": 404 },
+        { "op": "set", "path": "/outcome", "value": "typed_failure" },
+        { "op": "set", "path": "/reused_capture_ref_id", "value": null },
+        { "op": "set", "path": "/failure", "value": { "failure_type": "not_found", "retry_class": "terminal_observation", "target_class": "pagination_cursor", "safe_detail_code": "CURSOR_NOT_FOUND", "http_status": 404, "observed_at": "2026-08-30T01:01:03.000Z" } }
+      ],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "COLLECTION_ABSENCE_MISCLASSIFIED"
+    },
+    {
+      "case_id": "capture_content_address_mismatch",
+      "kind": "record",
+      "base_fixture_id": "valid_capture_reference",
+      "mutations": [{ "op": "set", "path": "/r2_key", "value": "captures/sha256/bb/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "CAPTURE_CONTENT_ADDRESS_MISMATCH"
+    },
+    {
+      "case_id": "job_idempotency_key_exactness",
+      "kind": "record",
+      "base_fixture_id": "valid_normalize_job",
+      "mutations": [{ "op": "set", "path": "/idempotency_key", "value": "normalize:wrong:2.0.0" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "JOB_IDEMPOTENCY_KEY_MISMATCH"
+    },
+    {
+      "case_id": "outbox_message_cannot_embed_response_body",
+      "kind": "record",
+      "base_fixture_id": "valid_outbox_event",
+      "mutations": [{ "op": "set", "path": "/response_body", "value": "PAYLOAD_SENTINEL_DO_NOT_TRANSPORT" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "terminal_not_found_cannot_be_blindly_retried",
+      "kind": "record",
+      "base_fixture_id": "valid_failure_policy",
+      "mutations": [{ "op": "set", "path": "/failure_rules/7/catalog_enumeration_disposition", "value": "retry" }],
+      "semantic_rule": "record",
+      "context": {},
+      "expected_code": "FAILURE_POLICY_DISPOSITION_MISMATCH"
+    }
+  ]
+}

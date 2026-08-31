@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.0.0/harvest-plan.schema.json",
+  "title": "Harvest plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "plan_id", "source_id", "endpoint_id", "source_configuration_revision", "mode", "scheduled_slot", "scope_ids", "prior_checkpoint_id", "prior_checkpoint_digest", "conditional_http", "bounded_by", "created_at"],
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+    "plan_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "source_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "endpoint_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "source_configuration_revision": { "type": "integer", "minimum": 1 },
+    "mode": { "enum": ["incremental", "full_membership", "operator_replay"] },
+    "scheduled_slot": { "$ref": "common.schema.json#/$defs/Timestamp" },
+    "scope_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "common.schema.json#/$defs/OpaqueId" } },
+    "prior_checkpoint_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+    "prior_checkpoint_digest": { "anyOf": [{ "$ref": "common.schema.json#/$defs/Sha256" }, { "type": "null" }] },
+    "conditional_http": {
+      "type": "object", "additionalProperties": false,
+      "required": ["enabled", "reuse_not_modified_capture", "validator_source"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "reuse_not_modified_capture": { "const": true },
+        "validator_source": { "enum": ["checkpoint_capture", "item_capture", "none"] }
+      }
+    },
+    "bounded_by": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maximum_pages", "maximum_response_bytes", "maximum_decompressed_bytes", "deadline_at"],
+      "properties": {
+        "maximum_pages": { "type": "integer", "minimum": 1, "maximum": 100000 },
+        "maximum_response_bytes": { "type": "integer", "minimum": 1, "maximum": 52428800 },
+        "maximum_decompressed_bytes": { "type": "integer", "minimum": 1, "maximum": 104857600 },
+        "deadline_at": { "$ref": "common.schema.json#/$defs/Timestamp" }
+      }
+    },
+    "created_at": { "$ref": "common.schema.json#/$defs/Timestamp" }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/package-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "package", "version", "digest_taxonomy", "excluded_paths", "files", "package_content_digest"],
+  "properties": {
+    "contract_version": { "const": "observatory-machine-toolkit-package-manifest.v1.0.0" },
+    "package": { "const": "@ushso/machine-toolkit-contract" },
+    "version": { "const": "1.0.0" },
+    "digest_taxonomy": { "const": "contracts/digest-taxonomy.json" },
+    "excluded_paths": { "type": "array", "minItems": 2, "maxItems": 10, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } },
+    "files": {
+      "type": "array",
+      "minItems": 30,
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "media_type", "bytes", "file_sha256", "canonical_json_sha256"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "maxLength": 256, "pattern": "^(?!/)(?!.*\\.\\.)[A-Za-z0-9._/-]+$" },
+          "media_type": { "enum": ["application/json", "text/markdown", "text/javascript"] },
+          "bytes": { "type": "integer", "minimum": 1, "maximum": 10000000 },
+          "file_sha256": { "type": "string", "minLength": 64, "maxLength": 64, "pattern": "^[a-f0-9]{64}$" },
+          "canonical_json_sha256": { "oneOf": [{ "$ref": "common.schema.json#/$defs/digest" }, { "type": "null" }] }
+        }
+      }
+    },
+    "package_content_digest": { "$ref": "common.schema.json#/$defs/digest" }
+  }
+}

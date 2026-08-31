@@ -1,0 +1,23 @@
+{
+  "schema_version": "ushso-test-strategy-evidence.v1.0.0",
+  "strategy_key": "web",
+  "plan_section": "§22.6",
+  "structural_status": "PASS",
+  "release_readiness": "BLOCKED",
+  "release_blockers": [
+    "human:researcher-task-study",
+    "authorization:AUTH-06",
+    "authorization:AUTH-07",
+    "live:public-crawler-smoke"
+  ],
+  "execution_policy": { "offline": true, "repository_writes": 0, "receipt_writes": 0, "network_calls": 0, "external_actions": 0 },
+  "controls": [
+    { "id": "T22.6-01", "statement": "Result-card decision hierarchy and bounded-count language.", "evidence_status": "pending_human", "evidence_scope": "local_unit", "evidence": [{ "kind": "test", "path": "apps/web/src/components/ResultCard.test.ts", "sha256": "eacbc6c05d13e88684db93632c185590169ce05a2aa2f5ecca7d3c5d707939fb" }] },
+    { "id": "T22.6-02", "statement": "Coverage matrix preserves all seven canonical `coverage_cell_state` values.", "evidence_status": "implemented_local", "evidence_scope": "local_unit", "evidence": [{ "kind": "test", "path": "apps/web/src/data/coveragePositioning.test.ts", "sha256": "fc43feb27e8ea8ee0a25be6c4da84e7da7a8f822a7162ec2f9808fb8b59195a0" }] },
+    { "id": "T22.6-03", "statement": "Detail-page researcher summary and exact verification labels.", "evidence_status": "implemented_local", "evidence_scope": "local_unit", "evidence": [{ "kind": "test", "path": "apps/web/src/lib/researcherGuidance.test.tsx", "sha256": "268aa7fee578fe98ce4dd8a787e03066a88c756a8a1e50f217edf23a9bfa2cf1" }] },
+    { "id": "T22.6-04", "statement": "Plan states, JSON export, keyboard access, and responsive behavior.", "evidence_status": "pending_human", "evidence_scope": "local_integration", "evidence": [{ "kind": "test", "path": "apps/web/src/pages/PlanPage.test.tsx", "sha256": "1ff9e6580c608a1e821ad1e2268f711d19297e772caf25e9bb140deff70f5847" }, { "kind": "test", "path": "apps/web/src/lib/planExport.test.ts", "sha256": "ade1f5aacff6263a005c5eeaca8ad1fdaf72b3287fe5166edbaf09476529883d" }] },
+    { "id": "T22.6-05", "statement": "No-JavaScript dataset-page crawl.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "test", "path": "packages/web-discoverability/tests/projection-crawler.test.mjs", "sha256": "d60a5b604a18f66f6f23b1878443248df15f2582bb316680673b3cb90be1a8c4" }] },
+    { "id": "T22.6-06", "statement": "Sitemap membership and structured-data validation.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "test", "path": "packages/web-discoverability/tests/projection-crawler.test.mjs", "sha256": "d60a5b604a18f66f6f23b1878443248df15f2582bb316680673b3cb90be1a8c4" }] },
+    { "id": "T22.6-07", "statement": "Canonical alias and withdrawn-record behavior.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "test", "path": "packages/web-discoverability/tests/lifecycle-security.test.mjs", "sha256": "839b3a0fa21934f3bdf3418e24e0596c96c843ce7d0b99c9cd535b7d7621e49f" }] }
+  ]
+}

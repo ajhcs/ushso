@@ -1,0 +1,92 @@
+{
+  "schema_version": "ushso-worker-binding-manifest.v1.0.0",
+  "environments": ["staging", "production"],
+  "global_rules": {
+    "workers_dev": false,
+    "routes": [],
+    "entrypoint_status": "inert_foundation_placeholder_not_live_wp4_composition",
+    "deployable_candidate": false,
+    "known_factories_not_entrypoints": ["services/scheduler-worker/index.mjs#createSchedulerWorker", "services/harvest-worker/index.mjs#createHarvestWorker", "services/harvest-worker/index.mjs#createCloudflareWorkflowPlatform", "services/harvest-worker/index.mjs#createHarvestWorkflowEntrypoint"],
+    "blocking_wp4_composition_artifacts": ["scheduler_default_handler_with_postgresql_control_store", "concrete_harvest_workflow_class", "harvest_queue_composition_root", "normalize_queue_composition_root", "projector_queue_composition_root", "ops_dlq_sink_composition_root"],
+    "node_client": "pg",
+    "required_compatibility_flags": ["nodejs_compat_v2"],
+    "workflow_connection_rule": "fresh_client_inside_each_step_do",
+    "queue_payload_rule": "identifiers_and_refs_only_no_source_bodies",
+    "dlq_sink_rule": "ops_ack_only_after_postgresql_incident_commit_initial_plus_five_deliveries_no_recursive_dlq",
+    "untrusted_version_selection": "denied"
+  },
+  "workers": [
+    {
+      "role": "public",
+      "name_suffix": "public",
+      "hyperdrive": ["HD_CORRECTNESS", "HD_IMMUTABLE_READ"],
+      "r2": [],
+      "queue_producers": [],
+      "queue_consumers": [],
+      "workflows": [],
+      "cron": [],
+      "secret_names": [],
+      "denied": ["connector_credentials", "source_egress", "r2_write", "queue_production", "canonical_write", "candidate_version_selection"]
+    },
+    {
+      "role": "scheduler",
+      "name_suffix": "scheduler",
+      "hyperdrive": ["HD_CORRECTNESS"],
+      "r2": [],
+      "queue_producers": ["HARVEST_PAGE_QUEUE"],
+      "queue_consumers": [],
+      "workflows": ["HARVEST_WORKFLOW"],
+      "cron": ["*/5 * * * *"],
+      "secret_names": [],
+      "denied": ["public_promotion", "capture_read", "source_credentials"]
+    },
+    {
+      "role": "harvest",
+      "name_suffix": "harvest",
+      "hyperdrive": ["HD_CORRECTNESS"],
+      "r2": ["R2_CAPTURE"],
+      "queue_producers": ["NORMALIZE_RECORD_QUEUE"],
+      "queue_consumers": ["harvest-page"],
+      "workflows": [],
+      "cron": [],
+      "secret_names": ["SOURCE_AUTH_BROKER_TOKEN"],
+      "denied": ["public_promotion", "canonical_acceptance"]
+    },
+    {
+      "role": "normalize",
+      "name_suffix": "normalize",
+      "hyperdrive": ["HD_CORRECTNESS"],
+      "r2": ["R2_CAPTURE"],
+      "queue_producers": ["ENRICH_SCHEMA_QUEUE", "ACCESS_CHECK_QUEUE", "PROJECT_INDEX_QUEUE"],
+      "queue_consumers": ["normalize-record", "enrich-schema", "access-check"],
+      "workflows": [],
+      "cron": [],
+      "secret_names": [],
+      "denied": ["source_network", "public_promotion"]
+    },
+    {
+      "role": "projector",
+      "name_suffix": "projector",
+      "hyperdrive": ["HD_CORRECTNESS", "HD_IMMUTABLE_READ"],
+      "r2": [],
+      "queue_producers": [],
+      "queue_consumers": ["project-index"],
+      "workflows": [],
+      "cron": [],
+      "secret_names": [],
+      "denied": ["source_network", "source_credentials", "active_generation_mutation"]
+    },
+    {
+      "role": "ops",
+      "name_suffix": "ops",
+      "hyperdrive": ["HD_CORRECTNESS"],
+      "r2": ["R2_ARCHIVE"],
+      "queue_producers": ["HARVEST_PAGE_QUEUE", "NORMALIZE_RECORD_QUEUE", "ENRICH_SCHEMA_QUEUE", "ACCESS_CHECK_QUEUE", "PROJECT_INDEX_QUEUE"],
+      "queue_consumers": ["harvest-page-dlq", "normalize-record-dlq", "enrich-schema-dlq", "access-check-dlq", "project-index-dlq"],
+      "workflows": ["HARVEST_WORKFLOW"],
+      "cron": [],
+      "secret_names": ["OPS_AUDIT_HMAC_KEY", "OPS_ACCESS_AUD"],
+      "denied": ["unauthenticated_access"]
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/normalization/v1.0.0/schemas/import-plan.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["plan_version", "import_id", "source", "normalizer", "policy", "expected_counts", "canonical_counts", "record_mappings", "join_route_mappings", "identity_review_candidates", "source_identity_review_candidates", "rejected_items", "bundle_fingerprint", "projection_fingerprint", "created_at"],
+  "properties": {
+    "plan_version": { "const": "ushso-normalization-import-plan.v1.0.0" },
+    "import_id": { "$ref": "#/$defs/opaqueId" },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["corpus_version", "manifest_file_sha256", "content_fingerprint_sha256", "records_file_sha256", "search_documents_file_sha256", "join_routes_file_sha256"],
+      "properties": {
+        "corpus_version": { "const": "1.1.0" },
+        "manifest_file_sha256": { "$ref": "#/$defs/bareSha256" },
+        "content_fingerprint_sha256": { "$ref": "#/$defs/bareSha256" },
+        "records_file_sha256": { "$ref": "#/$defs/bareSha256" },
+        "search_documents_file_sha256": { "$ref": "#/$defs/bareSha256" },
+        "join_routes_file_sha256": { "$ref": "#/$defs/bareSha256" }
+      }
+    },
+    "normalizer": {
+      "type": "object", "additionalProperties": false, "required": ["name", "version", "deterministic"],
+      "properties": { "name": { "const": "legacy-corpus-normalizer" }, "version": { "const": "1.0.0" }, "deterministic": { "const": true } }
+    },
+    "policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id_basis", "title_or_url_merge_permitted", "uncertain_identity_disposition", "destructive_rollback_permitted", "source_payloads_acquired", "analyses_executed"],
+      "properties": {
+        "id_basis": { "const": "source-scoped immutable legacy identifier" },
+        "title_or_url_merge_permitted": { "const": false },
+        "uncertain_identity_disposition": { "const": "separate_open_review_candidate" },
+        "destructive_rollback_permitted": { "const": false },
+        "source_payloads_acquired": { "const": false },
+        "analyses_executed": { "const": false }
+      }
+    },
+    "expected_counts": {
+      "type": "object", "additionalProperties": false, "required": ["legacy_records", "legacy_join_routes", "legacy_search_documents"],
+      "properties": { "legacy_records": { "const": 157 }, "legacy_join_routes": { "const": 14 }, "legacy_search_documents": { "const": 157 } }
+    },
+    "canonical_counts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["organizations", "sources", "assets", "releases", "distributions", "documentation", "schema_snapshots", "schema_fields", "access_routes", "access_observations", "evidence", "assertions", "relationships"],
+      "properties": {
+        "organizations": { "type": "integer", "minimum": 1 }, "sources": { "type": "integer", "minimum": 1 },
+        "assets": { "const": 157 }, "releases": { "const": 157 }, "distributions": { "const": 157 },
+        "documentation": { "const": 157 }, "schema_snapshots": { "type": "integer", "minimum": 14 },
+        "schema_fields": { "type": "integer", "minimum": 14 }, "access_routes": { "const": 157 },
+        "access_observations": { "const": 157 }, "evidence": { "type": "integer", "minimum": 157 },
+        "assertions": { "const": 157 }, "relationships": { "type": "integer", "minimum": 14 }
+      }
+    },
+    "record_mappings": { "type": "array", "minItems": 157, "maxItems": 157, "items": { "$ref": "#/$defs/recordMapping" } },
+    "join_route_mappings": { "type": "array", "minItems": 14, "maxItems": 14, "items": { "$ref": "#/$defs/routeMapping" } },
+    "identity_review_candidates": { "type": "array", "items": { "$ref": "#/$defs/candidate" } },
+    "source_identity_review_candidates": { "type": "array", "items": { "$ref": "#/$defs/sourceCandidate" } },
+    "rejected_items": { "type": "array", "items": { "$ref": "#/$defs/rejectedItem" } },
+    "bundle_fingerprint": { "$ref": "#/$defs/sha256" },
+    "projection_fingerprint": { "$ref": "#/$defs/sha256" },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "opaqueId": { "type": "string", "pattern": "^urn:ushso:[a-z][a-z0-9-]*:[A-Za-z0-9._~-]+$" },
+    "sha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "bareSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "canonicalIds": {
+      "type": "object", "additionalProperties": false,
+      "required": ["organization_id", "source_id", "asset_id", "release_id", "distribution_id", "documentation_id", "access_route_id", "observation_id", "assertion_id"],
+      "properties": {
+        "organization_id": { "$ref": "#/$defs/opaqueId" }, "source_id": { "$ref": "#/$defs/opaqueId" }, "asset_id": { "$ref": "#/$defs/opaqueId" },
+        "release_id": { "$ref": "#/$defs/opaqueId" }, "distribution_id": { "$ref": "#/$defs/opaqueId" }, "documentation_id": { "$ref": "#/$defs/opaqueId" },
+        "access_route_id": { "$ref": "#/$defs/opaqueId" }, "observation_id": { "$ref": "#/$defs/opaqueId" }, "assertion_id": { "$ref": "#/$defs/opaqueId" }
+      }
+    },
+    "recordMapping": {
+      "type": "object", "additionalProperties": false,
+      "required": ["legacy_record_id", "legacy_record_fingerprint", "disposition", "rejection_code", "canonical_ids", "evidence_ids", "legacy_alias_preserved", "identity_action", "source_identity_scope"],
+      "properties": {
+        "legacy_record_id": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "legacy_record_fingerprint": { "$ref": "#/$defs/sha256" }, "disposition": { "enum": ["accepted", "rejected"] },
+        "rejection_code": { "type": ["string", "null"], "pattern": "^[A-Z][A-Z0-9_]{2,79}$" },
+        "canonical_ids": { "$ref": "#/$defs/canonicalIds" },
+        "evidence_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/opaqueId" } },
+        "legacy_alias_preserved": { "const": true },
+        "identity_action": { "enum": ["created_separate", "created_separate_with_open_candidate"] },
+        "source_identity_scope": { "const": "source_scoped" }
+      }
+    },
+    "routeMapping": {
+      "type": "object", "additionalProperties": false,
+      "required": ["legacy_route_id", "legacy_route_fingerprint", "disposition", "rejection_code", "relationship_ids", "compatibility_preserved_as", "evidence_state_preserved_as"],
+      "properties": {
+        "legacy_route_id": { "type": "string", "minLength": 1, "maxLength": 240 }, "legacy_route_fingerprint": { "$ref": "#/$defs/sha256" },
+        "disposition": { "enum": ["accepted", "rejected"] }, "rejection_code": { "type": ["string", "null"], "pattern": "^[A-Z][A-Z0-9_]{2,79}$" },
+        "relationship_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/opaqueId" } },
+        "compatibility_preserved_as": { "enum": ["conditional", "incompatible"] }, "evidence_state_preserved_as": { "const": "candidate" }
+      }
+    },
+    "candidate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["candidate_id", "ordered_asset_ids", "ordered_legacy_record_ids", "candidate_type", "state", "algorithm", "features", "feature_fingerprint", "match_score_micros", "epistemic_confidence", "automatic_merge_performed", "required_resolution_basis"],
+      "properties": {
+        "candidate_id": { "$ref": "#/$defs/opaqueId" }, "ordered_asset_ids": { "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": { "$ref": "#/$defs/opaqueId" } },
+        "ordered_legacy_record_ids": { "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "candidate_type": { "const": "same_identity" }, "state": { "const": "open" },
+        "algorithm": { "type": "object", "additionalProperties": false, "required": ["name", "version", "feature_version"], "properties": { "name": { "const": "legacy-similarity-candidate-generator" }, "version": { "const": "1.0.0" }, "feature_version": { "const": "1.0.0" } } },
+        "features": { "type": "object", "additionalProperties": false, "required": ["normalized_title_equal", "normalized_locator_equal", "publisher_equal", "source_equal"], "properties": { "normalized_title_equal": { "type": "boolean" }, "normalized_locator_equal": { "type": "boolean" }, "publisher_equal": { "type": "boolean" }, "source_equal": { "type": "boolean" } } },
+        "feature_fingerprint": { "$ref": "#/$defs/sha256" }, "match_score_micros": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "epistemic_confidence": { "enum": ["low", "moderate"] }, "automatic_merge_performed": { "const": false }, "required_resolution_basis": { "const": "human_review" }
+      }
+    },
+    "sourceCandidate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["candidate_id", "ordered_source_ids", "ordered_legacy_record_ids", "candidate_type", "state", "algorithm", "features", "feature_fingerprint", "match_score_micros", "epistemic_confidence", "automatic_merge_performed", "required_resolution_basis"],
+      "properties": {
+        "candidate_id": { "$ref": "#/$defs/opaqueId" },
+        "ordered_source_ids": { "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": { "$ref": "#/$defs/opaqueId" } },
+        "ordered_legacy_record_ids": { "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "candidate_type": { "const": "same_source_identity" }, "state": { "const": "open" },
+        "algorithm": { "type": "object", "additionalProperties": false, "required": ["name", "version", "feature_version"], "properties": { "name": { "const": "legacy-source-observation-candidate-generator" }, "version": { "const": "1.0.0" }, "feature_version": { "const": "1.0.0" } } },
+        "features": { "type": "object", "additionalProperties": false, "required": ["same_operator_legacy_id", "same_observed_portal"], "properties": { "same_operator_legacy_id": { "const": true }, "same_observed_portal": { "const": true } } },
+        "feature_fingerprint": { "$ref": "#/$defs/sha256" }, "match_score_micros": { "const": 600000 },
+        "epistemic_confidence": { "const": "low" }, "automatic_merge_performed": { "const": false }, "required_resolution_basis": { "const": "human_review" }
+      }
+    },
+    "rejectedItem": {
+      "type": "object", "additionalProperties": false, "required": ["legacy_id", "legacy_kind", "rejection_code", "explanation"],
+      "properties": { "legacy_id": { "type": "string", "minLength": 1 }, "legacy_kind": { "enum": ["record", "join_route"] }, "rejection_code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,79}$" }, "explanation": { "type": "string", "minLength": 1 } }
+    }
+  }
+}

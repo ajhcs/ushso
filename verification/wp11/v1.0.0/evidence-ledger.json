@@ -1,0 +1,153 @@
+{
+  "schema_version": "ushso-wp11-evidence-ledger.v1.0.0",
+  "work_package": "WP11",
+  "entries": [
+    {
+      "requirement_id": "WP11-RESULT-CARD-SIX-REGIONS",
+      "requirement": "Result cards preserve exactly title, description, why match, geography/grain/time, access/evidence, and details action regions.",
+      "implementation": ["apps/web/src/components/ResultCard.tsx"],
+      "verification": ["apps/web/src/components/ResultCard.test.ts"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP11-VERIFICATION-TARGET",
+      "requirement": "Verification labels name the scoped metadata route target and avoid a generic verified claim.",
+      "implementation": ["apps/web/src/components/ResultCard.tsx", "apps/web/src/pages/DatasetDetailsPage.tsx"],
+      "verification": ["apps/web/src/components/ResultCard.test.ts"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP11-USE-CARD",
+      "requirement": "Dataset detail presents every evidence-backed Use Card decision field before factual detail.",
+      "implementation": ["apps/web/src/lib/researcherGuidance.ts", "apps/web/src/components/ResearcherDecisionSummary.tsx"],
+      "verification": ["apps/web/src/lib/researcherGuidance.test.tsx"],
+      "status": "implemented_external_review_pending"
+    },
+    {
+      "requirement_id": "WP11-ACCESS-PLAN",
+      "requirement": "Access Plan presents class, eligibility, ordered process, gates, bounded turnaround, fee basis, delivery, inputs, artifacts, stop conditions, and typed failures without authorizing access.",
+      "implementation": ["apps/web/src/lib/researcherGuidance.ts", "apps/web/src/components/ResearcherDecisionSummary.tsx"],
+      "verification": ["apps/web/src/lib/researcherGuidance.test.tsx"],
+      "status": "implemented_external_review_pending"
+    },
+    {
+      "requirement_id": "WP11-RETRIEVAL-RECIPE",
+      "requirement": "Technical Retrieval Recipe exposes missing exact pins, ordered non-executed steps, typed failures, artifacts, and machine-readiness flags.",
+      "implementation": ["apps/web/src/lib/researcherGuidance.ts", "apps/web/src/components/ResearcherDecisionSummary.tsx"],
+      "verification": ["apps/web/src/lib/researcherGuidance.test.tsx"],
+      "status": "implemented_external_review_pending"
+    },
+    {
+      "requirement_id": "WP11-PLAN-DISTINCT-ROUTE",
+      "requirement": "A distinct /plan UI consumes only an already-compiled canonical plan and does not reuse discovery as a plan mode.",
+      "implementation": ["apps/web/src/App.tsx", "apps/web/src/pages/PlanPage.tsx", "apps/web/src/components/CanonicalPlanView.tsx"],
+      "verification": ["apps/web/src/pages/PlanPage.test.tsx", "apps/web/src/pages/modeSeparation.test.ts"],
+      "status": "implemented_verified_renderer_only"
+    },
+    {
+      "requirement_id": "WP11-PLAN-SECTION-ORDER",
+      "requirement": "Canonical plan uses the exact eight-section researcher presentation order.",
+      "implementation": ["apps/web/src/lib/researchPlanContract.ts", "apps/web/src/components/CanonicalPlanView.tsx"],
+      "verification": ["apps/web/src/pages/PlanPage.test.tsx"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP11-PLAN-ALL-STATES",
+      "requirement": "Unsupported, clarification-required, incomplete, ready-with-constraints, and ready canonical plans render with accessible status semantics.",
+      "implementation": ["apps/web/src/pages/PlanPage.tsx", "apps/web/src/components/CanonicalPlanView.tsx"],
+      "verification": ["frozen contracts/research-plan/v1.0.0 fixtures through apps/web/src/pages/PlanPage.test.tsx"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP11-OPERATION-ORTHOGONALITY",
+      "requirement": "Operation kind, evidence state, compatibility, requirements, and unresolved blockers stay separate.",
+      "implementation": ["apps/web/src/types/researchPlan.ts", "apps/web/src/lib/researchPlanContract.ts", "apps/web/src/components/CanonicalPlanView.tsx"],
+      "verification": ["apps/web/src/pages/PlanPage.test.tsx"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP11-BOUNDED-JSON-EXPORT",
+      "requirement": "Copy/download exports only the canonical plan and fails closed above 256 KiB.",
+      "implementation": ["apps/web/src/lib/planExport.ts", "apps/web/src/components/PlanJsonExport.tsx"],
+      "verification": ["apps/web/src/lib/planExport.test.ts"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP11-BROWSE-NEVER-PLANS",
+      "requirement": "Browse and discovery never invoke plan generation.",
+      "implementation": ["apps/web/src/providers/DiscoveryProviderContext.tsx", "apps/web/src/pages/SearchResultsPage.tsx"],
+      "verification": ["apps/web/src/pages/modeSeparation.test.ts", "verification/wp11/v1.0.0/tests/wp11-verification.test.mjs"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP11-ADAPTER-GATE",
+      "requirement": "Future /api/plan and /api/contracts/research-plan/v1.0.0 seams remain disabled and perform zero transport while AUTH-12 is false.",
+      "implementation": ["apps/web/src/providers/planApiAdapter.ts"],
+      "verification": ["apps/web/src/providers/planApiAdapter.test.ts"],
+      "status": "implemented_dependency_blocked"
+    },
+    {
+      "requirement_id": "WP11-WP9-COVERAGE-PARITY",
+      "requirement": "Coverage labels preserve WP9 snapshot, as-of, unit, non-additivity, zero-result, and 11/2/1 applicability truth.",
+      "implementation": ["apps/web/src/data/coveragePositioning.ts", "apps/web/src/components/CoveragePositioning.tsx", "apps/web/src/pages/SourcesPage.tsx"],
+      "verification": ["apps/web/src/data/coveragePositioning.test.ts"],
+      "status": "implemented_owner_approval_pending"
+    },
+    {
+      "requirement_id": "WP11-PRIVACY-AND-PRODUCT-BOUNDARY",
+      "requirement": "UI and exports persist no raw question and perform no source, payload, access, identity, operation, or analysis action.",
+      "implementation": ["apps/web/src/pages/PlanPage.tsx", "apps/web/src/providers/planApiAdapter.ts", "apps/web/src/lib/planExport.ts"],
+      "verification": ["apps/web/src/providers/planApiAdapter.test.ts", "apps/web/src/lib/planExport.test.ts", "verification/wp11/v1.0.0/tests/wp11-verification.test.mjs"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP11-EXTERNAL-URL-TRUST-BOUNDARY",
+      "requirement": "Evidence-bearing external routes are untrusted input: only canonical public-DNS HTTPS URLs without credentials, signed query keys, local/private destinations, controls, or ambiguous syntax become browser navigation targets; non-web evidence locators remain visible but non-navigable.",
+      "implementation": ["apps/web/src/lib/externalUrls.ts", "apps/web/src/providers/discoveryProvider.ts", "apps/web/src/data/liveVerificationOverlay.ts", "apps/web/src/lib/catalogAdapter.ts", "apps/web/src/lib/researcherGuidance.ts", "apps/web/src/pages/DatasetDetailsPage.tsx"],
+      "verification": ["apps/web/src/lib/externalUrls.test.ts", "apps/web/src/providers/discoveryProvider.test.ts", "apps/web/src/data/liveVerificationOverlay.test.ts", "apps/web/src/lib/researcherGuidance.test.tsx", "verification/wp11/v1.0.0/tests/wp11-verification.test.mjs"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP11-A11Y-RESPONSIVE",
+      "requirement": "All plan states and new regions have semantic landmarks/statuses and explicit tablet/phone collapse contracts.",
+      "implementation": ["apps/web/src/styles.css", "apps/web/src/components/CanonicalPlanView.tsx", "apps/web/src/components/ResearcherDecisionSummary.tsx", "apps/web/src/components/CoveragePositioning.tsx"],
+      "verification": ["apps/web/src/pages/PlanPage.test.tsx", "apps/web/src/lib/researcherGuidance.test.tsx", "apps/web/src/data/coveragePositioning.test.ts"],
+      "status": "implemented_static_and_ssr_verified_browser_plugin_unavailable"
+    },
+    {
+      "requirement_id": "WP11-V1-COMPATIBILITY",
+      "requirement": "Existing v1 browse/discovery behavior remains separate and no plan server route is activated.",
+      "implementation": ["apps/web/src/App.tsx"],
+      "verification": ["existing apps/web suite and build", "verification/wp11/v1.0.0/tests/wp11-verification.test.mjs"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP11-RESULT-CARD-HUMAN-STUDY",
+      "requirement": "At least five representative researchers achieve at least 80% intended-source selection within 30 seconds with zero analytics-result misinterpretation.",
+      "implementation": ["verification/wp11/v1.0.0/governance/result-card-researcher-study.json"],
+      "verification": ["pending aggregate external study receipt"],
+      "status": "pending_external_researcher_study"
+    },
+    {
+      "requirement_id": "WP11-DECISION-SUMMARY-HUMAN-REVIEW",
+      "requirement": "Two reviewers assess 12 stratified assets at 100% critical-field accuracy and zero unsupported claims.",
+      "implementation": ["verification/wp11/v1.0.0/governance/decision-summary-review.json"],
+      "verification": ["pending aggregate external reviewer receipt"],
+      "status": "pending_external_reviewer_study"
+    },
+    {
+      "requirement_id": "WP11-AUTH-12",
+      "requirement": "Planner governance ratification precedes WP10B compiler and plan endpoint implementation or activation.",
+      "implementation": ["verification/external-authorization/v1.0.0/register.json"],
+      "verification": ["AUTH-12 authorized remains false"],
+      "status": "blocked_external_authorization"
+    },
+    {
+      "requirement_id": "WP11-AUTH-15",
+      "requirement": "Product-owner digest-bound approval precedes representing the WP9 coverage wording as approved for publication.",
+      "implementation": ["apps/web/src/data/coveragePositioning.ts", "verification/external-authorization/v1.0.0/register.json"],
+      "verification": ["AUTH-15 authorized remains false and UI visibly says approval pending"],
+      "status": "blocked_external_authorization"
+    }
+  ]
+}

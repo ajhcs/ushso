@@ -1,0 +1,19 @@
+{
+  "name": "@ushso/normalization",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic canonical normalization and idempotent legacy v1.1.0 import for USHSO.",
+  "dependencies": {
+    "ajv": "8.20.0"
+  },
+  "scripts": {
+    "build:fixtures": "node tools/build-fixtures.mjs",
+    "manifest": "node tools/build-manifest.mjs",
+    "import:local": "node tools/import-production-v1.1.0.mjs --environment local",
+    "reject:local": "node tools/reject-import-batch.mjs --environment local",
+    "validate": "node tools/validate-package.mjs",
+    "receipt": "node tools/validate-package.mjs --write-receipt",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

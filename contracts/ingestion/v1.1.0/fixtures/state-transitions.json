@@ -1,0 +1,79 @@
+{
+  "fixture_version": "ingestion-state-transitions.v1.1.0",
+  "machines": [
+    {
+      "machine": "run",
+      "states": ["scheduled", "starting", "enumerating", "enumerated", "normalizing", "projecting", "published", "succeeded", "succeeded_with_optional_degradation", "partial_unpublished", "failed", "cancelled"],
+      "cases": [
+        { "from": "scheduled", "to": "starting", "expected": "allowed", "context": {} },
+        { "from": "starting", "to": "enumerating", "expected": "allowed", "context": {} },
+        { "from": "enumerating", "to": "enumerated", "expected": "allowed", "context": {} },
+        { "from": "enumerated", "to": "normalizing", "expected": "allowed", "context": {} },
+        { "from": "normalizing", "to": "projecting", "expected": "allowed", "context": {} },
+        { "from": "projecting", "to": "published", "expected": "allowed", "context": {} },
+        { "from": "published", "to": "succeeded", "expected": "allowed", "context": {} },
+        { "from": "published", "to": "succeeded_with_optional_degradation", "expected": "allowed", "context": {} },
+        { "from": "enumerating", "to": "partial_unpublished", "expected": "allowed", "context": {} },
+        { "from": "normalizing", "to": "failed", "expected": "allowed", "context": {} },
+        { "from": "projecting", "to": "cancelled", "expected": "allowed", "context": {} },
+        { "from": "succeeded", "to": "starting", "expected": "rejected", "context": {} },
+        { "from": "succeeded_with_optional_degradation", "to": "starting", "expected": "rejected", "context": {} },
+        { "from": "partial_unpublished", "to": "projecting", "expected": "rejected", "context": {} },
+        { "from": "failed", "to": "starting", "expected": "rejected", "context": {} },
+        { "from": "cancelled", "to": "starting", "expected": "rejected", "context": {} }
+      ]
+    },
+    {
+      "machine": "job",
+      "states": ["pending", "leased", "succeeded", "retry_wait", "quarantined", "dead"],
+      "cases": [
+        { "from": "pending", "to": "leased", "expected": "allowed", "context": {} },
+        { "from": "leased", "to": "succeeded", "expected": "allowed", "context": {} },
+        { "from": "leased", "to": "retry_wait", "expected": "allowed", "context": {} },
+        { "from": "leased", "to": "quarantined", "expected": "allowed", "context": {} },
+        { "from": "leased", "to": "dead", "expected": "allowed", "context": {} },
+        { "from": "leased", "to": "pending", "expected": "allowed", "context": { "lease_expired": true } },
+        { "from": "leased", "to": "pending", "expected": "rejected", "context": { "lease_expired": false } },
+        { "from": "retry_wait", "to": "pending", "expected": "allowed", "context": { "retry_due": true } },
+        { "from": "retry_wait", "to": "pending", "expected": "rejected", "context": { "retry_due": false } },
+        { "from": "succeeded", "to": "leased", "expected": "rejected", "context": {} },
+        { "from": "quarantined", "to": "pending", "expected": "rejected", "context": {} },
+        { "from": "dead", "to": "pending", "expected": "rejected", "context": {} }
+      ]
+    },
+    {
+      "machine": "outbox",
+      "states": ["pending", "leased", "published", "retry_wait", "dead"],
+      "cases": [
+        { "from": "pending", "to": "leased", "expected": "allowed", "context": {} },
+        { "from": "leased", "to": "published", "expected": "allowed", "context": {} },
+        { "from": "leased", "to": "retry_wait", "expected": "allowed", "context": {} },
+        { "from": "leased", "to": "dead", "expected": "allowed", "context": {} },
+        { "from": "leased", "to": "pending", "expected": "allowed", "context": { "lease_expired": true } },
+        { "from": "leased", "to": "pending", "expected": "rejected", "context": { "lease_expired": false } },
+        { "from": "retry_wait", "to": "pending", "expected": "allowed", "context": { "retry_due": true } },
+        { "from": "published", "to": "pending", "expected": "rejected", "context": {} },
+        { "from": "dead", "to": "pending", "expected": "rejected", "context": {} }
+      ]
+    },
+    {
+      "machine": "source",
+      "states": ["active", "pause_requested", "draining", "paused", "auth_blocked", "schema_drift", "retired"],
+      "cases": [
+        { "from": "active", "to": "pause_requested", "expected": "allowed", "context": {} },
+        { "from": "pause_requested", "to": "draining", "expected": "allowed", "context": {} },
+        { "from": "draining", "to": "paused", "expected": "allowed", "context": { "drain_reconciled": true, "audit_present": true } },
+        { "from": "draining", "to": "paused", "expected": "rejected", "context": { "drain_reconciled": false, "audit_present": true } },
+        { "from": "paused", "to": "active", "expected": "allowed", "context": { "drain_reconciled": true, "audit_present": true } },
+        { "from": "active", "to": "auth_blocked", "expected": "allowed", "context": {} },
+        { "from": "active", "to": "schema_drift", "expected": "allowed", "context": {} },
+        { "from": "auth_blocked", "to": "active", "expected": "allowed", "context": { "remediation_present": true, "new_configuration_revision": true, "audit_present": true } },
+        { "from": "auth_blocked", "to": "active", "expected": "rejected", "context": { "remediation_present": false, "new_configuration_revision": true, "audit_present": true } },
+        { "from": "schema_drift", "to": "pause_requested", "expected": "allowed", "context": {} },
+        { "from": "schema_drift", "to": "active", "expected": "allowed", "context": { "remediation_present": true, "new_configuration_revision": true, "audit_present": true } },
+        { "from": "active", "to": "retired", "expected": "allowed", "context": {} },
+        { "from": "retired", "to": "active", "expected": "rejected", "context": {} }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "policy_version": "observatory-planner-benchmark-runtime-leakage.v1.0.0",
+  "production_runtime_import": "prohibited",
+  "held_out_gold_runtime_access": "prohibited",
+  "raw_user_query_persistence": "prohibited",
+  "ordinary_ci_held_out_scoring": "prohibited",
+  "runtime_roots": [
+    "apps/web/src",
+    "packages",
+    "services",
+    "worker"
+  ],
+  "excluded_evaluation_roots": [
+    "evaluation/planner/v1.0.0",
+    "verification/wp10a/v1.0.0"
+  ],
+  "forbidden_runtime_markers": [
+    "@ushso/planner-benchmark-v1",
+    "evaluation/planner/v1.0.0",
+    "observatory-planner-benchmark.v1.0.0"
+  ],
+  "allowed_held_out_phase": "WP14 final release gate",
+  "held_out_run_requirements": [
+    "immutable release-candidate identifier",
+    "code digest",
+    "planner policy digest",
+    "evaluator-contract digest",
+    "threshold digest",
+    "first-run attestation",
+    "no-post-result-tuning attestation",
+    "published failure receipt on failure"
+  ],
+  "report_privacy": {
+    "aggregate_only": true,
+    "question_text": false,
+    "raw_plan_payload": false,
+    "user_or_request_identifier": false,
+    "item_level_held_out_judgment": false
+  }
+}

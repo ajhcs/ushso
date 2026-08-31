@@ -1,0 +1,142 @@
+{
+  "schema_version": "ushso-external-authorization-register.v1.0.0",
+  "updated_at": "2026-08-30T22:37:00Z",
+  "policy": "No entry authorizes an action. Authorization must be explicit, scoped to the exact candidate and environment, and recorded before execution.",
+  "entries": [
+    {
+      "id": "AUTH-01",
+      "action": "Procure paid Neon and Cloudflare capabilities for isolated staging and production",
+      "environment": "external_accounts",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["accepted ADR 0004", "redacted capacity estimate", "provider capability review template"],
+      "blocks": ["WP3 managed-service acceptance", "DOD-02", "DOD-03"]
+    },
+    {
+      "id": "AUTH-02",
+      "action": "Create encrypted remote Terraform state, production/staging resource IDs, database credentials, Cloudflare secrets, and Access policies",
+      "environment": "staging_and_production_control_plane",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["validated IaC", "least-privilege binding manifest", "secret-reference and recovery procedure"],
+      "blocks": ["WP3 live resource configuration"]
+    },
+    {
+      "id": "AUTH-03",
+      "action": "Apply staging infrastructure and forward migrations to managed PostgreSQL and Cloudflare resources",
+      "environment": "staging",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["clean local migration tests", "reviewed Terraform plan", "rollback and data-classification review"],
+      "blocks": ["WP3 external rehearsal", "WP4 managed integration"]
+    },
+    {
+      "id": "AUTH-04",
+      "action": "Run bounded metadata-only live connector canaries against approved authoritative source routes",
+      "environment": "staging_egress",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["connector fixture matrix", "SSRF and payload-sentinel gates", "source-by-source endpoint/object allowlist", "pause/DLQ/denominator controls"],
+      "blocks": ["WP5 live canary acceptance", "DOD-01"]
+    },
+    {
+      "id": "AUTH-05",
+      "action": "Perform managed-provider failover, isolated PITR restore, Hyperdrive disconnect/reconnect, and emergency-static activation drills",
+      "environment": "production_like_isolated_recovery",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["approved RPO/RTO", "tested restore tooling", "isolated target", "complete rollback bundle"],
+      "blocks": ["WP3 recovery acceptance", "M24.5", "DOD-17"]
+    },
+    {
+      "id": "AUTH-06",
+      "action": "Expose database-backed candidate reads to Access-protected internal canary traffic",
+      "environment": "production_internal_canary",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["all pre-canary gates", "0-percent candidate in active deployment", "protected version selection", "rehearsed static and generation rollback"],
+      "blocks": ["M24.4", "WP14 canary acceptance"]
+    },
+    {
+      "id": "AUTH-07",
+      "action": "Deploy and gradually promote database-backed public traffic",
+      "environment": "production_public",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["held-out and release gates", "N-1 asset/binding/schema compatibility", "production-like 2x load receipt", "operator-approved rollback packet"],
+      "blocks": ["M24.5", "WP14 public cutover"]
+    },
+    {
+      "id": "AUTH-08",
+      "action": "Operate the full rollback support window through at least 30 days after 100-percent cutover and two launch cycles",
+      "environment": "production_soak",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["100-percent cutover timestamp", "on-call and alert ownership", "resource retention lock", "incident review process"],
+      "blocks": ["M24.6", "WP14 soak acceptance"]
+    },
+    {
+      "id": "AUTH-09",
+      "action": "Retire runtime static JSONL loading after the complete soak and rollback window",
+      "environment": "production_runtime",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["completed AUTH-08 receipt", "two rebuild/promote/rollback cycles", "two connector reconciliations", "healthy static emergency artifact"],
+      "blocks": ["M24.7", "DOD-18"]
+    },
+    {
+      "id": "AUTH-10",
+      "action": "Push implementation commits or open remote review artifacts",
+      "environment": "remote_git",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["complete local verification", "reviewable change inventory", "no secrets or protected evidence"],
+      "blocks": []
+    },
+    {
+      "id": "AUTH-11",
+      "action": "Apply the zero-traffic production foundation and forward migrations to isolated managed PostgreSQL and Cloudflare resources",
+      "environment": "production_foundation_no_traffic",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["completed staging foundation receipt", "reviewed production Terraform plan", "validated additive migration bundle", "least-privilege and environment-isolation receipts", "rollback and recovery runbook"],
+      "blocks": ["WP3 production foundation", "WP14 production-ready candidate"]
+    },
+    {
+      "id": "AUTH-12",
+      "action": "Ratify the frozen planner metric formulas, numeric thresholds, required strata, and denominator floors with reviewable product, research-methods, and engineering owner evidence",
+      "environment": "planner_governance",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["sealed WP10A benchmark and evaluator package", "three-split manifest with held-out safeguards", "owner-review packet", "no held-out scoring or tuning"],
+      "blocks": ["WP10B planner implementation", "WP10 planner acceptance", "G23.2", "G23.3"]
+    },
+    {
+      "id": "AUTH-13",
+      "action": "Supply and seal a fresh independently owned 20-item retrieval holdout, then authorize its one-time aggregate-only final-gate evaluation against the frozen release candidate",
+      "environment": "retrieval_evaluation_governance",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["completed development and validation tuning under frozen WP2 semantics", "frozen ranking and threshold fingerprint", "independent custodian package attestation proving never-published and never-evaluated status", "durable single-use ledger", "aggregate-only evaluator path", "no-post-result-tuning attestation"],
+      "blocks": ["WP8 final retrieval acceptance", "G23.1", "DOD-08"]
+    },
+    {
+      "id": "AUTH-14",
+      "action": "Coordinate and record externally verifiable independent human adjudication of the sealed identity benchmark, including the required double-review sample and per-stratum evidence",
+      "environment": "identity_evaluation_governance",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["sealed 720-case identity benchmark and digest", "reviewer instructions and conflict policy", "identified independent reviewers", "review-evidence receipt format", "controlled-fixture exclusion", "no production auto-resolution enablement"],
+      "blocks": ["WP7 final identity acceptance", "G23.9", "DOD-06"]
+    },
+    {
+      "id": "AUTH-15",
+      "action": "Obtain the product owner's exact digest-bound approval of the WP9 public coverage and zero-result wording",
+      "environment": "coverage_product_governance",
+      "status": "not_requested",
+      "authorized": false,
+      "required_before_request": ["sealed WP9 coverage snapshot", "sealed 51-by-6 not-assessed matrix", "three-digest wording review packet", "exact non-exhaustive attestation text"],
+      "blocks": ["WP9 final coverage acceptance", "G23.4", "DOD-09", "DOD-10"]
+    }
+  ]
+}

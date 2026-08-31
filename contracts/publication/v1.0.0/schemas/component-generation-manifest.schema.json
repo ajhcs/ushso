@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/publication/v1.0.0/component-generation-manifest.schema.json",
+  "title": "Sealed component generation manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "generation_id", "component_kind", "sealed_state", "canonical_manifest_ref", "projector", "projection_schema_version", "build_strategy", "document_count", "acknowledgement_count", "projected_count", "excluded_count", "document_refs", "acknowledgement_ids", "projection_set_checksum", "component_checksum", "sealed_at", "retention", "immutable"],
+  "properties": {
+    "manifest_version": {"const": "component-generation-manifest.v1"},
+    "generation_id": {"$ref": "common.schema.json#/$defs/id"},
+    "component_kind": {"$ref": "common.schema.json#/$defs/componentKind"},
+    "sealed_state": {"const": "validated"},
+    "canonical_manifest_ref": {"$ref": "common.schema.json#/$defs/canonicalManifestRef"},
+    "projector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "fingerprint"],
+      "properties": {
+        "version": {"$ref": "common.schema.json#/$defs/version"},
+        "fingerprint": {"$ref": "common.schema.json#/$defs/sha256"}
+      }
+    },
+    "projection_schema_version": {"$ref": "common.schema.json#/$defs/version"},
+    "build_strategy": {"const": "complete_as_of_exact_revision_manifest"},
+    "document_count": {"type": "integer", "minimum": 0},
+    "acknowledgement_count": {"type": "integer", "minimum": 1},
+    "projected_count": {"type": "integer", "minimum": 0},
+    "excluded_count": {"type": "integer", "minimum": 0},
+    "document_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["document_id", "document_checksum"],
+        "properties": {
+          "document_id": {"$ref": "common.schema.json#/$defs/id"},
+          "document_checksum": {"$ref": "common.schema.json#/$defs/digest"}
+        }
+      }
+    },
+    "acknowledgement_ids": {"type": "array", "minItems": 1, "items": {"$ref": "common.schema.json#/$defs/id"}, "uniqueItems": true},
+    "projection_set_checksum": {
+      "allOf": [
+        {"$ref": "common.schema.json#/$defs/digest"},
+        {"type": "object", "properties": {"domain": {"const": "projection_set"}}}
+      ]
+    },
+    "component_checksum": {
+      "allOf": [
+        {"$ref": "common.schema.json#/$defs/digest"},
+        {"type": "object", "properties": {"domain": {"const": "component_generation"}}}
+      ]
+    },
+    "sealed_at": {"$ref": "common.schema.json#/$defs/utcTimestamp"},
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["retained_until", "pin_behavior_before_expiry", "pin_behavior_after_expiry", "physical_expiry_requires_audit"],
+      "properties": {
+        "retained_until": {"$ref": "common.schema.json#/$defs/utcTimestamp"},
+        "pin_behavior_before_expiry": {"const": "serve_pinned"},
+        "pin_behavior_after_expiry": {"const": "restart_required"},
+        "physical_expiry_requires_audit": {"const": true}
+      }
+    },
+    "immutable": {"const": true}
+  }
+}

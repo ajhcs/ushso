@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/schemas/infra/connection-budget.v1.0.0.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "client", "allocations", "totals", "provider_gate"],
+  "properties": {
+    "schema_version": { "const": "ushso-connection-budget.v1.0.0" },
+    "status": { "const": "planning_candidate_unverified" },
+    "client": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["library", "maximum_clients_per_invocation", "workflow_lifetime", "tls", "pooled_origin"],
+      "properties": {
+        "library": { "const": "pg" },
+        "maximum_clients_per_invocation": { "const": 1 },
+        "workflow_lifetime": { "const": "fresh_client_inside_each_step_do" },
+        "tls": { "const": "require" },
+        "pooled_origin": { "const": false }
+      }
+    },
+    "allocations": {
+      "type": "array",
+      "minItems": 5,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["consumer", "maximum_origin_connections", "cache_semantics"],
+        "properties": {
+          "consumer": { "type": "string" },
+          "maximum_origin_connections": { "type": "integer", "minimum": 1 },
+          "cache_semantics": { "enum": ["disabled_correctness", "immutable_generation_pinned", "direct_maintenance_only", "recovery_reserve"] }
+        }
+      }
+    },
+    "totals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allocated_origin_connections", "required_provider_cap", "minimum_headroom_ratio"],
+      "properties": {
+        "allocated_origin_connections": { "type": "integer", "minimum": 1 },
+        "required_provider_cap": { "type": "integer", "minimum": 1 },
+        "minimum_headroom_ratio": { "type": "number", "minimum": 0.25, "maximum": 1 }
+      }
+    },
+    "provider_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "must_confirm"],
+      "properties": {
+        "status": { "const": "pending_external_authorization" },
+        "must_confirm": { "type": "array", "minItems": 4, "items": { "type": "string" }, "uniqueItems": true }
+      }
+    }
+  }
+}

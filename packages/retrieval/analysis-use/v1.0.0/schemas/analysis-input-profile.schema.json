@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.ushso.org/retrieval/analysis-use/v1.0.0/analysis-input-profile.schema.json",
+  "title": "Evidence-reviewed dataset-to-analysis input profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile_id",
+    "analysis_id",
+    "record_id",
+    "requirement_catalog_sha256",
+    "requirement_sha256",
+    "inputs",
+    "properties",
+    "limitations",
+    "truth_boundary"
+  ],
+  "properties": {
+    "schema_version": {"const": "observatory-analysis-input-profile.v1.0.0"},
+    "profile_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._:-]{2,191}$"},
+    "analysis_id": {"$ref": "#/$defs/token"},
+    "record_id": {"type": "string", "minLength": 1},
+    "requirement_catalog_sha256": {"$ref": "#/$defs/digest"},
+    "requirement_sha256": {"$ref": "#/$defs/digest"},
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/inputMapping"}
+    },
+    "properties": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/propertyObservation"}
+    },
+    "limitations": {"$ref": "#/$defs/nonEmptyStringSet"},
+    "truth_boundary": {"$ref": "#/$defs/truthBoundary"}
+  },
+  "$defs": {
+    "token": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "nonEmptyString": {"type": "string", "minLength": 1},
+    "stringSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "nonEmptyStringSet": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "inputMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_id", "availability", "field_refs", "observation_grain", "value_kind", "measurement_unit", "domain_compatibility", "evidence_ids", "limitations"],
+      "properties": {
+        "input_id": {"$ref": "#/$defs/token"},
+        "availability": {"enum": ["source_reported", "derivable", "request_dependent", "proxy_only", "unverified"]},
+        "field_refs": {"$ref": "#/$defs/stringSet"},
+        "observation_grain": {"$ref": "#/$defs/nonEmptyString"},
+        "value_kind": {"enum": ["identifier", "category", "integer", "decimal", "currency", "percent", "rate", "period"]},
+        "measurement_unit": {"$ref": "#/$defs/nonEmptyString"},
+        "domain_compatibility": {
+          "description": "documented attests, with the mapping evidence_ids, compatibility with the full allowed_values and conditional_ranges of the exact pinned input requirement; it is not a field-name inference.",
+          "enum": ["documented", "unknown", "incompatible"]
+        },
+        "derivation": {"$ref": "#/$defs/derivation"},
+        "evidence_ids": {"$ref": "#/$defs/nonEmptyStringSet"},
+        "limitations": {"$ref": "#/$defs/stringSet"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"availability": {"enum": ["source_reported", "derivable"]}}},
+          "then": {
+            "properties": {
+              "field_refs": {"type": "array", "minItems": 1},
+              "domain_compatibility": {"const": "documented"}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"availability": {"const": "derivable"}}},
+          "then": {
+            "properties": {"derivation": {"$ref": "#/$defs/derivation"}},
+            "required": ["derivation"]
+          }
+        },
+        {
+          "if": {"properties": {"availability": {"const": "source_reported"}}},
+          "then": {"not": {"required": ["derivation"]}}
+        }
+      ]
+    },
+    "derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["derivation_id", "description", "evidence_ids"],
+      "properties": {
+        "derivation_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._:-]{2,191}$"},
+        "description": {"$ref": "#/$defs/nonEmptyString"},
+        "evidence_ids": {"$ref": "#/$defs/nonEmptyStringSet"}
+      }
+    },
+    "propertyObservation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["property_id", "state", "evidence_ids", "limitations"],
+      "properties": {
+        "property_id": {"$ref": "#/$defs/token"},
+        "state": {"enum": ["documented", "candidate", "unknown", "not_satisfied"]},
+        "evidence_ids": {"$ref": "#/$defs/nonEmptyStringSet"},
+        "limitations": {"$ref": "#/$defs/stringSet"}
+      }
+    },
+    "truthBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assertion_type", "source_truth_separate", "field_inference_allowed"],
+      "properties": {
+        "assertion_type": {"const": "evidence_reviewed_field_mapping_not_source_truth"},
+        "source_truth_separate": {"const": true},
+        "field_inference_allowed": {"const": false}
+      }
+    }
+  }
+}

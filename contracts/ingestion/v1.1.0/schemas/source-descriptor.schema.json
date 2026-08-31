@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.1.0/source-descriptor.schema.json",
+  "title": "Configured authoritative source descriptor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version", "descriptor_id", "source_id", "connector_name", "connector_version",
+    "configuration_revision", "authority_type", "responsible_organization", "allowed_hosts",
+    "redirect_policy", "endpoints", "scopes", "native_identifier", "checkpoint_policy",
+    "refresh_policy", "bounds", "origin_policy", "credential_secret_locator", "supported_object_roles",
+    "capabilities", "exclusion_policy", "legal_review", "capture_retention_policy", "source_state"
+  ],
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+    "descriptor_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "source_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "connector_name": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,63}$" },
+    "connector_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "configuration_revision": { "type": "integer", "minimum": 1 },
+    "authority_type": { "enum": ["federal_agency", "state_agency", "local_agency", "tribal_authority", "academic_repository", "nonprofit_repository", "standards_body", "other_public_authority"] },
+    "responsible_organization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["organization_id", "name"],
+      "properties": {
+        "organization_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "name": { "type": "string", "minLength": 2, "maxLength": 200 }
+      }
+    },
+    "allowed_hosts": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": { "type": "string", "format": "hostname" }
+    },
+    "redirect_policy": { "enum": ["deny", "same_origin", "allowlisted_hosts"] },
+    "endpoints": {
+      "type": "array", "minItems": 1,
+      "items": { "$ref": "#/$defs/Endpoint" }
+    },
+    "scopes": {
+      "type": "array", "minItems": 1,
+      "items": { "$ref": "#/$defs/Scope" }
+    },
+    "native_identifier": {
+      "type": "object", "additionalProperties": false,
+      "required": ["namespace", "case_behavior"],
+      "properties": {
+        "namespace": { "type": "string", "pattern": "^[a-z][a-z0-9._:-]{2,127}$" },
+        "case_behavior": { "enum": ["sensitive", "insensitive", "source_defined"] }
+      }
+    },
+    "checkpoint_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["strategy", "opaque_cursor_durability", "overlap_seconds", "full_enumeration_interval_seconds"],
+      "properties": {
+        "strategy": { "enum": ["modified_at_native_id", "opaque_cursor", "full_snapshot"] },
+        "opaque_cursor_durability": { "enum": ["run_local", "source_guaranteed"] },
+        "overlap_seconds": { "type": "integer", "minimum": 0, "maximum": 604800 },
+        "full_enumeration_interval_seconds": { "type": "integer", "minimum": 3600, "maximum": 31536000 }
+      }
+    },
+    "refresh_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["interval_seconds", "jitter_seconds", "stale_after_seconds", "policy_version"],
+      "properties": {
+        "interval_seconds": { "type": "integer", "minimum": 300, "maximum": 31536000 },
+        "jitter_seconds": { "type": "integer", "minimum": 0, "maximum": 86400 },
+        "stale_after_seconds": { "type": "integer", "minimum": 300, "maximum": 63072000 },
+        "policy_version": { "type": "string", "pattern": "^[a-z0-9._-]{3,64}$" }
+      }
+    },
+    "bounds": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maximum_pages", "maximum_response_bytes", "maximum_decompressed_bytes", "maximum_run_seconds", "maximum_redirects"],
+      "properties": {
+        "maximum_pages": { "type": "integer", "minimum": 1, "maximum": 100000 },
+        "maximum_response_bytes": { "type": "integer", "minimum": 1, "maximum": 52428800 },
+        "maximum_decompressed_bytes": { "type": "integer", "minimum": 1, "maximum": 104857600 },
+        "maximum_run_seconds": { "type": "integer", "minimum": 1, "maximum": 86400 },
+        "maximum_redirects": { "type": "integer", "minimum": 0, "maximum": 5 }
+      }
+    },
+    "origin_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maximum_concurrency", "requests_per_second", "burst", "minimum_retry_delay_seconds", "maximum_retry_delay_seconds", "circuit_policy_version"],
+      "properties": {
+        "maximum_concurrency": { "type": "integer", "minimum": 1, "maximum": 32 },
+        "requests_per_second": { "type": "number", "exclusiveMinimum": 0, "maximum": 100 },
+        "burst": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "minimum_retry_delay_seconds": { "type": "integer", "minimum": 1, "maximum": 3600 },
+        "maximum_retry_delay_seconds": { "type": "integer", "minimum": 1, "maximum": 86400 },
+        "circuit_policy_version": { "type": "string", "pattern": "^[a-z0-9._-]{3,64}$" }
+      }
+    },
+    "credential_secret_locator": { "$ref": "common.schema.json#/$defs/SecretLocator" },
+    "supported_object_roles": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": { "enum": ["asset", "release", "distribution", "documentation", "schema", "access_route"] }
+    },
+    "capabilities": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_metadata", "documentation", "access_probe"],
+      "properties": {
+        "schema_metadata": { "type": "boolean" },
+        "documentation": { "type": "boolean" },
+        "access_probe": { "type": "boolean" }
+      }
+    },
+    "exclusion_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["policy_version", "rules", "exclusions_visible_upstream"],
+      "properties": {
+        "policy_version": { "type": "string", "pattern": "^[a-z0-9._-]{3,64}$" },
+        "rules": {
+          "type": "array", "maxItems": 100,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["rule_id", "reason_code", "description"],
+            "properties": {
+              "rule_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+              "reason_code": { "type": "string", "pattern": "^[a-z][a-z0-9_]{2,63}$" },
+              "description": { "type": "string", "minLength": 5, "maxLength": 500 }
+            }
+          }
+        },
+        "exclusions_visible_upstream": { "const": true }
+      }
+    },
+    "legal_review": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "reviewed_at", "reviewer_role", "terms_locator"],
+      "properties": {
+        "state": { "enum": ["approved", "approved_with_conditions", "pending", "blocked"] },
+        "reviewed_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+        "reviewer_role": { "type": ["string", "null"], "maxLength": 100 },
+        "terms_locator": { "type": ["string", "null"], "format": "https-uri" }
+      }
+    },
+    "capture_retention_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["policy_version", "active_days", "override_rationale", "review_at"],
+      "properties": {
+        "policy_version": { "type": "string", "pattern": "^[a-z0-9._-]{3,64}$" },
+        "active_days": { "type": "integer", "minimum": 1, "maximum": 3650 },
+        "override_rationale": { "type": ["string", "null"], "maxLength": 500 },
+        "review_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" }
+      }
+    },
+    "source_state": { "enum": ["active", "pause_requested", "draining", "paused", "auth_blocked", "schema_drift", "retired"] }
+  },
+  "$defs": {
+    "Endpoint": {
+      "type": "object", "additionalProperties": false,
+      "required": ["endpoint_id", "base_url", "target_class", "routes"],
+      "properties": {
+        "endpoint_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "base_url": { "type": "string", "format": "https-uri" },
+        "target_class": { "$ref": "common.schema.json#/$defs/TargetClass" },
+        "routes": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["template_id", "purpose", "method", "path_template", "allowed_parameters", "expected_content_classes", "forbidden_route_classes"],
+            "properties": {
+              "template_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+              "purpose": { "enum": ["catalog_metadata", "documentation", "schema", "access_probe"] },
+              "method": { "enum": ["GET", "HEAD"] },
+              "path_template": { "type": "string", "pattern": "^/[A-Za-z0-9._~!$&'()*+,;=:@%/{}/-]*$", "maxLength": 1000 },
+              "allowed_parameters": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$" } },
+              "expected_content_classes": {
+                "type": "array", "minItems": 1, "uniqueItems": true,
+                "items": { "enum": ["catalog_item_record", "catalog_collection", "data_dictionary", "schema_description", "documentation_page", "access_status_headers"] }
+              },
+              "forbidden_route_classes": {
+                "type": "array", "minItems": 5, "uniqueItems": true,
+                "items": { "enum": ["source_data_payload", "query_execution", "data_download", "archive_member", "form_submission", "login", "payment", "authorization_workflow"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["scope_id", "unit", "description", "endpoint_ids", "denominator", "completeness_evidence_strategy", "keyword_search_is_denominator"],
+      "properties": {
+        "scope_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "unit": { "enum": ["source_scope", "collection", "jurisdiction", "asset_listing"] },
+        "description": { "type": "string", "minLength": 5, "maxLength": 500 },
+        "endpoint_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "common.schema.json#/$defs/OpaqueId" } },
+        "denominator": {
+          "type": "object", "additionalProperties": false,
+          "required": ["unit", "inclusion_rule", "unknown_handling", "exclusions_visible"],
+          "properties": {
+            "unit": { "enum": ["configured_item", "source_reported_item", "enumerated_item", "jurisdiction"] },
+            "inclusion_rule": { "type": "string", "minLength": 5, "maxLength": 500 },
+            "unknown_handling": { "const": "preserve_unknown" },
+            "exclusions_visible": { "const": true }
+          }
+        },
+        "completeness_evidence_strategy": { "enum": ["configured_enumeration", "authoritative_total", "both"] },
+        "keyword_search_is_denominator": { "const": false }
+      }
+    }
+  }
+}

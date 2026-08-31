@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/coverage/v1.0.0/schemas/source-scope.schema.json",
+  "title": "Coverage source scope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "source_scope_id",
+    "registry_revision",
+    "source_scope_revision",
+    "registry_state",
+    "authority_level",
+    "responsible_organization_id",
+    "connector_id",
+    "connector_revision",
+    "connector_configuration_revision",
+    "jurisdiction_ids",
+    "scope_definition",
+    "policy_revisions",
+    "enumeration",
+    "absence_claim_permitted",
+    "absence_reason"
+  ],
+  "properties": {
+    "source_scope_id": { "$ref": "common.schema.json#/$defs/Id" },
+    "registry_revision": { "$ref": "common.schema.json#/$defs/Id" },
+    "source_scope_revision": { "$ref": "common.schema.json#/$defs/Id" },
+    "registry_state": { "enum": ["active", "paused", "excluded", "retired", "unassessed"] },
+    "authority_level": { "enum": ["federal", "state", "local", "multi_jurisdiction", "other"] },
+    "responsible_organization_id": { "$ref": "common.schema.json#/$defs/Id" },
+    "connector_id": { "$ref": "common.schema.json#/$defs/Id" },
+    "connector_revision": { "$ref": "common.schema.json#/$defs/Id" },
+    "connector_configuration_revision": { "$ref": "common.schema.json#/$defs/Id" },
+    "jurisdiction_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "common.schema.json#/$defs/Id" }
+    },
+    "scope_definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["counting_unit", "native_id_namespace", "bounded_scope", "completeness_denominator_definition", "authoritative_total_supported"],
+      "properties": {
+        "counting_unit": { "const": "native_item" },
+        "native_id_namespace": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "bounded_scope": { "type": "string", "minLength": 12, "maxLength": 1000 },
+        "completeness_denominator_definition": {
+          "oneOf": [
+            { "type": "string", "minLength": 12, "maxLength": 1000 },
+            { "type": "null" }
+          ]
+        },
+        "authoritative_total_supported": { "type": "boolean" }
+      }
+    },
+    "policy_revisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inclusion", "exclusion", "cadence", "check"],
+      "properties": {
+        "inclusion": { "$ref": "common.schema.json#/$defs/Id" },
+        "exclusion": { "$ref": "common.schema.json#/$defs/Id" },
+        "cadence": { "$ref": "common.schema.json#/$defs/Id" },
+        "check": { "$ref": "common.schema.json#/$defs/Id" }
+      }
+    },
+    "enumeration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "sealed", "membership_revision", "completed_at", "failure_class"],
+      "properties": {
+        "status": { "enum": ["never_started", "complete", "incomplete", "failed"] },
+        "sealed": { "type": "boolean" },
+        "membership_revision": {
+          "oneOf": [
+            { "$ref": "common.schema.json#/$defs/Id" },
+            { "type": "null" }
+          ]
+        },
+        "completed_at": {
+          "oneOf": [
+            { "$ref": "common.schema.json#/$defs/UtcInstant" },
+            { "type": "null" }
+          ]
+        },
+        "failure_class": {
+          "oneOf": [
+            { "type": "string", "minLength": 2, "maxLength": 120 },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "absence_claim_permitted": { "type": "boolean" },
+    "absence_reason": {
+      "oneOf": [
+        { "$ref": "common.schema.json#/$defs/AbsenceReason" },
+        { "type": "null" }
+      ]
+    }
+  }
+}

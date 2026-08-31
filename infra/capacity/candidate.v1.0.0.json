@@ -1,0 +1,53 @@
+{
+  "schema_version": "ushso-capacity-candidate.v1.0.0",
+  "candidate_id": "wp3-conservative-2026-08-30",
+  "decision": "configuration_input_not_capacity_claim",
+  "workload": {
+    "schema_version": "ushso-workload.v1.0.0",
+    "candidate_id": "wp3-conservative-2026-08-30",
+    "status": "planning_candidate_unverified",
+    "source": { "kind": "synthetic_and_frozen_benchmark", "contains_raw_questions": false, "contains_user_identifiers": false, "ratification": "pending_external_authorization" },
+    "public": {
+      "candidate_peak_requests_per_second": 20,
+      "candidate_concurrent_requests": 40,
+      "cold_cache_ratio": 0.25,
+      "route_mix": { "discovery": 0.15, "record_search": 0.35, "record_detail": 0.25, "bundle_plan": 0.1, "coverage": 0.05, "json_webmcp": 0.1 }
+    },
+    "pipeline": { "concurrent_harvest_runs": 2, "concurrent_normalize_batches": 2, "concurrent_projection_builds": 1, "maximum_capture_bytes": 8388608 },
+    "load_test": { "multiplier": 2, "duration_minutes": 30, "environment": "production_like_isolated", "status": "pending_external_authorization", "authorization": "AUTH-03" }
+  },
+  "connection_budget": {
+    "schema_version": "ushso-connection-budget.v1.0.0",
+    "status": "planning_candidate_unverified",
+    "client": { "library": "pg", "maximum_clients_per_invocation": 1, "workflow_lifetime": "fresh_client_inside_each_step_do", "tls": "require", "pooled_origin": false },
+    "allocations": [
+      { "consumer": "hyperdrive_correctness", "maximum_origin_connections": 8, "cache_semantics": "disabled_correctness" },
+      { "consumer": "hyperdrive_immutable_read", "maximum_origin_connections": 12, "cache_semantics": "immutable_generation_pinned" },
+      { "consumer": "migration_path", "maximum_origin_connections": 2, "cache_semantics": "direct_maintenance_only" },
+      { "consumer": "controlled_maintenance", "maximum_origin_connections": 4, "cache_semantics": "direct_maintenance_only" },
+      { "consumer": "provider_recovery_reserve", "maximum_origin_connections": 4, "cache_semantics": "recovery_reserve" }
+    ],
+    "totals": { "allocated_origin_connections": 30, "required_provider_cap": 45, "minimum_headroom_ratio": 0.333333 },
+    "provider_gate": { "status": "pending_external_authorization", "must_confirm": ["neon_compute_connection_cap", "hyperdrive_origin_connection_limit", "hyperdrive_multiplexing_behavior", "pg_statement_and_transaction_limits", "worker_concurrency_under_queues"] }
+  },
+  "storage_io": {
+    "schema_version": "ushso-storage-io.v1.0.0",
+    "status": "planning_candidate_unverified",
+    "postgresql": { "initial_gib": 5, "monthly_growth_gib": 0.5, "pitr_days": 30, "compute_units_min": 1, "compute_units_max": 4 },
+    "r2": { "capture_mib_per_day": 256, "capture_active_days": 90, "archive_gib_per_year": 12, "content_addressed": true, "public_access": false },
+    "io_candidate": { "steady_read_ops_per_second": 80, "steady_write_ops_per_second": 20, "two_x_read_ops_per_second": 160, "two_x_write_ops_per_second": 40 },
+    "retention_guard": { "blind_lifecycle_deletion": false, "dependency_reconciliation": true, "security_audit_minimum_days": 365, "planner_ledger_minimum_days": 90 }
+  },
+  "queue_capacity": {
+    "schema_version": "ushso-queue-capacity.v1.0.0",
+    "status": "planning_candidate_unverified",
+    "stages": [
+      { "stage": "harvest_page", "candidate_messages_per_minute": 60, "two_x_messages_per_minute": 120, "max_batch_size": 5, "max_concurrency": 2, "target_backlog_drain_minutes": 30 },
+      { "stage": "normalize_record", "candidate_messages_per_minute": 180, "two_x_messages_per_minute": 360, "max_batch_size": 10, "max_concurrency": 2, "target_backlog_drain_minutes": 30 },
+      { "stage": "schema_enrichment", "candidate_messages_per_minute": 60, "two_x_messages_per_minute": 120, "max_batch_size": 10, "max_concurrency": 1, "target_backlog_drain_minutes": 45 },
+      { "stage": "access_check", "candidate_messages_per_minute": 60, "two_x_messages_per_minute": 120, "max_batch_size": 10, "max_concurrency": 1, "target_backlog_drain_minutes": 45 },
+      { "stage": "index_projection", "candidate_messages_per_minute": 180, "two_x_messages_per_minute": 360, "max_batch_size": 10, "max_concurrency": 2, "target_backlog_drain_minutes": 30 }
+    ],
+    "load_test": { "duration_minutes": 30, "multiplier": 2, "status": "pending_external_authorization", "required_measurements": ["queue_oldest_age", "delivery_attempts", "dlq_count", "database_origin_connections", "worker_cpu_and_duration", "backlog_drain_time"] }
+  }
+}

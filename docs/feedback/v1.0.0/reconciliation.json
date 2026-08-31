@@ -1,0 +1,396 @@
+{
+  "schema_version": "ushso-tester-feedback-reconciliation.v1.0.0",
+  "reviewed_at": "2026-08-30T20:52:48Z",
+  "reviewer": "USHSO WP0 implementation review",
+  "review_basis": "The user explicitly directed execution of the authoritative implementation plan, including versioning and reconciling both tester sources.",
+  "status_vocabulary": [
+    "accepted",
+    "planned",
+    "implemented",
+    "verified",
+    "rejected"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "TST-COV-01",
+      "owner": "Product + Data",
+      "status": "implemented",
+      "acceptance_test": "coverage-positioning.contract",
+      "receipt_target": "coverage-copy-v1",
+      "evidence": ["verification/wp9/v1.0.0/receipts/wp9-verification.json", "verification/wp11/v1.0.0/receipts/wp11-verification.json"],
+      "remaining_gate": "AUTH-15 digest-bound product-owner wording approval"
+    },
+    {
+      "requirement_id": "TST-COV-02",
+      "owner": "Data",
+      "status": "implemented",
+      "acceptance_test": "state-matrix.accounting",
+      "receipt_target": "state-matrix-snapshot-reconciliation",
+      "evidence": ["verification/wp9/v1.0.0/receipts/wp9-verification.json"],
+      "remaining_gate": "AUTH-15 wording approval and production publication gate"
+    },
+    {
+      "requirement_id": "TST-RET-01",
+      "owner": "Search",
+      "status": "planned",
+      "acceptance_test": "retrieval-quality.v2",
+      "receipt_target": "retrieval-evaluator-cohort-v2",
+      "evidence": ["verification/wp8/v1.0.0/receipts/wp8-scaffolding.json"],
+      "remaining_gate": "FAIL_PRE_TUNING; AUTH-13 independent final holdout and production-like query-plan/latency gates"
+    },
+    {
+      "requirement_id": "TST-PLAN-01",
+      "owner": "Product + Planner",
+      "status": "planned",
+      "acceptance_test": "planner-pa-vertical",
+      "receipt_target": "canonical-plan-evidence",
+      "evidence": ["verification/wp10a/v1.0.0/receipts/wp10a-receipt.json"],
+      "remaining_gate": "AUTH-12 benchmark-owner ratification before WP10B compiler implementation"
+    },
+    {
+      "requirement_id": "TST-ID-01",
+      "owner": "Identity",
+      "status": "implemented",
+      "acceptance_test": "identity-resolution-benchmark",
+      "receipt_target": "identity-adjudication-reversal",
+      "evidence": ["verification/wp7/v1.0.0/receipts/wp7-verification.json"],
+      "remaining_gate": "AUTH-14 independent human adjudication and migrations 0008-0009"
+    },
+    {
+      "requirement_id": "TST-FIT-01",
+      "owner": "Research UX",
+      "status": "implemented",
+      "acceptance_test": "researcher-fitness-decision",
+      "receipt_target": "researcher-fitness-dual-review",
+      "evidence": ["verification/wp11/v1.0.0/receipts/wp11-verification.json"],
+      "remaining_gate": "Two-reviewer 12-asset external decision-summary study"
+    },
+    {
+      "requirement_id": "TST-UI-01",
+      "owner": "UX",
+      "status": "implemented",
+      "acceptance_test": "result-card-decision-hierarchy",
+      "receipt_target": "result-card-information-budget",
+      "evidence": ["verification/wp11/v1.0.0/receipts/wp11-verification.json"],
+      "remaining_gate": "Five-researcher timed external comprehension study"
+    },
+    {
+      "requirement_id": "TST-SEO-01",
+      "owner": "Web",
+      "status": "planned",
+      "acceptance_test": "crawler-record-pages",
+      "receipt_target": "sitemap-structured-data",
+      "remaining_gate": "WP13 candidate validation, public generation integration, and crawler release gate"
+    },
+    {
+      "requirement_id": "TST-TRUST-01",
+      "owner": "Product",
+      "status": "implemented",
+      "acceptance_test": "scope-language",
+      "receipt_target": "generation-copy-audit",
+      "evidence": ["verification/wp9/v1.0.0/receipts/wp9-verification.json", "verification/wp11/v1.0.0/receipts/wp11-verification.json"],
+      "remaining_gate": "AUTH-15 exact-copy approval and public generation release receipt"
+    },
+    {
+      "requirement_id": "TST-MCP-01",
+      "owner": "Machine interfaces",
+      "status": "implemented",
+      "acceptance_test": "machine-toolkit-composability",
+      "receipt_target": "machine-toolkit-workflow-trace",
+      "evidence": ["verification/wp12/v1.0.0/receipts/candidate-validation.json"],
+      "remaining_gate": "Canonical service integration, authorized activation, and public workflow trace"
+    },
+    {
+      "requirement_id": "TST-MCP-02",
+      "owner": "Machine interfaces",
+      "status": "implemented",
+      "acceptance_test": "machine-toolkit-output-bounds",
+      "receipt_target": "machine-toolkit-per-tool-boundaries",
+      "evidence": ["verification/wp12/v1.0.0/receipts/candidate-validation.json"],
+      "remaining_gate": "Authorized public activation and release-candidate bounds receipt"
+    },
+    {
+      "requirement_id": "TST-MCP-03",
+      "owner": "API + Web",
+      "status": "implemented",
+      "acceptance_test": "machine-interface-parity",
+      "receipt_target": "machine-interface-conformance-manifest",
+      "evidence": ["verification/wp12/v1.0.0/receipts/candidate-validation.json"],
+      "remaining_gate": "Live JSON API/WebMCP/UI shared-service integration and documentation activation"
+    },
+    {
+      "requirement_id": "TST-MCP-04",
+      "owner": "Security + Machine interfaces",
+      "status": "implemented",
+      "acceptance_test": "machine-toolkit-zero-action",
+      "receipt_target": "machine-toolkit-egress-redaction",
+      "evidence": ["verification/wp12/v1.0.0/receipts/candidate-validation.json"],
+      "remaining_gate": "Release-candidate egress-deny/redaction receipt under authorized bindings"
+    },
+    {
+      "requirement_id": "TST-MCP-05",
+      "owner": "Metadata + Search",
+      "status": "implemented",
+      "acceptance_test": "machine-readiness-classification",
+      "receipt_target": "machine-readiness-capability-vector",
+      "evidence": ["verification/wp11/v1.0.0/receipts/wp11-verification.json", "verification/wp12/v1.0.0/receipts/candidate-validation.json"],
+      "remaining_gate": "Canonical database integration and public machine-toolkit gate"
+    }
+  ],
+  "topics": [
+    {
+      "topic_id": "A1",
+      "source_id": "feedback-a",
+      "paragraph_start": 1,
+      "paragraph_end": 1,
+      "byte_start": 0,
+      "byte_end": 898,
+      "start_marker": ". The current production corpus has 157 records",
+      "requirement_ids": ["TST-COV-01", "TST-COV-02"],
+      "disposition": "accepted",
+      "rationale": "Requires honest corpus composition, selected-state positioning, and a canonical state/federal matrix."
+    },
+    {
+      "topic_id": "A2",
+      "source_id": "feedback-a",
+      "paragraph_start": 2,
+      "paragraph_end": 2,
+      "byte_start": 902,
+      "byte_end": 1728,
+      "start_marker": "Retrieval quality is the biggest functional problem after coverage.",
+      "requirement_ids": ["TST-RET-01"],
+      "disposition": "accepted",
+      "rationale": "Requires frozen retrieval gates and defensible top-three to top-five choices."
+    },
+    {
+      "topic_id": "A3",
+      "source_id": "feedback-a",
+      "paragraph_start": 2,
+      "paragraph_end": 2,
+      "byte_start": 1728,
+      "byte_end": 2548,
+      "start_marker": "Stop returning only “datasets”; return a research evidence plan.",
+      "requirement_ids": ["TST-PLAN-01"],
+      "disposition": "accepted",
+      "rationale": "Requires role-aware evidence bundles and research-workflow synthesis."
+    },
+    {
+      "topic_id": "A4",
+      "source_id": "feedback-a",
+      "paragraph_start": 2,
+      "paragraph_end": 2,
+      "byte_start": 2548,
+      "byte_end": 3500,
+      "start_marker": "Entity resolution is eventually unavoidable.",
+      "requirement_ids": ["TST-ID-01"],
+      "disposition": "accepted",
+      "rationale": "Requires conservative typed identity assertions with effective dates and unresolved conflicts."
+    },
+    {
+      "topic_id": "A5",
+      "source_id": "feedback-a",
+      "paragraph_start": 2,
+      "paragraph_end": 2,
+      "byte_start": 3500,
+      "byte_end": 4165,
+      "start_marker": "Add “Can I actually use this for my question?” metadata.",
+      "requirement_ids": ["TST-FIT-01"],
+      "disposition": "accepted",
+      "rationale": "Requires evidence-backed Use Cards and practical access guidance."
+    },
+    {
+      "topic_id": "A6",
+      "source_id": "feedback-a",
+      "paragraph_start": 2,
+      "paragraph_end": 2,
+      "byte_start": 4165,
+      "byte_end": 4854,
+      "start_marker": "Make search results much lighter and more decision-oriented.",
+      "requirement_ids": ["TST-UI-01"],
+      "disposition": "accepted",
+      "rationale": "Requires the six-region result-card decision hierarchy and bounded-count language."
+    },
+    {
+      "topic_id": "A7",
+      "source_id": "feedback-a",
+      "paragraph_start": 2,
+      "paragraph_end": 2,
+      "byte_start": 4854,
+      "byte_end": 5641,
+      "start_marker": "Fix ordinary web discoverability.",
+      "requirement_ids": ["TST-SEO-01"],
+      "disposition": "accepted",
+      "rationale": "Requires no-JavaScript record pages, complete sitemap coverage, and structured metadata."
+    },
+    {
+      "topic_id": "A8",
+      "source_id": "feedback-a",
+      "paragraph_start": 2,
+      "paragraph_end": 2,
+      "byte_start": 5641,
+      "byte_end": 5895,
+      "start_marker": "As a researcher today, I would absolutely use USHSO",
+      "requirement_ids": ["TST-TRUST-01"],
+      "disposition": "accepted",
+      "rationale": "Requires reconnaissance-scope language and prohibits exhaustive-source or best-evidence overclaims."
+    },
+    {
+      "topic_id": "B1",
+      "source_id": "feedback-b",
+      "paragraph_start": 1,
+      "paragraph_end": 5,
+      "byte_start": 0,
+      "byte_end": 420,
+      "start_marker": "I would move from one search tool to a small, composable USHSO research toolkit.",
+      "requirement_ids": ["TST-MCP-01", "TST-MCP-02"],
+      "disposition": "accepted",
+      "rationale": "Requires a small bounded toolkit instead of field- or screen-specific tool proliferation."
+    },
+    {
+      "topic_id": "B2",
+      "source_id": "feedback-b",
+      "paragraph_start": 6,
+      "paragraph_end": 13,
+      "byte_start": 420,
+      "byte_end": 1102,
+      "start_marker": "1. search_sources",
+      "requirement_ids": ["TST-MCP-01", "TST-MCP-02"],
+      "disposition": "accepted",
+      "rationale": "Requires summary-first bounded asset search."
+    },
+    {
+      "topic_id": "B3",
+      "source_id": "feedback-b",
+      "paragraph_start": 14,
+      "paragraph_end": 23,
+      "byte_start": 1102,
+      "byte_end": 1571,
+      "start_marker": "2. get_source",
+      "requirement_ids": ["TST-MCP-01"],
+      "disposition": "accepted",
+      "rationale": "Requires stable-ID dereference and a search-choose-dereference workflow."
+    },
+    {
+      "topic_id": "B4",
+      "source_id": "feedback-b",
+      "paragraph_start": 24,
+      "paragraph_end": 43,
+      "byte_start": 1571,
+      "byte_end": 3015,
+      "start_marker": "3. get_access_plan",
+      "requirement_ids": ["TST-FIT-01", "TST-MCP-01", "TST-MCP-04"],
+      "disposition": "accepted",
+      "rationale": "Requires separate policy/process guidance without implying requester eligibility or execution."
+    },
+    {
+      "topic_id": "B5",
+      "source_id": "feedback-b",
+      "paragraph_start": 44,
+      "paragraph_end": 59,
+      "byte_start": 3015,
+      "byte_end": 4012,
+      "start_marker": "4. get_retrieval_recipe",
+      "requirement_ids": ["TST-MCP-01", "TST-MCP-04"],
+      "disposition": "accepted",
+      "rationale": "Requires bounded technical retrieval recipes that never execute source retrieval."
+    },
+    {
+      "topic_id": "B6",
+      "source_id": "feedback-b",
+      "paragraph_start": 60,
+      "paragraph_end": 70,
+      "byte_start": 4012,
+      "byte_end": 4619,
+      "start_marker": "5. get_variables",
+      "requirement_ids": ["TST-MCP-01", "TST-MCP-02"],
+      "disposition": "accepted",
+      "rationale": "Requires exact-schema field search and cursor pagination."
+    },
+    {
+      "topic_id": "B7",
+      "source_id": "feedback-b",
+      "paragraph_start": 71,
+      "paragraph_end": 88,
+      "byte_start": 4619,
+      "byte_end": 5450,
+      "start_marker": "6. get_join_routes",
+      "requirement_ids": ["TST-ID-01", "TST-MCP-01"],
+      "disposition": "accepted",
+      "rationale": "Requires field-bound join/crosswalk routes with distinct evidence, compatibility, requirements, and blockers."
+    },
+    {
+      "topic_id": "B8",
+      "source_id": "feedback-b",
+      "paragraph_start": 89,
+      "paragraph_end": 96,
+      "byte_start": 5450,
+      "byte_end": 5932,
+      "start_marker": "7. compare_sources",
+      "requirement_ids": ["TST-MCP-01", "TST-MCP-03"],
+      "disposition": "accepted",
+      "rationale": "Requires deterministic metadata-only comparison shared by UI and machine adapters."
+    },
+    {
+      "topic_id": "B9",
+      "source_id": "feedback-b",
+      "paragraph_start": 97,
+      "paragraph_end": 107,
+      "byte_start": 5932,
+      "byte_end": 6688,
+      "start_marker": "8. get_coverage_status",
+      "requirement_ids": ["TST-COV-02", "TST-MCP-01"],
+      "disposition": "accepted",
+      "rationale": "Requires queryable coverage scope and explicit absence-claim permission."
+    },
+    {
+      "topic_id": "B10",
+      "source_id": "feedback-b",
+      "paragraph_start": 108,
+      "paragraph_end": 121,
+      "byte_start": 6688,
+      "byte_end": 7971,
+      "start_marker": "There is an even bigger opportunity: return an agent research plan",
+      "requirement_ids": ["TST-PLAN-01", "TST-MCP-01"],
+      "disposition": "accepted",
+      "rationale": "Requires a composed planner capability after its prerequisite gates pass."
+    },
+    {
+      "topic_id": "B11",
+      "source_id": "feedback-b",
+      "paragraph_start": 122,
+      "paragraph_end": 129,
+      "byte_start": 7971,
+      "byte_end": 8591,
+      "start_marker": "I would also change how you describe “machine usability”",
+      "requirement_ids": ["TST-MCP-05"],
+      "disposition": "accepted",
+      "rationale": "Requires evidence-backed machine-readiness capability flags, not an opaque quality score."
+    },
+    {
+      "topic_id": "B12",
+      "source_id": "feedback-b",
+      "paragraph_start": 130,
+      "paragraph_end": 138,
+      "byte_start": 8591,
+      "byte_end": 9231,
+      "start_marker": "Keep WebMCP and the normal API together",
+      "requirement_ids": ["TST-MCP-03"],
+      "disposition": "accepted",
+      "rationale": "Requires one canonical service boundary across UI, JSON API, WebMCP, and discovery documentation."
+    },
+    {
+      "topic_id": "B13",
+      "source_id": "feedback-b",
+      "paragraph_start": 139,
+      "paragraph_end": 154,
+      "byte_start": 9231,
+      "byte_end": 10829,
+      "start_marker": "One subtle but important limitation",
+      "requirement_ids": ["TST-MCP-01", "TST-MCP-03"],
+      "disposition": "accepted",
+      "rationale": "Requires browser-native and HTTP interface distinctions plus an end-to-end stable-ID inspection workflow."
+    }
+  ],
+  "non_requirement_paragraphs": [],
+  "rejected_topics": []
+}

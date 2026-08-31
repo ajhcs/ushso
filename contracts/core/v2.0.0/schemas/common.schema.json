@@ -1,0 +1,305 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json",
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^urn:ushso:[a-z][a-z0-9-]*:[A-Za-z0-9._~-]+$",
+      "minLength": 12,
+      "maxLength": 240
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "nullableDateTime": {
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "null" }
+      ]
+    },
+    "nullableDate": {
+      "oneOf": [
+        { "type": "string", "format": "date" },
+        { "type": "null" }
+      ]
+    },
+    "clocks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "first_seen_at",
+        "observed_at",
+        "recorded_at",
+        "publisher_released_at",
+        "publisher_modified_at",
+        "superseded_at"
+      ],
+      "properties": {
+        "first_seen_at": { "type": "string", "format": "date-time" },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "recorded_at": { "type": "string", "format": "date-time" },
+        "publisher_released_at": { "$ref": "#/$defs/nullableDateTime" },
+        "publisher_modified_at": { "$ref": "#/$defs/nullableDateTime" },
+        "superseded_at": { "$ref": "#/$defs/nullableDateTime" }
+      }
+    },
+    "coverageInterval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end", "period_basis", "fiscal_year_end_month", "precision", "status"],
+      "properties": {
+        "start": { "$ref": "#/$defs/nullableDate" },
+        "end": { "$ref": "#/$defs/nullableDate" },
+        "period_basis": { "enum": ["calendar", "fiscal", "rolling", "point_in_time", "mixed", "unknown"] },
+        "fiscal_year_end_month": {
+          "oneOf": [
+            { "type": "integer", "minimum": 1, "maximum": 12 },
+            { "type": "null" }
+          ]
+        },
+        "precision": { "enum": ["day", "month", "year", "interval", "unknown"] },
+        "status": { "enum": ["known", "estimated", "unknown", "not_applicable"] }
+      }
+    },
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_id",
+        "claim_paths",
+        "observed_at",
+        "evidence_state",
+        "staleness_state",
+        "derivation_lineage",
+        "review_status",
+        "reviewed_at"
+      ],
+      "properties": {
+        "evidence_id": { "$ref": "#/$defs/opaqueId" },
+        "claim_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^/(?:[^~/]|~[01])+(?:/(?:[^~/]|~[01])*)*$", "maxLength": 300 }
+        },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "evidence_state": { "enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven"] },
+        "staleness_state": { "enum": ["current", "stale", "unknown", "not_applicable"] },
+        "derivation_lineage": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/opaqueId" }
+        },
+        "review_status": { "enum": ["not_required", "pending", "reviewed", "rejected", "unknown"] },
+        "reviewed_at": { "$ref": "#/$defs/nullableDateTime" }
+      }
+    },
+    "nativeIdentifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "namespace",
+        "value",
+        "normalized_value",
+        "case_behavior",
+        "preservation",
+        "entity_scope",
+        "authority",
+        "uniqueness_policy",
+        "effective_from",
+        "effective_to",
+        "evidence_ids"
+      ],
+      "properties": {
+        "source_id": { "$ref": "#/$defs/opaqueId" },
+        "namespace": { "type": "string", "pattern": "^[a-z][a-z0-9._-]{1,79}$" },
+        "value": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "normalized_value": {
+          "oneOf": [
+            { "type": "string", "minLength": 1, "maxLength": 500 },
+            { "type": "null" }
+          ]
+        },
+        "case_behavior": { "enum": ["sensitive", "insensitive", "normalization_defined"] },
+        "preservation": { "const": "exact" },
+        "entity_scope": { "enum": ["organization", "source", "asset", "release", "distribution", "documentation", "schema", "field", "access_route", "unknown"] },
+        "authority": { "enum": ["source_native", "authoritative_cross_source", "legacy_alias"] },
+        "uniqueness_policy": { "enum": ["unique", "reusable_over_time", "source_scoped", "unknown"] },
+        "effective_from": { "$ref": "#/$defs/nullableDate" },
+        "effective_to": { "$ref": "#/$defs/nullableDate" },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/opaqueId" }
+        }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["connector_run_id", "normalizer", "import_id", "derivation_parent_ids"],
+      "properties": {
+        "connector_run_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/opaqueId" },
+            { "type": "null" }
+          ]
+        },
+        "normalizer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "version"],
+          "properties": {
+            "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,79}$" },
+            "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+          }
+        },
+        "import_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/opaqueId" },
+            { "type": "null" }
+          ]
+        },
+        "derivation_parent_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/opaqueId" }
+        }
+      }
+    },
+    "history": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["append_only", "supersedes_revision_ids", "superseded_by_revision_id", "rationale"],
+      "properties": {
+        "append_only": { "const": true },
+        "supersedes_revision_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/opaqueId" }
+        },
+        "superseded_by_revision_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/opaqueId" },
+            { "type": "null" }
+          ]
+        },
+        "rationale": {
+          "oneOf": [
+            { "type": "string", "minLength": 1, "maxLength": 1000 },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "truthEnvelope": {
+      "type": "object",
+      "required": [
+        "contract_version",
+        "entity_type",
+        "entity_id",
+        "revision_id",
+        "schema_version",
+        "lifecycle_state",
+        "canonical_content_fingerprint",
+        "native_identifiers",
+        "legacy_aliases",
+        "clocks",
+        "coverage_intervals",
+        "evidence_refs",
+        "assertion_refs",
+        "lineage",
+        "history"
+      ],
+      "properties": {
+        "contract_version": { "const": "observatory-core.v2.0.0" },
+        "entity_type": {
+          "enum": [
+            "Organization",
+            "Source",
+            "Asset",
+            "Release",
+            "Distribution",
+            "Documentation",
+            "SchemaSnapshot",
+            "SchemaField",
+            "AccessRoute",
+            "AccessObservation",
+            "Evidence",
+            "Assertion",
+            "Relationship"
+          ]
+        },
+        "entity_id": { "$ref": "#/$defs/opaqueId" },
+        "revision_id": { "$ref": "#/$defs/opaqueId" },
+        "schema_version": { "const": "2.0.0" },
+        "lifecycle_state": { "enum": ["active", "inactive", "pending_review", "quarantined", "superseded", "withdrawn", "retired", "excluded", "unknown"] },
+        "canonical_content_fingerprint": { "$ref": "#/$defs/sha256" },
+        "native_identifiers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nativeIdentifier" }
+        },
+        "legacy_aliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 240 }
+        },
+        "clocks": { "$ref": "#/$defs/clocks" },
+        "coverage_intervals": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/coverageInterval" }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/evidenceReference" }
+        },
+        "assertion_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/opaqueId" }
+        },
+        "lineage": { "$ref": "#/$defs/lineage" },
+        "history": { "$ref": "#/$defs/history" }
+      }
+    },
+    "accessRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "description", "satisfaction_state", "human_gate", "evidence_ids"],
+      "properties": {
+        "kind": { "enum": ["registration", "application", "dua", "license", "payment", "identity_verification", "institutional_approval", "crosswalk", "aggregation", "normalization", "authorization", "temporal_alignment", "other"] },
+        "description": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "satisfaction_state": { "enum": ["satisfied", "unsatisfied", "not_applicable", "unknown"] },
+        "human_gate": { "type": "boolean" },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/opaqueId" }
+        }
+      }
+    },
+    "joinBlocker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "description", "resolution_state", "evidence_ids"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,79}$" },
+        "description": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "resolution_state": { "enum": ["open", "resolved", "unknown"] },
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/opaqueId" }
+        }
+      }
+    }
+  }
+}

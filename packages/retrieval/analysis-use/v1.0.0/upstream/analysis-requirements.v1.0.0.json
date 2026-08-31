@@ -1,0 +1,3040 @@
+{
+  "authority": {
+    "calculation_authorized": false,
+    "data_access_authorized": false,
+    "discovery_guidance_only": true,
+    "persistence_authorized": false,
+    "publication_authorized": false
+  },
+  "catalog_id": "hc-metrics:analysis-requirements",
+  "catalog_version": "1.0.0",
+  "requirements": [
+    {
+      "acceptable_grains": [
+        "facility"
+      ],
+      "analysis_family": "market_position",
+      "analysis_id": "market_share",
+      "calculation_entrypoint": "hc_metrics.compute_market_share",
+      "implementation_methodology": "market_share",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "facility_utilization_to_system_membership_one_to_one",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "facility_id"
+              ],
+              "left_discriminator_input_ids": [
+                "utilization_volume"
+              ],
+              "right_discriminator_input_ids": [
+                "system_id"
+              ]
+            },
+            {
+              "alternative_id": "facility_utilization_to_system_membership_many_to_one",
+              "cardinality": "many_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "facility_id"
+              ],
+              "left_discriminator_input_ids": [
+                "utilization_volume"
+              ],
+              "right_discriminator_input_ids": [
+                "system_id"
+              ]
+            },
+            {
+              "alternative_id": "hospital_utilization_to_system_membership_one_to_one",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "hospital",
+              "key_input_set": [
+                "facility_id"
+              ],
+              "left_discriminator_input_ids": [
+                "utilization_volume"
+              ],
+              "right_discriminator_input_ids": [
+                "system_id"
+              ]
+            },
+            {
+              "alternative_id": "hospital_utilization_to_system_membership_many_to_one",
+              "cardinality": "many_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "hospital",
+              "key_input_set": [
+                "facility_id"
+              ],
+              "left_discriminator_input_ids": [
+                "utilization_volume"
+              ],
+              "right_discriminator_input_ids": [
+                "system_id"
+              ]
+            }
+          ],
+          "description": "A documented, period-aware facility-to-system relationship must connect every contributing asset.",
+          "input_ids": [
+            "facility_id",
+            "system_id",
+            "service_line",
+            "period",
+            "utilization_volume"
+          ],
+          "join_id": "facility_to_health_system",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Hospital market share",
+      "limitations": [
+        "Discharge-based share does not represent outpatient or unobserved utilization.",
+        "A facility identifier does not itself establish health-system membership."
+      ],
+      "methodology": "hc-metrics:market_share:1.0.0",
+      "methodology_key": "market_share",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "What is each health system's market share?",
+        "How does hospital market share differ by service line?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Stable facility identifier for each utilization observation.",
+          "input_id": "facility_id",
+          "label": "Facility identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "facility_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Health-system membership used to aggregate facilities.",
+          "input_id": "system_id",
+          "label": "Health-system identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility",
+            "health_system"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Consistent clinical service-line classification.",
+          "input_id": "service_line",
+          "label": "Service line",
+          "measurement_unit": "category",
+          "observation_grains": [
+            "facility"
+          ],
+          "role": "dimension",
+          "source_fields": [
+            "service_line"
+          ],
+          "value_kind": "category"
+        },
+        {
+          "description": "Calendar year used by the calculation.",
+          "input_id": "period",
+          "label": "Reporting period",
+          "measurement_unit": "calendar_year",
+          "observation_grains": [
+            "facility"
+          ],
+          "role": "period",
+          "source_fields": [
+            "year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Non-negative inpatient discharge count.",
+          "input_id": "utilization_volume",
+          "label": "Utilization volume",
+          "measurement_unit": "discharges",
+          "observation_grains": [
+            "facility"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "discharges"
+          ],
+          "value_kind": "integer"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "All competitors must be measured inside the same geographic and service market.",
+          "property_id": "consistent_market_definition"
+        },
+        {
+          "description": "All facility and system observations must use the same reporting year.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "The observed competitor set must not silently omit in-scope facilities or systems.",
+          "property_id": "complete_competitor_observation"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    },
+    {
+      "acceptable_grains": [
+        "facility"
+      ],
+      "analysis_family": "market_position",
+      "analysis_id": "market_concentration_hhi",
+      "calculation_entrypoint": "hc_metrics.compute_hhi",
+      "implementation_methodology": "hhi",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "facility_utilization_to_system_membership_one_to_one",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "facility_id"
+              ],
+              "left_discriminator_input_ids": [
+                "utilization_volume"
+              ],
+              "right_discriminator_input_ids": [
+                "system_id"
+              ]
+            },
+            {
+              "alternative_id": "facility_utilization_to_system_membership_many_to_one",
+              "cardinality": "many_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "facility_id"
+              ],
+              "left_discriminator_input_ids": [
+                "utilization_volume"
+              ],
+              "right_discriminator_input_ids": [
+                "system_id"
+              ]
+            },
+            {
+              "alternative_id": "hospital_utilization_to_system_membership_one_to_one",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "hospital",
+              "key_input_set": [
+                "facility_id"
+              ],
+              "left_discriminator_input_ids": [
+                "utilization_volume"
+              ],
+              "right_discriminator_input_ids": [
+                "system_id"
+              ]
+            },
+            {
+              "alternative_id": "hospital_utilization_to_system_membership_many_to_one",
+              "cardinality": "many_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "hospital",
+              "key_input_set": [
+                "facility_id"
+              ],
+              "left_discriminator_input_ids": [
+                "utilization_volume"
+              ],
+              "right_discriminator_input_ids": [
+                "system_id"
+              ]
+            }
+          ],
+          "description": "A documented, period-aware facility-to-system relationship must connect every contributing asset.",
+          "input_ids": [
+            "facility_id",
+            "system_id",
+            "service_line",
+            "period",
+            "utilization_volume"
+          ],
+          "join_id": "facility_to_health_system",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Hospital market concentration (HHI)",
+      "limitations": [
+        "HHI is only as complete as the observed competitor universe and market definition.",
+        "Discharge-based HHI excludes outpatient and other unobserved market activity."
+      ],
+      "methodology": "hc-metrics:hhi:1.0.0",
+      "methodology_key": "hhi",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "How concentrated is the hospital market?",
+        "What is the HHI for this service line?",
+        "I want to compare hospital market concentration."
+      ],
+      "required_inputs": [
+        {
+          "description": "Stable facility identifier for each utilization observation.",
+          "input_id": "facility_id",
+          "label": "Facility identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "facility_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Health-system membership used to aggregate competitors.",
+          "input_id": "system_id",
+          "label": "Health-system identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility",
+            "health_system"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Consistent clinical service-line classification.",
+          "input_id": "service_line",
+          "label": "Service line",
+          "measurement_unit": "category",
+          "observation_grains": [
+            "facility"
+          ],
+          "role": "dimension",
+          "source_fields": [
+            "service_line"
+          ],
+          "value_kind": "category"
+        },
+        {
+          "description": "Calendar year used by the calculation.",
+          "input_id": "period",
+          "label": "Reporting period",
+          "measurement_unit": "calendar_year",
+          "observation_grains": [
+            "facility"
+          ],
+          "role": "period",
+          "source_fields": [
+            "year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Non-negative inpatient discharge count used to derive shares.",
+          "input_id": "utilization_volume",
+          "label": "Utilization volume",
+          "measurement_unit": "discharges",
+          "observation_grains": [
+            "facility"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "discharges"
+          ],
+          "value_kind": "integer"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "All competitors must be measured inside the same geographic and service market.",
+          "property_id": "consistent_market_definition"
+        },
+        {
+          "description": "All competitor observations must use the same reporting year.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "HHI requires the complete observable competitor universe for the defined market.",
+          "property_id": "complete_competitor_observation"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": [
+        "market_share"
+      ]
+    },
+    {
+      "acceptable_grains": [
+        "geography_system_option"
+      ],
+      "analysis_family": "market_position",
+      "analysis_id": "effective_local_market_share",
+      "calculation_entrypoint": "hc_metrics.compute_effective_local_market_share",
+      "implementation_methodology": "elms_zip_gravity_v1",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "competitor_option_to_system_membership_one_to_one",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "competitor_id"
+              ],
+              "left_discriminator_input_ids": [
+                "geography_id",
+                "distance",
+                "attractiveness_score"
+              ],
+              "right_discriminator_input_ids": [
+                "system_id"
+              ]
+            },
+            {
+              "alternative_id": "competitor_option_to_system_membership_many_to_one",
+              "cardinality": "many_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "competitor_id"
+              ],
+              "left_discriminator_input_ids": [
+                "geography_id",
+                "distance",
+                "attractiveness_score"
+              ],
+              "right_discriminator_input_ids": [
+                "system_id"
+              ]
+            },
+            {
+              "alternative_id": "geography_option_to_demand_one_to_one",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "other",
+              "key_input_set": [
+                "geography_id"
+              ],
+              "left_discriminator_input_ids": [
+                "competitor_id",
+                "distance",
+                "attractiveness_score"
+              ],
+              "right_discriminator_input_ids": [
+                "geography_demand"
+              ]
+            },
+            {
+              "alternative_id": "geography_option_to_demand_many_to_one",
+              "cardinality": "many_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "other",
+              "key_input_set": [
+                "geography_id"
+              ],
+              "left_discriminator_input_ids": [
+                "competitor_id",
+                "distance",
+                "attractiveness_score"
+              ],
+              "right_discriminator_input_ids": [
+                "geography_demand"
+              ]
+            }
+          ],
+          "description": "Documented competitor, system, geography, and period relationships must connect every contributing asset.",
+          "input_ids": [
+            "geography_id",
+            "system_id",
+            "competitor_id",
+            "period",
+            "geography_demand",
+            "distance",
+            "attractiveness_score"
+          ],
+          "join_id": "competitor_to_health_system",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Effective Local Market Share",
+      "limitations": [
+        "Results are modeled capture estimates rather than observed patient flows.",
+        "Distance decay and attractiveness inputs require separate methodological approval for public use."
+      ],
+      "methodology": "hc-metrics:elms_zip_gravity_v1:1.0.0",
+      "methodology_key": "elms_zip_gravity_v1",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "What is the effective local market share for each system?",
+        "How does modeled ZIP-level capture affect local market position?"
+      ],
+      "required_inputs": [
+        {
+          "description": "ZIP or ZCTA identifier for each demand market.",
+          "input_id": "geography_id",
+          "label": "ZIP geography",
+          "measurement_unit": "zip_code",
+          "observation_grains": [
+            "zip_code",
+            "geography_system_option"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "zip_code"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "System receiving modeled capture.",
+          "input_id": "system_id",
+          "label": "Health-system identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "geography_system_option"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Facility or competitor option available to the geography.",
+          "input_id": "competitor_id",
+          "label": "Competitor option identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility",
+            "geography_system_option"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "competitor_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Year for demand and competitor inputs.",
+          "input_id": "period",
+          "label": "Reporting period",
+          "measurement_unit": "calendar_year",
+          "observation_grains": [
+            "geography_system_option"
+          ],
+          "role": "period",
+          "source_fields": [
+            "year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Non-negative demand volume for the ZIP geography.",
+          "input_id": "geography_demand",
+          "label": "Geography demand",
+          "measurement_unit": "patients_or_encounters",
+          "observation_grains": [
+            "zip_code",
+            "geography_system_option"
+          ],
+          "role": "denominator",
+          "source_fields": [
+            "zip_demand"
+          ],
+          "value_kind": "decimal"
+        },
+        {
+          "description": "Non-negative distance between geography and competitor option.",
+          "input_id": "distance",
+          "label": "Travel distance",
+          "measurement_unit": "miles",
+          "observation_grains": [
+            "geography_system_option"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "distance_miles"
+          ],
+          "value_kind": "decimal"
+        },
+        {
+          "description": "Positive source-backed competitor attractiveness input.",
+          "input_id": "attractiveness_score",
+          "label": "Attractiveness score",
+          "measurement_unit": "relative_score",
+          "observation_grains": [
+            "geography_system_option"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "attractiveness"
+          ],
+          "value_kind": "decimal"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "Demand, distance, system, and competitor inputs must align to one period.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "All inputs must use the same ZIP or ZCTA definition and vintage.",
+          "property_id": "consistent_geography_definition"
+        },
+        {
+          "description": "Every in-scope competitor option must be represented for each geography.",
+          "property_id": "complete_competitor_observation"
+        },
+        {
+          "description": "Demand must be identical across competitor rows for the same geography.",
+          "property_id": "consistent_demand_within_geography"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    },
+    {
+      "acceptable_grains": [
+        "health_system"
+      ],
+      "analysis_family": "health_system_profile",
+      "analysis_id": "health_system_scale",
+      "calculation_entrypoint": "hc_metrics.compute_health_system_scale_score",
+      "implementation_methodology": "health_system_scale_score_v1",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "health_system_component_alignment",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "symmetric",
+              "entity": "health_system",
+              "key_input_set": [
+                "system_id"
+              ]
+            }
+          ],
+          "description": "Documented health-system perimeter and period relationships must connect every contributing scale component.",
+          "input_ids": [
+            "system_id",
+            "period",
+            "operating_revenue",
+            "hospital_count",
+            "bed_count",
+            "utilization_volume",
+            "physician_count",
+            "service_line_count",
+            "safety_net_patient_mix",
+            "emergency_department_count",
+            "essential_service_designation_count"
+          ],
+          "join_id": "scale_components_to_health_system",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Health System Scale Score",
+      "limitations": [
+        "The score requires an approved and temporally coherent health-system perimeter.",
+        "Different bed, physician, or service-line definitions are not silently interchangeable."
+      ],
+      "methodology": "hc-metrics:health_system_scale_score_v1:1.0.0",
+      "methodology_key": "health_system_scale_score_v1",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "How large and operationally broad is this health system?",
+        "Which inputs are needed for the Health System Scale Score?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Approved health-system perimeter identifier.",
+          "input_id": "system_id",
+          "label": "Health-system identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Year for all scale inputs.",
+          "input_id": "period",
+          "label": "Reporting period",
+          "measurement_unit": "year",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "period",
+          "source_fields": [
+            "year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Total operating revenue for the system perimeter.",
+          "input_id": "operating_revenue",
+          "label": "Operating revenue",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "operating_revenue_usd"
+          ],
+          "value_kind": "currency"
+        },
+        {
+          "description": "Count of in-perimeter hospitals.",
+          "input_id": "hospital_count",
+          "label": "Hospital count",
+          "measurement_unit": "hospitals",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "hospital_count"
+          ],
+          "value_kind": "integer"
+        },
+        {
+          "description": "Consistently defined system bed count.",
+          "input_id": "bed_count",
+          "label": "Bed count",
+          "measurement_unit": "beds",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "bed_count"
+          ],
+          "value_kind": "integer"
+        },
+        {
+          "description": "Annual inpatient discharge volume.",
+          "input_id": "utilization_volume",
+          "label": "Annual discharges",
+          "measurement_unit": "discharges",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "annual_discharges"
+          ],
+          "value_kind": "decimal"
+        },
+        {
+          "description": "Consistently defined physician platform count.",
+          "input_id": "physician_count",
+          "label": "Physician count",
+          "measurement_unit": "physicians",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "physician_count"
+          ],
+          "value_kind": "integer"
+        },
+        {
+          "description": "Count of consistently classified service lines.",
+          "input_id": "service_line_count",
+          "label": "Service-line count",
+          "measurement_unit": "service_lines",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "service_line_count"
+          ],
+          "value_kind": "integer"
+        },
+        {
+          "description": "Percent safety-net patient mix for the system.",
+          "input_id": "safety_net_patient_mix",
+          "label": "Safety-net patient mix",
+          "measurement_unit": "percent",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "safety_net_patient_mix_pct"
+          ],
+          "value_kind": "percent"
+        },
+        {
+          "description": "Count of emergency access points.",
+          "input_id": "emergency_department_count",
+          "label": "Emergency department count",
+          "measurement_unit": "departments",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "emergency_department_count"
+          ],
+          "value_kind": "integer"
+        },
+        {
+          "description": "Count of approved essential-service designations.",
+          "input_id": "essential_service_designation_count",
+          "label": "Essential-service designations",
+          "measurement_unit": "designations",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "essential_service_designation_count"
+          ],
+          "value_kind": "integer"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "All component inputs must refer to the same analytical year.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "All component inputs must use the same approved health-system perimeter.",
+          "property_id": "consistent_health_system_perimeter"
+        },
+        {
+          "description": "Beds, physicians, services, and essentiality inputs must use documented comparable definitions.",
+          "property_id": "comparable_component_definitions"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    },
+    {
+      "acceptable_grains": [
+        "facility",
+        "provider",
+        "health_system"
+      ],
+      "analysis_family": "financial_metrics",
+      "analysis_id": "financial_operating_margin",
+      "calculation_entrypoint": "hc_metrics.compute_financial_metrics",
+      "implementation_methodology": "financial",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "operating_income_to_total_revenue_facility",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "operating_income"
+              ],
+              "right_discriminator_input_ids": [
+                "total_revenue"
+              ]
+            },
+            {
+              "alternative_id": "operating_income_to_total_revenue_hospital",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "hospital",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "operating_income"
+              ],
+              "right_discriminator_input_ids": [
+                "total_revenue"
+              ]
+            },
+            {
+              "alternative_id": "operating_income_to_total_revenue_provider",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "provider",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "operating_income"
+              ],
+              "right_discriminator_input_ids": [
+                "total_revenue"
+              ]
+            },
+            {
+              "alternative_id": "operating_income_to_total_revenue_health_system",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "health_system",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "operating_income"
+              ],
+              "right_discriminator_input_ids": [
+                "total_revenue"
+              ]
+            }
+          ],
+          "description": "All ratio components require a documented reporting-entity and period alignment when supplied by different assets.",
+          "input_ids": [
+            "reporting_entity_id",
+            "period",
+            "operating_income",
+            "total_revenue"
+          ],
+          "join_id": "financial_components_to_reporting_entity",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Operating margin",
+      "limitations": [
+        "Facility cost reports are not consolidated health-system statements without a documented consolidation method.",
+        "Operating-margin comparability depends on compatible revenue and expense definitions."
+      ],
+      "methodology": "hc-metrics:financial:1.0.0",
+      "methodology_key": "financial",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "Which data support operating-margin analysis?",
+        "Can this source support hospital operating margin?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Facility, provider, or approved system reporting-perimeter identifier.",
+          "input_id": "reporting_entity_id",
+          "label": "Reporting entity identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "facility_id",
+            "provider_ccn",
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Cost-report or financial reporting period.",
+          "input_id": "period",
+          "label": "Reporting period",
+          "measurement_unit": "reporting_period",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "period",
+          "source_fields": [
+            "reporting_period",
+            "year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Operating income or loss.",
+          "input_id": "operating_income",
+          "label": "Operating income",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "operating_income"
+          ],
+          "value_kind": "currency"
+        },
+        {
+          "description": "Revenue denominator for operating margin.",
+          "input_id": "total_revenue",
+          "label": "Total operating revenue",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "denominator",
+          "source_fields": [
+            "total_revenue"
+          ],
+          "value_kind": "currency"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "Numerator and denominator must use the same financial reporting period.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "Every input must refer to the same reporting perimeter.",
+          "property_id": "consistent_reporting_entity"
+        },
+        {
+          "description": "Accounting basis and source definitions must be compatible.",
+          "property_id": "compatible_financial_basis"
+        },
+        {
+          "description": "Health-system aggregation must address intercompany eliminations and duplicated entities.",
+          "property_id": "system_consolidation_eliminations"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    },
+    {
+      "acceptable_grains": [
+        "facility",
+        "provider",
+        "health_system"
+      ],
+      "analysis_family": "financial_metrics",
+      "analysis_id": "financial_days_cash_on_hand",
+      "calculation_entrypoint": "hc_metrics.compute_financial_metrics",
+      "implementation_methodology": "financial",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "cash_to_daily_operating_expense_facility",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "cash_and_investments"
+              ],
+              "right_discriminator_input_ids": [
+                "daily_operating_expense"
+              ]
+            },
+            {
+              "alternative_id": "cash_to_daily_operating_expense_hospital",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "hospital",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "cash_and_investments"
+              ],
+              "right_discriminator_input_ids": [
+                "daily_operating_expense"
+              ]
+            },
+            {
+              "alternative_id": "cash_to_daily_operating_expense_provider",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "provider",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "cash_and_investments"
+              ],
+              "right_discriminator_input_ids": [
+                "daily_operating_expense"
+              ]
+            },
+            {
+              "alternative_id": "cash_to_daily_operating_expense_health_system",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "health_system",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "cash_and_investments"
+              ],
+              "right_discriminator_input_ids": [
+                "daily_operating_expense"
+              ]
+            }
+          ],
+          "description": "All ratio components require a documented reporting-entity and period alignment when supplied by different assets.",
+          "input_ids": [
+            "reporting_entity_id",
+            "period",
+            "cash_and_investments",
+            "daily_operating_expense"
+          ],
+          "join_id": "financial_components_to_reporting_entity",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Days cash on hand",
+      "limitations": [
+        "Facility cost reports are not consolidated health-system statements without a documented consolidation method.",
+        "Daily operating expense definitions must be compatible with the cash and investment perimeter."
+      ],
+      "methodology": "hc-metrics:financial:1.0.0",
+      "methodology_key": "financial",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "Which data support days-cash-on-hand analysis?",
+        "Can this source support hospital liquidity analysis?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Facility, provider, or approved system reporting-perimeter identifier.",
+          "input_id": "reporting_entity_id",
+          "label": "Reporting entity identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "facility_id",
+            "provider_ccn",
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Cost-report or financial reporting period.",
+          "input_id": "period",
+          "label": "Reporting period",
+          "measurement_unit": "reporting_period",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "period",
+          "source_fields": [
+            "reporting_period",
+            "year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Liquid funds used for days cash on hand.",
+          "input_id": "cash_and_investments",
+          "label": "Cash and investments",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "cash_and_investments"
+          ],
+          "value_kind": "currency"
+        },
+        {
+          "description": "Daily expense denominator for liquidity.",
+          "input_id": "daily_operating_expense",
+          "label": "Daily operating expense",
+          "measurement_unit": "USD_per_day",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "denominator",
+          "source_fields": [
+            "daily_operating_expense"
+          ],
+          "value_kind": "currency"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "Numerator and denominator must use the same financial reporting period.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "Every input must refer to the same reporting perimeter.",
+          "property_id": "consistent_reporting_entity"
+        },
+        {
+          "description": "Accounting basis and source definitions must be compatible.",
+          "property_id": "compatible_financial_basis"
+        },
+        {
+          "description": "Health-system aggregation must address intercompany eliminations and duplicated entities.",
+          "property_id": "system_consolidation_eliminations"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    },
+    {
+      "acceptable_grains": [
+        "facility",
+        "provider",
+        "health_system"
+      ],
+      "analysis_family": "financial_metrics",
+      "analysis_id": "financial_debt_to_capitalization",
+      "calculation_entrypoint": "hc_metrics.compute_financial_metrics",
+      "implementation_methodology": "financial",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "total_debt_to_net_assets_facility",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_debt"
+              ],
+              "right_discriminator_input_ids": [
+                "net_assets"
+              ]
+            },
+            {
+              "alternative_id": "total_debt_to_net_assets_hospital",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "hospital",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_debt"
+              ],
+              "right_discriminator_input_ids": [
+                "net_assets"
+              ]
+            },
+            {
+              "alternative_id": "total_debt_to_net_assets_provider",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "provider",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_debt"
+              ],
+              "right_discriminator_input_ids": [
+                "net_assets"
+              ]
+            },
+            {
+              "alternative_id": "total_debt_to_net_assets_health_system",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "health_system",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_debt"
+              ],
+              "right_discriminator_input_ids": [
+                "net_assets"
+              ]
+            }
+          ],
+          "description": "All ratio components require a documented reporting-entity and period alignment when supplied by different assets.",
+          "input_ids": [
+            "reporting_entity_id",
+            "period",
+            "total_debt",
+            "net_assets"
+          ],
+          "join_id": "financial_components_to_reporting_entity",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Debt to capitalization",
+      "limitations": [
+        "Facility cost reports are not consolidated health-system statements without a documented consolidation method.",
+        "Negative net assets make the Toolkit ratio indeterminate."
+      ],
+      "methodology": "hc-metrics:financial:1.0.0",
+      "methodology_key": "financial",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "Which data support debt-to-capitalization analysis?",
+        "Can this source support hospital leverage analysis?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Facility, provider, or approved system reporting-perimeter identifier.",
+          "input_id": "reporting_entity_id",
+          "label": "Reporting entity identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "facility_id",
+            "provider_ccn",
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Cost-report or financial reporting period.",
+          "input_id": "period",
+          "label": "Reporting period",
+          "measurement_unit": "reporting_period",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "period",
+          "source_fields": [
+            "reporting_period",
+            "year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Debt used in capitalization metrics.",
+          "input_id": "total_debt",
+          "label": "Total debt",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "total_debt"
+          ],
+          "value_kind": "currency"
+        },
+        {
+          "description": "Net assets used in capitalization metrics.",
+          "input_id": "net_assets",
+          "label": "Net assets",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "net_assets"
+          ],
+          "value_kind": "currency"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "Debt and net assets must use the same financial reporting period.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "Every input must refer to the same reporting perimeter.",
+          "property_id": "consistent_reporting_entity"
+        },
+        {
+          "description": "Accounting basis and source definitions must be compatible.",
+          "property_id": "compatible_financial_basis"
+        },
+        {
+          "description": "Health-system aggregation must address intercompany eliminations and duplicated entities.",
+          "property_id": "system_consolidation_eliminations"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    },
+    {
+      "acceptable_grains": [
+        "facility",
+        "provider",
+        "health_system"
+      ],
+      "analysis_family": "financial_metrics",
+      "analysis_id": "financial_cost_per_adjusted_discharge",
+      "calculation_entrypoint": "hc_metrics.compute_financial_metrics",
+      "implementation_methodology": "financial",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "total_expenses_to_adjusted_discharges_facility",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_expenses"
+              ],
+              "right_discriminator_input_ids": [
+                "adjusted_discharges"
+              ]
+            },
+            {
+              "alternative_id": "total_expenses_to_adjusted_discharges_hospital",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "hospital",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_expenses"
+              ],
+              "right_discriminator_input_ids": [
+                "adjusted_discharges"
+              ]
+            },
+            {
+              "alternative_id": "total_expenses_to_adjusted_discharges_provider",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "provider",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_expenses"
+              ],
+              "right_discriminator_input_ids": [
+                "adjusted_discharges"
+              ]
+            },
+            {
+              "alternative_id": "total_expenses_to_adjusted_discharges_health_system",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "health_system",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_expenses"
+              ],
+              "right_discriminator_input_ids": [
+                "adjusted_discharges"
+              ]
+            }
+          ],
+          "description": "All ratio components require a documented reporting-entity and period alignment when supplied by different assets.",
+          "input_ids": [
+            "reporting_entity_id",
+            "period",
+            "total_expenses",
+            "adjusted_discharges"
+          ],
+          "join_id": "financial_components_to_reporting_entity",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Cost per adjusted discharge",
+      "limitations": [
+        "Facility cost reports are not consolidated health-system statements without a documented consolidation method.",
+        "Adjusted discharges embed an outpatient-intensity assumption."
+      ],
+      "methodology": "hc-metrics:financial:1.0.0",
+      "methodology_key": "financial",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "Which data support cost-per-adjusted-discharge analysis?",
+        "Can this source support hospital unit-cost analysis?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Facility, provider, or approved system reporting-perimeter identifier.",
+          "input_id": "reporting_entity_id",
+          "label": "Reporting entity identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "facility_id",
+            "provider_ccn",
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Cost-report or financial reporting period.",
+          "input_id": "period",
+          "label": "Reporting period",
+          "measurement_unit": "reporting_period",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "period",
+          "source_fields": [
+            "reporting_period",
+            "year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Operating expenses used for unit cost.",
+          "input_id": "total_expenses",
+          "label": "Total operating expenses",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "total_expenses"
+          ],
+          "value_kind": "currency"
+        },
+        {
+          "description": "Utilization denominator adjusted for outpatient activity.",
+          "input_id": "adjusted_discharges",
+          "label": "Adjusted discharges",
+          "measurement_unit": "adjusted_discharges",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "denominator",
+          "source_fields": [
+            "adjusted_discharges"
+          ],
+          "value_kind": "decimal"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "Expenses and adjusted discharges must use the same reporting period.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "Every input must refer to the same reporting perimeter.",
+          "property_id": "consistent_reporting_entity"
+        },
+        {
+          "description": "Accounting basis and source definitions must be compatible.",
+          "property_id": "compatible_financial_basis"
+        },
+        {
+          "description": "Health-system aggregation must address intercompany eliminations and duplicated entities.",
+          "property_id": "system_consolidation_eliminations"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    },
+    {
+      "acceptable_grains": [
+        "facility",
+        "provider",
+        "health_system"
+      ],
+      "analysis_family": "financial_metrics",
+      "analysis_id": "financial_fte_per_adjusted_occupied_bed",
+      "calculation_entrypoint": "hc_metrics.compute_financial_metrics",
+      "implementation_methodology": "financial",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "total_ftes_to_adjusted_occupied_beds_facility",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_ftes"
+              ],
+              "right_discriminator_input_ids": [
+                "adjusted_occupied_beds"
+              ]
+            },
+            {
+              "alternative_id": "total_ftes_to_adjusted_occupied_beds_hospital",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "hospital",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_ftes"
+              ],
+              "right_discriminator_input_ids": [
+                "adjusted_occupied_beds"
+              ]
+            },
+            {
+              "alternative_id": "total_ftes_to_adjusted_occupied_beds_provider",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "provider",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_ftes"
+              ],
+              "right_discriminator_input_ids": [
+                "adjusted_occupied_beds"
+              ]
+            },
+            {
+              "alternative_id": "total_ftes_to_adjusted_occupied_beds_health_system",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "health_system",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "total_ftes"
+              ],
+              "right_discriminator_input_ids": [
+                "adjusted_occupied_beds"
+              ]
+            }
+          ],
+          "description": "All ratio components require a documented reporting-entity and period alignment when supplied by different assets.",
+          "input_ids": [
+            "reporting_entity_id",
+            "period",
+            "total_ftes",
+            "adjusted_occupied_beds"
+          ],
+          "join_id": "financial_components_to_reporting_entity",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "FTE per adjusted occupied bed",
+      "limitations": [
+        "Facility cost reports are not consolidated health-system statements without a documented consolidation method.",
+        "FTE and adjusted occupied-bed definitions vary across reporting systems."
+      ],
+      "methodology": "hc-metrics:financial:1.0.0",
+      "methodology_key": "financial",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "Which data support FTE-per-adjusted-occupied-bed analysis?",
+        "Can this source support hospital labor-intensity analysis?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Facility, provider, or approved system reporting-perimeter identifier.",
+          "input_id": "reporting_entity_id",
+          "label": "Reporting entity identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "facility_id",
+            "provider_ccn",
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Cost-report or financial reporting period.",
+          "input_id": "period",
+          "label": "Reporting period",
+          "measurement_unit": "reporting_period",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "period",
+          "source_fields": [
+            "reporting_period",
+            "year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Full-time-equivalent staffing count.",
+          "input_id": "total_ftes",
+          "label": "Total FTEs",
+          "measurement_unit": "FTE",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "total_ftes"
+          ],
+          "value_kind": "decimal"
+        },
+        {
+          "description": "Adjusted occupied-bed denominator.",
+          "input_id": "adjusted_occupied_beds",
+          "label": "Adjusted occupied beds",
+          "measurement_unit": "adjusted_occupied_beds",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "denominator",
+          "source_fields": [
+            "adjusted_occupied_beds"
+          ],
+          "value_kind": "decimal"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "FTEs and adjusted occupied beds must use the same reporting period.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "Every input must refer to the same reporting perimeter.",
+          "property_id": "consistent_reporting_entity"
+        },
+        {
+          "description": "Staffing and capacity definitions must be compatible.",
+          "property_id": "compatible_financial_basis"
+        },
+        {
+          "description": "Health-system aggregation must address duplicated entities.",
+          "property_id": "system_consolidation_eliminations"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    },
+    {
+      "acceptable_grains": [
+        "facility",
+        "provider",
+        "health_system"
+      ],
+      "analysis_family": "financial_metrics",
+      "analysis_id": "financial_supply_cost_ratio",
+      "calculation_entrypoint": "hc_metrics.compute_financial_metrics",
+      "implementation_methodology": "financial",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "supply_expense_to_net_patient_revenue_facility",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "supply_expense"
+              ],
+              "right_discriminator_input_ids": [
+                "net_patient_revenue"
+              ]
+            },
+            {
+              "alternative_id": "supply_expense_to_net_patient_revenue_hospital",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "hospital",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "supply_expense"
+              ],
+              "right_discriminator_input_ids": [
+                "net_patient_revenue"
+              ]
+            },
+            {
+              "alternative_id": "supply_expense_to_net_patient_revenue_provider",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "provider",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "supply_expense"
+              ],
+              "right_discriminator_input_ids": [
+                "net_patient_revenue"
+              ]
+            },
+            {
+              "alternative_id": "supply_expense_to_net_patient_revenue_health_system",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "health_system",
+              "key_input_set": [
+                "reporting_entity_id"
+              ],
+              "left_discriminator_input_ids": [
+                "supply_expense"
+              ],
+              "right_discriminator_input_ids": [
+                "net_patient_revenue"
+              ]
+            }
+          ],
+          "description": "All ratio components require a documented reporting-entity and period alignment when supplied by different assets.",
+          "input_ids": [
+            "reporting_entity_id",
+            "period",
+            "supply_expense",
+            "net_patient_revenue"
+          ],
+          "join_id": "financial_components_to_reporting_entity",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Supply cost ratio",
+      "limitations": [
+        "Facility cost reports are not consolidated health-system statements without a documented consolidation method.",
+        "Supply-cost definitions may vary by cost-center allocation policy."
+      ],
+      "methodology": "hc-metrics:financial:1.0.0",
+      "methodology_key": "financial",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "Which data support supply-cost-ratio analysis?",
+        "Can this source support hospital supply-intensity analysis?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Facility, provider, or approved system reporting-perimeter identifier.",
+          "input_id": "reporting_entity_id",
+          "label": "Reporting entity identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "facility_id",
+            "provider_ccn",
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Cost-report or financial reporting period.",
+          "input_id": "period",
+          "label": "Reporting period",
+          "measurement_unit": "reporting_period",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "period",
+          "source_fields": [
+            "reporting_period",
+            "year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Medical supply expense.",
+          "input_id": "supply_expense",
+          "label": "Supply expense",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "supply_expense"
+          ],
+          "value_kind": "currency"
+        },
+        {
+          "description": "Net patient revenue denominator for supply cost ratio.",
+          "input_id": "net_patient_revenue",
+          "label": "Net patient revenue",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "facility",
+            "provider",
+            "health_system"
+          ],
+          "role": "denominator",
+          "source_fields": [
+            "net_patient_revenue"
+          ],
+          "value_kind": "currency"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "Supply expense and net patient revenue must use the same reporting period.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "Every input must refer to the same reporting perimeter.",
+          "property_id": "consistent_reporting_entity"
+        },
+        {
+          "description": "Expense and revenue definitions must be compatible.",
+          "property_id": "compatible_financial_basis"
+        },
+        {
+          "description": "Health-system aggregation must address intercompany eliminations and duplicated entities.",
+          "property_id": "system_consolidation_eliminations"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    },
+    {
+      "acceptable_grains": [
+        "health_system"
+      ],
+      "analysis_family": "financial_performance",
+      "analysis_id": "financial_strength",
+      "calculation_entrypoint": "hc_metrics.compute_financial_strength_index",
+      "implementation_methodology": "ushso_financial_strength_index_v1",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "health_system_component_alignment",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "symmetric",
+              "entity": "health_system",
+              "key_input_set": [
+                "system_id"
+              ]
+            },
+            {
+              "alternative_id": "system_financials_to_system_assigned_peer_benchmark_one_to_one",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "health_system",
+              "key_input_set": [
+                "system_id"
+              ],
+              "left_discriminator_input_ids": [
+                "operating_margin"
+              ],
+              "right_discriminator_input_ids": [
+                "peer_operating_margin"
+              ]
+            },
+            {
+              "alternative_id": "system_financials_to_system_assigned_peer_benchmark_many_to_one",
+              "cardinality": "many_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "health_system",
+              "key_input_set": [
+                "system_id"
+              ],
+              "left_discriminator_input_ids": [
+                "operating_margin"
+              ],
+              "right_discriminator_input_ids": [
+                "peer_operating_margin"
+              ]
+            }
+          ],
+          "description": "Documented system-perimeter, system-assigned peer-benchmark, and period relationships must connect every contributing asset.",
+          "input_ids": [
+            "system_id",
+            "period",
+            "operating_revenue",
+            "operating_margin",
+            "days_cash_on_hand",
+            "debt_to_capitalization",
+            "cash_to_debt_ratio",
+            "net_assets",
+            "peer_operating_margin",
+            "peer_days_cash_on_hand",
+            "peer_debt_to_capitalization",
+            "peer_cash_to_debt_ratio"
+          ],
+          "join_id": "system_to_peer_benchmark",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "USHSO Financial Strength Index",
+      "limitations": [
+        "Public use requires separate approval of formula, peer group, sources, and limitations.",
+        "Facility-level statements cannot be substituted for system financials without consolidation evidence.",
+        "Generic peer-group tables do not satisfy the system_id route unless a documented system-to-peer derivation materializes system-specific benchmark rows."
+      ],
+      "methodology": "hc-metrics:ushso_financial_strength_index_v1:1.0.0",
+      "methodology_key": "ushso_financial_strength_index_v1",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "How financially strong is this health system?",
+        "Which inputs support the USHSO Financial Strength Index?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Approved health-system perimeter identifier.",
+          "input_id": "system_id",
+          "label": "Health-system identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Year for system and peer financial inputs.",
+          "input_id": "period",
+          "label": "Reporting period",
+          "measurement_unit": "year",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "period",
+          "source_fields": [
+            "year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "System total operating revenue.",
+          "input_id": "operating_revenue",
+          "label": "Total operating revenue",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "total_operating_revenue_usd"
+          ],
+          "value_kind": "currency"
+        },
+        {
+          "description": "System operating margin percentage.",
+          "input_id": "operating_margin",
+          "label": "Operating margin",
+          "measurement_unit": "percent",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "operating_margin_pct"
+          ],
+          "value_kind": "percent"
+        },
+        {
+          "description": "System liquidity measure.",
+          "input_id": "days_cash_on_hand",
+          "label": "Days cash on hand",
+          "measurement_unit": "days",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "days_cash_on_hand"
+          ],
+          "value_kind": "decimal"
+        },
+        {
+          "description": "System leverage percentage.",
+          "input_id": "debt_to_capitalization",
+          "label": "Debt to capitalization",
+          "measurement_unit": "percent",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "debt_to_capitalization_pct"
+          ],
+          "value_kind": "percent"
+        },
+        {
+          "description": "System cash-to-debt ratio.",
+          "input_id": "cash_to_debt_ratio",
+          "label": "Cash to debt",
+          "measurement_unit": "ratio",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "cash_to_debt_ratio"
+          ],
+          "value_kind": "decimal"
+        },
+        {
+          "description": "System net assets used for distress caps.",
+          "input_id": "net_assets",
+          "label": "Net assets",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "health_system"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "net_assets_usd"
+          ],
+          "value_kind": "currency"
+        },
+        {
+          "description": "Approved peer benchmark operating margin.",
+          "input_id": "peer_operating_margin",
+          "label": "Peer operating margin",
+          "measurement_unit": "percent",
+          "observation_grains": [
+            "peer_group"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "peer_operating_margin_pct"
+          ],
+          "value_kind": "percent"
+        },
+        {
+          "description": "Approved peer benchmark liquidity.",
+          "input_id": "peer_days_cash_on_hand",
+          "label": "Peer days cash on hand",
+          "measurement_unit": "days",
+          "observation_grains": [
+            "peer_group"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "peer_days_cash_on_hand"
+          ],
+          "value_kind": "decimal"
+        },
+        {
+          "description": "Approved peer benchmark leverage.",
+          "input_id": "peer_debt_to_capitalization",
+          "label": "Peer debt to capitalization",
+          "measurement_unit": "percent",
+          "observation_grains": [
+            "peer_group"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "peer_debt_to_capitalization_pct"
+          ],
+          "value_kind": "percent"
+        },
+        {
+          "description": "Approved peer benchmark cash-to-debt ratio.",
+          "input_id": "peer_cash_to_debt_ratio",
+          "label": "Peer cash to debt",
+          "measurement_unit": "ratio",
+          "observation_grains": [
+            "peer_group"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "peer_cash_to_debt_ratio"
+          ],
+          "value_kind": "decimal"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "System component metrics must use the same reporting period.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "Peer benchmarks must align with the system reporting period.",
+          "property_id": "peer_period_alignment"
+        },
+        {
+          "description": "All system inputs must use one approved consolidation perimeter.",
+          "property_id": "consistent_health_system_perimeter"
+        },
+        {
+          "description": "Peer benchmarks require a documented comparable peer-group definition.",
+          "property_id": "comparable_peer_group_definition"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": [
+        "financial_operating_margin",
+        "financial_days_cash_on_hand",
+        "financial_debt_to_capitalization"
+      ]
+    },
+    {
+      "acceptable_grains": [
+        "facility",
+        "provider"
+      ],
+      "analysis_family": "quality",
+      "analysis_id": "quality_reliability",
+      "calculation_entrypoint": "hc_metrics.assess_reliability",
+      "implementation_methodology": "quality_reliability",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "quality_score_to_denominator_facility",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "facility",
+              "key_input_set": [
+                "facility_id",
+                "measure_id"
+              ],
+              "left_discriminator_input_ids": [
+                "quality_score"
+              ],
+              "right_discriminator_input_ids": [
+                "denominator"
+              ]
+            },
+            {
+              "alternative_id": "quality_score_to_denominator_hospital",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "hospital",
+              "key_input_set": [
+                "facility_id",
+                "measure_id"
+              ],
+              "left_discriminator_input_ids": [
+                "quality_score"
+              ],
+              "right_discriminator_input_ids": [
+                "denominator"
+              ]
+            },
+            {
+              "alternative_id": "quality_score_to_denominator_provider",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "provider",
+              "key_input_set": [
+                "facility_id",
+                "measure_id"
+              ],
+              "left_discriminator_input_ids": [
+                "quality_score"
+              ],
+              "right_discriminator_input_ids": [
+                "denominator"
+              ]
+            }
+          ],
+          "description": "Documented facility, measure, and period keys must connect scores and denominators across contributing assets.",
+          "input_ids": [
+            "facility_id",
+            "measure_id",
+            "period",
+            "quality_score",
+            "denominator"
+          ],
+          "join_id": "quality_score_to_denominator",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Quality measure reliability",
+      "limitations": [
+        "Reliability thresholds and intervals are measure-specific.",
+        "Reliability does not establish causal quality differences or risk-adjustment adequacy."
+      ],
+      "methodology": "hc-metrics:quality_reliability:1.0.0",
+      "methodology_key": "quality_reliability",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "Is this hospital quality score statistically reliable?",
+        "Which quality results have enough case volume?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Facility or provider associated with the quality score.",
+          "input_id": "facility_id",
+          "label": "Facility identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility",
+            "provider"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "facility_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "allowed_values": [
+            "overall_star",
+            "readmission_rate",
+            "hac_score"
+          ],
+          "description": "Supported quality measure identifier and definition.",
+          "input_id": "measure_id",
+          "label": "Quality measure",
+          "measurement_unit": "category",
+          "observation_grains": [
+            "facility",
+            "provider"
+          ],
+          "role": "dimension",
+          "source_fields": [
+            "measure"
+          ],
+          "value_kind": "category"
+        },
+        {
+          "description": "Reporting period for score and denominator.",
+          "input_id": "period",
+          "label": "Measurement period",
+          "measurement_unit": "reporting_period",
+          "observation_grains": [
+            "facility",
+            "provider"
+          ],
+          "role": "period",
+          "source_fields": [
+            "year",
+            "measurement_period"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "conditional_ranges": [
+            {
+              "equals": "overall_star",
+              "maximum": 5,
+              "minimum": 1,
+              "when_input_id": "measure_id"
+            },
+            {
+              "equals": "readmission_rate",
+              "maximum": 100,
+              "minimum": 0,
+              "when_input_id": "measure_id"
+            },
+            {
+              "equals": "hac_score",
+              "maximum": 1,
+              "minimum": 0,
+              "when_input_id": "measure_id"
+            }
+          ],
+          "description": "Observed score in the measure-specific unit.",
+          "input_id": "quality_score",
+          "label": "Quality score",
+          "measurement_unit": "measure_specific",
+          "observation_grains": [
+            "facility",
+            "provider"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "score"
+          ],
+          "value_kind": "decimal"
+        },
+        {
+          "description": "Eligible case or episode volume underlying the score.",
+          "input_id": "denominator",
+          "label": "Case denominator",
+          "measurement_unit": "cases",
+          "observation_grains": [
+            "facility",
+            "provider"
+          ],
+          "role": "denominator",
+          "source_fields": [
+            "denominator"
+          ],
+          "value_kind": "integer"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "Score and denominator must use the same measurement period.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "Measure identifier, direction, scale, and definition must be consistent.",
+          "property_id": "consistent_measure_definition"
+        },
+        {
+          "description": "The denominator must represent the cases used to calculate the score.",
+          "property_id": "denominator_matches_score"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    },
+    {
+      "acceptable_grains": [
+        "service_line"
+      ],
+      "analysis_family": "service_line",
+      "analysis_id": "service_line_analysis",
+      "calculation_entrypoint": "hc_metrics.compute_service_line_matrix",
+      "implementation_methodology": "service_line_matrix",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "service_line_component_alignment_facility",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "symmetric",
+              "entity": "facility",
+              "key_input_set": [
+                "reporting_entity_id",
+                "service_line"
+              ]
+            },
+            {
+              "alternative_id": "service_line_component_alignment_hospital",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "symmetric",
+              "entity": "hospital",
+              "key_input_set": [
+                "reporting_entity_id",
+                "service_line"
+              ]
+            },
+            {
+              "alternative_id": "service_line_component_alignment_health_system",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "symmetric",
+              "entity": "health_system",
+              "key_input_set": [
+                "reporting_entity_id",
+                "service_line"
+              ]
+            }
+          ],
+          "description": "Documented entity, service-line, and period relationships must connect every contributing asset.",
+          "input_ids": [
+            "reporting_entity_id",
+            "service_line",
+            "period",
+            "market_share",
+            "contribution_margin",
+            "utilization_volume",
+            "demand_growth"
+          ],
+          "join_id": "service_line_to_reporting_entity",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Service-line portfolio analysis",
+      "limitations": [
+        "Quadrants are screening aids, not capital-allocation decisions.",
+        "Contribution-margin and service-line definitions may not be comparable across organizations."
+      ],
+      "methodology": "hc-metrics:service_line_matrix:1.0.0",
+      "methodology_key": "service_line_matrix",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "Which service lines should be invested in, developed, harvested, or evaluated?",
+        "What data support a service-line portfolio analysis?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Facility or health-system perimeter for the portfolio.",
+          "input_id": "reporting_entity_id",
+          "label": "Reporting entity identifier",
+          "measurement_unit": "identifier",
+          "observation_grains": [
+            "facility",
+            "health_system"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "facility_id",
+            "system_id"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Consistent service-line classification.",
+          "input_id": "service_line",
+          "label": "Service line",
+          "measurement_unit": "category",
+          "observation_grains": [
+            "service_line"
+          ],
+          "role": "dimension",
+          "source_fields": [
+            "service_line"
+          ],
+          "value_kind": "category"
+        },
+        {
+          "description": "Period for market, finance, volume, and demand inputs.",
+          "input_id": "period",
+          "label": "Analysis period",
+          "measurement_unit": "reporting_period",
+          "observation_grains": [
+            "service_line"
+          ],
+          "role": "period",
+          "source_fields": [
+            "year",
+            "period"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "System market share by service line.",
+          "input_id": "market_share",
+          "label": "Market share",
+          "measurement_unit": "percent",
+          "observation_grains": [
+            "service_line"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "market_share_pct"
+          ],
+          "value_kind": "percent"
+        },
+        {
+          "description": "Service-line contribution margin as a decimal.",
+          "input_id": "contribution_margin",
+          "label": "Contribution margin",
+          "measurement_unit": "ratio",
+          "observation_grains": [
+            "service_line"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "contribution_margin"
+          ],
+          "value_kind": "decimal"
+        },
+        {
+          "description": "Annual service-line case volume.",
+          "input_id": "utilization_volume",
+          "label": "Annual volume",
+          "measurement_unit": "cases",
+          "observation_grains": [
+            "service_line"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "volume"
+          ],
+          "value_kind": "integer"
+        },
+        {
+          "description": "Projected annual service-line demand growth.",
+          "input_id": "demand_growth",
+          "label": "Demand growth",
+          "measurement_unit": "percent",
+          "observation_grains": [
+            "service_line"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "demand_growth_pct"
+          ],
+          "value_kind": "percent"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "Market, financial, volume, and demand inputs must be period-aligned.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "Every input must use the same service-line taxonomy.",
+          "property_id": "consistent_service_line_definition"
+        },
+        {
+          "description": "Contribution margin scope and allocation basis must be documented.",
+          "property_id": "documented_contribution_margin_basis"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": [
+        "market_share",
+        "demand_forecasting"
+      ]
+    },
+    {
+      "acceptable_grains": [
+        "cohort"
+      ],
+      "analysis_family": "demand",
+      "analysis_id": "demand_forecasting",
+      "calculation_entrypoint": "hc_metrics.forecast_demand",
+      "implementation_methodology": "population_x_utilization_age_sex",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "population_cohort_to_utilization_rate_one_to_one",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "other",
+              "key_input_set": [
+                "age_group",
+                "sex"
+              ],
+              "left_discriminator_input_ids": [
+                "geography_id",
+                "base_population",
+                "forecast_population"
+              ],
+              "right_discriminator_input_ids": [
+                "utilization_rate"
+              ]
+            },
+            {
+              "alternative_id": "population_cohort_to_utilization_rate_many_to_one",
+              "cardinality": "many_to_one",
+              "cardinality_orientation": "left_to_right",
+              "entity": "other",
+              "key_input_set": [
+                "age_group",
+                "sex"
+              ],
+              "left_discriminator_input_ids": [
+                "geography_id",
+                "base_population",
+                "forecast_population"
+              ],
+              "right_discriminator_input_ids": [
+                "utilization_rate"
+              ]
+            }
+          ],
+          "description": "Documented age-sex cohort keys must connect population and utilization-rate assets; geography and periods remain separately constrained.",
+          "input_ids": [
+            "geography_id",
+            "age_group",
+            "sex",
+            "base_period",
+            "forecast_period",
+            "base_population",
+            "forecast_population",
+            "utilization_rate",
+            "service_line"
+          ],
+          "join_id": "population_to_utilization_rate",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Population-based demand forecasting",
+      "limitations": [
+        "The v1 model holds utilization rates constant and attributes change to demography.",
+        "The calculation accepts one ZIP geography per forecast call."
+      ],
+      "methodology": "hc-metrics:demand:1.0.0",
+      "methodology_key": "demand",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "How will service-line demand change with population growth?",
+        "What data support a population-based healthcare demand forecast?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Single ZIP or ZCTA forecast geography.",
+          "input_id": "geography_id",
+          "label": "ZIP geography",
+          "measurement_unit": "zip_code",
+          "observation_grains": [
+            "cohort"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "zip_code"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "Age cohort matching the utilization-rate table.",
+          "input_id": "age_group",
+          "label": "Age group",
+          "measurement_unit": "category",
+          "observation_grains": [
+            "cohort"
+          ],
+          "role": "dimension",
+          "source_fields": [
+            "age_group"
+          ],
+          "value_kind": "category"
+        },
+        {
+          "description": "Sex cohort matching the utilization-rate table.",
+          "input_id": "sex",
+          "label": "Sex",
+          "measurement_unit": "category",
+          "observation_grains": [
+            "cohort"
+          ],
+          "role": "dimension",
+          "source_fields": [
+            "sex"
+          ],
+          "value_kind": "category"
+        },
+        {
+          "description": "Base population year.",
+          "input_id": "base_period",
+          "label": "Base year",
+          "measurement_unit": "year",
+          "observation_grains": [
+            "cohort"
+          ],
+          "role": "period",
+          "source_fields": [
+            "base_year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Target population projection year.",
+          "input_id": "forecast_period",
+          "label": "Forecast year",
+          "measurement_unit": "year",
+          "observation_grains": [
+            "cohort"
+          ],
+          "role": "period",
+          "source_fields": [
+            "forecast_year"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Population for each age-sex cohort in the base year.",
+          "input_id": "base_population",
+          "label": "Base population",
+          "measurement_unit": "persons",
+          "observation_grains": [
+            "cohort"
+          ],
+          "role": "denominator",
+          "source_fields": [
+            "population_{base_year}"
+          ],
+          "value_kind": "decimal"
+        },
+        {
+          "description": "Population for each age-sex cohort in the forecast year.",
+          "input_id": "forecast_population",
+          "label": "Forecast population",
+          "measurement_unit": "persons",
+          "observation_grains": [
+            "cohort"
+          ],
+          "role": "denominator",
+          "source_fields": [
+            "population_{forecast_year}"
+          ],
+          "value_kind": "decimal"
+        },
+        {
+          "description": "Complete age-sex utilization-rate mapping.",
+          "input_id": "utilization_rate",
+          "label": "Utilization rate",
+          "measurement_unit": "discharges_per_1000_persons",
+          "observation_grains": [
+            "cohort"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "utilization_rates"
+          ],
+          "value_kind": "rate"
+        },
+        {
+          "description": "Service line associated with the utilization rates and forecast.",
+          "input_id": "service_line",
+          "label": "Service line",
+          "measurement_unit": "category",
+          "observation_grains": [
+            "cohort"
+          ],
+          "role": "dimension",
+          "source_fields": [
+            "service_line"
+          ],
+          "value_kind": "category"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "Population and rate tables must use compatible age and sex cohorts.",
+          "property_id": "consistent_cohort_definition"
+        },
+        {
+          "description": "Every observed population cohort must have a utilization rate.",
+          "property_id": "complete_rate_mapping"
+        },
+        {
+          "description": "Base and forecast populations must use the same geography definition.",
+          "property_id": "consistent_geography_definition"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    },
+    {
+      "acceptable_grains": [
+        "zcta"
+      ],
+      "analysis_family": "social_risk",
+      "analysis_id": "sdoh",
+      "calculation_entrypoint": "hc_metrics.compute_sdoh_composite",
+      "implementation_methodology": "acs_4var_composite",
+      "join_requirements": [
+        {
+          "alternatives": [
+            {
+              "alternative_id": "geography_indicator_component_alignment",
+              "cardinality": "one_to_one",
+              "cardinality_orientation": "symmetric",
+              "entity": "other",
+              "key_input_set": [
+                "geography_id"
+              ]
+            }
+          ],
+          "description": "Documented ZCTA and ACS-vintage keys must connect every contributing indicator asset.",
+          "input_ids": [
+            "geography_id",
+            "period",
+            "poverty_rate",
+            "uninsured_rate",
+            "median_household_income",
+            "no_high_school_rate"
+          ],
+          "join_id": "geography_indicator_alignment",
+          "minimum_state": "documented",
+          "period_alignment": "required",
+          "when": "inputs_span_assets"
+        }
+      ],
+      "label": "Social Determinants of Health composite",
+      "limitations": [
+        "The composite is area-level context and must not determine individual patient care.",
+        "Values outside normalization bounds are clamped and should retain that limitation."
+      ],
+      "methodology": "hc-metrics:sdoh:1.0.0",
+      "methodology_key": "sdoh",
+      "methodology_version": "1.0.0",
+      "question_patterns": [
+        "Which data support an area-level SDOH composite?",
+        "How socially disadvantaged is this ZIP Code Tabulation Area?"
+      ],
+      "required_inputs": [
+        {
+          "description": "Five-digit ZIP Code Tabulation Area identifier.",
+          "input_id": "geography_id",
+          "label": "ZCTA identifier",
+          "measurement_unit": "ZCTA",
+          "observation_grains": [
+            "zcta"
+          ],
+          "role": "identifier",
+          "source_fields": [
+            "zip_code"
+          ],
+          "value_kind": "identifier"
+        },
+        {
+          "description": "ACS estimate year or release vintage shared by the indicators.",
+          "input_id": "period",
+          "label": "Source vintage",
+          "measurement_unit": "ACS_vintage",
+          "observation_grains": [
+            "zcta"
+          ],
+          "role": "period",
+          "source_fields": [
+            "year",
+            "vintage"
+          ],
+          "value_kind": "period"
+        },
+        {
+          "description": "Population below the federal poverty level.",
+          "input_id": "poverty_rate",
+          "label": "Poverty rate",
+          "measurement_unit": "percent",
+          "observation_grains": [
+            "zcta"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "poverty_rate"
+          ],
+          "value_kind": "percent"
+        },
+        {
+          "description": "Civilian non-institutionalized population without insurance.",
+          "input_id": "uninsured_rate",
+          "label": "Uninsured rate",
+          "measurement_unit": "percent",
+          "observation_grains": [
+            "zcta"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "uninsured_rate"
+          ],
+          "value_kind": "percent"
+        },
+        {
+          "description": "Median household income in dollars.",
+          "input_id": "median_household_income",
+          "label": "Median household income",
+          "measurement_unit": "USD",
+          "observation_grains": [
+            "zcta"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "median_income"
+          ],
+          "value_kind": "currency"
+        },
+        {
+          "description": "Adults age 25 and older without a high-school diploma or equivalent.",
+          "input_id": "no_high_school_rate",
+          "label": "No high-school diploma",
+          "measurement_unit": "percent",
+          "observation_grains": [
+            "zcta"
+          ],
+          "role": "measure",
+          "source_fields": [
+            "pct_no_high_school"
+          ],
+          "value_kind": "percent"
+        }
+      ],
+      "required_properties": [
+        {
+          "description": "All indicators must use the same ACS vintage or a documented aligned vintage.",
+          "property_id": "same_period"
+        },
+        {
+          "description": "All indicators must use the same ZCTA boundary vintage.",
+          "property_id": "consistent_geography_definition"
+        },
+        {
+          "description": "Rate inputs must be percentages from 0 to 100, not decimal proportions.",
+          "property_id": "percentage_scale"
+        }
+      ],
+      "schema_version": "hc-metrics.analysis-requirement.v1.0.0",
+      "upstream_analysis_ids": []
+    }
+  ],
+  "schema_version": "hc-metrics.analysis-requirements.v1.0.0"
+}

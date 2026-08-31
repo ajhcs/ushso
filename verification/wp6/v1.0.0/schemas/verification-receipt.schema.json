@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/verification/wp6/v1.0.0/schemas/verification-receipt.schema.json",
+  "title": "USHSO WP6 verification receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receipt_version", "status", "scope", "source", "migration_ids", "checks", "harness", "safety", "artifacts", "managed_execution", "rollback"],
+  "properties": {
+    "receipt_version": { "const": "ushso-wp6-verification-receipt.v1.0.0" },
+    "status": { "const": "pass" },
+    "scope": { "const": "local-isolated-postgresql-and-offline-corpus" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["corpus_version", "records", "search_documents", "join_routes", "manifest_file_sha256"],
+      "properties": {
+        "corpus_version": { "const": "1.1.0" },
+        "records": { "const": 157 },
+        "search_documents": { "const": 157 },
+        "join_routes": { "const": 14 },
+        "manifest_file_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "migration_ids": {
+      "type": "array",
+      "prefixItems": [{ "const": "0004" }, { "const": "0005" }, { "const": "0006" }, { "const": "0007" }],
+      "items": false,
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "checks": { "type": "array", "minItems": 15, "uniqueItems": true, "items": { "type": "string", "minLength": 3 } },
+    "harness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["listener_preflight_command", "listener_preflight_output_sha256", "postgres_image", "network_mode", "host_ports_published", "storage", "owner_label", "cleanup_verified", "remaining_labelled_containers"],
+      "properties": {
+        "listener_preflight_command": { "const": "ss -tlnp" },
+        "listener_preflight_output_sha256": { "$ref": "#/$defs/sha256" },
+        "postgres_image": { "const": "postgres:16-alpine" },
+        "network_mode": { "const": "none" },
+        "host_ports_published": { "const": 0 },
+        "storage": { "const": "tmpfs" },
+        "owner_label": { "const": "org.ushso.owner=wp6-local-test" },
+        "cleanup_verified": { "const": true },
+        "remaining_labelled_containers": { "const": 0 }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_requests", "host_ports_bound", "production_databases_touched", "payloads_acquired", "analyses_executed", "destructive_rollbacks"],
+      "properties": {
+        "external_requests": { "const": 0 },
+        "host_ports_bound": { "const": 0 },
+        "production_databases_touched": { "const": 0 },
+        "payloads_acquired": { "const": 0 },
+        "analyses_executed": { "const": 0 },
+        "destructive_rollbacks": { "const": 0 }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["import_plan_sha256", "migration_manifest_sha256", "normalization_package_manifest_sha256", "evidence_ledger_sha256", "static_output_sha256", "test_output_sha256"],
+      "properties": {
+        "import_plan_sha256": { "$ref": "#/$defs/sha256" },
+        "migration_manifest_sha256": { "$ref": "#/$defs/sha256" },
+        "normalization_package_manifest_sha256": { "$ref": "#/$defs/sha256" },
+        "evidence_ledger_sha256": { "$ref": "#/$defs/sha256" },
+        "static_output_sha256": { "$ref": "#/$defs/sha256" },
+        "test_output_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "managed_execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "staging_applied", "production_applied"],
+      "properties": {
+        "status": { "const": "pending_external_authorization" },
+        "staging_applied": { "const": false },
+        "production_applied": { "const": false }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "deletes_shared_state", "selected_successor_reverts_to_eligible_predecessor", "no_predecessor_state_is_explicit", "later_heads_unchanged", "static_public_path_unchanged"],
+      "properties": {
+        "action": { "const": "catalog.reject_import_batch" },
+        "deletes_shared_state": { "const": false },
+        "selected_successor_reverts_to_eligible_predecessor": { "const": true },
+        "no_predecessor_state_is_explicit": { "const": true },
+        "later_heads_unchanged": { "const": true },
+        "static_public_path_unchanged": { "const": true }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

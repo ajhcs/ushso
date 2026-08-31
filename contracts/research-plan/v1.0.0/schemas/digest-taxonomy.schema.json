@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/digest-taxonomy.schema.json",
+  "title": "Research-plan digest taxonomy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "canonicalization_algorithm", "string_order", "number_policy", "digests"],
+  "properties": {
+    "contract_version": {"const": "observatory-research-plan-digest-taxonomy.v1.0.0"},
+    "canonicalization_algorithm": {"const": "ushso-canonical-json.v1.0.0"},
+    "string_order": {"const": "utf8-bytewise"},
+    "number_policy": {"const": "safe-integer-only-no-negative-zero"},
+    "digests": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["digest_kind", "algorithm", "prefix", "coverage", "excluded_json_pointers", "transport_fields_outside_payload"],
+        "properties": {
+          "digest_kind": {"enum": ["canonical_plan", "normalized_request", "clarification_question_set", "package_file", "package_manifest"]},
+          "algorithm": {"const": "sha256"},
+          "prefix": {"const": "sha256:"},
+          "coverage": {"enum": ["raw_file_bytes", "canonical_json"]},
+          "excluded_json_pointers": {
+            "type": "array",
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 2, "maxLength": 128, "pattern": "^/"}
+          },
+          "transport_fields_outside_payload": {
+            "type": "array",
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 2, "maxLength": 128, "pattern": "^/"}
+          }
+        }
+      }
+    }
+  }
+}

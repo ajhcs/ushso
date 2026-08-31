@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/schemas/infra/structured-event.v1.0.0.json",
+  "title": "USHSO privacy-safe structured pipeline event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["trace_id", "run_id", "workflow_instance_id", "event_id", "source_id", "endpoint_id", "connector_version", "stage", "attempt", "outcome", "duration_ms", "rows_or_bytes", "error_class", "worker_version"],
+  "properties": {
+    "trace_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "run_id": { "type": ["string", "null"], "minLength": 1, "maxLength": 128 },
+    "workflow_instance_id": { "type": ["string", "null"], "minLength": 1, "maxLength": 128 },
+    "event_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "source_id": { "type": ["string", "null"], "minLength": 1, "maxLength": 256 },
+    "endpoint_id": { "type": ["string", "null"], "minLength": 1, "maxLength": 256 },
+    "connector_version": { "type": ["string", "null"], "minLength": 1, "maxLength": 128 },
+    "stage": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "attempt": { "type": "integer", "minimum": 0 },
+    "outcome": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "duration_ms": { "type": "integer", "minimum": 0 },
+    "rows_or_bytes": { "type": "integer", "minimum": 0 },
+    "error_class": { "type": ["string", "null"], "minLength": 1, "maxLength": 128 },
+    "worker_version": { "type": "string", "minLength": 1, "maxLength": 128 }
+  }
+}

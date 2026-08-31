@@ -1,0 +1,20 @@
+{
+  "schema_version": "ushso-wp3-infra-receipt.v1.0.0",
+  "receipt_id": "observability-and-alerts",
+  "generated_at": "2026-08-30T22:31:01Z",
+  "scope": "Structured pipeline events, 13 release alerts, 11 provisional SLOs, privacy exclusions, and response runbooks",
+  "overall_status": "pending_external_authorization",
+  "local_configuration": {
+    "status": "pass",
+    "commands": ["node --test verification/wp3/v1.0.0/infra/tests/*.test.mjs", "node verification/wp3/v1.0.0/infra/tools/validate-foundation.mjs"],
+    "evidence": ["Exact 14-field structured event allowlist is enforced", "All 13 plan-required alerts have a signal, candidate condition, severity, and runbook", "ALERT-04 covers both non-empty DLQs and terminal sink delivery failure and requires PostgreSQL-ledger/evidence reconstruction after Cloudflare deletion", "All 11 provisional SLOs have a measurement and response procedure", "Raw source bodies, credentials, public question text, and user identifiers are explicitly forbidden", "External endpoint pass rate is excluded from internal SLOs"],
+    "input_sha256": { "infra/observability/contract.v1.0.0.json": "b6bddcdccfa83515bdcb0045bdb6ca13d272956590c1a2381730becd105814c4", "infra/observability/RUNBOOKS.md": "6772c9c97e5dd812196a1033068f1bc92e2b0311dda29a3e19e5cb34deb07e5b" }
+  },
+  "managed_rehearsal": {
+    "status": "pending_external_authorization",
+    "authorization_gates": ["AUTH-02", "AUTH-03", "AUTH-05", "AUTH-11"],
+    "required_evidence": ["Authorized log/trace destinations and retention", "Installed staging alert rules and routed owners", "Synthetic firing and clear-state exercise for all 13 alerts", "Privacy inspection of emitted production-like events", "Thirty-minute capacity run SLO measurements", "Zero-traffic production monitors installed without exposing routes"]
+  },
+  "authorization_boundaries": { "AUTH-02": "managed sinks, destinations, and alert identities", "AUTH-03": "staging alert exercise", "AUTH-05": "recovery-alert exercise", "AUTH-11": "zero-traffic production monitoring foundation" },
+  "non_claims": ["No managed log, trace, or alert destination was created", "No on-call notification was sent", "SLO thresholds are provisional until workload ratification", "No alert has been proven against a live provider fault"]
+}

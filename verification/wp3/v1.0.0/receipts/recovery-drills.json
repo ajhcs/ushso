@@ -1,0 +1,20 @@
+{
+  "schema_version": "ushso-wp3-infra-receipt.v1.0.0",
+  "receipt_id": "recovery-drills",
+  "generated_at": "2026-08-30T22:31:01Z",
+  "scope": "Eight recovery controls and managed failover, PITR, reconnect, static activation, rollback, replay, environment, and state drills",
+  "overall_status": "pending_external_authorization",
+  "local_configuration": {
+    "status": "pass",
+    "commands": ["node --test verification/wp3/v1.0.0/infra/tests/*.test.mjs", "node verification/wp3/v1.0.0/infra/tools/validate-foundation.mjs"],
+    "evidence": ["All eight plan-required recovery controls are explicit, audited, and linked to a runbook", "Drill matrix records provisional RPO at most five minutes, RTO at most thirty minutes, and generation rollback at most fifteen minutes", "Safe sequence forbids destructive down-migrations, Queue purge as recovery, history reset, and active-generation mutation", "PITR target is isolated and never overwrites staging or production", "Replay creates new lineage preserving replay_of and original attempts", "DLQ sink exhaustion is bounded to five retries, pages on final failure, and reconstructs from PostgreSQL control-plane/evidence after Cloudflare deletion rather than Queue retention"],
+    "input_sha256": { "infra/recovery/controls.v1.0.0.json": "734f7c7f1c5e72479d134e493bc58f02b57b3cc89e347ddee43cfd108dc2ab12", "infra/recovery/drill-matrix.v1.0.0.json": "35859f3c7541289eb3db9cfb1a286b752dd722fb0c2f1509c2c1624f2f8c8716", "infra/recovery/RUNBOOKS.md": "43c54e764063dffeb9e4695b561e9874b1c40cfab830ec1856da00591793d12f" }
+  },
+  "managed_rehearsal": {
+    "status": "pending_external_authorization",
+    "authorization_gates": ["AUTH-05"],
+    "required_evidence": ["Timed managed-provider failover with measured RPO and RTO", "Isolated restore from a point inside the 30-day PITR window with checksum reconciliation", "Hyperdrive correctness/read disconnect and fresh-client reconnect without duplicate effect", "Emergency static public artifact activation across every semantic surface", "Warm-cache complete-manifest pointer rollback within fifteen minutes", "DLQ ACK-after-commit, five-retry exhaustion, final-failure page, PostgreSQL/evidence reconstruction, replay-lineage, and remote-state recovery exercises"]
+  },
+  "authorization_boundaries": { "AUTH-05": "isolated production-like managed recovery drills; no public traffic or production mutation" },
+  "non_claims": ["No provider fault was induced", "No PITR restore was requested", "No live Hyperdrive disconnect occurred", "No public or managed static activation occurred", "Provisional RPO and RTO are not yet verified"]
+}

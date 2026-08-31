@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/identity/v1.0.0/transformation-step.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "step_id",
+    "route_id",
+    "sequence",
+    "operation_kind",
+    "source_field_ids",
+    "target_field_ids",
+    "source_grain",
+    "target_grain",
+    "identifier_namespace_id",
+    "direction",
+    "cardinality",
+    "lossiness",
+    "evidence_state",
+    "compatibility",
+    "evidence",
+    "requirements",
+    "blockers",
+    "preconditions",
+    "validation_checks",
+    "execution_context",
+    "derived_readiness"
+  ],
+  "properties": {
+    "schema_version": {"const": "identity.transformation-step.v1.0.0"},
+    "step_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "route_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "operation_kind": {"enum": ["join", "crosswalk", "aggregate", "filter", "temporal_alignment", "measure_harmonization"]},
+    "source_field_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "target_field_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "source_grain": {"$ref": "common.schema.json#/$defs/grain"},
+    "target_grain": {"$ref": "common.schema.json#/$defs/grain"},
+    "identifier_namespace_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]},
+    "direction": {"enum": ["source_to_target", "target_to_source", "bidirectional"]},
+    "cardinality": {"enum": ["one_to_one", "one_to_many", "many_to_one", "many_to_many", "unknown"]},
+    "lossiness": {"enum": ["lossless", "potentially_lossy", "lossy", "unknown"]},
+    "evidence_state": {"enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven"]},
+    "compatibility": {"enum": ["compatible", "conditional", "incompatible", "unknown"]},
+    "evidence": {
+      "type": "array",
+      "items": {"$ref": "common.schema.json#/$defs/evidenceReference"}
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirement_id", "requirement_kind", "state", "satisfied_by_step_id", "evidence_ids", "description"],
+        "properties": {
+          "requirement_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+          "requirement_kind": {"enum": ["crosswalk", "aggregation", "normalization", "authorization", "temporal_alignment", "measure_harmonization", "other"]},
+          "state": {"enum": ["satisfied", "unsatisfied", "unknown", "not_applicable"]},
+          "satisfied_by_step_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]},
+          "evidence_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+          },
+          "description": {"type": "string", "minLength": 1, "maxLength": 800}
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["blocker_id", "blocker_kind", "state", "description", "evidence_ids"],
+        "properties": {
+          "blocker_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+          "blocker_kind": {"enum": ["identity_unresolved", "field_unverified", "crosswalk_missing", "authorization_required", "temporal_conflict", "grain_conflict", "evidence_insufficient", "other"]},
+          "state": {"enum": ["open", "resolved"]},
+          "description": {"type": "string", "minLength": 1, "maxLength": 800},
+          "evidence_ids": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+          }
+        }
+      }
+    },
+    "preconditions": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1, "maxLength": 800}
+    },
+    "validation_checks": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1, "maxLength": 800}
+    },
+    "execution_context": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "actor", "public_request", "evidence_id"],
+          "properties": {
+            "kind": {"enum": ["controlled_test", "external_execution"]},
+            "actor": {"enum": ["ushso_controlled_fixture", "source_publisher", "external_researcher"]},
+            "public_request": {"const": false},
+            "evidence_id": {"$ref": "common.schema.json#/$defs/opaqueId"}
+          }
+        }
+      ]
+    },
+    "derived_readiness": {"enum": ["ready", "blocked", "unknown"]}
+  }
+}

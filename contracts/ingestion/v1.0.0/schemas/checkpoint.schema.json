@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.0.0/checkpoint.schema.json",
+  "title": "Committed connector checkpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "checkpoint_id", "source_id", "scope_id", "configuration_revision", "strategy", "position", "state", "prior_checkpoint_id", "prior_checkpoint_digest", "checkpoint_digest", "proposed_by_run_id", "enumeration_seal_id", "downstream_outbox_committed", "committed_at", "superseded_at"],
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+    "checkpoint_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "source_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "scope_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "configuration_revision": { "type": "integer", "minimum": 1 },
+    "strategy": { "enum": ["modified_at_native_id", "opaque_cursor", "full_snapshot"] },
+    "position": {
+      "type": "object", "additionalProperties": false,
+      "required": ["publisher_modified_at", "native_id", "opaque_cursor_ref_id", "full_enumeration_sequence", "position_digest"],
+      "properties": {
+        "publisher_modified_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+        "native_id": { "type": ["string", "null"], "maxLength": 500 },
+        "opaque_cursor_ref_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+        "full_enumeration_sequence": { "type": ["integer", "null"], "minimum": 1 },
+        "position_digest": { "$ref": "common.schema.json#/$defs/Sha256" }
+      }
+    },
+    "state": { "enum": ["proposed", "committed", "superseded"] },
+    "prior_checkpoint_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+    "prior_checkpoint_digest": { "anyOf": [{ "$ref": "common.schema.json#/$defs/Sha256" }, { "type": "null" }] },
+    "checkpoint_digest": { "$ref": "common.schema.json#/$defs/Sha256" },
+    "proposed_by_run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "enumeration_seal_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "downstream_outbox_committed": { "type": "boolean" },
+    "committed_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+    "superseded_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" }
+  }
+}

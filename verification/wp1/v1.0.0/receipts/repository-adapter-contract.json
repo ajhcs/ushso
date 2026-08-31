@@ -1,0 +1,166 @@
+{
+  "receipt_version": "ushso-wp1-repository-adapter-contract.v1.0.0",
+  "receipt_id": "verification:wp1:repository-adapter-contract:2026-08-30",
+  "status": "PASS",
+  "scope": "WP1 repository ports, legacy-static adapters, request publication pin, v1 route parity, and local static rollback dry run",
+  "interfaces": [
+    "CatalogRepository",
+    "SearchBackend",
+    "CoverageRepository",
+    "PlannerRepository"
+  ],
+  "publication_context": {
+    "version": "ushso-publication-read-context.v1.0.0",
+    "resolved_once_per_request": true,
+    "deeply_frozen": true,
+    "same_object_passed_to_all_repository_calls": true,
+    "wire_v1_mutated": false
+  },
+  "static_behavior": {
+    "default_runtime": true,
+    "storage_mode": "legacy_static_assets",
+    "production_engine_path": "worker/retrieval-v1.1.0.mjs",
+    "production_engine_source_sha256": "b1e104055dc5e00b66769773ee33fe8c364aa7d3c7c872367145666bcb06dd5b",
+    "evaluator_core_imported": false,
+    "coverage_status": "unknown",
+    "absence_claim_permitted": false,
+    "planner_error": "planner_unavailable"
+  },
+  "parity": {
+    "response_fields": true,
+    "serialized_property_order": true,
+    "serialized_response_bytes": true,
+    "retrieval_ids": true,
+    "browse_order": true,
+    "stable_aliases": true,
+    "family_counts": true,
+    "join_route_selection": true,
+    "warnings": true,
+    "cache_headers": true,
+    "status_and_error_contracts": true
+  },
+  "verification_commands": [
+    {
+      "command": "node --test tests/worker-contract.test.mjs tests/release-features.test.mjs tests/wp1-repository-abstraction.test.mjs",
+      "status": "PASS",
+      "summary": "3 test files passed"
+    },
+    {
+      "command": "npm run test:web",
+      "status": "PASS",
+      "summary": "9 files and 30 tests passed"
+    },
+    {
+      "command": "node --test packages/retrieval/tests/webmcp-contract.test.mjs",
+      "status": "PASS",
+      "summary": "WebMCP compatibility file passed"
+    },
+    {
+      "command": "npm run build",
+      "status": "PASS",
+      "summary": "corpus staging, TypeScript, and Vite production build passed"
+    },
+    {
+      "command": "WRANGLER_LOG_PATH=/tmp/ushso-wp1-default-wrangler.log npm run cf:dry-run",
+      "status": "PASS",
+      "summary": "default Worker dry run reported only env.ASSETS"
+    },
+    {
+      "command": "WRANGLER_LOG_PATH=/tmp/ushso-wp1-wrangler.log node scripts/run-wrangler.mjs deploy worker/static-entry.mjs --dry-run --outdir /tmp/ushso-wp1-static-dry-run",
+      "status": "PASS",
+      "summary": "explicit rollback Worker dry run reported only env.ASSETS"
+    },
+    {
+      "command": "npm run release:audit",
+      "status": "PASS",
+      "summary": "694 repository files passed ignored-artifact, size, absolute-path, and credential-pattern checks"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "worker/index.mjs",
+      "sha256": "d24f857243ec12ca75937bfe937962a55964fa2d1b6182f3b8859bf6cfc4783f"
+    },
+    {
+      "path": "worker/public-query-service.mjs",
+      "sha256": "5a121d6522ad8920198204134b441095c4ca5046c2de100d07cb6f65ce59c3e9"
+    },
+    {
+      "path": "worker/static-composition.mjs",
+      "sha256": "c2109bd1d9a3c36e9ec4ed5b0b925afdbb5f3deb9a0bdc77245a5db39075ba02"
+    },
+    {
+      "path": "worker/static-entry.mjs",
+      "sha256": "b4fee6a2deac3121ac2d900b3b7cbafa47318b9aa633b8168469b163e473ddd5"
+    },
+    {
+      "path": "worker/retrieval-v1.1.0.mjs",
+      "sha256": "b1e104055dc5e00b66769773ee33fe8c364aa7d3c7c872367145666bcb06dd5b"
+    },
+    {
+      "path": "packages/registry/publication-read-context.mjs",
+      "sha256": "28b8f9d08fe9f6e135905eb5726b467e8ad9318b8aae814e65f29c3d808ee979"
+    },
+    {
+      "path": "packages/registry/catalog-repository.mjs",
+      "sha256": "fdb804d53cf1f8c0adcf1501891c970d4844180d04ed5547c44f5ea53f3b29e9"
+    },
+    {
+      "path": "packages/registry/static-asset-catalog-repository.mjs",
+      "sha256": "bf50cb556f5589a4e36b209b89508a3c984bbb2b18bede921e5c308649b2501f"
+    },
+    {
+      "path": "packages/search/search-backend.mjs",
+      "sha256": "1b2c910dcd6b57bbd0804a8aabc8eb170e5c68591dfae06f0873cbf17705a2d4"
+    },
+    {
+      "path": "packages/search/static-search-backend.mjs",
+      "sha256": "5212da43ecec802ae9881e497c5bdb44e3fbead97023c1741fbaa7725dd8464a"
+    },
+    {
+      "path": "packages/coverage/coverage-repository.mjs",
+      "sha256": "619598389eed36f01f06e0292ecd206ce9b0ee7379f9570e7ae71220b49088a6"
+    },
+    {
+      "path": "packages/coverage/static-coverage-repository.mjs",
+      "sha256": "6742ced209743f0f00f5db8a5b04f0cc4462a821e1f60442a94dc30f8e78ecf0"
+    },
+    {
+      "path": "packages/planner/planner-repository.mjs",
+      "sha256": "2a9ae257ebc32bfd8b61b86f474505ab3e357f2ffaac1bf5f2cadd82a567c617"
+    },
+    {
+      "path": "packages/planner/static-planner-repository.mjs",
+      "sha256": "03fca3f7cbafeeda762b1ef34bf899ac110c4983d30a3a1f3039e08e6245eae3"
+    },
+    {
+      "path": "packages/retrieval/versions/v1.1.0/manifests/corpus-manifest.json",
+      "sha256": "23f704ce3e421a6eb26c2b3677d616a1ae6b4f45226233257b9a1ff676caba2b"
+    }
+  ],
+  "rollback_artifact": {
+    "path": "verification/wp1/v1.0.0/static-rollback-artifact.json",
+    "entrypoint": "worker/static-entry.mjs",
+    "bundle_sha256": "ea34c3c3dac1b4f4d27d3ed357029b599c82b34af05c9e4579793b34a783384e",
+    "bundle_bytes": 72777,
+    "required_bindings": [
+      "ASSETS"
+    ]
+  },
+  "root_release_audit": {
+    "status": "PASS",
+    "reason": "The release-tooling owner narrowed the generated-coverage classifier; the escalated read-only audit passed after the fix",
+    "wp1_scope_changed_release_audit": false
+  },
+  "external_actions": {
+    "network_requests": 0,
+    "deployment_performed": false,
+    "production_state_changed": false,
+    "paid_infrastructure_created": false
+  },
+  "limitations": [
+    "This receipt covers the WP1 compatibility seam and local dry runs only.",
+    "It is not a database cutover, public canary, production rollback, provider recovery drill, or WP14 soak receipt."
+  ],
+  "verified_at": "2026-08-30T21:37:00Z"
+}

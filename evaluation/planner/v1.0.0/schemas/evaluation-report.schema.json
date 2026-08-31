@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/evaluation/planner/evaluation-report.v1.0.0.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "report_version", "benchmark_package", "benchmark_manifest_digest", "evaluator_contract_version",
+    "evaluator_contract_digest", "split", "evaluated_question_count", "evaluated_question_ids_sha256",
+    "aggregate_only", "item_level_judgments_included", "raw_question_text_included",
+    "raw_plan_payload_included", "source_network_requests", "raw_user_queries_persisted",
+    "usefulness", "safety", "result"
+  ],
+  "properties": {
+    "report_version": {"const": "observatory-planner-evaluation-report.v1.0.0"},
+    "benchmark_package": {"const": "observatory-planner-benchmark.v1.0.0"},
+    "benchmark_manifest_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "evaluator_contract_version": {"const": "observatory-planner-evaluator.v2.0.0"},
+    "evaluator_contract_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "split": {"enum": ["development", "validation", "held_out"]},
+    "evaluated_question_count": {"type": "integer", "minimum": 1, "maximum": 500},
+    "evaluated_question_ids_sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "aggregate_only": {"const": true},
+    "item_level_judgments_included": {"const": false},
+    "raw_question_text_included": {"const": false},
+    "raw_plan_payload_included": {"const": false},
+    "source_network_requests": {"const": 0},
+    "raw_user_queries_persisted": {"const": 0},
+    "usefulness": {"type": "object", "minProperties": 12, "maxProperties": 12},
+    "safety": {"type": "object"},
+    "result": {"enum": ["PASS", "FAIL"]}
+  }
+}

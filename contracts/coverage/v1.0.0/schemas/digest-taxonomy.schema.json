@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/coverage/v1.0.0/schemas/digest-taxonomy.schema.json",
+  "title": "Coverage digest taxonomy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["taxonomy_version", "canonical_json", "digests"],
+  "properties": {
+    "taxonomy_version": { "const": "1.0.0" },
+    "canonical_json": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm_id", "encoding", "object_keys", "arrays", "numbers", "terminal_newline"],
+      "properties": {
+        "algorithm_id": { "const": "ushso_canonical_json_v1" },
+        "encoding": { "const": "UTF-8" },
+        "object_keys": { "const": "lexicographic Unicode code-point order; no insignificant whitespace" },
+        "arrays": { "const": "order preserved" },
+        "numbers": { "const": "finite JSON numbers only; -0 normalized to 0" },
+        "terminal_newline": { "const": false }
+      }
+    },
+    "digests": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["digest_id", "algorithm", "input", "domain_separator", "exclusions", "purpose"],
+        "properties": {
+          "digest_id": {
+            "enum": [
+              "package_file_bytes_sha256/v1",
+              "canonical_json_sha256/v1",
+              "coverage_membership_manifest_sha256/v1",
+              "coverage_snapshot_sha256/v1"
+            ]
+          },
+          "algorithm": { "const": "sha256" },
+          "input": { "enum": ["exact_file_bytes", "ushso_canonical_json_v1"] },
+          "domain_separator": { "type": "string", "maxLength": 100 },
+          "exclusions": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1, "maxLength": 120 }
+          },
+          "purpose": { "type": "string", "minLength": 10, "maxLength": 400 }
+        }
+      }
+    }
+  }
+}

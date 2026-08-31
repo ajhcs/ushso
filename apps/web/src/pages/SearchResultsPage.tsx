@@ -119,9 +119,7 @@ export function SearchResultsPage() {
     updateState({ q: editQuery.trim(), page: 1, filters: [] })
   }
 
-  const familyCount = filteredFamilies.length
   const recordCount = filteredRecords.length
-  const sourceCount = new Set(activeItems.map((item) => item.sourceName)).size
 
   return (
     <div className="results-page">
@@ -142,7 +140,7 @@ export function SearchResultsPage() {
             <>
               <div className="results-overview">
                 <div>
-                  <p className="results-count"><strong>{familyCount} dataset families</strong><span>·</span><strong>{recordCount} records</strong><span>·</span><strong>{sourceCount} sources</strong></p>
+                  <p className="results-count"><strong>{recordCount} returned {recordCount === 1 ? 'record' : 'records'}{state.filters.length > 0 ? ' match the current filters' : ''}</strong></p>
                   <p>{getGroupingDescription(state.group)}</p>
                   <p className="facet-helper"><Info aria-hidden="true" />Facet counts show {state.group === 'family' ? 'families' : 'records'} while grouping is {state.group === 'family' ? 'enabled' : 'disabled'}. Counts overlap and will not sum to the total.</p>
                 </div>

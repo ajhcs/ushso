@@ -1,0 +1,55 @@
+{
+  "policy_version": "ushso-present-source-policy.v1.0.0",
+  "current_generation": "retrieval-corpus-v1.1.0-157",
+  "classification_order": [
+    "record_id_exact",
+    "source_native_id_exact",
+    "reviewed_authoritative_locator_equivalence",
+    "missing"
+  ],
+  "search_eligibility_rule": "A benchmark source is present_search_eligible only when at least one reviewed binding resolves to a record with a search document in the pinned 157-record generation.",
+  "present_but_excluded": [],
+  "explicit_equivalences": [
+    {
+      "record_id": "us-federal:cms-care-compare-hospital-general-information",
+      "canonical_source_id": "cms_hospital_general_information",
+      "basis": "reviewed_authoritative_locator_equivalence",
+      "evidence": "The promoted record and the existing benchmark-bound CMS Hospital General Information record share the exact authoritative data.cms.gov dataset locator xubh-q36u."
+    },
+    {
+      "record_id": "us-federal:cms-provider-of-services",
+      "canonical_source_id": "obs:asset:cms-provider-of-services-hospital",
+      "basis": "reviewed_authoritative_locator_equivalence",
+      "evidence": "The promoted and benchmark fixture records share the exact Provider of Services authoritative distribution URL and source-native identifier."
+    },
+    {
+      "record_id": "us-federal:usda-rural-urban-continuum-codes",
+      "canonical_source_id": "obs:asset:usda-rural-urban-continuum-codes",
+      "basis": "reviewed_authoritative_locator_equivalence",
+      "evidence": "The promoted and benchmark fixture records share the exact USDA Rural-Urban Continuum Codes authoritative landing URL and source-native identifier."
+    }
+  ],
+  "non_equivalences": [
+    {
+      "record_id": "us-federal:cms-pecos-system",
+      "candidate_source_id": "cms_pecos_public_enrollment",
+      "reason": "PECOS system access and the public enrollment file asset are not interchangeable executable assets."
+    },
+    {
+      "record_id": "us-federal:hrsa-health-center-service-delivery-sites",
+      "candidate_source_id": "hrsa_uds_sites",
+      "reason": "Related HRSA facility inventories are not silently merged without a benchmark-level asset equivalence review."
+    },
+    {
+      "record_id": "obs:asset:aha-annual-survey-database",
+      "candidate_source_id": "aha_annual_survey",
+      "reason": "The benchmark intentionally retains the fixture asset and registry source as distinct references."
+    }
+  ],
+  "review": {
+    "status": "engineering_verified",
+    "reviewer_roles": ["Search", "Data quality"],
+    "reviewed_at": "2026-08-30T00:00:00.000Z",
+    "tuning_started": false
+  }
+}

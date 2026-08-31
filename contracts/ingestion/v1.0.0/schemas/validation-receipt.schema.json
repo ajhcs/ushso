@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.0.0/validation-receipt.schema.json",
+  "title": "Deterministic ingestion contract validation receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receipt_version", "package_version", "mode", "offline", "valid", "schema_count", "valid_fixture_count", "adversarial_fixture_count", "transition_case_count", "transition_state_count", "positive_check_count", "negative_check_count", "failed_count", "manifest_verified", "manifest_raw_file_sha256", "manifest_canonical_json_sha256", "canonicalization_algorithm", "commands", "checks", "adversarial_results", "zero_action_counters", "errors", "immutable"],
+  "properties": {
+    "receipt_version": { "const": "ingestion-validation.v1" },
+    "package_version": { "const": "1.0.0" },
+    "mode": { "const": "fixture_offline" },
+    "offline": { "const": true },
+    "valid": { "type": "boolean" },
+    "schema_count": { "type": "integer", "minimum": 1 },
+    "valid_fixture_count": { "type": "integer", "minimum": 1 },
+    "adversarial_fixture_count": { "type": "integer", "minimum": 1 },
+    "transition_case_count": { "type": "integer", "minimum": 1 },
+    "transition_state_count": { "type": "integer", "minimum": 1 },
+    "positive_check_count": { "type": "integer", "minimum": 1 },
+    "negative_check_count": { "type": "integer", "minimum": 1 },
+    "failed_count": { "type": "integer", "minimum": 0 },
+    "manifest_verified": { "type": "boolean" },
+    "manifest_raw_file_sha256": { "$ref": "common.schema.json#/$defs/Sha256" },
+    "manifest_canonical_json_sha256": { "$ref": "common.schema.json#/$defs/Sha256" },
+    "canonicalization_algorithm": { "const": "ushso-canonical-json.v1" },
+    "commands": {
+      "type": "array", "minItems": 2, "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+    },
+    "checks": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z0-9-]{3,100}$" } },
+    "adversarial_results": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["case_id", "expected_code", "observed_code", "passed"],
+        "properties": {
+          "case_id": { "type": "string" },
+          "expected_code": { "type": "string" },
+          "observed_code": { "type": "string" },
+          "passed": { "type": "boolean" }
+        }
+      }
+    },
+    "zero_action_counters": {
+      "type": "object", "additionalProperties": false,
+      "required": ["external_requests", "source_payload_downloads", "source_data_rows_captured", "authorization_submissions", "identity_merges", "analyses_executed", "raw_questions_persisted", "secret_values_persisted"],
+      "properties": {
+        "external_requests": { "const": 0 },
+        "source_payload_downloads": { "const": 0 },
+        "source_data_rows_captured": { "const": 0 },
+        "authorization_submissions": { "const": 0 },
+        "identity_merges": { "const": 0 },
+        "analyses_executed": { "const": 0 },
+        "raw_questions_persisted": { "const": 0 },
+        "secret_values_persisted": { "const": 0 }
+      }
+    },
+    "errors": { "type": "array", "items": { "type": "string" } },
+    "immutable": { "const": true }
+  }
+}

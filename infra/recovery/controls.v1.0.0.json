@@ -1,0 +1,20 @@
+{
+  "schema_version": "ushso-recovery-controls.v1.0.0",
+  "controls": [
+    { "id": "global_scheduler_toggle", "scope": "all_new_dispatch", "safe_state": "disabled", "authority": "ops_access_role", "audit_required": true, "runbook": "REC-01" },
+    { "id": "per_source_pause", "scope": "one_source_after_drain_or_durable_reledger", "safe_state": "paused_zero_new_fetches", "authority": "ops_access_role", "audit_required": true, "runbook": "REC-02" },
+    { "id": "per_stage_queue_pause", "scope": "one_pipeline_stage", "safe_state": "paused_no_purge", "authority": "ops_access_role", "audit_required": true, "runbook": "REC-03" },
+    { "id": "connector_version_denylist", "scope": "one_or_more_connector_versions", "safe_state": "denied_before_egress", "authority": "ops_access_role", "audit_required": true, "runbook": "REC-04" },
+    { "id": "index_publication_freeze", "scope": "active_pointer_changes", "safe_state": "frozen_current_manifest", "authority": "ops_access_role", "audit_required": true, "runbook": "REC-05" },
+    { "id": "explicit_replay_with_lineage", "scope": "selected_job_run_or_dlq_record", "safe_state": "new_attempt_preserving_replay_of", "authority": "ops_access_role", "audit_required": true, "runbook": "REC-06" },
+    { "id": "immediate_pointer_rollback", "scope": "complete_publication_manifest", "safe_state": "previous_validated_generation", "authority": "ops_access_role", "audit_required": true, "runbook": "REC-07" },
+    { "id": "static_corpus_public_fallback", "scope": "all_public_read_surfaces", "safe_state": "co_resident_immutable_static_artifact", "authority": "release_operator", "audit_required": true, "runbook": "REC-08" }
+  ],
+  "invariants": [
+    "no_destructive_down_migration",
+    "no_queue_purge_as_recovery",
+    "no_history_reset",
+    "no_mutation_of_active_generation",
+    "all_operator_mutations_append_audit_event"
+  ]
+}

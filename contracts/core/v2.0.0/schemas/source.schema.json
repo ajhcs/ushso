@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/source.schema.json",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/truthEnvelope" },
+    {
+      "type": "object",
+      "required": ["source_id", "name", "operator_organization_id", "source_kind", "authority_level", "canonical_locator", "harvestable"],
+      "properties": {
+        "entity_type": { "const": "Source" },
+        "source_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "operator_organization_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "source_kind": { "enum": ["catalog", "portal", "repository", "regulator_inventory", "registry", "documentation_site", "other"] },
+        "authority_level": { "enum": ["authoritative", "official_mirror", "maintainer", "secondary", "candidate", "unknown"] },
+        "canonical_locator": { "type": "string", "format": "uri", "maxLength": 2000 },
+        "harvestable": { "type": "boolean" },
+        "native_identifiers": { "type": "array", "minItems": 1 },
+        "evidence_refs": { "type": "array", "minItems": 1 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

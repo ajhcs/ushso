@@ -1,0 +1,146 @@
+{
+  "schema_version": "ushso-wp9-evidence-ledger.v1.0.0",
+  "work_package": "WP9",
+  "entries": [
+    {
+      "requirement_id": "WP9-SOURCE-SCOPES",
+      "requirement": "Versioned source scopes preserve registry, connector, policy, enumeration, and absence semantics.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/artifacts/source-scopes.json", "packages/coverage/accounting/v1.0.0/artifacts/stage-facts.json"],
+      "verification": ["packages/coverage/accounting/v1.0.0/tests/accounting.test.mjs", "packages/coverage/accounting/v1.0.0/tools/validate-package.mjs"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-DENOMINATOR-DEFINITIONS",
+      "requirement": "All 18 versioned metric definitions share the frozen coverage contract truth.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/artifacts/denominator-definition-registry.json"],
+      "verification": ["DENOMINATOR_DEFINITION_TRUTH_DRIFT validator", "coverage contract schema and semantic validation"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-RATE-ENVELOPE",
+      "requirement": "Every public rate exposes numerator, denominator, unit, definition, as-of time, reporting window, revision pins, cohort, membership hash, and overlap semantics.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/artifacts/coverage-snapshot.json"],
+      "verification": ["all 18 metric envelopes expose denominator semantics and exact partitions"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-PARTITIONS",
+      "requirement": "Configured scope and normalized outcome partitions reconcile exactly with every required state.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/src/accounting.mjs"],
+      "verification": ["configured and normalized partition assertions", "COVERAGE_SEMANTIC_ERRORS validator"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-DUE-FAILURES",
+      "requirement": "Connector/check failures remain in due denominators and paused/excluded scopes remain visible in configured scope accounting.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/fixtures/denominator-invariants.json"],
+      "verification": ["configured and due denominator invariants retain paused, excluded, and failed work"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-UNKNOWN-NA",
+      "requirement": "Unknown and not-applicable remain explicit and never fold into pass/fail.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/src/accounting.mjs", "packages/coverage/accounting/v1.0.0/artifacts/coverage-snapshot.json"],
+      "verification": ["normalization six-state partition", "null-rate rules"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-ABSENCE-DENIAL",
+      "requirement": "Unknown, incomplete, or failed enumeration cannot produce a source absence claim.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/src/accounting.mjs"],
+      "verification": ["incomplete, failed, or unknown enumeration cannot support an absence claim"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-NON-ADDITIVITY",
+      "requirement": "51 jurisdictions, 14 federal source scopes, 306 cells, and 157 published records remain separate non-additive units.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/artifacts/public-coverage-view.json", "packages/coverage/accounting/v1.0.0/artifacts/corpus-positioning-manifest.json"],
+      "verification": ["51, 14, 306, and 157 remain distinct non-additive concepts"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-FEDERAL-BASELINE",
+      "requirement": "Represent the 14-source federal baseline with exact positioning and 11/2/1 applicability while denying stronger payload/fitness claims.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/artifacts/federal-source-registry.json", "packages/coverage/accounting/v1.0.0/fixtures/public-copy-audit.v1.0.0.json"],
+      "verification": ["FEDERAL_SOURCE_COUNT_MISMATCH and FEDERAL_APPLICABILITY_DRIFT validators"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-MATRIX",
+      "requirement": "A registry-derived 51 jurisdiction by six source-class matrix stores exactly one canonical state per cell.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/artifacts/state-source-class-cell-registry.json", "packages/coverage/accounting/v1.0.0/artifacts/coverage-matrix.json"],
+      "verification": ["registry cross-product creates exactly one honest state for every cell", "matrix contract validation"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-EVIDENCE-GRAIN",
+      "requirement": "Jurisdiction-level legacy statuses cannot manufacture cell-level integration, navigation, or evidence-gap claims.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/artifacts/evidence-reconciliation.json"],
+      "verification": ["UNSUPPORTED_MATRIX_STATE_PROMOTION validator", "LEGACY_GRAIN_PROMOTION_ENABLED validator"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-SEVEN-STATES",
+      "requirement": "The renderer/tooling recognizes all seven exact coverage-cell states without using synthetic cases as production evidence.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/fixtures/coverage-cell-state-conformance.json"],
+      "verification": ["all seven canonical state values are frozen without inventing production examples"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-FIVE-PANELS",
+      "requirement": "The public view exposes source operations, native inventory, revision funnel, canonical inventory, and operational health panels.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/artifacts/public-coverage-view.json"],
+      "verification": ["public view validator", "coverage service overview test"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-BOUNDED-SERVICE",
+      "requirement": "Service-ready views enforce snapshot pins, aborts, limits, cursors, byte bounds, zero action, and mutation isolation.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/src/coverage-accounting-service.mjs"],
+      "verification": ["packages/coverage/accounting/v1.0.0/tests/service.test.mjs"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "WP9-SQL-0011",
+      "requirement": "Provide reviewed forward-only SQL for later migration 0011 without touching db or applying it.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/sql/0011_coverage_facts_definitions_snapshots.reviewed.sql", "packages/coverage/accounting/v1.0.0/sql/REVIEW.md"],
+      "verification": ["reviewed 0011 SQL is additive, append-only, exact-state, and not applied"],
+      "status": "implemented_sequence_pending"
+    },
+    {
+      "requirement_id": "WP9-WP1-PRESERVATION",
+      "requirement": "The two WP1-pinned coverage repositories remain byte-for-byte unchanged.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/registry/evidence-provenance.v1.0.0.json"],
+      "verification": ["WP1 coverage adapters remain byte-for-byte pinned"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "TST-COV-01",
+      "requirement": "Public positioning states the 157-record composition without exhaustive national/state coverage language.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/fixtures/public-copy-audit.v1.0.0.json"],
+      "verification": ["coverage-copy-v1 exact-string and corpus composition audit"],
+      "status": "implemented_owner_review_pending"
+    },
+    {
+      "requirement_id": "TST-COV-02",
+      "requirement": "Every matrix cell selects exactly one of the seven canonical states.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/artifacts/coverage-matrix.json"],
+      "verification": ["state-matrix accounting tests and membership digest"],
+      "status": "implemented_verified"
+    },
+    {
+      "requirement_id": "TST-TRUST-01",
+      "requirement": "Zero-result and coverage language remains reconnaissance-only without a complete denominator.",
+      "implementation": ["packages/coverage/accounting/v1.0.0/fixtures/public-copy-audit.v1.0.0.json", "packages/coverage/accounting/v1.0.0/src/accounting.mjs"],
+      "verification": ["scope-language copy audit", "absence-denial tests"],
+      "status": "implemented_owner_review_pending"
+    },
+    {
+      "requirement_id": "G23.4-PRODUCT-OWNER",
+      "requirement": "State/federal coverage wording passes product-owner review.",
+      "implementation": ["verification/wp9/v1.0.0/governance/product-owner-wording-review.json"],
+      "verification": ["exact three-digest review packet and attestation recorder"],
+      "status": "pending_external_review"
+    }
+  ]
+}

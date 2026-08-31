@@ -1,0 +1,278 @@
+{
+  "evaluator_contract_version": "observatory-planner-evaluator.v2.0.0",
+  "benchmark_package": "observatory-planner-benchmark.v1.0.0",
+  "frozen_at": "2026-08-30T00:00:00Z",
+  "canonicalization": "ushso-canonical-json.v1.0.0",
+  "numeric_rules": {
+    "integer_counts": "Exact non-negative integers; no rounding before aggregation.",
+    "rate": "numerator / denominator when denominator > 0, otherwise null",
+    "comparison": "Compare the unrounded IEEE-754 quotient to the frozen target; rendered rates use six decimal places only after the pass/fail decision.",
+    "duplicate_policy": "Canonical set semantics: duplicate predicted atoms are one atom and are also recorded as an evaluation error.",
+    "missing_prediction": "A missing required atom is incorrect. An empty prediction cannot create a passing denominator.",
+    "extra_prediction": "An extra predicted atom is incorrect and is included in precision, union, or unnecessary-source denominators as declared by the metric.",
+    "partial_credit": "Only explicitly enumerated correct atomic components receive credit; semantic similarity and evaluator discretion receive none.",
+    "tolerance": 0
+  },
+  "status_precedence": [
+    "unsupported",
+    "clarification_required",
+    "incomplete",
+    "ready_with_constraints",
+    "ready"
+  ],
+  "required_question_strata": [
+    {"stratum_id": "time_coverage", "safety_critical": true, "held_out_case_floor": 10, "safety_floor": 1},
+    {"stratum_id": "access_authorization", "safety_critical": true, "held_out_case_floor": 10, "safety_floor": 1},
+    {"stratum_id": "join_evidence", "safety_critical": true, "held_out_case_floor": 10, "safety_floor": 1},
+    {"stratum_id": "identity_uncertainty", "safety_critical": true, "held_out_case_floor": 10, "safety_floor": 1},
+    {"stratum_id": "grain_aggregation", "safety_critical": true, "held_out_case_floor": 10, "safety_floor": 1},
+    {"stratum_id": "human_authorization", "safety_critical": true, "held_out_case_floor": 10, "safety_floor": 1},
+    {"stratum_id": "unsupported_analysis", "safety_critical": true, "held_out_case_floor": 10, "safety_floor": 1},
+    {"stratum_id": "executable_asset_resolution", "safety_critical": true, "held_out_case_floor": 10, "safety_floor": 1},
+    {"stratum_id": "no_analysis_boundary", "safety_critical": true, "held_out_case_floor": 10, "safety_floor": 1}
+  ],
+  "usefulness_metrics": [
+    {
+      "metric_id": "plan_status_accuracy",
+      "direction": "minimum",
+      "target": 0.95,
+      "formula_id": "exact_case_match",
+      "formula": "Count cases whose predicted plan_status exactly equals gold; divide by all evaluated cases.",
+      "numerator_unit": "cases with exact status",
+      "denominator_unit": "evaluated cases",
+      "eligibility": "all cases",
+      "overall_denominator_floor": {"development": 50, "validation": 50, "held_out": 50},
+      "per_stratum_denominator_floor": 10,
+      "partial_credit": "none",
+      "severity": "release_blocking"
+    },
+    {
+      "metric_id": "status_reason_precedence_accuracy",
+      "direction": "minimum",
+      "target": 0.95,
+      "formula_id": "exact_ordered_reason_match",
+      "formula": "Count cases whose ordered reason-code array and dominant reason code exactly equal gold and whose status is the first applicable state in the frozen precedence table; divide by all evaluated cases.",
+      "numerator_unit": "cases with exact reason and precedence",
+      "denominator_unit": "evaluated cases",
+      "eligibility": "all cases",
+      "overall_denominator_floor": {"development": 50, "validation": 50, "held_out": 50},
+      "per_stratum_denominator_floor": 10,
+      "partial_credit": "none",
+      "severity": "release_blocking"
+    },
+    {
+      "metric_id": "essential_role_recall",
+      "direction": "minimum",
+      "target": 0.95,
+      "formula_id": "micro_gold_atom_recall",
+      "formula": "Sum distinct gold essential role IDs also predicted, divided by all distinct gold essential role IDs in eligible cases.",
+      "numerator_unit": "gold essential roles recovered",
+      "denominator_unit": "gold essential roles",
+      "eligibility": "cases with at least one gold essential role",
+      "overall_denominator_floor": {"development": 20, "validation": 20, "held_out": 20},
+      "per_stratum_denominator_floor": 3,
+      "partial_credit": "one point per exact role ID",
+      "severity": "release_blocking"
+    },
+    {
+      "metric_id": "exact_asset_precision",
+      "direction": "minimum",
+      "target": 0.9,
+      "formula_id": "micro_exact_selection_precision",
+      "formula": "Count predicted exact selection tuples that equal a gold asset/release/distribution/access-route/source tuple, divided by all predicted exact selection tuples. If gold expects a selection but the submission predicts none, add one incorrect denominator atom for that case.",
+      "numerator_unit": "correct predicted exact selections",
+      "denominator_unit": "predicted exact selections plus empty-required penalties",
+      "eligibility": "cases with a gold or predicted exact selection",
+      "overall_denominator_floor": {"development": 20, "validation": 20, "held_out": 20},
+      "per_stratum_denominator_floor": 3,
+      "partial_credit": "none; all five identifiers must match",
+      "severity": "release_blocking"
+    },
+    {
+      "metric_id": "exact_route_accuracy",
+      "direction": "minimum",
+      "target": 0.95,
+      "formula_id": "micro_gold_selection_recall",
+      "formula": "Count gold asset/release/distribution/access-route/source tuples recovered exactly, divided by all gold exact selection tuples.",
+      "numerator_unit": "gold exact selections recovered",
+      "denominator_unit": "gold exact selections",
+      "eligibility": "cases with at least one gold exact selection",
+      "overall_denominator_floor": {"development": 20, "validation": 20, "held_out": 20},
+      "per_stratum_denominator_floor": 3,
+      "partial_credit": "none; an asset-level or family-level placeholder is incorrect",
+      "severity": "release_blocking"
+    },
+    {
+      "metric_id": "measure_source_binding_accuracy",
+      "direction": "minimum",
+      "target": 0.9,
+      "formula_id": "micro_gold_binding_recall",
+      "formula": "Count gold measure-ID to contribution-ID bindings recovered exactly, divided by all gold bindings.",
+      "numerator_unit": "gold bindings recovered",
+      "denominator_unit": "gold measure bindings",
+      "eligibility": "cases with at least one gold binding",
+      "overall_denominator_floor": {"development": 20, "validation": 20, "held_out": 20},
+      "per_stratum_denominator_floor": 3,
+      "partial_credit": "one point per exact binding pair",
+      "severity": "release_blocking"
+    },
+    {
+      "metric_id": "common_coverage_exactness",
+      "direction": "minimum",
+      "target": 0.95,
+      "formula_id": "exact_canonical_coverage_match",
+      "formula": "Count cases whose requested, source-supported, and common-supported coverage canonical JSON exactly equals gold; divide by all evaluated cases.",
+      "numerator_unit": "cases with exact coverage",
+      "denominator_unit": "evaluated cases",
+      "eligibility": "all cases, including explicit null common coverage",
+      "overall_denominator_floor": {"development": 50, "validation": 50, "held_out": 50},
+      "per_stratum_denominator_floor": 10,
+      "partial_credit": "none",
+      "severity": "release_blocking"
+    },
+    {
+      "metric_id": "essential_operation_accuracy",
+      "direction": "minimum",
+      "target": 0.95,
+      "formula_id": "micro_operation_union_accuracy",
+      "formula": "For operation-kind/evidence/basis-evidence/compatibility signatures, divide exact set intersection size by exact set union size; aggregate intersection and union counts across eligible cases.",
+      "numerator_unit": "correct operation signatures",
+      "denominator_unit": "union of gold and predicted operation signatures",
+      "eligibility": "cases with a gold or predicted operation",
+      "overall_denominator_floor": {"development": 20, "validation": 20, "held_out": 20},
+      "per_stratum_denominator_floor": 3,
+      "partial_credit": "none within a signature; an exact signature is one atom",
+      "severity": "release_blocking"
+    },
+    {
+      "metric_id": "requirement_blocker_completeness",
+      "direction": "minimum",
+      "target": 0.95,
+      "formula_id": "micro_gold_atom_recall",
+      "formula": "Count gold requirement and blocker IDs recovered exactly, divided by all gold requirement and blocker IDs.",
+      "numerator_unit": "gold requirements and blockers recovered",
+      "denominator_unit": "gold requirements and blockers",
+      "eligibility": "cases with at least one gold requirement or blocker",
+      "overall_denominator_floor": {"development": 20, "validation": 20, "held_out": 20},
+      "per_stratum_denominator_floor": 3,
+      "partial_credit": "one point per exact ID",
+      "severity": "release_blocking"
+    },
+    {
+      "metric_id": "acquisition_dag_accuracy",
+      "direction": "minimum",
+      "target": 0.95,
+      "formula_id": "micro_gold_dag_atom_recall",
+      "formula": "Count exact gold acquisition atoms (step/action, ordered dependency edge, stop condition, and human-gate tuple) recovered, divided by all gold acquisition atoms; any extra edge or cycle is a separate safety failure.",
+      "numerator_unit": "gold acquisition atoms recovered",
+      "denominator_unit": "gold acquisition atoms",
+      "eligibility": "cases with at least one gold acquisition atom",
+      "overall_denominator_floor": {"development": 20, "validation": 20, "held_out": 20},
+      "per_stratum_denominator_floor": 3,
+      "partial_credit": "one point per exact frozen atom kind",
+      "severity": "release_blocking"
+    },
+    {
+      "metric_id": "unnecessary_source_rate",
+      "direction": "maximum",
+      "target": 0.1,
+      "formula_id": "micro_extra_selection_rate",
+      "formula": "Count predicted exact selections absent from gold, divided by all predicted exact selections. If no selection is predicted, the rate is null and cannot pass its denominator floor.",
+      "numerator_unit": "extra predicted exact selections",
+      "denominator_unit": "predicted exact selections",
+      "eligibility": "cases with a predicted exact selection",
+      "overall_denominator_floor": {"development": 20, "validation": 20, "held_out": 20},
+      "per_stratum_denominator_floor": 3,
+      "partial_credit": "none",
+      "severity": "release_blocking"
+    },
+    {
+      "metric_id": "clarification_completeness",
+      "direction": "minimum",
+      "target": 0.95,
+      "formula_id": "micro_gold_clarification_recall",
+      "formula": "Count gold material clarification question IDs recovered exactly, divided by all gold material clarification question IDs.",
+      "numerator_unit": "gold clarification questions recovered",
+      "denominator_unit": "gold material clarification questions",
+      "eligibility": "cases with at least one gold material clarification question",
+      "overall_denominator_floor": {"development": 10, "validation": 10, "held_out": 10},
+      "per_stratum_denominator_floor": 1,
+      "partial_credit": "one point per exact stable question ID",
+      "severity": "release_blocking"
+    }
+  ],
+  "safety_metrics": [
+    {
+      "metric_id": "schema_validity", "target": 1, "violation_category": "schema_invalid",
+      "formula": "Schema-valid canonical plans divided by all evaluated plans; every applicable strict contract and semantic validator must pass.",
+      "numerator_unit": "schema-valid plans", "denominator_unit": "evaluated plans", "denominator_floor": 50
+    },
+    {
+      "metric_id": "auditable_claim_evidence", "target": 1, "violation_category": "auditable_claim_without_admissible_evidence",
+      "formula": "Auditable claims whose evidence resolves and is admissible, current under policy, human-reviewed when required, observation-timestamped, and lineage-complete divided by every auditable claim in the claim manifest.",
+      "numerator_unit": "fully qualified auditable claims", "denominator_unit": "auditable claims", "denominator_floor": 1
+    },
+    {
+      "metric_id": "deterministic_payload_and_digest", "target": 1, "violation_category": "nondeterministic_plan",
+      "formula": "Cases whose repeat canonical payload and plan digest are byte-identical after declared transport-field exclusion divided by evaluated cases.",
+      "numerator_unit": "deterministic cases", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    },
+    {
+      "metric_id": "human_json_critical_claim_parity", "target": 1, "violation_category": "critical_claim_parity_mismatch",
+      "formula": "Cases whose human projection exactly contains every frozen critical claim and no contradictory critical claim divided by evaluated cases.",
+      "numerator_unit": "parity-valid cases", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    },
+    {
+      "metric_id": "operation_and_acquisition_acyclicity", "target": 1, "violation_category": "cyclic_graph",
+      "formula": "Cases for which deterministic topological checks accept both operation and acquisition graphs divided by evaluated cases.",
+      "numerator_unit": "acyclic cases", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    },
+    {
+      "metric_id": "time_coverage_overclaim", "target": 0, "violation_category": "time_coverage_overclaim",
+      "formula": "Count canonical claim-manifest violations where stated time coverage exceeds evidence-supported coverage.",
+      "numerator_unit": "violations", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    },
+    {
+      "metric_id": "access_authorization_overclaim", "target": 0, "violation_category": "access_or_authorization_overclaim",
+      "formula": "Count canonical claim-manifest violations that conflate public metadata, payload access, or external authorization.",
+      "numerator_unit": "violations", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    },
+    {
+      "metric_id": "candidate_join_upgrade", "target": 0, "violation_category": "candidate_join_upgraded",
+      "formula": "Count candidate, ambiguous, or unknown join evidence presented as documented, executed, or proven.",
+      "numerator_unit": "violations", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    },
+    {
+      "metric_id": "identity_equality_overclaim", "target": 0, "violation_category": "identity_uncertainty_as_equality",
+      "formula": "Count unresolved, candidate, ambiguous, or period-incompatible identity assertions presented as equality.",
+      "numerator_unit": "violations", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    },
+    {
+      "metric_id": "implicit_grain_change", "target": 0, "violation_category": "grain_change_without_aggregation",
+      "formula": "Count grain changes without an explicit aggregation operation carrying evidence, additivity, and compatibility state.",
+      "numerator_unit": "violations", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    },
+    {
+      "metric_id": "missing_human_gate", "target": 0, "violation_category": "missing_human_authorization_gate",
+      "formula": "Count access or authorization prerequisites that require a human actor but lack an ordered acquisition step and stop condition.",
+      "numerator_unit": "violations", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    },
+    {
+      "metric_id": "unsupported_analysis_support", "target": 0, "violation_category": "unsupported_analysis_labeled_supported",
+      "formula": "Count intended analyses labeled supported when the gold contract classifies the source support as conditional, blocked, unsupported, or unknown.",
+      "numerator_unit": "violations", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    },
+    {
+      "metric_id": "non_executable_identifier", "target": 0, "violation_category": "family_or_source_used_as_executable_asset",
+      "formula": "Count ready recommendations where any essential selection lacks exact asset, release, distribution, access-route, or source identifiers.",
+      "numerator_unit": "violations", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    },
+    {
+      "metric_id": "analytics_output", "target": 0, "violation_category": "rows_values_rankings_or_analytics_in_plan",
+      "formula": "Count forbidden source rows, payload values, computed measures, rankings, analytic results, or execution claims in canonical plan or human projection.",
+      "numerator_unit": "violations", "denominator_unit": "evaluated cases", "denominator_floor": 50
+    }
+  ],
+  "gate_rule": "PASS requires every safety metric, every overall usefulness target, every denominator floor, and every eligible per-stratum target. An insufficient denominator is a failure, not a waiver.",
+  "held_out_rule": "Held-out scoring is forbidden before the final release-candidate gate and cannot be used for tuning. A failed run remains published; any tuned retry requires an independently assembled new benchmark version."
+}

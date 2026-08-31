@@ -1,0 +1,85 @@
+{
+  "ledger_version": "ushso-wp6-evidence-ledger.v1.0.0",
+  "work_package": "WP6",
+  "status": "implemented_local_pending_managed_execution",
+  "plan_sources": ["§7 canonical model", "§8.2 contracts", "§11–12 identity and metadata", "§20 WP6", "§22.1 contract tests", "§22.3 database tests", "§24 Stages 1–2"],
+  "requirements": [
+    {
+      "id": "WP6-01", "source": "§7.1–7.5; §20 WP6",
+      "statement": "Forward-only migrations 0004–0007 implement the canonical catalog object and revision model in dependency order.",
+      "implementation_paths": ["db/migrations/0004_catalog_objects_identifiers_evidence.sql", "db/migrations/0005_assets_releases_distributions_documentation.sql", "db/migrations/0006_schema_snapshots_fields_access.sql", "db/migrations/0007_assertions_relationships_temporal_history.sql"],
+      "verification": ["clean migration and N-1 upgrade subtests", "db/tools/verify-migrations.mjs"], "status": "verified_local"
+    },
+    {
+      "id": "WP6-02", "source": "§20 WP6 acceptance 1",
+      "statement": "Every one of the 157 legacy records and 14 join routes has an explicit fingerprinted disposition and mapping.",
+      "implementation_paths": ["packages/normalization/fixtures/import-plan.json", "packages/normalization/src/normalize.mjs"],
+      "verification": ["normalization.test.mjs", "database reconciliation count subtest"], "status": "verified_local"
+    },
+    {
+      "id": "WP6-03", "source": "§20 WP6 acceptance 2",
+      "statement": "An exact import replay creates zero new logical rows and a rejected import cannot be silently reapplied.",
+      "implementation_paths": ["packages/normalization/src/store.mjs", "db/migrations/0007_assertions_relationships_temporal_history.sql"],
+      "verification": ["import-store.test.mjs", "database replay subtest"], "status": "verified_local"
+    },
+    {
+      "id": "WP6-04", "source": "§11; §20 WP6 acceptance 3",
+      "statement": "Mutable titles and locators never merge identity; all similarity matches remain separate review candidates.",
+      "implementation_paths": ["packages/normalization/src/review-candidates.mjs", "packages/normalization/docs/MODEL_AND_MAPPING.md"],
+      "verification": ["title and locator collision unit test", "database identity and joins subtest"], "status": "verified_local"
+    },
+    {
+      "id": "WP6-05", "source": "§20 WP6 acceptance 4",
+      "statement": "The database-backed v1 projection preserves IDs, access, evidence, joins, warnings, browse order, and zero-result non-absence semantics.",
+      "implementation_paths": ["packages/normalization/src/projection.mjs", "db/migrations/0007_assertions_relationships_temporal_history.sql"],
+      "verification": ["projection-parity.test.mjs", "database byte-semantic parity subtest"], "status": "verified_local"
+    },
+    {
+      "id": "WP6-06", "source": "§20 WP6 acceptance 5; §24 Stage 2",
+      "statement": "The import receipt reconciles accepted and rejected legacy objects, digests, identity safety, parity, idempotency, and rollback.",
+      "implementation_paths": ["packages/normalization/tools/validate-package.mjs", "packages/normalization/schemas/import-receipt.schema.json"],
+      "verification": ["npm --prefix packages/normalization run validate", "strict Draft 2020-12 receipt validation"], "status": "verified_local"
+    },
+    {
+      "id": "WP6-07", "source": "§7.2–7.3; §22.1",
+      "statement": "Canonical revisions preserve four clocks, evidence lineage, aliases, temporal history, and typed referential integrity.",
+      "implementation_paths": ["packages/normalization/src/canonical.mjs", "db/migrations/0004_catalog_objects_identifiers_evidence.sql", "db/migrations/0007_assertions_relationships_temporal_history.sql"],
+      "verification": ["four-clocks unit test", "database dangling-reference adversarial matrix"], "status": "verified_local"
+    },
+    {
+      "id": "WP6-08", "source": "§22.1; §24 Stage 2 rollback",
+      "statement": "Immutable revisions use audited head selection; successor rejection restores the nearest eligible predecessor without deleting history.",
+      "implementation_paths": ["db/migrations/0007_assertions_relationships_temporal_history.sql", "packages/normalization/docs/ROLLBACK.md"],
+      "verification": ["N+1/cycle/revert/fallback database subtest", "non-destructive batch rejection database subtest"], "status": "verified_local"
+    },
+    {
+      "id": "WP6-09", "source": "§17; §22.3",
+      "statement": "Worker roles cannot self-sign imports or mutate catalog truth directly; PostgreSQL recomputes canonical digests and enforces exact authority pins.",
+      "implementation_paths": ["db/migrations/0004_catalog_objects_identifiers_evidence.sql", "db/migrations/0007_assertions_relationships_temporal_history.sql", "packages/normalization/src/database-import.mjs"],
+      "verification": ["six-role least-privilege subtest", "forged-receipt mutation and recovery subtest"], "status": "verified_local"
+    },
+    {
+      "id": "WP6-10", "source": "§9.3–9.5 normalization boundary",
+      "statement": "Normalization consumes only a complete sealed per-capture job workset and rejects aggregate, missing, duplicate, unsealed, unexpected, or version-drift work.",
+      "implementation_paths": ["packages/normalization/src/ingestion-boundary.mjs", "packages/normalization/tests/ingestion-boundary.test.mjs"],
+      "verification": ["ingestion-boundary.test.mjs", "database normalization manifest/outbox reconciliation subtest"], "status": "verified_local"
+    },
+    {
+      "id": "WP6-11", "source": "§3 product boundary; §24 Stage 1",
+      "statement": "WP6 remains an offline metadata normalization/backfill path and does not change public reads or execute analytics.",
+      "implementation_paths": ["packages/normalization/README.md", "packages/normalization/docs/IMPORT_RUNBOOK.md"],
+      "verification": ["zero-action assertions", "WP6 receipt safety counters"], "status": "verified_local"
+    }
+  ],
+  "managed_execution": {
+    "status": "pending_external_authorization",
+    "required_actions": [
+      "Authorize and apply the forward migration/import candidate to isolated staging, then verify parity and backup/restore.",
+      "Authorize production migration/import separately only after the staging receipt is approved; public cutover remains out of scope."
+    ]
+  },
+  "product_boundary": {
+    "source_payloads_acquired": false, "analyses_executed": false,
+    "market_share_calculated": false, "financial_benchmarks_produced": false
+  }
+}

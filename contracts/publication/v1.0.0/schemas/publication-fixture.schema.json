@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/publication/v1.0.0/publication-fixture.schema.json",
+  "title": "Publication conformance fixture bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixture_version", "fixture_clock", "digest_taxonomy", "canonical_manifests", "projection_documents", "acknowledgements", "component_manifests", "generation_history", "pin_resolution_cases", "build_receipts", "publication_manifests", "pointer", "publication_history", "legacy_static_manifest"],
+  "properties": {
+    "fixture_version": {"const": "publication-fixture.v1"},
+    "fixture_clock": {"$ref": "common.schema.json#/$defs/utcTimestamp"},
+    "digest_taxonomy": {"$ref": "digest-taxonomy.schema.json"},
+    "canonical_manifests": {"type": "array", "minItems": 2, "items": {"$ref": "canonical-revision-manifest.schema.json"}},
+    "projection_documents": {"type": "array", "minItems": 14, "items": {"$ref": "projection-document.schema.json"}},
+    "acknowledgements": {"type": "array", "minItems": 14, "items": {"$ref": "projection-acknowledgement.schema.json"}},
+    "component_manifests": {"type": "array", "minItems": 14, "items": {"$ref": "component-generation-manifest.schema.json"}},
+    "generation_history": {"type": "array", "minItems": 49, "items": {"$ref": "generation-state-event.schema.json"}},
+    "pin_resolution_cases": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["case_id", "generation_id", "observed_at", "expected_result"],
+        "properties": {
+          "case_id": {"$ref": "common.schema.json#/$defs/id"},
+          "generation_id": {"$ref": "common.schema.json#/$defs/id"},
+          "observed_at": {"$ref": "common.schema.json#/$defs/utcTimestamp"},
+          "expected_result": {"type": "string", "enum": ["serve_pinned", "restart_required"]}
+        }
+      }
+    },
+    "build_receipts": {"type": "array", "minItems": 2, "items": {"$ref": "full-snapshot-build-receipt.schema.json"}},
+    "publication_manifests": {"type": "array", "minItems": 2, "items": {"$ref": "publication-manifest.schema.json"}},
+    "pointer": {"$ref": "publication-pointer.schema.json"},
+    "publication_history": {"$ref": "publication-history.schema.json"},
+    "legacy_static_manifest": {"$ref": "legacy-static-compatibility-manifest.schema.json"}
+  }
+}

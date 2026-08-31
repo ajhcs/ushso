@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/organization.schema.json",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/truthEnvelope" },
+    {
+      "type": "object",
+      "required": ["organization_id", "display_name", "organization_roles", "jurisdiction_codes", "identity_resolution_state"],
+      "properties": {
+        "entity_type": { "const": "Organization" },
+        "organization_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "display_name": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "organization_roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["publisher", "regulator", "maintainer", "repository_operator", "data_steward", "other"] }
+        },
+        "jurisdiction_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Z0-9-]{2,20}$" }
+        },
+        "identity_resolution_state": { "enum": ["source_scoped", "authoritatively_resolved", "review_pending", "conflicted", "unknown"] },
+        "native_identifiers": { "type": "array", "minItems": 1 },
+        "evidence_refs": { "type": "array", "minItems": 1 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

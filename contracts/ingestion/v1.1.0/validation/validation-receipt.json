@@ -1,0 +1,297 @@
+{
+  "receipt_version": "ingestion-validation.v1",
+  "package_version": "1.1.0",
+  "mode": "fixture_offline",
+  "offline": true,
+  "valid": true,
+  "schema_count": 17,
+  "valid_fixture_count": 22,
+  "adversarial_fixture_count": 28,
+  "compatibility_fixture_count": 5,
+  "transition_case_count": 50,
+  "transition_state_count": 30,
+  "positive_check_count": 240,
+  "negative_check_count": 31,
+  "failed_count": 0,
+  "manifest_verified": true,
+  "manifest_raw_file_sha256": "7b94c81893e49fdc47bc4182202be8e0757df4200e50799016ff13b992373db1",
+  "manifest_canonical_json_sha256": "225a17bfd5c888b1bea240bea2406dbb9f441a0c4b4deb8427428d287dc61ffb",
+  "canonicalization_algorithm": "ushso-canonical-json.v1",
+  "commands": [
+    "npm run manifest --prefix contracts/ingestion/v1.1.0",
+    "npm test --prefix contracts/ingestion/v1.1.0",
+    "npm run validate --prefix contracts/ingestion/v1.1.0"
+  ],
+  "checks": [
+    "draft-2020-12-strict-schema-compilation",
+    "unexpected-property-rejection",
+    "exact-enum-and-state-transition-coverage",
+    "deterministic-idempotency-keys",
+    "lease-attempt-and-retry-fencing",
+    "four-clock-separation",
+    "conditional-http-304-reuse",
+    "content-addressed-metadata-capture",
+    "zero-source-payload-truth-boundary",
+    "complete-enumeration-checkpoint-cas",
+    "last-known-good-publication-barrier",
+    "transactional-outbox-duplicate-delivery",
+    "durable-dlq-and-replay-lineage",
+    "pause-drain-zero-fetch",
+    "raw-and-canonical-digest-taxonomy",
+    "cloudflare-workflow-instance-id-boundary",
+    "v1-0-predecessor-byte-pins",
+    "non-erratum-schema-structural-equivalence",
+    "strict-subset-no-remap-compatibility"
+  ],
+  "predecessor_verification": {
+    "package_version": "1.0.0",
+    "manifest_raw_file_sha256": "071b06d4fa03fd38c5bb1c522493a66d59f767b51f4bea9d26edd596858f929d",
+    "validation_receipt_raw_file_sha256": "be197529eb1e1714b0756fe5cca40543f1234cc553112ff33e45817ed13969b6",
+    "harvest_run_schema_raw_file_sha256": "9ff550bc27f9e70e418c8a586b0798eeafa122357ec8e9d99c4dc2a4b566f959",
+    "semantics_raw_file_sha256": "26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639",
+    "successor_semantics_raw_file_sha256": "26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639",
+    "predecessor_validation_valid": true,
+    "non_erratum_schema_count": 14,
+    "non_erratum_schemas_match": true,
+    "all_match": true
+  },
+  "compatibility_results": [
+    {
+      "case_id": "wp4_generated_id",
+      "expected_v1_0_valid": true,
+      "observed_v1_0_valid": true,
+      "expected_v1_1_valid": true,
+      "observed_v1_1_valid": true,
+      "expected_upgrade_action": "version_only",
+      "observed_upgrade_action": "version_only",
+      "observed_error_code": null,
+      "passed": true
+    },
+    {
+      "case_id": "provider_length_boundary_100",
+      "expected_v1_0_valid": true,
+      "observed_v1_0_valid": true,
+      "expected_v1_1_valid": true,
+      "observed_v1_1_valid": true,
+      "expected_upgrade_action": "version_only",
+      "observed_upgrade_action": "version_only",
+      "observed_error_code": null,
+      "passed": true
+    },
+    {
+      "case_id": "legacy_dot_is_audit_only",
+      "expected_v1_0_valid": true,
+      "observed_v1_0_valid": true,
+      "expected_v1_1_valid": false,
+      "observed_v1_1_valid": false,
+      "expected_upgrade_action": "retain_v1_0_audit_only",
+      "observed_upgrade_action": "retain_v1_0_audit_only",
+      "observed_error_code": "WORKFLOW_INSTANCE_ID_PROVIDER_INCOMPATIBLE",
+      "passed": true
+    },
+    {
+      "case_id": "legacy_colon_is_audit_only",
+      "expected_v1_0_valid": true,
+      "observed_v1_0_valid": true,
+      "expected_v1_1_valid": false,
+      "observed_v1_1_valid": false,
+      "expected_upgrade_action": "retain_v1_0_audit_only",
+      "observed_upgrade_action": "retain_v1_0_audit_only",
+      "observed_error_code": "WORKFLOW_INSTANCE_ID_PROVIDER_INCOMPATIBLE",
+      "passed": true
+    },
+    {
+      "case_id": "legacy_length_101_is_audit_only",
+      "expected_v1_0_valid": true,
+      "observed_v1_0_valid": true,
+      "expected_v1_1_valid": false,
+      "observed_v1_1_valid": false,
+      "expected_upgrade_action": "retain_v1_0_audit_only",
+      "observed_upgrade_action": "retain_v1_0_audit_only",
+      "observed_error_code": "WORKFLOW_INSTANCE_ID_PROVIDER_INCOMPATIBLE",
+      "passed": true
+    }
+  ],
+  "adversarial_results": [
+    {
+      "case_id": "unexpected_property_rejected",
+      "expected_code": "SCHEMA_INVALID",
+      "observed_code": "SCHEMA_INVALID",
+      "passed": true
+    },
+    {
+      "case_id": "workflow_instance_dot_rejected_by_provider_contract",
+      "expected_code": "SCHEMA_INVALID",
+      "observed_code": "SCHEMA_INVALID",
+      "passed": true
+    },
+    {
+      "case_id": "workflow_instance_colon_rejected_by_provider_contract",
+      "expected_code": "SCHEMA_INVALID",
+      "observed_code": "SCHEMA_INVALID",
+      "passed": true
+    },
+    {
+      "case_id": "workflow_instance_over_100_rejected_by_provider_contract",
+      "expected_code": "SCHEMA_INVALID",
+      "observed_code": "SCHEMA_INVALID",
+      "passed": true
+    },
+    {
+      "case_id": "secret_value_not_a_locator",
+      "expected_code": "SCHEMA_INVALID",
+      "observed_code": "SCHEMA_INVALID",
+      "passed": true
+    },
+    {
+      "case_id": "raw_healthcare_row_payload_sentinel",
+      "expected_code": "SCHEMA_INVALID",
+      "observed_code": "SCHEMA_INVALID",
+      "passed": true
+    },
+    {
+      "case_id": "payload_route_purpose_forbidden",
+      "expected_code": "SCHEMA_INVALID",
+      "observed_code": "SCHEMA_INVALID",
+      "passed": true
+    },
+    {
+      "case_id": "missing_capture_evidence",
+      "expected_code": "SCHEMA_INVALID",
+      "observed_code": "SCHEMA_INVALID",
+      "passed": true
+    },
+    {
+      "case_id": "stale_lease_epoch_fenced",
+      "expected_code": "STALE_LEASE_EPOCH",
+      "observed_code": "STALE_LEASE_EPOCH",
+      "passed": true
+    },
+    {
+      "case_id": "stale_run_attempt_fenced",
+      "expected_code": "STALE_RUN_ATTEMPT",
+      "observed_code": "STALE_RUN_ATTEMPT",
+      "passed": true
+    },
+    {
+      "case_id": "partial_run_keeps_last_known_good",
+      "expected_code": "LAST_KNOWN_GOOD_REPLACED_BY_INCOMPLETE_RUN",
+      "observed_code": "LAST_KNOWN_GOOD_REPLACED_BY_INCOMPLETE_RUN",
+      "passed": true
+    },
+    {
+      "case_id": "publication_barrier_missing_enumeration",
+      "expected_code": "PUBLICATION_BARRIER_INCOMPLETE",
+      "observed_code": "PUBLICATION_BARRIER_INCOMPLETE",
+      "passed": true
+    },
+    {
+      "case_id": "cursor_expiry_cannot_seal",
+      "expected_code": "ENUMERATION_SEAL_INCOMPLETE",
+      "observed_code": "ENUMERATION_SEAL_INCOMPLETE",
+      "passed": true
+    },
+    {
+      "case_id": "checkpoint_cannot_advance_without_seal",
+      "expected_code": "CHECKPOINT_ADVANCES_WITHOUT_SEALED_ENUMERATION",
+      "observed_code": "CHECKPOINT_ADVANCES_WITHOUT_SEALED_ENUMERATION",
+      "passed": true
+    },
+    {
+      "case_id": "duplicate_delivery_conflicting_effect",
+      "expected_code": "DUPLICATE_DELIVERY_EFFECT_CONFLICT",
+      "observed_code": "DUPLICATE_DELIVERY_EFFECT_CONFLICT",
+      "passed": true
+    },
+    {
+      "case_id": "dlq_replay_must_allocate_new_lineage",
+      "expected_code": "DLQ_REPLAY_RESETS_HISTORY",
+      "observed_code": "DLQ_REPLAY_RESETS_HISTORY",
+      "passed": true
+    },
+    {
+      "case_id": "dlq_replay_preserves_original_policy",
+      "expected_code": "DLQ_REPLAY_LINEAGE_UNRESOLVED",
+      "observed_code": "DLQ_REPLAY_LINEAGE_UNRESOLVED",
+      "passed": true
+    },
+    {
+      "case_id": "conditional_304_requires_reused_capture",
+      "expected_code": "CONDITIONAL_304_INVALID",
+      "observed_code": "CONDITIONAL_304_INVALID",
+      "passed": true
+    },
+    {
+      "case_id": "four_clocks_system_before_observation",
+      "expected_code": "FOUR_CLOCK_SYSTEM_BEFORE_OBSERVATION",
+      "observed_code": "FOUR_CLOCK_SYSTEM_BEFORE_OBSERVATION",
+      "passed": true
+    },
+    {
+      "case_id": "four_clocks_unknown_not_inferred",
+      "expected_code": "FOUR_CLOCK_COVERAGE_STATE_MISMATCH",
+      "observed_code": "FOUR_CLOCK_COVERAGE_STATE_MISMATCH",
+      "passed": true
+    },
+    {
+      "case_id": "bad_terminal_run_transition",
+      "expected_code": "STATE_TRANSITION_INVALID",
+      "observed_code": "STATE_TRANSITION_INVALID",
+      "passed": true
+    },
+    {
+      "case_id": "pause_requires_complete_drain",
+      "expected_code": "PAUSE_DRAIN_INCOMPLETE",
+      "observed_code": "PAUSE_DRAIN_INCOMPLETE",
+      "passed": true
+    },
+    {
+      "case_id": "retry_cannot_ack_before_reledger_commit",
+      "expected_code": "RELEDGER_RETRY_NOT_DURABLE",
+      "observed_code": "RELEDGER_RETRY_NOT_DURABLE",
+      "passed": true
+    },
+    {
+      "case_id": "cursor_404_is_enumeration_failure",
+      "expected_code": "COLLECTION_ABSENCE_MISCLASSIFIED",
+      "observed_code": "COLLECTION_ABSENCE_MISCLASSIFIED",
+      "passed": true
+    },
+    {
+      "case_id": "capture_content_address_mismatch",
+      "expected_code": "CAPTURE_CONTENT_ADDRESS_MISMATCH",
+      "observed_code": "CAPTURE_CONTENT_ADDRESS_MISMATCH",
+      "passed": true
+    },
+    {
+      "case_id": "job_idempotency_key_exactness",
+      "expected_code": "JOB_IDEMPOTENCY_KEY_MISMATCH",
+      "observed_code": "JOB_IDEMPOTENCY_KEY_MISMATCH",
+      "passed": true
+    },
+    {
+      "case_id": "outbox_message_cannot_embed_response_body",
+      "expected_code": "SCHEMA_INVALID",
+      "observed_code": "SCHEMA_INVALID",
+      "passed": true
+    },
+    {
+      "case_id": "terminal_not_found_cannot_be_blindly_retried",
+      "expected_code": "FAILURE_POLICY_DISPOSITION_MISMATCH",
+      "observed_code": "FAILURE_POLICY_DISPOSITION_MISMATCH",
+      "passed": true
+    }
+  ],
+  "zero_action_counters": {
+    "external_requests": 0,
+    "source_payload_downloads": 0,
+    "source_data_rows_captured": 0,
+    "authorization_submissions": 0,
+    "identity_merges": 0,
+    "analyses_executed": 0,
+    "raw_questions_persisted": 0,
+    "secret_values_persisted": 0
+  },
+  "errors": [],
+  "immutable": true
+}

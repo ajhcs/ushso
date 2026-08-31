@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/planner-fingerprint.schema.json",
+  "title": "Planner fingerprint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "planner_fingerprint_id",
+    "compiler_version",
+    "policy_version",
+    "contract_version",
+    "algorithm_ids",
+    "configuration_digest",
+    "code_digest",
+    "claim_manifest_digest",
+    "canonicalization_algorithm"
+  ],
+  "properties": {
+    "planner_fingerprint_id": {"$ref": "common.schema.json#/$defs/digest"},
+    "compiler_version": {"const": "observatory-planner.v1.0.0"},
+    "policy_version": {"$ref": "common.schema.json#/$defs/stableId"},
+    "contract_version": {"const": "observatory-research-plan.v1.0.0"},
+    "algorithm_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/stableId"}
+    },
+    "configuration_digest": {"$ref": "common.schema.json#/$defs/digest"},
+    "code_digest": {"$ref": "common.schema.json#/$defs/digest"},
+    "claim_manifest_digest": {"$ref": "common.schema.json#/$defs/digest"},
+    "canonicalization_algorithm": {"const": "ushso-canonical-json.v1.0.0"}
+  }
+}

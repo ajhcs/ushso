@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/common.schema.json",
+  "title": "Research plan common definitions",
+  "$defs": {
+    "stableId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "assetId": {
+      "type": "string",
+      "minLength": 11,
+      "maxLength": 128,
+      "pattern": "^obs:asset:[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "releaseId": {
+      "type": "string",
+      "minLength": 13,
+      "maxLength": 128,
+      "pattern": "^obs:release:[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "distributionId": {
+      "type": "string",
+      "minLength": 18,
+      "maxLength": 128,
+      "pattern": "^obs:distribution:[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "accessRouteId": {
+      "type": "string",
+      "minLength": 18,
+      "maxLength": 128,
+      "pattern": "^obs:access-route:[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 12,
+      "maxLength": 128,
+      "pattern": "^obs:source:[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "shortText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "maintainedText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "idArray": {
+      "type": "array",
+      "maxItems": 100,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/stableId"}
+    },
+    "evidenceReferenceIds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/stableId"}
+    },
+    "period": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end", "period_kind", "precision"],
+      "properties": {
+        "start": {"$ref": "#/$defs/date"},
+        "end": {"$ref": "#/$defs/date"},
+        "period_kind": {"enum": ["calendar", "fiscal", "mixed", "unknown"]},
+        "precision": {"enum": ["day", "month", "quarter", "year", "unknown"]}
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["period", "geographies", "grain", "coverage_state", "evidence_reference_ids"],
+      "properties": {
+        "period": {"$ref": "#/$defs/period"},
+        "geographies": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/stableId"}
+        },
+        "grain": {"enum": ["facility", "campus", "organization", "system", "county", "state", "national", "mixed", "unknown"]},
+        "coverage_state": {"enum": ["supported", "partial", "conditional", "blocked", "unknown"]},
+        "evidence_reference_ids": {"$ref": "#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "kind", "state", "description", "satisfied_by_operation_id", "evidence_reference_ids"],
+      "properties": {
+        "requirement_id": {"$ref": "#/$defs/stableId"},
+        "kind": {"enum": ["crosswalk", "aggregation", "normalization", "temporal_alignment", "measure_harmonization", "authorization", "application", "dua", "fee", "eligibility", "manual_review", "other"]},
+        "state": {"enum": ["satisfied", "unsatisfied", "external", "unknown", "not_applicable"]},
+        "description": {"$ref": "#/$defs/maintainedText"},
+        "satisfied_by_operation_id": {
+          "oneOf": [
+            {"$ref": "#/$defs/stableId"},
+            {"type": "null"}
+          ]
+        },
+        "evidence_reference_ids": {"$ref": "#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "blocker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blocker_id", "kind", "state", "fatal", "description", "evidence_reference_ids"],
+      "properties": {
+        "blocker_id": {"$ref": "#/$defs/stableId"},
+        "kind": {"enum": ["missing_asset", "missing_release", "missing_distribution", "missing_access_route", "missing_crosswalk", "identity_uncertain", "access_restricted", "authorization_required", "coverage_gap", "incompatible_grain", "unsupported_analysis", "evidence_missing", "evidence_stale", "other"]},
+        "state": {"enum": ["open", "resolved", "external", "unknown"]},
+        "fatal": {"type": "boolean"},
+        "description": {"$ref": "#/$defs/maintainedText"},
+        "evidence_reference_ids": {"$ref": "#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "humanGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gate_id", "kind", "required", "responsible_party", "state", "instructions", "evidence_reference_ids"],
+      "properties": {
+        "gate_id": {"$ref": "#/$defs/stableId"},
+        "kind": {"enum": ["registration", "application", "dua", "fee", "eligibility_review", "login", "institutional_approval", "manual_source_action"]},
+        "required": {"type": "boolean"},
+        "responsible_party": {"enum": ["researcher", "research_institution", "source_operator", "data_owner"]},
+        "state": {"enum": ["not_started", "external_required", "satisfied_outside_ushso", "not_applicable", "unknown"]},
+        "instructions": {"$ref": "#/$defs/maintainedText"},
+        "evidence_reference_ids": {"$ref": "#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_id", "code", "severity", "text", "affected_ids", "evidence_reference_ids"],
+      "properties": {
+        "claim_id": {"$ref": "#/$defs/stableId"},
+        "code": {"$ref": "#/$defs/stableId"},
+        "severity": {"enum": ["info", "warning", "blocking"]},
+        "text": {"$ref": "#/$defs/maintainedText"},
+        "affected_ids": {"$ref": "#/$defs/idArray"},
+        "evidence_reference_ids": {"$ref": "#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "truthBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_requests_made",
+        "execution_authorized_by_ushso",
+        "retrieval_executed",
+        "payloads_acquired",
+        "analysis_executed",
+        "identity_merges_performed"
+      ],
+      "properties": {
+        "source_requests_made": {"const": false},
+        "execution_authorized_by_ushso": {"const": false},
+        "retrieval_executed": {"const": false},
+        "payloads_acquired": {"const": false},
+        "analysis_executed": {"const": false},
+        "identity_merges_performed": {"const": false}
+      }
+    }
+  }
+}

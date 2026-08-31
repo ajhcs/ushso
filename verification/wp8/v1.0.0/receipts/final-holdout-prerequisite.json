@@ -1,0 +1,50 @@
+{
+  "receipt_version": "ushso-wp8-final-holdout-prerequisite.v1.0.0",
+  "receipt_id": "verification:wp8:final-holdout-prerequisite:2026-08-30",
+  "status": "BLOCKED_NEW_SEALED_PACKAGE_REQUIRED",
+  "release_gate_pass": false,
+  "external_authorization_id": "AUTH-13",
+  "authorization_register": "verification/external-authorization/v1.0.0/register.json",
+  "legacy_v0_1_0_split": {
+    "item_count": 20,
+    "already_published_and_evaluated": true,
+    "permitted_use": "audit_only_regression_lane",
+    "permitted_as_final_gate": false,
+    "evidence": "evaluation/bridge/v1.0.0/tools/run-bridge.mjs"
+  },
+  "replacement_requirement": {
+    "owner": "independent evaluation owner/custodian distinct from the authorized evaluator",
+    "item_count": 20,
+    "must_be_versioned_and_content_addressed": true,
+    "must_never_have_been_published_or_evaluated": true,
+    "ordinary_test_access": false,
+    "run_count_per_package": 1,
+    "run_after_ranking_and_threshold_freeze": true,
+    "aggregate_only_output": true,
+    "failed_run_remains_consumed_and_blocks_release": true,
+    "tuned_retry_requires_new_independently_assembled_package": true
+  },
+  "guard": {
+    "implementation": "packages/search/final-holdout-guard-v2.mjs",
+    "offline_tests": "verification/wp8/v1.0.0/tests/final-holdout-guard.test.mjs",
+    "single_use_fail_closed": true,
+    "candidate_fingerprint_and_wp2_pins_required": true,
+    "production_authorization_and_custody_verifier_required": true,
+    "production_terminal_execution_verifier_required": true,
+    "candidate_id_ranking_evaluator_metric_and_benchmark_pins_bound": true,
+    "authorization_expiry_carried_and_checked_against_guard_and_database_clocks_at_completion": true,
+    "authorized_evaluator_identity_required_on_success_and_failure": true,
+    "per_item_output_rejected": true,
+    "guard_receipt_contains_per_item_data": false,
+    "guard_proves_external_per_item_side_outputs_absent": false,
+    "independent_custody_and_aggregate_execution_assurance_boundary": "trusted injected verifier receipts; the guard validates their digest bindings but does not independently observe custody or evaluator side outputs",
+    "production_in_memory_ledger_rejected": true,
+    "durable_production_unique_use_ledger_implemented": true,
+    "database_acknowledgement_requires_one_accepted_row_with_matching_package_lease_and_terminal_digests": true,
+    "durable_ledger_migration_pending_0010": true
+  },
+  "external_authorization_required": true,
+  "package_supplied": false,
+  "final_run_performed": false,
+  "recorded_at": "2026-08-30T00:00:00.000Z"
+}

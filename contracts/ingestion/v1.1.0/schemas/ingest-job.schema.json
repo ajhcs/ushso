@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.1.0/ingest-job.schema.json",
+  "title": "Durable ingestion job",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "job_id", "run_id", "job_type", "state", "idempotency_key", "identity", "active_run_attempt", "attempt_count", "maximum_delivery_attempts", "lease", "delivery_fence", "retry_policy_version", "first_attempt_at", "next_eligible_at", "outbox_event_id", "updated_at"],
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+    "job_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "job_type": { "enum": ["harvest_page", "normalize_record", "enrich_schema", "access_check", "project_index"] },
+    "state": { "enum": ["pending", "leased", "succeeded", "retry_wait", "quarantined", "dead"] },
+    "idempotency_key": { "type": "string", "pattern": "^(page|normalize|schema|access|projection):[A-Za-z0-9._:-]+$", "maxLength": 700 },
+    "identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["cursor_sha256", "capture_sha256", "normalizer_version", "canonical_id", "canonical_revision_id", "recipe_version", "distribution_id", "scheduled_slot", "projection_version"],
+      "properties": {
+        "cursor_sha256": { "anyOf": [{ "$ref": "common.schema.json#/$defs/Sha256" }, { "type": "null" }] },
+        "capture_sha256": { "anyOf": [{ "$ref": "common.schema.json#/$defs/Sha256" }, { "type": "null" }] },
+        "normalizer_version": { "type": ["string", "null"], "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "canonical_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+        "canonical_revision_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+        "recipe_version": { "type": ["string", "null"], "pattern": "^[a-z0-9._-]{3,64}$" },
+        "distribution_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+        "scheduled_slot": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+        "projection_version": { "type": ["string", "null"], "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" }
+      }
+    },
+    "active_run_attempt": { "type": "integer", "minimum": 1 },
+    "attempt_count": { "type": "integer", "minimum": 0 },
+    "maximum_delivery_attempts": { "type": "integer", "minimum": 1, "maximum": 10 },
+    "lease": { "$ref": "common.schema.json#/$defs/Lease" },
+    "delivery_fence": { "$ref": "common.schema.json#/$defs/DeliveryFence" },
+    "retry_policy_version": { "type": "string", "pattern": "^[a-z0-9._-]{3,64}$" },
+    "first_attempt_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+    "next_eligible_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+    "outbox_event_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "updated_at": { "$ref": "common.schema.json#/$defs/Timestamp" }
+  }
+}

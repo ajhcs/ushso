@@ -1,5 +1,6 @@
 import { createRetrievalEngine } from './retrieval-v1.1.0.mjs';
 import { applyLiveVerificationReceipt } from './live-verification.mjs';
+import { createStaticPublicQueryService } from './static-composition.mjs';
 
 const MAX_REQUEST_BYTES = 20 * 1024;
 const CORPUS_BASE = '/corpus-v1.1.0';
@@ -98,110 +99,6 @@ export async function loadEngineFromAssets(request, env) {
   return (await loadCatalogFromAssets(request, env)).engine;
 }
 
-function retrievalId(value) {
-  let first = 0x811c9dc5;
-  let second = 0x9e3779b9;
-  for (let index = 0; index < value.length; index += 1) {
-    const code = value.charCodeAt(index);
-    first ^= code;
-    first = Math.imul(first, 0x01000193);
-    second ^= code + index;
-    second = Math.imul(second, 0x85ebca6b);
-  }
-  const hex = number => (number >>> 0).toString(16).padStart(8, '0');
-  return `retrieval-${hex(first)}${hex(second)}`;
-}
-
-function queryFromIntent(intent, filters = {}) {
-  return {
-    question: intent.original_question,
-    normalized_question: intent.normalized_question,
-    interpretation: intent.interpretation,
-    filters
-  };
-}
-
-function corpusSummary(bundle) {
-  return {
-    ...bundle.corpus,
-    record_count: bundle.records.length,
-    search_document_count: bundle.searchDocuments.length,
-    join_route_count: bundle.joinRoutes.length
-  };
-}
-
-function routesForRecord(bundle, recordId) {
-  return bundle.joinRoutes.filter(route => route.from_record_id === recordId || route.to_record_id === recordId);
-}
-
-function directResult(record, whyRelevant) {
-  return {
-    rank: 1,
-    score: 1,
-    record_id: record.record_id,
-    relevance: {
-      matched_subjects: [],
-      matched_geographies: [],
-      matched_units: [],
-      matched_terms: [],
-      score_components: [{
-        kind: 'direct_record_lookup',
-        value: 1,
-        reason: whyRelevant,
-        evidence_state: 'verified_first_party'
-      }],
-      why_relevant: [whyRelevant]
-    },
-    record: structuredClone(record)
-  };
-}
-
-function browseResponse(bundle, limit) {
-  const question = 'Browse published health systems data';
-  const intent = bundle.engine.interpret({ question, limit: Math.min(limit, 50) });
-  const records = [...bundle.records]
-    .sort((left, right) => Number(right.record_id.startsWith('us-federal:')) - Number(left.record_id.startsWith('us-federal:')) || left.record_id.localeCompare(right.record_id))
-    .slice(0, limit);
-  return {
-    contract_version: 'observatory-discovery-result.v1.0.0',
-    retrieval_id: retrievalId(`browse:${bundle.corpus.corpus_id}:${bundle.corpus.corpus_version}:${limit}`),
-    evidence_mode: 'published_offline_evidence',
-    corpus: corpusSummary(bundle),
-    query: queryFromIntent(intent, { mode: 'catalog_browse', limit }),
-    result_count: records.length,
-    results: records.map((record, index) => ({
-      ...directResult(record, 'Included in the published catalog browse view.'),
-      rank: index + 1
-    })),
-    join_routes: bundle.joinRoutes,
-    warnings: [
-      'Browse mode shows the validated federal baseline first, then other published metadata; order does not imply question relevance or quality.',
-      'Records describe indexed metadata and retrieval routes; they do not prove current endpoint availability or authorize access.'
-    ]
-  };
-}
-
-function datasetResponse(bundle, record) {
-  const question = `Open dataset ${record.record_id}`;
-  const intent = bundle.engine.interpret({ question });
-  const siblingCount = bundle.records.filter(candidate => candidate.identity?.family?.family_id && candidate.identity.family.family_id === record.identity?.family?.family_id).length;
-  return {
-    contract_version: 'observatory-discovery-result.v1.0.0',
-    retrieval_id: retrievalId(`dataset:${bundle.corpus.corpus_id}:${record.record_id}`),
-    evidence_mode: 'published_offline_evidence',
-    corpus: corpusSummary(bundle),
-    query: queryFromIntent(intent, {
-      mode: 'stable_dataset_dereference',
-      record_id: record.record_id,
-      family_sibling_count: Math.max(0, siblingCount - 1)
-    }),
-    result_count: 1,
-    results: [directResult(record, 'Opened by its stable published record identifier.')],
-    join_routes: routesForRecord(bundle, record.record_id),
-    warnings: ['This page describes indexed metadata and retrieval routes; it does not prove current endpoint availability or authorize access.']
-  };
-}
-
 function parseLimit(url) {
   const requested = Number(url.searchParams.get('limit') ?? 200);
   if (!Number.isInteger(requested) || requested < 1) return 200;
@@ -230,7 +127,11 @@ function machineText(request, pathname) {
   return null;
 }
 
-export function createWorker({ loadEngine = loadEngineFromAssets, loadCatalog = loadCatalogFromAssets } = {}) {
+export function createWorker({
+  loadEngine = loadEngineFromAssets,
+  loadCatalog = loadCatalogFromAssets,
+  publicQueryService = createStaticPublicQueryService({ loadEngine, loadCatalog })
+} = {}) {
   return {
     async fetch(request, env) {
       const url = new URL(request.url);
@@ -241,9 +142,8 @@ export function createWorker({ loadEngine = loadEngineFromAssets, loadCatalog = 
       if (url.pathname === '/api/health') {
         if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
         try {
-          const engine = await loadEngine(request, env);
-          const intent = engine.interpret({ question: 'health check' });
-          return jsonResponse({ status: 'ok', service: 'ushso-discovery', contract_version: 'observatory-discovery-result.v1.0.0', compiler: intent.compiler }, { cacheControl: 'public, max-age=60', head });
+          const session = await publicQueryService.openRequest({ request, env });
+          return jsonResponse(await publicQueryService.health(session), { cacheControl: 'public, max-age=60', head });
         } catch {
           return errorResponse(503, 'corpus_unavailable', 'The published discovery corpus could not be loaded.', { head });
         }
@@ -263,7 +163,8 @@ export function createWorker({ loadEngine = loadEngineFromAssets, loadCatalog = 
       if (url.pathname === '/api/catalog') {
         if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
         try {
-          return jsonResponse(browseResponse(await loadCatalog(request, env), parseLimit(url)), { cacheControl: 'public, max-age=300', head });
+          const session = await publicQueryService.openRequest({ request, env });
+          return jsonResponse(await publicQueryService.browse(session, parseLimit(url)), { cacheControl: 'public, max-age=300', head });
         } catch {
           return errorResponse(503, 'catalog_unavailable', 'The published discovery catalog could not be loaded.', { head });
         }
@@ -273,10 +174,10 @@ export function createWorker({ loadEngine = loadEngineFromAssets, loadCatalog = 
         if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
         const requestedId = decodeURIComponent(url.pathname.slice('/api/datasets/'.length));
         try {
-          const bundle = await loadCatalog(request, env);
-          const record = bundle.records.find(candidate => candidate.record_id === requestedId || candidate.record_id === `obs:asset:${requestedId}` || candidate.record_id.replace(/^obs:asset:/, '') === requestedId);
-          if (!record) return errorResponse(404, 'dataset_not_found', 'No published record has this identifier.', { head });
-          return jsonResponse(datasetResponse(bundle, record), { cacheControl: 'public, max-age=300', head });
+          const session = await publicQueryService.openRequest({ request, env });
+          const result = await publicQueryService.dataset(session, requestedId);
+          if (!result) return errorResponse(404, 'dataset_not_found', 'No published record has this identifier.', { head });
+          return jsonResponse(result, { cacheControl: 'public, max-age=300', head });
         } catch {
           return errorResponse(503, 'dataset_unavailable', 'The published record could not be loaded.', { head });
         }
@@ -297,8 +198,8 @@ export function createWorker({ loadEngine = loadEngineFromAssets, loadCatalog = 
           return errorResponse(400, 'invalid_json', 'The request body is not valid JSON.');
         }
         try {
-          const engine = await loadEngine(request, env);
-          return jsonResponse(engine.retrieve(input, { signal: request.signal }));
+          const session = await publicQueryService.openRequest({ request, env });
+          return jsonResponse(await publicQueryService.discover(session, input));
         } catch (error) {
           if (error instanceof TypeError) return errorResponse(400, 'invalid_query', error.message);
           return errorResponse(503, 'retrieval_unavailable', 'The published discovery corpus could not be queried.');

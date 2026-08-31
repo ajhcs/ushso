@@ -82,6 +82,7 @@ export interface DatasetFamily {
   variablesCodebook: string
   verification: DatasetVerification
   variableDetails: DatasetVariableDetails
+  accessStatus: string
   accessOptions: AccessOption[]
   categories: string[]
   sourceName: string

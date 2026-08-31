@@ -1,0 +1,201 @@
+{
+  "ledger_version": "wp5-evidence-ledger.v1.0.0",
+  "work_package": "WP5",
+  "authoritative_plan": "docs/RESEARCH_NAVIGATOR_IMPLEMENTATION_PLAN.md",
+  "implementation_fingerprint": "8fa355e21c9a5da3c729df5b3063dcb80fc0782e63f10da9bfad85527770e216",
+  "scope": "fixture_only_local_integration",
+  "controls": [
+    {
+      "id": "WP5-CONTRACT-VERSION-ROUTING",
+      "requirement": "Source descriptors use ingestion v1.1 while unchanged harvest, capture, and checkpoint objects retain their actually validated v1.0 envelope.",
+      "implementation": ["packages/connectors/src/contract-versions.mjs", "packages/connectors/src/route-manifest.mjs"],
+      "verification": ["packages/connectors/tests/contracts.test.mjs"],
+      "receipt": "receipts/delivery-wave-fixtures.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-9.1-SDK",
+      "requirement": "Adapters enumerate and parse native metadata while the shared runner owns side effects and checkpoints.",
+      "implementation": ["packages/connectors/src/adapters/base.mjs", "packages/connectors/src/runner.mjs"],
+      "verification": ["packages/connectors/tests/adapters.test.mjs", "packages/connectors/tests/fixture-matrix.test.mjs"],
+      "receipt": "receipts/fixture-matrix.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-9.2-DESCRIPTORS",
+      "requirement": "Descriptors declare versions, authority, hosts, routes, scopes, denominators, identifiers, checkpoints, bounds, pacing, secret locators, capabilities, exclusions, legal review, and retention.",
+      "implementation": ["packages/connectors/src/descriptors.mjs", "packages/connectors/src/route-manifest.mjs"],
+      "verification": ["packages/connectors/tests/contracts.test.mjs"],
+      "receipt": "receipts/request-capture-reconciliation.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-9.2-EGRESS",
+      "requirement": "Every request is compiled from a labeled route; source-data/query/payload intent is rejected before egress.",
+      "implementation": ["packages/connectors/src/route-manifest.mjs", "packages/connectors/src/bounded-http-client.mjs"],
+      "verification": ["packages/connectors/tests/security.test.mjs"],
+      "receipt": "receipts/zero-payload-proof.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-17.1-NETWORK",
+      "requirement": "Block private, loopback, link-local, metadata, reserved, multicast, unapproved, redirected, or DNS-rebound destinations.",
+      "implementation": ["packages/connectors/src/network-policy.mjs", "packages/connectors/src/bounded-http-client.mjs"],
+      "verification": ["packages/connectors/tests/security.test.mjs"],
+      "receipt": "receipts/zero-payload-proof.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-17.1-BOUNDS",
+      "requirement": "Bound methods, hosts, redirects, media types, compressed/decompressed bytes, duration, and pages.",
+      "implementation": ["packages/connectors/src/bounded-http-client.mjs", "packages/connectors/src/runner.mjs"],
+      "verification": ["packages/connectors/tests/security.test.mjs", "packages/connectors/tests/fixture-matrix.test.mjs"],
+      "receipt": "receipts/fixture-matrix.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-17.4-CREDENTIALS",
+      "requirement": "Credentials and signed locators never persist in descriptors, ledgers, captures, object metadata, errors, or receipts.",
+      "implementation": ["packages/connectors/src/bounded-http-client.mjs", "packages/connectors/src/route-manifest.mjs", "packages/connectors/src/capture-protocol.mjs"],
+      "verification": ["packages/connectors/tests/security.test.mjs"],
+      "receipt": "receipts/zero-payload-proof.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-9.7-CHECKPOINT",
+      "requirement": "Run cursors remain separate; incomplete/expired enumeration cannot seal or advance the checkpoint.",
+      "implementation": ["packages/connectors/src/runner.mjs", "packages/connectors/src/testing/memory-ports.mjs"],
+      "verification": ["packages/connectors/src/testing/fixture-matrix.mjs"],
+      "receipt": "receipts/fixture-matrix.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-9.7-DELETION",
+      "requirement": "One miss never withdraws; target classes, tombstones, and consecutive complete misses have separate semantics.",
+      "implementation": ["packages/connectors/src/deletion-policy.mjs", "packages/connectors/src/testing/memory-ports.mjs"],
+      "verification": ["packages/connectors/src/testing/fixture-matrix.mjs"],
+      "receipt": "receipts/fixture-matrix.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-9.8-CAPTURE",
+      "requirement": "Hash, conditionally write, confirm, then commit an exact redacted content-addressed capture reference.",
+      "implementation": ["packages/connectors/src/capture-protocol.mjs"],
+      "verification": ["packages/connectors/tests/contracts.test.mjs", "packages/connectors/src/testing/fixture-matrix.mjs"],
+      "receipt": "receipts/r2-capture-protocol.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-9.9-FAILURES",
+      "requirement": "HTTP, transport, policy, content, and cursor outcomes remain typed and target-aware.",
+      "implementation": ["packages/connectors/src/errors.mjs", "packages/connectors/src/bounded-http-client.mjs"],
+      "verification": ["packages/connectors/tests/security.test.mjs", "packages/connectors/src/testing/fixture-matrix.mjs"],
+      "receipt": "receipts/fixture-matrix.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-9.10-RATE-CIRCUIT",
+      "requirement": "Per-origin concurrency, token pacing, failure budget, open state, and half-open recovery are shared ports.",
+      "implementation": ["packages/connectors/src/origin-governor.mjs"],
+      "verification": ["packages/connectors/tests/security.test.mjs"],
+      "receipt": "receipts/fixture-matrix.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-WAVE1-ADAPTERS",
+      "requirement": "DCAT, CKAN, Socrata metadata-only, bounded HTML inventory, documentation, and schema extractors are deterministic.",
+      "implementation": ["packages/connectors/src/adapters"],
+      "verification": ["packages/connectors/tests/adapters.test.mjs"],
+      "receipt": "receipts/fixture-matrix.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-WAVE2-NATIONAL",
+      "requirement": "Disabled adapters and descriptors cover Data.gov v4, Data.CMS.gov, Provider Data, CDC Socrata/non-Socrata, and bounded Census metadata with origin/latest/payload boundaries.",
+      "implementation": ["packages/connectors/src/descriptors.mjs", "packages/connectors/src/adapters/data-gov-v4.mjs", "packages/connectors/src/adapters/cms.mjs", "packages/connectors/src/adapters/census.mjs"],
+      "verification": ["packages/connectors/tests/delivery-waves.test.mjs", "packages/connectors/src/testing/wave-fixtures.mjs"],
+      "receipt": "receipts/delivery-wave-fixtures.json",
+      "status": "PASS_FIXTURE_TEMPLATE_ONLY"
+    },
+    {
+      "id": "WP5-WAVE3-FEDERAL-INVENTORIES",
+      "requirement": "Disabled HRSA, AHRQ, IRS TEOS/EO-BMF/Form 990 manifest/index/XSD, and SOI inventories expose metadata-only routes and never unpack bulk filing archives.",
+      "implementation": ["packages/connectors/src/descriptors.mjs", "packages/connectors/src/delivery-waves.mjs"],
+      "verification": ["packages/connectors/tests/delivery-waves.test.mjs"],
+      "receipt": "receipts/delivery-wave-fixtures.json",
+      "status": "PASS_FIXTURE_TEMPLATE_ONLY"
+    },
+    {
+      "id": "WP5-WAVE4-STATE-CANARIES",
+      "requirement": "Pennsylvania and representative Socrata, CKAN, ArcGIS, and static state candidates remain source-specific candidate cells pending route and denominator confirmation.",
+      "implementation": ["packages/connectors/src/adapters/arcgis.mjs", "packages/connectors/src/descriptors.mjs", "packages/connectors/src/delivery-waves.mjs"],
+      "verification": ["packages/connectors/tests/delivery-waves.test.mjs"],
+      "receipt": "receipts/delivery-wave-fixtures.json",
+      "status": "PASS_FIXTURE_TEMPLATE_ONLY"
+    },
+    {
+      "id": "WP5-WAVE5-REGULATOR-APCD",
+      "requirement": "Regulator/APCD dispatch preserves navigation, application, access, absence, failure, evidence-gap, and not-assessed states without automating a protected workflow.",
+      "implementation": ["packages/connectors/src/regulator-apcd-registry.mjs"],
+      "verification": ["packages/connectors/tests/delivery-waves.test.mjs", "packages/connectors/src/testing/wave-fixtures.mjs"],
+      "receipt": "receipts/delivery-wave-fixtures.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-WAVE6-PROTOCOLS",
+      "requirement": "Dataverse, DataCite JSON:API, and OAI-PMH metadata protocols paginate deterministically and remain below first-party government authority ranking.",
+      "implementation": ["packages/connectors/src/adapters/dataverse.mjs", "packages/connectors/src/adapters/datacite.mjs", "packages/connectors/src/adapters/oai-pmh.mjs"],
+      "verification": ["packages/connectors/tests/delivery-waves.test.mjs"],
+      "receipt": "receipts/delivery-wave-fixtures.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-WAVE6-LEGACY-PARITY",
+      "requirement": "All 52 Harvard Dataverse and 50 DataCite canonical records retain stable record/asset/native IDs and complete evidence-to-provenance parity without automatic identity merges.",
+      "implementation": ["packages/connectors/src/legacy-lane-parity.mjs"],
+      "verification": ["packages/connectors/tests/delivery-waves.test.mjs", "verification/wp5/v1.0.0/tests/wp5-verification.test.mjs"],
+      "receipt": "receipts/legacy-lane-parity.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-SOURCE-SPECIFIC-PROMOTION",
+      "requirement": "Every Wave 2–6 source independently remains fixture_only, paused, candidate, legally pending, route-unconfirmed, and gated by AUTH-04.",
+      "implementation": ["packages/connectors/src/delivery-waves.mjs"],
+      "verification": ["packages/connectors/tests/delivery-waves.test.mjs"],
+      "receipt": "receipts/activation-status.json",
+      "status": "PENDING_EXTERNAL_AUTHORIZATION"
+    },
+    {
+      "id": "WP5-ACCEPT-MATRIX",
+      "requirement": "The mandatory full/no-op/304/change/failure/deletion/crash matrix passes.",
+      "implementation": ["packages/connectors/src/testing/fixture-matrix.mjs"],
+      "verification": ["packages/connectors/tests/fixture-matrix.test.mjs"],
+      "receipt": "receipts/fixture-matrix.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-ACCEPT-RECONCILE",
+      "requirement": "Every discovery resolves to an exact source locator and confirmed capture; inventories reconcile.",
+      "implementation": ["packages/connectors/src/testing/reconciliation-audit.mjs"],
+      "verification": ["packages/connectors/tests/contracts.test.mjs"],
+      "receipt": "receipts/request-capture-reconciliation.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-ACCEPT-ZERO-PAYLOAD",
+      "requirement": "No source payload or healthcare row reaches capture storage; adversarial sentinels fail before egress or before capture.",
+      "implementation": ["packages/connectors/src/content-classifier.mjs", "packages/connectors/src/route-manifest.mjs"],
+      "verification": ["packages/connectors/tests/security.test.mjs", "packages/connectors/src/testing/reconciliation-audit.mjs"],
+      "receipt": "receipts/zero-payload-proof.json",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "id": "WP5-ACTIVATION",
+      "requirement": "Two live reconciliations, one incremental cycle, zero unclassified failures, production traceability, freshness, and rollback are required before active.",
+      "implementation": ["packages/connectors/src/descriptors.mjs"],
+      "verification": [],
+      "receipt": "receipts/activation-status.json",
+      "status": "PENDING_EXTERNAL_AUTHORIZATION"
+    }
+  ]
+}
