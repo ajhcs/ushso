@@ -35,8 +35,11 @@ is not yet frozen for a gate run:
    commit is `85c11018622079e35dc6a5736e7e8b3c6e5ac6ff`; the five attestation
    files attest `f6edbb0`, not the attestation commit or any later fix commit.
 2. Subsequent bounded fixes and evidence refreshes are intentionally separate
-   from those attestations. A future gate candidate must therefore be frozen
-   after those fixes, with its exact commit, tree, artifact manifest,
+   from those attestations. They include connector egress (`c73343d`), identity
+   review state (`a095374`), generation-bound promotion evidence (`5ad4d61`),
+   release-gate reconciliation (`6b1facc`), and the Grok-reviewed PostgreSQL
+   portability fix (`626bd4a`). A future gate candidate must therefore be
+   frozen after those fixes, with its exact commit, tree, artifact manifest,
    environment, and scope recorded from a clean stable checkout.
 3. That newly frozen candidate may receive one fresh normal release-gate
    execution only after a release owner records approval. No such second
@@ -60,7 +63,18 @@ separate attestation:
   rejects a second current decision unless it explicitly supersedes the
   current decision.
 - Search promotion evidence now requires structured, generation-bound,
-  digest-bound receipts rather than opaque non-empty evidence references.
+  digest-bound receipts rather than opaque non-empty evidence references. The
+  follow-up fix replaces unavailable PostgreSQL `jsonb_object_length` calls
+  with portable `jsonb_object_keys` counts and refreshes the affected package
+  and WP8 receipts.
+
+The final bounded Grok review independently rechecked these surfaces and made
+only that portable SQL correction. It did not silently close the remaining
+blockers: WP3 restore/privilege and role-reconciliation concerns, identity
+reversal and load-path fail-closed behavior, the connector's positive
+source-specific allowlist and transport pre-connect/streaming contract, and
+toolkit schema/no-action-boundary gaps. The deferred principal-binding issue
+remains AP-01.
 
 The reviews also leave explicit blockers for human disposition rather than
 turning local synthetic evidence into production claims:
@@ -73,8 +87,19 @@ turning local synthetic evidence into production claims:
 - The connector design still needs a positive source-specific metadata-route
   allowlist, a production transport contract that pins addresses before
   connect and streams response limits, and a bounded policy for embedded
-  hostnames. Current source manifests remain paused/fixture-only, so these are
-  activation blockers, not evidence of live exploitation.
+  hostnames. Residual secret-key denylist coverage also needs an explicit
+  activation decision. Current source manifests remain paused/fixture-only, so
+  these are activation blockers, not evidence of live exploitation.
+- The machine-toolkit planner is not wired into the public runtime, but its
+  contract still needs to reconcile the disabled planner state with the
+  successful response branch. Runtime/semantic response scanning also needs
+  explicit coverage for embedded private or secret-bearing URLs and adapter
+  error-envelope shape. These remain publication blockers while the toolkit is
+  unwired.
+- Identity still needs a fail-closed reversal rule for a later human
+  `not_same_identity` or `defer` decision and a load-path check for duplicate
+  current decisions. These remain distinct from the already-fixed write-path
+  uniqueness guard.
 - The deferred `privileged-control-plane-principal-binding` issue remains
   AP-01. No production eligibility, full attribution, live source activation,
   or managed migration authorization is implied by the local receipts.
