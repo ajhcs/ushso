@@ -22,7 +22,12 @@ for (const directory of testDirectories) {
 }
 const events = [];
 for await (const event of run({ files, isolation: "none", concurrency: 1 })) {
-  if (["test:pass", "test:fail"].includes(event.type)) events.push({ type: event.type, name: event.data.name, file: event.data.file ?? null });
+  if (["test:pass", "test:fail"].includes(event.type)) {
+    const file = event.data.file
+      ? path.relative(repositoryRoot, path.resolve(event.data.file)).split(path.sep).join("/")
+      : null;
+    events.push({ type: event.type, name: event.data.name, file });
+  }
 }
 const failed = events.filter((event) => event.type === "test:fail");
 const eventSha256 = createHash("sha256").update(JSON.stringify(events)).digest("hex");
