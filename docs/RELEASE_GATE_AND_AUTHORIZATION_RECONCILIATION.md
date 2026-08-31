@@ -37,16 +37,49 @@ is not yet frozen for a gate run:
 2. Subsequent bounded fixes and evidence refreshes are intentionally separate
    from those attestations. They include connector egress (`c73343d`), identity
    review state (`a095374`), generation-bound promotion evidence (`5ad4d61`),
-   release-gate reconciliation (`6b1facc`), and the Grok-reviewed PostgreSQL
-   portability fix (`626bd4a`). A future gate candidate must therefore be
-   frozen after those fixes, with its exact commit, tree, artifact manifest,
-   environment, and scope recorded from a clean stable checkout.
+   release-gate reconciliation (`6b1facc`), the Grok-reviewed PostgreSQL
+   portability fix (`626bd4a`), the synthetic-fixture audit correction
+   (`0a7598e`), and the CI/moving-checkout compatibility fix (`e790121`). A
+   future gate candidate must therefore be frozen after those fixes, with its
+   exact commit, tree, artifact manifest, environment, and scope recorded from
+   a clean stable checkout.
 3. That newly frozen candidate may receive one fresh normal release-gate
    execution only after a release owner records approval. No such second
    execution has been performed or authorized by this record. Focused tests
    after the failed run do not consume or satisfy that exact-candidate gate.
 4. Until a fresh run exists and passes, the release-gate state is unresolved
    and must not be represented as `PASS`.
+
+## Remote CI discrepancy and remediation
+
+The first pushed CI attempt stopped in `release:audit` because the synthetic
+AWS-shaped fixture literal in
+`packages/web-discoverability/tests/bounds-and-portability.test.mjs` was
+correctly classified as a credential-shaped repository string. That fixture
+was rewritten without changing the runtime security assertion in `0a7598e`.
+
+The next observed CI run (`33432383865`, job `99620584375`) reached the root
+contract runner on merge checkout
+`4b81f91461e4667840fff8175dc2be83c046d224`, but failed for four distinct
+reasons:
+
+- WP2 and WP14 invoked the Node 22-incompatible `--test-isolation=none` flag.
+- WP3 required `rg`, which is not installed on the runner.
+- WP6 treated the unavailable local `postgres:16-alpine` image as a hard
+  failure even though network pulls are forbidden.
+- WP14's exact-base checker rejected the merge checkout because its
+  attestation is intentionally bound to `f6edbb0`, not to the moving merge
+  commit.
+
+Commit `e790121` addresses those discrepancies by using the supported Node 22
+test-concurrency flag, POSIX `grep -Fq`, an explicit WP6 preflight-unavailable
+classification that still fails real database errors, and a read-only
+moving-checkout verifier that rechecks the five WP14 receipts against
+`f6edbb0` and the attested tree. It does not relabel the attestation, modify
+sealed artifacts, or turn the historical attestation into a release-gate
+receipt. Remote CI must rerun against the pushed HEAD; any remaining local/CI
+receipt discrepancy reopens the affected receipt rather than being silently
+accepted.
 
 ## Focused review disposition
 
