@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   BoundedHttpClient, DcatDataJsonConnector, HtmlReleaseInventoryConnector,
-  MemoryOriginGovernor, SocrataCatalogConnector, classifyIpAddress, compileManifestRequest, routeManifestInventory,
+  MemoryOriginGovernor, SocrataCatalogConnector, classifyIpAddress, compileManifestRequest, matchManifestRedirect, redactedLocator, routeManifestInventory,
 } from '../src/index.mjs';
 import { DEFAULT_RESPONSE_LIMITS } from '../src/route-manifest.mjs';
 import {
@@ -56,6 +56,38 @@ test('payload and query sentinels are blocked before transport egress', async ()
   });
   assert.equal(queryBlocked.blockedBeforeEgress, true);
   assert.equal(harness.transport.calls.length, 0);
+});
+
+test('paused sources and unprofiled response media are blocked at the egress boundary', async () => {
+  const pausedDescriptor = makeFixtureDescriptor({ sourceState: 'paused' });
+  const paused = makeHarness({ descriptor: pausedDescriptor });
+  paused.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse({ dataset: [] }));
+  const pausedResult = await paused.client.execute({
+    descriptor: pausedDescriptor, runId: 'run_paused_egress', jobId: 'job_paused_egress', request: REQUEST,
+  });
+  assert.equal(pausedResult.blockedBeforeEgress, true);
+  assert.equal(pausedResult.failure.safe_detail_code, 'SOURCE_NOT_ACTIVE');
+  assert.equal(paused.transport.calls.length, 0);
+  assert.equal(paused.requestLedger.records[0].egress_performed, false);
+
+  for (const [runId, contentType, body, request, expectedCode] of [
+    ['run_vendor_media', 'application/vnd.unreviewed', '{}', REQUEST, 'UNEXPECTED_CONTENT_TYPE'],
+    ['run_unprofiled_json', 'application/json', '{}', REQUEST, 'JSON_ADAPTER_PROFILE_REQUIRED'],
+    ['run_unprofiled_html', 'text/html', '<html><body>unreviewed</body></html>', DOC_REQUEST, 'HTML_ADAPTER_PROFILE_REQUIRED'],
+    ['run_unprofiled_csv', 'text/csv', 'header', SCHEMA_REQUEST, 'CSV_ADAPTER_PROFILE_REQUIRED'],
+    ['run_unprofiled_text', 'text/plain', 'unreviewed', DOC_REQUEST, 'PLAIN_TEXT_ADAPTER_PROFILE_REQUIRED'],
+    ['run_unprofiled_xml', 'application/xml', '<root>unreviewed</root>', DOC_REQUEST, 'XML_ADAPTER_PROFILE_REQUIRED'],
+  ]) {
+    const harness = makeHarness();
+    const url = request === REQUEST ? 'https://catalog.example.gov/data.json'
+      : request === DOC_REQUEST ? 'https://catalog.example.gov/docs/plain-row' : 'https://catalog.example.gov/schemas/short-csv';
+    harness.transport.add('GET', url, jsonResponse({}, { bodyBytes: body, contentType }));
+    const result = await harness.client.execute({
+      descriptor: harness.descriptor, runId, jobId: `${runId}_job`, request,
+    });
+    assert.equal(result.failure.safe_detail_code, expectedCode, contentType);
+    assert.equal(harness.objectStore.objects.size, 0);
+  }
 });
 
 test('compressed, decompressed, duration, and page bounds fail closed', async () => {
@@ -281,6 +313,28 @@ test('unmanifested hosts, routes, methods, parameters, and secret query names fa
     allowed_hosts: ['127.0.0.1'],
     endpoints: descriptor.endpoints.map((endpoint) => ({ ...endpoint, base_url: 'https://127.0.0.1' })),
   }, REQUEST));
+  assert.throws(() => compileManifestRequest({
+    ...descriptor,
+    endpoints: descriptor.endpoints.map((endpoint, index) => index === 0 ? {
+      ...endpoint,
+      routes: endpoint.routes.map((route) => route.template_id === REQUEST.templateId ? { ...route, path_template: '//evil.example/data.json' } : route),
+    } : endpoint),
+  }, REQUEST));
+  for (const parameter of ['page[signature]', 'page[password]', 'page[authorization]', 'page[x-amz-signature]']) {
+    const unsafeDescriptor = {
+      ...descriptor,
+      endpoints: descriptor.endpoints.map((endpoint, index) => index === 0 ? {
+        ...endpoint,
+        routes: endpoint.routes.map((route) => route.template_id === REQUEST.templateId ? { ...route, allowed_parameters: [parameter] } : route),
+      } : endpoint),
+    };
+    assert.throws(() => compileManifestRequest(unsafeDescriptor, { ...REQUEST, query: { [parameter]: 'redacted' } }), parameter);
+  }
+  assert.equal(redactedLocator('https://catalog.example.gov/data.json?page%5Bsignature%5D=secret').includes('page%5Bsignature%5D'), false);
+  const redirectDescriptor = makeFixtureDescriptor({ redirectPolicy: 'same_origin' });
+  assert.throws(() => matchManifestRedirect(redirectDescriptor, 'https://catalog.example.gov/docs/%2e%2e/secret', {
+    purpose: 'documentation', method: 'GET', targetClass: 'documentation',
+  }), /REDIRECT_UNSAFE_PATH_SEGMENT/);
   const inventory = routeManifestInventory(descriptor);
   assert.ok(inventory.every((route) => route.forbidden_route_classes.includes('source_data_payload')));
   assert.ok(inventory.every((route) => ['GET', 'HEAD'].includes(route.method)));

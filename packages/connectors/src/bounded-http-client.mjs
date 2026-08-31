@@ -146,6 +146,12 @@ export class BoundedHttpClient {
     let compiled;
     try {
       compiled = compileManifestRequest(context.descriptor, context.request);
+      if (context.descriptor.source_state !== 'active') {
+        throw new ConnectorFailure('The source is not active for network egress.', {
+          failureType: 'policy_blocked', safeDetailCode: 'SOURCE_NOT_ACTIVE',
+          targetClass: compiled.targetClass, retryClass: 'pause_source', beforeEgress: true,
+        });
+      }
       validateRequestValidators(context.validators, compiled.targetClass);
       if (context.descriptor.credential_secret_locator && !this.credentialProvider?.headersFor) {
         throw new ConnectorFailure('The descriptor requires an injected credential provider.', {

@@ -147,7 +147,7 @@ export function classifyResponse({ purpose, expectedContentClasses, headers, bod
   const mediaType = mediaTypeFromHeaders(headers);
   if (bytes.byteLength === 0) return rejected('EMPTY_METADATA_BODY', 'schema_drift');
   if (ARCHIVE_MEDIA.has(mediaType) || hasArchiveMagic(bytes)) return rejected('ARCHIVE_RESPONSE_QUARANTINED', 'archive_member');
-  if (![...JSON_MEDIA, ...TEXT_MEDIA, 'application/xml'].includes(mediaType) && !mediaType.startsWith('application/vnd.')) {
+  if (![...JSON_MEDIA, ...TEXT_MEDIA, 'application/xml'].includes(mediaType)) {
     return rejected('UNEXPECTED_CONTENT_TYPE', 'unknown');
   }
   let text;
@@ -180,13 +180,10 @@ export function classifyResponse({ purpose, expectedContentClasses, headers, bod
     if (shape.privateLocator) return rejected('PRIVATE_LOCATOR_QUARANTINED', 'private_locator');
     if (shape.healthcareRows) return rejected('HEALTHCARE_ROW_SHAPE_QUARANTINED', 'healthcare_rows');
     if (shape.genericRows) return rejected('ROW_SHAPED_RESPONSE_QUARANTINED', 'source_data_payload');
-    if (typeof profile?.validateJson === 'function') {
-      const result = profile.validateJson(parsed, { purpose, expectedContentClasses });
-      if (!result?.accepted) return rejected(result?.reasonCode ?? 'ADAPTER_SCHEMA_DRIFT', result?.classification ?? 'schema_drift');
-      return accepted(result.classification ?? (purpose === 'schema' ? 'schema_metadata' : 'catalog_metadata'), parsed);
-    }
-    if (!parsed || typeof parsed !== 'object') return rejected('METADATA_OBJECT_REQUIRED', 'schema_drift');
-    return accepted(purpose === 'schema' ? 'schema_metadata' : 'catalog_metadata', parsed);
+    if (typeof profile?.validateJson !== 'function') return rejected('JSON_ADAPTER_PROFILE_REQUIRED', 'schema_drift');
+    const result = profile.validateJson(parsed, { purpose, expectedContentClasses });
+    if (!result?.accepted) return rejected(result?.reasonCode ?? 'ADAPTER_SCHEMA_DRIFT', result?.classification ?? 'schema_drift');
+    return accepted(result.classification ?? (purpose === 'schema' ? 'schema_metadata' : 'catalog_metadata'), parsed);
   }
 
   if (mediaType === 'text/html') {
@@ -195,18 +192,19 @@ export function classifyResponse({ purpose, expectedContentClasses, headers, bod
       return rejected('HTML_NOT_ALLOWED_FOR_ROUTE', 'unexpected_content_type');
     }
     if (/<form\b/i.test(text)) return rejected('FORM_CONTENT_QUARANTINED', 'login_or_form');
-    if (typeof profile?.validateText === 'function') {
-      const result = profile.validateText(text, { purpose, expectedContentClasses, mediaType });
-      if (!result?.accepted) return rejected(result?.reasonCode ?? 'ADAPTER_SCHEMA_DRIFT', result?.classification ?? 'schema_drift');
-      return accepted(result.classification ?? 'documentation', null);
-    }
-    return accepted('documentation', null);
+    if (typeof profile?.validateText !== 'function') return rejected('HTML_ADAPTER_PROFILE_REQUIRED', 'schema_drift');
+    const result = profile.validateText(text, { purpose, expectedContentClasses, mediaType });
+    if (!result?.accepted) return rejected(result?.reasonCode ?? 'ADAPTER_SCHEMA_DRIFT', result?.classification ?? 'schema_drift');
+    return accepted(result.classification ?? 'documentation', null);
   }
 
   if (mediaType === 'text/csv') {
     const lines = text.split(/\r?\n/).filter(Boolean);
     if (lines.length > 1) return rejected('CSV_ROW_PAYLOAD_QUARANTINED', 'source_data_payload');
-    return accepted(purpose === 'schema' ? 'schema_metadata' : 'documentation', null);
+    if (typeof profile?.validateText !== 'function') return rejected('CSV_ADAPTER_PROFILE_REQUIRED', 'schema_drift');
+    const result = profile.validateText(text, { purpose, expectedContentClasses, mediaType });
+    if (!result?.accepted) return rejected(result?.reasonCode ?? 'ADAPTER_SCHEMA_DRIFT', result?.classification ?? 'schema_drift');
+    return accepted(result.classification ?? (purpose === 'schema' ? 'schema_metadata' : 'documentation'), null);
   }
 
   if (mediaType === 'text/plain') {
@@ -217,14 +215,18 @@ export function classifyResponse({ purpose, expectedContentClasses, headers, bod
       return widths[0] > 1 && widths.every((width) => width === widths[0]);
     });
     if (tabular) return rejected('TEXT_ROW_PAYLOAD_QUARANTINED', 'source_data_payload');
+    if (typeof profile?.validateText !== 'function') return rejected('PLAIN_TEXT_ADAPTER_PROFILE_REQUIRED', 'schema_drift');
+    const result = profile.validateText(text, { purpose, expectedContentClasses, mediaType });
+    if (!result?.accepted) return rejected(result?.reasonCode ?? 'ADAPTER_SCHEMA_DRIFT', result?.classification ?? 'schema_drift');
+    return accepted(result.classification ?? (purpose === 'schema' ? 'schema_metadata' : 'documentation'), null);
   }
 
-  if (mediaType === 'application/xml' && xmlCatalogMetadata) {
+  if (mediaType === 'application/xml') {
     if (typeof profile?.validateText !== 'function') return rejected('XML_ADAPTER_PROFILE_REQUIRED', 'schema_drift');
     const result = profile.validateText(text, { purpose, expectedContentClasses, mediaType });
     if (!result?.accepted) return rejected(result?.reasonCode ?? 'ADAPTER_SCHEMA_DRIFT', result?.classification ?? 'schema_drift');
     return accepted(result.classification ?? 'catalog_metadata', null);
   }
 
-  return accepted(purpose === 'schema' ? 'schema_metadata' : 'documentation', null);
+  return rejected('UNVALIDATED_METADATA_RESPONSE', 'schema_drift');
 }

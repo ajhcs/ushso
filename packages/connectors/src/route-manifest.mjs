@@ -9,6 +9,7 @@ export const REQUIRED_FORBIDDEN_ROUTE_CLASSES = Object.freeze([
 
 const FORBIDDEN_INTENT_PATTERN = /(?:^|[^a-z0-9])(?:source[_-]?data[_-]?payload|payload[_-]?sentinel|execute[_-]?query|query[_-]?execution|sql|soda[_-]?rows?|download[_-]?(?:data|file)|archive[_-]?member|submit[_-]?(?:form|login|payment|dua)|credential)(?:$|[^a-z0-9])/i;
 const SECRET_PARAMETER_PATTERN = /(?:^|[_-])(?:api[_-]?key|access[_-]?token|auth|authorization|credential|password|signature|sig|x-amz-(?:credential|signature)|x-goog-(?:credential|signature)|awsaccesskeyid|googleaccessid|key-pair-id|policy|expires)(?:$|[_-])/i;
+const BRACKET_PARAMETER_PATTERN = /\[([A-Za-z][A-Za-z0-9_.-]{0,15})\]/gu;
 const SECRET_VALUE_PATTERN = /(?:[?&](?:x-amz-(?:credential|signature)|x-goog-(?:credential|signature)|awsaccesskeyid|googleaccessid|key-pair-id|signature|sig|access_token|api_key)=)|-----BEGIN [A-Z ]*PRIVATE KEY-----|\bBearer\s+[A-Za-z0-9._~+/-]{16,}/i;
 
 const TOP_LEVEL_KEYS = new Set([
@@ -115,7 +116,7 @@ function assertSafeHostname(value, label) {
 }
 
 function assertSafeRouteTemplate(pathTemplate, label) {
-  if (typeof pathTemplate !== 'string' || !pathTemplate.startsWith('/') || pathTemplate.length > 1000 || /[?#]|%2f|%5c|%00/i.test(pathTemplate)) {
+  if (typeof pathTemplate !== 'string' || !pathTemplate.startsWith('/') || pathTemplate.startsWith('//') || pathTemplate.length > 1000 || /[?#]|%2f|%5c|%00/i.test(pathTemplate)) {
     throw new TypeError(`${label} is not a safe bounded path template.`);
   }
   for (const segment of pathTemplate.split('/')) {
@@ -124,6 +125,12 @@ function assertSafeRouteTemplate(pathTemplate, label) {
     try { decoded = decodeURIComponent(literal); } catch { throw new TypeError(`${label} contains invalid percent encoding.`); }
     if (decoded === '.' || decoded === '..' || /[\\/\u0000]/.test(decoded)) throw new TypeError(`${label} contains an unsafe normalized segment.`);
   }
+}
+
+function isSecretParameterName(name) {
+  if (typeof name !== 'string') return false;
+  if (SECRET_PARAMETER_PATTERN.test(name)) return true;
+  return [...name.matchAll(BRACKET_PARAMETER_PATTERN)].some(([, innerName]) => SECRET_PARAMETER_PATTERN.test(innerName));
 }
 
 function assertBoundedUrl(url, targetClass) {
@@ -233,7 +240,7 @@ export function validateDescriptor(descriptor) {
       if (!route.forbidden_route_classes.includes(required)) throw new TypeError(`${route.template_id} does not explicitly forbid ${required}.`);
     }
     for (const parameter of route.allowed_parameters) {
-      if (!/^[A-Za-z][A-Za-z0-9_.-]{0,47}(?:\[[A-Za-z][A-Za-z0-9_.-]{0,15}\])?$/.test(parameter) || SECRET_PARAMETER_PATTERN.test(parameter) || FORBIDDEN_INTENT_PATTERN.test(parameter)) throw new TypeError(`${route.template_id} allows an unsafe query parameter.`);
+      if (!/^[A-Za-z][A-Za-z0-9_.-]{0,47}(?:\[[A-Za-z][A-Za-z0-9_.-]{0,15}\])?$/.test(parameter) || isSecretParameterName(parameter) || FORBIDDEN_INTENT_PATTERN.test(parameter)) throw new TypeError(`${route.template_id} allows an unsafe query parameter.`);
     }
   }
   if (endpointIds.size !== descriptor.endpoints.length) throw new TypeError('Endpoint IDs must be unique.');
@@ -278,7 +285,7 @@ function appendQuery(url, query, allowedParameters, targetClass) {
   let valueCount = 0;
   for (const [name, rawValue] of Object.entries(query ?? {}).sort(([a], [b]) => a.localeCompare(b))) {
     if (!allowedParameters.includes(name)) throw policyFailure('QUERY_PARAMETER_NOT_MANIFESTED', targetClass);
-    if (SECRET_PARAMETER_PATTERN.test(name)) throw policyFailure('SECRET_QUERY_PARAMETER_BLOCKED', targetClass);
+    if (isSecretParameterName(name)) throw policyFailure('SECRET_QUERY_PARAMETER_BLOCKED', targetClass);
     const values = Array.isArray(rawValue) ? rawValue : [rawValue];
     for (const value of values) {
       valueCount += 1;
@@ -299,6 +306,21 @@ function targetClassForRequest(endpoint, request) {
   return requested;
 }
 
+function assertManifestOrigin(url, endpoint, targetClass) {
+  const endpointUrl = new URL(endpoint.base_url);
+  if (url.origin !== endpointUrl.origin) throw policyFailure('REQUEST_ORIGIN_NOT_ALLOWED', targetClass);
+}
+
+function assertRawRedirectPath(value, targetClass) {
+  const raw = String(value).split(/[?#]/, 1)[0];
+  const authority = raw.match(/^(?:[A-Za-z][A-Za-z0-9+.-]*:)?\/\/[^/]*/)?.[0] ?? '';
+  for (const segment of raw.slice(authority.length).split('/')) {
+    let decoded;
+    try { decoded = decodeURIComponent(segment); } catch { throw policyFailure('REDIRECT_PATH_ENCODING_INVALID', targetClass); }
+    if (decoded === '.' || decoded === '..' || /[\\/\u0000]/.test(decoded)) throw policyFailure('REDIRECT_UNSAFE_PATH_SEGMENT', targetClass);
+  }
+}
+
 export function compileManifestRequest(descriptorInput, request) {
   const descriptor = validateDescriptor(descriptorInput);
   assertExactKeys(request, REQUEST_KEYS, 'Manifest request');
@@ -311,6 +333,7 @@ export function compileManifestRequest(descriptorInput, request) {
   }
   const path = substitutePath(route.path_template, request.pathParameters ?? {}, route.allowed_parameters, targetClass);
   const url = new URL(path, endpoint.base_url);
+  assertManifestOrigin(url, endpoint, targetClass);
   appendQuery(url, request.query ?? {}, route.allowed_parameters, targetClass);
   assertBoundedUrl(url, targetClass);
   return {
@@ -326,10 +349,16 @@ export function compileManifestRequest(descriptorInput, request) {
 
 export function matchManifestRedirect(descriptorInput, candidateUrl, { purpose, method, targetClass }) {
   const descriptor = validateDescriptor(descriptorInput);
+  assertRawRedirectPath(candidateUrl, targetClass);
   const url = new URL(candidateUrl);
   assertBoundedUrl(url, targetClass);
   if (url.protocol !== 'https:' || url.username || url.password || (url.port && url.port !== '443')) throw policyFailure('REDIRECT_SCHEME_OR_PORT_BLOCKED', targetClass);
   if (/%2f|%5c|%00/i.test(url.pathname)) throw policyFailure('REDIRECT_ENCODED_PATH_SEPARATOR_BLOCKED', targetClass);
+  for (const segment of url.pathname.split('/')) {
+    let decoded;
+    try { decoded = decodeURIComponent(segment); } catch { throw policyFailure('REDIRECT_PATH_ENCODING_INVALID', targetClass); }
+    if (decoded === '.' || decoded === '..' || /[\\/\u0000]/.test(decoded)) throw policyFailure('REDIRECT_UNSAFE_PATH_SEGMENT', targetClass);
+  }
   const host = normalizedHost(url.hostname);
   if (!descriptor.allowed_hosts.map(normalizedHost).includes(host)) throw policyFailure('REDIRECT_HOST_NOT_ALLOWED', targetClass);
   const queryEntries = [...url.searchParams];
@@ -338,7 +367,7 @@ export function matchManifestRedirect(descriptorInput, candidateUrl, { purpose, 
     const endpointHost = normalizedHost(new URL(endpoint.base_url).hostname);
     return endpointHost === host && route.purpose === purpose && route.method === method && templatePattern(route.path_template).test(url.pathname);
   });
-  const matches = candidates.filter(({ route }) => queryEntries.every(([name, value]) => route.allowed_parameters.includes(name) && !SECRET_PARAMETER_PATTERN.test(name) && !SECRET_VALUE_PATTERN.test(value)));
+  const matches = candidates.filter(({ route }) => queryEntries.every(([name, value]) => route.allowed_parameters.includes(name) && !isSecretParameterName(name) && !SECRET_VALUE_PATTERN.test(value)));
   if (matches.length !== 1) throw policyFailure(matches.length ? 'REDIRECT_ROUTE_AMBIGUOUS' : 'REDIRECT_ROUTE_NOT_MANIFESTED', targetClass);
   if (queryEntries.some(([name, value]) => FORBIDDEN_INTENT_PATTERN.test(`${name}=${value}`))) throw policyFailure('FORBIDDEN_ROUTE_INTENT', targetClass);
   const matched = matches[0];
@@ -355,7 +384,7 @@ export function redactedLocator(urlInput) {
   url.username = '';
   url.password = '';
   for (const name of [...url.searchParams.keys()]) {
-    if (SECRET_PARAMETER_PATTERN.test(name) || url.searchParams.getAll(name).some((value) => SECRET_VALUE_PATTERN.test(value))) url.searchParams.delete(name);
+    if (isSecretParameterName(name) || url.searchParams.getAll(name).some((value) => SECRET_VALUE_PATTERN.test(value))) url.searchParams.delete(name);
   }
   url.hash = '';
   return url.toString();
