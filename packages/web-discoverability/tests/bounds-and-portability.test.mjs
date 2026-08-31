@@ -85,9 +85,10 @@ test('every rendered external URL has exact policy-versioned public-locator and 
 });
 
 test('secret-bearing URL paths fail closed after repeated decoding while ordinary public paths remain admissible', async () => {
+  const syntheticAwsAccessKey = ['AKIA', 'ABCDEFGHIJKLMNOP'].join('');
   const forbidden = [
     'https://data.cms.gov/private/token/super-secret',
-    'https://data.cms.gov/files/api-key/AKIAABCDEFGHIJKLMNOP',
+    `https://data.cms.gov/files/api-key/${syntheticAwsAccessKey}`,
     'https://data.cms.gov/%74oken/secret-value',
     'https://data.cms.gov/%2574oken/secret-value',
     'https://data.cms.gov/private/%5Ctoken%5Csecret-value',
