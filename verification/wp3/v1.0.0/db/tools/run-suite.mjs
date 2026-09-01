@@ -13,7 +13,11 @@ process.stdout.write(staticResult.stdout || '');
 process.stderr.write(staticResult.stderr || '');
 if (staticResult.status !== 0) process.exit(staticResult.status ?? 1);
 
-const testResult = spawnSync(process.execPath, ['--test', '--test-concurrency=1', path.join(packageRoot, 'tests/wp3-foundation.test.mjs')], {
+const testResult = spawnSync(process.execPath, [
+  '--test', '--test-concurrency=1',
+  path.join(packageRoot, 'tests/managed-authorization.test.mjs'),
+  path.join(packageRoot, 'tests/wp3-foundation.test.mjs'),
+], {
   cwd: repositoryRoot, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024,
 });
 process.stdout.write(testResult.stdout || '');
@@ -30,6 +34,7 @@ await writeFile(resultPath, `${JSON.stringify({
   command: 'npm test --prefix verification/wp3/v1.0.0/db',
   tests: [
     'static migration and policy audit',
+    'operation-specific managed authorization receipt binding',
     'clean forward migrations and exact checksums',
     'N-1 additive upgrade',
     'migration idempotency and drift rejection',
@@ -56,4 +61,3 @@ const receipts = spawnSync(process.execPath, [path.join(packageRoot, 'tools/buil
 process.stdout.write(receipts.stdout || '');
 process.stderr.write(receipts.stderr || '');
 process.exit(receipts.status ?? 1);
-

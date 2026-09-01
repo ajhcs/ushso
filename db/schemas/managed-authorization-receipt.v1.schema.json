@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/db/schemas/managed-authorization-receipt.v1.schema.json",
+  "title": "USHSO managed database operation authorization receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "receipt_version",
+    "authorization_id",
+    "authorized",
+    "environment",
+    "database",
+    "deployment_fingerprint",
+    "action",
+    "parameters",
+    "reviewer",
+    "approved_at",
+    "expires_at"
+  ],
+  "properties": {
+    "receipt_version": { "const": "ushso-database-managed-authorization.v1.0.0" },
+    "authorization_id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@/-]{7,239}$" },
+    "authorized": { "const": true },
+    "environment": { "enum": ["staging", "production"] },
+    "database": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_-]{0,62}$" },
+    "deployment_fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "action": {
+      "enum": [
+        "database_foundation_apply",
+        "database_role_reconciliation",
+        "database_partition_manage",
+        "database_archive_partition",
+        "database_restore_archive",
+        "database_direct_maintenance_assert"
+      ]
+    },
+    "parameters": { "type": "object" },
+    "reviewer": { "type": "string", "minLength": 3, "maxLength": 240 },
+    "approved_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" }
+  }
+}
