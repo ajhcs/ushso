@@ -166,8 +166,8 @@ local evidence, not a new committed receipt or a managed-provider claim.
 
 ## Current integration and local-gate checkpoint — 2026-09-01
 
-The clean integration candidate is `63929b341fa881a01d3b795c26b22faddca6ed8a`
-with tree `552351f6c9e61420560b46f67d70c54dbae9a1ac` on
+The clean integration candidate is `c680fb6b035848e0d74b5ed035bb33ac35092d65`
+with tree `943be7c718fce4dd102365c31d28bd468bb8cc02` on
 `codex/research-navigator-integration`. It contains PR #3 through PR #7 as
 ordered merges, the selectively ported PR #8 CAS successor with its original
 attestation ancestry attached by `49e5658`, and the focused WP4 disabled
@@ -212,14 +212,23 @@ independent release evidence.
 
 ### Reconciliation and release boundary
 
-- Local implementation evidence is partially complete; WP8 post-freeze tuning
-  and the final exact-candidate release gate remain open.
+- Local implementation evidence is partially complete; WP8 remains
+  `FAIL_PRE_TUNING`, and the exact gate failed on the immutable WP0 aggregate
+  receipt.
 - Managed, live, human, holdout, canary, recovery, load, soak, public, and
   retirement evidence is blocked by the unchanged authorization register.
 - `AUTH-01` through `AUTH-17` remain `not_requested` and `authorized: false`.
 - No production deployment, live request, managed mutation, secret, migration,
   public pointer switch, protected holdout score, human review, remote push, or
   PR was created.
-- The final release gate must execute once against the eventual clean frozen
-  tree. The old `20260831T170024Z-3003695ba806` failure remains historical and
-  is not repurposed as this candidate's result.
+- The exact release gate was executed once against this clean frozen tree. Run
+  `20260901T185317Z-773cc4870771` completed with
+  `failed` / `product_test_failed` and candidate key
+  `b64fa8dfc3406f4a4cade312efe4a0a5f9c16c1cfe929b1d90a9b9bb5ec01985`. Its
+  first failure was the immutable WP0 v1.0.0 aggregate receipt being stale for
+  this candidate (`WP0_AGGREGATE_RECEIPT_STALE`); build, browser, and artifact
+  stages were skipped by the fail-fast gate. The canonical receipt is
+  `/home/plumbob/.local/state/release-gate/repositories/ushso-375cca760f7dab38/runs/20260901T185317Z-773cc4870771/receipt.json`.
+  The old `20260831T170024Z-3003695ba806` failure remains historical. No
+  release eligibility follows from either failed run, and the WP0 v1.0.0 final
+  receipt was not overwritten.

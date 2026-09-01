@@ -9,8 +9,8 @@ contact live sources, apply migrations, or expose a candidate.
 ## 2026-09-01 integrated-candidate addendum
 
 The current clean integration snapshot is
-`63929b341fa881a01d3b795c26b22faddca6ed8a` (tree
-`552351f6c9e61420560b46f67d70c54dbae9a1ac`) on
+`c680fb6b035848e0d74b5ed035bb33ac35092d65` (tree
+`943be7c718fce4dd102365c31d28bd468bb8cc02`) on
 `codex/research-navigator-integration`. PR #3 through PR #8 are reconciled in
 that candidate; PR #8 was selectively ported and topology-attached, not merged
 wholesale. WP4 now has disabled-by-default dependency-injected composition
@@ -21,12 +21,42 @@ provider-lane disposition, work-package matrix, and machine blockers are in
 [`docs/research-navigator-reconciliation-2026-09-01.json`](./research-navigator-reconciliation-2026-09-01.json)
 and its companion
 [`docs/RESEARCH_NAVIGATOR_RECONCILIATION_2026-09-01.md`](./RESEARCH_NAVIGATOR_RECONCILIATION_2026-09-01.md).
-The earlier failed release-gate run below remains historical; this addendum
-does not represent a fresh gate pass or change `AUTH-01` through `AUTH-17`.
+The exact gate result for this snapshot is recorded immediately below; it is a
+failed gate, not a pass, and does not change `AUTH-01` through `AUTH-17`.
 
-## Release-gate disposition
+## 2026-09-01 exact-candidate release-gate result
 
-The one independent repository release-gate execution was:
+The clean candidate was captured and tested exactly at
+`c680fb6b035848e0d74b5ed035bb33ac35092d65` (tree
+`943be7c718fce4dd102365c31d28bd468bb8cc02`). The independent gate completed
+with a failed result:
+
+| Field | Value |
+| --- | --- |
+| Run | `20260901T185317Z-773cc4870771` |
+| Result | `failed` / `product_test_failed` |
+| Candidate key | `b64fa8dfc3406f4a4cade312efe4a0a5f9c16c1cfe929b1d90a9b9bb5ec01985` |
+| First failure | `verification/wp0/v1.0.0:test` and `:validate` — `WP0_AGGREGATE_RECEIPT_STALE` |
+| Receipt | `/home/plumbob/.local/state/release-gate/repositories/ushso-375cca760f7dab38/runs/20260901T185317Z-773cc4870771/receipt.json` |
+| Independent evidence | `true` |
+
+Bootstrap and the root/local verification stages reached the expected
+candidate; the gate failed because the immutable v1.0.0 WP0 final aggregate
+receipt still describes an older file inventory after the authorized local
+WP4/CI and rolling-boundary receipt updates. Build, browser, and artifact
+stages were skipped after the first test failure. The historical final receipt
+was not overwritten or silently repinned, so this result establishes
+`not release-eligible`, not a release approval.
+
+The sealed standard offline security audit is scan
+`e465021e-0450-4622-9630-25f7ae745133`, targeting the implementation parent
+`63929b3`; it reported zero reportable findings with partial coverage and is
+retained as bounded source-audit evidence, not a managed or production
+security approval.
+
+## Historical 2026-08-31 release-gate disposition
+
+The earlier independent repository release-gate execution was:
 
 | Field | Value |
 | --- | --- |

@@ -13,8 +13,8 @@ The machine-readable source is
 ## Candidate and integration
 
 The candidate branch is `codex/research-navigator-integration`, clean at
-`63929b341fa881a01d3b795c26b22faddca6ed8a` with tree
-`552351f6c9e61420560b46f67d70c54dbae9a1ac`. The main worktree’s pre-existing
+`c680fb6b035848e0d74b5ed035bb33ac35092d65` with tree
+`943be7c718fce4dd102365c31d28bd468bb8cc02`. The main worktree’s pre-existing
 user changes to `RELEASE_PROVENANCE.json` and `.serena/` were kept out of the
 candidate and out of all provider payloads.
 
@@ -64,7 +64,7 @@ consolidated v2 ranking implementation.
 
 | Plane | State | Meaning |
 | --- | --- | --- |
-| Local implementation | Partially complete | PR integration, local control-plane seams, contract tests, and static/fixture receipts are present. WP8 post-freeze tuning and the final exact-candidate gate remain open. |
+| Local implementation | Partially complete | PR integration, local control-plane seams, contract tests, and static/fixture receipts are present. WP8 remains `FAIL_PRE_TUNING`; the exact gate ran and failed on the immutable WP0 aggregate receipt. |
 | External verification | Blocked | Managed provider catalogs, live egress, recovery/load/soak, the protected holdout, and human evidence have not been performed. |
 | Public activation | Blocked | Candidate routers and public flags remain disabled or unwired; no public pointer or production traffic changed. |
 
@@ -85,8 +85,8 @@ flowchart LR
 ```
 
 The first edge is already available as historical/static compatibility. The
-candidate edge is held by the WP8 quality state and the one exact release-gate
-run. Candidate-to-staging requires `AUTH-01`, `AUTH-02`, `AUTH-03`, and
+candidate edge is held by the WP8 quality state and the failed WP0 exactness
+check. Candidate-to-staging requires `AUTH-01`, `AUTH-02`, `AUTH-03`, and
 `AUTH-11`; subsequent edges require the specific recovery, canary, human,
 holdout, cutover, soak, and retirement entries recorded in the JSON blocker
 list.
@@ -107,7 +107,7 @@ list.
 | WP11 | Candidate UI/API implementation, human evidence pending | Usability study, expert review, and activation approval |
 | WP12 | Fixture-only, unwired toolkit pass | Capability parity and authorized canary gates |
 | WP13 | Fixture-only, unwired SEO pass | Exact production corpus, crawler/sitemap canaries, and public activation |
-| WP14 | Fixture CAS successor and state-machine tests pass | One exact final gate, managed canary/recovery/load/soak, promotion, and retirement |
+| WP14 | Fixture CAS successor and state-machine tests pass; exact gate failed on WP0 receipt staleness | Separately approved WP0 successor/reseal, a future exact gate for that changed candidate, managed canary/recovery/load/soak, promotion, and retirement |
 
 ## Co-Engineer lanes
 
@@ -134,11 +134,17 @@ CI verification. The WP14 v1.1 verifier passed 24/24 checks and remains bound to
 `f2641a3`; it does not attest the later integration tree. WP8’s 35 passing tests
 are scaffolding tests; the quality receipt remains `FAIL_PRE_TUNING`.
 
-The final gate must run once against the eventual exact clean candidate and
-capture its own commit, tree, artifact manifest, environment, and result. The
-older failed run `20260831T170024Z-3003695ba806` remains historical because it
-predates this candidate. A focused test or a successful historical CI run cannot
-be relabeled as that final gate.
+The exact gate was run once against the clean candidate captured at
+`c680fb6b035848e0d74b5ed035bb33ac35092d65` / tree
+`943be7c718fce4dd102365c31d28bd468bb8cc02`. It completed with
+`failed` / `product_test_failed` because the immutable WP0 v1.0.0 aggregate
+receipt is stale for this candidate (`WP0_AGGREGATE_RECEIPT_STALE`). The run
+key is `b64fa8dfc3406f4a4cade312efe4a0a5f9c16c1cfe929b1d90a9b9bb5ec01985`,
+and its receipt is
+`/home/plumbob/.local/state/release-gate/repositories/ushso-375cca760f7dab38/runs/20260901T185317Z-773cc4870771/receipt.json`.
+The result is evidence of a failed exact gate, not release eligibility; its
+build, browser, and artifact stages were correctly skipped after the first
+test failure. The prior `20260831T170024Z-3003695ba806` run remains historical.
 
 ## Authorization and no-claim boundary
 
@@ -165,8 +171,9 @@ rollback plan, and resulting execution receipt.
 
 1. Complete or explicitly disposition development/validation-only WP8 tuning
    without reading or scoring the protected final holdout.
-2. Freeze the final local candidate and run the exact release gate once.
-3. With owner authorization, perform only the appropriate managed or human
+2. Resolve the immutable WP0 receipt through a separately approved successor
+   or exact-base reseal procedure; never overwrite the v1.0.0 final receipt.
+3. Freeze that changed candidate and run its exact release gate once. With owner authorization, perform only the appropriate managed or human
    packet, retaining a separate receipt for each external state transition.
 4. Reconcile final PR/remote handoff only after the local release gate and
    scoped review inventory are complete; never convert this packet into an
