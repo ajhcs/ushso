@@ -46,6 +46,22 @@ export async function sha256File(filePath) {
   return sha256Bytes(await readFile(filePath));
 }
 
+export function gitIdentity() {
+  const readGitValue = (args) => {
+    const result = spawnSync('git', args, {
+      cwd: repositoryRoot,
+      encoding: 'utf8',
+      maxBuffer: 1024 * 1024,
+    });
+    if (result.status !== 0) throw new Error(`cannot resolve Git identity: ${(result.stderr || '').trim()}`);
+    return result.stdout.trim();
+  };
+  return {
+    head_commit: readGitValue(['rev-parse', 'HEAD']),
+    head_tree_oid: readGitValue(['rev-parse', 'HEAD^{tree}']),
+  };
+}
+
 export function parseArgs(argv = process.argv.slice(2)) {
   const values = {};
   for (let index = 0; index < argv.length; index += 1) {

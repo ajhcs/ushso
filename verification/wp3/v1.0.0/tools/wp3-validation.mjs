@@ -81,6 +81,8 @@ export function validateDatabaseReceipts() {
   assert.equal(result.scope, 'local_synthetic');
   assert.equal(result.command, 'npm test --prefix verification/wp3/v1.0.0/db');
   assert.equal(result.managed_resource_evidence?.status, 'pending_external_authorization');
+  assert.match(result.git_head_commit ?? '', /^[0-9a-f]{40}$/);
+  assert.match(result.git_head_tree_oid ?? '', /^[0-9a-f]{40}$/);
   assert.deepEqual(
     { network_calls: result.network_calls, host_ports_bound: result.host_ports_bound, secrets_processed: result.secrets_processed },
     { network_calls: 0, host_ports_bound: 0, secrets_processed: 0 },
@@ -93,6 +95,8 @@ export function validateDatabaseReceipts() {
   const receipts = Object.fromEntries(DATABASE_RECEIPTS.map((name) => {
     const receipt = readJson(`verification/wp3/v1.0.0/receipts/${name}`);
     validateDatabaseReceiptEnvelope(receipt, name, resultSha, completedAt);
+    assert.equal(receipt.git_head_commit, result.git_head_commit, `${name}: Git commit drift`);
+    assert.equal(receipt.git_head_tree_oid, result.git_head_tree_oid, `${name}: Git tree drift`);
     return [name, receipt];
   }));
 

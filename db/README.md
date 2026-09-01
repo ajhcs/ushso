@@ -61,6 +61,11 @@ input to the gate, not evidence that a managed provider or database was
 contacted; provider authenticity, role/catalog proof, and managed execution
 remain external prerequisites.
 
+The local WP3 result and its database receipts also record the exact Git
+commit and tree used for the test run. That identity is captured before the
+receipt files are written, so the evidence does not make a self-referential
+claim about the final receipt-refresh commit.
+
 ## Local verification
 
 From the repository root:

@@ -3,9 +3,10 @@ import { spawnSync } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { repositoryRoot } from '../../../../../db/tools/common.mjs';
+import { gitIdentity, repositoryRoot } from '../../../../../db/tools/common.mjs';
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const testedGit = gitIdentity();
 const staticResult = spawnSync(process.execPath, [path.join(packageRoot, 'tools/validate-static.mjs')], {
   cwd: repositoryRoot, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024,
 });
@@ -50,6 +51,8 @@ await writeFile(resultPath, `${JSON.stringify({
     'section 9.11 correctness-ledger registry coverage'
   ],
   managed_resource_evidence: { status: 'pending_external_authorization' },
+  git_head_commit: testedGit.head_commit,
+  git_head_tree_oid: testedGit.head_tree_oid,
   network_calls: 0,
   host_ports_bound: 0,
   secrets_processed: 0
