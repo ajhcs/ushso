@@ -29,7 +29,7 @@ authorization status.
 | Managed database roles, privilege proof, and environment binding | `db/bootstrap/roles.sql`, `role-matrix.v1.json`, `db/migrations/manifest.json`, WP3 least-privilege and migration receipts; local static checks pass; attestation now walks recursive membership and protected-schema ACLs | Managed-provider catalog evidence, role/grant inspection, Hyperdrive binding proof, failover/PITR/RPO/RTO and workload evidence | `db/`, `infra/terraform/`, WP3 | Hubble; Grok review for privilege/security-definer concerns | Separate infrastructure/evidence PR; static SQL/manifest/attestation tests locally, then owner-authorized managed rehearsal | Requires managed infrastructure and AUTH-01/02/03/05/11; no provider mutation authorized |
 | Trusted principal binding / AP-01 | `packages/ingestion/src/audit-principal.mjs`, PostgreSQL control-store tests, forged/mismatch negative tests | Runtime-authenticated principal source, handler-to-store binding proof, owner residual-risk disposition if technical proof cannot be completed | Ingestion/auth boundary | Zeno; Grok adversarial review | Separate auth-boundary PR or decision packet; focused principal tests and exact evidence inventory | Requires genuine trusted auth context and owner/security-platform decision; AP-01 remains pending |
 | Archive, restore, recovery, and rollback integrity | `db/tools/archive-partition.mjs`, `restore-archive.mjs`, operation-specific authorization verifier/schema, WP3 local Docker fixture tests, WP14 rollback state machine | Isolated managed target restore, provider backup/PITR/failover evidence, operator authorization and recovery receipts | `db/`, WP3, WP14 | Hubble; Grok review | Separate operations/evidence PR; local failure-injection, authorization-negative, checksum, and isolated-restore tests, then authorized isolated rehearsal | Requires managed infrastructure and AUTH-02/03/05/11; production evidence forbidden here |
-| Durable compare-and-swap and append-only publication transitions | WP14 durable adapter contract and fixture tests; inspection found an async interleaving race in the in-memory fixture store | Serialize/recheck concurrent fixture commits, bind state history to the ledger, protect the fixture durability label, and reject direct fixture production appends; authoritative transactional adapter remains unproven | `verification/wp14/v1.0.0/` | Cursor implementation; Grok review; Zeno independent local audit | Focused WP14 code/test slice; concurrent `Promise.all` regression, replay/failure-injection/production-rejection tests, then exact-head receipt refresh | Local implementation/verifiable fixture hardening; authoritative durability requires managed/database evidence |
+| Durable compare-and-swap and append-only publication transitions | WP14 durable adapter contract and fixture tests; inspection found an async interleaving race in the in-memory fixture store | Serialize/recheck concurrent fixture commits, bind state history to the ledger, protect the fixture durability label, and reject direct fixture production appends; authoritative transactional adapter remains unproven | `verification/wp14/v1.0.0/` | Cursor implementation; Grok review; Zeno independent local audit | Dedicated CAS-only successor PR; concurrent `Promise.all` regression, replay/failure-injection/production-rejection tests, and an exact-code-bound local receipt. Historical WP14 attestation requires a separate owner-approved reseal procedure before aggregate CI can pass. | Local implementation/verifiable fixture hardening; authoritative durability and any attestation reseal require managed/database evidence or owner direction |
 | Connector transport, DNS/redirect/egress boundaries | Connector network policy, bounded client, pinned streaming transport, route allowlists, fixture/security tests | Provider-specific production transport proof, live DNS/address pinning rehearsal, AUTH-04 canary, source payload boundary evidence | `packages/connectors/`, WP5 | Hume; Grok adversarial review | Separate connector safety PR; all fixture/negative suites and static egress audit; live transport remains disabled | Production traffic and AUTH-04; no live canary authorized |
 | Terraform CLI/provider and trusted catalog attestation | Pinned Terraform/provider versions and lockfiles; static schema/attestation tests; recursive membership and protected-schema ACL checks are bound into canonical evidence; README explicitly records no provider API plan/apply | Real CLI/provider schema compatibility, provider plan/apply, managed catalog/role attestation, digest-bound execution receipt | `infra/terraform/`, WP3 infrastructure | Hume; Grok trust-boundary review | Separate infrastructure-enablement PR; local `fmt`/validation/static tests, then owner-authorized provider rehearsal | Requires credentials/managed provider and AUTH-01/02/03/05/11; no secrets or provider mutation |
 | Canonical migration/import/readiness | Migrations 0001–0007 sealed in manifest; local harness through 0003; WP6 tests pass; normalization import/readiness tests pass | Managed application through 0007, rollback against isolated target, provider role/readiness receipts | `db/migrations/`, normalization, WP6 | Hubble | Migration/application vertical slice only; local checksum/N-1/idempotency/readiness suites, then managed rehearsal | Managed infrastructure and authorization; local proof cannot become managed proof |
@@ -40,8 +40,8 @@ authorization status.
 
 ### Classification summary
 
-Locally implementable and verifiable work includes the fixture CAS race fix,
-negative/contract tests, static Terraform and transport checks, migration
+Locally implementable and verifiable work includes the fixture CAS race fix on
+its dedicated successor branch, negative/contract tests, static Terraform and transport checks, migration
 manifest/readiness checks, documentation, and deterministic receipt tooling.
 Managed-provider catalog/privilege/backup/restore/CLI evidence, live connector
 transport, protected holdout results, human review, production traffic, soak,
@@ -101,12 +101,14 @@ rejected; they must not be represented as one coordinated independent review.
   state/history-to-ledger binding, direct production-append rejection, and
   additional replay/clone-isolation tests. Its result is review input only;
   the local branch implements and verifies the orchestrator-selected subset.
-- The scoped CAS receipt at
-  `verification/receipts/research-navigator-cas-hardening-2026-09-01.json`
-  binds the focused 3/3 pass to successor commit `38bf0f9` and tree
-  `4703edc`; its canonical digest was recomputed locally. It records the full
-  WP14 result as 10/26 passing and 16/26 blocked by the historical base pin,
-  not as a pass.
+- The scoped CAS receipt is kept only on the dedicated CAS-only successor
+  branch. It binds the focused 3/3 pass to code commit
+  `f2641a3bfd5ae7249d0acffff883b312e4bdb077` and tree
+  `dc80d1c0f9ff7d8c4a2a4a8beb01ed2723878675`; its canonical digest is
+  `sha256:1bfc1813a2d0383c3b56a626af4c80a90b68150042e979cbfd9b79b1cef37e2d`.
+  It records the full WP14 result as 10/26 passing and 16/26 blocked by the
+  historical base pin, not as a pass. The AP-01/connector/database PR line
+  does not carry this receipt or the CAS implementation.
 - The AP-01 hardening commit `55c8257` removes the claimed operator ID from
   the trusted-source input, rejects unsupported actor types, and passes the
   ingestion package suite 6/6. It does not prove a runtime-authenticated
