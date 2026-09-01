@@ -2,14 +2,21 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseArgs, repositoryRoot, requireEnvironmentFence, runPsql, sha256File, verifyManagedAuthorization } from './common.mjs';
+import { DATABASE_OPERATION_ACTIONS, parseArgs, repositoryRoot, requireEnvironmentFence, runPsql, sha256File, verifyManagedAuthorization } from './common.mjs';
 
 export async function applyMigrations(options) {
   const args = options ?? parseArgs();
   const fence = requireEnvironmentFence(args);
-  await verifyManagedAuthorization(fence);
   const container = args.container || null;
   const database = args.database || 'ushso';
+  const manifestPath = path.join(repositoryRoot, 'db/migrations/manifest.json');
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+  const through = args.through ? String(args.through) : manifest.migrations.at(-1).id;
+  await verifyManagedAuthorization(fence, {
+    action: DATABASE_OPERATION_ACTIONS.FOUNDATION_APPLY,
+    database,
+    parameters: { through },
+  });
 
   const roleSql = await readFile(path.join(repositoryRoot, 'db/bootstrap/roles.sql'), 'utf8');
   runPsql({ container, database, sql: roleSql });
@@ -51,12 +58,10 @@ export async function applyMigrations(options) {
   `;
   runPsql({ container, database, sql: bootstrapSql });
 
-  const manifestPath = path.join(repositoryRoot, 'db/migrations/manifest.json');
-  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
   const applied = [];
   const skipped = [];
   for (const migration of manifest.migrations) {
-    if (args.through && Number(migration.id) > Number(args.through)) break;
+    if (Number(migration.id) > Number(through)) break;
     const filePath = path.join(repositoryRoot, 'db/migrations', migration.file);
     const actualSha = await sha256File(filePath);
     if (actualSha !== migration.byte_sha256) throw new Error(`migration checksum mismatch: ${migration.file}`);
@@ -98,7 +103,7 @@ export async function applyMigrations(options) {
     applied,
     skipped,
     migration_count: applied.length + skipped.length,
-    through: args.through || manifest.migrations.at(-1).id,
+    through,
   };
 }
 

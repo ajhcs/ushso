@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PARTITION_PATTERN } from './archive-partition.mjs';
-import { parseArgs, requireEnvironmentFence, verifyManagedAuthorization } from './common.mjs';
+import { DATABASE_OPERATION_ACTIONS, parseArgs, requireEnvironmentFence, verifyManagedAuthorization } from './common.mjs';
 
 function isolatedFlag(value) {
   return value === true || value === 'true';
@@ -14,14 +14,23 @@ function isolatedFlag(value) {
 export async function restoreArchive(options) {
   const args = options ?? parseArgs();
   const fence = requireEnvironmentFence(args);
-  await verifyManagedAuthorization(fence);
   if (!args.input || !args.container || !args.database || !args.partition) {
     throw new Error('--input, --container, --database, and --partition are required');
   }
+  const sourceDatabase = args['source-database'] || 'ushso';
+  await verifyManagedAuthorization(fence, {
+    action: DATABASE_OPERATION_ACTIONS.RESTORE_ARCHIVE,
+    database: args.database,
+    parameters: {
+      source_database: sourceDatabase,
+      target_database: args.database,
+      partition: args.partition,
+      archive_sha256: args['expected-sha256'] || null,
+    },
+  });
   if (fence.environment !== 'local') throw new Error('managed restore remains pending_external_authorization');
   if (!isolatedFlag(args['isolated-target'])) throw new Error('isolated restore requires --isolated-target');
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(args.database)) throw new Error('restore database name is invalid');
-  const sourceDatabase = args['source-database'] || 'ushso';
   if (args.database === sourceDatabase) throw new Error('restore target must be an isolated database, not the source');
   if (!PARTITION_PATTERN.test(args.partition)) throw new Error('partition is not an allowlisted monthly correctness-ledger relation');
   const bytes = await readFile(path.resolve(args.input));

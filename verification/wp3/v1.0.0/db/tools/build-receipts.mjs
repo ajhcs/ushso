@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { repositoryRoot, sha256File } from '../../../../../db/tools/common.mjs';
+import { gitIdentity, repositoryRoot, sha256File } from '../../../../../db/tools/common.mjs';
 
 const packageRoot = path.join(repositoryRoot, 'verification/wp3/v1.0.0/db');
 const receiptRoot = path.join(repositoryRoot, 'verification/wp3/v1.0.0/receipts');
 const resultPath = path.join(packageRoot, 'results/local-suite.json');
 const result = JSON.parse(await readFile(resultPath, 'utf8'));
 if (result.status !== 'pass' || result.scope !== 'local_synthetic') throw new Error('passing local suite result required');
+const testedGit = gitIdentity();
+if (result.git_head_commit !== testedGit.head_commit || result.git_head_tree_oid !== testedGit.head_tree_oid) {
+  throw new Error('local suite result Git identity changed before receipt generation');
+}
 const resultSha = await sha256File(resultPath);
 const manifest = JSON.parse(await readFile(path.join(repositoryRoot, 'db/migrations/manifest.json'), 'utf8'));
 const migrationIds = manifest.migrations.map((migration) => migration.id);
@@ -18,6 +22,8 @@ const common = {
   evidence_scope: 'local_synthetic',
   generated_at: new Date().toISOString(),
   local_suite_sha256: resultSha,
+  git_head_commit: testedGit.head_commit,
+  git_head_tree_oid: testedGit.head_tree_oid,
   managed_resource_evidence: {
     status: 'pending_external_authorization',
     provider_capability_verified: false,

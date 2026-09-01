@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { parseArgs, requireEnvironmentFence, runPsql, verifyManagedAuthorization } from './common.mjs';
+import { DATABASE_OPERATION_ACTIONS, parseArgs, requireEnvironmentFence, runPsql, verifyManagedAuthorization } from './common.mjs';
 
 const allowed = new Map([
   ['ingest.run_state_events', 'run_job_attempt'],
@@ -13,8 +13,13 @@ const allowed = new Map([
 
 const args = parseArgs();
 const fence = requireEnvironmentFence(args);
-await verifyManagedAuthorization(fence);
 const parent = args.parent;
+const database = args.database || 'ushso';
+await verifyManagedAuthorization(fence, {
+  action: DATABASE_OPERATION_ACTIONS.PARTITION_MANAGE,
+  database,
+  parameters: { month: args.month, parent },
+});
 if (!allowed.has(parent)) throw new Error('partition parent is not allowlisted');
 if (!/^\d{4}-\d{2}-01$/.test(args.month || '')) throw new Error('--month must be YYYY-MM-01');
 const [schema, table] = parent.split('.');
@@ -35,5 +40,5 @@ const sql = `
   values ('${relation}', '${allowed.get(parent)}', '${lowerBound}', '${upperBound}', 'online', clock_timestamp(), '${upperBound}'::timestamptz + interval '90 days')
   on conflict (partition_relation) do nothing;
 `;
-runPsql({ container: args.container || null, database: args.database || 'ushso', sql });
+runPsql({ container: args.container || null, database, sql });
 console.log(JSON.stringify({ status: 'pass', environment: fence.environment, partition_relation: relation }));

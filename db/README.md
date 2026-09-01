@@ -51,6 +51,21 @@ is never forwarded as a command-line argument. Managed staging or production
 commands also require an exact, separately approved authorization receipt;
 without it they return `pending_external_authorization` before connecting.
 
+Managed receipts use the fail-closed envelope in
+`db/schemas/managed-authorization-receipt.v1.schema.json`. The verifier binds
+the exact action, database, deployment fingerprint, canonical parameter object,
+reviewer, and a current approval window of no more than 24 hours. The allowed
+actions distinguish foundation apply, role reconciliation, partition
+management, archive, restore, and direct-maintenance checks. A receipt is an
+input to the gate, not evidence that a managed provider or database was
+contacted; provider authenticity, role/catalog proof, and managed execution
+remain external prerequisites.
+
+The local WP3 result and its database receipts also record the exact Git
+commit and tree used for the test run. That identity is captured before the
+receipt files are written, so the evidence does not make a self-referential
+claim about the final receipt-refresh commit.
+
 ## Local verification
 
 From the repository root:
