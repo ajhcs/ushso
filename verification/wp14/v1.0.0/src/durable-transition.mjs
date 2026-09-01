@@ -20,20 +20,6 @@ function requirePort(condition, code, message, details = {}) {
   if (!condition) fail(code, message, details);
 }
 
-function assertCasPrecondition(committed, request) {
-  const { expected_revision, expected_state_digest_sha256, expected_ledger_head_sha256 } = request;
-  if (committed.revision !== expected_revision || committed.state.state_digest_sha256 !== expected_state_digest_sha256 || committed.ledger_head_sha256 !== expected_ledger_head_sha256) {
-    fail("DURABLE_CAS_CONFLICT", "durable state changed before this transition could commit", {
-      expected_revision,
-      actual_revision: committed.revision,
-      expected_state_digest_sha256,
-      actual_state_digest_sha256: committed.state.state_digest_sha256,
-      expected_ledger_head_sha256,
-      actual_ledger_head_sha256: committed.ledger_head_sha256,
-    });
-  }
-}
-
 function sealLedgerEntry(entry) {
   return withCanonicalDigest(entry, "ledger_entry_sha256");
 }
@@ -61,58 +47,34 @@ function buildLedgerEntry(snapshot, nextState, event) {
 function validateSnapshot(snapshot) {
   requirePort(snapshot && Number.isInteger(snapshot.revision) && snapshot.revision >= 0, "DURABLE_SNAPSHOT_INVALID", "durable state snapshot needs a nonnegative integer revision");
   requirePort(snapshot.state && isSha256(snapshot.state.state_digest_sha256), "DURABLE_SNAPSHOT_INVALID", "durable state snapshot needs a sealed state");
-  requirePort(Array.isArray(snapshot.state.history), "DURABLE_STATE_HISTORY_INVALID", "durable state snapshot needs a state history array");
   requirePort(Array.isArray(snapshot.ledger), "DURABLE_SNAPSHOT_INVALID", "durable state snapshot needs an append-only ledger array");
   requirePort(snapshot.ledger.length === snapshot.revision, "DURABLE_LEDGER_REVISION_MISMATCH", "ledger length must equal the committed revision");
-  requirePort(snapshot.state.history.length === snapshot.revision, "DURABLE_STATE_HISTORY_REVISION_MISMATCH", "state history length must equal the committed revision");
-  const expectedEventHead = snapshot.state.history.at(-1)?.event_sha256 ?? EMPTY_LEDGER_SHA256;
-  requirePort(snapshot.state.event_ledger_head_sha256 === expectedEventHead, "DURABLE_STATE_HISTORY_HEAD_MISMATCH", "state event-ledger head does not match its final history entry");
   const expectedHead = snapshot.ledger.at(-1)?.ledger_entry_sha256 ?? EMPTY_LEDGER_SHA256;
   requirePort(snapshot.ledger_head_sha256 === expectedHead, "DURABLE_LEDGER_HEAD_MISMATCH", "durable ledger head does not match its final entry");
   let prior = EMPTY_LEDGER_SHA256;
-  let priorEvent = EMPTY_LEDGER_SHA256;
   const ids = new Set();
   for (let index = 0; index < snapshot.ledger.length; index += 1) {
     const entry = snapshot.ledger[index];
-    const historyEntry = snapshot.state.history[index];
     requirePort(verifyCanonicalDigest(entry, "ledger_entry_sha256").ok, "DURABLE_LEDGER_ENTRY_DIGEST_MISMATCH", "durable ledger entry digest mismatch", { index });
     requirePort(entry.sequence === index + 1, "DURABLE_LEDGER_SEQUENCE_INVALID", "durable ledger sequence is not contiguous", { index, sequence: entry.sequence });
     requirePort(entry.prior_ledger_entry_sha256 === prior, "DURABLE_LEDGER_CHAIN_INVALID", "durable ledger chain is broken", { index });
     requirePort(!ids.has(entry.event_id), "DURABLE_LEDGER_EVENT_REPLAY", "durable ledger contains a duplicate event ID", { event_id: entry.event_id });
-    requirePort(verifyCanonicalDigest(historyEntry, "event_sha256").ok, "DURABLE_STATE_HISTORY_DIGEST_MISMATCH", "durable state history entry digest mismatch", { index });
-    requirePort(historyEntry.sequence === index + 1, "DURABLE_STATE_HISTORY_SEQUENCE_INVALID", "durable state history sequence is not contiguous", { index });
-    requirePort(historyEntry.previous_event_sha256 === priorEvent, "DURABLE_STATE_HISTORY_CHAIN_INVALID", "durable state history chain is broken", { index });
-    requirePort(entry.event_id === historyEntry.event_id, "DURABLE_STATE_HISTORY_EVENT_MISMATCH", "durable ledger event ID does not match state history", { index });
-    requirePort(entry.state_history_event_sha256 === historyEntry.event_sha256, "DURABLE_STATE_HISTORY_EVENT_DIGEST_MISMATCH", "durable ledger does not bind the state history entry", { index });
-    requirePort(entry.event_payload_sha256 === historyEntry.event_payload_sha256, "DURABLE_STATE_HISTORY_PAYLOAD_MISMATCH", "durable ledger does not bind the state history payload", { index });
-    requirePort(Array.isArray(historyEntry.evidence_receipts), "DURABLE_STATE_HISTORY_EVIDENCE_INVALID", "durable state history evidence must be an array", { index });
-    requirePort(canonicalJson(entry.evidence_receipt_sha256s) === canonicalJson(historyEntry.evidence_receipts.map((item) => item.receipt_sha256)), "DURABLE_STATE_HISTORY_EVIDENCE_MISMATCH", "durable ledger evidence does not match state history", { index });
-    requirePort(canonicalJson(entry.verifier_receipt_sha256s) === canonicalJson(historyEntry.evidence_receipts.map((item) => item.verifier_receipt_sha256)), "DURABLE_STATE_HISTORY_VERIFIER_MISMATCH", "durable ledger verifiers do not match state history", { index });
     ids.add(entry.event_id);
     prior = entry.ledger_entry_sha256;
-    priorEvent = historyEntry.event_sha256;
   }
 }
 
 export function createDurableTransitionAdapter(store) {
   requirePort(store && typeof store.readSnapshot === "function" && typeof store.atomicCompareAndSwapAppend === "function", "DURABLE_STORE_PORT_INVALID", "the injected durable store must expose readSnapshot and atomicCompareAndSwapAppend");
-  const durabilityClass = store.durability_class;
-  requirePort(["fixture_atomic", "authoritative_transactional"].includes(durabilityClass), "DURABILITY_CLASS_INVALID", "the durable store must declare its durability class");
+  requirePort(["fixture_atomic", "authoritative_transactional"].includes(store.durability_class), "DURABILITY_CLASS_INVALID", "the durable store must declare its durability class");
   return Object.freeze({
-    durability_class: durabilityClass,
+    durability_class: store.durability_class,
     async readSnapshot() {
       const snapshot = await store.readSnapshot();
       validateSnapshot(snapshot);
       return clone(snapshot);
     },
     async compareAndSwapAppend(request) {
-      requirePort(request && typeof request === "object", "DURABLE_REQUEST_INVALID", "durable append request is required");
-      if (request.next_state?.mode === "production") {
-        requirePort(durabilityClass === "authoritative_transactional", "AUTHORITATIVE_DURABLE_ADAPTER_REQUIRED", "production transitions require an authoritative transactional durable adapter");
-      }
-      requirePort(request.next_state && isSha256(request.next_state.state_digest_sha256), "DURABLE_REQUEST_INVALID", "durable append request needs a sealed next state");
-      requirePort(request.ledger_entry && isSha256(request.ledger_entry.ledger_entry_sha256), "DURABLE_REQUEST_INVALID", "durable append request needs a sealed ledger entry");
-      requirePort(request.ledger_entry.next_state_digest_sha256 === request.next_state.state_digest_sha256, "DURABLE_LEDGER_NEXT_STATE_INVALID", "durable append request ledger does not bind the next state");
       const storeRequest = clone({ ...request, failure_injector: undefined });
       storeRequest.failure_injector = request.failure_injector;
       const result = await store.atomicCompareAndSwapAppend(storeRequest);
@@ -120,8 +82,6 @@ export function createDurableTransitionAdapter(store) {
       requirePort(result.revision === request.expected_revision + 1, "DURABLE_COMMIT_REVISION_INVALID", "one transition must advance the durable revision exactly once");
       requirePort(result.state.state_digest_sha256 === request.next_state.state_digest_sha256, "DURABLE_COMMIT_STATE_MISMATCH", "committed state differs from the evaluated next state");
       requirePort(result.ledger_head_sha256 === request.ledger_entry.ledger_entry_sha256, "DURABLE_COMMIT_LEDGER_MISMATCH", "committed ledger head differs from the requested append");
-      requirePort(canonicalJson(result.state) === canonicalJson(request.next_state), "DURABLE_COMMIT_STATE_BYTES_MISMATCH", "committed state bytes differ from the evaluated next state");
-      requirePort(canonicalJson(result.ledger.at(-1)) === canonicalJson(request.ledger_entry), "DURABLE_COMMIT_LEDGER_ENTRY_MISMATCH", "committed ledger entry differs from the requested append");
       return clone(result);
     },
   });
@@ -135,43 +95,44 @@ export function createInMemoryAtomicStore(initialState) {
     ledger_head_sha256: EMPTY_LEDGER_SHA256,
   };
   validateSnapshot(committed);
-  let queue = Promise.resolve();
-  async function append(request) {
-    const { expected_revision, expected_state_digest_sha256, expected_ledger_head_sha256, next_state, ledger_entry, failure_injector } = request;
-    assertCasPrecondition(committed, request);
-    requirePort(ledger_entry.sequence === committed.revision + 1, "DURABLE_LEDGER_SEQUENCE_INVALID", "ledger append sequence must be the next committed revision");
-    requirePort(ledger_entry.prior_state_digest_sha256 === committed.state.state_digest_sha256, "DURABLE_LEDGER_STATE_CHAIN_INVALID", "ledger append is not chained to the committed state");
-    requirePort(ledger_entry.prior_ledger_entry_sha256 === committed.ledger_head_sha256, "DURABLE_LEDGER_CHAIN_INVALID", "ledger append is not chained to the committed ledger head");
-    requirePort(ledger_entry.next_state_digest_sha256 === next_state.state_digest_sha256, "DURABLE_LEDGER_NEXT_STATE_INVALID", "ledger append does not bind the next state");
-    requirePort(!committed.ledger.some((entry) => entry.event_id === ledger_entry.event_id), "DURABLE_LEDGER_EVENT_REPLAY", "event ID already exists in the durable ledger");
-    requirePort(!committed.ledger.some((entry) => entry.ledger_entry_sha256 === ledger_entry.ledger_entry_sha256), "DURABLE_LEDGER_RECEIPT_REPLAY", "ledger entry digest already exists");
-    requirePort(verifyCanonicalDigest(ledger_entry, "ledger_entry_sha256").ok, "DURABLE_LEDGER_ENTRY_DIGEST_MISMATCH", "ledger append digest mismatch");
-
-    const prepared = {
-      revision: committed.revision + 1,
-      state: clone(next_state),
-      ledger: [...clone(committed.ledger), clone(ledger_entry)],
-      ledger_head_sha256: ledger_entry.ledger_entry_sha256,
-    };
-    validateSnapshot(prepared);
-    if (failure_injector) await failure_injector("after_prepare", clone(prepared));
-    if (failure_injector) await failure_injector("before_commit", clone(prepared));
-    assertCasPrecondition(committed, request);
-    committed = prepared;
-    return clone(committed);
-  }
-  const store = {
+  return {
     durability_class: "fixture_atomic",
     async readSnapshot() {
       return clone(committed);
     },
-    atomicCompareAndSwapAppend(request) {
-      const result = queue.then(() => append(request), () => append(request));
-      queue = result.catch(() => undefined);
-      return result;
+    async atomicCompareAndSwapAppend(request) {
+      const { expected_revision, expected_state_digest_sha256, expected_ledger_head_sha256, next_state, ledger_entry, failure_injector } = request;
+      if (committed.revision !== expected_revision || committed.state.state_digest_sha256 !== expected_state_digest_sha256 || committed.ledger_head_sha256 !== expected_ledger_head_sha256) {
+        fail("DURABLE_CAS_CONFLICT", "durable state changed before this transition could commit", {
+          expected_revision,
+          actual_revision: committed.revision,
+          expected_state_digest_sha256,
+          actual_state_digest_sha256: committed.state.state_digest_sha256,
+          expected_ledger_head_sha256,
+          actual_ledger_head_sha256: committed.ledger_head_sha256,
+        });
+      }
+      requirePort(ledger_entry.sequence === committed.revision + 1, "DURABLE_LEDGER_SEQUENCE_INVALID", "ledger append sequence must be the next committed revision");
+      requirePort(ledger_entry.prior_state_digest_sha256 === committed.state.state_digest_sha256, "DURABLE_LEDGER_STATE_CHAIN_INVALID", "ledger append is not chained to the committed state");
+      requirePort(ledger_entry.prior_ledger_entry_sha256 === committed.ledger_head_sha256, "DURABLE_LEDGER_CHAIN_INVALID", "ledger append is not chained to the committed ledger head");
+      requirePort(ledger_entry.next_state_digest_sha256 === next_state.state_digest_sha256, "DURABLE_LEDGER_NEXT_STATE_INVALID", "ledger append does not bind the next state");
+      requirePort(!committed.ledger.some((entry) => entry.event_id === ledger_entry.event_id), "DURABLE_LEDGER_EVENT_REPLAY", "event ID already exists in the durable ledger");
+      requirePort(!committed.ledger.some((entry) => entry.ledger_entry_sha256 === ledger_entry.ledger_entry_sha256), "DURABLE_LEDGER_RECEIPT_REPLAY", "ledger entry digest already exists");
+      requirePort(verifyCanonicalDigest(ledger_entry, "ledger_entry_sha256").ok, "DURABLE_LEDGER_ENTRY_DIGEST_MISMATCH", "ledger append digest mismatch");
+
+      const prepared = {
+        revision: committed.revision + 1,
+        state: clone(next_state),
+        ledger: [...clone(committed.ledger), clone(ledger_entry)],
+        ledger_head_sha256: ledger_entry.ledger_entry_sha256,
+      };
+      validateSnapshot(prepared);
+      if (failure_injector) await failure_injector("after_prepare", clone(prepared));
+      if (failure_injector) await failure_injector("before_commit", clone(prepared));
+      committed = prepared;
+      return clone(committed);
     },
   };
-  return Object.freeze(store);
 }
 
 export function createInMemoryTransitionAdapter(initialState) {

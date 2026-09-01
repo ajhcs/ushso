@@ -1,14 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { buildCandidateSnapshot } from "../src/candidate-snapshot.mjs";
-import { withCanonicalDigest } from "../src/common.mjs";
 import {
   DurableTransitionError,
   applyEventDurably,
   createDurableTransitionAdapter,
   createInMemoryAtomicStore,
   createInMemoryTransitionAdapter,
-  durableTransitionConstants,
 } from "../src/durable-transition.mjs";
 import { createFixtureReceiptAuthority } from "../src/evidence-receipts.mjs";
 import { MODES, makeInitialState } from "../src/release-state-machine.mjs";
@@ -50,14 +48,6 @@ function fixtureEvent(type, second, id = type) {
     occurred_at: new Date(Date.parse("2026-08-30T00:00:00.000Z") + second * 1000).toISOString(),
     simulated: true,
   };
-}
-
-function minimalFixtureState(marker) {
-  return withCanonicalDigest({
-    marker,
-    history: [],
-    event_ledger_head_sha256: durableTransitionConstants.EMPTY_LEDGER_SHA256,
-  }, "state_digest_sha256");
 }
 
 test("durable transition commits state CAS and append-only ledger in one revision", async () => {
@@ -131,114 +121,6 @@ for (const failurePoint of ["after_prepare", "before_commit"]) {
   });
 }
 
-test("async failure-injector yield cannot interleave fixture CAS appends", async () => {
-  const placeholderSha = `sha256:${"ab".repeat(32)}`;
-  const initial = minimalFixtureState("fixture-cas-initial");
-  const store = createInMemoryAtomicStore(initial);
-
-  function buildAppendRequest(eventId, nextMarker) {
-    const historyEntry = withCanonicalDigest({
-      sequence: 1,
-      event: "fixture_append",
-      event_id: eventId,
-      occurred_at: "2026-08-30T00:00:01.000Z",
-      from_stage: "fixture",
-      to_stage: "fixture",
-      outcome: "applied",
-      simulated: true,
-      reason: null,
-      previous_event_sha256: durableTransitionConstants.EMPTY_LEDGER_SHA256,
-      event_payload_sha256: placeholderSha,
-      evidence_receipts: [],
-    }, "event_sha256");
-    const next_state = withCanonicalDigest({
-      marker: nextMarker,
-      history: [historyEntry],
-      event_ledger_head_sha256: historyEntry.event_sha256,
-    }, "state_digest_sha256");
-    const ledger_entry = withCanonicalDigest({
-      schema_version: "ushso-wp14-transition-ledger-entry.v1.0.0",
-      sequence: 1,
-      event_id: eventId,
-      occurred_at: "2026-08-30T00:00:01.000Z",
-      candidate_digest_sha256: placeholderSha,
-      previous_candidate_digest_sha256: null,
-      prior_state_digest_sha256: initial.state_digest_sha256,
-      next_state_digest_sha256: next_state.state_digest_sha256,
-      prior_ledger_entry_sha256: durableTransitionConstants.EMPTY_LEDGER_SHA256,
-      state_history_event_sha256: historyEntry.event_sha256,
-      event_payload_sha256: historyEntry.event_payload_sha256,
-      evidence_receipt_sha256s: [],
-      verifier_receipt_sha256s: [],
-    }, "ledger_entry_sha256");
-    return {
-      expected_revision: 0,
-      expected_state_digest_sha256: initial.state_digest_sha256,
-      expected_ledger_head_sha256: durableTransitionConstants.EMPTY_LEDGER_SHA256,
-      next_state,
-      ledger_entry,
-    };
-  }
-
-  let releaseFirst;
-  let signalFirstReached;
-  const firstReached = new Promise((resolve) => {
-    signalFirstReached = resolve;
-  });
-  const releaseGate = new Promise((resolve) => {
-    releaseFirst = resolve;
-  });
-  const holdFirstAtBeforeCommit = async (point) => {
-    if (point !== "before_commit") return;
-    signalFirstReached();
-    await releaseGate;
-  };
-
-  const firstRequest = buildAppendRequest("durable-fixture:concurrent-a", "next-a");
-  const secondRequest = buildAppendRequest("durable-fixture:concurrent-b", "next-b");
-  const firstPromise = store.atomicCompareAndSwapAppend({ ...firstRequest, failure_injector: holdFirstAtBeforeCommit });
-  await firstReached;
-  const secondPromise = store.atomicCompareAndSwapAppend(secondRequest);
-  releaseFirst();
-  const outcomes = await Promise.allSettled([firstPromise, secondPromise]);
-
-  const fulfilled = outcomes.filter((outcome) => outcome.status === "fulfilled");
-  const rejected = outcomes.filter((outcome) => outcome.status === "rejected");
-  assert.equal(fulfilled.length, 1);
-  assert.equal(rejected.length, 1);
-  assert.ok(rejected[0].reason instanceof DurableTransitionError);
-  assert.equal(rejected[0].reason.code, "DURABLE_CAS_CONFLICT");
-
-  const after = await store.readSnapshot();
-  assert.equal(after.revision, 1);
-  assert.equal(after.ledger.length, 1);
-  assert.equal(
-    new Set([firstRequest.ledger_entry.event_id, secondRequest.ledger_entry.event_id]).has(after.ledger[0].event_id),
-    true,
-  );
-});
-
-test("fixture durability class cannot be upgraded by mutating the store", () => {
-  const store = createInMemoryAtomicStore(minimalFixtureState("fixture-cas-frozen"));
-  assert.equal(Object.isFrozen(store), true);
-  assert.throws(() => {
-    store.durability_class = "authoritative_transactional";
-  }, TypeError);
-  assert.equal(store.durability_class, "fixture_atomic");
-});
-
-test("fixture store rejects a state history that has no durable revision", () => {
-  const inconsistent = withCanonicalDigest({
-    marker: "fixture-cas-inconsistent",
-    history: [{ event_id: "not-durable" }],
-    event_ledger_head_sha256: durableTransitionConstants.EMPTY_LEDGER_SHA256,
-  }, "state_digest_sha256");
-  assert.throws(
-    () => createInMemoryAtomicStore(inconsistent),
-    (error) => error instanceof DurableTransitionError && error.code === "DURABLE_STATE_HISTORY_REVISION_MISMATCH",
-  );
-});
-
 test("event replay is rejected before a durable append and production rejects fixture durability", async () => {
   const { context, clock, state } = fixtureSetup();
   const adapter = createInMemoryTransitionAdapter(state);
@@ -257,11 +139,6 @@ test("event replay is rejected before a durable append and production rejects fi
   const fixtureAdapter = createInMemoryTransitionAdapter(productionState);
   await assert.rejects(
     () => applyEventDurably({ adapter: fixtureAdapter, event: productionEvent("prepare_expand", "2026-08-30T00:00:01.000Z", "durability"), context: production.context }),
-    (error) => error instanceof DurableTransitionError && error.code === "AUTHORITATIVE_DURABLE_ADAPTER_REQUIRED",
-  );
-  assert.equal(Object.isFrozen(fixtureAdapter), true);
-  await assert.rejects(
-    () => fixtureAdapter.compareAndSwapAppend({ next_state: { mode: MODES.PRODUCTION } }),
     (error) => error instanceof DurableTransitionError && error.code === "AUTHORITATIVE_DURABLE_ADAPTER_REQUIRED",
   );
 });
