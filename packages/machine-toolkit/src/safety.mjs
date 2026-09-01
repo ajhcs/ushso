@@ -1,5 +1,5 @@
 import { serializedBytes } from './json.mjs';
-import { responseSchemaIssues } from './response-schema.mjs';
+import { isPrivateHost, responseSchemaIssues } from './response-schema.mjs';
 
 export const FALSE_TRUTH_BOUNDARY = Object.freeze({
   source_requests_made: false,
@@ -61,24 +61,6 @@ const SECRET_QUERY_NAMES = new Set([
 ]);
 const SAFE_ERROR_PRIVACY = /\b(?:quarantined|excluded|withdrawn|private|never existed|internal reason|suppressed)\b/iu;
 const SECRET_STRING = /(?:\bBearer\s+[A-Za-z0-9._~+/=-]{8,}|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|\bAKIA[A-Z0-9]{16}\b|\b(?:api[_-]?key|access[_-]?token|password)\s*[:=]\s*[^\s,;]{4,})/iu;
-
-function isPrivateHost(hostname) {
-  const host = hostname.toLowerCase().replace(/^\[|\]$/gu, '').replace(/\.$/u, '');
-  if (host === 'localhost' || host === 'metadata.google.internal' || /\.(?:localhost|local|internal|home\.arpa|onion)$/u.test(host)) return true;
-  const octets = host.split('.');
-  if (octets.length === 4 && octets.every((part) => /^\d{1,3}$/u.test(part) && Number(part) <= 255)) {
-    const [first, second] = octets.map(Number);
-    return first === 0 || first === 10 || first === 127 || first >= 224
-      || (first === 100 && second >= 64 && second <= 127)
-      || (first === 169 && second === 254)
-      || (first === 172 && second >= 16 && second <= 31)
-      || (first === 192 && [0, 168].includes(second))
-      || (first === 198 && [18, 19].includes(second));
-  }
-  if (host === '::' || host === '::1' || /^[fd][0-9a-f]{1,3}:/u.test(host) || /^fe[89ab][0-9a-f]:/u.test(host)) return true;
-  const mapped = /^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/u.exec(host);
-  return mapped ? isPrivateHost(mapped[1]) : false;
-}
 
 function issue(code, path, message = code) {
   return { code, path, message };

@@ -252,6 +252,17 @@ test('embedded private and secret-bearing locators fail closed even inside prose
   }).some((entry) => ['PRIVATE_LOCATOR_PROHIBITED', 'SECRET_QUERY_PROHIBITED'].includes(entry.code)), true);
 });
 
+test('IPv4-mapped private IPv6 locators fail closed after URL canonicalization', () => {
+  const mappedLocator = 'http://[::ffff:127.0.0.1]/admin';
+  const directIssues = prohibitedOutputIssues({ text: `blocked locator: ${mappedLocator}` });
+  assert.ok(directIssues.some((entry) => entry.code === 'PRIVATE_LOCATOR_PROHIBITED'));
+
+  const forged = responseCore(search.json_api.response);
+  forged.evidence_references[0].public_locator = mappedLocator;
+  const canonicalIssues = validateCanonicalCore(forged, 'search_assets', search.input);
+  assert.ok(canonicalIssues.some((entry) => entry.path === '/evidence_references/0/public_locator'));
+});
+
 test('planner success envelopes are rejected as a no-action boundary', async () => {
   const row = bundle.conformance_cases.find((entry) => entry.case_id === 'planner.disabled');
   const { toolkit, calls } = harness(row);

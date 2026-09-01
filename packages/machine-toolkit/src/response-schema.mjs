@@ -182,22 +182,58 @@ function enumValue(value, path, issues, values) {
   string(value, path, issues, { enumValues: values, min: 1 });
 }
 
-function isPrivateHost(hostname) {
+function parseIpv4(address) {
+  if (!/^\d{1,3}(?:\.\d{1,3}){3}$/u.test(address)) return null;
+  const octets = address.split('.').map(Number);
+  return octets.every((octet) => octet <= 255) ? octets : null;
+}
+
+function expandIpv6(address) {
+  let input = address.toLowerCase();
+  if (!input.includes(':')) return null;
+  const ipv4Tail = input.match(/(?:^|:)(\d{1,3}(?:\.\d{1,3}){3})$/u)?.[1];
+  if (ipv4Tail) {
+    const octets = parseIpv4(ipv4Tail);
+    if (!octets) return null;
+    const replacement = `${((octets[0] << 8) | octets[1]).toString(16)}:${((octets[2] << 8) | octets[3]).toString(16)}`;
+    input = `${input.slice(0, input.length - ipv4Tail.length)}${replacement}`;
+  }
+  if ((input.match(/::/gu) ?? []).length > 1) return null;
+  const [leftRaw, rightRaw] = input.split('::');
+  const left = leftRaw ? leftRaw.split(':') : [];
+  const right = rightRaw ? rightRaw.split(':') : [];
+  if (![...left, ...right].every((part) => /^[0-9a-f]{1,4}$/u.test(part))) return null;
+  const missing = 8 - left.length - right.length;
+  if (missing < 0 || (!input.includes('::') && missing !== 0) || (input.includes('::') && missing < 1)) return null;
+  const parts = [...left, ...Array(missing).fill('0'), ...right].map((part) => Number.parseInt(part, 16));
+  return parts.length === 8 ? parts : null;
+}
+
+function isPrivateIpv4(octets) {
+  const [first, second] = octets;
+  return first === 0 || first === 10 || first === 127 || first >= 224
+    || (first === 100 && second >= 64 && second <= 127)
+    || (first === 169 && second === 254)
+    || (first === 172 && second >= 16 && second <= 31)
+    || (first === 192 && [0, 168].includes(second))
+    || (first === 198 && [18, 19].includes(second));
+}
+
+export function isPrivateHost(hostname) {
   const host = hostname.toLowerCase().replace(/^\[|\]$/gu, '').replace(/\.$/u, '');
   if (host === 'localhost' || host === 'metadata.google.internal' || /\.(?:localhost|local|internal|home\.arpa|onion)$/u.test(host)) return true;
-  const octets = host.split('.');
-  if (octets.length === 4 && octets.every((part) => /^\d{1,3}$/u.test(part) && Number(part) <= 255)) {
-    const [first, second] = octets.map(Number);
-    return first === 0 || first === 10 || first === 127 || first >= 224
-      || (first === 100 && second >= 64 && second <= 127)
-      || (first === 169 && second === 254)
-      || (first === 172 && second >= 16 && second <= 31)
-      || (first === 192 && [0, 168].includes(second))
-      || (first === 198 && [18, 19].includes(second));
+  const ipv4 = parseIpv4(host);
+  if (ipv4) return isPrivateIpv4(ipv4);
+  const ipv6 = expandIpv6(host);
+  if (!ipv6) return false;
+  if (ipv6.slice(0, 5).every((part) => part === 0) && ipv6[5] === 0xffff) {
+    const mappedIpv4 = [ipv6[6] >> 8, ipv6[6] & 0xff, ipv6[7] >> 8, ipv6[7] & 0xff];
+    return isPrivateIpv4(mappedIpv4);
   }
-  if (host === '::' || host === '::1' || /^[fd][0-9a-f]{1,3}:/u.test(host) || /^fe[89ab][0-9a-f]:/u.test(host)) return true;
-  const mapped = /^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/u.exec(host);
-  return mapped ? isPrivateHost(mapped[1]) : false;
+  return ipv6.every((part) => part === 0)
+    || (ipv6.slice(0, 7).every((part) => part === 0) && ipv6[7] === 1)
+    || (ipv6[0] & 0xfe00) === 0xfc00
+    || (ipv6[0] & 0xffc0) === 0xfe80;
 }
 
 function uri(value, path, issues) {
