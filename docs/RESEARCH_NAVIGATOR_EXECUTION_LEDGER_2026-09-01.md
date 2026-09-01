@@ -109,11 +109,14 @@ rejected; they must not be represented as one coordinated independent review.
   the trusted-source input, rejects unsupported actor types, and passes the
   ingestion package suite 6/6. It does not prove a runtime-authenticated
   principal, managed role binding, or AP-01 authorization.
-- The connector Cursor candidate tightens three local boundaries and reported
-  28/28 fixture tests, while Grok's review keeps actual socket pinning,
-  streaming-time memory bounds, managed R2, and AUTH-04 external. The
-  candidate remains unintegrated pending orchestrator review and branch-level
-  tests; no provider receipt is a live or managed proof.
+- The connector safety slice is integrated on this branch after orchestrator
+  inspection. It enforces explicit fixture route keys (including the declared
+  Census schema fixture route), raw redirect checks before URL normalization,
+  manifest/source/final-URL capture coherence, and capture byte bounds. The
+  connector suite, package validation, and WP5 local validator pass; Grok's
+  review keeps actual socket pinning, streaming-time memory bounds, managed R2,
+  and AUTH-04 external. The refreshed implementation fingerprint is
+  `c872bc72937c2b5cfd301535e4546778a8bd9af7bdd80fbdcebfa1c4bebd9487`.
 
 ## Evidence and authorization invariants
 
