@@ -15,6 +15,17 @@ export function createHarvestWorker({ queueConsumers, deadLetterConsumers = {} }
   });
 }
 
+// This is the only Queue composition seam. The deployment-specific module
+// supplies consumers; this adapter never resolves bindings or credentials.
+export function createHarvestEntrypoint({ queueConsumers, deadLetterConsumers = {} }) {
+  const harvestWorker = createHarvestWorker({ queueConsumers, deadLetterConsumers });
+  return Object.freeze({
+    async queue(batch) {
+      return harvestWorker.queue(batch);
+    },
+  });
+}
+
 function retentionDurationMs(value) {
   const match = /^(\d+)\s+(second|minute|hour|day|week)s?$/.exec(value);
   invariant(match, 'WORKFLOW_RETENTION_DURATION_INVALID');

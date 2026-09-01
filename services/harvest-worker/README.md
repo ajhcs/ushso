@@ -1,8 +1,10 @@
 # Harvest Worker composition boundary
 
 This directory exports only dependency-injected Queue routing and a Workflow
-entrypoint adapter. It performs no source request, binding lookup, deployment,
-or secret access at module initialization. Queue consumers explicitly call
+entrypoint adapter. `worker.mjs` exposes those seams while its default export
+remains disabled until an authorized composition supplies the ports. It
+performs no source request, binding lookup, deployment, or secret access at
+module initialization. Queue consumers explicitly call
 exactly one of `ack()` or `retry()` per delivery; per-message handling prevents
 one failure from implicitly replaying an entire batch.
 

@@ -31,3 +31,21 @@ export function createSchedulerWorker({ scheduler, workflowStartReconciler, queu
     }
   });
 }
+
+// Cloudflare passes the scheduled slot on the event object. Keep this adapter
+// deliberately dependency-injected so importing the production entrypoint
+// cannot discover bindings, open a database, or contact a provider.
+export function createSchedulerEntrypoint(dependencies) {
+  const schedulerWorker = createSchedulerWorker(dependencies);
+  return Object.freeze({
+    async scheduled(event) {
+      const scheduledTime = event?.scheduledTime ?? event?.scheduled;
+      invariant(Number.isFinite(scheduledTime), 'SCHEDULED_EVENT_TIME_MISSING');
+      return schedulerWorker.scheduled({
+        scheduledTime,
+        cron: event?.cron,
+        traceId: event?.traceId ?? `trace_cron_${scheduledTime}`,
+      });
+    },
+  });
+}
