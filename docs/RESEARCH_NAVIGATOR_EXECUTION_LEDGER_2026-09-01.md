@@ -163,3 +163,63 @@ local evidence, not a new committed receipt or a managed-provider claim.
 - The product remains a public-source research recommender/planner. No change
   in this work may execute analyses, calculate market share, produce financial
   benchmarks, or turn the system into a general analytics application.
+
+## Current integration and local-gate checkpoint — 2026-09-01
+
+The clean integration candidate is `63929b341fa881a01d3b795c26b22faddca6ed8a`
+with tree `552351f6c9e61420560b46f67d70c54dbae9a1ac` on
+`codex/research-navigator-integration`. It contains PR #3 through PR #7 as
+ordered merges, the selectively ported PR #8 CAS successor with its original
+attestation ancestry attached by `49e5658`, and the focused WP4 disabled
+composition seam in `63929b3`.
+
+The WP4 receipt was regenerated against the current implementation and now
+reports `pass_local` with `service_composition: pass_static_markers` and zero
+actions. The new `services/scheduler-worker/worker.mjs` and
+`services/harvest-worker/worker.mjs` exports are dependency-injected and
+disabled by default. They make the composition boundary testable; they are not
+Cloudflare deployment roots and do not prove managed Queue, Workflow, Cron,
+DLQ, Hyperdrive, or PostgreSQL behavior.
+
+The exact local sweep in a writable isolated clone passed the root contract and
+verification suites, WP4, ingestion, WP6 (14 tests with local PostgreSQL), WP8
+(35 scaffolding tests), WP10A, WP11, WP12, WP13, WP14, program verification,
+external-authorization validation, and CI verification. WP14 v1.1 validation
+passed 24/24 checks and remains bound to `f2641a3`; it does not attest this
+later integration tree. WP8 remains `FAIL_PRE_TUNING` and WP10B remains
+unauthorized by design.
+
+The candidate reconciliation packet is
+`docs/research-navigator-reconciliation-2026-09-01.json`, with its schema and
+human-readable companion. It explicitly separates manifest-file SHA-256 from
+corpus-content and algorithm fingerprints. It records the legacy
+`RELEASE_PROVENANCE.json` manifest field as a content-fingerprint alias and
+preserves that historical file unchanged.
+
+### Current Co-Engineer safety disposition
+
+The fresh Cursor-local aggregate `ushso-cursor-wave-0901` was submitted with
+six implementation/fix scopes and two read-only review scopes against the exact
+candidate base. The required `decision_or_attention` wait returned all eight
+lanes `dispatch_failed`; no child task, worktree, commit, artifact, or remote
+mutation exists. The provider was not given candidate files.
+
+The fresh Grok submissions were rejected by payload safety before dispatch,
+first for a selected-path mirror and then for the two-file CAS mirror. No code
+was sent to Grok and no indirect retry was attempted. Historical bounded Grok
+and Cursor receipts remain review input only and do not constitute approval or
+independent release evidence.
+
+### Reconciliation and release boundary
+
+- Local implementation evidence is partially complete; WP8 post-freeze tuning
+  and the final exact-candidate release gate remain open.
+- Managed, live, human, holdout, canary, recovery, load, soak, public, and
+  retirement evidence is blocked by the unchanged authorization register.
+- `AUTH-01` through `AUTH-17` remain `not_requested` and `authorized: false`.
+- No production deployment, live request, managed mutation, secret, migration,
+  public pointer switch, protected holdout score, human review, remote push, or
+  PR was created.
+- The final release gate must execute once against the eventual clean frozen
+  tree. The old `20260831T170024Z-3003695ba806` failure remains historical and
+  is not repurposed as this candidate's result.

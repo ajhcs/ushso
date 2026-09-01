@@ -6,6 +6,24 @@ This record separates implementation evidence, release-gate evidence, and
 external authorization. It is a review packet, not an approval to deploy,
 contact live sources, apply migrations, or expose a candidate.
 
+## 2026-09-01 integrated-candidate addendum
+
+The current clean integration snapshot is
+`63929b341fa881a01d3b795c26b22faddca6ed8a` (tree
+`552351f6c9e61420560b46f67d70c54dbae9a1ac`) on
+`codex/research-navigator-integration`. PR #3 through PR #8 are reconciled in
+that candidate; PR #8 was selectively ported and topology-attached, not merged
+wholesale. WP4 now has disabled-by-default dependency-injected composition
+seams, but no managed Cloudflare composition is claimed.
+
+The machine-readable inventory, hash-semantic correction, status-plane graph,
+provider-lane disposition, work-package matrix, and machine blockers are in
+[`docs/research-navigator-reconciliation-2026-09-01.json`](./research-navigator-reconciliation-2026-09-01.json)
+and its companion
+[`docs/RESEARCH_NAVIGATOR_RECONCILIATION_2026-09-01.md`](./RESEARCH_NAVIGATOR_RECONCILIATION_2026-09-01.md).
+The earlier failed release-gate run below remains historical; this addendum
+does not represent a fresh gate pass or change `AUTH-01` through `AUTH-17`.
+
 ## Release-gate disposition
 
 The one independent repository release-gate execution was:

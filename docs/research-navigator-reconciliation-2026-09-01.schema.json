@@ -1,0 +1,204 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ushso.research-navigator-reconciliation.v1.0.0",
+  "title": "USHSo Research Navigator reconciliation",
+  "type": "object",
+  "required": [
+    "$schema",
+    "schema_version",
+    "generated_at",
+    "candidate",
+    "source_prs",
+    "integration_decisions",
+    "evidence_semantics",
+    "evidence_inventory",
+    "status_planes",
+    "dependency_graph",
+    "machine_blockers",
+    "work_package_status",
+    "local_verification",
+    "provider_lanes",
+    "no_claims",
+    "release_disposition"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "ushso.research-navigator-reconciliation.v1.0.0" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "candidate": {
+      "type": "object",
+      "required": [
+        "branch",
+        "implementation_commit",
+        "implementation_tree",
+        "working_tree",
+        "production_eligibility",
+        "remote_mutation",
+        "receipt_binding_rule"
+      ],
+      "properties": {
+        "branch": { "type": "string" },
+        "implementation_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "implementation_tree": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "working_tree": { "enum": ["clean", "dirty"] },
+        "production_eligibility": { "const": false },
+        "remote_mutation": { "const": false },
+        "receipt_binding_rule": { "type": "string" },
+        "main_worktree_preservation": { "type": "string" }
+      }
+    },
+    "source_prs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["number", "tip", "tree", "relationship", "included"],
+        "properties": {
+          "number": { "type": "integer", "minimum": 1 },
+          "tip": { "type": "string" },
+          "tree": { "type": "string" },
+          "relationship": { "type": "string" },
+          "included": { "type": "boolean" },
+          "handling": { "type": "string" }
+        }
+      }
+    },
+    "integration_decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "decision", "evidence"],
+        "properties": {
+          "id": { "type": "string" },
+          "decision": { "type": "string" },
+          "evidence": { "type": "array", "items": { "type": "string" } },
+          "conflict": { "type": "boolean" }
+        }
+      }
+    },
+    "evidence_semantics": {
+      "type": "object",
+      "required": ["classes", "corpus_hashes", "legacy_aliases"],
+      "properties": {
+        "classes": { "type": "array", "items": { "type": "string" } },
+        "corpus_hashes": {
+          "type": "object",
+          "required": ["c143", "c157"],
+          "additionalProperties": {
+            "type": "object",
+            "required": ["manifest_file_sha256", "content_fingerprint_sha256", "algorithm_fingerprint_sha256"],
+            "properties": {
+              "manifest_file_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+              "content_fingerprint_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+              "algorithm_fingerprint_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+              "record_count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "legacy_aliases": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "evidence_inventory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "class", "path", "status", "sha256", "disposition"],
+        "properties": {
+          "id": { "type": "string" },
+          "class": { "enum": ["current", "stale", "historical", "fixture_only", "integrated_candidate", "blocked_external_authorization"] },
+          "path": { "type": "string" },
+          "status": { "type": "string" },
+          "sha256": { "type": ["string", "null"] },
+          "disposition": { "type": "string" },
+          "binding": { "type": "string" }
+        }
+      }
+    },
+    "status_planes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["plane", "status", "authorized", "summary"],
+        "properties": {
+          "plane": { "enum": ["local_implementation", "external_verification", "public_activation"] },
+          "status": { "type": "string" },
+          "authorized": { "type": "boolean" },
+          "summary": { "type": "string" },
+          "blockers": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "dependency_graph": {
+      "type": "object",
+      "required": ["nodes", "edges"],
+      "properties": {
+        "nodes": { "type": "array", "items": { "type": "object" } },
+        "edges": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "machine_blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "class", "status", "authorized", "summary", "source"],
+        "properties": {
+          "id": { "type": "string" },
+          "class": { "enum": ["blocked_external_authorization", "local_implementation", "stale_evidence", "human_evidence"] },
+          "status": { "type": "string" },
+          "authorized": { "type": "boolean" },
+          "summary": { "type": "string" },
+          "source": { "type": "array", "items": { "type": "string" } },
+          "unblocks": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "work_package_status": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["work_package", "status", "evidence", "remaining"],
+        "properties": {
+          "work_package": { "type": "string" },
+          "status": { "type": "string" },
+          "evidence": { "type": "array", "items": { "type": "string" } },
+          "remaining": { "type": "array", "items": { "type": "string" } },
+          "authorization": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "local_verification": {
+      "type": "object",
+      "required": ["commands", "aggregate_status", "environment_notes"],
+      "properties": {
+        "commands": { "type": "array", "items": { "type": "object" } },
+        "aggregate_status": { "type": "string" },
+        "environment_notes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "provider_lanes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["lane", "provider", "status", "files_sent", "remote_mutation"],
+        "properties": {
+          "lane": { "type": "string" },
+          "provider": { "type": "string" },
+          "status": { "type": "string" },
+          "files_sent": { "type": "boolean" },
+          "remote_mutation": { "type": "boolean" },
+          "summary": { "type": "string" }
+        }
+      }
+    },
+    "no_claims": { "type": "array", "items": { "type": "string" } },
+    "release_disposition": {
+      "type": "object",
+      "required": ["status", "release_gate_pass", "production_eligible", "next_actions"],
+      "properties": {
+        "status": { "type": "string" },
+        "release_gate_pass": { "const": false },
+        "production_eligible": { "const": false },
+        "next_actions": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
