@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process'
+import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { buildImplementationManifest } from '../verification/wp14/v1.0.0/src/package-integrity.mjs'
 import { loadPolicy } from '../verification/wp14/v1.0.0/src/rehearsal.mjs'
@@ -10,6 +11,10 @@ import {
   repoPath,
   verifyCanonicalDigest,
 } from '../verification/wp14/v1.0.0/src/common.mjs'
+import {
+  SUCCESSOR_POLICY_PATH,
+  verifySuccessorAttestation,
+} from '../verification/wp14/v1.1.0/src/successor-attestation.mjs'
 
 export const WP14_ATTESTED_COMMIT = 'f6edbb0b31530cdcf3391e8bddf85015d5d30265'
 export const WP14_ATTESTED_TREE = '956320f2ce36a195250b55d627c174a3c2a2eefc'
@@ -27,7 +32,7 @@ function check(checks, id, condition, details = null) {
   checks.push({ id, status: condition ? 'pass' : 'fail', details })
 }
 
-export function verifyWp14Attestation() {
+export function verifyLegacyWp14Attestation() {
   const checks = []
   const failures = []
   const currentHead = resolveCurrentHead()
@@ -78,6 +83,11 @@ export function verifyWp14Attestation() {
     checks,
     failures,
   }
+}
+
+export function verifyWp14Attestation() {
+  if (existsSync(repoPath(SUCCESSOR_POLICY_PATH))) return verifySuccessorAttestation()
+  return verifyLegacyWp14Attestation()
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {

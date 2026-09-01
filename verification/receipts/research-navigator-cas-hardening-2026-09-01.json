@@ -1,0 +1,59 @@
+{
+  "schema_version": "ushso-local-verification-receipt.v1.0.0",
+  "receipt_id": "wp14-fixture-cas-hardening-2026-09-01",
+  "recorded_at": "2026-09-01T14:45:00Z",
+  "evidence_class": "local_fixture_only",
+  "subject": "WP14 in-memory durable append serialization and state-history binding",
+  "source": {
+    "tested_commit": "f2641a3bfd5ae7249d0acffff883b312e4bdb077",
+    "tested_tree_oid": "dc80d1c0f9ff7d8c4a2a4a8beb01ed2723878675",
+    "paths": [
+      "verification/wp14/v1.0.0/src/durable-transition.mjs",
+      "verification/wp14/v1.0.0/tests/durable-transition.test.mjs"
+    ]
+  },
+  "environment": {
+    "node": "v24.14.0",
+    "npm": "11.9.0",
+    "package_lock_sha256": "sha256:3a7a0295adcaf9e38be36cc836529e85d4e0cf21083f3c7d8656f7d761a04225"
+  },
+  "verification": [
+    {
+      "command": "node --test --test-isolation=none --test-name-pattern=^(async failure-injector|fixture durability|fixture store rejects) verification/wp14/v1.0.0/tests/durable-transition.test.mjs",
+      "status": "PASS",
+      "tests": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "command": "npm test --prefix verification/wp14/v1.0.0",
+      "status": "BLOCKED_STALE_WP14_BASE_PIN",
+      "tests": 26,
+      "passed": 10,
+      "failed": 16,
+      "observation": "The exact CAS candidate is not the historical WP14 base: the checked-in base pin remains f6edbb0b31530cdcf3391e8bddf85015d5d30265 while this candidate is f2641a3bfd5ae7249d0acffff883b312e4bdb077. The failures are fail-closed candidate-binding failures, not relabeled passes."
+    }
+  ],
+  "controls_verified": [
+    "post-await fixture CAS serialization",
+    "state history and append-ledger binding",
+    "fixture durability label is immutable",
+    "direct fixture production append is rejected"
+  ],
+  "controls_not_proven": [
+    "authoritative transactional durable store",
+    "managed database or provider durability",
+    "production or live traffic evidence",
+    "exact WP14 aggregate receipt set at this successor head",
+    "failure-injection throw rollback path in the scoped command"
+  ],
+  "actions": {
+    "provider_mutations": 0,
+    "deployments": 0,
+    "source_or_public_requests": 0,
+    "analyses_executed": 0
+  },
+  "production_eligibility": false,
+  "note": "Scoped local evidence only. The historical release-gate failure and historical WP14 attestation are preserved; no release gate was rerun.",
+  "receipt_sha256": "sha256:1bfc1813a2d0383c3b56a626af4c80a90b68150042e979cbfd9b79b1cef37e2d"
+}
