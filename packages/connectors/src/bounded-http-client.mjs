@@ -3,7 +3,10 @@ import { classifyResponse, mediaTypeFromHeaders } from './content-classifier.mjs
 import { ConnectorFailure, failureRecord } from './errors.mjs';
 import { assertConnectedAddress, assertNoDnsRebinding, assertPublicAddressSet } from './network-policy.mjs';
 import { assertPinnedTransportRequest } from './pinned-streaming-transport.mjs';
-import { compileManifestRequest, matchManifestRedirect, redactedLocator, responseLimitsForDescriptor } from './route-manifest.mjs';
+import {
+  compileManifestRequest, matchManifestRedirect, redactedLocator,
+  resolveManifestRedirectLocation, responseLimitsForDescriptor,
+} from './route-manifest.mjs';
 
 const TRANSIENT_NETWORK_CODES = new Map([
   ['ETIMEDOUT', ['timeout', 'UPSTREAM_TIMEOUT']],
@@ -298,10 +301,12 @@ export class BoundedHttpClient {
           if (!location) throw new ConnectorFailure('Redirect omitted Location.', { failureType: 'redirect_unapproved', safeDetailCode: 'REDIRECT_LOCATION_MISSING', targetClass: compiled.targetClass, retryClass: 'quarantine', quarantine: true });
           if (context.descriptor.redirect_policy === 'deny') throw new ConnectorFailure('Redirects are disabled.', { failureType: 'redirect_unapproved', safeDetailCode: 'REDIRECT_POLICY_DENY', targetClass: compiled.targetClass, retryClass: 'quarantine', quarantine: true });
           if (redirects >= context.descriptor.bounds.maximum_redirects) throw new ConnectorFailure('Redirect bound exceeded.', { failureType: 'redirect_unapproved', safeDetailCode: 'REDIRECT_BOUND_EXCEEDED', targetClass: compiled.targetClass, retryClass: 'quarantine', quarantine: true });
-          const candidate = new URL(location, currentUrl);
+          // Raw Location path checks run before URL normalization so encoded
+          // dot-segments cannot collapse into a manifested path.
+          const candidate = resolveManifestRedirectLocation(location, currentUrl, compiled.targetClass);
           if (context.descriptor.redirect_policy === 'same_origin' && candidate.origin !== currentUrl.origin) throw new ConnectorFailure('Cross-origin redirect is disabled.', { failureType: 'redirect_unapproved', safeDetailCode: 'CROSS_ORIGIN_REDIRECT_BLOCKED', targetClass: compiled.targetClass, retryClass: 'quarantine', quarantine: true });
           const redirectFrom = compiled;
-          const redirectTo = matchManifestRedirect(context.descriptor, candidate, compiled);
+          const redirectTo = matchManifestRedirect(context.descriptor, candidate.toString(), compiled);
           await this.requestLedger.append({
             request_id: requestId, source_id: context.descriptor.source_id,
             endpoint_id: redirectFrom.endpoint.endpoint_id, template_id: redirectFrom.route.template_id,

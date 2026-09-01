@@ -5,7 +5,7 @@ export { classifyDeletionEvidence } from './deletion-policy.mjs';
 export { ConnectorFailure, failureRecord } from './errors.mjs';
 export { classifyIpAddress, assertPublicAddressSet, assertConnectedAddress, assertNoDnsRebinding } from './network-policy.mjs';
 export { MemoryOriginGovernor } from './origin-governor.mjs';
-export { compileManifestRequest, matchManifestRedirect, redactedLocator, routeManifestInventory, validateDescriptor } from './route-manifest.mjs';
+export { compileManifestRequest, matchManifestRedirect, redactedLocator, resolveManifestRedirectLocation, assertRawRedirectPath, routeManifestInventory, validateDescriptor } from './route-manifest.mjs';
 export {
   SECRET_QUERY_DENYLIST_ACTIVE,
   SOURCE_METADATA_ROUTE_ALLOWLIST,
