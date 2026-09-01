@@ -203,6 +203,16 @@ action.
   audit identity, and any claim that the privileged control plane is fully
   attributable.
 
+Local implementation status (2026-09-01): the bounded AP-01 hardening slice in
+commit `55c8257` removes `claimedOperatorId` from the trusted-principal source
+input, enforces the supported actor-type allowlist, and adds echo, mismatch,
+unsupported-type, and forged-input regression coverage. The ingestion package
+suite passes 6/6, and the exact successor CI receipt is recorded on draft PR
+#4. This is local contract evidence only: it does not provide an
+authenticated runtime principal source, prove handler-to-store binding,
+establish managed role attribution, or constitute the owner/security-platform
+disposition required by AP-01. The packet remains pending and unauthorized.
+
 ### AP-02 — Planner-governance decision (`AUTH-12`)
 
 - Decision owner: Product, research-methods, and engineering owners.
