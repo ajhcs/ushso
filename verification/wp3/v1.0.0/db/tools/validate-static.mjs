@@ -43,6 +43,27 @@ assert.equal(roleMatrix.credential_values_in_repository, false);
 assert.doesNotMatch(rolesSql, /password\s+['"]/);
 assert.match(allSql, /grant select on search\.published_runtime_status, search\.published_generation_records\s+to ushso_public/);
 
+const databaseToolSources = await Promise.all([
+  'db/tools/migrate.mjs',
+  'db/tools/manage-partitions.mjs',
+  'db/tools/archive-partition.mjs',
+  'db/tools/restore-archive.mjs',
+  'db/tools/assert-direct-maintenance.mjs',
+  'db/bootstrap/reconcile-roles.mjs',
+].map(async (file) => readFile(path.join(repositoryRoot, file), 'utf8')));
+assert.ok(databaseToolSources.every((source) => source.includes('verifyManagedAuthorization(fence, {')));
+assert.ok(databaseToolSources.every((source) => source.includes('DATABASE_OPERATION_ACTIONS.')));
+const authorizationSchema = JSON.parse(await readFile(path.join(repositoryRoot, 'db/schemas/managed-authorization-receipt.v1.schema.json'), 'utf8'));
+assert.equal(authorizationSchema.additionalProperties, false);
+assert.deepEqual(authorizationSchema.properties.action.enum, [
+  'database_foundation_apply',
+  'database_role_reconciliation',
+  'database_partition_manage',
+  'database_archive_partition',
+  'database_restore_archive',
+  'database_direct_maintenance_assert',
+]);
+
 const ledger = JSON.parse(await readFile(path.join(repositoryRoot, 'db/policies/correctness-ledgers.v1.json'), 'utf8'));
 assert.deepEqual(ledger.ledgers.map((entry) => entry.name).sort(), [
   'audit', 'durable_dlq', 'outbox', 'processed_event', 'publication_history', 'run_job_attempt', 'workflow_mapping',
