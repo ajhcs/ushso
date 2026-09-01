@@ -31,6 +31,9 @@ rerun for a later apply.
 The emitted `roles` value is already keyed by the six role names and uses
 Terraform's exact `database_role`/`login_user` field names; operators must not
 reshape the catalog evidence between SQL and the sensitive Terraform input.
+The catalog query walks the complete role-membership closure and inspects
+explicit and default ACLs for the protected application schemas, rejecting
+unexpected transitive memberships, direct login grants, and `PUBLIC` grants.
 Terraform also refuses every origin unless `rolsuper`,
 `rolbypassrls`, `rolreplication`, and `neon_superuser_member` are false and the
 receipt digest is present. The sensitive password map is supplied separately;

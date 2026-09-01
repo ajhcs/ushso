@@ -89,7 +89,7 @@ export function validateResourceManifest(resource) {
     "verified_at_not_future_at_apply", "expires_at_not_past_at_apply", "validity_window_max_900_seconds",
     "template_sha256_exact", "evidence_sha256_recomputed_exact",
     "rolsuper_false", "rolbypassrls_false", "rolreplication_false", "rolcreatedb_false", "rolcreaterole_false",
-    "capability_member_true", "neon_superuser_member_false", "unexpected_membership_false"
+    "capability_member_true", "neon_superuser_member_false", "unexpected_membership_false", "unexpected_acl_false"
   ], "prebinding privilege assertions");
   if (resource.environment === "production") {
     assert.equal(resource.neon.scale_to_zero, "disabled");
@@ -442,6 +442,7 @@ export function validateDatabaseOriginAttestation(attestation, environment, bind
     assert.equal(value.capability_member, true);
     assert.equal(value.neon_superuser_member, false);
     assert.equal(value.unexpected_membership, false);
+    assert.equal(value.unexpected_acl, false);
   }
   assert.equal(attestation.evidence_sha256, attestationEvidenceSha256(attestation), "attestation evidence digest mismatch");
 }
@@ -683,6 +684,11 @@ export function validateTerraformStatic(root) {
   }
   assert.match(attestation, /neon_superuser/);
   assert.match(attestation, /unexpected_membership/);
+  assert.match(attestation, /WITH RECURSIVE expected/);
+  assert.match(attestation, /membership_closure\(login_oid, granted_oid\)/);
+  assert.match(attestation, /aclexplode\(/);
+  assert.match(attestation, /pg_default_acl/);
+  assert.match(attestation, /unexpected_acl/);
   assert.match(attestation, /bootstrap_maintenance_member/);
   assert.match(attestation, /temporal_attestation_pass/);
   assert.match(attestation, /USHSO_ATTESTATION_ENVELOPE/);
@@ -842,7 +848,7 @@ function validatePolicyAndAccess(root) {
   assert.ok(privacy.controls.includes("plan_redaction_before_persistence"));
   assert.ok(privacy.controls.includes("maintenance_credentials_never_bound_to_workers"));
   assert.ok(privacy.controls.includes("worker_logins_created_only_by_audited_direct_sql_never_neon_api_console_cli_or_neon_role"));
-  assert.ok(privacy.controls.includes("hyperdrive_prebinding_catalog_attestation_rejects_elevated_attributes_neon_superuser_or_unexpected_membership"));
+  assert.ok(privacy.controls.includes("hyperdrive_prebinding_catalog_attestation_rejects_elevated_attributes_neon_superuser_or_unexpected_membership_or_acl"));
   assert.ok(privacy.controls.includes("hyperdrive_prebinding_attestation_expires_at_apply_within_15_minutes_and_binds_environment_project_branch_endpoint_direct_tls_host_template_recomputed_evidence_and_all_login_fields"));
   assert.ok(privacy.controls.includes("attestation_runner_resolves_connection_only_from_exact_environment_terraform_outputs_and_uses_tls_verify_full"));
   sameMembers(privacy.managed_pending.map((item) => item.authorization), ["AUTH-02", "AUTH-03", "AUTH-11", "AUTH-02"], "security auth gates");
