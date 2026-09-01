@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/evaluation/planner/owner-approval-evidence.v1.0.0.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["evidence_version", "external_authorization_id", "approval_digests", "approvals"],
+  "properties": {
+    "evidence_version": {"const": "observatory-planner-owner-approval-evidence.v1.0.0"},
+    "external_authorization_id": {"const": "AUTH-12"},
+    "approval_digests": {"$ref": "#/$defs/approvalDigests"},
+    "approvals": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["role", "reviewer_identity", "reviewed_at", "attestation", "approval_digests", "review_evidence"],
+        "properties": {
+          "role": {"enum": ["product", "research_methods", "engineering"]},
+          "reviewer_identity": {"type": "string", "minLength": 1, "maxLength": 240},
+          "reviewed_at": {"type": "string", "format": "date-time"},
+          "attestation": {"type": "string", "minLength": 1, "maxLength": 2000},
+          "approval_digests": {"$ref": "#/$defs/approvalDigests"},
+          "review_evidence": {
+            "type": "object", "additionalProperties": false,
+            "required": ["kind", "reference", "sha256"],
+            "properties": {
+              "kind": {"enum": ["digital_signature", "review_system_record", "signed_document"]},
+              "reference": {"type": "string", "minLength": 1, "maxLength": 1000},
+              "sha256": {"$ref": "#/$defs/digest"}
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "approvalDigests": {
+      "type": "object", "additionalProperties": false,
+      "required": ["benchmark_manifest_digest", "evaluator_contract_digest", "review_subject_digest"],
+      "properties": {
+        "benchmark_manifest_digest": {"$ref": "#/$defs/digest"},
+        "evaluator_contract_digest": {"$ref": "#/$defs/digest"},
+        "review_subject_digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

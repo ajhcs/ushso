@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/evaluation/identity/v1.0.0/adjudication-validation-receipt.schema.json",
+  "description": "Shape for a future offline validation receipt. No completed instance is included in this package.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "submission_id",
+    "packet_id",
+    "reviewer_packet_byte_sha256",
+    "benchmark_case_sha256",
+    "reviewer_case_sha256",
+    "record_set_sha256",
+    "authorization_reference",
+    "authorization_receipt_id",
+    "metrics",
+    "controlled_fixture_records_accepted",
+    "import_executed",
+    "receipt_payload_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "identity.adjudication-validation-receipt.v1.0.0"},
+    "status": {"const": "validated_ready_for_append_only_import"},
+    "submission_id": {"type": "string", "pattern": "^adjudication-submission:"},
+    "packet_id": {"type": "string", "pattern": "^identity-review-packet:"},
+    "reviewer_packet_byte_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "benchmark_case_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "reviewer_case_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "record_set_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "authorization_reference": {"const": "AUTH-14"},
+    "authorization_receipt_id": {"type": "string", "minLength": 3, "maxLength": 200},
+    "metrics": {"type": "object"},
+    "controlled_fixture_records_accepted": {"const": 0},
+    "import_executed": {"const": false},
+    "receipt_payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

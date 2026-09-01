@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export const PROJECT_ROOT = path.resolve(PACKAGE_ROOT, '../../..');
+export const PROJECT_ROOT = path.resolve(PACKAGE_ROOT, '../..');
 
 export function assertFixtureOnly(argv) {
   if (argv.includes('--full')) throw new Error('FULL_MODE_UNSUPPORTED: retrieval v1.0.0 is offline and fixture-only');

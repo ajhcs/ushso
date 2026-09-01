@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/distribution.schema.json",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/truthEnvelope" },
+    {
+      "type": "object",
+      "required": ["distribution_id", "release_id", "title", "distribution_kind", "format", "media_type", "access_route_ids", "machine_readiness"],
+      "properties": {
+        "entity_type": { "const": "Distribution" },
+        "distribution_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "release_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "distribution_kind": { "enum": ["download", "api", "query_service", "web_interface", "document", "other"] },
+        "format": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "media_type": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[a-z0-9.+-]+/[a-z0-9.+-]+$" },
+            { "type": "null" }
+          ]
+        },
+        "access_route_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" }
+        },
+        "machine_readiness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "human_readable", "direct_download", "documented_api", "indexed_schema", "verified_recipe", "join_guidance", "evidence_ids", "observed_at"],
+          "properties": {
+            "label": { "enum": ["human_only", "downloadable", "api_documented", "schema_indexed", "retrieval_ready", "join_ready", "unknown"] },
+            "human_readable": { "enum": ["yes", "no", "unknown"] },
+            "direct_download": { "enum": ["yes", "no", "unknown"] },
+            "documented_api": { "enum": ["yes", "no", "unknown"] },
+            "indexed_schema": { "enum": ["yes", "no", "unknown"] },
+            "verified_recipe": { "enum": ["yes", "no", "unknown"] },
+            "join_guidance": { "enum": ["yes", "no", "unknown"] },
+            "evidence_ids": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" }
+            },
+            "observed_at": { "type": "string", "format": "date-time" }
+          }
+        },
+        "native_identifiers": { "type": "array", "minItems": 1 },
+        "evidence_refs": { "type": "array", "minItems": 1 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

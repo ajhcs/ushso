@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/documentation.schema.json",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/truthEnvelope" },
+    {
+      "type": "object",
+      "required": ["documentation_id", "subject_id", "documentation_type", "title", "locator"],
+      "properties": {
+        "entity_type": { "const": "Documentation" },
+        "documentation_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "subject_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "documentation_type": { "enum": ["codebook", "methodology", "schema", "data_dictionary", "license", "landing_page", "access_guide", "change_log", "other"] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "locator": { "type": "string", "format": "uri", "maxLength": 2000 },
+        "native_identifiers": { "type": "array", "minItems": 1 },
+        "evidence_refs": { "type": "array", "minItems": 1 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/publication/v1.0.0/package-manifest.schema.json",
+  "title": "Publication contract package file manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "package_name", "package_version", "canonicalization", "manifest_excludes", "file_count", "payload_bytes", "files", "immutable"],
+  "properties": {
+    "manifest_version": {"const": "publication-package-manifest.v1"},
+    "package_name": {"const": "ushso/publication-contract"},
+    "package_version": {"const": "1.0.0"},
+    "canonicalization": {"const": "exact-file-bytes"},
+    "manifest_excludes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "file_count": {"type": "integer", "minimum": 1},
+    "payload_bytes": {"type": "integer", "minimum": 1},
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "bytes", "sha256"],
+        "properties": {
+          "path": {"type": "string", "pattern": "^[^/].+"},
+          "bytes": {"type": "integer", "minimum": 1},
+          "sha256": {"$ref": "common.schema.json#/$defs/sha256"}
+        }
+      }
+    },
+    "immutable": {"const": true}
+  }
+}

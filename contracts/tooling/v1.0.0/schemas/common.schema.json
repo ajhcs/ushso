@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/tooling/v1.0.0/common.schema.json",
+  "$defs": {
+    "Digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest_type", "algorithm", "value"],
+      "properties": {
+        "digest_type": {
+          "enum": ["byte_sha256", "canonical_json_sha256", "jsonl_set_sha256", "package_sha256"]
+        },
+        "algorithm": {"const": "sha256"},
+        "value": {
+          "type": "string",
+          "format": "sha256-hex",
+          "minLength": 64,
+          "maxLength": 64
+        }
+      }
+    },
+    "ByteDigest": {
+      "allOf": [
+        {"$ref": "#/$defs/Digest"},
+        {"type": "object", "properties": {"digest_type": {"const": "byte_sha256"}}}
+      ]
+    },
+    "CanonicalDigest": {
+      "allOf": [
+        {"$ref": "#/$defs/Digest"},
+        {"type": "object", "properties": {"digest_type": {"const": "canonical_json_sha256"}}}
+      ]
+    },
+    "JsonlSetDigest": {
+      "allOf": [
+        {"$ref": "#/$defs/Digest"},
+        {"type": "object", "properties": {"digest_type": {"const": "jsonl_set_sha256"}}}
+      ]
+    },
+    "PackageDigest": {
+      "allOf": [
+        {"$ref": "#/$defs/Digest"},
+        {"type": "object", "properties": {"digest_type": {"const": "package_sha256"}}}
+      ]
+    },
+    "SafeRelativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)[A-Za-z0-9._/-]+$"
+    },
+    "SchemaId": {
+      "type": "string",
+      "format": "https-uri",
+      "minLength": 16,
+      "maxLength": 512
+    },
+    "Identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z][a-z0-9._-]*$"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/acquisition-plan.schema.json",
+  "title": "Ordered, non-executed acquisition DAG",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["steps", "complete", "evidence_reference_ids"],
+  "properties": {
+    "steps": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step_id", "sequence", "action_kind", "asset_id", "release_id", "distribution_id", "access_route_id", "depends_on", "performed_by", "human_gate_ids", "instructions", "stop_conditions", "execution_state", "evidence_reference_ids"],
+        "properties": {
+          "step_id": {"$ref": "common.schema.json#/$defs/stableId"},
+          "sequence": {"type": "integer", "minimum": 1, "maximum": 50},
+          "action_kind": {"enum": ["prepare_inputs", "registration", "application", "dua", "fee", "institutional_approval", "retrieve_from_source", "verify_artifact"]},
+          "asset_id": {"$ref": "common.schema.json#/$defs/assetId"},
+          "release_id": {"$ref": "common.schema.json#/$defs/releaseId"},
+          "distribution_id": {"$ref": "common.schema.json#/$defs/distributionId"},
+          "access_route_id": {"$ref": "common.schema.json#/$defs/accessRouteId"},
+          "depends_on": {
+            "type": "array",
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {"$ref": "common.schema.json#/$defs/stableId"}
+          },
+          "performed_by": {"enum": ["researcher", "research_institution", "source_operator", "data_owner"]},
+          "human_gate_ids": {
+            "type": "array",
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {"$ref": "common.schema.json#/$defs/stableId"}
+          },
+          "instructions": {"$ref": "common.schema.json#/$defs/maintainedText"},
+          "stop_conditions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {"$ref": "common.schema.json#/$defs/maintainedText"}
+          },
+          "execution_state": {"const": "not_executed"},
+          "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+        }
+      }
+    },
+    "complete": {"type": "boolean"},
+    "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+  }
+}

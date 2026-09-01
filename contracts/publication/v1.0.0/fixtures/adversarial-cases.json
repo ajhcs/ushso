@@ -1,0 +1,391 @@
+{
+  "fixture_version": "publication-adversarial-cases.v1",
+  "base_fixture": "fixtures/valid-publication.json",
+  "cases": [
+    {
+      "case_id": "adversarial:w1-unsorted",
+      "description": "The exact revision manifest cannot change member order.",
+      "mutations": [
+        {
+          "op": "swap",
+          "path": "/canonical_manifests/1/members",
+          "left": 0,
+          "right": 1
+        }
+      ],
+      "expected_code": "CANONICAL_MEMBERSHIP_NOT_SORTED"
+    },
+    {
+      "case_id": "adversarial:w1-duplicate-object",
+      "description": "A W1 manifest cannot pin two revisions of one canonical object.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/canonical_manifests/1/members/1/canonical_id",
+          "value": "ushso:asset:alpha"
+        }
+      ],
+      "expected_code": "MULTIPLE_REVISIONS_FOR_CANONICAL_OBJECT"
+    },
+    {
+      "case_id": "adversarial:w1-digest",
+      "description": "A changed membership digest fails exact revision verification.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/canonical_manifests/1/membership_digest/value",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "expected_code": "CANONICAL_MEMBERSHIP_DIGEST_MISMATCH"
+    },
+    {
+      "case_id": "adversarial:component-missing",
+      "description": "A candidate cannot omit any required publication component.",
+      "mutations": [
+        {
+          "op": "delete",
+          "path": "/build_receipts/1/component_generation_refs/6"
+        }
+      ],
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "adversarial:ack-missing",
+      "description": "Every exact projection obligation requires one acknowledgement.",
+      "mutations": [
+        {
+          "op": "delete",
+          "path": "/acknowledgements/8"
+        }
+      ],
+      "expected_code": "UNRESOLVED_ACKNOWLEDGEMENT_REFERENCE"
+    },
+    {
+      "case_id": "adversarial:public-excluded",
+      "description": "A public eligible revision cannot be silently excluded.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/acknowledgements/8/result",
+          "value": "excluded"
+        },
+        {
+          "op": "set",
+          "path": "/acknowledgements/8/document_refs",
+          "value": []
+        },
+        {
+          "op": "set",
+          "path": "/acknowledgements/8/exclusion",
+          "value": {
+            "reason_code": "visibility_excluded",
+            "evidence_refs": [
+              "evidence:r2:bad-exclusion"
+            ],
+            "absence_claim_permitted": false
+          }
+        }
+      ],
+      "expected_code": "PUBLIC_REVISION_NOT_PROJECTED"
+    },
+    {
+      "case_id": "adversarial:quarantine-projected",
+      "description": "A quarantined revision cannot produce a public document.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/acknowledgements/11/result",
+          "value": "projected"
+        },
+        {
+          "op": "set",
+          "path": "/acknowledgements/11/document_refs",
+          "value": [
+            {
+              "document_id": "doc:r2:asset_search:alpha",
+              "document_checksum": {
+                "algorithm": "sha256",
+                "canonicalization": "ushso-canonical-json-v1",
+                "domain": "projection_document",
+                "value": "81f10bdfc3f725bc66b24ce49d5ea1eb75da59eb055fe54cc8cfa13f327b7841"
+              }
+            }
+          ]
+        },
+        {
+          "op": "set",
+          "path": "/acknowledgements/11/exclusion",
+          "value": null
+        }
+      ],
+      "expected_code": "NONPUBLIC_REVISION_PROJECTED"
+    },
+    {
+      "case_id": "adversarial:document-checksum",
+      "description": "Projection document content is protected by a deterministic checksum.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/projection_documents/7/document_checksum/value",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "expected_code": "PROJECTION_DOCUMENT_CHECKSUM_MISMATCH"
+    },
+    {
+      "case_id": "adversarial:component-checksum",
+      "description": "A sealed component checksum cannot be substituted.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/component_manifests/7/component_checksum/value",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "expected_code": "COMPONENT_CHECKSUM_MISMATCH"
+    },
+    {
+      "case_id": "adversarial:component-w1",
+      "description": "All component generations must pin the same exact W1.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/component_manifests/7/canonical_manifest_ref/digest/value",
+          "value": "8075fc224c5467e0675b30431f5b296f4e3a089da46e998c3592ba6ff79c9ac2"
+        }
+      ],
+      "expected_code": "COMPONENT_W1_MISMATCH"
+    },
+    {
+      "case_id": "adversarial:barrier-failed",
+      "description": "A failed required barrier blocks validated publication.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/build_receipts/1/barriers/0/status",
+          "value": "failed"
+        }
+      ],
+      "expected_code": "VALIDATED_BUILD_HAS_FAILED_BARRIER"
+    },
+    {
+      "case_id": "adversarial:rejected-promoted",
+      "description": "A rejected full snapshot cannot be promoted partially.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/build_receipts/1/candidate_outcome",
+          "value": "rejected"
+        }
+      ],
+      "expected_code": "PARTIAL_OR_FAILED_BUILD_PROMOTION"
+    },
+    {
+      "case_id": "adversarial:pointer-active",
+      "description": "The active pointer must resolve the exact active manifest digest.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/pointer/active_publication_ref/manifest_digest/value",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "expected_code": "ACTIVE_POINTER_PUBLICATION_UNRESOLVED"
+    },
+    {
+      "case_id": "adversarial:pointer-nonatomic",
+      "description": "Publication pointer promotion is always one atomic commit.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/pointer/atomic_commit",
+          "value": false
+        }
+      ],
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "adversarial:n-minus-one-retention",
+      "description": "Prior generations remain retained for the active rollback window.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/component_manifests/0/retention/retained_until",
+          "value": "2026-10-15T00:00:00Z"
+        }
+      ],
+      "expected_code": "N_MINUS_ONE_RETENTION_TOO_SHORT"
+    },
+    {
+      "case_id": "adversarial:expired-pin-served",
+      "description": "A pin at or beyond expiry returns restart_required.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/pin_resolution_cases/2/expected_result",
+          "value": "serve_pinned"
+        }
+      ],
+      "expected_code": "PIN_RESOLUTION_RESULT_INVALID"
+    },
+    {
+      "case_id": "adversarial:legacy-coverage-fabricated",
+      "description": "The static fallback cannot fabricate a coverage component.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/legacy_static_manifest/capabilities/coverage/availability",
+          "value": "available"
+        }
+      ],
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "adversarial:legacy-absence",
+      "description": "Unknown static capabilities never permit an absence claim.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/legacy_static_manifest/capabilities/seo/absence_claim_permitted",
+          "value": true
+        }
+      ],
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "adversarial:static-pin",
+      "description": "Every publication must resolve the exact static fallback manifest.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/publication_manifests/1/rollback/static_compatibility_ref/manifest_digest/value",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "expected_code": "STATIC_ROLLBACK_PIN_UNRESOLVED"
+    },
+    {
+      "case_id": "adversarial:publication-digest",
+      "description": "The coherent publication pin set is immutable and checksummed.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/publication_manifests/1/publication_digest/value",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "expected_code": "PUBLICATION_MANIFEST_DIGEST_MISMATCH"
+    },
+    {
+      "case_id": "adversarial:incremental-strategy",
+      "description": "This contract freezes the complete as-of-W1 full snapshot strategy.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/build_receipts/1/build_strategy",
+          "value": "incremental_replay"
+        }
+      ],
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "adversarial:generation-transition",
+      "description": "Generation lifecycle transitions fail closed.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/generation_history/28/to_state",
+          "value": "validated"
+        }
+      ],
+      "expected_code": "INVALID_GENERATION_TRANSITION"
+    },
+    {
+      "case_id": "adversarial:history-transaction",
+      "description": "Pointer and append-only history share one transaction identity.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/pointer/transaction_id",
+          "value": "transaction:wrong"
+        }
+      ],
+      "expected_code": "POINTER_HISTORY_ATOMIC_MISMATCH"
+    },
+    {
+      "case_id": "adversarial:duplicate-component-kind",
+      "description": "A publication cannot replace coverage with a duplicate search component.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/publication_manifests/1/component_generation_refs/6/component_kind",
+          "value": "asset_search"
+        }
+      ],
+      "expected_code": "PUBLICATION_COMPONENT_SET_INCOMPLETE"
+    },
+    {
+      "case_id": "adversarial:unresolved-document",
+      "description": "Every component document reference must resolve.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/projection_documents/8/document_id",
+          "value": "doc:r2:coverage:changed"
+        }
+      ],
+      "expected_code": "UNRESOLVED_PROJECTION_DOCUMENT_REFERENCE"
+    },
+    {
+      "case_id": "adversarial:repeatability",
+      "description": "Two same-input full builds must have identical checksums.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/build_receipts/1/repeatability/second_checksum",
+          "value": "1111111111111111111111111111111111111111111111111111111111111111"
+        }
+      ],
+      "expected_code": "BUILD_REPEATABILITY_MISMATCH"
+    },
+    {
+      "case_id": "adversarial:partial-promotion-flag",
+      "description": "No contract may authorize partial publication.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/publication_manifests/1/promotion/partial_promotion_allowed",
+          "value": true
+        }
+      ],
+      "expected_code": "SCHEMA_INVALID"
+    },
+    {
+      "case_id": "adversarial:retired-pin-behavior",
+      "description": "A retained retired generation remains serveable until expiry.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/generation_history/3/pin_behavior",
+          "value": "restart_required"
+        }
+      ],
+      "expected_code": "GENERATION_EVENT_PIN_BEHAVIOR_INVALID"
+    },
+    {
+      "case_id": "adversarial:analytic-content",
+      "description": "Search projections cannot contain computed analytical output.",
+      "mutations": [
+        {
+          "op": "set",
+          "path": "/projection_documents/7/content/computed_values",
+          "value": {
+            "market": 42
+          }
+        }
+      ],
+      "expected_code": "PROJECTION_CONTENT_PRODUCT_BOUNDARY_VIOLATION"
+    }
+  ]
+}

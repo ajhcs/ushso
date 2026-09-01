@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.0.0/ingest-attempt.schema.json",
+  "title": "Ingestion delivery attempt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "attempt_id", "job_id", "run_id", "delivery_attempt", "maximum_delivery_attempts", "retry_policy_version", "first_attempt_at", "started_at", "finished_at", "delivery_fence", "failure", "retry_after_seconds", "computed_delay_seconds", "next_eligible_at", "database_transaction_committed", "transport_action", "durable_dead_letter_id"],
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+    "attempt_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "job_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "delivery_attempt": { "type": "integer", "minimum": 1 },
+    "maximum_delivery_attempts": { "type": "integer", "minimum": 1, "maximum": 10 },
+    "retry_policy_version": { "type": "string", "pattern": "^[a-z0-9._-]{3,64}$" },
+    "first_attempt_at": { "$ref": "common.schema.json#/$defs/Timestamp" },
+    "started_at": { "$ref": "common.schema.json#/$defs/Timestamp" },
+    "finished_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+    "delivery_fence": { "$ref": "common.schema.json#/$defs/DeliveryFence" },
+    "failure": { "$ref": "common.schema.json#/$defs/Failure" },
+    "retry_after_seconds": { "type": ["integer", "null"], "minimum": 0, "maximum": 86400 },
+    "computed_delay_seconds": { "type": ["integer", "null"], "minimum": 0, "maximum": 86400 },
+    "next_eligible_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+    "database_transaction_committed": { "type": "boolean" },
+    "transport_action": { "enum": ["ack_after_commit", "retry_after_rollback", "ack_reledgered_after_commit", "none_pending"] },
+    "durable_dead_letter_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] }
+  }
+}

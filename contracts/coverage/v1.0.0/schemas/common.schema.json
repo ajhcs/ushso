@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/coverage/v1.0.0/schemas/common.schema.json",
+  "title": "USHSO coverage common types",
+  "$defs": {
+    "Id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 180,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]*$"
+    },
+    "Sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "Semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "UtcInstant": {
+      "type": "string",
+      "format": "utc-instant"
+    },
+    "MetricId": {
+      "enum": [
+        "coverage.configured_scope_status/v1",
+        "coverage.harvest_completion/v1",
+        "coverage.discovered_inventory/v1",
+        "coverage.revision_ingestion/v1",
+        "coverage.normalized_outcome/v1",
+        "coverage.canonical_assets/v1",
+        "coverage.canonical_releases/v1",
+        "coverage.canonical_families/v1",
+        "coverage.schema_indexed/v1",
+        "coverage.search_indexed/v1",
+        "coverage.current_check_coverage/v1",
+        "coverage.due_check_timeliness/v1",
+        "coverage.check_pass/v1",
+        "coverage.stale/v1",
+        "coverage.failed/v1",
+        "coverage.overdue_not_started/v1",
+        "coverage.excluded_native_items/v1",
+        "coverage.excluded_canonical_assets/v1"
+      ]
+    },
+    "CountingUnit": {
+      "enum": [
+        "connector_scope",
+        "native_item",
+        "native_item_revision",
+        "asset",
+        "release",
+        "distribution",
+        "family",
+        "endpoint_check_target",
+        "scheduled_check_target",
+        "checked_target",
+        "named_layer_unit",
+        "stage_work_item",
+        "scheduled_work_item",
+        "coverage_assessment_cell"
+      ]
+    },
+    "CoverageCellState": {
+      "enum": [
+        "integrated",
+        "candidate",
+        "navigation_only",
+        "evidence_gap",
+        "inaccessible",
+        "unknown",
+        "not_assessed"
+      ]
+    },
+    "CohortDimension": {
+      "enum": [
+        "connector",
+        "connector_version",
+        "source_platform",
+        "authority_level",
+        "jurisdiction",
+        "subject",
+        "asset_type",
+        "access_class",
+        "format_schema_eligibility",
+        "cadence",
+        "identity_state",
+        "first_seen_band",
+        "last_seen_band",
+        "stage",
+        "failure_state",
+        "exclusion_state",
+        "source_scope",
+        "layer"
+      ]
+    },
+    "ReportingWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "start", "end"],
+      "properties": {
+        "kind": { "enum": ["instant", "bounded"] },
+        "start": {
+          "oneOf": [
+            { "$ref": "#/$defs/UtcInstant" },
+            { "type": "null" }
+          ]
+        },
+        "end": {
+          "oneOf": [
+            { "$ref": "#/$defs/UtcInstant" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "RevisionPin": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "not_applicable_reason"],
+          "properties": {
+            "value": { "$ref": "#/$defs/Id" },
+            "not_applicable_reason": { "type": "null" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "not_applicable_reason"],
+          "properties": {
+            "value": { "type": "null" },
+            "not_applicable_reason": { "type": "string", "minLength": 3, "maxLength": 240 }
+          }
+        }
+      ]
+    },
+    "RevisionPins": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry_revision",
+        "source_scope_revision",
+        "policy_revision",
+        "connector_revision",
+        "connector_configuration_revision",
+        "canonical_revision",
+        "coverage_contract_version",
+        "index_generation"
+      ],
+      "properties": {
+        "registry_revision": { "$ref": "#/$defs/RevisionPin" },
+        "source_scope_revision": { "$ref": "#/$defs/RevisionPin" },
+        "policy_revision": { "$ref": "#/$defs/RevisionPin" },
+        "connector_revision": { "$ref": "#/$defs/RevisionPin" },
+        "connector_configuration_revision": { "$ref": "#/$defs/RevisionPin" },
+        "canonical_revision": { "$ref": "#/$defs/RevisionPin" },
+        "coverage_contract_version": { "$ref": "#/$defs/RevisionPin" },
+        "index_generation": { "$ref": "#/$defs/RevisionPin" }
+      }
+    },
+    "CohortFilter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dimension", "values", "known_at_stage", "unclassified_count"],
+      "properties": {
+        "dimension": { "$ref": "#/$defs/CohortDimension" },
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 120 }
+        },
+        "known_at_stage": {
+          "enum": [
+            "registry",
+            "enumeration",
+            "capture",
+            "normalization",
+            "canonical",
+            "schema_index",
+            "search_index",
+            "access_check",
+            "freshness",
+            "pipeline",
+            "exclusion"
+          ]
+        },
+        "unclassified_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "MemberKey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "namespace", "value"],
+      "properties": {
+        "unit": { "$ref": "#/$defs/CountingUnit" },
+        "namespace": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "value": { "type": "string", "minLength": 1, "maxLength": 300 }
+      }
+    },
+    "EvidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "revision", "observed_at"],
+      "properties": {
+        "evidence_id": { "$ref": "#/$defs/Id" },
+        "revision": { "$ref": "#/$defs/Id" },
+        "observed_at": { "$ref": "#/$defs/UtcInstant" }
+      }
+    },
+    "OverlapDisclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["can_overlap", "additive", "overlap_group_ids", "note"],
+      "properties": {
+        "can_overlap": { "type": "boolean" },
+        "additive": { "type": "boolean" },
+        "overlap_group_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/Id" }
+        },
+        "note": { "type": "string", "minLength": 3, "maxLength": 500 }
+      }
+    },
+    "EstimateAssertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "uncertainty", "source_evidence", "rate_permitted"],
+      "properties": {
+        "method": { "type": "string", "minLength": 3, "maxLength": 400 },
+        "uncertainty": { "type": "string", "minLength": 3, "maxLength": 400 },
+        "source_evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/EvidenceRef" }
+        },
+        "rate_permitted": { "type": "boolean" }
+      }
+    },
+    "AbsenceReason": {
+      "enum": [
+        "enumeration_incomplete",
+        "denominator_unknown",
+        "scope_not_assessed",
+        "policy_mismatch",
+        "not_an_absence_metric",
+        "evidence_insufficient",
+        "excluded_or_quarantined",
+        "unknown_membership"
+      ]
+    }
+  }
+}

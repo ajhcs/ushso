@@ -8,17 +8,46 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "1"
+  USHSO_LIVE_SOURCE_REQUESTS: forbidden
+  USHSO_ALLOW_LIVE_SOURCE_REQUESTS: "0"
+  USHSO_NETWORK_POLICY: authoritative-sources-forbidden
+  USHSO_ALLOW_RECEIPT_WRITES: "0"
+  USHSO_RECEIPT_MODE: verify-only
+
 jobs:
-  verify:
+  node22-compatibility:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.12.0'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run release:audit
+      - run: npm test
+
+  build-and-dry-run:
+    needs: node22-compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
-      - run: npm run release:audit
-      - run: npm test
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm run build
-      - run: npm run cf:dry-run
+      - run: npm run cf:dry-run:artifact

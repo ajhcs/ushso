@@ -1,0 +1,22 @@
+{
+  "schema_version": "ushso-correctness-ledgers.v1",
+  "minimum_online_days": 90,
+  "publication_and_security_receipt_days": 365,
+  "ledgers": [
+    {"name":"run_job_attempt","heads":["ingest.harvest_runs","ingest.jobs","ingest.job_attempt_keys"],"histories":["ingest.run_state_events","ingest.job_attempts"],"partition_key":"recorded_at","source_index":true,"state":"active"},
+    {"name":"outbox","heads":["ops.outbox"],"histories":["ops.outbox_attempt_events"],"partition_key":"recorded_at","source_index":false,"state":"active"},
+    {"name":"processed_event","heads":["ops.processed_event_keys"],"histories":["ops.processed_event_history"],"partition_key":"transaction_committed_at","source_index":false,"state":"active"},
+    {"name":"workflow_mapping","heads":["ingest.workflow_attempt_mappings"],"histories":["ingest.workflow_reconciliation_events"],"partition_key":"recorded_at","source_index":false,"state":"active"},
+    {"name":"durable_dlq","heads":["ops.durable_dead_letters"],"histories":["ops.dead_letter_events"],"partition_key":"recorded_at","source_index":true,"state":"active"},
+    {"name":"publication_history","heads":[],"histories":["search.publication_history"],"partition_key":"published_at","source_index":false,"state":"planned_future_migration"},
+    {"name":"audit","heads":[],"histories":["ops.audit_events"],"partition_key":"occurred_at","source_index":false,"state":"active"}
+  ],
+  "invariants": [
+    "hot heads and global uniqueness guards remain unpartitioned",
+    "append-only high-volume histories use bounded UTC month partitions",
+    "no idempotency key is pruned while a delivery or replay can remain valid",
+    "publication, rollback, evidence, review, audit, backup, PITR, and legal dependencies are proven absent before GC",
+    "archive checksum and isolated restore verification precede a GC watermark"
+  ]
+}
+

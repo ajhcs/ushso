@@ -1,0 +1,52 @@
+{
+  "schema_version": "ushso-environment-fence.v1.0.0",
+  "environments": {
+    "staging": {
+      "terraform_root": "infra/terraform/environments/staging",
+      "state_key": "ushso/staging/wp3-foundation.tfstate",
+      "resource_prefix": "ushso-staging",
+      "neon_project": "dedicated_staging_project",
+      "credential_scope": "staging_only",
+      "traffic": "none"
+    },
+    "production": {
+      "terraform_root": "infra/terraform/environments/production",
+      "state_key": "ushso/production/wp3-foundation.tfstate",
+      "resource_prefix": "ushso-production",
+      "neon_project": "dedicated_production_project",
+      "credential_scope": "production_only",
+      "traffic": "none",
+      "apply_authorization": "AUTH-11"
+    }
+  },
+  "required_distinct_dimensions": [
+    "remote_state_bucket_and_key",
+    "cloudflare_resource_names",
+    "neon_project",
+    "neon_endpoint_and_direct_tls_host",
+    "database_credentials_and_roles",
+    "database_privilege_attestation_receipts",
+    "r2_buckets",
+    "queues_and_dlqs",
+    "hyperdrive_configs",
+    "workflows",
+    "worker_names",
+    "access_application",
+    "secret_values",
+    "service_identities"
+  ],
+  "static_negative_checks": [
+    "manifest_environment_must_equal_root_environment",
+    "all_resource_names_must_start_with_environment_prefix",
+    "backend_state_keys_must_be_distinct_and_environment_named",
+    "production_files_must_not_reference_staging_ids_or_state",
+    "staging_files_must_not_reference_production_ids_or_state",
+    "production_workers_dev_false_and_routes_empty",
+    "no_dns_or_custom_domain_resource",
+    "no_neon_api_created_worker_role",
+    "hyperdrive_requires_exact_environment_catalog_attestation",
+    "attestation_runner_rejects_host_project_branch_or_endpoint_overrides",
+    "hyperdrive_attestation_digest_recomputed_and_expiry_checked_at_apply",
+    "no_committed_credentials_or_unredacted_plan"
+  ]
+}

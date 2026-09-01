@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-asset-response.schema.json",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common.schema.json#/$defs/responseEnvelope" },
+    { "type": "object", "properties": { "capability": { "const": "get_asset" }, "evidence_references": { "type": "array", "maxItems": 100, "uniqueItems": true, "items": { "$ref": "common.schema.json#/$defs/evidenceReference" } } } }
+  ],
+  "oneOf": [
+    { "type": "object", "properties": { "ok": { "const": true }, "result": { "$ref": "result-types.schema.json#/$defs/assetResult" }, "error": { "type": "null" }, "result_state": { "enum": ["complete", "partial"] } } },
+    { "type": "object", "properties": { "ok": { "const": false }, "result": { "type": "null" }, "error": { "$ref": "common.schema.json#/$defs/error" }, "result_state": { "enum": ["unknown", "unavailable", "gated", "disabled"] } } }
+  ],
+  "unevaluatedProperties": false
+}

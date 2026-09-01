@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { CoveragePositioning } from '../components/CoveragePositioning'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { adaptDiscoveryResponse } from '../lib/catalogAdapter'
@@ -72,15 +73,17 @@ export function SourcesPage() {
           <Link className="button-link" to="/search">Browse all records</Link>
         </header>
 
+        <CoveragePositioning />
+
         {readiness && (
           <section className="readiness" aria-labelledby="readiness-heading">
-            <h2 id="readiness-heading">National readiness</h2>
+            <h2 id="readiness-heading">Legacy aggregate reconnaissance</h2>
             <div className="readiness__summary">
               <div><strong>{readiness.summary.jurisdictions}</strong><span>states plus DC recognized</span></div>
               <div><strong>{readiness.summary.federal_sources_live_metadata_validated}</strong><span>federal source routes live metadata-checked</span></div>
               <div><strong>{readiness.summary.published_records}</strong><span>published records in corpus v{readiness.corpus_version}</span></div>
             </div>
-            <p>Every jurisdiction receives the same federal baseline. State overlays remain visibly separate so navigation candidates are not mistaken for validated datasets.</p>
+            <p>This older jurisdiction-level artifact remains visible for provenance. It is not the canonical source-class matrix, cannot promote any cell to integrated, and must not be used as a completeness denominator. State overlays remain visibly separate so navigation candidates are not mistaken for validated datasets.</p>
             <div className="readiness-table-wrap">
               <table className="readiness-table">
                 <thead><tr><th scope="col">Jurisdiction</th><th scope="col">Federal baseline</th><th scope="col">State overlay</th><th scope="col">Status meaning</th></tr></thead>

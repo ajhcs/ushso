@@ -1,0 +1,171 @@
+{
+  "ledger_version": "ushso-wp8-evidence-ledger.v1.0.0",
+  "work_package": "WP8",
+  "recorded_at": "2026-08-30T00:00:00.000Z",
+  "scope": "untuned immutable PostgreSQL search-generation and publication scaffolding",
+  "quality_status": "FAIL_PRE_TUNING",
+  "release_ready": false,
+  "requirements": [
+    {
+      "requirement_id": "WP8-01",
+      "requirement": "All five searchable projection types use one bounded, non-authoritative, immutable envelope with exact canonical revision and truth references",
+      "status": "implemented_verified_offline",
+      "implementation": ["packages/search/projection-v2.mjs"],
+      "tests": ["tests/projection.test.mjs"],
+      "receipt": "receipts/wp8-scaffolding.json"
+    },
+    {
+      "requirement_id": "WP8-02",
+      "requirement": "A build uses one exact W1 immutable revision membership and reconciles every projection obligation, visibility outcome, reference, and checksum",
+      "status": "implemented_verified_offline_and_static_sql",
+      "implementation": ["packages/search/projection-v2.mjs", "packages/search/sql/0010_search_projection_schema.reviewed.sql"],
+      "tests": ["tests/projection.test.mjs", "tests/sql-shape.test.mjs"],
+      "receipt": "receipts/wp8-scaffolding.json"
+    },
+    {
+      "requirement_id": "WP8-03",
+      "requirement": "Two builds from the same W1 and projector inputs have identical checksums, independent of generation identity and input order",
+      "status": "implemented_verified_offline",
+      "implementation": ["packages/search/projection-v2.mjs"],
+      "tests": ["tests/projection.test.mjs"],
+      "receipt": "receipts/wp8-scaffolding.json"
+    },
+    {
+      "requirement_id": "WP8-04",
+      "requirement": "Incremental projection chunks converge byte-for-byte with a complete full projection and conflicting chunks fail closed",
+      "status": "implemented_verified_offline",
+      "implementation": ["packages/search/projection-v2.mjs"],
+      "tests": ["tests/projection.test.mjs"],
+      "receipt": "receipts/wp8-scaffolding.json"
+    },
+    {
+      "requirement_id": "WP8-05",
+      "requirement": "Generation lifecycle is building to validated to published to retired or rejected; failed builds cannot alter the live pointer",
+      "status": "implemented_verified_fault_injection_offline",
+      "implementation": ["packages/search/publication-lifecycle-v2.mjs", "packages/search/sql/0010_search_projection_schema.reviewed.sql"],
+      "tests": ["tests/publication-lifecycle.test.mjs", "tests/sql-shape.test.mjs"],
+      "receipt": "receipts/wp8-scaffolding.json"
+    },
+    {
+      "requirement_id": "WP8-06",
+      "requirement": "Publication history, seven-component transition, and singleton pointer switch are atomic and rollback restores retained N-1",
+      "status": "implemented_verified_fault_injection_offline_and_static_sql",
+      "implementation": ["packages/search/publication-lifecycle-v2.mjs", "packages/search/sql/0010_search_projection_schema.reviewed.sql"],
+      "tests": ["tests/publication-lifecycle.test.mjs", "tests/sql-shape.test.mjs"],
+      "receipt": "receipts/wp8-scaffolding.json"
+    },
+    {
+      "requirement_id": "WP8-07",
+      "requirement": "Cursors and hydration remain pinned to an immutable publication/generation, are bounded and signed, and require restart after retention or safety revocation",
+      "status": "implemented_verified_offline",
+      "implementation": ["packages/search/generation-cursor-v2.mjs", "packages/search/postgres-search-backend-v2.mjs"],
+      "tests": ["tests/cursor.test.mjs", "tests/postgres-adapter.test.mjs"],
+      "receipt": "receipts/wp8-scaffolding.json"
+    },
+    {
+      "requirement_id": "WP8-08",
+      "requirement": "Public search uses PostgreSQL FTS/GIN, normalized indexed facets, keyset pagination, capped candidates, and capped exact-revision hydration without JSONL or Worker corpus scans",
+      "status": "implemented_verified_static_sql_and_adapter",
+      "implementation": ["packages/search/postgres-search-backend-v2.mjs", "packages/search/sql/0010_search_projection_schema.reviewed.sql", "packages/search/sql/query"],
+      "tests": ["tests/postgres-adapter.test.mjs", "tests/sql-shape.test.mjs"],
+      "receipt": "receipts/query-plan-gate.json"
+    },
+    {
+      "requirement_id": "WP8-09",
+      "requirement": "Production-like query plans and latency/resource SLOs pass the frozen workload gate",
+      "status": "pending_external_authorization",
+      "implementation": ["packages/search/sql/explain/production-query-plan-gate.sql"],
+      "tests": ["tests/sql-shape.test.mjs"],
+      "receipt": "receipts/query-plan-gate.json"
+    },
+    {
+      "requirement_id": "WP8-10",
+      "requirement": "Ranking quality, synonyms, authority priors, negative constraints, near-miss policy, and graph expansion meet frozen section 23 thresholds",
+      "status": "pending_post_freeze_tuning",
+      "implementation": ["packages/search/postgres-search-backend-v2.mjs"],
+      "tests": [],
+      "receipt": "receipts/retrieval-quality.json"
+    },
+    {
+      "requirement_id": "WP8-11",
+      "requirement": "WP2 evaluator, metric, cohort, and benchmark semantics remain frozen before any tuning",
+      "status": "verified_frozen_tuning_not_started",
+      "implementation": [],
+      "tests": ["tests/boundary-and-pins.test.mjs"],
+      "receipt": "receipts/retrieval-quality.json"
+    },
+    {
+      "requirement_id": "WP8-12",
+      "requirement": "The final 20-item holdout runs once only after candidate freeze, under independently verified custody and authorization, with an authenticated evaluator and an aggregate-only terminal receipt contract",
+      "status": "guard_and_verifier_interfaces_implemented_replacement_package_and_external_receipts_pending",
+      "implementation": ["packages/search/final-holdout-guard-v2.mjs"],
+      "tests": ["tests/final-holdout-guard.test.mjs", "tests/boundary-and-pins.test.mjs"],
+      "receipt": "receipts/final-holdout-prerequisite.json",
+      "external_authorization_id": "AUTH-13"
+    },
+    {
+      "requirement_id": "WP8-13",
+      "requirement": "WP1 v1/static compatibility and rollback sources remain byte-for-byte pinned",
+      "status": "verified_unchanged",
+      "implementation": [],
+      "tests": ["tests/boundary-and-pins.test.mjs"],
+      "receipt": "receipts/wp8-scaffolding.json"
+    },
+    {
+      "requirement_id": "WP8-14",
+      "requirement": "Reviewed SQL becomes migration 0010 only after migrations 0004 through 0009 freeze and passes clean/N-1 PostgreSQL migration tests",
+      "status": "pending_dependency_sequence",
+      "implementation": ["packages/search/sql/0010_search_projection_schema.reviewed.sql"],
+      "tests": ["tests/sql-shape.test.mjs"],
+      "receipt": "receipts/database-migration-readiness.json"
+    },
+    {
+      "requirement_id": "WP8-15",
+      "requirement": "USHSO recommends and explains public-source research options but never executes analyses, calculates market share, emits financial benchmarks, fetches source payloads, or silently merges uncertain identities",
+      "status": "implemented_verified_offline",
+      "implementation": ["packages/search/projection-v2.mjs", "packages/search/postgres-search-backend-v2.mjs"],
+      "tests": ["tests/projection.test.mjs", "tests/postgres-adapter.test.mjs"],
+      "receipt": "receipts/wp8-scaffolding.json"
+    },
+    {
+      "requirement_id": "WP8-16",
+      "requirement": "The successor search implementation has a versioned package surface, exact workspace dependencies, immutable content manifest, and non-mutating test/validate entry points",
+      "status": "implemented_verified",
+      "implementation": ["packages/search/package.json", "packages/search/index-v2.mjs", "packages/search/manifests/package-manifest.json", "packages/search/tools/validate-package.mjs"],
+      "tests": ["packages/search npm test", "packages/search npm run validate"],
+      "receipt": "receipts/wp8-scaffolding.json"
+    }
+  ],
+  "external_gates": [
+    {
+      "gate_id": "migration-0010-integration",
+      "status": "pending_dependency_sequence",
+      "reason": "Migrations 0004 through 0009 are owned by active predecessor work; db/** was not modified."
+    },
+    {
+      "gate_id": "postgresql-runtime-and-migration-rehearsal",
+      "status": "pending_local_or_external_environment",
+      "reason": "Only psql/pg_isready clients are installed; no local initdb/postgres server was available, and no external database was contacted."
+    },
+    {
+      "gate_id": "production-like-query-plan-and-load",
+      "status": "pending_external_authorization",
+      "reason": "No production-like 30-minute 2x workload or measured latency receipt was fabricated."
+    },
+    {
+      "gate_id": "post-freeze-ranking-tuning",
+      "status": "pending",
+      "reason": "This delivery is intentionally untuned and reports FAIL_PRE_TUNING."
+    },
+    {
+      "gate_id": "replacement-final-holdout",
+      "status": "pending_independent_owner",
+      "reason": "AUTH-13: the published legacy 20 are audit-only. A new sealed, never-evaluated 20-item gold package and trusted authorization/custody receipt must be supplied by an independent evaluation owner, then run once by the bound evaluator with an aggregate-only terminal receipt."
+    },
+    {
+      "gate_id": "public-publication-cutover",
+      "status": "pending_external_authorization",
+      "reason": "No production deployment, public pointer switch, or paid infrastructure action was authorized or performed."
+    }
+  ]
+}

@@ -1,0 +1,436 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/result-types.schema.json",
+  "$defs": {
+    "boundedIdList": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": { "$ref": "common.schema.json#/$defs/stableId" }
+    },
+    "assetSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_id", "title", "geography_ids", "grain", "time_intervals", "access_class", "machine_readiness", "evidence_state", "observed_at", "staleness_state", "evidence_ids", "role_candidates", "why_relevant", "confidence", "derivation_references", "near_miss_reasons"],
+      "properties": {
+        "asset_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "title": { "$ref": "common.schema.json#/$defs/sourceExcerpt" },
+        "geography_ids": { "$ref": "#/$defs/boundedIdList" },
+        "grain": { "enum": ["facility", "campus", "organization", "system", "county", "state", "national", "mixed", "unknown"] },
+        "time_intervals": { "type": "array", "maxItems": 20, "items": { "$ref": "common.schema.json#/$defs/timePeriod" } },
+        "access_class": { "enum": ["public", "registration", "application", "dua", "licensed", "paid", "report_only", "unknown"] },
+        "machine_readiness": { "enum": ["human_only", "downloadable", "api_documented", "schema_indexed", "retrieval_ready", "join_ready", "unknown"] },
+        "evidence_state": { "enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven"] },
+        "observed_at": { "$ref": "common.schema.json#/$defs/dateTime" },
+        "staleness_state": { "enum": ["current", "stale", "unknown", "not_applicable"] },
+        "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" },
+        "role_candidates": {
+          "oneOf": [
+            { "$ref": "#/$defs/boundedIdList" },
+            { "type": "null" }
+          ]
+        },
+        "why_relevant": {
+          "oneOf": [
+            { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "common.schema.json#/$defs/sourceExcerpt" } },
+            { "type": "null" }
+          ]
+        },
+        "confidence": {
+          "oneOf": [
+            { "enum": ["low", "moderate", "high", "unknown"] },
+            { "type": "null" }
+          ]
+        },
+        "derivation_references": {
+          "oneOf": [
+            { "$ref": "#/$defs/boundedIdList" },
+            { "type": "null" }
+          ]
+        },
+        "near_miss_reasons": {
+          "oneOf": [
+            { "type": "array", "maxItems": 20, "items": { "$ref": "common.schema.json#/$defs/sourceExcerpt" } },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "facetCount": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dimension", "value", "count", "count_state", "denominator_scope", "evidence_ids"],
+      "properties": {
+        "dimension": { "$ref": "common.schema.json#/$defs/stableId" },
+        "value": { "$ref": "common.schema.json#/$defs/stableId" },
+        "count": { "type": "integer", "minimum": 0, "maximum": 1000000000 },
+        "count_state": { "enum": ["exact", "estimated", "unknown"] },
+        "denominator_scope": { "$ref": "common.schema.json#/$defs/shortText" },
+        "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" }
+      }
+    },
+    "searchResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "sort", "ranker_version", "grouping", "cursor_binding_digest", "summaries", "facet_counts", "aggregates", "scoped_zero_statement", "absence_claim_permitted"],
+      "properties": {
+        "mode": { "enum": ["browse", "search"] },
+        "sort": { "enum": ["title_asc", "publisher_title", "updated_desc", "frozen_rank_tuple"] },
+        "ranker_version": { "$ref": "common.schema.json#/$defs/stableId" },
+        "grouping": { "enum": ["none", "family", "source", "release"] },
+        "cursor_binding_digest": { "$ref": "common.schema.json#/$defs/digest" },
+        "summaries": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/assetSummary" } },
+        "facet_counts": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/facetCount" } },
+        "aggregates": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/facetCount" } },
+        "scoped_zero_statement": { "$ref": "common.schema.json#/$defs/maintainedText" },
+        "absence_claim_permitted": { "const": false }
+      }
+    },
+    "nestedRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_id", "record_type", "label", "lifecycle_state", "evidence_ids"],
+      "properties": {
+        "record_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "record_type": { "enum": ["release", "distribution", "documentation", "schema"] },
+        "label": { "$ref": "common.schema.json#/$defs/sourceExcerpt" },
+        "lifecycle_state": { "enum": ["active", "inactive", "superseded", "withdrawn", "retired", "excluded", "unknown"] },
+        "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" }
+      }
+    },
+    "assetResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset", "source", "identity_state", "family_state", "releases", "distributions", "documentation", "schemas", "collection_completeness"],
+      "properties": {
+        "asset": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["asset_id", "title", "asset_kind", "evidence_ids"],
+          "properties": {
+            "asset_id": { "$ref": "common.schema.json#/$defs/stableId" },
+            "title": { "$ref": "common.schema.json#/$defs/sourceExcerpt" },
+            "asset_kind": { "enum": ["dataset", "product", "report_series", "registry", "collection", "crosswalk", "methodology", "other"] },
+            "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" }
+          }
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_id", "name", "authority_level", "evidence_ids"],
+          "properties": {
+            "source_id": { "$ref": "common.schema.json#/$defs/stableId" },
+            "name": { "$ref": "common.schema.json#/$defs/sourceExcerpt" },
+            "authority_level": { "enum": ["authoritative", "official_mirror", "maintainer", "secondary", "candidate", "unknown"] },
+            "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" }
+          }
+        },
+        "identity_state": { "enum": ["source_scoped", "authoritatively_resolved", "review_pending", "conflicted", "unknown"] },
+        "family_state": { "enum": ["not_grouped", "candidate", "accepted", "conflicted", "unknown"] },
+        "releases": { "type": "array", "maxItems": 50, "items": { "$ref": "#/$defs/nestedRecord" } },
+        "distributions": { "type": "array", "maxItems": 50, "items": { "$ref": "#/$defs/nestedRecord" } },
+        "documentation": { "type": "array", "maxItems": 50, "items": { "$ref": "#/$defs/nestedRecord" } },
+        "schemas": { "type": "array", "maxItems": 50, "items": { "$ref": "#/$defs/nestedRecord" } },
+        "collection_completeness": {
+          "type": "object",
+          "additionalProperties": false,
+          "maxProperties": 4,
+          "required": ["releases", "distributions", "documentation", "schemas"],
+          "properties": {
+            "releases": { "enum": ["complete", "partial", "unknown", "unavailable"] },
+            "distributions": { "enum": ["complete", "partial", "unknown", "unavailable"] },
+            "documentation": { "enum": ["complete", "partial", "unknown", "unavailable"] },
+            "schemas": { "enum": ["complete", "partial", "unknown", "unavailable"] }
+          }
+        }
+      }
+    },
+    "accessPlanResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_id", "release_id", "distribution_id", "access_route_id", "access_class", "requester_eligibility", "eligibility_criteria", "requirements", "human_process", "process_steps", "turnaround_category", "authoritative_links", "verified_at", "human_authorization_gate", "execution_authorized_by_ushso", "access_workflow_submitted", "evidence_ids"],
+      "properties": {
+        "asset_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "release_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "distribution_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "access_route_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "access_class": { "enum": ["public", "registration", "application", "dua", "licensed", "paid", "unknown"] },
+        "requester_eligibility": { "const": "not_assessed" },
+        "eligibility_criteria": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/sourceExcerpt" } },
+        "requirements": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/requirement" } },
+        "human_process": { "$ref": "common.schema.json#/$defs/maintainedText" },
+        "process_steps": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/maintainedText" } },
+        "turnaround_category": { "enum": ["immediate_if_eligible", "days", "weeks", "months", "source_determined", "unknown"] },
+        "authoritative_links": { "type": "array", "maxItems": 50, "uniqueItems": true, "items": { "$ref": "common.schema.json#/$defs/uri" } },
+        "verified_at": { "$ref": "common.schema.json#/$defs/dateTime" },
+        "human_authorization_gate": { "type": "boolean" },
+        "execution_authorized_by_ushso": { "const": false },
+        "access_workflow_submitted": { "const": false },
+        "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" }
+      }
+    },
+    "recipeParameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "location", "required", "description", "example_value"],
+      "properties": {
+        "name": { "$ref": "common.schema.json#/$defs/stableId" },
+        "location": { "enum": ["path", "query", "header", "body", "form"] },
+        "required": { "type": "boolean" },
+        "description": { "$ref": "common.schema.json#/$defs/sourceExcerpt" },
+        "example_value": {
+          "oneOf": [
+            { "$ref": "common.schema.json#/$defs/sourceExcerpt" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "retrievalRecipeResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_id", "release_id", "distribution_id", "access_route_id", "interface", "request_method", "request_template", "parameters", "authentication_type", "pagination", "response_formats", "compression", "size_category", "update_behavior", "parser_hints", "sample_requests", "expected_artifacts", "checks", "stop_conditions", "retrieval_executed", "payloads_acquired", "evidence_ids"],
+      "properties": {
+        "asset_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "release_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "distribution_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "access_route_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "interface": { "enum": ["download", "api", "query_service", "web_interface", "application", "unknown"] },
+        "request_method": { "enum": ["GET", "HEAD", "POST", "SOURCE_DEFINED", "unknown"] },
+        "request_template": { "$ref": "common.schema.json#/$defs/nullableUri" },
+        "parameters": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/recipeParameter" } },
+        "authentication_type": { "enum": ["none", "api_key", "oauth", "session", "application_approval", "source_defined", "unknown"] },
+        "pagination": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "page_parameter", "page_size_parameter", "maximum_page_size"],
+          "properties": {
+            "kind": { "enum": ["none", "page", "offset", "cursor", "link_header", "source_defined", "unknown"] },
+            "page_parameter": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+            "page_size_parameter": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+            "maximum_page_size": { "oneOf": [{ "type": "integer", "minimum": 1, "maximum": 1000000 }, { "type": "null" }] }
+          }
+        },
+        "response_formats": { "type": "array", "maxItems": 20, "uniqueItems": true, "items": { "$ref": "common.schema.json#/$defs/stableId" } },
+        "compression": { "enum": ["none", "gzip", "zip", "source_defined", "unknown"] },
+        "size_category": { "enum": ["small", "medium", "large", "very_large", "source_determined", "unknown"] },
+        "update_behavior": { "$ref": "common.schema.json#/$defs/sourceExcerpt" },
+        "parser_hints": { "type": "array", "maxItems": 100, "items": { "$ref": "common.schema.json#/$defs/sourceExcerpt" } },
+        "sample_requests": { "type": "array", "maxItems": 10, "items": { "type": "string", "minLength": 1, "maxLength": 2048 } },
+        "expected_artifacts": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/sourceExcerpt" } },
+        "checks": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/maintainedText" } },
+        "stop_conditions": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/maintainedText" } },
+        "retrieval_executed": { "const": false },
+        "payloads_acquired": { "const": false },
+        "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" }
+      }
+    },
+    "variableField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_field_id", "label", "description", "native_name", "data_type", "unit", "allowed_values", "code_system", "semantic_role", "identifier_namespace", "evidence_ids", "limitations"],
+      "properties": {
+        "schema_field_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "label": { "$ref": "common.schema.json#/$defs/sourceExcerpt" },
+        "description": { "oneOf": [{ "$ref": "common.schema.json#/$defs/sourceExcerpt" }, { "type": "null" }] },
+        "native_name": { "$ref": "common.schema.json#/$defs/sourceExcerpt" },
+        "data_type": { "$ref": "common.schema.json#/$defs/stableId" },
+        "unit": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+        "allowed_values": { "type": "array", "maxItems": 100, "items": { "$ref": "common.schema.json#/$defs/sourceExcerpt" } },
+        "code_system": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+        "semantic_role": { "enum": ["identifier", "dimension", "measure_description", "date", "geography", "suppression_flag", "metadata", "unknown"] },
+        "identifier_namespace": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+        "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" },
+        "limitations": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/maintainedText" } }
+      }
+    },
+    "variablesResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_id", "release_id", "distribution_id", "schema_id", "schema_completeness", "fields"],
+      "properties": {
+        "asset_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "release_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "distribution_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "schema_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "schema_completeness": { "enum": ["complete", "partial", "unknown", "unavailable"] },
+        "fields": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/variableField" } }
+      }
+    },
+    "joinRoute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route_id", "from_field_id", "to_field_id", "from_namespace", "to_namespace", "entity_scope", "direction", "cardinality", "temporal_applicability", "normalization", "operation_kind", "evidence_state", "compatibility", "requirements", "blockers", "caveats", "evidence_ids", "hop_count"],
+      "properties": {
+        "route_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "from_field_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "to_field_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "from_namespace": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+        "to_namespace": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+        "entity_scope": { "enum": ["facility", "campus", "organization", "system", "legal_entity", "unknown"] },
+        "direction": { "enum": ["unidirectional", "bidirectional"] },
+        "cardinality": { "enum": ["one_to_one", "one_to_many", "many_to_one", "many_to_many", "unknown"] },
+        "temporal_applicability": { "$ref": "common.schema.json#/$defs/timePeriod" },
+        "normalization": { "$ref": "common.schema.json#/$defs/maintainedText" },
+        "operation_kind": { "enum": ["join", "crosswalk", "aggregate", "filter", "temporal_alignment", "measure_harmonization"] },
+        "evidence_state": { "enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven"] },
+        "compatibility": { "enum": ["compatible", "conditional", "incompatible", "unknown"] },
+        "requirements": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/requirement" } },
+        "blockers": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/blocker" } },
+        "caveats": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/maintainedText" } },
+        "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" },
+        "hop_count": { "type": "integer", "minimum": 1, "maximum": 2 }
+      }
+    },
+    "joinRoutesResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from_id", "to_id", "max_hops_used", "routes"],
+      "properties": {
+        "from_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "to_id": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+        "max_hops_used": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "routes": { "type": "array", "maxItems": 50, "items": { "$ref": "#/$defs/joinRoute" } }
+      }
+    },
+    "comparisonDimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dimension", "state", "values", "explanation", "evidence_ids"],
+      "properties": {
+        "dimension": { "enum": ["role", "authority", "geography", "time", "grain", "access", "variables_schema", "freshness", "machine_readiness", "operation_kind", "join_evidence", "join_compatibility"] },
+        "state": { "enum": ["comparable", "incomparable", "unknown", "unavailable"] },
+        "values": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["asset_id", "metadata_value", "state"],
+            "properties": {
+              "asset_id": { "$ref": "common.schema.json#/$defs/stableId" },
+              "metadata_value": { "oneOf": [{ "$ref": "common.schema.json#/$defs/sourceExcerpt" }, { "type": "null" }] },
+              "state": { "enum": ["known", "unknown", "unavailable", "not_applicable"] }
+            }
+          }
+        },
+        "explanation": { "$ref": "common.schema.json#/$defs/maintainedText" },
+        "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" }
+      }
+    },
+    "pairwiseOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left_asset_id", "right_asset_id", "operation_kind", "evidence_state", "compatibility", "requirements", "blockers", "evidence_ids"],
+      "properties": {
+        "left_asset_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "right_asset_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "operation_kind": { "enum": ["join", "crosswalk", "aggregate", "filter", "temporal_alignment", "measure_harmonization", "none", "unknown"] },
+        "evidence_state": { "enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven"] },
+        "compatibility": { "enum": ["compatible", "conditional", "incompatible", "unknown"] },
+        "requirements": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/requirement" } },
+        "blockers": { "type": "array", "maxItems": 50, "items": { "$ref": "common.schema.json#/$defs/blocker" } },
+        "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" }
+      }
+    },
+    "compareResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_ids", "dimensions", "pairwise_operations", "ranking_performed", "source_values_compared"],
+      "properties": {
+        "asset_ids": { "type": "array", "minItems": 2, "maxItems": 5, "uniqueItems": true, "items": { "$ref": "common.schema.json#/$defs/stableId" } },
+        "dimensions": { "type": "array", "minItems": 1, "maxItems": 12, "items": { "$ref": "#/$defs/comparisonDimension" } },
+        "pairwise_operations": { "type": "array", "maxItems": 10, "items": { "$ref": "#/$defs/pairwiseOperation" } },
+        "ranking_performed": { "const": false },
+        "source_values_compared": { "const": false }
+      }
+    },
+    "denominator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["definition_id", "unit", "count", "status", "bounded_inventory_complete", "membership_manifest_digest"],
+      "properties": {
+        "definition_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "unit": { "enum": ["connector_scope", "native_item", "native_item_revision", "asset", "release", "distribution", "endpoint", "check_target", "work_item", "cohort_cell"] },
+        "count": { "oneOf": [{ "type": "integer", "minimum": 0, "maximum": 1000000000 }, { "type": "null" }] },
+        "status": { "enum": ["known", "estimated", "unknown"] },
+        "bounded_inventory_complete": { "type": "boolean" },
+        "membership_manifest_digest": { "oneOf": [{ "$ref": "common.schema.json#/$defs/digest" }, { "type": "null" }] }
+      }
+    },
+    "coverageCell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cell_id", "geography_id", "source_class", "coverage_cell_state", "processing_status", "completeness_state", "denominator", "interpretation", "absence_claim_permitted", "evidence_ids"],
+      "properties": {
+        "cell_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "geography_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "source_class": { "$ref": "common.schema.json#/$defs/stableId" },
+        "coverage_cell_state": { "$ref": "common.schema.json#/$defs/coverage_cell_state" },
+        "processing_status": { "enum": ["normalized", "pending", "failed", "excluded", "not_applicable", "unknown"] },
+        "completeness_state": { "enum": ["complete", "partial", "unknown", "not_applicable"] },
+        "denominator": { "$ref": "#/$defs/denominator" },
+        "interpretation": { "$ref": "common.schema.json#/$defs/maintainedText" },
+        "absence_claim_permitted": { "type": "boolean" },
+        "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" }
+      }
+    },
+    "coverageResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["federal_baseline", "cells", "scope_interpretation", "absence_claim_permitted"],
+      "properties": {
+        "federal_baseline": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "source_scope_count", "description", "evidence_ids"],
+          "properties": {
+            "state": { "enum": ["integrated", "partial", "unknown", "unavailable"] },
+            "source_scope_count": { "oneOf": [{ "type": "integer", "minimum": 0, "maximum": 1000000 }, { "type": "null" }] },
+            "description": { "$ref": "common.schema.json#/$defs/maintainedText" },
+            "evidence_ids": { "$ref": "common.schema.json#/$defs/evidenceIds" }
+          }
+        },
+        "cells": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/coverageCell" } },
+        "scope_interpretation": { "$ref": "common.schema.json#/$defs/maintainedText" },
+        "absence_claim_permitted": { "type": "boolean" }
+      }
+    },
+    "clarificationQuestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question_id", "prompt", "answer_schema"],
+      "properties": {
+        "question_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "prompt": { "$ref": "common.schema.json#/$defs/maintainedText" },
+        "answer_schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "max_length", "allowed_values"],
+          "properties": {
+            "type": { "enum": ["string", "single_choice"] },
+            "max_length": { "type": "integer", "minimum": 1, "maximum": 2000 },
+            "allowed_values": { "type": "array", "maxItems": 20, "uniqueItems": true, "items": { "$ref": "common.schema.json#/$defs/sourceExcerpt" } }
+          }
+        }
+      }
+    },
+    "planResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plan", "clarification_token", "clarification_expires_at", "questions"],
+      "properties": {
+        "plan": { "$ref": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/research-plan.schema.json" },
+        "clarification_token": {
+          "oneOf": [
+            { "type": "string", "minLength": 32, "maxLength": 2048, "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$" },
+            { "type": "null" }
+          ]
+        },
+        "clarification_expires_at": { "$ref": "common.schema.json#/$defs/nullableDateTime" },
+        "questions": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/clarificationQuestion" } }
+      }
+    }
+  }
+}

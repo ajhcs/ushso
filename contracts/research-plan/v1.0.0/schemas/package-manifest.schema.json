@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/package-manifest.schema.json",
+  "title": "Research-plan package manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "package_name", "package_version", "schema_dialect", "canonicalization_algorithm", "compatibility", "artifact_hash_kind", "artifacts", "manifest_digest"],
+  "properties": {
+    "contract_version": {"const": "observatory-research-plan-package-manifest.v1.0.0"},
+    "package_name": {"const": "@ushso/research-plan-contract"},
+    "package_version": {"const": "1.0.0"},
+    "schema_dialect": {"const": "https://json-schema.org/draft/2020-12/schema"},
+    "canonicalization_algorithm": {"const": "ushso-canonical-json.v1.0.0"},
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stability", "supersedes", "deprecated", "unexpected_properties"],
+      "properties": {
+        "stability": {"const": "immutable"},
+        "supersedes": {"type": "null"},
+        "deprecated": {"const": false},
+        "unexpected_properties": {"const": "reject"}
+      }
+    },
+    "artifact_hash_kind": {"const": "raw_file_bytes"},
+    "artifacts": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256", "bytes", "media_type"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "^(?!/)(?!.*\\.\\./).+$"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "bytes": {"type": "integer", "minimum": 1},
+          "media_type": {"enum": ["application/json", "text/markdown", "text/javascript"]}
+        }
+      }
+    },
+    "manifest_digest": {"$ref": "common.schema.json#/$defs/digest"}
+  }
+}

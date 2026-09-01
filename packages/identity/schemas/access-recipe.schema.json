@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/identity/v1.0.0/access-recipe.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "recipe_id", "asset_id", "access_route_id", "access_class", "who_qualifies", "request_process", "human_authorization_gates", "turnaround", "fee_basis", "delivery", "required_inputs", "expected_artifacts", "stop_conditions", "typed_failures", "evidence_ids", "observed_at", "immutable", "authorization"],
+  "properties": {
+    "schema_version": {"const": "identity.access-recipe.v1.0.0"},
+    "recipe_id": {"type": "string", "minLength": 3},
+    "asset_id": {"type": "string", "minLength": 3},
+    "access_route_id": {"type": "string", "minLength": 3},
+    "access_class": {"enum": ["public", "registration", "application", "dua", "licensed", "paid", "unknown"]},
+    "who_qualifies": {"$ref": "#/$defs/nonEmptyArray"},
+    "request_process": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "human_authorization_gates": {"type": "array", "items": {"type": "object"}},
+    "turnaround": {
+      "type": "object", "additionalProperties": false,
+      "required": ["category", "point_estimate", "evidence_ids", "observed_at"],
+      "properties": {
+        "category": {"enum": ["immediate", "days", "weeks", "months", "variable", "unknown", "not_applicable"]},
+        "point_estimate": {"type": "null"},
+        "evidence_ids": {"$ref": "#/$defs/evidenceIds"},
+        "observed_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "fee_basis": {"type": "object"},
+    "delivery": {"type": "object"},
+    "required_inputs": {"$ref": "#/$defs/nonEmptyArray"},
+    "expected_artifacts": {"$ref": "#/$defs/nonEmptyArray"},
+    "stop_conditions": {"$ref": "#/$defs/nonEmptyArray"},
+    "typed_failures": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["outcome", "translate_to_not_found"],
+        "properties": {
+          "outcome": {"enum": ["authorization_required", "authentication_required", "registration_required", "application_required", "dua_required", "payment_required", "license_required", "rate_limited", "timed_out", "transport_failure", "malformed_response", "cancelled", "unavailable", "unresolved"]},
+          "translate_to_not_found": {"const": false}
+        }
+      }
+    },
+    "evidence_ids": {"$ref": "#/$defs/evidenceIds"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "immutable": {"const": true},
+    "authorization": {
+      "type": "object", "additionalProperties": false,
+      "required": ["acquired_by_ushso", "public_route_is_authorization", "execution_allowed", "access_workflow_submission_allowed"],
+      "properties": {
+        "acquired_by_ushso": {"const": false},
+        "public_route_is_authorization": {"const": false},
+        "execution_allowed": {"const": false},
+        "access_workflow_submission_allowed": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyArray": {"type": "array", "minItems": 1},
+    "evidenceIds": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 3}}
+  }
+}

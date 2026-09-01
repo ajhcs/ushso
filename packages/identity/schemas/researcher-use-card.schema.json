@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/identity/v1.0.0/researcher-use-card.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "use_card_id", "asset_id", "asset_revision_id", "best_for", "not_sufficient_for", "key_analytic_cautions", "typical_unit_of_observation", "known_breaks_in_series", "update_frequency", "expected_lag", "suppression_and_completeness_notes", "identifier_stability_over_time", "measure_semantics", "compatibility", "known_join_requirements", "evidence_ids", "status", "review_receipt_id", "observed_at", "immutable", "truth_boundary"],
+  "properties": {
+    "schema_version": {"const": "identity.researcher-use-card.v1.0.0"},
+    "use_card_id": {"type": "string", "minLength": 3},
+    "asset_id": {"type": "string", "minLength": 3},
+    "asset_revision_id": {"type": "string", "minLength": 3},
+    "best_for": {"$ref": "#/$defs/nonEmptyNarratives"},
+    "not_sufficient_for": {"$ref": "#/$defs/nonEmptyNarratives"},
+    "key_analytic_cautions": {"$ref": "#/$defs/nonEmptyNarratives"},
+    "typical_unit_of_observation": {"$ref": "#/$defs/evidencedObject"},
+    "known_breaks_in_series": {"$ref": "#/$defs/nonEmptyNarratives"},
+    "update_frequency": {"$ref": "#/$defs/evidencedObject"},
+    "expected_lag": {"$ref": "#/$defs/evidencedObject"},
+    "suppression_and_completeness_notes": {"$ref": "#/$defs/nonEmptyNarratives"},
+    "identifier_stability_over_time": {"$ref": "#/$defs/evidencedObject"},
+    "measure_semantics": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidencedObject"}},
+    "compatibility": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidencedObject"}},
+    "known_join_requirements": {"type": "array", "items": {"$ref": "#/$defs/evidencedObject"}},
+    "evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 3}},
+    "status": {"enum": ["draft", "pending_review", "reviewed", "withdrawn", "unresolved"]},
+    "review_receipt_id": {"type": ["string", "null"]},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "immutable": {"const": true},
+    "truth_boundary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_truth_separate", "analytical_fit_is_curated", "source_reported_derived_proxy_separate", "analysis_execution_allowed"],
+      "properties": {
+        "source_truth_separate": {"const": true},
+        "analytical_fit_is_curated": {"const": true},
+        "source_reported_derived_proxy_separate": {"const": true},
+        "analysis_execution_allowed": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyNarratives": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "evidencedObject": {
+      "type": "object", "minProperties": 2,
+      "required": ["evidence_ids"],
+      "properties": {"evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 3}}}
+    }
+  }
+}

@@ -1,0 +1,381 @@
+{
+  "fixture_version": "1.0.0",
+  "cases": [
+    {
+      "id": "unit-mixing-member-versus-manifest",
+      "expected_code": "UNIT_MIXING",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/membership_manifests/0/members/0/member_key/unit",
+          "value": "asset"
+        }
+      ]
+    },
+    {
+      "id": "denominator-definition-omission",
+      "expected_code": "SCHEMA_INVALID",
+      "mutations": [
+        {
+          "operation": "delete",
+          "path": "/snapshot/metrics/1/denominator_definition"
+        }
+      ]
+    },
+    {
+      "id": "configured-partition-drift",
+      "expected_code": "PARTITION_DRIFT",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/0/partition_counts/0/count",
+          "value": 999
+        }
+      ]
+    },
+    {
+      "id": "failed-enumeration-absence-claim",
+      "expected_code": "FAILED_ENUMERATION_ABSENCE_CLAIM",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/membership_manifests/1/enumeration/status",
+          "value": "failed"
+        },
+        {
+          "operation": "set",
+          "path": "/snapshot/membership_manifests/1/enumeration/sealed",
+          "value": false
+        },
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/1/absence_claim_permitted",
+          "value": true
+        },
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/1/absence_reason",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": "upstream-exclusion-laundering",
+      "expected_code": "EXCLUSION_LAUNDERING",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/membership_manifests/4/members/3/denominator_membership",
+          "value": "outside_conditional_cohort"
+        }
+      ]
+    },
+    {
+      "id": "overlapping-total-marked-additive",
+      "expected_code": "OVERLAPPING_ADDITIVE_TOTAL",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/2/overlap/additive",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "zero-denominator-published-as-percentage",
+      "expected_code": "ZERO_DENOMINATOR_PERCENTAGE",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/membership_manifests/11/members/0/denominator_membership",
+          "value": "outside_conditional_cohort"
+        },
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/11/denominator_count",
+          "value": 0
+        },
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/11/rate",
+          "value": 0.5
+        },
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/11/display/n_of_d",
+          "value": "1 of 0 scheduled_check_target"
+        }
+      ]
+    },
+    {
+      "id": "stale-policy-pin-mismatch",
+      "expected_code": "STALE_POLICY_PIN_MISMATCH",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/membership_manifests/1/revision_pins/policy_revision/value",
+          "value": "policy:coverage:v0"
+        }
+      ]
+    },
+    {
+      "id": "unknown-folded-out-of-partition",
+      "expected_code": "UNKNOWN_COUNT_MISMATCH",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/4/unknown_count",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "not-applicable-folded-out-of-partition",
+      "expected_code": "NOT_APPLICABLE_COUNT_MISMATCH",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/4/not_applicable_count",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "unclassified-member-disappears",
+      "expected_code": "UNCLASSIFIED_COUNT_MISMATCH",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/3/unclassified_count",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "membership-manifest-digest-does-not-resolve",
+      "expected_code": "MEMBERSHIP_MANIFEST_DIGEST_MISMATCH",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/1/membership_manifest_hash",
+          "value": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "id": "duplicate-membership-key",
+      "expected_code": "DUPLICATE_MEMBER_KEY",
+      "mutations": [
+        {
+          "operation": "append",
+          "path": "/snapshot/membership_manifests/1/members",
+          "value": {
+            "member_key": {
+              "unit": "connector_scope",
+              "namespace": "fixture:connector_scope",
+              "value": "coverage.harvest_completion/v1:member:1"
+            },
+            "source_scope_id": "scope:active",
+            "in_numerator": true,
+            "denominator_membership": "included",
+            "state": "complete",
+            "unclassified_dimensions": [],
+            "policy_decision": null,
+            "overlap_group_ids": [],
+            "evidence_refs": [
+              {
+                "evidence_id": "evidence:coverage-fixture",
+                "revision": "evidence-revision:v1",
+                "observed_at": "2026-08-30T12:00:00Z"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "downstream-filter-applied-upstream",
+      "expected_code": "COHORT_FILTER_STAGE_OVERCLAIM",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/1/cohort_filters",
+          "value": [
+            {
+              "dimension": "identity_state",
+              "values": [
+                "resolved"
+              ],
+              "known_at_stage": "enumeration",
+              "unclassified_count": 0
+            }
+          ]
+        },
+        {
+          "operation": "set",
+          "path": "/snapshot/membership_manifests/1/cohort_filters",
+          "value": [
+            {
+              "dimension": "identity_state",
+              "values": [
+                "resolved"
+              ],
+              "known_at_stage": "enumeration",
+              "unclassified_count": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "source-scope-failure-claims-absence",
+      "expected_code": "FAILED_ENUMERATION_ABSENCE_CLAIM",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/source_scopes/0/enumeration/status",
+          "value": "failed"
+        },
+        {
+          "operation": "set",
+          "path": "/source_scopes/0/enumeration/sealed",
+          "value": false
+        },
+        {
+          "operation": "set",
+          "path": "/source_scopes/0/enumeration/membership_revision",
+          "value": null
+        },
+        {
+          "operation": "set",
+          "path": "/source_scopes/0/enumeration/completed_at",
+          "value": null
+        },
+        {
+          "operation": "set",
+          "path": "/source_scopes/0/enumeration/failure_class",
+          "value": "network_failure"
+        }
+      ]
+    },
+    {
+      "id": "eighth-coverage-cell-state",
+      "expected_code": "SCHEMA_INVALID",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/matrix/cells/0/coverage_cell_state",
+          "value": "partially_integrated"
+        }
+      ]
+    },
+    {
+      "id": "matrix-failed-enumeration-claims-absence",
+      "expected_code": "FAILED_ENUMERATION_ABSENCE_CLAIM",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/matrix/cells/1/absence_claim_permitted",
+          "value": true
+        },
+        {
+          "operation": "set",
+          "path": "/matrix/cells/1/absence_reason",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": "matrix-overlap-marked-additive",
+      "expected_code": "OVERLAPPING_ADDITIVE_TOTAL",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/matrix/cells/0/overlap/additive",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "excluded-member-lacks-policy-evidence",
+      "expected_code": "EXCLUSION_POLICY_EVIDENCE_MISSING",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/membership_manifests/4/members/3/policy_decision",
+          "value": null
+        }
+      ]
+    },
+    {
+      "id": "search-absence-lacks-generation-pin",
+      "expected_code": "REQUIRED_REVISION_PIN_MISSING",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/9/revision_pins/index_generation",
+          "value": {
+            "value": null,
+            "not_applicable_reason": "Generation intentionally removed by adversarial fixture."
+          }
+        },
+        {
+          "operation": "set",
+          "path": "/snapshot/membership_manifests/9/revision_pins/index_generation",
+          "value": {
+            "value": null,
+            "not_applicable_reason": "Generation intentionally removed by adversarial fixture."
+          }
+        }
+      ]
+    },
+    {
+      "id": "absolute-count-invents-rate",
+      "expected_code": "RATE_WITHOUT_DENOMINATOR",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/5/rate",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "estimated-denominator-lacks-evidence",
+      "expected_code": "ESTIMATE_ASSERTION_MISSING",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/2/denominator_status",
+          "value": "estimated"
+        },
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/2/denominator_count",
+          "value": 20
+        },
+        {
+          "operation": "set",
+          "path": "/snapshot/metrics/2/display/n_of_d",
+          "value": "2 observed; denominator estimated (native_item)"
+        },
+        {
+          "operation": "set",
+          "path": "/snapshot/membership_manifests/2/denominator_status",
+          "value": "estimated"
+        }
+      ]
+    },
+    {
+      "id": "partition-member-has-unclassified-state",
+      "expected_code": "PARTITION_STATE_INVALID",
+      "mutations": [
+        {
+          "operation": "set",
+          "path": "/snapshot/membership_manifests/0/members/0/state",
+          "value": "included"
+        }
+      ]
+    }
+  ]
+}

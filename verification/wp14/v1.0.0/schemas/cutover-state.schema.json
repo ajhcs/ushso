@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/wp14/cutover-state.v1.0.0.schema.json",
+  "title": "WP14 fail-closed cutover state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "mode", "stage", "candidate_digest_sha256", "previous_candidate_digest_sha256", "policy_digest_sha256", "public_read_backend", "public_traffic_percent", "runtime_jsonl_active", "active_search_generation", "candidate_search_generation", "active_worker_version", "candidate_worker_version", "active_asset_bundle_sha256", "worker_traffic_percent", "rollback_bundle", "rollback_window", "cycles", "history", "event_ledger_head_sha256", "soak_receipt_sha256", "retirement_authorization_receipt_sha256", "consumed_single_use_receipts", "production_action_authorized", "state_digest_sha256"],
+  "properties": {
+    "schema_version": {"const": "ushso-wp14-cutover-state.v1.0.0"},
+    "mode": {"enum": ["fixture_rehearsal", "production"]},
+    "stage": {"enum": ["foundation_local", "expand_ready", "expand_applied", "backfill_complete", "shadow_complete", "internal_canary", "public_promotion", "public_100_percent", "soak_active", "soak_complete", "retirement_eligible", "retired"]},
+    "candidate_digest_sha256": {"$ref": "#/$defs/sha256"},
+    "previous_candidate_digest_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+    "policy_digest_sha256": {"$ref": "#/$defs/sha256"},
+    "public_read_backend": {"enum": ["immutable_static_jsonl", "database_generation_pinned", "n_minus_one_worker"]},
+    "public_traffic_percent": {"enum": [0, 1, 5, 25, 50, 100]},
+    "runtime_jsonl_active": {"type": "boolean"},
+    "active_search_generation": {"type": "string", "minLength": 1},
+    "candidate_search_generation": {"type": "string", "minLength": 1},
+    "active_worker_version": {"type": "string", "minLength": 1},
+    "candidate_worker_version": {"type": "string", "minLength": 1},
+    "active_asset_bundle_sha256": {"$ref": "#/$defs/sha256"},
+    "worker_traffic_percent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["n_minus_one", "candidate", "static_emergency"],
+      "properties": {
+        "n_minus_one": {"type": "integer", "minimum": 0, "maximum": 100},
+        "candidate": {"type": "integer", "minimum": 0, "maximum": 100},
+        "static_emergency": {"type": "integer", "minimum": 0, "maximum": 100}
+      }
+    },
+    "rollback_bundle": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/rollbackBundleSnapshot"}]},
+    "rollback_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["first_public_database_canary_at", "one_hundred_percent_at", "support_expires_no_earlier_than"],
+      "properties": {
+        "first_public_database_canary_at": {"$ref": "#/$defs/nullableTimestamp"},
+        "one_hundred_percent_at": {"$ref": "#/$defs/nullableTimestamp"},
+        "support_expires_no_earlier_than": {"$ref": "#/$defs/nullableTimestamp"}
+      }
+    },
+    "cycles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["connector_reconciliation", "rebuild_promote_rollback"],
+      "properties": {
+        "connector_reconciliation": {"type": "array", "items": {"$ref": "#/$defs/cycle"}},
+        "rebuild_promote_rollback": {"type": "array", "items": {"$ref": "#/$defs/cycle"}}
+      }
+    },
+    "history": {"type": "array", "items": {"$ref": "#/$defs/historyEntry"}},
+    "event_ledger_head_sha256": {"$ref": "#/$defs/sha256"},
+    "soak_receipt_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+    "retirement_authorization_receipt_sha256": {"anyOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+    "consumed_single_use_receipts": {"type": "array", "items": {"$ref": "#/$defs/receiptUse"}},
+    "production_action_authorized": {"type": "boolean"},
+    "state_digest_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "allOf": [
+    {"if": {"properties": {"stage": {"const": "retired"}}, "required": ["stage"]}, "then": {"properties": {"runtime_jsonl_active": {"const": false}}}, "else": {"properties": {"runtime_jsonl_active": {"const": true}}}},
+    {"if": {"properties": {"mode": {"const": "fixture_rehearsal"}}, "required": ["mode"]}, "then": {"properties": {"production_action_authorized": {"const": false}}}}
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"},
+    "nullableTimestamp": {"anyOf": [{"$ref": "#/$defs/timestamp"}, {"type": "null"}]},
+    "rollbackBundleSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bundle_id", "bundle_sha256", "support_window_anchor_at", "support_expires_at", "verification_receipt_sha256"],
+      "properties": {
+        "bundle_id": {"type": "string", "minLength": 1},
+        "bundle_sha256": {"$ref": "#/$defs/sha256"},
+        "support_window_anchor_at": {"$ref": "#/$defs/timestamp"},
+        "support_expires_at": {"$ref": "#/$defs/timestamp"},
+        "verification_receipt_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "cycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cycle_id", "connector_run_id", "index_generation_id", "occurred_at", "receipt_sha256", "evidence_class", "attempted", "succeeded", "failed", "counts_toward_production_soak"],
+      "properties": {
+        "cycle_id": {"type": "string", "minLength": 1},
+        "connector_run_id": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "index_generation_id": {"anyOf": [{"type": "string", "minLength": 1}, {"type": "null"}]},
+        "occurred_at": {"$ref": "#/$defs/timestamp"},
+        "receipt_sha256": {"$ref": "#/$defs/sha256"},
+        "evidence_class": {"enum": ["fixture_rehearsal_only", "live_launch_cycle"]},
+        "attempted": {"type": "integer", "minimum": 1},
+        "succeeded": {"type": "integer", "minimum": 1},
+        "failed": {"type": "integer", "minimum": 0},
+        "counts_toward_production_soak": {"type": "boolean"}
+      }
+    },
+    "receiptUse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receipt_sha256", "nonce"],
+      "properties": {
+        "receipt_sha256": {"$ref": "#/$defs/sha256"},
+        "nonce": {"type": "string", "minLength": 16}
+      }
+    },
+    "historyEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "event", "event_id", "occurred_at", "from_stage", "to_stage", "outcome", "simulated", "reason", "previous_event_sha256", "event_payload_sha256", "evidence_receipts", "event_sha256"],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 1},
+        "event": {"type": "string", "minLength": 1},
+        "event_id": {"type": "string", "minLength": 1},
+        "occurred_at": {"$ref": "#/$defs/timestamp"},
+        "from_stage": {"type": "string", "minLength": 1},
+        "to_stage": {"type": "string", "minLength": 1},
+        "outcome": {"const": "applied"},
+        "simulated": {"type": "boolean"},
+        "reason": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+        "previous_event_sha256": {"$ref": "#/$defs/sha256"},
+        "event_payload_sha256": {"$ref": "#/$defs/sha256"},
+        "evidence_receipts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["receipt_sha256", "verifier_receipt_sha256"],
+            "properties": {"receipt_sha256": {"$ref": "#/$defs/sha256"}, "verifier_receipt_sha256": {"$ref": "#/$defs/sha256"}}
+          }
+        },
+        "event_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

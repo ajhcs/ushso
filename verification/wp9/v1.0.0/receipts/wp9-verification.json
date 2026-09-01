@@ -1,0 +1,134 @@
+{
+  "schema_version": "ushso-wp9-verification-receipt.v1.0.0",
+  "work_package": "WP9",
+  "generated_at": "2026-08-30T00:00:00Z",
+  "technical_status": "pass",
+  "release_gate_status": "blocked_external_product_owner_wording_review",
+  "network_access": false,
+  "production_actions": false,
+  "database_actions": false,
+  "public_route_changes": false,
+  "raw_user_queries_persisted": false,
+  "validator": {
+    "status": "pass",
+    "coverage_snapshot_sha256": "7d3711b907b1a934802f15150e736321956bada46068a98eb9409cdbd37b1ded",
+    "matrix_membership_sha256": "e49f2b30728aeeab923634f5a60cb13f10322da6621f5f0e525836f14e3de480",
+    "artifact_set_sha256": "a4095455758a015b148816de2d1f0b2c0fb23ebbe143f6e13b707d50513dfdbd",
+    "counts": {
+      "metrics": 18,
+      "source_scopes": 14,
+      "jurisdictions": 51,
+      "source_classes": 6,
+      "cells": 306,
+      "published_records": 157
+    },
+    "product_owner_wording_review": "pending_product_owner_review"
+  },
+  "deterministic_seals": {
+    "coverage_snapshot_sha256": "7d3711b907b1a934802f15150e736321956bada46068a98eb9409cdbd37b1ded",
+    "matrix_membership_sha256": "e49f2b30728aeeab923634f5a60cb13f10322da6621f5f0e525836f14e3de480",
+    "artifact_set_sha256": "a4095455758a015b148816de2d1f0b2c0fb23ebbe143f6e13b707d50513dfdbd",
+    "public_view_sha256": "bffe61ad0e3fe6bccff342e48973bbc113ccf7475413ad39af9e077cf815e8f4",
+    "implementation_file_set_sha256": "edbe2213c9ba65527f55e79e226387d19e86a55dcb74da1e7322b58830385da2"
+  },
+  "counts": {
+    "metric_definitions": 18,
+    "source_scopes": 14,
+    "federal_applicability": {
+      "direct": 11,
+      "crosswalk_required": 2,
+      "unknown": 1
+    },
+    "jurisdictions": 51,
+    "source_classes": 6,
+    "assessment_cells": 306,
+    "production_matrix_state_distribution": {
+      "integrated": 0,
+      "candidate": 0,
+      "navigation_only": 0,
+      "evidence_gap": 0,
+      "inaccessible": 0,
+      "unknown": 0,
+      "not_assessed": 306
+    },
+    "published_records": 157,
+    "corpus_composition": {
+      "harvard_dataverse": 52,
+      "datacite": 50,
+      "pennsylvania_catalog": 22,
+      "curated_authoritative_registry": 15,
+      "federal_baseline": 14,
+      "canonical_base": 4
+    }
+  },
+  "test_receipts": [
+    {
+      "command": "npm test --prefix packages/coverage/accounting/v1.0.0",
+      "status": "pass",
+      "scope": "contract/schema semantics, partitions, denominator failure injection, absence denial, matrix accounting, service bounds, deterministic 3x rebuild, WP1 byte pins, SQL review"
+    },
+    {
+      "command": "node packages/coverage/accounting/v1.0.0/tools/validate-package.mjs",
+      "status": "pass",
+      "scope": "frozen coverage contract schemas and semantic bundle validator"
+    }
+  ],
+  "requirement_ledger": {
+    "path": "verification/wp9/v1.0.0/requirements/evidence-ledger.json",
+    "entry_count": 20,
+    "pending_entries": [
+      {
+        "requirement_id": "WP9-SQL-0011",
+        "status": "implemented_sequence_pending"
+      },
+      {
+        "requirement_id": "TST-COV-01",
+        "status": "implemented_owner_review_pending"
+      },
+      {
+        "requirement_id": "TST-TRUST-01",
+        "status": "implemented_owner_review_pending"
+      },
+      {
+        "requirement_id": "G23.4-PRODUCT-OWNER",
+        "status": "pending_external_review"
+      }
+    ]
+  },
+  "migration_0011": {
+    "path": "packages/coverage/accounting/v1.0.0/sql/0011_coverage_facts_definitions_snapshots.reviewed.sql",
+    "sha256": "cda7c8874fd6ab91e2b5cb07c47214d9760006657e70c650a45c7e493cff12d0",
+    "review_status": "offline_technical_review_pass",
+    "application_status": "not_applied_sequence_pending",
+    "db_directory_modified_by_wp9": false
+  },
+  "wp1_preservation": {
+    "packages/coverage/coverage-repository.mjs": "619598389eed36f01f06e0292ecd206ce9b0ee7379f9570e7ae71220b49088a6",
+    "packages/coverage/static-coverage-repository.mjs": "6742ced209743f0f00f5db8a5b04f0cc4462a821e1f60442a94dc30f8e78ecf0"
+  },
+  "external_steps": [
+    {
+      "step_id": "WP9-COVERAGE-COPY-OWNER-01",
+      "status": "pending_external_review",
+      "packet": "verification/wp9/v1.0.0/governance/product-owner-wording-review.json",
+      "effect": "Blocks the section 23.4 public wording gate; does not block local technical validation."
+    },
+    {
+      "step_id": "MIGRATION-0011-SEQUENCE-AND-AUTHORIZATION",
+      "status": "not_requested",
+      "effect": "Required before moving reviewed SQL into db/migrations or applying it after migrations 0007 through 0010."
+    },
+    {
+      "step_id": "PUBLIC-ROUTE-INTEGRATION",
+      "status": "not_started_by_design",
+      "effect": "A later authorized work package must wire the bounded service through a sealed publication projection; WP9 made no web or Worker route edit."
+    }
+  ],
+  "rollback": {
+    "current_state": "No route, database, or production activation occurred.",
+    "package_rollback": "Remove or disengage the successor package from a future composition root while retaining its receipt for audit.",
+    "future_database_rollback": "Select a prior sealed coverage/publication snapshot; never drop immutable 0011 tables as an operational rollback."
+  },
+  "receipt_digest_algorithm": "ushso_wp9_receipt_sha256/v1",
+  "receipt_sha256": "a97cb5b0c5f5ef92655c95af85806f08d34ba8381ba6dbbe02030b437e311d22"
+}

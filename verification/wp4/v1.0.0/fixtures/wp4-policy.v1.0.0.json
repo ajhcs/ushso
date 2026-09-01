@@ -1,0 +1,41 @@
+{
+  "schema_version": "ushso-wp4-offline-policy-fixture.v1.0.0",
+  "evidence_scope": "offline_synthetic_fault_injection_and_static_sql",
+  "transport": {
+    "dlq_sink_maximum_delivery_attempts": 6,
+    "dlq_sink_transport_max_retries": 5,
+    "dlq_sink_maximum_batch_size": 1,
+    "recursive_dead_letter_queue_allowed": false,
+    "queue_retention_ms": 345600000,
+    "unknown_send_detail_code": "OUTBOX_SEND_OUTCOME_UNKNOWN_AWAITING_QUEUE_RETENTION"
+  },
+  "workflow_identity": {
+    "policy_version": "workflow-instance.v1.1",
+    "maximum_length": 100,
+    "pattern": "^harvest-run_[a-f0-9]{32}-[1-9][0-9]*$"
+  },
+  "normalization": {
+    "normalizer_version": "1.0.0",
+    "job_cardinality": "one_deterministic_job_per_unique_capture_sha256_and_normalizer_version",
+    "zero_capture_run_allowed": true,
+    "sealed_manifest_is_immutable": true
+  },
+  "managed_integration": {
+    "status": "pending_external_authorization",
+    "authorization_gate_ids": ["AUTH-03"],
+    "deployment_performed": false,
+    "paid_infrastructure_used": false
+  },
+  "production_entrypoints": [
+    {
+      "id": "scheduler",
+      "file": "services/scheduler-worker/worker.mjs",
+      "handler_markers": ["export default", "scheduled"]
+    },
+    {
+      "id": "harvest",
+      "file": "services/harvest-worker/worker.mjs",
+      "handler_markers": ["export default", "queue", "Workflow"]
+    }
+  ]
+}

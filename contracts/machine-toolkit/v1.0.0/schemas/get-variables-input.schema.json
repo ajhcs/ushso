@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-variables-input.schema.json",
+  "title": "observatory.get_variables input",
+  "type": "object",
+  "additionalProperties": false,
+  "maxProperties": 10,
+  "required": ["contract_version", "record_id", "release_id", "distribution_id", "schema_id", "semantic_query", "filters", "limit", "cursor", "expected_generation"],
+  "properties": {
+    "contract_version": { "const": "observatory.machine.get-variables.input.v1.0.0" },
+    "record_id": { "$ref": "common.schema.json#/$defs/stableId" },
+    "release_id": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+    "distribution_id": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+    "schema_id": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+    "semantic_query": {
+      "oneOf": [
+        { "type": "string", "minLength": 1, "maxLength": 4000 },
+        { "type": "null" }
+      ]
+    },
+    "filters": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dimension", "values"],
+        "properties": {
+          "dimension": { "$ref": "common.schema.json#/$defs/stableId" },
+          "values": {
+            "type": "array",
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": { "$ref": "common.schema.json#/$defs/stableId" }
+          }
+        }
+      }
+    },
+    "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 25 },
+    "cursor": { "$ref": "common.schema.json#/$defs/nullableCursor" },
+    "expected_generation": { "$ref": "common.schema.json#/$defs/nullableStableId" }
+  }
+}

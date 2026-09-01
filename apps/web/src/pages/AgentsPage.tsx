@@ -1,11 +1,13 @@
 import { Code2 } from 'lucide-react'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
-import agentsExampleSource from '../data/agents-discovery-example.json'
-import { agentsCurlExample } from '../data/agentsDiscoveryExample'
+import responseExample from '../data/generatedAgentsResponseExample.json'
 
-const curlExample = agentsCurlExample(agentsExampleSource.question, agentsExampleSource.limit)
-const jsonExample = JSON.stringify(agentsExampleSource.example, null, 2)
+const curlExample = `curl -sS https://ushso.org/api/discover \\
+  -H "content-type: application/json" \\
+  --data '{"question":"I need hospital financial and utilization data for Pennsylvania","limit":15}'`
+
+const jsonExample = JSON.stringify(responseExample, null, 2)
 
 export function AgentsPage() {
   return (

@@ -1,0 +1,3450 @@
+{
+  "contract_version": "observatory-machine-toolkit-fixtures.v1.0.0",
+  "manifest_id": "machine-toolkit.manifest.v1.0.0",
+  "conformance_cases": [
+    {
+      "case_id": "search.search.success",
+      "case_kind": "success",
+      "capability": "search_assets",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/search-assets-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/search-assets-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.search-assets.input.v1.0.0",
+        "mode": "search",
+        "research_need": "Identify public hospital facility metadata suitable for a documented linkage design.",
+        "filters": {
+          "geography_ids": [],
+          "subject_ids": [],
+          "grain": [],
+          "access_classes": [],
+          "authority_levels": [],
+          "machine_readiness": [],
+          "time_period": null,
+          "negative_constraints": [],
+          "dimensions": []
+        },
+        "grouping": "none",
+        "limit": 5,
+        "cursor": null,
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "POST",
+        "route": "/api/discover",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "search_assets",
+          "transport_adapter": "json_api",
+          "request_id": "search.search.success.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:d93d76b7188116b564cb9bdd433e9f75b7999b99fd5742f8e33f4d4eaa816531",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "mode": "search",
+            "sort": "frozen_rank_tuple",
+            "ranker_version": "ranker.frozen.v1",
+            "grouping": "none",
+            "cursor_binding_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "summaries": [
+              {
+                "asset_id": "asset.a",
+                "title": "Example Hospital Facility Directory",
+                "geography_ids": [
+                  "geo.us"
+                ],
+                "grain": "facility",
+                "time_intervals": [
+                  {
+                    "start": "2025-01-01",
+                    "end": "2025-12-31",
+                    "period_kind": "calendar",
+                    "precision": "year"
+                  }
+                ],
+                "access_class": "public",
+                "machine_readiness": "schema_indexed",
+                "evidence_state": "observed",
+                "observed_at": "2026-08-29T12:00:00Z",
+                "staleness_state": "current",
+                "evidence_ids": [
+                  "ev.catalog"
+                ],
+                "role_candidates": [
+                  "role.facility_frame"
+                ],
+                "why_relevant": [
+                  "Facility grain and a documented public distribution match the stated metadata need."
+                ],
+                "confidence": "moderate",
+                "derivation_references": [
+                  "ranker.frozen.v1"
+                ],
+                "near_miss_reasons": []
+              }
+            ],
+            "facet_counts": [
+              {
+                "dimension": "grain",
+                "value": "facility",
+                "count": 1,
+                "count_state": "exact",
+                "denominator_scope": "Selected immutable generation and normalized filters.",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "aggregates": [
+              {
+                "dimension": "source",
+                "value": "source.example",
+                "count": 1,
+                "count_state": "exact",
+                "denominator_scope": "Selected immutable generation and normalized filters.",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "scoped_zero_statement": "No corpus-wide absence claim is made; zero items would mean only that this bounded generation and filter scope returned none.",
+            "absence_claim_permitted": false
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.search_assets",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "search_assets",
+          "transport_adapter": "webmcp",
+          "request_id": "search.search.success.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:d93d76b7188116b564cb9bdd433e9f75b7999b99fd5742f8e33f4d4eaa816531",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "mode": "search",
+            "sort": "frozen_rank_tuple",
+            "ranker_version": "ranker.frozen.v1",
+            "grouping": "none",
+            "cursor_binding_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "summaries": [
+              {
+                "asset_id": "asset.a",
+                "title": "Example Hospital Facility Directory",
+                "geography_ids": [
+                  "geo.us"
+                ],
+                "grain": "facility",
+                "time_intervals": [
+                  {
+                    "start": "2025-01-01",
+                    "end": "2025-12-31",
+                    "period_kind": "calendar",
+                    "precision": "year"
+                  }
+                ],
+                "access_class": "public",
+                "machine_readiness": "schema_indexed",
+                "evidence_state": "observed",
+                "observed_at": "2026-08-29T12:00:00Z",
+                "staleness_state": "current",
+                "evidence_ids": [
+                  "ev.catalog"
+                ],
+                "role_candidates": [
+                  "role.facility_frame"
+                ],
+                "why_relevant": [
+                  "Facility grain and a documented public distribution match the stated metadata need."
+                ],
+                "confidence": "moderate",
+                "derivation_references": [
+                  "ranker.frozen.v1"
+                ],
+                "near_miss_reasons": []
+              }
+            ],
+            "facet_counts": [
+              {
+                "dimension": "grain",
+                "value": "facility",
+                "count": 1,
+                "count_state": "exact",
+                "denominator_scope": "Selected immutable generation and normalized filters.",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "aggregates": [
+              {
+                "dimension": "source",
+                "value": "source.example",
+                "count": 1,
+                "count_state": "exact",
+                "denominator_scope": "Selected immutable generation and normalized filters.",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "scoped_zero_statement": "No corpus-wide absence claim is made; zero items would mean only that this bounded generation and filter scope returned none.",
+            "absence_claim_permitted": false
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "search.browse.success",
+      "case_kind": "success",
+      "capability": "search_assets",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/search-assets-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/search-assets-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.search-assets.input.v1.0.0",
+        "mode": "browse",
+        "filters": {
+          "geography_ids": [],
+          "subject_ids": [],
+          "grain": [],
+          "access_classes": [],
+          "authority_levels": [],
+          "machine_readiness": [],
+          "time_period": null,
+          "negative_constraints": [],
+          "dimensions": []
+        },
+        "sort": "title_asc",
+        "grouping": "none",
+        "limit": 5,
+        "cursor": null,
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "POST",
+        "route": "/api/discover",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "search_assets",
+          "transport_adapter": "json_api",
+          "request_id": "search.browse.success.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:ae5055efc30f9a4faee28b570638b055c1800ce9ad2139c79199b4b1fa3d9f71",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "mode": "browse",
+            "sort": "title_asc",
+            "ranker_version": "sort.total-order.v1",
+            "grouping": "none",
+            "cursor_binding_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "summaries": [
+              {
+                "asset_id": "asset.a",
+                "title": "Example Hospital Facility Directory",
+                "geography_ids": [
+                  "geo.us"
+                ],
+                "grain": "facility",
+                "time_intervals": [
+                  {
+                    "start": "2025-01-01",
+                    "end": "2025-12-31",
+                    "period_kind": "calendar",
+                    "precision": "year"
+                  }
+                ],
+                "access_class": "public",
+                "machine_readiness": "schema_indexed",
+                "evidence_state": "observed",
+                "observed_at": "2026-08-29T12:00:00Z",
+                "staleness_state": "current",
+                "evidence_ids": [
+                  "ev.catalog"
+                ],
+                "role_candidates": null,
+                "why_relevant": null,
+                "confidence": null,
+                "derivation_references": null,
+                "near_miss_reasons": null
+              }
+            ],
+            "facet_counts": [
+              {
+                "dimension": "grain",
+                "value": "facility",
+                "count": 1,
+                "count_state": "exact",
+                "denominator_scope": "Selected immutable generation and normalized filters.",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "aggregates": [
+              {
+                "dimension": "source",
+                "value": "source.example",
+                "count": 1,
+                "count_state": "exact",
+                "denominator_scope": "Selected immutable generation and normalized filters.",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "scoped_zero_statement": "No corpus-wide absence claim is made; zero items would mean only that this bounded generation and filter scope returned none.",
+            "absence_claim_permitted": false
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.search_assets",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "search_assets",
+          "transport_adapter": "webmcp",
+          "request_id": "search.browse.success.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:ae5055efc30f9a4faee28b570638b055c1800ce9ad2139c79199b4b1fa3d9f71",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "mode": "browse",
+            "sort": "title_asc",
+            "ranker_version": "sort.total-order.v1",
+            "grouping": "none",
+            "cursor_binding_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "summaries": [
+              {
+                "asset_id": "asset.a",
+                "title": "Example Hospital Facility Directory",
+                "geography_ids": [
+                  "geo.us"
+                ],
+                "grain": "facility",
+                "time_intervals": [
+                  {
+                    "start": "2025-01-01",
+                    "end": "2025-12-31",
+                    "period_kind": "calendar",
+                    "precision": "year"
+                  }
+                ],
+                "access_class": "public",
+                "machine_readiness": "schema_indexed",
+                "evidence_state": "observed",
+                "observed_at": "2026-08-29T12:00:00Z",
+                "staleness_state": "current",
+                "evidence_ids": [
+                  "ev.catalog"
+                ],
+                "role_candidates": null,
+                "why_relevant": null,
+                "confidence": null,
+                "derivation_references": null,
+                "near_miss_reasons": null
+              }
+            ],
+            "facet_counts": [
+              {
+                "dimension": "grain",
+                "value": "facility",
+                "count": 1,
+                "count_state": "exact",
+                "denominator_scope": "Selected immutable generation and normalized filters.",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "aggregates": [
+              {
+                "dimension": "source",
+                "value": "source.example",
+                "count": 1,
+                "count_state": "exact",
+                "denominator_scope": "Selected immutable generation and normalized filters.",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "scoped_zero_statement": "No corpus-wide absence claim is made; zero items would mean only that this bounded generation and filter scope returned none.",
+            "absence_claim_permitted": false
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "asset.partial.success",
+      "case_kind": "success",
+      "capability": "get_asset",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-asset-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-asset-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.get-asset.input.v1.0.0",
+        "record_id": "asset.a",
+        "expected_generation": "gen-2026-08-30",
+        "collection_limits": {
+          "releases": 20,
+          "distributions": 20,
+          "documentation": 20,
+          "schemas": 20
+        },
+        "collection_cursors": {
+          "releases": null,
+          "distributions": null,
+          "documentation": null,
+          "schemas": null
+        }
+      },
+      "json_api": {
+        "method": "GET",
+        "route": "/api/datasets/{record_id}",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_asset",
+          "transport_adapter": "json_api",
+          "request_id": "asset.partial.success.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:cafd88ecfd4b7b2c746e264c17dcb15330010c15cd697471161143a358247c97",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "partial",
+          "result": {
+            "asset": {
+              "asset_id": "asset.a",
+              "title": "Example Hospital Facility Directory",
+              "asset_kind": "dataset",
+              "evidence_ids": [
+                "ev.catalog"
+              ]
+            },
+            "source": {
+              "source_id": "source.example",
+              "name": "Example Department of Health",
+              "authority_level": "authoritative",
+              "evidence_ids": [
+                "ev.catalog"
+              ]
+            },
+            "identity_state": "source_scoped",
+            "family_state": "candidate",
+            "releases": [
+              {
+                "record_id": "release.a.2025",
+                "record_type": "release",
+                "label": "2025 release",
+                "lifecycle_state": "active",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "distributions": [
+              {
+                "record_id": "distribution.a.csv",
+                "record_type": "distribution",
+                "label": "CSV distribution",
+                "lifecycle_state": "active",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "documentation": [
+              {
+                "record_id": "documentation.a.dictionary",
+                "record_type": "documentation",
+                "label": "Public data dictionary",
+                "lifecycle_state": "active",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "schemas": [
+              {
+                "record_id": "schema.a.2025",
+                "record_type": "schema",
+                "label": "2025 schema",
+                "lifecycle_state": "active",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "collection_completeness": {
+              "releases": "complete",
+              "distributions": "complete",
+              "documentation": "partial",
+              "schemas": "partial"
+            }
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.get_asset",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_asset",
+          "transport_adapter": "webmcp",
+          "request_id": "asset.partial.success.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:cafd88ecfd4b7b2c746e264c17dcb15330010c15cd697471161143a358247c97",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "partial",
+          "result": {
+            "asset": {
+              "asset_id": "asset.a",
+              "title": "Example Hospital Facility Directory",
+              "asset_kind": "dataset",
+              "evidence_ids": [
+                "ev.catalog"
+              ]
+            },
+            "source": {
+              "source_id": "source.example",
+              "name": "Example Department of Health",
+              "authority_level": "authoritative",
+              "evidence_ids": [
+                "ev.catalog"
+              ]
+            },
+            "identity_state": "source_scoped",
+            "family_state": "candidate",
+            "releases": [
+              {
+                "record_id": "release.a.2025",
+                "record_type": "release",
+                "label": "2025 release",
+                "lifecycle_state": "active",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "distributions": [
+              {
+                "record_id": "distribution.a.csv",
+                "record_type": "distribution",
+                "label": "CSV distribution",
+                "lifecycle_state": "active",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "documentation": [
+              {
+                "record_id": "documentation.a.dictionary",
+                "record_type": "documentation",
+                "label": "Public data dictionary",
+                "lifecycle_state": "active",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "schemas": [
+              {
+                "record_id": "schema.a.2025",
+                "record_type": "schema",
+                "label": "2025 schema",
+                "lifecycle_state": "active",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "collection_completeness": {
+              "releases": "complete",
+              "distributions": "complete",
+              "documentation": "partial",
+              "schemas": "partial"
+            }
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "access.success",
+      "case_kind": "success",
+      "capability": "get_access_plan",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-access-plan-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-access-plan-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.get-access-plan.input.v1.0.0",
+        "record_id": "asset.a",
+        "release_id": "release.a.2025",
+        "distribution_id": "distribution.a.csv",
+        "access_route_id": "access.a.public",
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "GET",
+        "route": "/api/datasets/{record_id}/access-plan",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_access_plan",
+          "transport_adapter": "json_api",
+          "request_id": "access.success.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:9530033ff60207c1f16832cceb9035216ba0a9abd0e15477e71f2e43ce451f3a",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "asset_id": "asset.a",
+            "release_id": "release.a.2025",
+            "distribution_id": "distribution.a.csv",
+            "access_route_id": "access.a.public",
+            "access_class": "public",
+            "requester_eligibility": "not_assessed",
+            "eligibility_criteria": [
+              "The publisher describes this distribution as publicly downloadable."
+            ],
+            "requirements": [
+              {
+                "requirement_id": "requirement.verify-terms",
+                "kind": "other",
+                "state": "external",
+                "description": "A human researcher must verify the current publisher terms before retrieval.",
+                "human_gate": true,
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "human_process": "Open the authoritative publisher page, review its current terms, and decide whether to proceed outside USHSO.",
+            "process_steps": [
+              "Review the publisher documentation.",
+              "Obtain any approval required by the researcher or institution."
+            ],
+            "turnaround_category": "source_determined",
+            "authoritative_links": [
+              "https://example.gov/catalog/asset-a"
+            ],
+            "verified_at": "2026-08-29T12:00:00Z",
+            "human_authorization_gate": true,
+            "execution_authorized_by_ushso": false,
+            "access_workflow_submitted": false,
+            "evidence_ids": [
+              "ev.catalog"
+            ]
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.get_access_plan",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_access_plan",
+          "transport_adapter": "webmcp",
+          "request_id": "access.success.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:9530033ff60207c1f16832cceb9035216ba0a9abd0e15477e71f2e43ce451f3a",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "asset_id": "asset.a",
+            "release_id": "release.a.2025",
+            "distribution_id": "distribution.a.csv",
+            "access_route_id": "access.a.public",
+            "access_class": "public",
+            "requester_eligibility": "not_assessed",
+            "eligibility_criteria": [
+              "The publisher describes this distribution as publicly downloadable."
+            ],
+            "requirements": [
+              {
+                "requirement_id": "requirement.verify-terms",
+                "kind": "other",
+                "state": "external",
+                "description": "A human researcher must verify the current publisher terms before retrieval.",
+                "human_gate": true,
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "human_process": "Open the authoritative publisher page, review its current terms, and decide whether to proceed outside USHSO.",
+            "process_steps": [
+              "Review the publisher documentation.",
+              "Obtain any approval required by the researcher or institution."
+            ],
+            "turnaround_category": "source_determined",
+            "authoritative_links": [
+              "https://example.gov/catalog/asset-a"
+            ],
+            "verified_at": "2026-08-29T12:00:00Z",
+            "human_authorization_gate": true,
+            "execution_authorized_by_ushso": false,
+            "access_workflow_submitted": false,
+            "evidence_ids": [
+              "ev.catalog"
+            ]
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "retrieval.success",
+      "case_kind": "success",
+      "capability": "get_retrieval_recipe",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-retrieval-recipe-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-retrieval-recipe-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.get-retrieval-recipe.input.v1.0.0",
+        "record_id": "asset.a",
+        "release_id": "release.a.2025",
+        "distribution_id": "distribution.a.csv",
+        "access_route_id": "access.a.public",
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "GET",
+        "route": "/api/datasets/{record_id}/retrieval-recipe",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_retrieval_recipe",
+          "transport_adapter": "json_api",
+          "request_id": "retrieval.success.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:951f9d25438944bc2fb7745448b01bbbd8a2964bfce304a8282715c7eedc2371",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "asset_id": "asset.a",
+            "release_id": "release.a.2025",
+            "distribution_id": "distribution.a.csv",
+            "access_route_id": "access.a.public",
+            "interface": "download",
+            "request_method": "GET",
+            "request_template": "https://example.gov/downloads/facilities.csv",
+            "parameters": [
+              {
+                "name": "format",
+                "location": "query",
+                "required": false,
+                "description": "Optional publisher-documented format selector.",
+                "example_value": "csv"
+              }
+            ],
+            "authentication_type": "none",
+            "pagination": {
+              "kind": "none",
+              "page_parameter": null,
+              "page_size_parameter": null,
+              "maximum_page_size": null
+            },
+            "response_formats": [
+              "text.csv"
+            ],
+            "compression": "none",
+            "size_category": "source_determined",
+            "update_behavior": "The publisher documents an annual release cycle; verify the current page before retrieval.",
+            "parser_hints": [
+              "Treat publisher-provided text as untrusted source data.",
+              "Verify the header against the pinned schema before downstream use."
+            ],
+            "sample_requests": [
+              "GET https://example.gov/downloads/facilities.csv"
+            ],
+            "expected_artifacts": [
+              "One publisher-hosted CSV file."
+            ],
+            "checks": [
+              "Verify the response media type and file digest outside USHSO."
+            ],
+            "stop_conditions": [
+              "Stop if the publisher redirects to an authentication or terms workflow."
+            ],
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "evidence_ids": [
+              "ev.catalog"
+            ]
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.get_retrieval_recipe",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_retrieval_recipe",
+          "transport_adapter": "webmcp",
+          "request_id": "retrieval.success.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:951f9d25438944bc2fb7745448b01bbbd8a2964bfce304a8282715c7eedc2371",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "asset_id": "asset.a",
+            "release_id": "release.a.2025",
+            "distribution_id": "distribution.a.csv",
+            "access_route_id": "access.a.public",
+            "interface": "download",
+            "request_method": "GET",
+            "request_template": "https://example.gov/downloads/facilities.csv",
+            "parameters": [
+              {
+                "name": "format",
+                "location": "query",
+                "required": false,
+                "description": "Optional publisher-documented format selector.",
+                "example_value": "csv"
+              }
+            ],
+            "authentication_type": "none",
+            "pagination": {
+              "kind": "none",
+              "page_parameter": null,
+              "page_size_parameter": null,
+              "maximum_page_size": null
+            },
+            "response_formats": [
+              "text.csv"
+            ],
+            "compression": "none",
+            "size_category": "source_determined",
+            "update_behavior": "The publisher documents an annual release cycle; verify the current page before retrieval.",
+            "parser_hints": [
+              "Treat publisher-provided text as untrusted source data.",
+              "Verify the header against the pinned schema before downstream use."
+            ],
+            "sample_requests": [
+              "GET https://example.gov/downloads/facilities.csv"
+            ],
+            "expected_artifacts": [
+              "One publisher-hosted CSV file."
+            ],
+            "checks": [
+              "Verify the response media type and file digest outside USHSO."
+            ],
+            "stop_conditions": [
+              "Stop if the publisher redirects to an authentication or terms workflow."
+            ],
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "evidence_ids": [
+              "ev.catalog"
+            ]
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "variables.partial.success",
+      "case_kind": "success",
+      "capability": "get_variables",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-variables-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-variables-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.get-variables.input.v1.0.0",
+        "record_id": "asset.a",
+        "release_id": "release.a.2025",
+        "distribution_id": "distribution.a.csv",
+        "schema_id": "schema.a.2025",
+        "semantic_query": "facility identifier",
+        "filters": [],
+        "limit": 25,
+        "cursor": null,
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "GET",
+        "route": "/api/datasets/{record_id}/variables",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_variables",
+          "transport_adapter": "json_api",
+          "request_id": "variables.partial.success.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:465bbe56138d61dd4e9618b795552bffa3711b435b1f3fa0b682149cd417f876",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "partial",
+          "result": {
+            "asset_id": "asset.a",
+            "release_id": "release.a.2025",
+            "distribution_id": "distribution.a.csv",
+            "schema_id": "schema.a.2025",
+            "schema_completeness": "partial",
+            "fields": [
+              {
+                "schema_field_id": "field.a.facility-id",
+                "label": "Facility identifier",
+                "description": "Publisher-described facility identifier for this release.",
+                "native_name": "facility_id",
+                "data_type": "string",
+                "unit": null,
+                "allowed_values": [],
+                "code_system": null,
+                "semantic_role": "identifier",
+                "identifier_namespace": "example.facility",
+                "evidence_ids": [
+                  "ev.catalog"
+                ],
+                "limitations": [
+                  "Identity equivalence outside this source namespace is not established."
+                ]
+              }
+            ]
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.get_variables",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_variables",
+          "transport_adapter": "webmcp",
+          "request_id": "variables.partial.success.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:465bbe56138d61dd4e9618b795552bffa3711b435b1f3fa0b682149cd417f876",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "partial",
+          "result": {
+            "asset_id": "asset.a",
+            "release_id": "release.a.2025",
+            "distribution_id": "distribution.a.csv",
+            "schema_id": "schema.a.2025",
+            "schema_completeness": "partial",
+            "fields": [
+              {
+                "schema_field_id": "field.a.facility-id",
+                "label": "Facility identifier",
+                "description": "Publisher-described facility identifier for this release.",
+                "native_name": "facility_id",
+                "data_type": "string",
+                "unit": null,
+                "allowed_values": [],
+                "code_system": null,
+                "semantic_role": "identifier",
+                "identifier_namespace": "example.facility",
+                "evidence_ids": [
+                  "ev.catalog"
+                ],
+                "limitations": [
+                  "Identity equivalence outside this source namespace is not established."
+                ]
+              }
+            ]
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "joins.success",
+      "case_kind": "success",
+      "capability": "get_join_routes",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-join-routes-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-join-routes-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.get-join-routes.input.v1.0.0",
+        "from_id": "asset.a",
+        "to_id": "asset.b",
+        "from_release_id": "release.a.2025",
+        "to_release_id": "release.b.2025",
+        "research_purpose": "Document a possible facility-level linkage.",
+        "include_indirect": false,
+        "max_hops": 1,
+        "limit": 50,
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "GET",
+        "route": "/api/join-routes",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_join_routes",
+          "transport_adapter": "json_api",
+          "request_id": "joins.success.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:0fce6fa2542a2322454bc63b13ed18d101cdc765d46498f93e9a850f65422379",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "from_id": "asset.a",
+            "to_id": "asset.b",
+            "max_hops_used": 1,
+            "routes": [
+              {
+                "route_id": "route.a-b.facility",
+                "from_field_id": "field.a.facility-id",
+                "to_field_id": "field.b.facility-id",
+                "from_namespace": "example.facility",
+                "to_namespace": "other.facility",
+                "entity_scope": "facility",
+                "direction": "unidirectional",
+                "cardinality": "many_to_one",
+                "temporal_applicability": {
+                  "start": "2025-01-01",
+                  "end": "2025-12-31",
+                  "period_kind": "calendar",
+                  "precision": "year"
+                },
+                "normalization": "Normalize documented padding before applying the publisher-maintained crosswalk.",
+                "operation_kind": "crosswalk",
+                "evidence_state": "documented",
+                "compatibility": "conditional",
+                "requirements": [
+                  {
+                    "requirement_id": "requirement.crosswalk",
+                    "kind": "crosswalk",
+                    "state": "external",
+                    "description": "Acquire and validate the publisher-maintained crosswalk for the same period.",
+                    "human_gate": true,
+                    "evidence_ids": [
+                      "ev.catalog"
+                    ]
+                  }
+                ],
+                "blockers": [
+                  {
+                    "blocker_id": "blocker.not-executed",
+                    "kind": "evidence_missing",
+                    "state": "open",
+                    "description": "USHSO has not executed or proven this route over source data.",
+                    "evidence_ids": [
+                      "ev.policy"
+                    ]
+                  }
+                ],
+                "caveats": [
+                  "Documentation evidence does not establish executed or proven compatibility."
+                ],
+                "evidence_ids": [
+                  "ev.catalog"
+                ],
+                "hop_count": 1
+              }
+            ]
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.get_join_routes",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_join_routes",
+          "transport_adapter": "webmcp",
+          "request_id": "joins.success.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:0fce6fa2542a2322454bc63b13ed18d101cdc765d46498f93e9a850f65422379",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "from_id": "asset.a",
+            "to_id": "asset.b",
+            "max_hops_used": 1,
+            "routes": [
+              {
+                "route_id": "route.a-b.facility",
+                "from_field_id": "field.a.facility-id",
+                "to_field_id": "field.b.facility-id",
+                "from_namespace": "example.facility",
+                "to_namespace": "other.facility",
+                "entity_scope": "facility",
+                "direction": "unidirectional",
+                "cardinality": "many_to_one",
+                "temporal_applicability": {
+                  "start": "2025-01-01",
+                  "end": "2025-12-31",
+                  "period_kind": "calendar",
+                  "precision": "year"
+                },
+                "normalization": "Normalize documented padding before applying the publisher-maintained crosswalk.",
+                "operation_kind": "crosswalk",
+                "evidence_state": "documented",
+                "compatibility": "conditional",
+                "requirements": [
+                  {
+                    "requirement_id": "requirement.crosswalk",
+                    "kind": "crosswalk",
+                    "state": "external",
+                    "description": "Acquire and validate the publisher-maintained crosswalk for the same period.",
+                    "human_gate": true,
+                    "evidence_ids": [
+                      "ev.catalog"
+                    ]
+                  }
+                ],
+                "blockers": [
+                  {
+                    "blocker_id": "blocker.not-executed",
+                    "kind": "evidence_missing",
+                    "state": "open",
+                    "description": "USHSO has not executed or proven this route over source data.",
+                    "evidence_ids": [
+                      "ev.policy"
+                    ]
+                  }
+                ],
+                "caveats": [
+                  "Documentation evidence does not establish executed or proven compatibility."
+                ],
+                "evidence_ids": [
+                  "ev.catalog"
+                ],
+                "hop_count": 1
+              }
+            ]
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "compare.success",
+      "case_kind": "success",
+      "capability": "compare_assets",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/compare-assets-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/compare-assets-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.compare-assets.input.v1.0.0",
+        "asset_ids": [
+          "asset.a",
+          "asset.b"
+        ],
+        "dimensions": [
+          "access"
+        ],
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "POST",
+        "route": "/api/compare-assets",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "compare_assets",
+          "transport_adapter": "json_api",
+          "request_id": "compare.success.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:fead144f3e6503b0fb0a550b6f596effcabb1b4bfc99ca840e0be3702cea0ada",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "asset_ids": [
+              "asset.a",
+              "asset.b"
+            ],
+            "dimensions": [
+              {
+                "dimension": "access",
+                "state": "comparable",
+                "values": [
+                  {
+                    "asset_id": "asset.a",
+                    "metadata_value": "public",
+                    "state": "known"
+                  },
+                  {
+                    "asset_id": "asset.b",
+                    "metadata_value": null,
+                    "state": "unknown"
+                  }
+                ],
+                "explanation": "The comparison preserves unknown metadata and does not infer a value for asset.b.",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "pairwise_operations": [
+              {
+                "left_asset_id": "asset.a",
+                "right_asset_id": "asset.b",
+                "operation_kind": "crosswalk",
+                "evidence_state": "documented",
+                "compatibility": "conditional",
+                "requirements": [
+                  {
+                    "requirement_id": "requirement.crosswalk",
+                    "kind": "crosswalk",
+                    "state": "external",
+                    "description": "Validate the documented crosswalk outside USHSO.",
+                    "human_gate": true,
+                    "evidence_ids": [
+                      "ev.catalog"
+                    ]
+                  }
+                ],
+                "blockers": [
+                  {
+                    "blocker_id": "blocker.not-executed",
+                    "kind": "evidence_missing",
+                    "state": "open",
+                    "description": "No executed join evidence is present.",
+                    "evidence_ids": [
+                      "ev.policy"
+                    ]
+                  }
+                ],
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "ranking_performed": false,
+            "source_values_compared": false
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.compare_assets",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "compare_assets",
+          "transport_adapter": "webmcp",
+          "request_id": "compare.success.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:fead144f3e6503b0fb0a550b6f596effcabb1b4bfc99ca840e0be3702cea0ada",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "complete",
+          "result": {
+            "asset_ids": [
+              "asset.a",
+              "asset.b"
+            ],
+            "dimensions": [
+              {
+                "dimension": "access",
+                "state": "comparable",
+                "values": [
+                  {
+                    "asset_id": "asset.a",
+                    "metadata_value": "public",
+                    "state": "known"
+                  },
+                  {
+                    "asset_id": "asset.b",
+                    "metadata_value": null,
+                    "state": "unknown"
+                  }
+                ],
+                "explanation": "The comparison preserves unknown metadata and does not infer a value for asset.b.",
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "pairwise_operations": [
+              {
+                "left_asset_id": "asset.a",
+                "right_asset_id": "asset.b",
+                "operation_kind": "crosswalk",
+                "evidence_state": "documented",
+                "compatibility": "conditional",
+                "requirements": [
+                  {
+                    "requirement_id": "requirement.crosswalk",
+                    "kind": "crosswalk",
+                    "state": "external",
+                    "description": "Validate the documented crosswalk outside USHSO.",
+                    "human_gate": true,
+                    "evidence_ids": [
+                      "ev.catalog"
+                    ]
+                  }
+                ],
+                "blockers": [
+                  {
+                    "blocker_id": "blocker.not-executed",
+                    "kind": "evidence_missing",
+                    "state": "open",
+                    "description": "No executed join evidence is present.",
+                    "evidence_ids": [
+                      "ev.policy"
+                    ]
+                  }
+                ],
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "ranking_performed": false,
+            "source_values_compared": false
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "coverage.unknown.success",
+      "case_kind": "success",
+      "capability": "get_coverage_status",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-coverage-status-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-coverage-status-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.get-coverage-status.input.v1.0.0",
+        "geography_ids": [
+          "geo.us"
+        ],
+        "subject_ids": [],
+        "source_classes": [
+          "facility_directory"
+        ],
+        "time_period": null,
+        "authority_levels": [
+          "authoritative"
+        ],
+        "limit": 100,
+        "cursor": null,
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "GET",
+        "route": "/api/coverage/status",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_coverage_status",
+          "transport_adapter": "json_api",
+          "request_id": "coverage.unknown.success.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:f1ba57adc53fa2efe87f945867c7724b378359d06a5e4c512ded19b424197c1d",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "partial",
+          "result": {
+            "federal_baseline": {
+              "state": "partial",
+              "source_scope_count": 1,
+              "description": "The federal baseline reflects only explicitly tracked connector scopes in this snapshot.",
+              "evidence_ids": [
+                "ev.catalog"
+              ]
+            },
+            "cells": [
+              {
+                "cell_id": "coverage.us.example",
+                "geography_id": "geo.us",
+                "source_class": "facility_directory",
+                "coverage_cell_state": "unknown",
+                "processing_status": "pending",
+                "completeness_state": "unknown",
+                "denominator": {
+                  "definition_id": "denominator.connector-scope.v1",
+                  "unit": "connector_scope",
+                  "count": null,
+                  "status": "unknown",
+                  "bounded_inventory_complete": false,
+                  "membership_manifest_digest": null
+                },
+                "interpretation": "The current bounded inventory is incomplete, so nonappearance must not be interpreted as source absence.",
+                "absence_claim_permitted": false,
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "scope_interpretation": "Coverage describes indexed public metadata for named connector scopes and is not a census of all possible sources.",
+            "absence_claim_permitted": false
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.get_coverage_status",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_coverage_status",
+          "transport_adapter": "webmcp",
+          "request_id": "coverage.unknown.success.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": true,
+          "result_snapshot_id": "sha256:f1ba57adc53fa2efe87f945867c7724b378359d06a5e4c512ded19b424197c1d",
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "partial",
+          "result": {
+            "federal_baseline": {
+              "state": "partial",
+              "source_scope_count": 1,
+              "description": "The federal baseline reflects only explicitly tracked connector scopes in this snapshot.",
+              "evidence_ids": [
+                "ev.catalog"
+              ]
+            },
+            "cells": [
+              {
+                "cell_id": "coverage.us.example",
+                "geography_id": "geo.us",
+                "source_class": "facility_directory",
+                "coverage_cell_state": "unknown",
+                "processing_status": "pending",
+                "completeness_state": "unknown",
+                "denominator": {
+                  "definition_id": "denominator.connector-scope.v1",
+                  "unit": "connector_scope",
+                  "count": null,
+                  "status": "unknown",
+                  "bounded_inventory_complete": false,
+                  "membership_manifest_digest": null
+                },
+                "interpretation": "The current bounded inventory is incomplete, so nonappearance must not be interpreted as source absence.",
+                "absence_claim_permitted": false,
+                "evidence_ids": [
+                  "ev.catalog"
+                ]
+              }
+            ],
+            "scope_interpretation": "Coverage describes indexed public metadata for named connector scopes and is not a census of all possible sources.",
+            "absence_claim_permitted": false
+          },
+          "error": null,
+          "evidence_references": [
+            {
+              "evidence_id": "ev.catalog",
+              "evidence_class": "catalog_record",
+              "public_locator": "https://example.gov/catalog/asset-a",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "observed",
+              "staleness_state": "current",
+              "derivation_reference": "source.direct",
+              "policy_reference": null
+            },
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "public_metadata_only",
+              "message": "This response describes indexed public-source metadata and does not contain source-data payloads or analytical results.",
+              "evidence_ids": [
+                "ev.policy"
+              ],
+              "copy_policy_version": "research-navigator-boundary.v1"
+            }
+          ],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "planner.gated",
+      "case_kind": "planner_gated",
+      "capability": "plan_research",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/plan-research-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/plan-research-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.plan-research.input.v1.0.0",
+        "mode": "initial",
+        "research_need": "Design an evidence-bound facility metadata study.",
+        "constraints": {
+          "geography_ids": [
+            "geo.us"
+          ],
+          "time_period": null,
+          "grain": "facility",
+          "access_classes": [
+            "public"
+          ],
+          "machine_access_required": false,
+          "intended_analyses": [
+            "external_descriptive_analysis"
+          ]
+        },
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "POST",
+        "route": "/api/plan",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "plan_research",
+          "transport_adapter": "json_api",
+          "request_id": "planner.gated.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": false,
+          "result_snapshot_id": null,
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "gated",
+          "result": null,
+          "error": {
+            "code": "planner_unavailable",
+            "safe_message": "The research-plan compiler is gated until every required safety and usefulness receipt passes.",
+            "retryable": false,
+            "generation": "gen-2026-08-30",
+            "scope": {
+              "capability": "plan_research",
+              "record_id": null,
+              "query_scope_id": null
+            },
+            "corrective_guidance": "Use the inspection tools while the plan_research capability remains gated.",
+            "retry_after_seconds": null
+          },
+          "evidence_references": [
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.plan_research",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "plan_research",
+          "transport_adapter": "webmcp",
+          "request_id": "planner.gated.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": false,
+          "result_snapshot_id": null,
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "gated",
+          "result": null,
+          "error": {
+            "code": "planner_unavailable",
+            "safe_message": "The research-plan compiler is gated until every required safety and usefulness receipt passes.",
+            "retryable": false,
+            "generation": "gen-2026-08-30",
+            "scope": {
+              "capability": "plan_research",
+              "record_id": null,
+              "query_scope_id": null
+            },
+            "corrective_guidance": "Use the inspection tools while the plan_research capability remains gated.",
+            "retry_after_seconds": null
+          },
+          "evidence_references": [
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "planner.disabled",
+      "case_kind": "planner_disabled",
+      "capability": "plan_research",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/plan-research-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/plan-research-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.plan-research.input.v1.0.0",
+        "mode": "initial",
+        "research_need": "Design an evidence-bound facility metadata study.",
+        "constraints": {
+          "geography_ids": [
+            "geo.us"
+          ],
+          "time_period": null,
+          "grain": "facility",
+          "access_classes": [
+            "public"
+          ],
+          "machine_access_required": false,
+          "intended_analyses": [
+            "external_descriptive_analysis"
+          ]
+        },
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "POST",
+        "route": "/api/plan",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "plan_research",
+          "transport_adapter": "json_api",
+          "request_id": "planner.disabled.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": false,
+          "result_snapshot_id": null,
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "disabled",
+          "result": null,
+          "error": {
+            "code": "planner_unavailable",
+            "safe_message": "The research-plan compiler is not enabled in the public capability manifest.",
+            "retryable": false,
+            "generation": "gen-2026-08-30",
+            "scope": {
+              "capability": "plan_research",
+              "record_id": null,
+              "query_scope_id": null
+            },
+            "corrective_guidance": "Do not advertise or invoke plan_research until the manifest is promoted with passing receipts.",
+            "retry_after_seconds": null
+          },
+          "evidence_references": [
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.plan_research",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "plan_research",
+          "transport_adapter": "webmcp",
+          "request_id": "planner.disabled.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": false,
+          "result_snapshot_id": null,
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "disabled",
+          "result": null,
+          "error": {
+            "code": "planner_unavailable",
+            "safe_message": "The research-plan compiler is not enabled in the public capability manifest.",
+            "retryable": false,
+            "generation": "gen-2026-08-30",
+            "scope": {
+              "capability": "plan_research",
+              "record_id": null,
+              "query_scope_id": null
+            },
+            "corrective_guidance": "Do not advertise or invoke plan_research until the manifest is promoted with passing receipts.",
+            "retry_after_seconds": null
+          },
+          "evidence_references": [
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "asset.unavailable",
+      "case_kind": "domain_error",
+      "capability": "get_asset",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-asset-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-asset-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.get-asset.input.v1.0.0",
+        "record_id": "asset.unresolved",
+        "expected_generation": "gen-2026-08-30",
+        "collection_limits": {
+          "releases": 20,
+          "distributions": 20,
+          "documentation": 20,
+          "schemas": 20
+        },
+        "collection_cursors": {
+          "releases": null,
+          "distributions": null,
+          "documentation": null,
+          "schemas": null
+        }
+      },
+      "json_api": {
+        "method": "GET",
+        "route": "/api/datasets/{record_id}",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_asset",
+          "transport_adapter": "json_api",
+          "request_id": "asset.unavailable.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": false,
+          "result_snapshot_id": null,
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "unavailable",
+          "result": null,
+          "error": {
+            "code": "record_unavailable_in_generation",
+            "safe_message": "The requested public metadata result is unavailable in the selected scope.",
+            "retryable": false,
+            "generation": "gen-2026-08-30",
+            "scope": {
+              "capability": "get_asset",
+              "record_id": "asset.unresolved",
+              "query_scope_id": null
+            },
+            "corrective_guidance": "Check the public input and generation pin, then retry only when the error is retryable.",
+            "retry_after_seconds": null
+          },
+          "evidence_references": [
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.get_asset",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "get_asset",
+          "transport_adapter": "webmcp",
+          "request_id": "asset.unavailable.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": false,
+          "result_snapshot_id": null,
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "unavailable",
+          "result": null,
+          "error": {
+            "code": "record_unavailable_in_generation",
+            "safe_message": "The requested public metadata result is unavailable in the selected scope.",
+            "retryable": false,
+            "generation": "gen-2026-08-30",
+            "scope": {
+              "capability": "get_asset",
+              "record_id": "asset.unresolved",
+              "query_scope_id": null
+            },
+            "corrective_guidance": "Check the public input and generation pin, then retry only when the error is retryable.",
+            "retry_after_seconds": null
+          },
+          "evidence_references": [
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "search.cursor-expired",
+      "case_kind": "domain_error",
+      "capability": "search_assets",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/search-assets-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/search-assets-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.search-assets.input.v1.0.0",
+        "mode": "browse",
+        "filters": {
+          "geography_ids": [],
+          "subject_ids": [],
+          "grain": [],
+          "access_classes": [],
+          "authority_levels": [],
+          "machine_readiness": [],
+          "time_period": null,
+          "negative_constraints": [],
+          "dimensions": []
+        },
+        "sort": "title_asc",
+        "grouping": "none",
+        "limit": 5,
+        "cursor": "cursor.expired.0001",
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "POST",
+        "route": "/api/discover",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "search_assets",
+          "transport_adapter": "json_api",
+          "request_id": "search.cursor-expired.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": false,
+          "result_snapshot_id": null,
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "unavailable",
+          "result": null,
+          "error": {
+            "code": "cursor_expired",
+            "safe_message": "The opaque cursor can no longer continue in its pinned generation.",
+            "retryable": false,
+            "generation": "gen-2026-08-30",
+            "scope": {
+              "capability": "search_assets",
+              "record_id": null,
+              "query_scope_id": null
+            },
+            "corrective_guidance": "Restart the request without a cursor and retain the newly returned generation.",
+            "retry_after_seconds": null
+          },
+          "evidence_references": [
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": true,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.search_assets",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "search_assets",
+          "transport_adapter": "webmcp",
+          "request_id": "search.cursor-expired.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": false,
+          "result_snapshot_id": null,
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "unavailable",
+          "result": null,
+          "error": {
+            "code": "cursor_expired",
+            "safe_message": "The opaque cursor can no longer continue in its pinned generation.",
+            "retryable": false,
+            "generation": "gen-2026-08-30",
+            "scope": {
+              "capability": "search_assets",
+              "record_id": null,
+              "query_scope_id": null
+            },
+            "corrective_guidance": "Restart the request without a cursor and retain the newly returned generation.",
+            "retry_after_seconds": null
+          },
+          "evidence_references": [
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": true,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 59,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": null
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    },
+    {
+      "case_id": "search.rate-limited",
+      "case_kind": "rate_limited",
+      "capability": "search_assets",
+      "input_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/search-assets-input.schema.json",
+      "response_schema_id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/search-assets-response.schema.json",
+      "input": {
+        "contract_version": "observatory.machine.search-assets.input.v1.0.0",
+        "mode": "search",
+        "research_need": "Identify public hospital facility metadata suitable for a documented linkage design.",
+        "filters": {
+          "geography_ids": [],
+          "subject_ids": [],
+          "grain": [],
+          "access_classes": [],
+          "authority_levels": [],
+          "machine_readiness": [],
+          "time_period": null,
+          "negative_constraints": [],
+          "dimensions": []
+        },
+        "grouping": "none",
+        "limit": 5,
+        "cursor": null,
+        "expected_generation": "gen-2026-08-30"
+      },
+      "json_api": {
+        "method": "POST",
+        "route": "/api/discover",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "search_assets",
+          "transport_adapter": "json_api",
+          "request_id": "search.rate-limited.json",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": false,
+          "result_snapshot_id": null,
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "unavailable",
+          "result": null,
+          "error": {
+            "code": "rate_limited",
+            "safe_message": "The public machine-read rate limit was reached.",
+            "retryable": true,
+            "generation": "gen-2026-08-30",
+            "scope": {
+              "capability": "search_assets",
+              "record_id": null,
+              "query_scope_id": null
+            },
+            "corrective_guidance": "Retry after the stated interval without changing the generation pin.",
+            "retry_after_seconds": 30
+          },
+          "evidence_references": [
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 0,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": 30
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      },
+      "webmcp": {
+        "tool_name": "observatory.search_assets",
+        "response": {
+          "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+          "capability": "search_assets",
+          "transport_adapter": "webmcp",
+          "request_id": "search.rate-limited.web",
+          "response_generated_at": "2026-08-30T00:00:00Z",
+          "ok": false,
+          "result_snapshot_id": null,
+          "candidate_snapshot_id": null,
+          "registry_revision": "registry.rev.42",
+          "index_generation": "gen-2026-08-30",
+          "publication_manifest_id": "publication.manifest.42",
+          "canonical_as_of": "2026-08-29T23:59:59Z",
+          "coverage_snapshot_id": "coverage.snapshot.42",
+          "result_state": "unavailable",
+          "result": null,
+          "error": {
+            "code": "rate_limited",
+            "safe_message": "The public machine-read rate limit was reached.",
+            "retryable": true,
+            "generation": "gen-2026-08-30",
+            "scope": {
+              "capability": "search_assets",
+              "record_id": null,
+              "query_scope_id": null
+            },
+            "corrective_guidance": "Retry after the stated interval without changing the generation pin.",
+            "retry_after_seconds": 30
+          },
+          "evidence_references": [
+            {
+              "evidence_id": "ev.policy",
+              "evidence_class": "maintained_policy",
+              "public_locator": "https://ushso.org/policies/research-navigator-boundary",
+              "observed_at": "2026-08-29T12:00:00Z",
+              "evidence_state": "documented",
+              "staleness_state": "current",
+              "derivation_reference": "policy.direct",
+              "policy_reference": "research-navigator-boundary.v1"
+            }
+          ],
+          "warnings": [],
+          "truncated": false,
+          "omitted_sections": [],
+          "next_cursor": null,
+          "continuation_expires_at": null,
+          "generation_retention_expires_at": "2026-09-01T00:00:00Z",
+          "restart_required": false,
+          "rate_limit": {
+            "policy_id": "public-machine-read.v1",
+            "limit": 60,
+            "remaining": 0,
+            "reset_at": "2026-08-30T00:01:00Z",
+            "retry_after_seconds": 30
+          },
+          "truth_boundary": {
+            "source_requests_made": false,
+            "execution_authorized_by_ushso": false,
+            "retrieval_executed": false,
+            "payloads_acquired": false,
+            "analysis_executed": false,
+            "identity_merges_performed": false
+          }
+        }
+      }
+    }
+  ],
+  "legacy_compatibility_cases": [
+    {
+      "case_id": "legacy.safe.translation",
+      "legacy_input": {
+        "question": "Find public facility metadata.",
+        "limit": 5
+      },
+      "translated_input": {
+        "contract_version": "observatory.machine.search-assets.input.v1.0.0",
+        "mode": "search",
+        "research_need": "Find public facility metadata.",
+        "filters": {
+          "geography_ids": [],
+          "subject_ids": [],
+          "grain": [],
+          "access_classes": [],
+          "authority_levels": [],
+          "machine_readiness": [],
+          "time_period": null,
+          "negative_constraints": [],
+          "dimensions": []
+        },
+        "grouping": "none",
+        "limit": 5,
+        "cursor": null,
+        "expected_generation": null
+      },
+      "expected_outcome": "translated"
+    },
+    {
+      "case_id": "legacy.limit.fail-closed",
+      "legacy_input": {
+        "question": "Find public facility metadata.",
+        "limit": 21
+      },
+      "translated_input": null,
+      "expected_outcome": "invalid_input_never_clip"
+    }
+  ],
+  "gate_cases": [
+    {
+      "case_id": "planner.all-gates-pass",
+      "capability": "plan_research",
+      "required_gates": [
+        "publication_runtime",
+        "retrieval",
+        "planner_safety",
+        "planner_usefulness",
+        "coverage",
+        "identity_resolution",
+        "machine_interface",
+        "security_privacy"
+      ],
+      "gate_receipts": [
+        {
+          "gate": "publication_runtime",
+          "passed": true
+        },
+        {
+          "gate": "retrieval",
+          "passed": true
+        },
+        {
+          "gate": "planner_safety",
+          "passed": true
+        },
+        {
+          "gate": "planner_usefulness",
+          "passed": true
+        },
+        {
+          "gate": "coverage",
+          "passed": true
+        },
+        {
+          "gate": "identity_resolution",
+          "passed": true
+        },
+        {
+          "gate": "machine_interface",
+          "passed": true
+        },
+        {
+          "gate": "security_privacy",
+          "passed": true
+        }
+      ],
+      "expected_registration_state": "enabled"
+    },
+    {
+      "case_id": "planner.one-gate-missing",
+      "capability": "plan_research",
+      "required_gates": [
+        "publication_runtime",
+        "retrieval",
+        "planner_safety",
+        "planner_usefulness",
+        "coverage",
+        "identity_resolution",
+        "machine_interface",
+        "security_privacy"
+      ],
+      "gate_receipts": [
+        {
+          "gate": "publication_runtime",
+          "passed": true
+        },
+        {
+          "gate": "retrieval",
+          "passed": true
+        },
+        {
+          "gate": "planner_safety",
+          "passed": false
+        },
+        {
+          "gate": "planner_usefulness",
+          "passed": true
+        },
+        {
+          "gate": "coverage",
+          "passed": true
+        },
+        {
+          "gate": "identity_resolution",
+          "passed": true
+        },
+        {
+          "gate": "machine_interface",
+          "passed": true
+        },
+        {
+          "gate": "security_privacy",
+          "passed": true
+        }
+      ],
+      "expected_registration_state": "disabled"
+    },
+    {
+      "case_id": "search.base-gated",
+      "capability": "search_assets",
+      "required_gates": [
+        "publication_runtime",
+        "machine_interface",
+        "security_privacy",
+        "retrieval"
+      ],
+      "gate_receipts": [
+        {
+          "gate": "publication_runtime",
+          "passed": true
+        },
+        {
+          "gate": "machine_interface",
+          "passed": true
+        },
+        {
+          "gate": "security_privacy",
+          "passed": true
+        },
+        {
+          "gate": "retrieval",
+          "passed": false
+        }
+      ],
+      "expected_registration_state": "gated"
+    }
+  ]
+}

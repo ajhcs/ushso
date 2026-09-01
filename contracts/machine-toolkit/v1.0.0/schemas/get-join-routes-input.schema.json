@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/get-join-routes-input.schema.json",
+  "title": "observatory.get_join_routes input",
+  "type": "object",
+  "additionalProperties": false,
+  "maxProperties": 10,
+  "required": ["contract_version", "from_id", "to_id", "from_release_id", "to_release_id", "research_purpose", "include_indirect", "max_hops", "limit", "expected_generation"],
+  "properties": {
+    "contract_version": { "const": "observatory.machine.get-join-routes.input.v1.0.0" },
+    "from_id": { "$ref": "common.schema.json#/$defs/stableId" },
+    "to_id": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+    "from_release_id": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+    "to_release_id": { "$ref": "common.schema.json#/$defs/nullableStableId" },
+    "research_purpose": {
+      "oneOf": [
+        { "type": "string", "minLength": 1, "maxLength": 4000 },
+        { "type": "null" }
+      ]
+    },
+    "include_indirect": { "type": "boolean" },
+    "max_hops": { "type": "integer", "minimum": 1, "maximum": 2 },
+    "limit": { "type": "integer", "minimum": 1, "maximum": 50 },
+    "expected_generation": { "$ref": "common.schema.json#/$defs/nullableStableId" }
+  }
+}

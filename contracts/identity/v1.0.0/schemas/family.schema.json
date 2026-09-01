@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/identity/v1.0.0/family.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "family_id", "family_kind", "label", "resolution_state", "evidence_ids", "current_revision_id", "recorded_at"],
+  "properties": {
+    "schema_version": {"const": "identity.family.v1.0.0"},
+    "family_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "family_kind": {"enum": ["version", "mirror", "successor", "format", "collection"]},
+    "label": {"type": "string", "minLength": 1, "maxLength": 300},
+    "resolution_state": {"enum": ["unresolved", "review_pending", "accepted", "rejected"]},
+    "evidence_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "current_revision_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "recorded_at": {"$ref": "common.schema.json#/$defs/dateTime"}
+  }
+}

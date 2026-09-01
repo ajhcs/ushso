@@ -1,0 +1,23 @@
+{
+  "schema_version": "ushso-ops-access-template.v1.0.0",
+  "status": "pending_external_authorization",
+  "authorization": "AUTH-02",
+  "application": {
+    "name_template": "ushso-{environment}-ops",
+    "hostname": "REPLACE_AFTER_AUTHORIZATION",
+    "type": "self_hosted",
+    "session_duration": "1h",
+    "http_only_cookie": true,
+    "same_site_cookie": "strict",
+    "worker_routes_created": false,
+    "dns_records_created": false
+  },
+  "policy_order": [
+    { "precedence": 1, "decision": "allow", "include": "dedicated_ops_group", "require": "mfa" },
+    { "precedence": 2, "decision": "non_identity", "include": "separately_scoped_ops_service_token", "require": "token_rotation_and_audit" },
+    { "precedence": 999, "decision": "deny", "include": "everyone", "require": "none" }
+  ],
+  "application_controls": ["no_public_bypass", "no_candidate_version_from_untrusted_request", "one_hour_max_session", "audit_every_mutation", "csrf_origin_check_for_browser_mutations"],
+  "required_audit_actions": ["pause", "replay", "review", "promotion", "rollback", "retention_override", "deletion"],
+  "unresolved_inputs": ["account_id", "identity_provider", "ops_group_id", "service_token_id", "application_audience", "hostname"]
+}

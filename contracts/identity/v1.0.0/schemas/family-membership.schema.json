@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/identity/v1.0.0/family-membership.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "membership_id",
+    "family_id",
+    "member_object_id",
+    "member_object_type",
+    "relationship_type",
+    "resolution_state",
+    "basis",
+    "effective_interval",
+    "evidence_ids",
+    "state",
+    "supersedes_membership_id",
+    "superseded_by_membership_id",
+    "recorded_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "identity.family-membership.v1.0.0"},
+    "membership_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "family_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "member_object_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "member_object_type": {"enum": ["asset", "release", "distribution"]},
+    "relationship_type": {"enum": ["family_member", "mirror_of", "successor_of", "version_of", "format_variant_of", "collection_member"]},
+    "resolution_state": {"enum": ["candidate", "accepted", "rejected", "superseded"]},
+    "basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reference_id"],
+      "properties": {
+        "kind": {"enum": ["review_decision", "source_declared_lineage", "candidate"]},
+        "reference_id": {"$ref": "common.schema.json#/$defs/opaqueId"}
+      }
+    },
+    "effective_interval": {"$ref": "common.schema.json#/$defs/effectiveInterval"},
+    "evidence_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "state": {"enum": ["active", "superseded"]},
+    "supersedes_membership_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]},
+    "superseded_by_membership_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]},
+    "recorded_at": {"$ref": "common.schema.json#/$defs/dateTime"}
+  }
+}

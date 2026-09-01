@@ -1,0 +1,55 @@
+{
+  "schema_version": "ushso-queue-workflow-contract.v1.1.0",
+  "delivery_semantics": "at_least_once",
+  "message_body": {
+    "contract_version": "ingestion.v1.0.0",
+    "top_level_allowed": ["attempt", "contract_version", "delivery_fence", "delivery_started_at", "event_id", "event_type", "idempotency_key", "observed_at", "origin_id", "references", "retry_policy_version", "schema_version", "source_id", "target_class", "trace_id"],
+    "references_allowed": ["canonical_id", "canonical_revision_id", "capture_ref_id", "checkpoint_id", "cursor_ref_id", "job_id", "r2_key", "run_id"],
+    "delivery_fence_allowed": ["lease_epoch", "run_attempt"],
+    "forbidden": ["payload", "raw", "body", "row", "rows", "recordset", "result", "results", "query", "answer", "healthcare", "financial", "benchmark", "market_share", "cookie", "authorization", "password", "secret", "token", "credential", "public_question", "user_identifier"]
+  },
+  "retry_rule": "transport_max_retries_equals_maximum_delivery_attempts_minus_one",
+  "dlq_sink": {
+    "consumer_worker_role": "ops",
+    "applies_to": ["harvest-page-dlq", "normalize-record-dlq", "enrich-schema-dlq", "access-check-dlq", "project-index-dlq"],
+    "maximum_delivery_attempts": 6,
+    "transport_max_retries": 5,
+    "retry_delays_seconds_by_retry": [30, 60, 120, 240, 300],
+    "wrangler_default_retry_delay_seconds": 30,
+    "max_batch_size": 1,
+    "max_batch_timeout_seconds": 5,
+    "max_concurrency": 1,
+    "acknowledgement": "ack_only_after_postgresql_durable_dead_letter_incident_transaction_commits",
+    "second_dead_letter_queue": null,
+    "terminal_failure": "cloudflare_permanently_deletes_message_after_initial_delivery_plus_five_failed_retries",
+    "terminal_control": "page_dlq_nonempty_alert_and_reconstruct_from_postgresql_control_plane_ledger_and_evidence",
+    "durability_contract_refs": ["contracts/ingestion/v1.0.0/schemas/event-ledger.schema.json", "db/migrations/0003_ops_outbox_processed_events_dead_letters.sql"]
+  },
+  "queues": [
+    { "stage": "harvest_page", "queue": "harvest-page", "dlq": "harvest-page-dlq", "maximum_delivery_attempts": 6, "transport_max_retries": 5, "full_jitter": { "minimum_seconds": 5, "maximum_seconds": 900, "bounded_retry_after": true }, "exhausted_outcome": "durable_dlq_and_failed_or_partial_unpublished_run" },
+    { "stage": "normalize_record", "queue": "normalize-record", "dlq": "normalize-record-dlq", "maximum_delivery_attempts": 5, "transport_max_retries": 4, "full_jitter": { "minimum_seconds": 2, "maximum_seconds": 300 }, "exhausted_outcome": "quarantine_record_and_durable_dlq" },
+    { "stage": "schema_enrichment", "queue": "enrich-schema", "dlq": "enrich-schema-dlq", "maximum_delivery_attempts": 4, "transport_max_retries": 3, "full_jitter": { "minimum_seconds": 10, "maximum_seconds": 1800 }, "exhausted_outcome": "schema_unknown_or_quarantined_and_durable_dlq" },
+    { "stage": "access_check", "queue": "access-check", "dlq": "access-check-dlq", "maximum_delivery_attempts": 4, "transport_max_retries": 3, "full_jitter": { "minimum_seconds": 30, "maximum_seconds": 1800 }, "exhausted_outcome": "typed_stale_or_failed_observation_and_durable_dlq" },
+    { "stage": "index_projection", "queue": "project-index", "dlq": "project-index-dlq", "maximum_delivery_attempts": 5, "transport_max_retries": 4, "full_jitter": { "minimum_seconds": 2, "maximum_seconds": 300 }, "exhausted_outcome": "reject_candidate_generation_and_durable_dlq" }
+  ],
+  "workflow": {
+    "logical_name": "harvest",
+    "deterministic_instance_id": {
+      "format": "harvest-{run_id}-{positive_attempt}",
+      "run_id_pattern": "^run_[a-f0-9]{32}$",
+      "provider_pattern": "^[A-Za-z0-9_][A-Za-z0-9_-]*$",
+      "maximum_length": 100,
+      "example": "harvest-run_0123456789abcdef0123456789abcdef-1"
+    },
+    "step_input_rule": "small_ids_and_references_only",
+    "database_client_lifetime": "one_fresh_pg_client_per_step_do",
+    "idempotency_authority": "postgresql_unique_constraints_and_processed_event_guards",
+    "reconciliation": "postgresql_workflow_start_outbox"
+  },
+  "cron": {
+    "schedule": "*/5 * * * *",
+    "timezone": "UTC",
+    "delivery_semantics": "at_least_once",
+    "deduplication": "one_database_dispatch_slot_per_utc_cron_slot"
+  }
+}

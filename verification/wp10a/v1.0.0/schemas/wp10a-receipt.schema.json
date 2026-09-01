@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/verification/wp10a-receipt.v1.0.0.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "receipt_version", "work_package", "generated_at", "technical_status", "governance_status",
+    "wp10a_artifact_freeze_complete", "wp10b_authorized", "benchmark", "evaluator",
+    "component_seals", "provenance", "privacy_and_leakage", "verification", "governance",
+    "external_actions", "receipt_digest"
+  ],
+  "properties": {
+    "receipt_version": {"const": "observatory-wp10a-receipt.v1.0.0"},
+    "work_package": {"const": "WP10A"},
+    "generated_at": {"const": "2026-08-30T00:00:00Z"},
+    "technical_status": {"const": "PASS"},
+    "governance_status": {"const": "PENDING_REQUIRED_OWNER_RATIFICATION"},
+    "wp10a_artifact_freeze_complete": {"const": true},
+    "wp10b_authorized": {"const": false},
+    "benchmark": {"type": "object"},
+    "evaluator": {"type": "object"},
+    "component_seals": {"type": "object"},
+    "provenance": {"type": "object"},
+    "privacy_and_leakage": {"type": "object"},
+    "verification": {"type": "object"},
+    "governance": {"type": "object"},
+    "external_actions": {"type": "object"},
+    "receipt_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}
+  }
+}

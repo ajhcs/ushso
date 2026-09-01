@@ -10,6 +10,7 @@ import type {
   Relationship,
 } from '../types/catalog'
 import type { DiscoveryResult, DiscoveryResultItem, ObservatoryRecord, ObservatoryRetrievalStep } from '../types/discovery'
+import { safeExternalHttpsUrl } from './externalUrls'
 
 function sentenceCase(value: string) {
   return value.replace(/[_-]+/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
@@ -97,14 +98,17 @@ function accessLabel(step: ObservatoryRetrievalStep) {
 }
 
 function accessOptions(record: ObservatoryRecord): AccessOption[] {
-  return record.retrieval.instructions.slice(0, 2).map((step) => ({
-    id: `${record.record_id}:${step.sequence}`,
-    label: accessLabel(step),
-    description: step.instruction,
-    kind: accessKind(step),
-    ...(step.url ? { href: step.url } : {}),
-    requirements: [...record.access.requirements],
-  }))
+  return record.retrieval.instructions.slice(0, 2).map((step) => {
+    const href = safeExternalHttpsUrl(step.url)
+    return {
+      id: `${record.record_id}:${step.sequence}`,
+      label: accessLabel(step),
+      description: step.instruction,
+      kind: accessKind(step),
+      ...(href ? { href } : {}),
+      requirements: [...record.access.requirements],
+    }
+  })
 }
 
 function verificationDetails(record: ObservatoryRecord): DatasetVerification {
@@ -253,10 +257,11 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
     variablesCodebook: variables.summary ?? variables.expectedArtifacts.join(' · '),
     verification,
     variableDetails: variables,
+    accessStatus: sentenceCase(record.access.status),
     accessOptions: accessOptions(record),
     categories: topics,
     sourceName: record.identity.source.name,
-    sourceUrl: record.authoritative_url,
+    sourceUrl: safeExternalHttpsUrl(record.authoritative_url) ?? undefined,
     detailsUrl: `/datasets/${encodeURIComponent(id)}`,
     facetValues: {
       'data-category': dataCategoryFacets(record),

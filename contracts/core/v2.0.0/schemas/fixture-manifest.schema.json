@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/fixture-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "contract_version", "offline", "network_used", "source_data_included", "valid_bundle", "adversarial_cases", "collections"],
+  "properties": {
+    "manifest_version": { "const": "observatory-core-fixture-manifest.v2.0.0" },
+    "contract_version": { "const": "observatory-core.v2.0.0" },
+    "offline": { "const": true },
+    "network_used": { "const": false },
+    "source_data_included": { "const": false },
+    "valid_bundle": { "const": "bundle/valid-bundle.json" },
+    "adversarial_cases": { "const": "fixtures/adversarial-cases.json" },
+    "collections": {
+      "type": "array",
+      "minItems": 13,
+      "maxItems": 13,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "entity_type", "schema_id", "minimum_records"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-z][a-z_]+$" },
+          "entity_type": { "enum": ["Organization", "Source", "Asset", "Release", "Distribution", "Documentation", "SchemaSnapshot", "SchemaField", "AccessRoute", "AccessObservation", "Evidence", "Assertion", "Relationship"] },
+          "schema_id": { "type": "string", "format": "uri" },
+          "minimum_records": { "type": "integer", "minimum": 1 }
+        }
+      }
+    }
+  }
+}

@@ -30,6 +30,7 @@ export async function publishImmutable(file, content) {
 export async function walkFiles(root, relative = '') {
   const result = [];
   for (const entry of (await fs.readdir(path.join(root, relative), { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
+    if (entry.name === 'node_modules' || entry.name === '.git') continue;
     const child = path.posix.join(relative.replaceAll('\\', '/'), entry.name);
     if (entry.isDirectory()) result.push(...await walkFiles(root, child)); else result.push(child);
   }

@@ -1,0 +1,31 @@
+[
+  {
+    "schema_version": "observatory-semantic-join.v1.0.0",
+    "semantic_join_id": "example:semantic-join:hhi:facility-to-system",
+    "analysis_id": "market_concentration_hhi",
+    "requirement_catalog_sha256": "sha256:7f5c77645c8609021cc15ff7dd8a78d6d1edda75d79fa1d0753ed4534406b33c",
+    "requirement_sha256": "sha256:78037d84f591b493b8c36897648e1172b774615b9d716cc964ce29413df9d2b6",
+    "join_requirement_id": "facility_to_health_system",
+    "join_alternative_id": "facility_utilization_to_system_membership_many_to_one",
+    "route_id": "example:join:pa-utilization:facility-system:facility-id",
+    "from_record_id": "example:dataset:pa-inpatient-utilization",
+    "to_record_id": "example:dataset:facility-system-crosswalk",
+    "from_logical_endpoint": "left",
+    "to_logical_endpoint": "right",
+    "period_alignment": "documented",
+    "from_key_input_ids": ["facility_id"],
+    "to_key_input_ids": ["facility_id"],
+    "from_field_refs": ["facility_id"],
+    "to_field_refs": ["facility_key"],
+    "evidence_ids": [
+      "example:evidence:crosswalk-data-dictionary",
+      "example:evidence:period-alignment-review"
+    ],
+    "limitations": ["The route is valid only when facility identity and membership effective year pass review."],
+    "truth_boundary": {
+      "assertion_type": "evidence_reviewed_join_not_source_truth",
+      "source_truth_separate": true,
+      "field_inference_allowed": false
+    }
+  }
+]

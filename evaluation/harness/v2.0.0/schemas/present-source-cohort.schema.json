@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Frozen present-source cohort",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "generated_at", "current_generation", "status_vocabulary", "source_classifications", "requirements", "asset_bindings", "counts", "review"],
+  "properties": {
+    "manifest_version": {"const": "ushso-retrieval-present-source-cohort.v1"},
+    "generated_at": {"type": "string", "maxLength": 40},
+    "current_generation": {"type": "object"},
+    "status_vocabulary": {"const": ["present_search_eligible", "present_but_excluded", "missing"]},
+    "source_classifications": {"type": "array", "minItems": 36, "maxItems": 36, "items": {"type": "object"}},
+    "requirements": {"type": "array", "minItems": 115, "maxItems": 115, "items": {"type": "object"}},
+    "asset_bindings": {"type": "array", "minItems": 1, "maxItems": 157, "items": {"type": "object"}},
+    "counts": {"type": "object"},
+    "review": {"type": "object"}
+  }
+}

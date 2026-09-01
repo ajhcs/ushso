@@ -1,0 +1,107 @@
+{
+  "fixture_version": "observatory-core-adversarial.v2.0.0",
+  "cases": [
+    {
+      "case_id": "ADV-ACCESS-OVERCLAIM",
+      "title": "Catalog visibility and metadata review are promoted to payload access",
+      "target_collection": "access_observations",
+      "target_revision_id": "urn:ushso:revision:access-observation-facility-directory-r1",
+      "mutations": [
+        { "op": "set", "path": "/payload_access_state", "value": "accessible" },
+        { "op": "set", "path": "/check_method", "value": "metadata_review" }
+      ],
+      "expected_error_codes": ["ACCESS_OVERCLAIM", "VISIBILITY_IS_NOT_ACCESS"]
+    },
+    {
+      "case_id": "ADV-TEMPORAL-CONTRADICTION",
+      "title": "System record time precedes observation time",
+      "target_collection": "assets",
+      "target_revision_id": "urn:ushso:revision:asset-facility-directory-r1",
+      "mutations": [
+        { "op": "set", "path": "/clocks/recorded_at", "value": "2026-01-15T12:00:00Z" }
+      ],
+      "expected_error_codes": ["TEMPORAL_ORDER"]
+    },
+    {
+      "case_id": "ADV-UNRESOLVED-IDENTITY-EQUALITY",
+      "title": "An unresolved algorithmic candidate is labeled as exact identity equality",
+      "target_collection": "relationships",
+      "target_revision_id": "urn:ushso:revision:relationship-identity-candidate-r1",
+      "mutations": [
+        { "op": "set", "path": "/relationship_kind", "value": "same_identity" }
+      ],
+      "expected_error_codes": ["IDENTITY_UNRESOLVED_EQUALITY"]
+    },
+    {
+      "case_id": "ADV-FAMILY-IDENTITY-CONFUSION",
+      "title": "Accepted family membership is relabeled as identity equality",
+      "target_collection": "relationships",
+      "target_revision_id": "urn:ushso:revision:relationship-family-member-r1",
+      "mutations": [
+        { "op": "set", "path": "/relationship_kind", "value": "same_identity" }
+      ],
+      "expected_error_codes": ["FAMILY_IDENTITY_CONFUSION"]
+    },
+    {
+      "case_id": "ADV-JOIN-EVIDENCE-UPGRADE",
+      "title": "A field-name candidate is promoted to a proven join",
+      "target_collection": "relationships",
+      "target_revision_id": "urn:ushso:revision:relationship-join-candidate-r1",
+      "mutations": [
+        { "op": "set", "path": "/join_semantics/evidence_state", "value": "proven" },
+        { "op": "set", "path": "/epistemic_confidence", "value": "confirmed" }
+      ],
+      "expected_error_codes": ["JOIN_EVIDENCE_UPGRADE"]
+    },
+    {
+      "case_id": "ADV-MISSING-EVIDENCE",
+      "title": "A truth-bearing assertion has no evidence references",
+      "target_collection": "assertions",
+      "target_revision_id": "urn:ushso:revision:assertion-facility-coverage-r2",
+      "mutations": [
+        { "op": "remove", "path": "/evidence_refs" }
+      ],
+      "expected_error_codes": ["MISSING_EVIDENCE", "SCHEMA_INVALID"]
+    },
+    {
+      "case_id": "ADV-UNKNOWN-COLLAPSE",
+      "title": "An unresolved payload access state is collapsed to not-found",
+      "target_collection": "access_observations",
+      "target_revision_id": "urn:ushso:revision:access-observation-facility-directory-r1",
+      "mutations": [
+        { "op": "set", "path": "/payload_access_state", "value": "not_found" }
+      ],
+      "expected_error_codes": ["UNKNOWN_COLLAPSE", "SCHEMA_INVALID"]
+    },
+    {
+      "case_id": "ADV-SOURCE-DATA-PAYLOAD",
+      "title": "Healthcare source rows are embedded in a metadata object",
+      "target_collection": "assets",
+      "target_revision_id": "urn:ushso:revision:asset-facility-directory-r1",
+      "mutations": [
+        { "op": "set", "path": "/dataset_rows", "value": [{ "facility": "example" }] }
+      ],
+      "expected_error_codes": ["SOURCE_DATA_OR_ANALYSIS_PAYLOAD", "SCHEMA_INVALID"]
+    },
+    {
+      "case_id": "ADV-ANALYSIS-PAYLOAD",
+      "title": "Computed rankings are embedded in the canonical metadata contract",
+      "target_collection": "assets",
+      "target_revision_id": "urn:ushso:revision:asset-facility-utilization-r1",
+      "mutations": [
+        { "op": "set", "path": "/analytical_results", "value": { "rankings": [1, 2, 3] } }
+      ],
+      "expected_error_codes": ["SOURCE_DATA_OR_ANALYSIS_PAYLOAD", "SCHEMA_INVALID"]
+    },
+    {
+      "case_id": "ADV-UNKNOWN-COVERAGE-BOUNDS",
+      "title": "Known date bounds are retained after coverage is changed to unknown",
+      "target_collection": "releases",
+      "target_revision_id": "urn:ushso:revision:release-facility-directory-2025-r1",
+      "mutations": [
+        { "op": "set", "path": "/coverage_intervals/0/status", "value": "unknown" }
+      ],
+      "expected_error_codes": ["TEMPORAL_UNKNOWN_OVERCLAIM"]
+    }
+  ]
+}

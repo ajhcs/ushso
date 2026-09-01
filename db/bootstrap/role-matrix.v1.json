@@ -1,0 +1,57 @@
+{
+  "schema_version": "ushso-postgresql-role-matrix.v1",
+  "roles": {
+    "ushso_public": {
+      "login_identity": true,
+      "credential_boundary": "dedicated_ushso_public_managed_secret",
+      "allow": ["connect", "pointer_read:search.published_runtime_status", "generation_pinned_read:search.published_generation_records"],
+      "deny": ["registry", "ingest", "catalog", "ops", "credential_reference", "publication_write", "schema_create"]
+    },
+    "ushso_scheduler": {
+      "login_identity": true,
+      "credential_boundary": "dedicated_ushso_scheduler_managed_secret",
+      "allow": ["registry_schedule_read", "ingest_run_write", "ops_outbox_write", "ops_heartbeat_write"],
+      "deny": ["capture_read", "capture_write", "publication_write", "audit_delete"]
+    },
+    "ushso_harvest": {
+      "login_identity": true,
+      "credential_boundary": "dedicated_ushso_harvest_managed_secret",
+      "allow": ["registry_connector_read", "ingest_write", "ops_outbox_write"],
+      "deny": ["catalog_accept", "publication_write", "audit_delete"]
+    },
+    "ushso_normalize": {
+      "login_identity": true,
+      "credential_boundary": "dedicated_ushso_normalize_managed_secret",
+      "allow": ["capture_reference_read", "ingest_normalization_write", "ops_outbox_write"],
+      "deny": ["registry_secret_material", "publication_write", "audit_delete"]
+    },
+    "ushso_projector": {
+      "login_identity": true,
+      "credential_boundary": "dedicated_ushso_projector_managed_secret",
+      "allow": ["candidate_projection_write", "accepted_catalog_read"],
+      "deny": ["ingest_write", "active_publication_update", "audit_delete"]
+    },
+    "ushso_ops": {
+      "login_identity": true,
+      "credential_boundary": "dedicated_ushso_ops_managed_secret",
+      "allow": ["pause_replay_audit", "durable_dlq_write", "publication_control"],
+      "deny": ["unaudited_delete", "schema_owner"]
+    },
+    "ushso_maintenance": {
+      "login_identity": false,
+      "credential_boundary": "direct_identity_assumes_non_worker_capability",
+      "allow": ["migration", "partition", "archive_restore", "grant_reconciliation"],
+      "deny": ["worker_binding", "public_runtime"]
+    }
+  },
+  "owner_roles_are_login_disabled": true,
+  "credential_values_in_repository": false,
+  "managed_evidence": {
+    "status": "pending_external_authorization",
+    "required_receipts": [
+      "provider-capability-review.json",
+      "environment-isolation.json",
+      "managed-binding-grant-test.json"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "ushso-recovery-drill-matrix.v1.0.0",
+  "local_configuration_status": "pass",
+  "managed_rehearsal_status": "pending_external_authorization",
+  "authorization": "AUTH-05",
+  "objectives": { "rpo_seconds_max": 300, "rto_seconds_max": 1800, "generation_rollback_seconds_max": 900 },
+  "drills": [
+    { "id": "provider_failover", "target": "isolated_production_like_neon", "evidence": ["provider_event_timeline", "last_durable_transaction", "application_reconnect", "measured_rpo_seconds", "measured_rto_seconds"], "status": "pending_external_authorization" },
+    { "id": "pitr_restore", "target": "new_isolated_project_or_branch", "evidence": ["restore_point_within_30_day_window", "checksum_reconciliation", "no_overwrite_of_source", "measured_rpo_seconds", "measured_rto_seconds"], "status": "pending_external_authorization" },
+    { "id": "hyperdrive_disconnect_reconnect", "target": "staging_dual_bindings", "evidence": ["correctness_read_failure", "bounded_retry", "fresh_client_reconnect", "no_duplicate_logical_effect"], "status": "pending_external_authorization" },
+    { "id": "static_emergency_activation", "target": "co_resident_public_artifact", "evidence": ["activation_timeline", "all_public_surfaces", "semantic_pin_headers", "database_independence"], "status": "pending_external_authorization" },
+    { "id": "publication_pointer_rollback", "target": "previous_complete_manifest", "evidence": ["single_transaction_history", "warm_cache_skew_check", "all_surface_checksums", "elapsed_seconds"], "status": "pending_external_authorization" },
+    { "id": "queue_dlq_replay", "target": "one_isolated_stage", "evidence": ["durable_dlq_record", "replay_of_lineage", "attempt_budget", "one_logical_effect"], "status": "pending_external_authorization" },
+    { "id": "environment_fence_negative", "target": "staging_credentials_against_production_inputs", "evidence": ["denied_plan_or_api", "no_resource_change", "audit_record"], "status": "pending_external_authorization" },
+    { "id": "state_recovery", "target": "encrypted_remote_state_copy", "evidence": ["version_restore", "lock_integrity", "redacted_plan_equality", "access_audit"], "status": "pending_external_authorization" }
+  ]
+}

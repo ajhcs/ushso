@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/package-manifest.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "package_version", "immutable", "digest_contract", "excluded_paths", "file_count", "payload_bytes", "files"],
+  "properties": {
+    "manifest_version": { "const": "observatory-core-package-manifest.v2.0.0" },
+    "package_version": { "const": "2.0.0" },
+    "immutable": { "const": true },
+    "digest_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_sha256", "content_fingerprint", "canonical_json_algorithm", "array_order"],
+      "properties": {
+        "file_sha256": { "const": "SHA-256 of the exact bytes stored at path" },
+        "content_fingerprint": { "const": "SHA-256 of canonical JSON value bytes, independent of JSON whitespace and object-key order" },
+        "canonical_json_algorithm": { "const": "ushso-canonical-json-v1" },
+        "array_order": { "const": "preserved" }
+      }
+    },
+    "excluded_paths": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": { "enum": ["manifests/package-manifest.json", "validation/validation-receipt.json"] }
+    },
+    "file_count": { "type": "integer", "minimum": 1 },
+    "payload_bytes": { "type": "integer", "minimum": 1 },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "bytes", "file_sha256", "content_fingerprint"],
+        "properties": {
+          "path": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+          "bytes": { "type": "integer", "minimum": 0 },
+          "file_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "content_fingerprint": {
+            "oneOf": [
+              { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/sha256" },
+              { "type": "null" }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

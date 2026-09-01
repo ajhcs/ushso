@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/evaluation/planner/benchmark-question.v1.0.0.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "question_contract_version", "question_id", "split", "synthetic_only", "synthetic_question",
+    "topic_cluster", "geographic_composition", "safety_strata", "provenance"
+  ],
+  "properties": {
+    "question_contract_version": {"const": "observatory-planner-benchmark-question.v1.0.0"},
+    "question_id": {"type": "string", "pattern": "^PLAN-V1-[DVH][0-9]{3}$"},
+    "split": {"enum": ["development", "validation", "held_out"]},
+    "synthetic_only": {"const": true},
+    "synthetic_question": {"type": "string", "minLength": 10, "maxLength": 1000},
+    "topic_cluster": {"type": "string", "minLength": 1, "maxLength": 160},
+    "geographic_composition": {"enum": ["pennsylvania", "national_federal", "comparative_multi_state", "other_state_locality", "geography_ambiguous_or_independent"]},
+    "safety_strata": {
+      "type": "array", "minItems": 1, "maxItems": 9, "uniqueItems": true,
+      "items": {"enum": ["time_coverage", "access_authorization", "join_evidence", "identity_uncertainty", "grain_aggregation", "human_authorization", "unsupported_analysis", "executable_asset_resolution", "no_analysis_boundary"]}
+    },
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "legacy_question_id"],
+      "properties": {
+        "kind": {"enum": ["legacy_synthetic_migration", "wp10a_synthetic_augmentation"]},
+        "legacy_question_id": {"type": ["string", "null"], "pattern": "^QTD-O3-[0-9]{3}$"}
+      }
+    }
+  }
+}

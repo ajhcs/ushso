@@ -1,0 +1,59 @@
+{
+  "$schema": "../../../../node_modules/wrangler/config-schema.json",
+  "name": "ushso-production-harvest",
+  "main": "../../templates/foundation-placeholder.mjs",
+  "compatibility_date": "2026-08-30",
+  "compatibility_flags": [
+    "nodejs_compat_v2"
+  ],
+  "workers_dev": false,
+  "routes": [],
+  "vars": {
+    "USHSO_ENVIRONMENT": "production",
+    "USHSO_WORKER_ROLE": "harvest",
+    "FOUNDATION_INERT": "true",
+    "CONFIG_SCHEMA_VERSION": "ushso-worker-binding-manifest.v1.0.0"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 0.1,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.05
+    }
+  },
+  "hyperdrive": [
+    {
+      "binding": "HD_CORRECTNESS",
+      "id": "REPLACE_PRODUCTION_HARVEST_HD_CORRECTNESS_ID"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_CAPTURE",
+      "bucket_name": "ushso-production-capture"
+    }
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "NORMALIZE_RECORD_QUEUE",
+        "queue": "ushso-production-normalize-record"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "ushso-production-harvest-page",
+        "max_batch_size": 5,
+        "max_batch_timeout": 5,
+        "max_retries": 5,
+        "dead_letter_queue": "ushso-production-harvest-page-dlq",
+        "max_concurrency": 2
+      }
+    ]
+  }
+}

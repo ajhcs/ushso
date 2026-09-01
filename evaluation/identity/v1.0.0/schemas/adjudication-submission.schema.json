@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/evaluation/identity/v1.0.0/adjudication-submission.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "submission_id",
+    "packet_id",
+    "reviewer_packet_byte_sha256",
+    "benchmark_case_sha256",
+    "reviewer_case_sha256",
+    "authorization_reference",
+    "authorization_receipt_id",
+    "reviewer_roster",
+    "records",
+    "record_set_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "identity.adjudication-submission.v1.0.0"},
+    "submission_id": {"type": "string", "pattern": "^adjudication-submission:"},
+    "packet_id": {"type": "string", "pattern": "^identity-review-packet:"},
+    "reviewer_packet_byte_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "benchmark_case_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "reviewer_case_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "authorization_reference": {"const": "AUTH-14"},
+    "authorization_receipt_id": {"type": "string", "minLength": 3, "maxLength": 200},
+    "reviewer_roster": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["schema_version", "reviewer_id", "human", "identified", "controlled_fixture", "identity_receipt_id", "independence_attestation_id", "assigned_roles", "independence_declarations"],
+        "properties": {
+          "schema_version": {"const": "identity.reviewer-roster-entry.v1.0.0"},
+          "reviewer_id": {"type": "string", "pattern": "^reviewer:[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+          "human": {"const": true},
+          "identified": {"const": true},
+          "controlled_fixture": {"const": false},
+          "identity_receipt_id": {"type": "string", "pattern": "^receipt:[A-Za-z0-9][A-Za-z0-9._:-]{2,191}$"},
+          "independence_attestation_id": {"type": "string", "pattern": "^attestation:[A-Za-z0-9][A-Za-z0-9._:-]{2,187}$"},
+          "assigned_roles": {"type": "array", "minItems": 1, "maxItems": 3, "uniqueItems": true, "items": {"enum": ["primary", "secondary", "adjudicator"]}},
+          "independence_declarations": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["controlled_label_access", "peer_decision_access_before_independent_submission", "algorithm_output_access", "conflict_disclosures"],
+            "properties": {
+              "controlled_label_access": {"const": false},
+              "peer_decision_access_before_independent_submission": {"const": false},
+              "algorithm_output_access": {"const": false},
+              "conflict_disclosures": {"type": "array", "maxItems": 0}
+            }
+          }
+        }
+      }
+    },
+    "records": {"type": "array", "maxItems": 3000, "items": {"$ref": "adjudication-record.schema.json"}},
+    "record_set_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

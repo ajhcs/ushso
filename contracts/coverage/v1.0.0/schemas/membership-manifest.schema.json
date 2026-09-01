@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/coverage/v1.0.0/schemas/membership-manifest.schema.json",
+  "title": "Immutable coverage membership manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_id",
+    "manifest_version",
+    "metric_id",
+    "metric_version",
+    "unit",
+    "as_of",
+    "reporting_window",
+    "revision_pins",
+    "cohort_filters",
+    "numerator_definition_version",
+    "denominator_definition_version",
+    "denominator_status",
+    "estimate_assertion",
+    "enumeration",
+    "members",
+    "overlap"
+  ],
+  "properties": {
+    "manifest_id": { "$ref": "common.schema.json#/$defs/Id" },
+    "manifest_version": { "const": "1.0.0" },
+    "metric_id": { "$ref": "common.schema.json#/$defs/MetricId" },
+    "metric_version": { "const": "1.0.0" },
+    "unit": { "$ref": "common.schema.json#/$defs/CountingUnit" },
+    "as_of": { "$ref": "common.schema.json#/$defs/UtcInstant" },
+    "reporting_window": { "$ref": "common.schema.json#/$defs/ReportingWindow" },
+    "revision_pins": { "$ref": "common.schema.json#/$defs/RevisionPins" },
+    "cohort_filters": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/CohortFilter" }
+    },
+    "numerator_definition_version": { "$ref": "common.schema.json#/$defs/Id" },
+    "denominator_definition_version": {
+      "oneOf": [
+        { "$ref": "common.schema.json#/$defs/Id" },
+        { "type": "null" }
+      ]
+    },
+    "denominator_status": { "enum": ["known", "estimated", "unknown"] },
+    "estimate_assertion": {
+      "oneOf": [
+        { "$ref": "common.schema.json#/$defs/EstimateAssertion" },
+        { "type": "null" }
+      ]
+    },
+    "enumeration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "sealed", "run_ids", "membership_revision", "source_reported_total_admissible"],
+      "properties": {
+        "status": { "enum": ["complete", "incomplete", "failed", "not_applicable"] },
+        "sealed": { "type": "boolean" },
+        "run_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/Id" }
+        },
+        "membership_revision": {
+          "oneOf": [
+            { "$ref": "common.schema.json#/$defs/Id" },
+            { "type": "null" }
+          ]
+        },
+        "source_reported_total_admissible": { "type": "boolean" }
+      }
+    },
+    "members": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Member" }
+    },
+    "overlap": { "$ref": "common.schema.json#/$defs/OverlapDisclosure" }
+  },
+  "$defs": {
+    "Member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "member_key",
+        "source_scope_id",
+        "in_numerator",
+        "denominator_membership",
+        "state",
+        "unclassified_dimensions",
+        "policy_decision",
+        "overlap_group_ids",
+        "evidence_refs"
+      ],
+      "properties": {
+        "member_key": { "$ref": "common.schema.json#/$defs/MemberKey" },
+        "source_scope_id": {
+          "oneOf": [
+            { "$ref": "common.schema.json#/$defs/Id" },
+            { "type": "null" }
+          ]
+        },
+        "in_numerator": { "type": "boolean" },
+        "denominator_membership": { "enum": ["included", "outside_conditional_cohort", "unknown"] },
+        "state": {
+          "enum": [
+            "active",
+            "paused",
+            "excluded",
+            "retired",
+            "unassessed",
+            "observed",
+            "captured",
+            "normalized",
+            "pending",
+            "failed",
+            "not_applicable",
+            "unknown",
+            "included",
+            "unclassified",
+            "passed",
+            "stale",
+            "complete",
+            "due",
+            "current",
+            "indexed",
+            "eligible",
+            "overdue",
+            "terminal",
+            "dead_letter"
+          ]
+        },
+        "unclassified_dimensions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/CohortDimension" }
+        },
+        "policy_decision": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["policy_revision", "reason_code", "decided_at"],
+              "properties": {
+                "policy_revision": { "$ref": "common.schema.json#/$defs/Id" },
+                "reason_code": { "$ref": "common.schema.json#/$defs/Id" },
+                "decided_at": { "$ref": "common.schema.json#/$defs/UtcInstant" }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "overlap_group_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/Id" }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "common.schema.json#/$defs/EvidenceRef" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "fixture_version": "ushso.offline-dcat3-dataset-conformance.v1.0.0",
+  "fixture_origin": "hand-authored normative expectations; not generated from USHSO implementation output",
+  "specification": {
+    "title": "Data Catalog Vocabulary (DCAT) - Version 3",
+    "status": "W3C Recommendation",
+    "published": "2024-08-22",
+    "immutable_url": "https://www.w3.org/TR/2024/REC-vocab-dcat-3-20240822/",
+    "dcat_namespace": "http://www.w3.org/ns/dcat#",
+    "normative_requirements": [
+      {
+        "id": "DCAT3-DATASET-CLASS",
+        "spec_section": "6.6 Class: Dataset",
+        "jsonld_path": "@type",
+        "expected": "dcat:Dataset"
+      },
+      {
+        "id": "DCAT3-DISTRIBUTION-CLASS",
+        "spec_section": "6.15 Class: Distribution",
+        "jsonld_path": "dcat:distribution[0].@type",
+        "expected": "dcat:Distribution"
+      },
+      {
+        "id": "DCAT3-ACCESS-URL",
+        "spec_section": "6.7 Property: access URL",
+        "jsonld_path": "dcat:distribution[0].dcat:accessURL.@id",
+        "expected": "https://data.cms.gov/provider-data/dataset/example"
+      },
+      {
+        "id": "DCAT3-DOWNLOAD-URL",
+        "spec_section": "6.8 Property: download URL",
+        "jsonld_path": "dcat:distribution[0].dcat:downloadURL.@id",
+        "expected": "https://data.cms.gov/files/example.csv"
+      },
+      {
+        "id": "DCAT3-TEMPORAL-START-END",
+        "spec_section": "6.16 Class: Period of Time",
+        "jsonld_path": "dct:temporal",
+        "expected": "typed start and end xsd:date values"
+      }
+    ]
+  },
+  "input": {
+    "public_id": "obs:asset:dcat3-conformance",
+    "title": "DCAT 3 conformance fixture",
+    "description": "Offline fixture for independently specified DCAT 3 dataset terms.",
+    "profile": "dcat-3"
+  },
+  "expected_jsonld": {
+    "@context": {
+      "dcat": "http://www.w3.org/ns/dcat#",
+      "dct": "http://purl.org/dc/terms/",
+      "foaf": "http://xmlns.com/foaf/0.1/",
+      "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+      "xsd": "http://www.w3.org/2001/XMLSchema#"
+    },
+    "@id": "https://ushso.example/datasets/obs%3Aasset%3Adcat3-conformance",
+    "@type": "dcat:Dataset",
+    "dct:identifier": "obs:asset:dcat3-conformance",
+    "dct:title": "DCAT 3 conformance fixture",
+    "dct:description": "Offline fixture for independently specified DCAT 3 dataset terms.",
+    "dct:publisher": {
+      "@type": "foaf:Agent",
+      "foaf:name": "Centers for Medicare & Medicaid Services"
+    },
+    "dct:conformsTo": {
+      "@id": "https://www.w3.org/TR/2024/REC-vocab-dcat-3-20240822/"
+    },
+    "dct:temporal": {
+      "@type": "dct:PeriodOfTime",
+      "dcat:startDate": {
+        "@value": "2020-01-01",
+        "@type": "xsd:date"
+      },
+      "dcat:endDate": {
+        "@value": "2025-12-31",
+        "@type": "xsd:date"
+      }
+    },
+    "dct:spatial": [
+      {
+        "@type": "dct:Location",
+        "rdfs:label": "United States"
+      }
+    ],
+    "dcat:distribution": [
+      {
+        "@id": "https://data.cms.gov/provider-data/dataset/example#distribution-1",
+        "@type": "dcat:Distribution",
+        "dct:title": "CSV distribution",
+        "dct:format": "CSV",
+        "dcat:mediaType": "text/csv",
+        "dcat:accessURL": {
+          "@id": "https://data.cms.gov/provider-data/dataset/example"
+        },
+        "dcat:downloadURL": {
+          "@id": "https://data.cms.gov/files/example.csv"
+        }
+      }
+    ]
+  }
+}

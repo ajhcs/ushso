@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/coverage/v1.0.0/schemas/coverage-matrix.schema.json",
+  "title": "State and federal coverage assessment matrix",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "matrix_id",
+    "matrix_version",
+    "coverage_snapshot_id",
+    "as_of",
+    "revision_pins",
+    "denominator",
+    "cells"
+  ],
+  "properties": {
+    "matrix_id": { "$ref": "common.schema.json#/$defs/Id" },
+    "matrix_version": { "const": "1.0.0" },
+    "coverage_snapshot_id": { "$ref": "common.schema.json#/$defs/Id" },
+    "as_of": { "$ref": "common.schema.json#/$defs/UtcInstant" },
+    "revision_pins": { "$ref": "common.schema.json#/$defs/RevisionPins" },
+    "denominator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "configured_cell_count", "membership_manifest_hash", "definition"],
+      "properties": {
+        "unit": { "const": "coverage_assessment_cell" },
+        "configured_cell_count": { "type": "integer", "minimum": 0 },
+        "membership_manifest_hash": { "$ref": "common.schema.json#/$defs/Sha256" },
+        "definition": { "type": "string", "minLength": 12, "maxLength": 1000 }
+      }
+    },
+    "cells": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/CoverageCell" }
+    }
+  },
+  "$defs": {
+    "CoverageCell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cell_id",
+        "jurisdiction_id",
+        "jurisdiction_type",
+        "source_class_id",
+        "authority_level",
+        "coverage_cell_state",
+        "state_definition_version",
+        "registry_revision",
+        "source_scope_revision",
+        "policy_revision",
+        "assessed_at",
+        "evidence_refs",
+        "last_enumeration",
+        "next_action",
+        "overlap",
+        "absence_claim_permitted",
+        "absence_reason"
+      ],
+      "properties": {
+        "cell_id": { "$ref": "common.schema.json#/$defs/Id" },
+        "jurisdiction_id": { "$ref": "common.schema.json#/$defs/Id" },
+        "jurisdiction_type": { "enum": ["federal", "state", "district", "territory", "multi"] },
+        "source_class_id": { "$ref": "common.schema.json#/$defs/Id" },
+        "authority_level": { "enum": ["federal", "state", "local", "multi_jurisdiction", "other"] },
+        "coverage_cell_state": { "$ref": "common.schema.json#/$defs/CoverageCellState" },
+        "state_definition_version": { "const": "coverage-cell-state/v1" },
+        "registry_revision": { "$ref": "common.schema.json#/$defs/Id" },
+        "source_scope_revision": { "$ref": "common.schema.json#/$defs/Id" },
+        "policy_revision": { "$ref": "common.schema.json#/$defs/Id" },
+        "assessed_at": { "$ref": "common.schema.json#/$defs/UtcInstant" },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "common.schema.json#/$defs/EvidenceRef" }
+        },
+        "last_enumeration": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["status", "sealed", "membership_revision", "completed_at"],
+              "properties": {
+                "status": { "enum": ["complete", "incomplete", "failed"] },
+                "sealed": { "type": "boolean" },
+                "membership_revision": {
+                  "oneOf": [
+                    { "$ref": "common.schema.json#/$defs/Id" },
+                    { "type": "null" }
+                  ]
+                },
+                "completed_at": {
+                  "oneOf": [
+                    { "$ref": "common.schema.json#/$defs/UtcInstant" },
+                    { "type": "null" }
+                  ]
+                }
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "next_action": { "type": "string", "minLength": 3, "maxLength": 500 },
+        "overlap": { "$ref": "common.schema.json#/$defs/OverlapDisclosure" },
+        "absence_claim_permitted": { "type": "boolean" },
+        "absence_reason": {
+          "oneOf": [
+            { "$ref": "common.schema.json#/$defs/AbsenceReason" },
+            { "type": "null" }
+          ]
+        }
+      }
+    }
+  }
+}

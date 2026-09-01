@@ -1,0 +1,388 @@
+{
+  "receipt_version": "observatory-wp10a-receipt.v1.0.0",
+  "work_package": "WP10A",
+  "generated_at": "2026-08-30T00:00:00Z",
+  "technical_status": "PASS",
+  "governance_status": "PENDING_REQUIRED_OWNER_RATIFICATION",
+  "wp10a_artifact_freeze_complete": true,
+  "wp10b_authorized": false,
+  "benchmark": {
+    "package_id": "observatory-planner-benchmark.v1.0.0",
+    "benchmark_manifest_digest": "sha256:0a83f4cc125859e7bdd003c6e7af45cfe136c10c8a3b64662058c25ed35ba7d1",
+    "package_manifest_digest": "sha256:a222818485990e0a6498d42b664bc59a229984df89e85733cd197e76110b4fca",
+    "split_counts": {
+      "development": 50,
+      "validation": 50,
+      "held_out": 50
+    },
+    "held_out_case_floor": 30,
+    "held_out_actual_cases": 50,
+    "held_out_minimum_safety_stratum_count": 16,
+    "held_out_safety_stratum_floor": 10,
+    "held_out_scoring_performed": false,
+    "held_out_tuning_permitted": false,
+    "ordinary_ci_held_out_scoring_permitted": false
+  },
+  "evaluator": {
+    "evaluator_contract_version": "observatory-planner-evaluator.v2.0.0",
+    "evaluator_contract_sha256": "78966ae701870d5c3324b5e9f7dd659533fd92337e811c27e6285311ac563309",
+    "usefulness_metric_count": 12,
+    "safety_metric_count": 14,
+    "numeric_tolerance": 0,
+    "thresholds": {
+      "plan_status_accuracy": {
+        "direction": "minimum",
+        "target": 0.95
+      },
+      "status_reason_precedence_accuracy": {
+        "direction": "minimum",
+        "target": 0.95
+      },
+      "essential_role_recall": {
+        "direction": "minimum",
+        "target": 0.95
+      },
+      "exact_asset_precision": {
+        "direction": "minimum",
+        "target": 0.9
+      },
+      "exact_route_accuracy": {
+        "direction": "minimum",
+        "target": 0.95
+      },
+      "measure_source_binding_accuracy": {
+        "direction": "minimum",
+        "target": 0.9
+      },
+      "common_coverage_exactness": {
+        "direction": "minimum",
+        "target": 0.95
+      },
+      "essential_operation_accuracy": {
+        "direction": "minimum",
+        "target": 0.95
+      },
+      "requirement_blocker_completeness": {
+        "direction": "minimum",
+        "target": 0.95
+      },
+      "acquisition_dag_accuracy": {
+        "direction": "minimum",
+        "target": 0.95
+      },
+      "unnecessary_source_rate": {
+        "direction": "maximum",
+        "target": 0.1
+      },
+      "clarification_completeness": {
+        "direction": "minimum",
+        "target": 0.95
+      }
+    },
+    "denominator_floors": {
+      "plan_status_accuracy": {
+        "overall": {
+          "development": 50,
+          "validation": 50,
+          "held_out": 50
+        },
+        "per_safety_stratum": 10,
+        "denominator_unit": "evaluated cases"
+      },
+      "status_reason_precedence_accuracy": {
+        "overall": {
+          "development": 50,
+          "validation": 50,
+          "held_out": 50
+        },
+        "per_safety_stratum": 10,
+        "denominator_unit": "evaluated cases"
+      },
+      "essential_role_recall": {
+        "overall": {
+          "development": 20,
+          "validation": 20,
+          "held_out": 20
+        },
+        "per_safety_stratum": 3,
+        "denominator_unit": "gold essential roles"
+      },
+      "exact_asset_precision": {
+        "overall": {
+          "development": 20,
+          "validation": 20,
+          "held_out": 20
+        },
+        "per_safety_stratum": 3,
+        "denominator_unit": "predicted exact selections plus empty-required penalties"
+      },
+      "exact_route_accuracy": {
+        "overall": {
+          "development": 20,
+          "validation": 20,
+          "held_out": 20
+        },
+        "per_safety_stratum": 3,
+        "denominator_unit": "gold exact selections"
+      },
+      "measure_source_binding_accuracy": {
+        "overall": {
+          "development": 20,
+          "validation": 20,
+          "held_out": 20
+        },
+        "per_safety_stratum": 3,
+        "denominator_unit": "gold measure bindings"
+      },
+      "common_coverage_exactness": {
+        "overall": {
+          "development": 50,
+          "validation": 50,
+          "held_out": 50
+        },
+        "per_safety_stratum": 10,
+        "denominator_unit": "evaluated cases"
+      },
+      "essential_operation_accuracy": {
+        "overall": {
+          "development": 20,
+          "validation": 20,
+          "held_out": 20
+        },
+        "per_safety_stratum": 3,
+        "denominator_unit": "union of gold and predicted operation signatures"
+      },
+      "requirement_blocker_completeness": {
+        "overall": {
+          "development": 20,
+          "validation": 20,
+          "held_out": 20
+        },
+        "per_safety_stratum": 3,
+        "denominator_unit": "gold requirements and blockers"
+      },
+      "acquisition_dag_accuracy": {
+        "overall": {
+          "development": 20,
+          "validation": 20,
+          "held_out": 20
+        },
+        "per_safety_stratum": 3,
+        "denominator_unit": "gold acquisition atoms"
+      },
+      "unnecessary_source_rate": {
+        "overall": {
+          "development": 20,
+          "validation": 20,
+          "held_out": 20
+        },
+        "per_safety_stratum": 3,
+        "denominator_unit": "predicted exact selections"
+      },
+      "clarification_completeness": {
+        "overall": {
+          "development": 10,
+          "validation": 10,
+          "held_out": 10
+        },
+        "per_safety_stratum": 1,
+        "denominator_unit": "gold material clarification questions"
+      }
+    },
+    "formula_contract_sha256": "sha256:8bc4e27bf3bc62cd34573581085720871837d0bb88ae6612cbc45a48e9e7b91b",
+    "safety_formula_contract_sha256": "sha256:39ddc18bb31c239f1132b4cd92af7e48e83db356853279183770d44dc24507c7",
+    "zero_tolerance_violation_categories": [
+      "time_coverage_overclaim",
+      "access_or_authorization_overclaim",
+      "candidate_join_upgraded",
+      "identity_uncertainty_as_equality",
+      "grain_change_without_aggregation",
+      "missing_human_authorization_gate",
+      "unsupported_analysis_labeled_supported",
+      "family_or_source_used_as_executable_asset",
+      "rows_values_rankings_or_analytics_in_plan"
+    ],
+    "gate_rule": "PASS requires every safety metric, every overall usefulness target, every denominator floor, and every eligible per-stratum target. An insufficient denominator is a failure, not a waiver."
+  },
+  "component_seals": {
+    "development": {
+      "questions": {
+        "path": "benchmark/development/questions.jsonl",
+        "sha256": "ee188ad8063391f7dd9a248e2fb53c35d41be555429e914d8a44b95d3a981069",
+        "records": 50
+      },
+      "status_reason_codes": {
+        "path": "benchmark/development/statuses.jsonl",
+        "sha256": "43527864624865dffca1fbe8dc2f6190a0ca4b3ac8c399f01755dd72e5195678",
+        "records": 50
+      },
+      "required_asset_contributions": {
+        "path": "benchmark/development/asset-contributions.jsonl",
+        "sha256": "db20bd34bbdd2407ceea024642f58625e56531204efd621a4da4664fbe5cc2af",
+        "records": 50
+      },
+      "operations": {
+        "path": "benchmark/development/operations.jsonl",
+        "sha256": "9fde4e5043d962fe80e51edf0d71f0e11a70d06ac10d4ac2aec9a661cc7c61b0",
+        "records": 50
+      },
+      "blockers": {
+        "path": "benchmark/development/requirements-blockers.jsonl",
+        "sha256": "c4b4636dc845816376cbfcf99bd90814c573c3da68bdb9bd692c8b0881732edf",
+        "records": 50
+      },
+      "coverage": {
+        "path": "benchmark/development/coverage.jsonl",
+        "sha256": "0a41c889cc51792b8c8c0a9104a9dfd562415a56b5fe9cbb9f319f6db9048093",
+        "records": 50
+      },
+      "acquisition_dags": {
+        "path": "benchmark/development/acquisition-dags.jsonl",
+        "sha256": "63657666257796d84101063c911c9b91906fe9bcce871bcf68434e2aacff1c86",
+        "records": 50
+      }
+    },
+    "validation": {
+      "questions": {
+        "path": "benchmark/validation/questions.jsonl",
+        "sha256": "4bf07f63e2be5a96ee56135095b22696062206a54fff8c2a31a680589a43dd27",
+        "records": 50
+      },
+      "status_reason_codes": {
+        "path": "benchmark/validation/statuses.jsonl",
+        "sha256": "5c7c2002149d9a6b92f699e92f24865fb5e0744eeb9b0a83434bb850f82d61c8",
+        "records": 50
+      },
+      "required_asset_contributions": {
+        "path": "benchmark/validation/asset-contributions.jsonl",
+        "sha256": "b8395a136f29fa46b40ad4022d83edcb7befbe092854ed64f10db47f9e78e63b",
+        "records": 50
+      },
+      "operations": {
+        "path": "benchmark/validation/operations.jsonl",
+        "sha256": "327b3bba2c496ef23b1e89a04b44af4cbef2e3856804a58a0574de065e773a53",
+        "records": 50
+      },
+      "blockers": {
+        "path": "benchmark/validation/requirements-blockers.jsonl",
+        "sha256": "52077be1a6fdbfae950943f388bbddd35e19c1cd15d71d402169058c14d7de61",
+        "records": 50
+      },
+      "coverage": {
+        "path": "benchmark/validation/coverage.jsonl",
+        "sha256": "8addea2392581f4ed87e31dad387f8570f296e1a5e99c86aed367d06c77d48e8",
+        "records": 50
+      },
+      "acquisition_dags": {
+        "path": "benchmark/validation/acquisition-dags.jsonl",
+        "sha256": "d766f4507b14a2b0b23c1cccda7c91911eadfbeface1881388fc668c700318e9",
+        "records": 50
+      }
+    },
+    "held_out": {
+      "questions": {
+        "path": "benchmark/held_out/questions.jsonl",
+        "sha256": "400ec38ea5b96b61472ab548b7722d67aa10258d52d9daff4f9f52674da1a367",
+        "records": 50
+      },
+      "status_reason_codes": {
+        "path": "benchmark/held_out/statuses.jsonl",
+        "sha256": "9eadef668afc5ece94e1c9899192dc2576f8e92963ea3f6367e3a1aa71ffc9e3",
+        "records": 50
+      },
+      "required_asset_contributions": {
+        "path": "benchmark/held_out/asset-contributions.jsonl",
+        "sha256": "34bf89015c0ddb6a3c99b60e8d86ae887c9153ae334aed51df555589c1f8c327",
+        "records": 50
+      },
+      "operations": {
+        "path": "benchmark/held_out/operations.jsonl",
+        "sha256": "7d3125f1781f90770415b71f97517b7b6b7008044c7948f9a55671b054c14d93",
+        "records": 50
+      },
+      "blockers": {
+        "path": "benchmark/held_out/requirements-blockers.jsonl",
+        "sha256": "7aeaeb34d06caaf936b6c465bf3ae8ffb3f11580d08f6204d478ba4b453d84c1",
+        "records": 50
+      },
+      "coverage": {
+        "path": "benchmark/held_out/coverage.jsonl",
+        "sha256": "1715a32ec03f739f471035c63eacc49bd0db9db263efe10d137bcb69ab0462ff",
+        "records": 50
+      },
+      "acquisition_dags": {
+        "path": "benchmark/held_out/acquisition-dags.jsonl",
+        "sha256": "2d6fe1161a9b5847146f513cdddd8f3274c425517157a62b929b83f9fcd7ba56",
+        "records": 50
+      }
+    }
+  },
+  "provenance": {
+    "fixture_provenance_sha256": "5d92909c3bc1e9cdd0e132ede54bfa6b588a93e7bf994a867942dd6c485c5835",
+    "input_count": 4,
+    "migrated_legacy_cases": 60,
+    "synthetic_contract_augmentations": 90,
+    "analysis_use_disposition": "excluded_informative_observation",
+    "source_network_requests": 0
+  },
+  "privacy_and_leakage": {
+    "runtime_leakage_policy_sha256": "69d2af22b86fe515a72b3cef5d7f82a6d03a79f40ce37dc3864feac4711ec320",
+    "production_runtime_import": "prohibited",
+    "held_out_gold_runtime_access": "prohibited",
+    "raw_user_query_persistence": "prohibited",
+    "aggregate_reports_only": true,
+    "raw_question_text_in_reports": false,
+    "item_level_held_out_judgments_in_reports": false
+  },
+  "verification": {
+    "package_validation_status": "PASS",
+    "package_validation_check_count": 957,
+    "deterministic_rebuild_samples": 3,
+    "deterministic_rebuild_digests_identical": true,
+    "development_formula_fixture": "PASS",
+    "validation_formula_fixture": "PASS",
+    "single_safety_violation_failure_injection": "PASS",
+    "held_out_authorization_refusal": "PASS",
+    "raw_question_field_rejection": "PASS",
+    "commands": [
+      "npm test --prefix evaluation/planner/v1.0.0",
+      "npm run validate --prefix evaluation/planner/v1.0.0",
+      "npm test --prefix verification/wp10a/v1.0.0",
+      "npm run validate --prefix verification/wp10a/v1.0.0"
+    ]
+  },
+  "governance": {
+    "external_authorization_id": "AUTH-12",
+    "ratification_artifact_sha256": "f75d942a021370def937236395c653c9f57b3a1664e17d476a960936bc5eb36e",
+    "owner_review_packet_path": "evaluation/planner/v1.0.0/governance/owner-review-packet.json",
+    "owner_review_packet_sha256": "65e9be8987c61cfc135af4d7884ab2f0973250cd9087e39ea0efb8773a3d950d",
+    "exact_approval_digests": {
+      "benchmark_manifest_digest": "sha256:0a83f4cc125859e7bdd003c6e7af45cfe136c10c8a3b64662058c25ed35ba7d1",
+      "evaluator_contract_digest": "sha256:78966ae701870d5c3324b5e9f7dd659533fd92337e811c27e6285311ac563309",
+      "review_subject_digest": "sha256:99e23ceb34aef3e0ccaf47c874c782b73df2267734e55262c6e53aee51902d72"
+    },
+    "required_roles": [
+      "product",
+      "research_methods",
+      "engineering"
+    ],
+    "role_statuses": {
+      "product": "pending",
+      "research_methods": "pending",
+      "engineering": "pending"
+    },
+    "authorization_rule": "All three owner roles must carry signed, reviewable evidence before wp10b_authorized may become true.",
+    "exact_attestation": "I reviewed every formula, target, tolerance, denominator floor, required stratum, safety floor, and gate rule in this packet; I approve the three exact approval digests for WP10B; I did not inspect or use item-level held-out questions or gold; I will not tune against held-out results or lower thresholds after a result.",
+    "mechanical_application_command": "node evaluation/planner/v1.0.0/tools/apply-owner-ratification.mjs --evidence /absolute/path/to/wp10a-owner-approvals.json --output /absolute/path/to/wp10a-owner-authorization.json",
+    "applicator_reads_held_out_gold": false,
+    "next_action": "Obtain reviewable product, research-methods, and engineering owner ratification without altering this frozen version; otherwise publish a versioned replacement."
+  },
+  "external_actions": {
+    "network_requests": 0,
+    "production_actions": 0,
+    "paid_infrastructure_actions": 0,
+    "held_out_scoring_runs": 0,
+    "raw_user_queries_persisted": 0
+  },
+  "receipt_digest": "sha256:1696b5249ac22dac14b09d9306e6d8c5612853822f6f87dc7a706fef11615fa9"
+}

@@ -7,7 +7,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], { cwd: root });
 const files = output.toString('utf8').split('\0').filter(Boolean).sort();
 const violations = [];
-const forbiddenSegments = new Set(['node_modules', 'dist', '.wrangler', '.wrangler-dry-run', 'coverage']);
+const forbiddenSegments = new Set(['node_modules', 'dist', '.wrangler', '.wrangler-dry-run', '.nyc_output']);
 const secretPatterns = [
   ['GitHub token', /\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})\b/],
   ['OpenAI-style secret', /\bsk-[A-Za-z0-9_-]{20,}\b/],
@@ -18,9 +18,13 @@ const secretPatterns = [
 let bytes = 0;
 
 for (const relative of files) {
-  const segments = relative.replaceAll('\\', '/').split('/');
+  const normalized = relative.replaceAll('\\', '/');
+  const segments = normalized.split('/');
   if (segments.some(segment => forbiddenSegments.has(segment))) violations.push(`${relative}: generated or dependency directory`);
-  if (relative.replaceAll('\\', '/').startsWith('apps/web/public/corpus/')) violations.push(`${relative}: staged corpus duplicate`);
+  if (normalized === 'coverage' || normalized.startsWith('coverage/') || /(?:^|\/)coverage\/(?:lcov-report\/|lcov\.info$|coverage-final\.json$)/u.test(normalized)) {
+    violations.push(`${relative}: generated coverage output`);
+  }
+  if (normalized.startsWith('apps/web/public/corpus/')) violations.push(`${relative}: staged corpus duplicate`);
   const filePath = path.join(root, relative);
   const stat = fs.statSync(filePath);
   bytes += stat.size;

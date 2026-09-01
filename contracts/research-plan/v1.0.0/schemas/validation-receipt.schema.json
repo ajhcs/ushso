@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/validation-receipt.schema.json",
+  "title": "Research-plan validation receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "receipt_id", "verification_date", "package_version", "manifest_digest", "commands", "results", "fixture_counts", "validated_requirements"],
+  "properties": {
+    "contract_version": {"const": "observatory-research-plan-validation-receipt.v1.0.0"},
+    "receipt_id": {"const": "obs:receipt:research-plan-contract:v1.0.0"},
+    "verification_date": {"const": "2026-08-30"},
+    "package_version": {"const": "1.0.0"},
+    "manifest_digest": {"$ref": "common.schema.json#/$defs/digest"},
+    "commands": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 10,
+      "items": {"type": "string", "minLength": 1, "maxLength": 256}
+    },
+    "results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemas_compiled", "valid_fixtures", "adversarial_fixtures", "clarification_scenarios", "manifest_integrity", "determinism"],
+      "properties": {
+        "schemas_compiled": {"const": "pass"},
+        "valid_fixtures": {"const": "pass"},
+        "adversarial_fixtures": {"const": "pass"},
+        "clarification_scenarios": {"const": "pass"},
+        "manifest_integrity": {"const": "pass"},
+        "determinism": {"const": "pass"}
+      }
+    },
+    "fixture_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["valid_plans", "statuses", "adversarial_cases", "clarification_cases"],
+      "properties": {
+        "valid_plans": {"type": "integer", "minimum": 5},
+        "statuses": {"const": 5},
+        "adversarial_cases": {"type": "integer", "minimum": 15},
+        "clarification_cases": {"type": "integer", "minimum": 5}
+      }
+    },
+    "validated_requirements": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 50,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/stableId"}
+    }
+  }
+}

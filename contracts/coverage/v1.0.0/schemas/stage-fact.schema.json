@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/coverage/v1.0.0/schemas/stage-fact.schema.json",
+  "title": "Immutable coverage stage fact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "fact_id",
+    "fact_version",
+    "member_key",
+    "stage",
+    "outcome",
+    "source_scope_id",
+    "run_id",
+    "definition_version",
+    "observed_at",
+    "effective_at",
+    "revision_pins",
+    "axes",
+    "evidence_refs"
+  ],
+  "properties": {
+    "fact_id": { "$ref": "common.schema.json#/$defs/Id" },
+    "fact_version": { "const": "1.0.0" },
+    "member_key": { "$ref": "common.schema.json#/$defs/MemberKey" },
+    "stage": {
+      "enum": [
+        "registry",
+        "enumeration",
+        "capture",
+        "normalization",
+        "canonical",
+        "schema_index",
+        "search_index",
+        "access_check",
+        "freshness",
+        "pipeline",
+        "exclusion"
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "active",
+        "paused",
+        "excluded",
+        "retired",
+        "unassessed",
+        "observed",
+        "captured",
+        "normalized",
+        "pending",
+        "failed",
+        "not_applicable",
+        "unknown",
+        "indexed",
+        "current",
+        "passed",
+        "stale",
+        "retrying",
+        "dead_letter",
+        "overdue"
+      ]
+    },
+    "source_scope_id": {
+      "oneOf": [
+        { "$ref": "common.schema.json#/$defs/Id" },
+        { "type": "null" }
+      ]
+    },
+    "run_id": {
+      "oneOf": [
+        { "$ref": "common.schema.json#/$defs/Id" },
+        { "type": "null" }
+      ]
+    },
+    "definition_version": { "$ref": "common.schema.json#/$defs/Id" },
+    "observed_at": { "$ref": "common.schema.json#/$defs/UtcInstant" },
+    "effective_at": { "$ref": "common.schema.json#/$defs/UtcInstant" },
+    "revision_pins": { "$ref": "common.schema.json#/$defs/RevisionPins" },
+    "axes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["milestone", "inclusion", "pipeline", "freshness", "access", "identity"],
+      "properties": {
+        "milestone": {
+          "oneOf": [
+            { "enum": ["discovered", "ingested", "normalized", "schema_indexed", "search_indexed"] },
+            { "type": "null" }
+          ]
+        },
+        "inclusion": {
+          "oneOf": [
+            { "enum": ["included", "excluded", "quarantined", "review_pending"] },
+            { "type": "null" }
+          ]
+        },
+        "pipeline": {
+          "oneOf": [
+            { "enum": ["healthy", "pending", "retrying", "dead_letter"] },
+            { "type": "null" }
+          ]
+        },
+        "freshness": {
+          "oneOf": [
+            { "enum": ["fresh", "stale", "unknown", "not_applicable"] },
+            { "type": "null" }
+          ]
+        },
+        "access": {
+          "oneOf": [
+            { "enum": ["current_pass", "current_typed_failure", "check_stale", "never_checked"] },
+            { "type": "null" }
+          ]
+        },
+        "identity": {
+          "oneOf": [
+            { "enum": ["resolved", "candidate", "conflict", "review_pending"] },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "common.schema.json#/$defs/EvidenceRef" }
+    }
+  }
+}

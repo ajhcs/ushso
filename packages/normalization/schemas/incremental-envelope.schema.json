@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/normalization/v1.0.0/schemas/incremental-envelope.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "envelope_version",
+    "contract_version",
+    "import_id",
+    "source_content_fingerprint",
+    "document_fingerprint",
+    "persistence_profile",
+    "plan",
+    "bundle",
+    "supersession_edges",
+    "legacy_projection",
+    "projection_row_fingerprints"
+  ],
+  "properties": {
+    "envelope_version": { "const": "ushso-normalization-incremental-envelope.v1.0.0" },
+    "contract_version": { "const": "ushso-normalization-incremental-import.v1.0.0" },
+    "import_id": { "$ref": "#/$defs/importId" },
+    "source_content_fingerprint": { "$ref": "#/$defs/bareSha256" },
+    "document_fingerprint": { "$ref": "#/$defs/sha256" },
+    "persistence_profile": { "$ref": "#/$defs/persistenceProfile" },
+    "plan": { "$ref": "#/$defs/plan" },
+    "bundle": { "$ref": "#/$defs/revisionBundle" },
+    "supersession_edges": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/supersessionEdge" }
+    },
+    "legacy_projection": { "$ref": "#/$defs/emptyLegacyProjection" },
+    "projection_row_fingerprints": { "$ref": "#/$defs/emptyProjectionFingerprints" }
+  },
+  "$defs": {
+    "importId": {
+      "type": "string",
+      "pattern": "^urn:ushso:import:[A-Za-z0-9._~-]+$"
+    },
+    "revisionId": {
+      "type": "string",
+      "pattern": "^urn:ushso:revision:[A-Za-z0-9._~-]+$"
+    },
+    "entityId": {
+      "type": "string",
+      "pattern": "^urn:ushso:[a-z][a-z0-9-]*:[A-Za-z0-9._~-]+$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "bareSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "persistenceProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_version",
+        "snapshot_contract",
+        "stored_revision_semantics",
+        "supersession_semantics",
+        "prior_resolution",
+        "materialization_contract"
+      ],
+      "properties": {
+        "profile_version": { "const": "ushso-normalization-append-only-persistence.v1.0.0" },
+        "snapshot_contract": { "const": "observatory-core.v2.0.0" },
+        "stored_revision_semantics": { "const": "immutable-current-form" },
+        "supersession_semantics": { "const": "external-append-only-edge" },
+        "prior_resolution": { "const": "database-exact-revision-and-content-digest" },
+        "materialization_contract": { "const": "core-v2-self-contained-bidirectional-snapshot" }
+      }
+    },
+    "normalizer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "deterministic"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,79}$" },
+        "version": { "$ref": "#/$defs/semver" },
+        "deterministic": { "const": true }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "corpus_version",
+        "manifest_file_sha256",
+        "content_fingerprint_sha256",
+        "records_file_sha256",
+        "search_documents_file_sha256",
+        "join_routes_file_sha256"
+      ],
+      "properties": {
+        "corpus_version": { "$ref": "#/$defs/semver" },
+        "manifest_file_sha256": { "$ref": "#/$defs/bareSha256" },
+        "content_fingerprint_sha256": { "$ref": "#/$defs/bareSha256" },
+        "records_file_sha256": { "$ref": "#/$defs/bareSha256" },
+        "search_documents_file_sha256": { "$ref": "#/$defs/bareSha256" },
+        "join_routes_file_sha256": { "$ref": "#/$defs/bareSha256" }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id_basis",
+        "title_or_url_merge_permitted",
+        "uncertain_identity_disposition",
+        "destructive_rollback_permitted",
+        "source_payloads_acquired",
+        "analyses_executed"
+      ],
+      "properties": {
+        "id_basis": { "const": "source-scoped immutable identifier" },
+        "title_or_url_merge_permitted": { "const": false },
+        "uncertain_identity_disposition": { "const": "separate_open_review_candidate" },
+        "destructive_rollback_permitted": { "const": false },
+        "source_payloads_acquired": { "const": false },
+        "analyses_executed": { "const": false }
+      }
+    },
+    "canonicalCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "organizations", "sources", "assets", "releases", "distributions",
+        "documentation", "schema_snapshots", "schema_fields", "access_routes",
+        "access_observations", "evidence", "assertions", "relationships"
+      ],
+      "properties": {
+        "organizations": { "type": "integer", "minimum": 0 },
+        "sources": { "type": "integer", "minimum": 0 },
+        "assets": { "type": "integer", "minimum": 0 },
+        "releases": { "type": "integer", "minimum": 0 },
+        "distributions": { "type": "integer", "minimum": 0 },
+        "documentation": { "type": "integer", "minimum": 0 },
+        "schema_snapshots": { "type": "integer", "minimum": 0 },
+        "schema_fields": { "type": "integer", "minimum": 0 },
+        "access_routes": { "type": "integer", "minimum": 0 },
+        "access_observations": { "type": "integer", "minimum": 0 },
+        "evidence": { "type": "integer", "minimum": 0 },
+        "assertions": { "type": "integer", "minimum": 0 },
+        "relationships": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_version", "import_id", "source", "normalizer", "policy",
+        "expected_counts", "canonical_counts", "record_mappings",
+        "join_route_mappings", "identity_review_candidates",
+        "source_identity_review_candidates", "rejected_items",
+        "bundle_fingerprint", "projection_fingerprint", "created_at"
+      ],
+      "properties": {
+        "plan_version": { "const": "ushso-normalization-incremental-plan.v1.0.0" },
+        "import_id": { "$ref": "#/$defs/importId" },
+        "source": { "$ref": "#/$defs/source" },
+        "normalizer": { "$ref": "#/$defs/normalizer" },
+        "policy": { "$ref": "#/$defs/policy" },
+        "expected_counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["legacy_records", "legacy_join_routes", "legacy_search_documents"],
+          "properties": {
+            "legacy_records": { "const": 0 },
+            "legacy_join_routes": { "const": 0 },
+            "legacy_search_documents": { "const": 0 }
+          }
+        },
+        "canonical_counts": { "$ref": "#/$defs/canonicalCounts" },
+        "record_mappings": { "type": "array", "maxItems": 0 },
+        "join_route_mappings": { "type": "array", "maxItems": 0 },
+        "identity_review_candidates": { "type": "array", "maxItems": 0 },
+        "source_identity_review_candidates": { "type": "array", "maxItems": 0 },
+        "rejected_items": { "type": "array", "maxItems": 0 },
+        "bundle_fingerprint": { "$ref": "#/$defs/sha256" },
+        "projection_fingerprint": { "$ref": "#/$defs/sha256" },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "revisionBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bundle_version", "organizations", "sources", "assets", "releases",
+        "distributions", "documentation", "schema_snapshots", "schema_fields",
+        "access_routes", "access_observations", "evidence", "assertions", "relationships"
+      ],
+      "properties": {
+        "bundle_version": { "const": "ushso-normalization-incremental-revision-bundle.v1.0.0" },
+        "organizations": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/organization.schema.json" } },
+        "sources": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/source.schema.json" } },
+        "assets": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/asset.schema.json" } },
+        "releases": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/release.schema.json" } },
+        "distributions": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/distribution.schema.json" } },
+        "documentation": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/documentation.schema.json" } },
+        "schema_snapshots": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/schema-snapshot.schema.json" } },
+        "schema_fields": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/schema-field.schema.json" } },
+        "access_routes": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/access-route.schema.json" } },
+        "access_observations": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/access-observation.schema.json" } },
+        "evidence": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/evidence.schema.json" } },
+        "assertions": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/assertion.schema.json" } },
+        "relationships": { "type": "array", "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/relationship.schema.json" } }
+      }
+    },
+    "supersessionEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prior_revision_id", "prior_canonical_content_fingerprint",
+        "successor_revision_id", "entity_id", "rationale", "superseded_at"
+      ],
+      "properties": {
+        "prior_revision_id": { "$ref": "#/$defs/revisionId" },
+        "prior_canonical_content_fingerprint": { "$ref": "#/$defs/sha256" },
+        "successor_revision_id": { "$ref": "#/$defs/revisionId" },
+        "entity_id": { "$ref": "#/$defs/entityId" },
+        "rationale": { "type": "string", "minLength": 3, "maxLength": 1000 },
+        "superseded_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "emptyLegacyProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["records", "search_documents", "join_routes", "corpus", "semantics"],
+      "properties": {
+        "records": { "type": "array", "maxItems": 0 },
+        "search_documents": { "type": "array", "maxItems": 0 },
+        "join_routes": { "type": "array", "maxItems": 0 },
+        "corpus": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["projection_kind", "published"],
+          "properties": {
+            "projection_kind": { "const": "incremental-persistence-context" },
+            "published": { "const": false }
+          }
+        },
+        "semantics": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["legacy_projection_published", "source_payloads_acquired", "analyses_executed"],
+          "properties": {
+            "legacy_projection_published": { "const": false },
+            "source_payloads_acquired": { "const": false },
+            "analyses_executed": { "const": false }
+          }
+        }
+      }
+    },
+    "emptyProjectionFingerprints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["corpus", "records", "search_documents", "join_routes"],
+      "properties": {
+        "corpus": { "$ref": "#/$defs/sha256" },
+        "records": { "type": "object", "additionalProperties": false },
+        "search_documents": { "type": "object", "additionalProperties": false },
+        "join_routes": { "type": "object", "additionalProperties": false }
+      }
+    }
+  }
+}

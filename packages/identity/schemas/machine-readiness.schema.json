@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/identity/v1.0.0/machine-readiness.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "release_id", "distribution_id", "flags", "convenience_label", "evidence_ids", "observed_at", "boundaries"],
+  "properties": {
+    "schema_version": {"const": "identity.machine-readiness.v1.0.0"},
+    "release_id": {"type": "string", "minLength": 3},
+    "distribution_id": {"type": "string", "minLength": 3},
+    "flags": {
+      "type": "object", "additionalProperties": false,
+      "required": ["interface", "authentication", "schema", "pagination", "recipe", "verification", "join_evidence"],
+      "properties": {
+        "interface": {"$ref": "#/$defs/interfaceFlag"},
+        "authentication": {"$ref": "#/$defs/authenticationFlag"},
+        "schema": {"$ref": "#/$defs/schemaFlag"},
+        "pagination": {"$ref": "#/$defs/paginationFlag"},
+        "recipe": {"$ref": "#/$defs/recipeFlag"},
+        "verification": {"$ref": "#/$defs/verificationFlag"},
+        "join_evidence": {"$ref": "#/$defs/joinFlag"}
+      }
+    },
+    "convenience_label": {"enum": ["human_only", "downloadable", "api_documented", "schema_indexed", "retrieval_ready", "join_ready"]},
+    "evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 3}},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "boundaries": {
+      "type": "object", "additionalProperties": false,
+      "required": ["analytical_quality_inferred", "authorization_inferred", "opaque_score_used"],
+      "properties": {
+        "analytical_quality_inferred": {"const": false},
+        "authorization_inferred": {"const": false},
+        "opaque_score_used": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "flag": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "evidence_ids", "observed_at"],
+      "properties": {
+        "state": {"type": "string", "minLength": 1},
+        "evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 3}},
+        "observed_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "interfaceFlag": {"allOf": [{"$ref": "#/$defs/flag"}, {"type": "object", "properties": {"state": {"enum": ["human_readable_only", "direct_download", "documented_api", "query_service", "unknown"]}}}]},
+    "authenticationFlag": {"allOf": [{"$ref": "#/$defs/flag"}, {"type": "object", "properties": {"state": {"enum": ["not_required", "required", "unknown"]}}}]},
+    "schemaFlag": {"allOf": [{"$ref": "#/$defs/flag"}, {"type": "object", "properties": {"state": {"enum": ["none", "documented", "indexed", "unknown"]}}}]},
+    "paginationFlag": {"allOf": [{"$ref": "#/$defs/flag"}, {"type": "object", "properties": {"state": {"enum": ["not_applicable", "documented", "undocumented", "unknown"]}}}]},
+    "recipeFlag": {"allOf": [{"$ref": "#/$defs/flag"}, {"type": "object", "properties": {"state": {"enum": ["none", "candidate", "available", "unknown"]}}}]},
+    "verificationFlag": {"allOf": [{"$ref": "#/$defs/flag"}, {"type": "object", "properties": {"state": {"enum": ["unverified", "verified", "stale", "unknown"]}}}]},
+    "joinFlag": {"allOf": [{"$ref": "#/$defs/flag"}, {"type": "object", "properties": {"state": {"enum": ["none", "candidate", "compatible_documented", "blocked", "unknown"]}}}]}
+  }
+}

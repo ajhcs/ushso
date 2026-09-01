@@ -1,0 +1,117 @@
+{
+  "ledger_version": "wp12.machine-toolkit-foundation.v1.0.0",
+  "scope": "protected_candidate_foundation",
+  "contract": "observatory-machine-toolkit.v1.0.0",
+  "external_authorizations": [
+    {
+      "id": "AUTH-12",
+      "register": "verification/external-authorization/v1.0.0/register.json",
+      "environment": "planner_governance",
+      "status": "not_requested",
+      "authorized": false,
+      "blocks": ["WP10B planner implementation", "plan_research activation"]
+    },
+    {
+      "id": "AUTH-06",
+      "register": "verification/external-authorization/v1.0.0/register.json",
+      "environment": "production_internal_canary",
+      "status": "not_requested",
+      "authorized": false,
+      "blocks": ["Access-protected machine-toolkit candidate traffic"]
+    },
+    {
+      "id": "AUTH-07",
+      "register": "verification/external-authorization/v1.0.0/register.json",
+      "environment": "production_public",
+      "status": "not_requested",
+      "authorized": false,
+      "blocks": ["public machine-toolkit deployment", "public capability cutover"]
+    },
+    {
+      "id": "AUTH-13",
+      "register": "verification/external-authorization/v1.0.0/register.json",
+      "environment": "retrieval_evaluation_governance",
+      "status": "not_requested",
+      "authorized": false,
+      "blocks": ["search_assets retrieval gate", "plan_research retrieval gate"]
+    },
+    {
+      "id": "AUTH-14",
+      "register": "verification/external-authorization/v1.0.0/register.json",
+      "environment": "identity_evaluation_governance",
+      "status": "not_requested",
+      "authorized": false,
+      "blocks": ["get_join_routes identity-resolution gate", "plan_research identity-resolution gate"]
+    },
+    {
+      "id": "AUTH-15",
+      "register": "verification/external-authorization/v1.0.0/register.json",
+      "environment": "coverage_product_governance",
+      "status": "not_requested",
+      "authorized": false,
+      "blocks": ["get_coverage_status coverage gate", "plan_research coverage gate"]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "WP12-CANONICAL-SERVICE",
+      "source": "WP12; sections 15.6.5 and 15.6.7",
+      "status": "implemented_candidate",
+      "evidence": ["packages/machine-toolkit/src/service.mjs", "packages/machine-toolkit/tests/contract-parity.test.mjs"]
+    },
+    {
+      "id": "TST-MCP-01",
+      "source": "tester feedback B; section 22.7",
+      "status": "implemented_candidate_plan_gated",
+      "evidence": ["packages/machine-toolkit/src/manifest.mjs", "packages/machine-toolkit/tests/contract-parity.test.mjs", "packages/machine-toolkit/tests/webmcp-legacy.test.mjs"]
+    },
+    {
+      "id": "TST-MCP-02",
+      "source": "tester feedback B; sections 15.6.2-15.6.4 and 23.7",
+      "status": "verified_local",
+      "evidence": ["packages/machine-toolkit/src/input-validation.mjs", "packages/machine-toolkit/src/safety.mjs", "packages/machine-toolkit/tests/all-tools-adversarial.test.mjs"]
+    },
+    {
+      "id": "TST-MCP-03",
+      "source": "tester feedback B; sections 15.6.5-15.6.7",
+      "status": "verified_local_adapters_not_publicly_wired",
+      "evidence": ["packages/machine-toolkit/tests/contract-parity.test.mjs", "worker/machine-toolkit-router.mjs", "apps/web/src/providers/registerObservatoryToolkit.ts"]
+    },
+    {
+      "id": "TST-MCP-04",
+      "source": "tester feedback B; sections 15.6.2, 17, and 23.8",
+      "status": "verified_local",
+      "evidence": ["packages/machine-toolkit/src/safety.mjs", "packages/machine-toolkit/tests/all-tools-adversarial.test.mjs", "packages/machine-toolkit/tests/safety.test.mjs"]
+    },
+    {
+      "id": "TST-MCP-05",
+      "source": "tester feedback B; sections 12.1 and 15.6",
+      "status": "contract_parity_verified_service_data_pending_wp7",
+      "evidence": ["contracts/machine-toolkit/v1.0.0/schemas/search-assets-input.schema.json", "packages/machine-toolkit/tests/contract-parity.test.mjs"]
+    },
+    {
+      "id": "WP12-WEBMCP-PIN-LIFECYCLE",
+      "source": "sections 15.6 and 22.7",
+      "status": "verified_local",
+      "evidence": ["packages/machine-toolkit/src/manifest.mjs", "packages/machine-toolkit/src/webmcp.mjs", "apps/web/src/providers/registerObservatoryToolkit.test.ts"]
+    },
+    {
+      "id": "WP12-LEGACY-COMPATIBILITY",
+      "source": "sections 15.6.1 and WP12",
+      "status": "audited_alias_disabled",
+      "evidence": ["verification/wp12/v1.0.0/audits/legacy-discover-sources.md", "packages/machine-toolkit/src/legacy.mjs", "packages/machine-toolkit/tests/webmcp-legacy.test.mjs"]
+    },
+    {
+      "id": "AUTH-12-PLANNER-GOVERNANCE",
+      "source": "external-authorization register AUTH-12; WP10A/WP10B dependency",
+      "status": "not_authorized_blocks_planner_implementation_and_activation",
+      "evidence": ["verification/external-authorization/v1.0.0/register.json", "verification/wp10a/v1.0.0/receipts/wp10a-receipt.json", "packages/machine-toolkit/src/service.mjs"]
+    },
+    {
+      "id": "WP12-PUBLIC-ACTIVATION",
+      "source": "section 15.6.8 and machine-interface release gate",
+      "status": "pending_prerequisite_gates_AUTH-06_candidate_and_AUTH-07_cutover",
+      "evidence": ["packages/machine-toolkit/src/manifest.mjs", "apps/web/src/providers/registerObservatoryToolkit.ts", "worker/machine-toolkit-router.mjs"]
+    }
+  ]
+}

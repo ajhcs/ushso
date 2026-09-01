@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/operation.schema.json",
+  "title": "Non-executed research operation DAG node",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "operation_id",
+    "operation_kind",
+    "essential",
+    "input_ids",
+    "output_id",
+    "depends_on",
+    "source_grain",
+    "target_grain",
+    "period_kind",
+    "evidence_state",
+    "basis_evidence_state",
+    "compatibility",
+    "join_route_id",
+    "identifier_namespace_id",
+    "measure_additivity",
+    "identity_context",
+    "requirements",
+    "blockers",
+    "executed",
+    "evidence_reference_ids"
+  ],
+  "properties": {
+    "operation_id": {"$ref": "common.schema.json#/$defs/stableId"},
+    "operation_kind": {"enum": ["join", "crosswalk", "aggregate", "filter", "temporal_alignment", "measure_harmonization"]},
+    "essential": {"type": "boolean"},
+    "input_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/stableId"}
+    },
+    "output_id": {"$ref": "common.schema.json#/$defs/stableId"},
+    "depends_on": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/stableId"}
+    },
+    "source_grain": {"enum": ["facility", "campus", "organization", "system", "county", "state", "national", "mixed", "unknown"]},
+    "target_grain": {"enum": ["facility", "campus", "organization", "system", "county", "state", "national", "mixed", "unknown"]},
+    "period_kind": {"enum": ["calendar", "fiscal", "mixed", "unknown"]},
+    "evidence_state": {"enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven"]},
+    "basis_evidence_state": {"enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven"]},
+    "compatibility": {"enum": ["compatible", "conditional", "incompatible", "unknown"]},
+    "join_route_id": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/stableId"},
+        {"type": "null"}
+      ]
+    },
+    "identifier_namespace_id": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/stableId"},
+        {"type": "null"}
+      ]
+    },
+    "measure_additivity": {"enum": ["not_applicable", "additive", "semi_additive", "non_additive", "unknown"]},
+    "identity_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity_snapshot_id", "valid_from", "valid_to", "resolution_state", "evidence_reference_ids"],
+      "properties": {
+        "identity_snapshot_id": {"$ref": "common.schema.json#/$defs/stableId"},
+        "valid_from": {"$ref": "common.schema.json#/$defs/date"},
+        "valid_to": {"$ref": "common.schema.json#/$defs/date"},
+        "resolution_state": {"enum": ["accepted", "exact_policy", "candidate", "ambiguous", "unknown"]},
+        "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {"$ref": "common.schema.json#/$defs/requirement"}
+    },
+    "blockers": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {"$ref": "common.schema.json#/$defs/blocker"}
+    },
+    "executed": {"const": false},
+    "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+  }
+}

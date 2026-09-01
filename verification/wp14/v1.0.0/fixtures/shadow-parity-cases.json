@@ -1,0 +1,38 @@
+{
+  "schema_version": "ushso-wp14-shadow-parity-fixture.v1.0.0",
+  "evidence_class": "synthetic_and_published_metadata_fixture_only",
+  "contains_raw_user_queries": false,
+  "contains_source_payloads": false,
+  "cases": [
+    {
+      "case_id": "detail-visible-exact-revision",
+      "surface": "dataset_detail",
+      "static": {"asset_id": "fixture:asset:alpha", "revision_id": "fixture:revision:alpha:1", "visibility": "public", "generation_id": "fixture-search-generation-n"},
+      "candidate": {"asset_id": "fixture:asset:alpha", "revision_id": "fixture:revision:alpha:1", "visibility": "public", "generation_id": "fixture-search-generation-n"}
+    },
+    {
+      "case_id": "browse-order-and-generation",
+      "surface": "browse",
+      "static": {"asset_ids": ["fixture:asset:alpha", "fixture:asset:beta"], "next_cursor": null, "generation_id": "fixture-search-generation-n"},
+      "candidate": {"asset_ids": ["fixture:asset:alpha", "fixture:asset:beta"], "next_cursor": null, "generation_id": "fixture-search-generation-n"}
+    },
+    {
+      "case_id": "zero-result-no-absence-claim",
+      "surface": "search",
+      "static": {"asset_ids": [], "absence_claim": false, "warning_code": "NO_MATCH_NOT_ABSENCE", "generation_id": "fixture-search-generation-n"},
+      "candidate": {"asset_ids": [], "absence_claim": false, "warning_code": "NO_MATCH_NOT_ABSENCE", "generation_id": "fixture-search-generation-n"}
+    },
+    {
+      "case_id": "coverage-units-remain-non-additive",
+      "surface": "coverage",
+      "static": {"federal_sources": 14, "jurisdictions": 51, "published_records": 157, "units_additive": false, "snapshot_id": "fixture:coverage:snapshot"},
+      "candidate": {"federal_sources": 14, "jurisdictions": 51, "published_records": 157, "units_additive": false, "snapshot_id": "fixture:coverage:snapshot"}
+    },
+    {
+      "case_id": "plan-disabled-no-generation",
+      "surface": "plan",
+      "static": {"status": "unavailable", "compiler_invocations": 0, "raw_question_persisted": false},
+      "candidate": {"status": "unavailable", "compiler_invocations": 0, "raw_question_persisted": false}
+    }
+  ]
+}

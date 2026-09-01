@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/relationship.schema.json",
+  "type": "object",
+  "$defs": {
+    "identitySemantics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "resolution_basis", "auto_resolved", "authoritative_namespace", "effective_overlap", "conflicting_identifier"],
+      "properties": {
+        "state": { "enum": ["candidate", "accepted", "rejected", "deferred", "superseded"] },
+        "resolution_basis": { "enum": ["exact_authoritative_identifier", "human_review", "algorithmic_candidate", "unknown"] },
+        "auto_resolved": { "type": "boolean" },
+        "authoritative_namespace": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[a-z][a-z0-9._-]{1,79}$" },
+            { "type": "null" }
+          ]
+        },
+        "effective_overlap": {
+          "oneOf": [
+            { "type": "boolean" },
+            { "type": "null" }
+          ]
+        },
+        "conflicting_identifier": { "type": "boolean" }
+      }
+    },
+    "familySemantics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family_kind", "state", "identity_equality"],
+      "properties": {
+        "family_kind": { "enum": ["version", "mirror", "successor", "format", "collection"] },
+        "state": { "enum": ["candidate", "accepted", "rejected", "deferred", "superseded"] },
+        "identity_equality": { "const": false }
+      }
+    },
+    "joinSemantics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation_kind", "source_field_id", "target_field_id", "source_grain", "target_grain", "identifier_namespace", "direction", "cardinality", "lossiness", "evidence_state", "compatibility", "requirements", "blockers"],
+      "properties": {
+        "operation_kind": { "enum": ["join", "crosswalk", "aggregate", "filter", "temporal_alignment", "measure_harmonization"] },
+        "source_field_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "target_field_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "source_grain": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "target_grain": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "identifier_namespace": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[a-z][a-z0-9._-]{1,79}$" },
+            { "type": "null" }
+          ]
+        },
+        "direction": { "enum": ["unidirectional", "bidirectional"] },
+        "cardinality": { "enum": ["one_to_one", "one_to_many", "many_to_one", "many_to_many", "unknown"] },
+        "lossiness": { "enum": ["lossless", "potentially_lossy", "lossy", "unknown"] },
+        "evidence_state": { "enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven"] },
+        "compatibility": { "enum": ["compatible", "conditional", "incompatible", "unknown"] },
+        "requirements": {
+          "type": "array",
+          "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/accessRequirement" }
+        },
+        "blockers": {
+          "type": "array",
+          "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/joinBlocker" }
+        }
+      }
+    }
+  },
+  "allOf": [
+    { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/truthEnvelope" },
+    {
+      "type": "object",
+      "required": ["relationship_id", "subject_id", "object_id", "relationship_domain", "relationship_kind", "match_score_micros", "epistemic_confidence", "identity_semantics", "family_semantics", "join_semantics"],
+      "properties": {
+        "entity_type": { "const": "Relationship" },
+        "relationship_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "subject_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "object_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "relationship_domain": { "enum": ["identity", "family", "join", "lineage", "provenance"] },
+        "relationship_kind": { "enum": ["same_identity_candidate", "same_identity", "not_same_identity", "family_member", "mirror_of", "successor_of", "version_of", "collection_member", "join_route", "distribution_of", "documents", "schema_of", "published_by", "maintained_by"] },
+        "match_score_micros": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0, "maximum": 1000000 },
+            { "type": "null" }
+          ]
+        },
+        "epistemic_confidence": { "enum": ["unknown", "low", "moderate", "high", "confirmed"] },
+        "identity_semantics": {
+          "oneOf": [
+            { "$ref": "#/$defs/identitySemantics" },
+            { "type": "null" }
+          ]
+        },
+        "family_semantics": {
+          "oneOf": [
+            { "$ref": "#/$defs/familySemantics" },
+            { "type": "null" }
+          ]
+        },
+        "join_semantics": {
+          "oneOf": [
+            { "$ref": "#/$defs/joinSemantics" },
+            { "type": "null" }
+          ]
+        },
+        "native_identifiers": { "type": "array", "maxItems": 0 },
+        "evidence_refs": { "type": "array", "minItems": 1 },
+        "assertion_refs": { "type": "array", "maxItems": 0 }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "relationship_domain": { "const": "identity" },
+            "identity_semantics": { "$ref": "#/$defs/identitySemantics" },
+            "family_semantics": { "type": "null" },
+            "join_semantics": { "type": "null" }
+          }
+        },
+        {
+          "properties": {
+            "relationship_domain": { "const": "family" },
+            "identity_semantics": { "type": "null" },
+            "family_semantics": { "$ref": "#/$defs/familySemantics" },
+            "join_semantics": { "type": "null" }
+          }
+        },
+        {
+          "properties": {
+            "relationship_domain": { "const": "join" },
+            "identity_semantics": { "type": "null" },
+            "family_semantics": { "type": "null" },
+            "join_semantics": { "$ref": "#/$defs/joinSemantics" }
+          }
+        },
+        {
+          "properties": {
+            "relationship_domain": { "enum": ["lineage", "provenance"] },
+            "identity_semantics": { "type": "null" },
+            "family_semantics": { "type": "null" },
+            "join_semantics": { "type": "null" }
+          }
+        }
+      ]
+    }
+  ],
+  "unevaluatedProperties": false
+}

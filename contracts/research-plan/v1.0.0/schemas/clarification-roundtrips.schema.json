@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/clarification-roundtrips.schema.json",
+  "title": "Stateless clarification outcome fixtures",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "transitions"],
+  "properties": {
+    "contract_version": {"const": "observatory-clarification-roundtrips.v1.0.0"},
+    "transitions": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["transition_id", "initial_plan_id", "initial_status", "answer_question_ids", "expected_generation", "result_plan_id", "result_status"],
+        "properties": {
+          "transition_id": {"$ref": "common.schema.json#/$defs/stableId"},
+          "initial_plan_id": {"$ref": "common.schema.json#/$defs/digest"},
+          "initial_status": {"const": "clarification_required"},
+          "answer_question_ids": {
+            "type": "array", "minItems": 1, "maxItems": 20, "uniqueItems": true,
+            "items": {"$ref": "common.schema.json#/$defs/stableId"}
+          },
+          "expected_generation": {"$ref": "common.schema.json#/$defs/stableId"},
+          "result_plan_id": {"$ref": "common.schema.json#/$defs/digest"},
+          "result_status": {"enum": ["incomplete", "ready_with_constraints", "ready"]}
+        }
+      }
+    }
+  }
+}

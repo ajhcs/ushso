@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/coverage/v1.0.0/schemas/coverage-snapshot.schema.json",
+  "title": "Immutable public coverage snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "coverage_snapshot_id",
+    "snapshot_version",
+    "as_of",
+    "reporting_window",
+    "revision_pins",
+    "metric_definition_registry_hash",
+    "source_scope_ids",
+    "stage_fact_ids",
+    "membership_manifests",
+    "metrics",
+    "matrix_id",
+    "public_positioning",
+    "immutability"
+  ],
+  "properties": {
+    "coverage_snapshot_id": { "$ref": "common.schema.json#/$defs/Id" },
+    "snapshot_version": { "const": "1.0.0" },
+    "as_of": { "$ref": "common.schema.json#/$defs/UtcInstant" },
+    "reporting_window": { "$ref": "common.schema.json#/$defs/ReportingWindow" },
+    "revision_pins": { "$ref": "common.schema.json#/$defs/RevisionPins" },
+    "metric_definition_registry_hash": { "$ref": "common.schema.json#/$defs/Sha256" },
+    "source_scope_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "common.schema.json#/$defs/Id" }
+    },
+    "stage_fact_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "common.schema.json#/$defs/Id" }
+    },
+    "membership_manifests": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": { "$ref": "membership-manifest.schema.json" }
+    },
+    "metrics": {
+      "type": "array",
+      "minItems": 18,
+      "maxItems": 18,
+      "items": { "$ref": "coverage-metric.schema.json" }
+    },
+    "matrix_id": { "$ref": "common.schema.json#/$defs/Id" },
+    "public_positioning": {
+      "const": "14-source, live-metadata-validated federal baseline plus selected state coverage"
+    },
+    "immutability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sealed", "supersedes_snapshot_id", "digest_algorithm", "canonical_digest"],
+      "properties": {
+        "sealed": { "const": true },
+        "supersedes_snapshot_id": {
+          "oneOf": [
+            { "$ref": "common.schema.json#/$defs/Id" },
+            { "type": "null" }
+          ]
+        },
+        "digest_algorithm": { "const": "coverage_snapshot_sha256/v1" },
+        "canonical_digest": { "$ref": "common.schema.json#/$defs/Sha256" }
+      }
+    }
+  }
+}
