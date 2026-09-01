@@ -101,6 +101,7 @@ variable "database_origin_attestation" {
       capability_member     = bool
       neon_superuser_member = bool
       unexpected_membership = bool
+      unexpected_acl        = bool
     }))
   })
   sensitive = true
@@ -132,7 +133,8 @@ variable "database_origin_attestation" {
         !attestation.rolcreaterole &&
         attestation.capability_member &&
         !attestation.neon_superuser_member &&
-        !attestation.unexpected_membership
+        !attestation.unexpected_membership &&
+        !attestation.unexpected_acl
       )
     ])
     error_message = "Worker login attestation proves an elevated attribute, missing capability grant, neon_superuser membership, or unexpected membership"

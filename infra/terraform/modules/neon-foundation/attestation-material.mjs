@@ -15,6 +15,7 @@ export const ATTESTATION_ROLE_FIELDS = Object.freeze([
   'capability_member',
   'neon_superuser_member',
   'unexpected_membership',
+  'unexpected_acl',
 ]);
 
 const TOP_LEVEL_FIELDS = Object.freeze([

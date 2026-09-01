@@ -61,6 +61,7 @@ variable "database_origin_attestation" {
       capability_member     = bool
       neon_superuser_member = bool
       unexpected_membership = bool
+      unexpected_acl        = bool
     }))
   })
   nullable  = true
