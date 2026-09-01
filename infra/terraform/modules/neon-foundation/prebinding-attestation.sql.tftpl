@@ -19,7 +19,7 @@ SELECT (
   \quit 2
 \endif
 
-WITH expected(role_key, login_user, database_role) AS (
+WITH RECURSIVE expected(role_key, login_user, database_role) AS (
   VALUES
     ('public', :'public_login', 'ushso_public'),
     ('scheduler', :'scheduler_login', 'ushso_scheduler'),
@@ -27,6 +27,43 @@ WITH expected(role_key, login_user, database_role) AS (
     ('normalize', :'normalize_login', 'ushso_normalize'),
     ('projector', :'projector_login', 'ushso_projector'),
     ('ops', :'ops_login', 'ushso_ops')
+), membership_closure(login_oid, granted_oid) AS (
+  SELECT memberships.member, memberships.roleid
+  FROM pg_auth_members memberships
+  UNION
+  SELECT closure.login_oid, memberships.roleid
+  FROM membership_closure closure
+  JOIN pg_auth_members memberships ON memberships.member = closure.granted_oid
+), protected_acl_grantees(grantee) AS (
+  SELECT privileges.grantee
+  FROM pg_namespace namespaces
+  CROSS JOIN LATERAL aclexplode(coalesce(namespaces.nspacl, acldefault('n', namespaces.nspowner))) privileges
+  WHERE namespaces.nspname IN ('registry', 'ingest', 'catalog', 'identity', 'search', 'ops')
+  UNION ALL
+  SELECT privileges.grantee
+  FROM pg_class relations
+  JOIN pg_namespace namespaces ON namespaces.oid = relations.relnamespace
+  CROSS JOIN LATERAL aclexplode(coalesce(
+    relations.relacl,
+    CASE WHEN relations.relkind = 'S'
+      THEN acldefault('S', relations.relowner)
+      ELSE acldefault('r', relations.relowner)
+    END
+  )) privileges
+  WHERE namespaces.nspname IN ('registry', 'ingest', 'catalog', 'identity', 'search', 'ops')
+  UNION ALL
+  SELECT privileges.grantee
+  FROM pg_proc procedures
+  JOIN pg_namespace namespaces ON namespaces.oid = procedures.pronamespace
+  CROSS JOIN LATERAL aclexplode(coalesce(procedures.proacl, acldefault('f', procedures.proowner))) privileges
+  WHERE namespaces.nspname IN ('registry', 'ingest', 'catalog', 'identity', 'search', 'ops')
+  UNION ALL
+  SELECT privileges.grantee
+  FROM pg_default_acl defaults
+  LEFT JOIN pg_namespace namespaces ON namespaces.oid = defaults.defaclnamespace
+  CROSS JOIN LATERAL aclexplode(coalesce(defaults.defaclacl, '{}'::aclitem[])) privileges
+  WHERE defaults.defaclnamespace = 0
+     OR namespaces.nspname IN ('registry', 'ingest', 'catalog', 'identity', 'search', 'ops')
 ), role_state AS (
   SELECT
     expected.role_key,
@@ -55,11 +92,16 @@ WITH expected(role_key, login_user, database_role) AS (
     ) AS capability_member,
     EXISTS (
       SELECT 1
-      FROM pg_auth_members memberships
-      JOIN pg_roles granted_role ON granted_role.oid = memberships.roleid
-      WHERE memberships.member = roles.oid
-        AND granted_role.rolname NOT IN (expected.database_role)
-    ) AS unexpected_membership
+      FROM membership_closure closure
+      JOIN pg_roles granted_role ON granted_role.oid = closure.granted_oid
+      WHERE closure.login_oid = roles.oid
+        AND granted_role.rolname <> expected.database_role
+    ) AS unexpected_membership,
+    EXISTS (
+      SELECT 1
+      FROM protected_acl_grantees privileges
+      WHERE privileges.grantee = 0 OR privileges.grantee = roles.oid
+    ) AS unexpected_acl
   FROM expected
   LEFT JOIN pg_roles roles ON roles.rolname = expected.login_user
 ), attestation AS (
@@ -74,7 +116,8 @@ WITH expected(role_key, login_user, database_role) AS (
       AND bool_and(rolinherit)
       AND bool_and(NOT neon_superuser_member)
       AND bool_and(capability_member)
-      AND bool_and(NOT unexpected_membership) AS privilege_attestation_pass,
+      AND bool_and(NOT unexpected_membership)
+      AND bool_and(NOT unexpected_acl) AS privilege_attestation_pass,
     jsonb_object_agg(
       role_key,
       to_jsonb(role_state) - 'role_key' - 'rolcanlogin' - 'rolinherit'
@@ -82,7 +125,8 @@ WITH expected(role_key, login_user, database_role) AS (
     ) AS role_catalog_evidence
   FROM role_state
 )
-SELECT privilege_attestation_pass, role_catalog_evidence FROM attestation \gset
+SELECT privilege_attestation_pass, role_catalog_evidence
+FROM attestation \gset
 
 \echo :role_catalog_evidence
 \if :privilege_attestation_pass
@@ -148,7 +192,8 @@ WITH role_evidence AS (
         'roles.' || role_key || '.rolcreaterole=' || (value ->> 'rolcreaterole'),
         'roles.' || role_key || '.capability_member=' || (value ->> 'capability_member'),
         'roles.' || role_key || '.neon_superuser_member=' || (value ->> 'neon_superuser_member'),
-        'roles.' || role_key || '.unexpected_membership=' || (value ->> 'unexpected_membership')
+        'roles.' || role_key || '.unexpected_membership=' || (value ->> 'unexpected_membership'),
+        'roles.' || role_key || '.unexpected_acl=' || (value ->> 'unexpected_acl')
       ), E'\n' ORDER BY CASE role_key
         WHEN 'public' THEN 1
         WHEN 'scheduler' THEN 2

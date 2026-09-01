@@ -34,7 +34,8 @@ function safeAttestation(environment = "staging") {
       rolcreaterole: false,
       capability_member: true,
       neon_superuser_member: false,
-      unexpected_membership: false
+      unexpected_membership: false,
+      unexpected_acl: false
     }]))
   };
   attestation.evidence_sha256 = attestationEvidenceSha256(attestation);
@@ -55,7 +56,7 @@ test("synthetic SQL-created login catalog attestation satisfies the prebinding p
   assert.doesNotThrow(() => validateDatabaseOriginAttestation(safeAttestation(), "staging", binding()));
 });
 
-for (const field of ["rolsuper", "rolbypassrls", "rolreplication", "rolcreatedb", "rolcreaterole", "neon_superuser_member", "unexpected_membership"]) {
+for (const field of ["rolsuper", "rolbypassrls", "rolreplication", "rolcreatedb", "rolcreaterole", "neon_superuser_member", "unexpected_membership", "unexpected_acl"]) {
   test(`prebinding policy rejects ${field}=true`, () => {
     const candidate = safeAttestation();
     candidate.roles.public[field] = true;

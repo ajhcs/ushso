@@ -42,6 +42,7 @@ locals {
         "roles.${role}.capability_member=${var.database_origin_attestation.roles[role].capability_member}",
         "roles.${role}.neon_superuser_member=${var.database_origin_attestation.roles[role].neon_superuser_member}",
         "roles.${role}.unexpected_membership=${var.database_origin_attestation.roles[role].unexpected_membership}",
+        "roles.${role}.unexpected_acl=${var.database_origin_attestation.roles[role].unexpected_acl}",
       ]
     ])
   ))
@@ -164,7 +165,8 @@ resource "cloudflare_hyperdrive_config" "role_scoped" {
         !var.database_origin_attestation.roles[each.value.worker_role].rolcreaterole &&
         var.database_origin_attestation.roles[each.value.worker_role].capability_member &&
         !var.database_origin_attestation.roles[each.value.worker_role].neon_superuser_member &&
-        !var.database_origin_attestation.roles[each.value.worker_role].unexpected_membership
+        !var.database_origin_attestation.roles[each.value.worker_role].unexpected_membership &&
+        !var.database_origin_attestation.roles[each.value.worker_role].unexpected_acl
       )
       error_message = "Hyperdrive origin is prohibited until its SQL-created login passes the reviewed catalog attestation"
     }
