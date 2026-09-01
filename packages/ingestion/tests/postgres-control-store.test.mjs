@@ -166,6 +166,18 @@ test('audit identity is derived from trusted context and caller-supplied operato
     () => resolveAuditActor({ auditEventId: 'audit_forged', action: 'correctness_ledger_gc', operatorId: 'operator_forged' }),
     error => error.code === 'PRIVILEGED_PRINCIPAL_BINDING_REQUIRED',
   );
+  let echoSourceInput;
+  assert.throws(
+    () => resolveAuditActor(
+      { auditEventId: 'audit_echo', action: 'correctness_ledger_gc', operatorId: 'operator_echo' },
+      input => {
+        echoSourceInput = input;
+        return { actorId: input.claimedOperatorId, actorType: 'maintenance_identity' };
+      },
+    ),
+    error => error.code === 'PRIVILEGED_PRINCIPAL_BINDING_REQUIRED',
+  );
+  assert.deepEqual(echoSourceInput, { action: 'correctness_ledger_gc', auditEventId: 'audit_echo' });
   assert.throws(
     () => resolveAuditActor(
       { auditEventId: 'audit_mismatch', action: 'correctness_ledger_gc', operatorId: 'operator_forged' },
@@ -173,10 +185,20 @@ test('audit identity is derived from trusted context and caller-supplied operato
     ),
     error => error.code === 'PRIVILEGED_PRINCIPAL_BINDING_MISMATCH',
   );
+  assert.throws(
+    () => resolveAuditActor(
+      { auditEventId: 'audit_bad_type', action: 'correctness_ledger_gc', operatorId: 'operator_trusted' },
+      () => ({ actorId: 'operator_trusted', actorType: 'unsupported_identity' }),
+    ),
+    error => error.code === 'PRIVILEGED_PRINCIPAL_ACTOR_TYPE_UNSUPPORTED',
+  );
   assert.deepEqual(
     resolveAuditActor(
       { auditEventId: 'audit_bound', action: 'correctness_ledger_gc', operatorId: 'operator_trusted' },
-      () => ({ actorId: 'operator_trusted', actorType: 'maintenance_identity' }),
+      input => {
+        assert.deepEqual(input, { action: 'correctness_ledger_gc', auditEventId: 'audit_bound' });
+        return { actorId: 'operator_trusted', actorType: 'maintenance_identity' };
+      },
     ),
     { actorId: 'operator_trusted', actorType: 'maintenance_identity' },
   );
@@ -195,7 +217,10 @@ test('audit identity is derived from trusted context and caller-supplied operato
   const database = await createPostgresControlStoreFactory({
     connectionString: 'postgres://example.invalid/ushso',
     Client: RecordingClient,
-    trustedPrincipalSource: () => ({ actorId: 'operator_trusted', actorType: 'maintenance_identity' }),
+    trustedPrincipalSource: input => {
+      assert.deepEqual(input, { action: 'correctness_ledger_gc', auditEventId: 'audit_bound' });
+      return { actorId: 'operator_trusted', actorType: 'maintenance_identity' };
+    },
   })();
   await database.appendAudit({
     auditEventId: 'audit_bound', action: 'correctness_ledger_gc', operatorId: 'operator_trusted',

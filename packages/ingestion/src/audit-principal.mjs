@@ -3,6 +3,12 @@ import { invariant } from './common.mjs';
 export const SYSTEM_AUDIT_ACTOR_ID = 'ushso-ingestion-control-store';
 export const SYSTEM_AUDIT_ACTOR_TYPE = 'system_reconciler';
 
+const SUPPORTED_AUDIT_ACTOR_TYPES = Object.freeze([
+  'cloudflare_access',
+  'maintenance_identity',
+  'system_reconciler',
+]);
+
 export function resolveAuditActor(event, trustedPrincipalSource = null) {
   invariant(event && typeof event === 'object' && !Array.isArray(event), 'AUDIT_EVENT_INVALID');
   const claimedOperator = event.operatorId ?? event.actorId ?? null;
@@ -17,7 +23,6 @@ export function resolveAuditActor(event, trustedPrincipalSource = null) {
   const trusted = trustedPrincipalSource({
     action: event.action,
     auditEventId: event.auditEventId,
-    claimedOperatorId: claimedOperator,
   });
   invariant(
     trusted
@@ -26,6 +31,11 @@ export function resolveAuditActor(event, trustedPrincipalSource = null) {
       && typeof trusted.actorType === 'string'
       && trusted.actorType.length > 0,
     'PRIVILEGED_PRINCIPAL_BINDING_REQUIRED',
+  );
+  invariant(
+    SUPPORTED_AUDIT_ACTOR_TYPES.includes(trusted.actorType),
+    'PRIVILEGED_PRINCIPAL_ACTOR_TYPE_UNSUPPORTED',
+    trusted.actorType,
   );
   invariant(trusted.actorId === claimedOperator, 'PRIVILEGED_PRINCIPAL_BINDING_MISMATCH', claimedOperator);
   return Object.freeze({ actorId: trusted.actorId, actorType: trusted.actorType });
