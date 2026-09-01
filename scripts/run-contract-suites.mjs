@@ -371,7 +371,7 @@ function resolveRepositoryHead() {
 }
 
 function usesMovingTreeAttestation(descriptor) {
-  if (descriptor.movingTreeAttestation !== true) return false
+  if (descriptor.movingTreeAttestation !== true || descriptor.version !== '1.0.0') return false
   const pinPath = resolve(repositoryRoot, 'verification/wp14/v1.0.0/policy/repository-base-pin.v1.0.0.json')
   const pin = JSON.parse(readFileSync(pinPath, 'utf8'))
   return resolveRepositoryHead() !== pin.head_commit

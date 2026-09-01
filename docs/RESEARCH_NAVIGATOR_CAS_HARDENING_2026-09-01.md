@@ -24,20 +24,23 @@ The implementation and regression tests are bound to:
 - receipt: `verification/receipts/research-navigator-cas-hardening-2026-09-01.json`
 - receipt digest: `sha256:1bfc1813a2d0383c3b56a626af4c80a90b68150042e979cbfd9b79b1cef37e2d`
 
-The focused regression command passed 3/3 tests. The complete WP14 package
-run was deliberately retained as `BLOCKED_STALE_WP14_BASE_PIN` (26 tests,
-10 passed, 16 fail-closed candidate-binding failures), because the historical
-WP14 v1.0.0 receipts remain bound to `f6edbb0b31530cdcf3391e8bddf85015d5d30265`
-and must not be silently repinned.
+The original focused regression command passed 3/3 tests. The repository owner
+subsequently authorized an additive v1.1.0 successor attestation. It copies the
+authorized implementation and regression-test blobs exactly, exercises them
+through compatibility bridges, and passes 12/12 tests plus 24/24 binding and
+preservation checks. The historical WP14 v1.0.0 package and receipts remain
+bound to `f6edbb0b31530cdcf3391e8bddf85015d5d30265`; they were restored to their
+sealed bytes and were not repinned.
 
 ## Boundaries and next decision
 
 No provider mutation, deployment, source request, public request, or analysis
 was performed. No managed PostgreSQL durability, archive/restore, failover,
-PITR, live traffic, independent review, or authorization was obtained. The
-historical release-gate failure remains unchanged and no successor release
-gate was run. A release owner must approve the successor-candidate attestation
-procedure before this WP14 v1.0.0 implementation can be resealed or considered
-for any release-gate execution.
+PITR, live traffic, or independent review was obtained. The authorization was
+strictly limited to local code, tests, documentation, commits, push, and PR #8
+updates. The historical release-gate failure remains unchanged and no
+successor release gate was run. Any deployment, provider operation, release
+gate, or production-eligibility decision requires separate authorization and
+evidence.
 
 Production eligibility remains false.
