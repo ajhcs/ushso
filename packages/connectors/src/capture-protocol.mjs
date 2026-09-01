@@ -1,6 +1,6 @@
 import { canonicalJson, deterministicId, semanticSha256, sha256, asBytes } from './canonical.mjs';
 import { ConnectorFailure } from './errors.mjs';
-import { redactedLocator } from './route-manifest.mjs';
+import { matchManifestRedirect, redactedLocator } from './route-manifest.mjs';
 
 const SAFE_HEADER_NAMES = ['etag', 'last-modified', 'content-type', 'content-length', 'cache-control'];
 const HEADER_SECRET_OR_LOCATOR = /https?:\/\/|(?:x-amz|x-goog)-(?:credential|signature)|awsaccesskeyid|googleaccessid|access[_-]?token|api[_-]?key|\bbearer\b|-----BEGIN/i;
@@ -37,6 +37,87 @@ function captureClassification(purpose) {
   throw new TypeError('Access-probe responses are observations and cannot be captured as evidence bodies.');
 }
 
+function capturePolicyFailure(safeDetailCode, targetClass, message = safeDetailCode) {
+  return new ConnectorFailure(message, {
+    failureType: 'policy_blocked',
+    safeDetailCode,
+    targetClass,
+    retryClass: 'quarantine',
+    quarantine: true,
+  });
+}
+
+function assertCaptureCoherence({ descriptor, compiledRequest, finalUrl }) {
+  const targetClass = compiledRequest?.targetClass ?? 'collection';
+  if (!descriptor?.bounds || !compiledRequest?.endpoint || !compiledRequest?.route || !compiledRequest?.url) {
+    throw capturePolicyFailure('CAPTURE_REQUEST_INCOHERENT', targetClass);
+  }
+  if (
+    !compiledRequest.descriptor
+    || compiledRequest.descriptor.source_id !== descriptor.source_id
+    || compiledRequest.descriptor.descriptor_id !== descriptor.descriptor_id
+  ) {
+    throw capturePolicyFailure('CAPTURE_REQUEST_DESCRIPTOR_MISMATCH', targetClass);
+  }
+  const endpoint = descriptor.endpoints?.find((candidate) => candidate.endpoint_id === compiledRequest.endpoint.endpoint_id);
+  const route = endpoint?.routes?.find((candidate) => candidate.template_id === compiledRequest.route.template_id);
+  if (!endpoint || !route) {
+    throw capturePolicyFailure('CAPTURE_REQUEST_DESCRIPTOR_MISMATCH', targetClass);
+  }
+  if (route.purpose !== compiledRequest.purpose || route.method !== compiledRequest.method) {
+    throw capturePolicyFailure('CAPTURE_REQUEST_DESCRIPTOR_MISMATCH', targetClass);
+  }
+  let compiledUrl;
+  let observedUrl;
+  try {
+    compiledUrl = new URL(compiledRequest.url);
+    observedUrl = new URL(finalUrl);
+  } catch {
+    throw capturePolicyFailure('CAPTURE_FINAL_URL_INVALID', targetClass);
+  }
+  let manifested;
+  try {
+    manifested = matchManifestRedirect(descriptor, compiledUrl.toString(), {
+      purpose: compiledRequest.purpose,
+      method: compiledRequest.method,
+      targetClass,
+    });
+  } catch (error) {
+    if (error instanceof ConnectorFailure) throw capturePolicyFailure(error.safeDetailCode ?? 'CAPTURE_REQUEST_NOT_MANIFESTED', targetClass);
+    throw capturePolicyFailure('CAPTURE_REQUEST_NOT_MANIFESTED', targetClass);
+  }
+  if (
+    manifested.endpoint.endpoint_id !== endpoint.endpoint_id
+    || manifested.route.template_id !== route.template_id
+    || manifested.purpose !== compiledRequest.purpose
+    || manifested.method !== compiledRequest.method
+  ) {
+    throw capturePolicyFailure('CAPTURE_REQUEST_DESCRIPTOR_MISMATCH', targetClass);
+  }
+  if (redactedLocator(compiledUrl) !== redactedLocator(observedUrl)) {
+    throw capturePolicyFailure('CAPTURE_FINAL_URL_MISMATCH', targetClass);
+  }
+  const endpointHost = new URL(endpoint.base_url).hostname.toLowerCase().replace(/\.$/u, '');
+  const finalHost = observedUrl.hostname.toLowerCase().replace(/\.$/u, '');
+  if (endpointHost !== finalHost) {
+    throw capturePolicyFailure('CAPTURE_FINAL_URL_MISMATCH', targetClass);
+  }
+  if (!(descriptor.allowed_hosts ?? []).map((host) => host.toLowerCase().replace(/\.$/u, '')).includes(finalHost)) {
+    throw capturePolicyFailure('CAPTURE_FINAL_HOST_NOT_ALLOWED', targetClass);
+  }
+}
+
+function assertCaptureByteBounds(descriptor, wire, body, targetClass) {
+  const maximumCompressed = descriptor.bounds.maximum_response_bytes;
+  const maximumDecompressed = descriptor.bounds.maximum_decompressed_bytes;
+  if (!Number.isSafeInteger(maximumCompressed) || !Number.isSafeInteger(maximumDecompressed)) {
+    throw capturePolicyFailure('CAPTURE_BOUNDS_MISSING', targetClass);
+  }
+  if (wire.byteLength > maximumCompressed || body.byteLength > maximumDecompressed) {
+    throw capturePolicyFailure('CAPTURE_RESPONSE_BOUND_EXCEEDED', targetClass);
+  }
+}
+
 export class R2CaptureProtocol {
   constructor({ objectStore, referenceStore, clock = () => new Date(), crashInjector = null }) {
     if (!objectStore?.putIfAbsent || !referenceStore?.commit) throw new TypeError('Capture ports are required.');
@@ -47,8 +128,11 @@ export class R2CaptureProtocol {
   }
 
   async capture({ descriptor, runId, compiledRequest, finalUrl, headers, wireBytes, bodyBytes, observedAt }) {
+    const targetClass = compiledRequest?.targetClass ?? 'collection';
+    assertCaptureCoherence({ descriptor, compiledRequest, finalUrl });
     const wire = asBytes(wireBytes ?? bodyBytes);
     const body = asBytes(bodyBytes);
+    assertCaptureByteBounds(descriptor, wire, body, targetClass);
     // The durable capture is the exact bounded, decoded representation that
     // classifiers and normalizers consume. Wire size remains separately
     // accounted so compression cannot hide a decompression bomb.

@@ -38,6 +38,12 @@ export const FIXTURE_METADATA_ROUTE_ALLOWLIST = Object.freeze([
     "method": "HEAD",
     "purpose": "access_probe",
     "path_template": "/files/{id}"
+  },
+  {
+    "host": "catalog.example.gov",
+    "method": "GET",
+    "purpose": "schema",
+    "path_template": "/data/{year}/{dataset_family}/{dataset}/variables.json"
   }
 ].map((entry) => Object.freeze(entry)));
 
@@ -259,19 +265,21 @@ export const SOURCE_METADATA_ROUTE_ALLOWLIST = Object.freeze(Object.fromEntries(
   ]),
 ));
 
+function normalizedHost(value) {
+  return String(value).toLowerCase().replace(/\.$/u, '');
+}
+
 function routeKey(entry) {
-  return [entry.host, entry.method, entry.purpose, entry.path_template].join('|');
+  return [normalizedHost(entry.host), entry.method, entry.purpose, entry.path_template].join('|');
 }
 
-function routeShape(entry) {
-  return [entry.method, entry.purpose, entry.path_template].join('|');
-}
-
-const FIXTURE_ROUTE_SHAPE_ALLOWLIST = new Set([
-  ...FIXTURE_METADATA_ROUTE_ALLOWLIST,
-  ...Object.values(SOURCE_METADATA_ROUTE_ALLOWLIST).flat(),
-].map(routeShape));
 const FIXTURE_HOST_ALLOWLIST = new Set(['catalog.example.gov', 'mirror.example.gov']);
+
+// Fixture descriptors may use either fixture host, but only the fixture
+// path_template/method/purpose tuples — never a union of production shapes.
+const FIXTURE_ROUTE_KEY_ALLOWLIST = new Set(
+  [...FIXTURE_HOST_ALLOWLIST].flatMap((host) => FIXTURE_METADATA_ROUTE_ALLOWLIST.map((entry) => routeKey({ ...entry, host }))),
+);
 
 export function isFixtureSourceId(sourceId) {
   return typeof sourceId === 'string' && FIXTURE_SOURCE_IDS.has(sourceId);
@@ -284,13 +292,22 @@ export function allowlistedRoutesFor(descriptor) {
   return SOURCE_METADATA_ROUTE_ALLOWLIST[descriptor.source_id] ?? null;
 }
 
+function descriptorRouteKeys(descriptor) {
+  return descriptor.endpoints.flatMap((endpoint) => {
+    const host = normalizedHost(new URL(endpoint.base_url).hostname);
+    return endpoint.routes.map((route) => routeKey({
+      host,
+      method: route.method,
+      purpose: route.purpose,
+      path_template: route.path_template,
+    }));
+  });
+}
+
 export function assertPositiveMetadataRouteAllowlist(descriptor) {
   if (isFixtureSourceId(descriptor.source_id)) {
-    const actual = descriptor.endpoints.flatMap((endpoint) => {
-      const host = new URL(endpoint.base_url).hostname.toLowerCase().replace(/\.$/u, '');
-      return endpoint.routes.map((route) => ({ host, method: route.method, purpose: route.purpose, path_template: route.path_template }));
-    });
-    if (actual.some((route) => !FIXTURE_HOST_ALLOWLIST.has(route.host) || !FIXTURE_ROUTE_SHAPE_ALLOWLIST.has(routeShape(route)))) {
+    const actualKeys = descriptorRouteKeys(descriptor);
+    if (actualKeys.some((key) => !FIXTURE_ROUTE_KEY_ALLOWLIST.has(key))) {
       throw new TypeError(`Descriptor routes are not the positive allowlist for ${descriptor.source_id}.`);
     }
     return;
@@ -299,17 +316,8 @@ export function assertPositiveMetadataRouteAllowlist(descriptor) {
   if (!expected) {
     throw new TypeError(`No positive metadata-route allowlist for ${descriptor.source_id}.`);
   }
-  const actual = descriptor.endpoints.flatMap((endpoint) => {
-    const host = new URL(endpoint.base_url).hostname.toLowerCase().replace(/\.$/, '');
-    return endpoint.routes.map((route) => ({
-      host,
-      method: route.method,
-      purpose: route.purpose,
-      path_template: route.path_template,
-    }));
-  });
   const expectedKeys = expected.map(routeKey).sort();
-  const actualKeys = actual.map(routeKey).sort();
+  const actualKeys = descriptorRouteKeys(descriptor).sort();
   if (expectedKeys.length !== actualKeys.length || expectedKeys.some((key, index) => key !== actualKeys[index])) {
     throw new TypeError(`Descriptor routes are not the positive allowlist for ${descriptor.source_id}.`);
   }

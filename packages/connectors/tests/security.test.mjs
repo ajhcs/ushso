@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   BoundedHttpClient, DcatDataJsonConnector, HtmlReleaseInventoryConnector,
-  MemoryOriginGovernor, SocrataCatalogConnector, classifyIpAddress, compileManifestRequest, matchManifestRedirect, redactedLocator, routeManifestInventory,
+  MemoryOriginGovernor, R2CaptureProtocol, SocrataCatalogConnector, classifyIpAddress, compileManifestRequest, matchManifestRedirect, redactedLocator, resolveManifestRedirectLocation, routeManifestInventory,
   SECRET_QUERY_DENYLIST_ACTIVE, SOURCE_METADATA_ROUTE_ALLOWLIST, assertPositiveMetadataRouteAllowlist,
   assertPinnedTransportRequest, createPinnedStreamingTransport, readLimitedBody, validateDescriptor,
 } from '../src/index.mjs';
@@ -10,6 +10,8 @@ import { DEFAULT_RESPONSE_LIMITS } from '../src/route-manifest.mjs';
 import {
   FixtureDnsResolver, FixtureTransport, MemoryRunRepository, jsonResponse, makeFixtureDescriptor, makeHarness,
 } from '../src/testing/index.mjs';
+import { asBytes } from '../src/canonical.mjs';
+import { MemoryCaptureReferenceStore, MemoryObjectStore } from '../src/testing/memory-ports.mjs';
 
 const REQUEST = {
   endpointId: 'endpoint_fixture_catalog', templateId: 'route_fixture_catalog', purpose: 'catalog_metadata',
@@ -337,6 +339,9 @@ test('unmanifested hosts, routes, methods, parameters, and secret query names fa
   assert.throws(() => matchManifestRedirect(redirectDescriptor, 'https://catalog.example.gov/docs/%2e%2e/secret', {
     purpose: 'documentation', method: 'GET', targetClass: 'documentation',
   }), /REDIRECT_UNSAFE_PATH_SEGMENT/);
+  assert.throws(() => matchManifestRedirect(redirectDescriptor, new URL('https://catalog.example.gov/docs/%2e%2e/secret'), {
+    purpose: 'documentation', method: 'GET', targetClass: 'documentation',
+  }), /REDIRECT_RAW_LOCATION_REQUIRED/);
   const inventory = routeManifestInventory(descriptor);
   assert.ok(inventory.every((route) => route.forbidden_route_classes.includes('source_data_payload')));
   assert.ok(inventory.every((route) => ['GET', 'HEAD'].includes(route.method)));
@@ -607,6 +612,7 @@ test('source descriptors must match the frozen positive metadata-route allowlist
   assert.equal(SECRET_QUERY_DENYLIST_ACTIVE, true);
   const { CDC_SOCRATA_DESCRIPTOR } = await import('../src/descriptors.mjs');
   assert.doesNotThrow(() => assertPositiveMetadataRouteAllowlist(CDC_SOCRATA_DESCRIPTOR));
+  assert.doesNotThrow(() => validateDescriptor(makeFixtureDescriptor()));
   const mutated = structuredClone(CDC_SOCRATA_DESCRIPTOR);
   mutated.endpoints[0].routes[0].path_template = '/api/views/metadata/v2';
   assert.throws(() => validateDescriptor(mutated), /positive allowlist/);
@@ -624,7 +630,116 @@ test('source descriptors must match the frozen positive metadata-route allowlist
   const spoofedKnownFixtureRoute = structuredClone(makeFixtureDescriptor());
   spoofedKnownFixtureRoute.endpoints[0].routes[0].path_template = '/alternate-metadata';
   assert.throws(() => validateDescriptor(spoofedKnownFixtureRoute), /positive allowlist/);
+  // Production-shaped routes must not ride a fixture descriptor via shape-union matching.
+  const productionShapedFixture = structuredClone(makeFixtureDescriptor());
+  productionShapedFixture.endpoints[0].routes[0].path_template = '/api/views/{id}';
+  productionShapedFixture.endpoints[0].routes[0].allowed_parameters = ['id'];
+  assert.throws(() => validateDescriptor(productionShapedFixture), /positive allowlist/);
+  assert.throws(() => assertPositiveMetadataRouteAllowlist(productionShapedFixture), /positive allowlist/);
   assert.ok(Object.keys(SOURCE_METADATA_ROUTE_ALLOWLIST).length >= 18);
+});
+
+test('raw redirect Location path checks reject dot-segment evasion before a second transport call', async () => {
+  const descriptor = makeFixtureDescriptor({ redirectPolicy: 'same_origin' });
+  assert.throws(
+    () => resolveManifestRedirectLocation('/docs/%2e%2e/data.json', 'https://catalog.example.gov/data.json', 'collection'),
+    /REDIRECT_UNSAFE_PATH_SEGMENT/,
+  );
+  assert.throws(
+    () => resolveManifestRedirectLocation('https://catalog.example.gov/items/%2e%2e/data.json', 'https://catalog.example.gov/data.json', 'collection'),
+    /REDIRECT_UNSAFE_PATH_SEGMENT/,
+  );
+  assert.throws(
+    () => resolveManifestRedirectLocation('/docs/foo%2fbar', 'https://catalog.example.gov/data.json', 'collection'),
+    /REDIRECT_ENCODED_PATH_SEPARATOR_BLOCKED/,
+  );
+
+  for (const location of ['/docs/%2e%2e/data.json', 'https://catalog.example.gov/docs/%2e%2e/data.json', '/docs/%2e./data.json']) {
+    const harness = makeHarness({ descriptor });
+    harness.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse({}, {
+      status: 302, bodyBytes: '', contentLength: 0, location,
+    }));
+    // A normalized follow-up would otherwise look manifested; it must never be fetched.
+    harness.transport.add('GET', 'https://catalog.example.gov/data.json', jsonResponse({ dataset: [{ identifier: 'must-not-fetch', title: 'Must not fetch' }] }));
+    const blocked = await harness.client.execute({
+      descriptor, runId: `run_redirect_dot_${location.length}`, jobId: `job_redirect_dot_${location.length}`,
+      request: REQUEST,
+      responseProfile: new DcatDataJsonConnector({ descriptor, endpointId: 'endpoint_fixture_catalog', templateId: 'route_fixture_catalog' }).responseProfile(),
+    });
+    assert.equal(blocked.failure.safe_detail_code, 'REDIRECT_UNSAFE_PATH_SEGMENT', location);
+    assert.equal(harness.transport.calls.length, 1, location);
+    assert.equal(harness.objectStore.objects.size, 0, location);
+    assert.equal(harness.requestLedger.records.at(-1).outcome, 'quarantined', location);
+  }
+});
+
+test('R2 capture rejects incoherent URLs and oversize compressed or decompressed bodies', async () => {
+  const descriptor = makeFixtureDescriptor({ maximumResponseBytes: 32, maximumDecompressedBytes: 64 });
+  const compiled = compileManifestRequest(descriptor, REQUEST);
+  const objectStore = new MemoryObjectStore();
+  const referenceStore = new MemoryCaptureReferenceStore();
+  const protocol = new R2CaptureProtocol({ objectStore, referenceStore });
+  const headers = new Headers({ 'content-type': 'application/json', 'content-length': '2' });
+  const observedAt = '2026-08-30T00:00:00.000Z';
+
+  await assert.rejects(
+    () => protocol.capture({
+      descriptor, runId: 'run_capture_url_mismatch', compiledRequest: compiled,
+      finalUrl: 'https://catalog.example.gov/items/other', headers,
+      wireBytes: asBytes('{}'), bodyBytes: asBytes('{}'), observedAt,
+    }),
+    (error) => error.safeDetailCode === 'CAPTURE_FINAL_URL_MISMATCH',
+  );
+  assert.equal(objectStore.objects.size, 0);
+
+  const foreignCompiled = {
+    ...compiled,
+    endpoint: { ...compiled.endpoint, endpoint_id: 'endpoint_missing' },
+  };
+  await assert.rejects(
+    () => protocol.capture({
+      descriptor, runId: 'run_capture_endpoint_mismatch', compiledRequest: foreignCompiled,
+      finalUrl: compiled.url, headers,
+      wireBytes: asBytes('{}'), bodyBytes: asBytes('{}'), observedAt,
+    }),
+    (error) => error.safeDetailCode === 'CAPTURE_REQUEST_DESCRIPTOR_MISMATCH',
+  );
+  assert.equal(objectStore.objects.size, 0);
+
+  const foreignSourceCompiled = {
+    ...compiled,
+    descriptor: { ...compiled.descriptor, source_id: 'source_foreign' },
+  };
+  await assert.rejects(
+    () => protocol.capture({
+      descriptor, runId: 'run_capture_source_mismatch', compiledRequest: foreignSourceCompiled,
+      finalUrl: compiled.url, headers,
+      wireBytes: asBytes('{}'), bodyBytes: asBytes('{}'), observedAt,
+    }),
+    (error) => error.safeDetailCode === 'CAPTURE_REQUEST_DESCRIPTOR_MISMATCH',
+  );
+  assert.equal(objectStore.objects.size, 0);
+
+  await assert.rejects(
+    () => protocol.capture({
+      descriptor, runId: 'run_capture_compressed_bound', compiledRequest: compiled,
+      finalUrl: compiled.url, headers,
+      wireBytes: asBytes('x'.repeat(33)), bodyBytes: asBytes('{}'), observedAt,
+    }),
+    (error) => error.safeDetailCode === 'CAPTURE_RESPONSE_BOUND_EXCEEDED',
+  );
+  assert.equal(objectStore.objects.size, 0);
+
+  await assert.rejects(
+    () => protocol.capture({
+      descriptor, runId: 'run_capture_decompressed_bound', compiledRequest: compiled,
+      finalUrl: compiled.url, headers,
+      wireBytes: asBytes('{}'), bodyBytes: asBytes('y'.repeat(65)), observedAt,
+    }),
+    (error) => error.safeDetailCode === 'CAPTURE_RESPONSE_BOUND_EXCEEDED',
+  );
+  assert.equal(objectStore.objects.size, 0);
+  assert.equal(referenceStore.references.size, 0);
 });
 
 test('transport requests pin approved addresses before connect and stream response limits', async () => {
