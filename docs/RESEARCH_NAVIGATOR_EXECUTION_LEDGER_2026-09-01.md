@@ -51,8 +51,10 @@ decision or ADR before implementation.
 
 ## Assignment ledger
 
-All assignments use the exact frozen checkpoint as their source. No assignment
-has access to secrets, credentials, cookies, private keys, `.env` files,
+Assignments use an immutable exact selected base: the frozen checkpoint for the
+initial audits and CAS review, and a successor commit for the later principal
+and connector slices. No assignment has access to secrets, credentials,
+cookies, private keys, `.env` files,
 `.serena/`, the main worktree's local state, or `RELEASE_PROVENANCE.json`.
 Provider responses are proposals, not approvals.
 
@@ -64,6 +66,9 @@ Provider responses are proposals, not approvals.
 | Co-Engineer mixed Grok+Cursor attempt | Intended two isolated bounded assignments; submission was rejected before dispatch because its payload was not proven to exclude full-repository exposure | No provider work or approval resulted; retained as a safety event | Rejected/unsubmitted; no receipt |
 | Cursor / `ushso-cas-cursor-0901` | Sanitized mirror only; target `verification/wp14/v1.0.0/src/durable-transition.mjs` and `verification/wp14/v1.0.0/tests/durable-transition.test.mjs` | Implement fixture-only CAS serialization hardening and a concurrent regression test; run focused test and report assumptions | Completed; normal receipt; proposed two-file patch inspected, focused test 1/1 pass, mirror-wide test blocked by missing binding; not an approval |
 | Grok / `ushso-cas-grok-0901` | Same sanitized mirror; read-only review of the two CAS files and directly relevant WP14 docs | Adversarial findings on concurrency, append-ledger/state invariants, failure injection, and production fixture rejection; not an approval | Completed; normal receipt after an intermediate transport-lost status; review result was bounded/truncated by provider, no files or commits changed, not an approval |
+| Luna / Zeno — resume submission `01a05d33-e623-7b70-bd08-051e32abd8b8` | Successor worktree at the CAS-hardening exact base; only `packages/ingestion/src/audit-principal.mjs` and `packages/ingestion/tests/postgres-control-store.test.mjs` | Remove claimed-ID input from trusted principal lookup, enforce actor-type allowlist, and add echo/type/binding tests; no AP-01 completion claim | Completed; normal subagent result; orchestrator inspected and committed as `55c8257`; local contract hardening only, real principal provenance and AP-01 authorization remain pending |
+| Cursor / `ushso-connectors-cursor-0901` | Sanitized mirror `f518450fc2b930cb97e8a75cbad82c4dc16f0005`; only the six connector source/test files in the task prompt | Exact fixture route-key checks, raw redirect `Location` checks before URL normalization, and capture coherence/byte-bound tests | Completed; normal receipt after an intermediate transport-lost status; six-file uncommitted candidate inspected, fixture tests reported 28/28, no provider commit accepted, no live/managed claim |
+| Grok / `ushso-connectors-grok-0901` | Same sanitized mirror; read-only review of the connector safety slice and WP5 evidence | Adversarial review of fixture allowlisting, raw redirects, capture bounds, socket pinning, streaming, and managed/live limitations | Completed; normal receipt after an intermediate transport-lost status; no files changed; result was provider-truncated and is review input only, not approval |
 
 The sanitized provider mirror was created from selected tracked paths at the
 frozen checkpoint and contains no excluded local-state paths. The direct
@@ -100,6 +105,15 @@ rejected; they must not be represented as one coordinated independent review.
   `4703edc`; its canonical digest was recomputed locally. It records the full
   WP14 result as 10/26 passing and 16/26 blocked by the historical base pin,
   not as a pass.
+- The AP-01 hardening commit `55c8257` removes the claimed operator ID from
+  the trusted-source input, rejects unsupported actor types, and passes the
+  ingestion package suite 6/6. It does not prove a runtime-authenticated
+  principal, managed role binding, or AP-01 authorization.
+- The connector Cursor candidate tightens three local boundaries and reported
+  28/28 fixture tests, while Grok's review keeps actual socket pinning,
+  streaming-time memory bounds, managed R2, and AUTH-04 external. The
+  candidate remains unintegrated pending orchestrator review and branch-level
+  tests; no provider receipt is a live or managed proof.
 
 ## Evidence and authorization invariants
 
