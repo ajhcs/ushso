@@ -29,7 +29,7 @@ authorization status.
 | Managed database roles, privilege proof, and environment binding | `db/bootstrap/roles.sql`, `role-matrix.v1.json`, `db/migrations/manifest.json`, WP3 least-privilege and migration receipts; local static checks pass | Managed-provider catalog evidence, role/grant inspection, Hyperdrive binding proof, failover/PITR/RPO/RTO and workload evidence | `db/`, `infra/terraform/`, WP3 | Hubble; Grok review for privilege/security-definer concerns | Separate infrastructure/evidence PR; static SQL/manifest tests locally, then owner-authorized managed rehearsal | Requires managed infrastructure and AUTH-01/02/03/05/11; no provider mutation authorized |
 | Trusted principal binding / AP-01 | `packages/ingestion/src/audit-principal.mjs`, PostgreSQL control-store tests, forged/mismatch negative tests | Runtime-authenticated principal source, handler-to-store binding proof, owner residual-risk disposition if technical proof cannot be completed | Ingestion/auth boundary | Zeno; Grok adversarial review | Separate auth-boundary PR or decision packet; focused principal tests and exact evidence inventory | Requires genuine trusted auth context and owner/security-platform decision; AP-01 remains pending |
 | Archive, restore, recovery, and rollback integrity | `db/tools/archive-partition.mjs`, `restore-archive.mjs`, WP3 local Docker fixture tests, WP14 rollback state machine | Isolated managed target restore, provider backup/PITR/failover evidence, operator authorization and recovery receipts | `db/`, WP3, WP14 | Hubble; Grok review | Separate operations/evidence PR; local failure-injection and checksum tests, then authorized isolated rehearsal | Requires managed infrastructure and AUTH-02/03/05/11; production evidence forbidden here |
-| Durable compare-and-swap and append-only publication transitions | WP14 durable adapter contract and fixture tests; inspection found an async interleaving race in the in-memory fixture store | Serialize/recheck concurrent fixture commits; authoritative transactional adapter remains unproven; exact receipts must be refreshed after code changes | `verification/wp14/v1.0.0/` | Cursor implementation; Grok review; Zeno independent local audit | Focused WP14 code/test slice; concurrent `Promise.all` regression, replay/failure-injection/production-rejection tests, then exact-head receipt refresh | Local implementation/verifiable fixture hardening; authoritative durability requires managed/database evidence |
+| Durable compare-and-swap and append-only publication transitions | WP14 durable adapter contract and fixture tests; inspection found an async interleaving race in the in-memory fixture store | Serialize/recheck concurrent fixture commits, bind state history to the ledger, protect the fixture durability label, and reject direct fixture production appends; authoritative transactional adapter remains unproven | `verification/wp14/v1.0.0/` | Cursor implementation; Grok review; Zeno independent local audit | Focused WP14 code/test slice; concurrent `Promise.all` regression, replay/failure-injection/production-rejection tests, then exact-head receipt refresh | Local implementation/verifiable fixture hardening; authoritative durability requires managed/database evidence |
 | Connector transport, DNS/redirect/egress boundaries | Connector network policy, bounded client, pinned streaming transport, route allowlists, fixture/security tests | Provider-specific production transport proof, live DNS/address pinning rehearsal, AUTH-04 canary, source payload boundary evidence | `packages/connectors/`, WP5 | Hume; Grok adversarial review | Separate connector safety PR; all fixture/negative suites and static egress audit; live transport remains disabled | Production traffic and AUTH-04; no live canary authorized |
 | Terraform CLI/provider and trusted catalog attestation | Pinned Terraform/provider versions and lockfiles; static schema/attestation tests; README explicitly records no provider API plan/apply | Real CLI/provider schema compatibility, provider plan/apply, managed catalog/role attestation, digest-bound execution receipt | `infra/terraform/`, WP3 infrastructure | Hume; Grok trust-boundary review | Separate infrastructure-enablement PR; local `fmt`/validation/static tests, then owner-authorized provider rehearsal | Requires credentials/managed provider and AUTH-01/02/03/05/11; no secrets or provider mutation |
 | Canonical migration/import/readiness | Migrations 0001–0007 sealed in manifest; local harness through 0003; WP6 tests pass; normalization import/readiness tests pass | Managed application through 0007, rollback against isolated target, provider role/readiness receipts | `db/migrations/`, normalization, WP6 | Hubble | Migration/application vertical slice only; local checksum/N-1/idempotency/readiness suites, then managed rehearsal | Managed infrastructure and authorization; local proof cannot become managed proof |
@@ -58,17 +58,42 @@ Provider responses are proposals, not approvals.
 
 | Provider / task | Scope and allowed files | Deliverable | State / receipt |
 | --- | --- | --- | --- |
-| Luna / Hubble — `01a05d0a-f895-7500-9fa8-1007c8a07e80` | Read-only `db/**`, `packages/ingestion/**`, `packages/normalization/**`, `verification/wp3/**`, `verification/wp6/**` | Evidence-led audit of privilege, recovery, migration, rollback, and CAS-adjacent gaps; separate local fixes from external blockers | Running; no normal receipt yet |
-| Luna / Hume — `01a05d0a-f4d9-7b11-b9fa-e52142d49b87` | Read-only `packages/connectors/**`, `infra/terraform/**`, `verification/wp5/**`, `verification/wp3/v1.0.0/infra/**` | Egress/transport/Terraform/provider-attestation audit with exact local verification and external dependencies | Running; no normal receipt yet |
-| Luna / Zeno — `01a05d0a-f5d9-7010-8267-daef47052a98` | Read-only `packages/search/**`, `packages/ingestion/src/audit-principal.mjs`, `packages/ingestion/tests/**`, `verification/wp8/**`, `verification/wp14/**`, `verification/external-authorization/**` | Principal/CAS/generation/publication audit and evidence-bound implementation recommendations | Running; no normal receipt yet |
+| Luna / Hubble — `01a05d0a-f895-7500-9fa8-1007c8a07e80` | Read-only `db/**`, `packages/ingestion/**`, `packages/normalization/**`, `verification/wp3/**`, `verification/wp6/**` | Evidence-led audit of privilege, recovery, migration, rollback, and CAS-adjacent gaps; separate local fixes from external blockers | Completed; normal read-only receipt; no files or commits changed |
+| Luna / Hume — `01a05d0a-f4d9-7b11-b9fa-e52142d49b87` | Read-only `packages/connectors/**`, `infra/terraform/**`, `verification/wp5/**`, `verification/wp3/v1.0.0/infra/**` | Egress/transport/Terraform/provider-attestation audit with exact local verification and external dependencies | Completed; normal read-only receipt; connector tests 5/5; no files or commits changed |
+| Luna / Zeno — `01a05d0a-f5d9-7010-8267-daef47052a98` | Read-only `packages/search/**`, `packages/ingestion/src/audit-principal.mjs`, `packages/ingestion/tests/**`, `verification/wp8/**`, `verification/wp14/**`, `verification/external-authorization/**` | Principal/CAS/generation/publication audit and evidence-bound implementation recommendations | Completed; normal read-only receipt; WP8 pass, WP14 stale-base failures confirmed; no files or commits changed |
 | Co-Engineer mixed Grok+Cursor attempt | Intended two isolated bounded assignments; submission was rejected before dispatch because its payload was not proven to exclude full-repository exposure | No provider work or approval resulted; retained as a safety event | Rejected/unsubmitted; no receipt |
-| Cursor / `ushso-cas-cursor-0901` | Sanitized mirror only; target `verification/wp14/v1.0.0/src/durable-transition.mjs` and `verification/wp14/v1.0.0/tests/durable-transition.test.mjs` | Implement fixture-only CAS serialization hardening and a concurrent regression test; run focused test and report assumptions | Accepted/running in isolated worktree; no normal receipt yet |
-| Grok / `ushso-cas-grok-0901` | Same sanitized mirror; read-only review of the two CAS files and directly relevant WP14 docs | Adversarial findings on concurrency, append-ledger/state invariants, failure injection, and production fixture rejection; not an approval | Accepted/running in isolated worktree; no normal receipt yet |
+| Cursor / `ushso-cas-cursor-0901` | Sanitized mirror only; target `verification/wp14/v1.0.0/src/durable-transition.mjs` and `verification/wp14/v1.0.0/tests/durable-transition.test.mjs` | Implement fixture-only CAS serialization hardening and a concurrent regression test; run focused test and report assumptions | Completed; normal receipt; proposed two-file patch inspected, focused test 1/1 pass, mirror-wide test blocked by missing binding; not an approval |
+| Grok / `ushso-cas-grok-0901` | Same sanitized mirror; read-only review of the two CAS files and directly relevant WP14 docs | Adversarial findings on concurrency, append-ledger/state invariants, failure injection, and production fixture rejection; not an approval | Completed; normal receipt after an intermediate transport-lost status; review result was bounded/truncated by provider, no files or commits changed, not an approval |
 
 The sanitized provider mirror was created from selected tracked paths at the
 frozen checkpoint and contains no excluded local-state paths. The direct
 Cursor/Grok tasks are separate bounded tasks because the earlier mixed run was
 rejected; they must not be represented as one coordinated independent review.
+
+## Audit updates requiring follow-up
+
+- Hubble found direct SQL audit/recovery/archive/GC paths broader than the
+  application principal guard, completion paths that do not repeat GC
+  authorization, recovery controls that are not consumed at runtime, and
+  generic operation receipts that are not bound to database, fingerprint,
+  candidate, scope, or expiry. These are local hardening candidates, but managed
+  role/catalog, archive/restore, failover/PITR, and principal evidence remain
+  external.
+- Hume found that the pinned streaming wrapper cannot force an injected inner
+  transport to pin the actual socket, capture storage relies on upstream
+  validation, and redirect normalization weakens raw-path checks. It also found
+  that Terraform attestation checks do not cover recursive membership, effective
+  ACLs, or authenticity-bound runner output. Connector tests remain fixture
+  evidence only; no live transport or provider API was used.
+- Zeno found stale WP14 receipt/base bindings, caller-supplied SQL publication
+  authorization references and digests, missing SQL visibility predicates for
+  linked revisions, and the AP-01 dependency-injection limitation. These need
+  separate search SQL/auth/ADR work and must not be hidden by repinning old
+  receipts.
+- Grok independently identified the fixture CAS race and recommended a mutex,
+  state/history-to-ledger binding, direct production-append rejection, and
+  additional replay/clone-isolation tests. Its result is review input only;
+  the local branch implements and verifies the orchestrator-selected subset.
 
 ## Evidence and authorization invariants
 
@@ -85,4 +110,3 @@ rejected; they must not be represented as one coordinated independent review.
 - The product remains a public-source research recommender/planner. No change
   in this work may execute analyses, calculate market share, produce financial
   benchmarks, or turn the system into a general analytics application.
-
