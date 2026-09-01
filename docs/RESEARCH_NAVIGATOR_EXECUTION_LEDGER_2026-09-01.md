@@ -94,6 +94,12 @@ rejected; they must not be represented as one coordinated independent review.
   state/history-to-ledger binding, direct production-append rejection, and
   additional replay/clone-isolation tests. Its result is review input only;
   the local branch implements and verifies the orchestrator-selected subset.
+- The scoped CAS receipt at
+  `verification/receipts/research-navigator-cas-hardening-2026-09-01.json`
+  binds the focused 3/3 pass to successor commit `38bf0f9` and tree
+  `4703edc`; its canonical digest was recomputed locally. It records the full
+  WP14 result as 10/26 passing and 16/26 blocked by the historical base pin,
+  not as a pass.
 
 ## Evidence and authorization invariants
 
