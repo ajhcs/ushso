@@ -313,14 +313,39 @@ function assertManifestOrigin(url, endpoint, targetClass) {
   if (url.origin !== endpointUrl.origin) throw policyFailure('REQUEST_ORIGIN_NOT_ALLOWED', targetClass);
 }
 
-function assertRawRedirectPath(value, targetClass) {
+export function assertRawRedirectPath(value, targetClass) {
   const raw = String(value).split(/[?#]/, 1)[0];
   const authority = raw.match(/^(?:[A-Za-z][A-Za-z0-9+.-]*:)?\/\/[^/]*/)?.[0] ?? '';
-  for (const segment of raw.slice(authority.length).split('/')) {
+  const pathPart = raw.slice(authority.length);
+  // Encoded separators must be rejected on the raw Location before URL() can
+  // normalize them away or treat them as ordinary path text.
+  if (/%2f|%5c|%00/i.test(pathPart)) throw policyFailure('REDIRECT_ENCODED_PATH_SEPARATOR_BLOCKED', targetClass);
+  for (const segment of pathPart.split('/')) {
     let decoded;
     try { decoded = decodeURIComponent(segment); } catch { throw policyFailure('REDIRECT_PATH_ENCODING_INVALID', targetClass); }
     if (decoded === '.' || decoded === '..' || /[\\/\u0000]/.test(decoded)) throw policyFailure('REDIRECT_UNSAFE_PATH_SEGMENT', targetClass);
   }
+}
+
+/**
+ * Resolve a redirect Location against the current request URL only after the
+ * raw path has been checked. Callers must pass the header string — never a
+ * pre-normalized URL — so dot-segment / encoded-separator evasion cannot hide
+ * behind WHATWG path normalization.
+ */
+export function resolveManifestRedirectLocation(location, baseUrl, targetClass) {
+  if (typeof location !== 'string' || location.length === 0 || location.length > 2000) {
+    throw policyFailure('REDIRECT_LOCATION_INVALID', targetClass);
+  }
+  assertRawRedirectPath(location, targetClass);
+  let url;
+  try {
+    url = new URL(location, baseUrl);
+  } catch {
+    throw policyFailure('REDIRECT_LOCATION_INVALID', targetClass);
+  }
+  assertBoundedUrl(url, targetClass);
+  return url;
 }
 
 export function compileManifestRequest(descriptorInput, request) {
@@ -350,9 +375,15 @@ export function compileManifestRequest(descriptorInput, request) {
 }
 
 export function matchManifestRedirect(descriptorInput, candidateUrl, { purpose, method, targetClass }) {
+  if (typeof candidateUrl !== 'string') throw policyFailure('REDIRECT_RAW_LOCATION_REQUIRED', targetClass);
   const descriptor = validateDescriptor(descriptorInput);
   assertRawRedirectPath(candidateUrl, targetClass);
-  const url = new URL(candidateUrl);
+  let url;
+  try {
+    url = new URL(candidateUrl);
+  } catch {
+    throw policyFailure('REDIRECT_LOCATION_INVALID', targetClass);
+  }
   assertBoundedUrl(url, targetClass);
   if (url.protocol !== 'https:' || url.username || url.password || (url.port && url.port !== '443')) throw policyFailure('REDIRECT_SCHEME_OR_PORT_BLOCKED', targetClass);
   if (/%2f|%5c|%00/i.test(url.pathname)) throw policyFailure('REDIRECT_ENCODED_PATH_SEPARATOR_BLOCKED', targetClass);
