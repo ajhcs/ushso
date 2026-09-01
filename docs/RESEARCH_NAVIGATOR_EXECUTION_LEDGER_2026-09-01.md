@@ -139,6 +139,16 @@ rejected; they must not be represented as one coordinated independent review.
   The final receipt-refresh commit is intentionally not self-attested as the
   tested implementation tree.
 
+### Operations-branch post-split provenance
+
+The database-operations branch now includes the additive CAS split correction
+after the receipt-refresh commit. The isolated Docker rerun at branch tip
+`d846bcbb84b5a42e2b8ae6bbda52e4ef3cef576f` passed 17/17 tests with zero network
+calls and no host ports bound. The checked-in WP3 receipts intentionally remain
+bound to their earlier tested implementation commit `e73def8` and tree
+`54f99603965d6e267a0c65cd4db198dd003d775d`; the later rerun is corroborating
+local evidence, not a new committed receipt or a managed-provider claim.
+
 ## Evidence and authorization invariants
 
 - Local, fixture, simulated, managed, staging, and production evidence remain
