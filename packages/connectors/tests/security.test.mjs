@@ -618,6 +618,12 @@ test('source descriptors must match the frozen positive metadata-route allowlist
   spoofedReviewer.legal_review = { ...spoofedReviewer.legal_review, state: 'approved', reviewer_role: 'fixture-reviewer' };
   spoofedReviewer.endpoints[0].routes[0].path_template = '/api/views/metadata/v2';
   assert.throws(() => validateDescriptor(spoofedReviewer), /positive allowlist/);
+  const spoofedFixture = structuredClone(makeFixtureDescriptor({ sourceId: 'source_fixture_attacker' }));
+  spoofedFixture.endpoints[0].routes[0].path_template = '/alternate-metadata';
+  assert.throws(() => validateDescriptor(spoofedFixture), /No positive metadata-route allowlist/);
+  const spoofedKnownFixtureRoute = structuredClone(makeFixtureDescriptor());
+  spoofedKnownFixtureRoute.endpoints[0].routes[0].path_template = '/alternate-metadata';
+  assert.throws(() => validateDescriptor(spoofedKnownFixtureRoute), /positive allowlist/);
   assert.ok(Object.keys(SOURCE_METADATA_ROUTE_ALLOWLIST).length >= 18);
 });
 

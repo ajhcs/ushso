@@ -1,4 +1,4 @@
-const FIXTURE_SOURCE_PREFIX = 'source_fixture';
+const FIXTURE_SOURCE_IDS = new Set(['source_fixture_catalog']);
 
 export const SECRET_QUERY_DENYLIST_ACTIVE = true;
 
@@ -263,8 +263,18 @@ function routeKey(entry) {
   return [entry.host, entry.method, entry.purpose, entry.path_template].join('|');
 }
 
+function routeShape(entry) {
+  return [entry.method, entry.purpose, entry.path_template].join('|');
+}
+
+const FIXTURE_ROUTE_SHAPE_ALLOWLIST = new Set([
+  ...FIXTURE_METADATA_ROUTE_ALLOWLIST,
+  ...Object.values(SOURCE_METADATA_ROUTE_ALLOWLIST).flat(),
+].map(routeShape));
+const FIXTURE_HOST_ALLOWLIST = new Set(['catalog.example.gov', 'mirror.example.gov']);
+
 export function isFixtureSourceId(sourceId) {
-  return typeof sourceId === 'string' && sourceId.startsWith(`${FIXTURE_SOURCE_PREFIX}`);
+  return typeof sourceId === 'string' && FIXTURE_SOURCE_IDS.has(sourceId);
 }
 
 export function allowlistedRoutesFor(descriptor) {
@@ -276,6 +286,13 @@ export function allowlistedRoutesFor(descriptor) {
 
 export function assertPositiveMetadataRouteAllowlist(descriptor) {
   if (isFixtureSourceId(descriptor.source_id)) {
+    const actual = descriptor.endpoints.flatMap((endpoint) => {
+      const host = new URL(endpoint.base_url).hostname.toLowerCase().replace(/\.$/u, '');
+      return endpoint.routes.map((route) => ({ host, method: route.method, purpose: route.purpose, path_template: route.path_template }));
+    });
+    if (actual.some((route) => !FIXTURE_HOST_ALLOWLIST.has(route.host) || !FIXTURE_ROUTE_SHAPE_ALLOWLIST.has(routeShape(route)))) {
+      throw new TypeError(`Descriptor routes are not the positive allowlist for ${descriptor.source_id}.`);
+    }
     return;
   }
   const expected = SOURCE_METADATA_ROUTE_ALLOWLIST[descriptor.source_id];
