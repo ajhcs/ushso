@@ -68,7 +68,9 @@ The fresh Cursor review `wp8-v2-review-0902` is paused before provider dispatch
 at the host’s explicit repository-exposure consent checkpoint. The fresh Grok
 review `wp4-grok-review-0902` was rejected before dispatch by the provider-safety
 boundary because full private-repository exposure was not explicitly authorized;
-no files were sent. Neither lane supplies a review result or release evidence.
+no files were sent. A subsequent four-lane Grok/Cursor review-and-fix submission
+was likewise rejected before admission for the same missing repository-payload
+consent. Neither lane supplies a review result or release evidence.
 
 The complete machine ledger contains the remaining WP, environment, authorization,
 quality, and provider blockers. The required next action is an authorized WP0

@@ -1,7 +1,7 @@
 {
   "$schema": "./research-navigator-reconciliation-2026-09-02.schema.json",
   "schema_version": "ushso.research-navigator-reconciliation.v1.0.0",
-  "generated_at": "2026-09-02T17:17:23Z",
+  "generated_at": "2026-09-02T17:23:58Z",
   "candidate": {
     "branch": "codex/research-navigator-integration",
     "implementation_commit": "3a93ff47c185995797cde57264a8ea435a91317b",
@@ -75,7 +75,8 @@
     { "id": "AUTH-13", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "The fresh independently owned final retrieval holdout and one-time aggregate-only evaluation are absent.", "source": ["verification/external-authorization/v1.0.0/register.json", "verification/wp8/v1.0.0/receipts/final-holdout-prerequisite.json"] },
     { "id": "AUTH-14..AUTH-17", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "Identity adjudication, coverage wording approval, researcher usability study, and expert review are absent.", "source": ["verification/external-authorization/v1.0.0/register.json"] },
     { "id": "COENGINEER-CURSOR-CONSENT", "class": "blocked_external_authorization", "status": "awaiting_explicit_repository_exposure_consent", "authorized": false, "summary": "The fresh Cursor review is paused before provider dispatch at the host consent checkpoint; no review result or candidate artifact exists.", "source": ["Co-Engineer run wp8-v2-review-0902"] },
-    { "id": "COENGINEER-GROK-SAFETY", "class": "blocked_external_authorization", "status": "rejected_before_dispatch", "authorized": false, "summary": "The fresh Grok full-repository review was rejected by the safety boundary before admission because repository exposure was not explicitly authorized; no files were sent.", "source": ["Co-Engineer run wp4-grok-review-0902"] }
+    { "id": "COENGINEER-GROK-SAFETY", "class": "blocked_external_authorization", "status": "rejected_before_dispatch", "authorized": false, "summary": "The fresh Grok full-repository review was rejected by the safety boundary before admission because repository exposure was not explicitly authorized; no files were sent.", "source": ["Co-Engineer run wp4-grok-review-0902"] },
+    { "id": "COENGINEER-REPOSITORY-CONSENT-0902", "class": "blocked_external_authorization", "status": "rejected_before_admission", "authorized": false, "summary": "A fresh four-lane Grok/Cursor review-and-fix submission was rejected before admission because the private repository payload and external destinations were not explicitly authorized; no provider received files.", "source": ["Co-Engineer run research-navigator-audit-fix-0902"] }
   ],
   "work_package_status": [
     { "work_package": "WP0", "status": "historical_final_receipt_stale_for_candidate", "evidence": ["verification/wp0/v1.0.0/receipts/wp0-aggregate.json"], "remaining": ["separately approved successor/reseal; no overwrite"] },
@@ -113,6 +114,7 @@
     { "command": "release gate 20260901T185317Z-773cc4870771", "status": "HISTORICAL_FAIL", "result": "Exact gate was already run once for the prior frozen candidate and failed on WP0_AGGREGATE_RECEIPT_STALE; it is not rerun for this candidate." }
   ],
   "provider_lanes": [
+    { "run_id": "research-navigator-audit-fix-0902", "provider": "grok+cursor-local", "role": "four-lane review and implementation attempt", "status": "rejected_before_admission", "provider_dispatched": false, "remote_mutation": false, "scope": "full_repository", "result": "Host safety boundary rejected the submission pending explicit repository-payload consent; no files were sent." },
     { "run_id": "wp8-v2-review-0902", "provider": "cursor-local", "role": "read-only review", "status": "awaiting_consent", "provider_dispatched": false, "remote_mutation": false, "scope": "full_repository", "result": null },
     { "run_id": "wp4-grok-review-0902", "provider": "grok", "role": "read-only review", "status": "rejected_before_dispatch", "provider_dispatched": false, "remote_mutation": false, "scope": "full_repository", "result": null },
     { "run_id": "ushso-cursor-wave-0901", "provider": "cursor-local", "role": "historical implementation/review wave", "status": "historical_dispatch_failed", "provider_dispatched": false, "remote_mutation": false, "result": "No child worktrees, commits, artifacts, or remote mutations." },
