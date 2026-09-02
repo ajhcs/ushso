@@ -38,7 +38,9 @@ remain unchanged. The run is deterministic and safety-clean:
 
 The repository-wide verification aggregator now has only the expected WP0
 failure: its immutable v1.0.0 final aggregate receipt is stale for the changed
-candidate tree. It was not overwritten or silently repinned.
+candidate tree. The literal root `npm test` reproduces that same two-check
+failure after all other root and aggregate suites pass. It was not overwritten
+or silently repinned.
 
 The exact release gate was already run once for the earlier frozen candidate and
 failed on `WP0_AGGREGATE_RECEIPT_STALE`. The immutable v1.0 aggregate is not
