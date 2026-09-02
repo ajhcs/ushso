@@ -1,0 +1,130 @@
+{
+  "$schema": "./research-navigator-reconciliation-2026-09-02.schema.json",
+  "schema_version": "ushso.research-navigator-reconciliation.v1.0.0",
+  "generated_at": "2026-09-02T17:00:00Z",
+  "candidate": {
+    "branch": "codex/research-navigator-integration",
+    "implementation_commit": "6482ad4bdbad68a38f22bba6922141c2be85c9bc",
+    "implementation_tree": "3d42cb5f5747e01d1f2eca597669cc70e0ff47d0",
+    "working_tree": "clean",
+    "production_eligibility": false,
+    "remote_mutation": false,
+    "main_worktree_preservation": "The main worktree's pre-existing RELEASE_PROVENANCE.json modification and .serena directory remain untouched and outside this integration worktree."
+  },
+  "provenance": {
+    "current_static_production": {
+      "class": "historical",
+      "source": "RELEASE_PROVENANCE.json",
+      "corpus_id": "ushso-observatory-national-federal",
+      "corpus_version": "1.1.0",
+      "legacy_manifest_sha256_field": "adcfb56babc981a4c7dfc787af86d56f5fb2a31e84de02f9db8c93f0548b5d03",
+      "legacy_manifest_sha256_semantics": "content_fingerprint_sha256, not the SHA-256 of corpus-manifest.json",
+      "manifest_file_sha256": "23f704ce3e421a6eb26c2b3677d616a1ae6b4f45226233257b9a1ff676caba2b",
+      "content_fingerprint_sha256": "adcfb56babc981a4c7dfc787af86d56f5fb2a31e84de02f9db8c93f0548b5d03",
+      "algorithm_fingerprint_sha256": "b17c49fcd3f5fd1a09c38902f8733437e366b75f1e764a92cadf3f9788116ae6",
+      "publication_generation_digest": "legacy-static:1.1.0:adcfb56babc981a4c7dfc787af86d56f5fb2a31e84de02f9db8c93f0548b5d03",
+      "deployment_version": null,
+      "deployment_id": null,
+      "disposition": "Historical production snapshot only; its legacy field is preserved and never used as new candidate evidence."
+    },
+    "integrated_candidate": {
+      "class": "integrated_candidate",
+      "source": "local integration candidate",
+      "corpus_manifest_file_sha256": "23f704ce3e421a6eb26c2b3677d616a1ae6b4f45226233257b9a1ff676caba2b",
+      "corpus_content_fingerprint_sha256": "adcfb56babc981a4c7dfc787af86d56f5fb2a31e84de02f9db8c93f0548b5d03",
+      "corpus_algorithm_fingerprint_sha256": "b17c49fcd3f5fd1a09c38902f8733437e366b75f1e764a92cadf3f9788116ae6",
+      "retrieval_algorithm_fingerprint_sha256": "799d2da29ba16d328e640c9a06b9ad637d5216430f61a2e82141f386d8168673",
+      "publication_generation_digest": null,
+      "deployment_version": null,
+      "deployment_id": null,
+      "production_eligibility": false,
+      "disposition": "Development and validation candidate only; no public pointer or deployment identity exists."
+    },
+    "future_deployment": {
+      "class": "blocked_external_authorization",
+      "status": "not_authorized",
+      "deployment_version": null,
+      "deployment_id": null,
+      "publication_generation_digest": null,
+      "production_eligibility": false,
+      "required_authorizations": ["AUTH-01", "AUTH-02", "AUTH-03", "AUTH-05", "AUTH-06", "AUTH-07", "AUTH-08", "AUTH-09", "AUTH-11"]
+    }
+  },
+  "evidence_inventory": [
+    { "id": "static-production-provenance", "class": "historical", "path": "RELEASE_PROVENANCE.json", "status": "historical snapshot with legacy alias", "disposition": "Preserved; not candidate eligibility evidence." },
+    { "id": "c157-manifest", "class": "current", "path": "packages/retrieval/versions/v1.1.0/manifests/corpus-manifest.json", "status": "byte-pinned", "disposition": "Manifest file SHA and content fingerprint are tracked separately." },
+    { "id": "wp8-v11-candidate", "class": "integrated_candidate", "path": "verification/wp8/v1.1.0/validation/validation-receipt.json", "status": "PASS_DEVELOPMENT_VALIDATION / FAIL_TARGET_PRECISION", "disposition": "Safety-clean selected-split evidence; not release-ready." },
+    { "id": "wp8-v10-compatibility", "class": "current", "path": "verification/wp8/v1.0.0", "status": "35 legacy contract tests and validator pass", "disposition": "Immutable compatibility and PostgreSQL/static contract evidence." },
+    { "id": "wp0-aggregate", "class": "stale", "path": "verification/wp0/v1.0.0/receipts/wp0-aggregate.json", "status": "final receipt is stale for the changed tree", "disposition": "Never overwritten; successor/reseal required." },
+    { "id": "wp14-successor", "class": "fixture_only", "path": "verification/wp14/v1.1.0/receipts/successor-attestation.json", "status": "24/24 pass bound to f2641a3", "disposition": "CAS successor evidence; production eligibility remains false." },
+    { "id": "authorization-register", "class": "blocked_external_authorization", "path": "verification/external-authorization/v1.0.0/register.json", "status": "AUTH-01..AUTH-17 not_requested / unauthorized", "disposition": "Authoritative boundary; unchanged." },
+    { "id": "exact-gate-20260901", "class": "historical", "path": "release-gate receipt 20260901T185317Z-773cc4870771", "status": "failed on WP0 aggregate staleness", "disposition": "One prior exact gate result; not rerun or repurposed for this candidate." }
+  ],
+  "status_planes": [
+    { "plane": "local_implementation", "status": "substantial_candidate_quality_gate_open", "blockers": ["WP8-PRECISION", "WP0-AGGREGATE-STALE", "WP3-LOCAL-POSTGRES-IMAGE"] },
+    { "plane": "external_verification", "status": "blocked_external_authorization", "blockers": ["AUTH-01..AUTH-11", "AUTH-13", "AUTH-14..AUTH-17"] },
+    { "plane": "public_activation", "status": "blocked_external_authorization", "blockers": ["AUTH-06", "AUTH-07", "AUTH-08", "AUTH-09", "WP8", "WP10B", "WP11-HUMAN-EVIDENCE"] }
+  ],
+  "machine_blockers": [
+    { "id": "WP8-PRECISION", "class": "local_implementation", "status": "open_no_waiver", "authorized": true, "summary": "Selected development/validation present-source graded precision is 0.223333 at rank 5 against the frozen 0.70 target; the fixed selected split has a 0.23 maximum under its five-slot denominator.", "source": ["verification/wp8/v1.1.0/validation/validation-receipt.json", "verification/wp8/v1.1.0/README.md"] },
+    { "id": "WP0-AGGREGATE-STALE", "class": "stale_evidence", "status": "exactness_blocked", "authorized": true, "summary": "The immutable WP0 v1.0.0 final aggregate receipt describes an older file inventory. It cannot be overwritten or silently repinned.", "source": ["verification/wp0/v1.0.0/receipts/wp0-aggregate.json", "release-gate receipt 20260901T185317Z-773cc4870771"] },
+    { "id": "WP3-LOCAL-POSTGRES-IMAGE", "class": "environment_precondition", "status": "blocked_local_environment", "authorized": true, "summary": "The offline WP3 local Docker lane requires postgres:16-alpine, which is not installed locally; network image pulls are forbidden.", "source": ["verification/wp3/v1.0.0/db/tools/local-postgres.mjs"] },
+    { "id": "AUTH-01..AUTH-09", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "Paid resources, secrets, provider mutations, staging migrations, canaries, recovery, load, soak, cutover, and retirement are not authorized.", "source": ["verification/external-authorization/v1.0.0/register.json"] },
+    { "id": "AUTH-10", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "Remote push and PR handoff are not authorized in this run; commits remain local for review.", "source": ["verification/external-authorization/v1.0.0/register.json"] },
+    { "id": "AUTH-12", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "Planner governance is absent; WP10B and plan_research remain disabled.", "source": ["verification/external-authorization/v1.0.0/register.json", "verification/wp10a/v1.0.0/receipts/wp10a-receipt.json"] },
+    { "id": "AUTH-13", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "The fresh independently owned final retrieval holdout and one-time aggregate-only evaluation are absent.", "source": ["verification/external-authorization/v1.0.0/register.json", "verification/wp8/v1.0.0/receipts/final-holdout-prerequisite.json"] },
+    { "id": "AUTH-14..AUTH-17", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "Identity adjudication, coverage wording approval, researcher usability study, and expert review are absent.", "source": ["verification/external-authorization/v1.0.0/register.json"] },
+    { "id": "COENGINEER-CURSOR-CONSENT", "class": "blocked_external_authorization", "status": "awaiting_explicit_repository_exposure_consent", "authorized": false, "summary": "The fresh Cursor review is paused before provider dispatch at the host consent checkpoint; no review result or candidate artifact exists.", "source": ["Co-Engineer run wp8-v2-review-0902"] },
+    { "id": "COENGINEER-GROK-SAFETY", "class": "blocked_external_authorization", "status": "rejected_before_dispatch", "authorized": false, "summary": "The fresh Grok full-repository review was rejected by the safety boundary before admission because repository exposure was not explicitly authorized; no files were sent.", "source": ["Co-Engineer run wp4-grok-review-0902"] }
+  ],
+  "work_package_status": [
+    { "work_package": "WP0", "status": "historical_final_receipt_stale_for_candidate", "evidence": ["verification/wp0/v1.0.0/receipts/wp0-aggregate.json"], "remaining": ["separately approved successor/reseal; no overwrite"] },
+    { "work_package": "WP3", "status": "offline_static_pass_local_docker_image_unavailable", "evidence": ["verification/wp3/v1.0.0/receipts", "verification/wp3/v1.0.0/db/results/local-suite.json"], "remaining": ["local image precondition or authorized managed staging"] },
+    { "work_package": "WP4", "status": "pass_local_static_composition_managed_pending", "evidence": ["verification/wp4/v1.0.0/tools/verify-wp4.mjs", "packages/ingestion/src"], "remaining": ["authorized Cloudflare composition and managed fault injection"] },
+    { "work_package": "WP5", "status": "pass_fixture_only_live_pending", "evidence": ["verification/wp5/v1.0.0/receipts"], "remaining": ["authorized metadata-only socket canary and managed capture"] },
+    { "work_package": "WP6", "status": "pass_local_database_validation_managed_pending", "evidence": ["verification/wp6/v1.0.0/receipts/verification-receipt.json"], "remaining": ["authorized managed migration and rollback"] },
+    { "work_package": "WP7", "status": "local_contract_pass_human_adjudication_pending", "evidence": ["verification/wp7/v1.0.0/receipts"], "remaining": ["AUTH-14 independent double review"] },
+    { "work_package": "WP8", "status": "development_validation_safety_pass_quality_fail", "evidence": ["verification/wp8/v1.1.0/validation/validation-receipt.json", "packages/retrieval/tools/retrieval-v2.mjs"], "remaining": ["quality threshold, production-shaped plans, migration 0010, AUTH-13 holdout"] },
+    { "work_package": "WP9", "status": "technical_pass_owner_wording_pending", "evidence": ["verification/wp9/v1.0.0/receipts/wp9-verification.json"], "remaining": ["AUTH-15 and production corpus evidence"] },
+    { "work_package": "WP10A", "status": "technical_freeze_pass_governance_pending", "evidence": ["verification/wp10a/v1.0.0/receipts/wp10a-receipt.json"], "remaining": ["AUTH-12 owner ratification"] },
+    { "work_package": "WP10B", "status": "not_started_by_design", "evidence": ["verification/wp10a/v1.0.0/receipts/wp10a-receipt.json"], "remaining": ["authorized planner implementation"] },
+    { "work_package": "WP11", "status": "implemented_human_evidence_pending", "evidence": ["verification/wp11/v1.0.0/receipts/wp11-verification.json"], "remaining": ["AUTH-16 researcher study and AUTH-17 expert review"] },
+    { "work_package": "WP12", "status": "fixture_only_unwired", "evidence": ["verification/wp12/v1.0.0/receipts/candidate-validation.json"], "remaining": ["dependency gates and authorized activation"] },
+    { "work_package": "WP13", "status": "fixture_only_unwired", "evidence": ["verification/wp13/v1.0.0/receipts/candidate-validation.json"], "remaining": ["production-corpus crawler/sitemap canary and activation"] },
+    { "work_package": "WP14", "status": "fixture_cas_successor_pass_managed_pending", "evidence": ["verification/wp14/v1.1.0/receipts/successor-attestation.json"], "remaining": ["managed canary, recovery, load, soak, promotion, retirement"] }
+  ],
+  "local_verification": [
+    { "command": "npm ci --ignore-scripts --offline", "status": "PASS", "result": "183 packages added; clean locked dependency graph; no vulnerabilities reported." },
+    { "command": "npm test --workspace @ushso/observatory-retrieval", "status": "PASS", "result": "6 test files passed, including retrieval-v2 and historical schema compatibility." },
+    { "command": "node --test verification/wp4/v1.0.0/tests/*.test.mjs && node verification/wp4/v1.0.0/tools/verify-wp4.mjs", "status": "PASS", "result": "WP4 local tests and deterministic offline verifier pass after clean install." },
+    { "command": "npm test --prefix verification/wp8/v1.0.0 && npm run validate --prefix verification/wp8/v1.0.0", "status": "PASS", "result": "7 legacy test files, 35 test cases, and sealed validator pass." },
+    { "command": "node verification/wp8/v1.1.0/tools/validate.mjs && node --test verification/wp8/v1.1.0/tests/development-validation.test.mjs", "status": "PASS_WITH_QUALITY_FAILURE", "result": "40 selected questions; safety zero tolerance passes; target precision remains open; held-out rows parsed/evaluated: 0/0." },
+    { "command": "node scripts/run-contract-suites.mjs --verification", "status": "FAIL_EXPECTED_BLOCKERS", "result": "WP0 immutable aggregate stale, WP3 Docker image/local listener precondition unavailable, and CI receipt stale at the time of the sweep; WP4 passes after clean install and WP8 v1.1 passes." },
+    { "command": "node verification/wp14/v1.1.0/tools/verify.mjs", "status": "PASS", "result": "24/24 successor-attestation checks pass; current checkout is an authorized ancestor; production_eligibility=false." },
+    { "command": "release gate 20260901T185317Z-773cc4870771", "status": "HISTORICAL_FAIL", "result": "Exact gate was already run once for the prior frozen candidate and failed on WP0_AGGREGATE_RECEIPT_STALE; it is not rerun for this candidate." }
+  ],
+  "provider_lanes": [
+    { "run_id": "wp8-v2-review-0902", "provider": "cursor-local", "role": "read-only review", "status": "awaiting_consent", "provider_dispatched": false, "remote_mutation": false, "scope": "full_repository", "result": null },
+    { "run_id": "wp4-grok-review-0902", "provider": "grok", "role": "read-only review", "status": "rejected_before_dispatch", "provider_dispatched": false, "remote_mutation": false, "scope": "full_repository", "result": null },
+    { "run_id": "ushso-cursor-wave-0901", "provider": "cursor-local", "role": "historical implementation/review wave", "status": "historical_dispatch_failed", "provider_dispatched": false, "remote_mutation": false, "result": "No child worktrees, commits, artifacts, or remote mutations." },
+    { "run_id": "ushso-connectors-grok-0901", "provider": "grok", "role": "historical connector review", "status": "historical_receipt_only", "provider_dispatched": false, "remote_mutation": false, "result": "Not independent release evidence." }
+  ],
+  "external_boundary": {
+    "external_requests": 0,
+    "payloads_accessed": 0,
+    "deployments": 0,
+    "remote_writes": 0,
+    "paid_actions": 0,
+    "secrets_processed": 0,
+    "held_out_rows_parsed": 0,
+    "human_reviews": 0
+  },
+  "release_disposition": {
+    "status": "NOT_RELEASE_ELIGIBLE",
+    "production_eligibility": false,
+    "quality_gate": { "status": "FAIL_TARGET_PRECISION", "safety_zero_tolerance": true, "waiver": false, "rank_5_present_graded_precision": 0.223333, "frozen_target": 0.7, "selected_split_precision_ceiling": 0.23 },
+    "exact_gate": { "prior_run_id": "20260901T185317Z-773cc4870771", "prior_status": "failed_WP0_AGGREGATE_RECEIPT_STALE", "rerun_forbidden_until_new_exact_candidate_freeze": true },
+    "next_action": "Keep the static public path unchanged. Resolve WP0 through an explicitly approved successor/reseal procedure, obtain required external and human authorizations, then freeze a new exact candidate before any new release-gate run.",
+    "no_claims": ["production deployment", "production eligibility", "public cutover", "live connector request", "managed migration", "protected holdout score", "human review", "remote push", "PR handoff"]
+  }
+}

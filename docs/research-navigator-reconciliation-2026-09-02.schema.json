@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ushso.research-navigator-reconciliation.v1.0.0",
+  "title": "USHSo Research Navigator current candidate reconciliation",
+  "type": "object",
+  "required": [
+    "$schema",
+    "schema_version",
+    "generated_at",
+    "candidate",
+    "provenance",
+    "evidence_inventory",
+    "status_planes",
+    "machine_blockers",
+    "work_package_status",
+    "local_verification",
+    "provider_lanes",
+    "external_boundary",
+    "release_disposition"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "ushso.research-navigator-reconciliation.v1.0.0" },
+    "generated_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T" },
+    "candidate": {
+      "type": "object",
+      "required": ["branch", "implementation_commit", "implementation_tree", "working_tree", "production_eligibility", "remote_mutation", "main_worktree_preservation"],
+      "properties": {
+        "branch": { "type": "string" },
+        "implementation_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "implementation_tree": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "working_tree": { "const": "clean" },
+        "production_eligibility": { "const": false },
+        "remote_mutation": { "const": false },
+        "main_worktree_preservation": { "type": "string" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["current_static_production", "integrated_candidate", "future_deployment"],
+      "properties": {
+        "current_static_production": { "type": "object" },
+        "integrated_candidate": { "type": "object" },
+        "future_deployment": { "type": "object" }
+      }
+    },
+    "evidence_inventory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "class", "path", "status", "disposition"],
+        "properties": {
+          "id": { "type": "string" },
+          "class": { "enum": ["current", "integrated_candidate", "fixture_only", "historical", "stale", "blocked_external_authorization", "environment_precondition"] },
+          "path": { "type": "string" },
+          "status": { "type": "string" },
+          "disposition": { "type": "string" }
+        }
+      }
+    },
+    "status_planes": { "type": "array", "items": { "type": "object", "required": ["plane", "status", "blockers"] } },
+    "machine_blockers": { "type": "array", "items": { "type": "object", "required": ["id", "class", "status", "authorized", "summary", "source"] } },
+    "work_package_status": { "type": "array", "items": { "type": "object", "required": ["work_package", "status", "evidence", "remaining"] } },
+    "local_verification": { "type": "array", "items": { "type": "object", "required": ["command", "status", "result"] } },
+    "provider_lanes": { "type": "array", "items": { "type": "object", "required": ["run_id", "provider", "role", "status", "provider_dispatched", "remote_mutation"] } },
+    "external_boundary": {
+      "type": "object",
+      "required": ["external_requests", "payloads_accessed", "deployments", "remote_writes", "paid_actions", "secrets_processed", "held_out_rows_parsed", "human_reviews"],
+      "properties": {
+        "external_requests": { "const": 0 },
+        "payloads_accessed": { "const": 0 },
+        "deployments": { "const": 0 },
+        "remote_writes": { "const": 0 },
+        "paid_actions": { "const": 0 },
+        "secrets_processed": { "const": 0 },
+        "held_out_rows_parsed": { "const": 0 },
+        "human_reviews": { "const": 0 }
+      }
+    },
+    "release_disposition": { "type": "object", "required": ["status", "production_eligibility", "quality_gate", "exact_gate", "next_action"] }
+  }
+}
