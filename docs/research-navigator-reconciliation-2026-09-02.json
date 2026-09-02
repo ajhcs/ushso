@@ -1,11 +1,11 @@
 {
   "$schema": "./research-navigator-reconciliation-2026-09-02.schema.json",
   "schema_version": "ushso.research-navigator-reconciliation.v1.0.0",
-  "generated_at": "2026-09-02T17:00:00Z",
+  "generated_at": "2026-09-02T17:08:22Z",
   "candidate": {
     "branch": "codex/research-navigator-integration",
-    "implementation_commit": "6482ad4bdbad68a38f22bba6922141c2be85c9bc",
-    "implementation_tree": "3d42cb5f5747e01d1f2eca597669cc70e0ff47d0",
+    "implementation_commit": "3a93ff47c185995797cde57264a8ea435a91317b",
+    "implementation_tree": "2ac18466e4d1d816f3e9d2d5cae6253c547ab757",
     "working_tree": "clean",
     "production_eligibility": false,
     "remote_mutation": false,
@@ -68,7 +68,7 @@
   "machine_blockers": [
     { "id": "WP8-PRECISION", "class": "local_implementation", "status": "open_no_waiver", "authorized": true, "summary": "Selected development/validation present-source graded precision is 0.223333 at rank 5 against the frozen 0.70 target; the fixed selected split has a 0.23 maximum under its five-slot denominator.", "source": ["verification/wp8/v1.1.0/validation/validation-receipt.json", "verification/wp8/v1.1.0/README.md"] },
     { "id": "WP0-AGGREGATE-STALE", "class": "stale_evidence", "status": "exactness_blocked", "authorized": true, "summary": "The immutable WP0 v1.0.0 final aggregate receipt describes an older file inventory. It cannot be overwritten or silently repinned.", "source": ["verification/wp0/v1.0.0/receipts/wp0-aggregate.json", "release-gate receipt 20260901T185317Z-773cc4870771"] },
-    { "id": "WP3-LOCAL-POSTGRES-IMAGE", "class": "environment_precondition", "status": "blocked_local_environment", "authorized": true, "summary": "The offline WP3 local Docker lane requires postgres:16-alpine, which is not installed locally; network image pulls are forbidden.", "source": ["verification/wp3/v1.0.0/db/tools/local-postgres.mjs"] },
+    { "id": "WP3-LOCAL-POSTGRES-IMAGE", "class": "environment_precondition", "status": "blocked_local_environment", "authorized": true, "summary": "The safe offline/static WP3 aggregate passes, but the optional local Docker rehearsal remains unavailable because postgres:16-alpine is not installed locally; network image pulls are forbidden.", "source": ["verification/wp3/v1.0.0/db/tools/local-postgres.mjs", "verification/wp3/v1.0.0/tools/validate-wp3.mjs"] },
     { "id": "AUTH-01..AUTH-09", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "Paid resources, secrets, provider mutations, staging migrations, canaries, recovery, load, soak, cutover, and retirement are not authorized.", "source": ["verification/external-authorization/v1.0.0/register.json"] },
     { "id": "AUTH-10", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "Remote push and PR handoff are not authorized in this run; commits remain local for review.", "source": ["verification/external-authorization/v1.0.0/register.json"] },
     { "id": "AUTH-12", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "Planner governance is absent; WP10B and plan_research remain disabled.", "source": ["verification/external-authorization/v1.0.0/register.json", "verification/wp10a/v1.0.0/receipts/wp10a-receipt.json"] },
@@ -79,7 +79,7 @@
   ],
   "work_package_status": [
     { "work_package": "WP0", "status": "historical_final_receipt_stale_for_candidate", "evidence": ["verification/wp0/v1.0.0/receipts/wp0-aggregate.json"], "remaining": ["separately approved successor/reseal; no overwrite"] },
-    { "work_package": "WP3", "status": "offline_static_pass_local_docker_image_unavailable", "evidence": ["verification/wp3/v1.0.0/receipts", "verification/wp3/v1.0.0/db/results/local-suite.json"], "remaining": ["local image precondition or authorized managed staging"] },
+    { "work_package": "WP3", "status": "offline_static_pass_local_docker_rehearsal_unavailable", "evidence": ["verification/wp3/v1.0.0/receipts", "verification/wp3/v1.0.0/tools/validate-wp3.mjs", "verification/wp3/v1.0.0/db/results/local-suite.json"], "remaining": ["local image precondition or authorized managed staging"] },
     { "work_package": "WP4", "status": "pass_local_static_composition_managed_pending", "evidence": ["verification/wp4/v1.0.0/tools/verify-wp4.mjs", "packages/ingestion/src"], "remaining": ["authorized Cloudflare composition and managed fault injection"] },
     { "work_package": "WP5", "status": "pass_fixture_only_live_pending", "evidence": ["verification/wp5/v1.0.0/receipts"], "remaining": ["authorized metadata-only socket canary and managed capture"] },
     { "work_package": "WP6", "status": "pass_local_database_validation_managed_pending", "evidence": ["verification/wp6/v1.0.0/receipts/verification-receipt.json"], "remaining": ["authorized managed migration and rollback"] },
@@ -99,8 +99,16 @@
     { "command": "node --test verification/wp4/v1.0.0/tests/*.test.mjs && node verification/wp4/v1.0.0/tools/verify-wp4.mjs", "status": "PASS", "result": "WP4 local tests and deterministic offline verifier pass after clean install." },
     { "command": "npm test --prefix verification/wp8/v1.0.0 && npm run validate --prefix verification/wp8/v1.0.0", "status": "PASS", "result": "7 legacy test files, 35 test cases, and sealed validator pass." },
     { "command": "node verification/wp8/v1.1.0/tools/validate.mjs && node --test verification/wp8/v1.1.0/tests/development-validation.test.mjs", "status": "PASS_WITH_QUALITY_FAILURE", "result": "40 selected questions; safety zero tolerance passes; target precision remains open; held-out rows parsed/evaluated: 0/0." },
-    { "command": "node scripts/run-contract-suites.mjs --verification", "status": "FAIL_EXPECTED_BLOCKERS", "result": "WP0 immutable aggregate stale, WP3 Docker image/local listener precondition unavailable, and CI receipt stale at the time of the sweep; WP4 passes after clean install and WP8 v1.1 passes." },
+    { "command": "node scripts/run-contract-suites.mjs --verification", "status": "FAIL_EXPECTED_BLOCKERS", "result": "Only WP0 test and validate fail on WP0_AGGREGATE_RECEIPT_STALE; WP3 safe offline/static lanes, WP4-WP14, evaluator/bridge, authorization, program, and refreshed CI lanes pass. Optional WP3 local Docker rehearsal remains excluded because postgres:16-alpine is unavailable." },
+    { "command": "node --test verification/wp3/v1.0.0/tests/*.test.mjs && node verification/wp3/v1.0.0/tools/validate-wp3.mjs", "status": "PASS", "result": "WP3 generic safe offline/static runner and aggregate validator pass with infrastructure and database domains green; managed apply and local Docker rehearsal remain explicitly excluded." },
     { "command": "node verification/wp14/v1.1.0/tools/verify.mjs", "status": "PASS", "result": "24/24 successor-attestation checks pass; current checkout is an authorized ancestor; production_eligibility=false." },
+    { "command": "npm run test:web", "status": "PASS", "result": "Vitest: 19 files and 98 tests pass." },
+    { "command": "npm run cf:types", "status": "PASS", "result": "Wrangler 4.127.1 generated runtime types successfully; generated file removed after verification because it is not tracked source." },
+    { "command": "npm run build", "status": "PASS", "result": "17 corpus files staged; TypeScript build and Vite production bundle pass." },
+    { "command": "npm run cf:dry-run:artifact", "status": "PASS", "result": "Wrangler reads 70 asset files and exits at --dry-run without deployment." },
+    { "command": "npm test --prefix packages/connectors && npm run validate --prefix packages/connectors", "status": "PASS", "result": "Five connector test files pass; 46 implementation files, 18 fixture scenarios, 145 assertions, and zero external actions validate." },
+    { "command": "npm test --prefix contracts/ingestion/v1.1.0 && npm run validate --prefix contracts/ingestion/v1.1.0", "status": "PASS", "result": "v1.1 ingestion contract tests and validator pass with 244 positive, 36 negative, 50 transition, and zero failed checks." },
+    { "command": "npm run release:audit", "status": "PASS", "result": "1,459 repository files pass ignored-artifact, file-size, absolute-path, and credential-pattern checks." },
     { "command": "release gate 20260901T185317Z-773cc4870771", "status": "HISTORICAL_FAIL", "result": "Exact gate was already run once for the prior frozen candidate and failed on WP0_AGGREGATE_RECEIPT_STALE; it is not rerun for this candidate." }
   ],
   "provider_lanes": [

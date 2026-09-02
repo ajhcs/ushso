@@ -5,8 +5,8 @@ the 2026-09-01 reconciliation remains historical. The machine-readable ledger is
 [`research-navigator-reconciliation-2026-09-02.json`](./research-navigator-reconciliation-2026-09-02.json),
 validated by [`research-navigator-reconciliation-2026-09-02.schema.json`](./research-navigator-reconciliation-2026-09-02.schema.json).
 
-The isolated integration candidate is `6482ad4bdbad68a38f22bba6922141c2be85c9bc`
-with tree `3d42cb5f5747e01d1f2eca597669cc70e0ff47d0`. The main worktree’s
+The isolated integration candidate is `3a93ff47c185995797cde57264a8ea435a91317b`
+with tree `2ac18466e4d1d816f3e9d2d5cae6253c547ab757`. The main worktree’s
 pre-existing `RELEASE_PROVENANCE.json` change and `.serena/` directory remain
 untouched. The candidate retains the static public path by default and has no
 deployment identity, remote mutation, or production eligibility.
@@ -27,9 +27,18 @@ remain unchanged. The run is deterministic and safety-clean:
 - The v1.0 WP8 compatibility package still passes its 35 tests and validator;
   the v1.1 candidate receipt is separate and does not rewrite the v1 bridge.
 - A clean offline `npm ci` restored the locked `pg@8.23.0` dependency, after
-  which WP4’s local tests and verifier passed. The optional WP3 Docker lane
-  remains unavailable because `postgres:16-alpine` is not installed and pulls
-  are forbidden.
+  which WP4’s local tests and verifier passed. WP3’s safe offline/static
+  aggregate and validator also pass; only its optional Docker rehearsal remains
+  unavailable because `postgres:16-alpine` is not installed and pulls are
+  forbidden.
+- The application-level checks pass: web Vitest (19 files/98 tests), Wrangler
+  types, TypeScript/Vite build, 70-file Wrangler artifact dry-run, connector
+  package tests/validation, v1.1 ingestion-contract tests/validation, and the
+  release audit.
+
+The repository-wide verification aggregator now has only the expected WP0
+failure: its immutable v1.0.0 final aggregate receipt is stale for the changed
+candidate tree. It was not overwritten or silently repinned.
 
 The exact release gate was already run once for the earlier frozen candidate and
 failed on `WP0_AGGREGATE_RECEIPT_STALE`. The immutable v1.0 aggregate is not
