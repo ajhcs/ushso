@@ -48,3 +48,26 @@ test('facility framing favors a bounded facility/status source', () => {
   assert.ok(result.results[0].relevance.matched_anchors.includes('facility_status_anchor'));
 });
 
+test('v2 applies explicit grain and query-role safety constraints', () => {
+  const daily = engine().retrieve({ question: 'Which public dataset gives comparable daily profitability for every hospital in all states?', limit: 20 });
+  assert.equal(daily.results.length, 0);
+
+  const namedPatient = engine().retrieve({ question: 'Can the current public index provide named-patient insurer claims linked to hospital facilities?', limit: 20 });
+  assert.equal(namedPatient.results.length, 0);
+
+  const facilityClaims = engine().retrieve({ question: 'Where is an anonymous, no-application, insurer-level all-payer claims file with facility and day granularity?', limit: 20 });
+  assert.equal(facilityClaims.results.length, 0);
+});
+
+test('v2 keeps local-source and facility-role requests from emitting near-miss records', () => {
+  const pennsylvania = engine().retrieve({ question: 'Which public Pennsylvania source reports hospital financial condition?', limit: 20 });
+  assert.equal(pennsylvania.results[0].record_id, 'obs:asset:pa-phc4-public-financial-reports');
+  assert.ok(!pennsylvania.results.some(result => result.record_id === 'us-federal:cms-hcris-cost-reports'));
+
+  const facilityStatus = engine().retrieve({ question: 'Which original federal source provides current hospital facility identifiers and status?', limit: 20 });
+  assert.ok(!facilityStatus.results.some(result => result.record_id === 'us-federal:cms-hcris-cost-reports'));
+
+  const nonprofitStatus = engine().retrieve({ question: 'What public federal source provides the nonprofit-organization universe and status?', limit: 20 });
+  assert.equal(nonprofitStatus.results[0].record_id, 'us-federal:irs-exempt-organizations-bmf');
+  assert.ok(!nonprofitStatus.results.some(result => result.record_id === 'us-federal:irs-teos-990-xml'));
+});

@@ -256,6 +256,8 @@ function authorityKind(record) {
 }
 
 function sourceDiversityKey(record) {
+  const url = record.identity?.match_fields?.normalized_url ?? record.identity?.match_fields?.canonical_url;
+  if (typeof url === 'string' && url) return `url:${normalizeText(url)}`;
   const explicit = record.identity?.match_fields?.source_id ?? record.identity?.source_id;
   if (typeof explicit === 'string' && explicit) return `source:${explicit}`;
   const family = record.identity?.family?.family_id;
@@ -361,7 +363,16 @@ function negativeConstraints(normalizedQuestion) {
     ['catalog', ['not catalog only', 'reject catalog only', 'original source']]
   ];
   for (const [unit, phrases] of negativePhrases) if (phrases.some(phrase => containsPhrase(normalizedQuestion, phrase))) negativeUnits.add(unit);
-  return { negativeUnits };
+  return {
+    negativeUnits,
+    requires_daily_granularity: /\b(?:daily|per day|day granularity|facility day|facility-day|claim day|claim-day)\b/.test(normalizedQuestion),
+    requires_facility_lookup: /\b(?:facility level|facility-level|facility (?:record|records|identifier|identifiers|status)|facility frame|provider status|federal directory)\b/.test(normalizedQuestion),
+    requires_maternity_evidence: /\b(?:maternity|maternal)[ -]care deserts?\b|\bmaternity deserts?\b/.test(normalizedQuestion),
+    requires_named_patient_claims: /\b(?:named patient|named-patient|patient level|patient-level)\b/.test(normalizedQuestion) && /\bclaims?\b/.test(normalizedQuestion),
+    requires_facility_claims: /\b(?:all payer|all-payer|insurer level|insurer-level)\b/.test(normalizedQuestion) && /\b(?:facility|day|daily)\b/.test(normalizedQuestion),
+    requires_organization_status: /\b(?:nonprofit|tax exempt|tax-exempt) (?:organization )?(?:universe|status)\b|\borganization universe\b/.test(normalizedQuestion),
+    requires_county_capacity_frame: /\bcounty\b.*\b(?:losing|lose|loss)\b.*\bcapacity\b/.test(normalizedQuestion)
+  };
 }
 
 function anchorIntent(normalizedQuestion) {
@@ -446,6 +457,108 @@ function recordYears(record) {
     .filter(Boolean)
     .flatMap(value => String(value).match(/\b(?:18|19|20|21)\d{2}\b/g) ?? [])
     .map(Number);
+}
+
+function capabilityText(record) {
+  return normalizeText(flattenStrings(record.capabilities).join(' '));
+}
+
+function recordUnitSet(record) {
+  return new Set(record.unit_of_analysis ?? []);
+}
+
+function supportsFacilityLookup(record) {
+  const text = capabilityText(record);
+  const title = normalizeText(record.title);
+  return [
+    'provider and facility directories',
+    'provider and facility characteristics',
+    'facility licensure and certification',
+    'facility status',
+    'hospital general information',
+    'provider of services',
+    'hospital enrollment',
+    'provider enrollment',
+    'facility id',
+    'ccn',
+    'npi',
+    'practice location'
+  ].some(term => containsPhrase(text, term) || containsPhrase(title, term));
+}
+
+function supportsMaternityEvidence(record) {
+  const text = normalizeText([
+    record.title,
+    ...(record.capabilities?.topics ?? []).map(item => [item.id, item.label].filter(Boolean).join(' ')),
+    ...(record.capabilities?.use_cases ?? []).map(item => [item.id, item.label].filter(Boolean).join(' '))
+  ].filter(Boolean).join(' '));
+  return /\b(?:matern|delivery|birth|newborn|obstetric|prenatal)\w*/.test(text);
+}
+
+function supportsClaims(record, { facility = false, namedPatient = false } = {}) {
+  const units = recordUnitSet(record);
+  const text = capabilityText(record);
+  if (!/(?:claim|encounter|all payer|apcd)/.test(text)) return false;
+  if (namedPatient && ![...units].some(unit => ['person', 'event'].includes(unit))) return false;
+  if (facility && ![...units].some(unit => ['hospital', 'facility', 'provider', 'event'].includes(unit))) return false;
+  return true;
+}
+
+function supportsOrganizationStatus(record) {
+  const units = recordUnitSet(record);
+  const title = normalizeText(record.title);
+  const text = capabilityText(record);
+  return units.has('tax_exempt_organization') || units.has('ein') || title.includes('business master file') ||
+    (text.includes('tax exemption') && (text.includes('organization baseline') || text.includes('status screening')));
+}
+
+function supportsCountyCapacityFrame(record) {
+  const text = capabilityText(record);
+  return [
+    'provider and facility characteristics',
+    'provider and facility directories',
+    'hospital closures and conversions',
+    'rurality classification',
+    'geography access and rurality',
+    'geography, rurality, and access context',
+    'facility status'
+  ].some(term => containsPhrase(text, term));
+}
+
+function localSourceRequest(intent, normalizedQuestion) {
+  return intent.interpretation.geographies
+    .filter(geography => String(geography.id).toUpperCase() !== 'US')
+    .some(geography => {
+      const label = normalizeText(geography.label);
+      return [
+        `${label} source`,
+        `${label} public source`,
+        `public ${label} source`,
+        `${label} original source`,
+        `original ${label} source`,
+        `${label} government source`,
+        `government ${label} source`
+      ].some(phrase => containsPhrase(normalizedQuestion, phrase));
+    });
+}
+
+function hasDailyGranularity(record) {
+  return /^(?:day|daily)$/.test(normalizeText(record.time_coverage?.temporal_granularity));
+}
+
+function passesQueryConstraints(record, fields, intent, negatives) {
+  if (negatives.requires_daily_granularity && !hasDailyGranularity(record)) return false;
+  if (negatives.requires_facility_lookup && !supportsFacilityLookup(record)) return false;
+  if (negatives.requires_maternity_evidence && !supportsMaternityEvidence(record)) return false;
+  if (negatives.requires_named_patient_claims && !supportsClaims(record, { namedPatient: true })) return false;
+  if (negatives.requires_facility_claims && (!hasDailyGranularity(record) || !supportsClaims(record, { facility: true }))) return false;
+  if (negatives.requires_organization_status && !supportsOrganizationStatus(record)) return false;
+  if (negatives.requires_county_capacity_frame && !supportsCountyCapacityFrame(record)) return false;
+  if (localSourceRequest(intent, intent.normalized_question)) {
+    const requested = new Set(intent.interpretation.geographies.map(geography => String(geography.id).toUpperCase()));
+    if (!(record.geography?.jurisdictions ?? []).some(jurisdiction => requested.has(String(jurisdiction).toUpperCase()))) return false;
+  }
+  return true;
 }
 
 function scoreGeography(record, intent, config) {
@@ -542,6 +655,7 @@ function scoreLexical(fields, queryTokens, idf, config) {
 }
 
 function scoreCandidate({ record, fields, intent, concepts, queryTokens, queryPhrases: phrases, idf, negatives, anchors, config }) {
+  if (!passesQueryConstraints(record, fields, intent, negatives)) return null;
   const geography = scoreGeography(record, intent, config);
   if (!geography.eligible) return null;
   const units = scoreUnits(record, intent, negatives, config);
@@ -555,6 +669,7 @@ function scoreCandidate({ record, fields, intent, concepts, queryTokens, queryPh
   const anchor = anchorScore(record, intent.normalized_question, anchors);
   const components = [...geography.components, ...units.components, ...time.components, ...access.components, ...lexical.components, ...anchor.components];
   const matchedConcepts = [];
+  const matchedCapabilityFitnesses = [];
   for (const concept of concepts) {
     const capability = capabilityMatch(record, concept);
     const title = fields.find(field => field.kind === 'title');
@@ -565,6 +680,7 @@ function scoreCandidate({ record, fields, intent, concepts, queryTokens, queryPh
     matchedConcepts.push(concept.id);
     if (capability) {
       const multiplier = FITNESS_MULTIPLIER[capability.capability.fitness] ?? FITNESS_MULTIPLIER.unknown;
+      matchedCapabilityFitnesses.push(capability.capability.fitness ?? 'unknown');
       const value = config.concept_weights.subject_capability * multiplier + (EVIDENCE_BONUS[capability.capability.evidence_state] ?? 0);
       components.push({ kind: 'concept_capability', value, reason: `${concept.label} matches the ${capability.capability.fitness} capability “${capability.capability.label}”.`, evidence_state: capability.capability.evidence_state ?? 'unresolved' });
       if (capability.capability.fitness === 'context_only') components.push({ kind: 'context_only_penalty', value: -config.penalties.context_only, reason: 'Capability is marked context-only and is not treated as a primary recommendation.', evidence_state: capability.capability.evidence_state ?? 'unresolved' });
@@ -593,6 +709,7 @@ function scoreCandidate({ record, fields, intent, concepts, queryTokens, queryPh
   const activatedSemanticConcept = concepts.some(concept => !concept.id.startsWith('subject:'));
   const hasSignal = matchedConcepts.length > 0 || anchor.matched.length > 0 || regional.matched.length > 0 || (!activatedSemanticConcept && lexical.matched.length > 0) || units.matched.length > 0 || (explicitGeography && geography.matched.length > 0);
   if (subjectRequired && matchedConcepts.length === 0) return null;
+  if (subjectRequired && matchedCapabilityFitnesses.length && matchedCapabilityFitnesses.every(fitness => ['context_only', 'unknown'].includes(fitness))) return null;
   if (!hasSignal) return null;
 
   const sourceKind = authorityKind(record);
