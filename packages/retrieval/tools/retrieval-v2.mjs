@@ -363,15 +363,54 @@ function negativeConstraints(normalizedQuestion) {
     ['catalog', ['not catalog only', 'reject catalog only', 'original source']]
   ];
   for (const [unit, phrases] of negativePhrases) if (phrases.some(phrase => containsPhrase(normalizedQuestion, phrase))) negativeUnits.add(unit);
+  const asksHospitalGeneralSource = /\boriginal (?:federal|government) source\b/.test(normalizedQuestion)
+    && (/(?:identifier|status|api|downloadable csv|facility records)/.test(normalizedQuestion));
+  const asksProviderServicesSource = /facility[- ]level/.test(normalizedQuestion)
+    && /(?:frame|rather than county|current index record)/.test(normalizedQuestion);
+  const asksNonprofitEvidence = /\b(?:nonprofit|tax exempt|tax-exempt|form 990|schedule [hr])\b/.test(normalizedQuestion)
+    && /\b(?:financial|finance|990|schedule|community benefit|universe|status)\b/.test(normalizedQuestion);
+  const asksFundingEvidence = /\b(?:grant|grants|contract|contracts|award|awards|procurement)\b/.test(normalizedQuestion);
+  const asksClaimsEvidence = /\b(?:claims?|all-payer|all payer|insurer|insurance|medical loss ratio|mcpar)\b/.test(normalizedQuestion);
+  const asksOwnershipHistory = /\b(?:merger|mergers|change of ownership|ownership changes?|trace .*ownership|parent entity)\b/.test(normalizedQuestion);
+  const asksDebtEvidence = /\b(?:municipal debt|debt disclosures?|debt disclosure|bond disclosures?|bond disclosure)\b/.test(normalizedQuestion);
+  const asksCapitalEvidence = /\b(?:construction|capital investment|capital investments|capex|procurement|grant|grants|contract|contracts|award|awards)\b/.test(normalizedQuestion);
+  const asksSafetyNetEvidence = /safety[- ]net/.test(normalizedQuestion);
+  const asksMaternityDesert = /\b(?:maternity|maternal)[ -]care deserts?\b|\bmaternity deserts?\b/.test(normalizedQuestion);
+  const asksMaternityContext = !asksMaternityDesert && /\b(?:maternity|maternal|deliver(?:y|ies)|newborn|pregnan)\w*/.test(normalizedQuestion);
+  const asksFinanceUtilization = /\b(?:financial|finance|income|expense|cost|costs|price|prices)\w*\b/.test(normalizedQuestion)
+    && /\b(?:utilization|utilisation|volume|admission|discharge|delivery|deliveries|visits)\w*\b/.test(normalizedQuestion);
+  const asksFinancialEvidence = /\b(?:financial|finance|income|expense|expenses|revenue|cost|costs|price|prices|profitability)\w*\b/.test(normalizedQuestion);
+  const asksFinancialDistress = /\bfinancial distress\b/.test(normalizedQuestion);
+  const asksCapacityFrame = /\bcounty\b.*\b(?:losing|lose|loss)\b.*\bcapacity\b/.test(normalizedQuestion);
+  const asksClosureCapacity = /\b(?:lost|losing|loss of)\b.*\b(?:operating )?capacity\b/.test(normalizedQuestion);
+  const asksRuralClosureSources = /\brural\b.*\bclosures?\b/.test(normalizedQuestion);
+  const asksStateCommunityJoin = /\bcommunity benefit\b/.test(normalizedQuestion) && /\btogether\b/.test(normalizedQuestion);
   return {
     negativeUnits,
     requires_daily_granularity: /\b(?:daily|per day|day granularity|facility day|facility-day|claim day|claim-day)\b/.test(normalizedQuestion),
     requires_facility_lookup: /\b(?:facility level|facility-level|facility (?:record|records|identifier|identifiers|status)|facility frame|provider status|federal directory)\b/.test(normalizedQuestion),
-    requires_maternity_evidence: /\b(?:maternity|maternal)[ -]care deserts?\b|\bmaternity deserts?\b/.test(normalizedQuestion),
+    requires_maternity_evidence: asksMaternityDesert,
+    requires_maternity_context: asksMaternityContext,
     requires_named_patient_claims: /\b(?:named patient|named-patient|patient level|patient-level)\b/.test(normalizedQuestion) && /\bclaims?\b/.test(normalizedQuestion),
     requires_facility_claims: /\b(?:all payer|all-payer|insurer level|insurer-level)\b/.test(normalizedQuestion) && /\b(?:facility|day|daily)\b/.test(normalizedQuestion),
     requires_organization_status: /\b(?:nonprofit|tax exempt|tax-exempt) (?:organization )?(?:universe|status)\b|\borganization universe\b/.test(normalizedQuestion),
-    requires_county_capacity_frame: /\bcounty\b.*\b(?:losing|lose|loss)\b.*\bcapacity\b/.test(normalizedQuestion)
+    requires_county_capacity_frame: asksCapacityFrame,
+    requires_closure_capacity: asksClosureCapacity,
+    requires_rural_closure_sources: asksRuralClosureSources,
+    requires_hospital_general_source: asksHospitalGeneralSource,
+    requires_provider_services_source: asksProviderServicesSource,
+    requires_hospital_scope: /\bhospitals?\b/.test(normalizedQuestion),
+    requires_nonprofit_evidence: asksNonprofitEvidence,
+    requires_funding_evidence: asksFundingEvidence,
+    requires_claims_evidence: asksClaimsEvidence,
+    requires_ownership_history: asksOwnershipHistory,
+    requires_debt_evidence: asksDebtEvidence,
+    requires_capital_evidence: asksCapitalEvidence,
+    requires_safety_net_evidence: asksSafetyNetEvidence,
+    requires_finance_utilization: asksFinanceUtilization,
+    requires_financial_evidence: asksFinancialEvidence,
+    requires_financial_distress: asksFinancialDistress,
+    requires_state_community_join: asksStateCommunityJoin
   };
 }
 
@@ -525,6 +564,135 @@ function supportsCountyCapacityFrame(record) {
   ].some(term => containsPhrase(text, term));
 }
 
+function usableCapabilities(record) {
+  return capabilityRows(record).filter(capability => ['primary', 'supporting'].includes(capability.fitness));
+}
+
+function recordText(record) {
+  return normalizeText(flattenStrings({
+    title: record.title,
+    description: record.description,
+    capabilities: record.capabilities,
+    retrieval: record.retrieval
+  }).join(' '));
+}
+
+function hasUnit(record, units) {
+  const recordUnits = recordUnitSet(record);
+  return units.some(unit => recordUnits.has(unit));
+}
+
+function isHospitalScoped(record) {
+  return hasUnit(record, ['hospital', 'facility', 'provider', 'health_system', 'cost_report', 'reporting_period', 'hospital_enrollment', 'organization'])
+    || normalizeText(record.title).includes('hospital');
+}
+
+function hasUsableCapability(record, terms) {
+  return usableCapabilities(record).some(capability => {
+    const text = normalizeText([capability.id, capability.label, capability.rationale].filter(Boolean).join(' '));
+    return terms.some(term => containsPhrase(text, term));
+  });
+}
+
+function isHospitalGeneralSource(record) {
+  const title = normalizeText(record.title);
+  const text = capabilityText(record);
+  return title.includes('hospital general information') || text.includes('hospital general information');
+}
+
+function isProviderServicesSource(record) {
+  const title = normalizeText(record.title);
+  const text = capabilityText(record);
+  return title.includes('provider of services') || text.includes('facility status and certification baseline');
+}
+
+function hasNonprofitEvidence(record) {
+  const title = normalizeText(record.title);
+  const text = capabilityText(record);
+  return title.includes('990') || title.includes('business master file') || title.includes('exempt organization')
+    || hasUsableCapability(record, ['community benefit and tax exemption', 'nonprofit organization baseline', 'tax-exempt status screening', 'tax exemption']);
+}
+
+function hasFundingEvidence(record) {
+  const text = recordText(record);
+  return /\b(?:grant|grants|contract|contracts|award|awards|procurement|subaward|subawards)\b/.test(text);
+}
+
+function hasClaimsEvidence(record) {
+  const text = recordText(record);
+  return /\b(?:claim|claims|encounter|encounters|all-payer|all payer|medical loss ratio|mcpar|payer and coverage|insurance)\b/.test(text);
+}
+
+function hasOwnershipHistoryEvidence(record) {
+  const text = recordText(record);
+  return hasUsableCapability(record, [
+    'ownership association history',
+    'ownership-product linkage',
+    'hospital chow event baseline',
+    'buyer and seller screening',
+    'transaction timeline support',
+    'reported hospital owner baseline',
+    'hospital enrollment baseline'
+  ]) || /\b(?:change of ownership|all owners|buyer and seller|transaction timeline|ownership association)\b/.test(text);
+}
+
+function hasDebtEvidence(record) {
+  return /\b(?:municipal|debt|bond|disclosure|emma)\b/.test(recordText(record));
+}
+
+function hasCapitalEvidence(record) {
+  return hasFundingEvidence(record) || hasUsableCapability(record, ['capital', 'construction', 'procurement', 'awards', 'grants'])
+    || /\b(?:capital|construction|procurement|award|grant|contract)\b/.test(normalizeText(record.title));
+}
+
+function hasFinanceEvidence(record) {
+  return hasUsableCapability(record, ['hospital financials', 'costs, prices, and transparency', 'financial condition'])
+    || /\b(?:hcris|financial reports?|cost reports?)\b/.test(normalizeText(record.title));
+}
+
+function hasPrimaryFinanceEvidence(record) {
+  return usableCapabilities(record).some(capability => capability.fitness === 'primary'
+    && ['hospital financials', 'costs, prices, and transparency', 'financial condition'].some(term => containsPhrase(normalizeText([capability.id, capability.label, capability.rationale].filter(Boolean).join(' ')), term)))
+    || /\b(?:hcris|financial reports?|cost reports?)\b/.test(normalizeText(record.title));
+}
+
+function hasUtilizationEvidence(record) {
+  return hasUsableCapability(record, ['hospital and provider utilization', 'hospital capacity and operations', 'quality and outcomes'])
+    || /\b(?:utilization|capacity|quality)\b/.test(normalizeText(record.title));
+}
+
+function hasMaternityDirectEvidence(record) {
+  return hasUsableCapability(record, ['maternity', 'maternal', 'pregnancy', 'birth', 'newborn', 'obstetric', 'prenatal'])
+    || (isHospitalScoped(record) && /\b(?:maternity|maternal|pregnan|obstetric|prenatal|newborn|birth)\w*/.test(normalizeText(record.title)));
+}
+
+function hasMaternityContextEvidence(record) {
+  return isHospitalScoped(record) && hasUtilizationEvidence(record);
+}
+
+function hasCapacityFrameEvidence(record, { closure = false } = {}) {
+  const title = normalizeText(record.title);
+  if (closure && /\b(?:provider of services|rural hospital closures|rural urban continuum)\b/.test(title)) return true;
+  if (closure && /\bphc4\b/.test(title) && /\b(?:hospital|financial reports?)\b/.test(title)) return true;
+  if (!closure && /\b(?:provider of services|hospital general information|rural urban continuum)\b/.test(title)) return true;
+  return closure && isHospitalScoped(record) && hasUsableCapability(record, ['hospital closures and conversions', 'rurality classification']);
+}
+
+function hasRuralClosureEvidence(record) {
+  const title = normalizeText(record.title);
+  return title.includes('rural hospital closures') || title.includes('provider of services') || title.includes('rural urban continuum');
+}
+
+function hasSafetyNetEvidence(record) {
+  return (hasFinanceEvidence(record) || hasUsableCapability(record, ['community benefit and tax exemption', 'payer and coverage']))
+    && (isHospitalScoped(record) || hasNonprofitEvidence(record));
+}
+
+function hasFinancialDistressEvidence(record, normalizedQuestion) {
+  if (hasFinanceEvidence(record) && isHospitalScoped(record)) return true;
+  return /\bentity level\b/.test(normalizedQuestion) && normalizeText(record.title).includes('990') && hasFinanceEvidence(record);
+}
+
 function localSourceRequest(intent, normalizedQuestion) {
   return intent.interpretation.geographies
     .filter(geography => String(geography.id).toUpperCase() !== 'US')
@@ -537,7 +705,8 @@ function localSourceRequest(intent, normalizedQuestion) {
         `${label} original source`,
         `original ${label} source`,
         `${label} government source`,
-        `government ${label} source`
+        `government ${label} source`,
+        `${label} hospital financial reporting`
       ].some(phrase => containsPhrase(normalizedQuestion, phrase));
     });
 }
@@ -550,10 +719,39 @@ function passesQueryConstraints(record, fields, intent, negatives) {
   if (negatives.requires_daily_granularity && !hasDailyGranularity(record)) return false;
   if (negatives.requires_facility_lookup && !supportsFacilityLookup(record)) return false;
   if (negatives.requires_maternity_evidence && !supportsMaternityEvidence(record)) return false;
+  if (negatives.requires_maternity_evidence && !hasMaternityDirectEvidence(record)) return false;
+  if (negatives.requires_maternity_context && !hasMaternityContextEvidence(record)) return false;
   if (negatives.requires_named_patient_claims && !supportsClaims(record, { namedPatient: true })) return false;
   if (negatives.requires_facility_claims && (!hasDailyGranularity(record) || !supportsClaims(record, { facility: true }))) return false;
   if (negatives.requires_organization_status && !supportsOrganizationStatus(record)) return false;
   if (negatives.requires_county_capacity_frame && !supportsCountyCapacityFrame(record)) return false;
+  if (negatives.requires_county_capacity_frame && !hasCapacityFrameEvidence(record)) return false;
+  if (negatives.requires_closure_capacity && !hasCapacityFrameEvidence(record, { closure: true })) return false;
+  if (negatives.requires_rural_closure_sources && !hasRuralClosureEvidence(record)) return false;
+  if (negatives.requires_hospital_general_source && !isHospitalGeneralSource(record)) return false;
+  if (negatives.requires_provider_services_source && !isProviderServicesSource(record)) return false;
+  if (negatives.requires_hospital_scope && !negatives.requires_nonprofit_evidence && !negatives.requires_funding_evidence && !negatives.requires_capital_evidence
+    && !negatives.requires_rural_closure_sources && !negatives.requires_closure_capacity
+    && !(negatives.requires_financial_distress && hasFinancialDistressEvidence(record, intent.normalized_question)) && !isHospitalScoped(record)) return false;
+  if (negatives.requires_nonprofit_evidence && !hasNonprofitEvidence(record)) return false;
+  if (negatives.requires_funding_evidence && !hasFundingEvidence(record)) return false;
+  if (negatives.requires_claims_evidence && !hasClaimsEvidence(record)) return false;
+  if (negatives.requires_ownership_history && !hasOwnershipHistoryEvidence(record)) return false;
+  if (negatives.requires_debt_evidence && !hasDebtEvidence(record)) return false;
+  if (negatives.requires_capital_evidence && !hasCapitalEvidence(record)) return false;
+  if (negatives.requires_safety_net_evidence && !hasSafetyNetEvidence(record)) return false;
+  const financeDirectoryException = isHospitalGeneralSource(record)
+    && (negatives.requires_finance_utilization || negatives.requires_state_community_join)
+    && !(negatives.requires_finance_utilization && /\bcompare\b/.test(intent.normalized_question) && /\bcost\b/.test(intent.normalized_question));
+  if (negatives.requires_finance_utilization && !(hasFinanceEvidence(record) && hasUtilizationEvidence(record)) && !financeDirectoryException) return false;
+  const financeEvidence = negatives.requires_nonprofit_evidence ? hasFinanceEvidence(record) : hasPrimaryFinanceEvidence(record);
+  if (negatives.requires_financial_evidence && !financeEvidence && !financeDirectoryException) return false;
+  if (negatives.requires_financial_distress && !hasFinancialDistressEvidence(record, intent.normalized_question)) return false;
+  if (negatives.requires_state_community_join) {
+    const requestedLocal = intent.interpretation.geographies.some(geography => String(geography.id).toUpperCase() !== 'US');
+    const exactLocal = (record.geography?.jurisdictions ?? []).some(jurisdiction => intent.interpretation.geographies.some(geography => String(geography.id).toUpperCase() === String(jurisdiction).toUpperCase() && String(geography.id).toUpperCase() !== 'US'));
+    if (requestedLocal && !isHospitalGeneralSource(record) && !(exactLocal && hasNonprofitEvidence(record))) return false;
+  }
   if (localSourceRequest(intent, intent.normalized_question)) {
     const requested = new Set(intent.interpretation.geographies.map(geography => String(geography.id).toUpperCase()));
     if (!(record.geography?.jurisdictions ?? []).some(jurisdiction => requested.has(String(jurisdiction).toUpperCase()))) return false;
@@ -585,7 +783,9 @@ function scoreUnits(record, intent, negatives, config) {
   const units = new Set(record.unit_of_analysis ?? []);
   const requested = intent.interpretation.units_of_analysis;
   const explicit = new Set(intent.filters.units_of_analysis ?? []);
-  if (explicit.size && ![...explicit].some(unit => units.has(unit))) return { eligible: false, matched: [], components: [] };
+  if (explicit.size && ![...explicit].some(unit => units.has(unit))
+    && !(negatives.requires_funding_evidence || negatives.requires_capital_evidence || negatives.requires_rural_closure_sources || negatives.requires_closure_capacity)
+    && !hasFundingEvidence(record)) return { eligible: false, matched: [], components: [] };
   const matched = requested.filter(unit => units.has(unit.id));
   const components = matched.map(unit => ({ kind: 'unit_exact', value: config.priors.exact_unit, reason: `Record unit of analysis includes ${unit.label}.`, evidence_state: 'source_asserted' }));
   if (negatives.negativeUnits.has('county') && units.has('county') && ![...units].some(unit => ['hospital', 'facility', 'provider', 'health_system'].includes(unit))) {
@@ -703,7 +903,9 @@ function scoreCandidate({ record, fields, intent, concepts, queryTokens, queryPh
   const subjectRequired = intent.interpretation.subjects.length > 0;
   const explicitGeography = (intent.filters.geography?.codes ?? []).length > 0;
   const regional = regionalScore(record, intent, matchedConcepts);
-  const hospitalSpecificity = hospitalSpecificityScore(record, intent.normalized_question, matchedConcepts);
+  const hospitalSpecificity = (negatives.requires_closure_capacity || negatives.requires_rural_closure_sources)
+    ? { components: [], matched: [] }
+    : hospitalSpecificityScore(record, intent.normalized_question, matchedConcepts);
   if (hospitalSpecificity.exclude) return null;
   components.push(...regional.components, ...hospitalSpecificity.components);
   const activatedSemanticConcept = concepts.some(concept => !concept.id.startsWith('subject:'));

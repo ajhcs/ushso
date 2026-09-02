@@ -71,3 +71,23 @@ test('v2 keeps local-source and facility-role requests from emitting near-miss r
   assert.equal(nonprofitStatus.results[0].record_id, 'us-federal:irs-exempt-organizations-bmf');
   assert.ok(!nonprofitStatus.results.some(result => result.record_id === 'us-federal:irs-teos-990-xml'));
 });
+
+test('v2 applies role-specific source families before ranking', () => {
+  const facilitySource = engine().retrieve({ question: 'Which original federal source provides current hospital facility identifiers and status?', limit: 20 });
+  assert.deepEqual(facilitySource.results.map(result => result.record_id), ['obs:asset:cms-hospital-general-information']);
+
+  const capacity = engine().retrieve({ question: 'What data could show whether a county is losing healthcare capacity?', limit: 20 });
+  assert.deepEqual(new Set(capacity.results.map(result => result.record_id)), new Set([
+    'us-federal:cms-provider-of-services',
+    'us-federal:usda-rural-urban-continuum-codes'
+  ]));
+
+  const funding = engine().retrieve({ question: 'Which federal source can show grants and contracts received by a hospital or nonprofit?', limit: 20 });
+  assert.equal(funding.results[0].record_id, 'obs:asset:usaspending-awards');
+
+  const missingMaternityEvidence = engine().retrieve({ question: 'What data could help identify maternity-care deserts across states?', limit: 20 });
+  assert.equal(missingMaternityEvidence.results.length, 0);
+
+  const missingDebtEvidence = engine().retrieve({ question: 'Which public source can compare municipal hospital debt disclosures across states?', limit: 20 });
+  assert.equal(missingDebtEvidence.results.length, 0);
+});
