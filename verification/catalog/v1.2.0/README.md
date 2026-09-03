@@ -14,8 +14,8 @@ the current stage and all affected downstream gates are rerun.
 | 3 | Build a bounded reproducible corpus | PASS | unique IDs, three sub-8-MiB shards, hashes, zero merges |
 | 4 | Serve the successor without hiding totals | PASS | on-demand projection; returned/total counts separated; bounded runtime gate |
 | 5 | Wire inspection tools | PASS | Chrome discovered exactly eight tools and invoked all eight through native WebMCP |
-| 6 | Freeze one exact release candidate | PENDING FINAL RECEIPT | full suite, release audit, dry-run, WP0 receipt, exact commit |
-| 7 | Preview, canary, and promote | BLOCKED BY STAGE 6 | isolated hostname, remote preview receipt, explicit production authorization |
+| 6 | Freeze one exact release candidate | PASS | commit `ed7145d7…`, tree `a16fd1e3…`, independent exact-tree gate `20260903T230339Z-3585edda72cc` |
+| 7 | Preview, canary, and promote | PREVIEW PASS / PRODUCTION HOLD | isolated HTTPS preview and remote WebMCP pass; production unchanged pending explicit authorization |
 
 ## Stage 0 — baseline and fault isolation
 
@@ -80,17 +80,28 @@ Invocation performs no source network or payload operation.
 Automated acceptance covers registration, routing, schema parity, cancellation,
 strict response safety, and one safe response from every tool. Native Chrome
 149 then discovered exactly eight tools through its transitional
-`navigator.modelContext` surface and successfully invoked all eight against a
-secure local Worker preview. Every input schema was self-contained, the planner
-was absent, and every response preserved all six false execution-boundary flags.
-The machine-readable evidence is `native-webmcp-receipt.json`.
+`navigator.modelContext` surface and successfully invoked all eight against the
+isolated HTTPS staging Worker. Every input schema was self-contained, the
+planner was absent, and every response preserved all six false
+execution-boundary flags. The machine-readable evidence is
+`native-webmcp-receipt.json`.
 
 ## Stage 6 — exact candidate
 
-After all edits stop, rebuild generated artifacts, create the WP0 successor
-receipt, and run every listed gate on one exact tree. Commit that tree once and
-record its commit and tree IDs. Any subsequent edit invalidates Stage 6 and
-requires new receipts.
+The exact release candidate is commit
+`ed7145d7effb29dba35add5e81814337958c39f0`, tree
+`a16fd1e39aab0ddf8993476592c977543978284d`. Independent release-gate run
+`20260903T230339Z-3585edda72cc` captured that same tree and passed the clean
+bootstrap, complete product and aggregate test suites, build, local HTTP E2E,
+release audit, and Cloudflare artifact dry-run. The receipt SHA-256 is
+`f57919170ddf3f6bda28656b79f70b7ff61f73cb672c573680e623ace2b62564`.
+
+The first independent run remains recorded as a failure. It exposed that an
+asset-only Worker test depended on an ignored staged directory and therefore
+passed only after a prior build. The test fixture was corrected to read its
+committed corpus source, the affected receipts were rebuilt, and a fresh
+independent candidate was run. `stage6-release-gate.json` records both runs so
+the correction is auditable rather than relabeled as a first-pass success.
 
 ## Stage 7 — controlled promotion
 
@@ -101,10 +112,20 @@ oversized requests, and native WebMCP discovery/invocation. Promote only through
 an explicitly authorized canary. Roll back on any count, hash, latency, memory,
 safety, tool, or error-contract regression.
 
-The isolated upload uses `wrangler.staging.jsonc`, whose distinct Worker name is
-`ushso-catalog-recovery-v12` and which intentionally contains no custom routes.
-The production `wrangler.jsonc` and `npm run cf:deploy` remain outside this
-stage unless production promotion is explicitly authorized.
+The exact Stage 6 commit is deployed to the distinct, route-free Worker
+[`ushso-catalog-recovery-v12`](https://ushso-catalog-recovery-v12.clyons.workers.dev).
+The remote HTTP suite passed catalog counts, searches, every machine route,
+security headers, asset hashes, malformed and oversized guards, SPA routing,
+and CORS. Native Chrome then discovered and invoked all eight WebMCP tools on
+that HTTPS origin. The receipts are `staging-http-receipt.json`,
+`native-webmcp-receipt.json`, and `staging-deployment.json`.
+
+Production was queried after staging deployment and remains deployment
+`cc66a810-40b2-4ccf-98fb-b599482acb41`, version
+`374c623c-8946-4974-9739-11f4917baf1a`, at 100%. No production route,
+deployment, or traffic allocation changed. Canary and production promotion
+remain an explicit operational authorization boundary; they are not required
+to accept the isolated preview.
 
 ## Reproduction
 
@@ -126,7 +147,6 @@ npx wrangler deploy --dry-run
 
 `harvest:catalog` is the only command above that contacts authoritative source
 catalogs. The native WebMCP check requires a compatible Chrome debugging target
-at `http://127.0.0.1:8798` and a secure local Worker preview at
-`http://127.0.0.1:8799`; either URL can be overridden with
-`USHSO_CHROME_DEBUGGER_ORIGIN` or `USHSO_WEBMCP_PAGE_URL`. Preview upload and
-production promotion are deliberately not part of the local gate.
+at `http://127.0.0.1:8798`; its page URL can be selected with
+`USHSO_WEBMCP_PAGE_URL`. Staging upload and production promotion are deliberately
+not part of the local exact-tree gate.
