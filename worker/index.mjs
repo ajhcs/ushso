@@ -1,10 +1,12 @@
-import { createRetrievalEngine } from './retrieval-v1.1.0.mjs';
-import { applyLiveVerificationReceipt } from './live-verification.mjs';
+import { createRetrievalEngine } from './retrieval-v1.2.0.mjs';
+import { createWorkerMachineToolkit } from './machine-toolkit-adapter.mjs';
+import { createMachineToolkitRouter } from './machine-toolkit-router.mjs';
 import { createStaticPublicQueryService } from './static-composition.mjs';
+import { createStaticMachineToolkitRuntime } from './static-machine-toolkit-service.mjs';
 
 const MAX_REQUEST_BYTES = 20 * 1024;
-const CORPUS_BASE = '/corpus-v1.1.0';
-const LIVE_VERIFICATION_RECEIPT = '/verification-v0.1.0/live-verification-2026-08-30.json';
+const CORPUS_RESOURCE_BASE = '/corpus-v1.2.0';
+const CORPUS_BASE = `${CORPUS_RESOURCE_BASE}/corpus`;
 const catalogByAssets = new WeakMap();
 const SPA_ROUTES = new Set(['/', '/search', '/agents', '/sources', '/about', '/privacy', '/terms', '/contact']);
 const STATIC_PATHS = new Set(['/favicon.svg', '/observatory-lighthouse.png', '/state-readiness-v0.1.0.json', '/_headers']);
@@ -69,19 +71,22 @@ export async function loadCatalogFromAssets(request, env) {
   if (!env?.ASSETS || typeof env.ASSETS.fetch !== 'function') throw new Error('STATIC_ASSET_BINDING_REQUIRED');
   if (!catalogByAssets.has(env.ASSETS)) {
     catalogByAssets.set(env.ASSETS, (async () => {
-      const [recordsText, searchDocumentsText, routesText, vocabularyText, corpusText, verificationText] = await Promise.all([
-        assetText(request, env, `${CORPUS_BASE}/records.jsonl`),
-        assetText(request, env, `${CORPUS_BASE}/search-documents.jsonl`),
+      const [routesText, vocabularyText, corpusText] = await Promise.all([
         assetText(request, env, `${CORPUS_BASE}/join-routes.jsonl`),
-        assetText(request, env, `${CORPUS_BASE}/controlled-vocabulary.json`),
+        assetText(request, env, `${CORPUS_RESOURCE_BASE}/fixtures/controlled-vocabulary.json`),
         assetText(request, env, `${CORPUS_BASE}/corpus.json`),
-        assetText(request, env, LIVE_VERIFICATION_RECEIPT)
       ]);
-      const records = applyLiveVerificationReceipt(parseJsonl(recordsText, 'records'), JSON.parse(verificationText));
-      const searchDocuments = parseJsonl(searchDocumentsText, 'search-documents');
+      const corpus = JSON.parse(corpusText);
+      if (!Array.isArray(corpus.record_files) || !Array.isArray(corpus.search_document_files)) throw new Error('CORPUS_SHARD_MANIFEST_REQUIRED');
+      const [recordShards, searchDocumentShards] = await Promise.all([
+        Promise.all(corpus.record_files.map(file => assetText(request, env, `${CORPUS_BASE}/${file}`))),
+        Promise.all(corpus.search_document_files.map(file => assetText(request, env, `${CORPUS_BASE}/${file}`))),
+      ]);
+      const records = recordShards.flatMap((text, index) => parseJsonl(text, `records:${corpus.record_files[index]}`));
+      const searchDocuments = searchDocumentShards.flatMap((text, index) => parseJsonl(text, `search-documents:${corpus.search_document_files[index]}`));
       const joinRoutes = parseJsonl(routesText, 'join-routes');
       const vocabulary = JSON.parse(vocabularyText);
-      const corpus = JSON.parse(corpusText);
+      if (records.length !== corpus.record_count || searchDocuments.length !== corpus.search_document_count) throw new Error('CORPUS_SHARD_COUNT_MISMATCH');
       return {
         records,
         searchDocuments,
@@ -110,13 +115,13 @@ function isSpaPath(pathname) {
 }
 
 function isStaticPath(pathname) {
-  return STATIC_PATHS.has(pathname) || pathname.startsWith('/assets/') || pathname.startsWith('/corpus/') || pathname.startsWith('/corpus-v1.1.0/') || pathname.startsWith('/verification-v0.1.0/');
+  return STATIC_PATHS.has(pathname) || pathname.startsWith('/assets/') || pathname.startsWith('/corpus/') || pathname.startsWith('/corpus-v1.1.0/') || pathname.startsWith('/corpus-v1.2.0/') || pathname.startsWith('/contracts/') || pathname.startsWith('/verification-v0.1.0/');
 }
 
 function machineText(request, pathname) {
   const origin = new URL(request.url).origin;
   if (pathname === '/llms.txt') {
-    return `# United States Health Systems Observatory (USHSO)\n\nUSHSO routes people and machines to authoritative health-systems data sources. It does not host the underlying datasets.\n\nAPI contract: ${origin}/api/contract\nDiscovery: POST ${origin}/api/discover with application/json (maximum request size: 20 KiB)\nCatalog browse: GET ${origin}/api/catalog\nStable record: GET ${origin}/api/datasets/{record_id}\nHuman and agent guide: ${origin}/agents\n\nA zero-result response is not evidence that no source exists. Results describe indexed metadata and access routes; users must follow each source's requirements.\n`;
+    return `# United States Health Systems Observatory (USHSO)\n\nUSHSO routes people and machines to authoritative health-systems data sources. It does not host the underlying datasets.\n\nAPI contract: ${origin}/api/contract\nHuman discovery: POST ${origin}/api/discover with application/json (maximum request size: 20 KiB)\nCatalog browse: GET ${origin}/api/catalog\nStable human-facing record: GET ${origin}/api/datasets/{record_id}\nMachine toolkit: eight read-only inspection routes under ${origin}/api/machine/v1/\nHuman and agent guide: ${origin}/agents\n\nVerification means the first-party catalog metadata entry was observed live for the published snapshot. It does not assert dataset-payload availability, schema completeness, authorization, geographic coverage, or analytic fitness. A zero-result response is not evidence that no source exists.\n`;
   }
   if (pathname === '/robots.txt') return `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`;
   if (pathname === '/sitemap.xml') {
@@ -139,6 +144,20 @@ export function createWorker({
 
       if (url.pathname.startsWith('/api/') && request.method === 'OPTIONS') return corsPreflightResponse();
 
+      if (url.pathname.startsWith('/api/machine/v1/')) {
+        try {
+          const catalog = await loadCatalog(request, env);
+          const runtime = createStaticMachineToolkitRuntime(catalog);
+          const toolkit = createWorkerMachineToolkit({ operations: runtime.operations, responseContext: runtime.context });
+          const router = createMachineToolkitRouter({ toolkit, expectedOrigin: url.origin });
+          return await router.handle(request)
+            ?? errorResponse(404, 'api_not_found', 'No machine-toolkit route exists at this path.');
+        } catch (error) {
+          if (error?.name === 'AbortError') throw error;
+          return errorResponse(503, 'machine_toolkit_unavailable', 'The published machine toolkit could not safely serve this request.');
+        }
+      }
+
       if (url.pathname === '/api/health') {
         if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
         try {
@@ -152,7 +171,7 @@ export function createWorker({
       if (url.pathname === '/api/contract') {
         if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
         try {
-          const response = await env.ASSETS.fetch(new Request(new URL(`${CORPUS_BASE}/webmcp-tool.json`, request.url)));
+          const response = await env.ASSETS.fetch(new Request(new URL(`${CORPUS_RESOURCE_BASE}/webmcp-tool.json`, request.url)));
           if (!response.ok) throw new Error('contract unavailable');
           return jsonResponse(await response.json(), { cacheControl: 'public, max-age=300', head });
         } catch {

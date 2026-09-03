@@ -1,16 +1,16 @@
 # USHSO machine-toolkit foundation
 
-This private package is the additive WP12 foundation for
+This package is the additive WP12 foundation for
 `observatory-machine-toolkit.v1.0.0`. It provides one injected canonical service
 interface, transport adapters for JSON API and WebMCP, strict runtime input and
 safety-boundary validation, semantic snapshots, the frozen tool descriptors,
 and lifecycle-aware WebMCP registration.
 
-It does not activate a public capability. Every value in
-`PUBLIC_CAPABILITY_FLAGS` is `false`, the browser successor is not imported by
-the application entry point, and the candidate Worker router is not imported by
-`worker/index.mjs`. `plan_research` is additionally denied in code and cannot be
-enabled by configuration.
+The v1.2 successor activates exactly eight public read-only inspection
+capabilities in `PUBLIC_CAPABILITY_FLAGS`. The browser entry point registers
+them when `document.modelContext` exists, and the Worker exposes equivalent
+same-origin JSON routes under `/api/machine/v1`. `plan_research` is denied in
+code and cannot be enabled by caller configuration.
 
 ## Canonical service boundary
 
@@ -56,25 +56,25 @@ workflow, identity mutation, or payload-acquisition code.
 
 ## Registration and routing
 
-`registerObservatoryToolkitWebMcp` has no activation argument and therefore
-registers zero public tools in this candidate. The explicitly named local-
-verification helper uses a fixed eight-inspection-tool set, accepts no caller-
-supplied capability flags, and cannot include the planner. All enabled
-candidate registrations share one `AbortSignal`, propagate caller cancellation,
-and unregister as a set.
+`registerObservatoryToolkitWebMcp` has no activation argument and registers the
+fixed eight-inspection-tool public set. It accepts no caller-supplied capability
+flags and cannot include the planner. All registrations share one
+`AbortSignal`, propagate caller cancellation, and unregister as a set. The web
+application supplies self-contained copies of the frozen input schemas so a
+browser agent does not need to resolve external JSON Schema references.
 
-The additive Worker router similarly defaults to the all-false public manifest
-and rejects caller activation fields. Its separately named local-verification
-router has the same fixed inspection set and provides bounded JSON streaming, exact methods,
-same-origin enforcement, safe errors, and request cancellation without adding a
-Worker entry point or binding.
+The Worker router uses the same reviewed public flags and rejects caller
+activation fields. It provides bounded JSON input handling, exact methods,
+same-origin enforcement, safe errors, and request cancellation. The static
+service reads only the pinned catalog already loaded by the Worker; tool
+invocation cannot perform source acquisition or payload retrieval.
 
 ## Legacy decision
 
 `observatory.discover_sources` remains untouched for v1 compatibility. The WP12
 audit found that its current descriptor permits limits above the v1 toolkit cap
 and does not publish complete nested collection/byte bounds or the new envelope.
-The new `versioned_gated_alias` therefore remains unregistered. The safe
+The legacy alias therefore remains unregistered. The safe
 translation subset maps `question` to `search_assets.research_need`, defaults to
 ten, rejects limits above twenty rather than clipping, and rejects legacy filters
 whose canonical meaning has not been reviewed.
@@ -89,5 +89,6 @@ npm test --prefix contracts/machine-toolkit/v1.0.0
 npm run verify --prefix packages/machine-toolkit
 ```
 
-No command performs a live request, deployment, database/R2 operation, or public
-registration.
+These commands use mocks and pinned fixtures. Native browser discovery and
+invocation must additionally be demonstrated in a WebMCP-capable secure browser
+against an isolated deployment before production promotion.

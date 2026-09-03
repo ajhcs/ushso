@@ -39,7 +39,7 @@ export function makeFixtureDescriptor({
     allowed_hosts: ['catalog.example.gov'], redirect_policy: redirectPolicy,
     endpoints: [
       { endpoint_id: 'endpoint_fixture_catalog', base_url: 'https://catalog.example.gov', target_class: 'collection', routes: [
-        route('route_fixture_catalog', 'catalog_metadata', 'GET', '/data.json', ['cursor', 'start', 'rows', 'limit', 'offset'], ['catalog_collection', 'catalog_item_record']),
+        route('route_fixture_catalog', 'catalog_metadata', 'GET', '/data.json', ['cursor', 'start', 'rows', 'limit', 'page'], ['catalog_collection', 'catalog_item_record']),
       ] },
       { endpoint_id: 'endpoint_fixture_item', base_url: 'https://catalog.example.gov', target_class: 'exact_item', routes: [
         route('route_fixture_item', 'catalog_metadata', 'GET', '/items/{id}', ['id'], ['catalog_item_record']),

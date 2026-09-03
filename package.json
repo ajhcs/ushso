@@ -18,6 +18,10 @@
     "verification/testing/*/v*"
   ],
   "scripts": {
+    "harvest:catalog": "node scripts/harvest-live-catalog.mjs",
+    "test:catalog": "node --test tests/live-catalog-candidate.test.mjs tests/static-machine-toolkit.test.mjs",
+    "verify:catalog-runtime": "npm run build && node --expose-gc scripts/check-live-catalog-runtime.mjs",
+    "verify:webmcp-native": "node scripts/check-webmcp-native.mjs",
     "import:national": "node scripts/import-national-federal-evidence.mjs",
     "import:readiness": "node scripts/import-state-readiness.mjs",
     "build:national": "node packages/retrieval/tools/build-national-successor.mjs --fixture",
@@ -48,6 +52,7 @@
     "cf:dry-run:artifact": "node scripts/run-wrangler.mjs deploy --dry-run --outdir .wrangler-dry-run",
     "cf:dry-run": "npm run build && npm run cf:dry-run:artifact",
     "cf:dev": "node scripts/run-wrangler.mjs dev --local --port 8787",
+    "cf:deploy:staging": "npm run build && node scripts/run-wrangler.mjs deploy --config wrangler.staging.jsonc",
     "cf:deploy": "npm run build && node scripts/run-wrangler.mjs deploy"
   },
   "devDependencies": {

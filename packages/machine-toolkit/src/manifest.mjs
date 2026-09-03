@@ -50,14 +50,12 @@ export const TOOL_DEFINITIONS = Object.freeze(rows.map(([capability, toolName, t
 export const TOOL_BY_CAPABILITY = new Map(TOOL_DEFINITIONS.map((tool) => [tool.capability, tool]));
 export const TOOL_BY_NAME = new Map(TOOL_DEFINITIONS.map((tool) => [tool.toolName, tool]));
 
-// These flags are the executable public truth. They remain false until a later,
-// reviewed release changes the frozen capability manifest after every gate passes.
 export const PUBLIC_CAPABILITY_FLAGS = Object.freeze(Object.fromEntries(
-  TOOL_DEFINITIONS.map((tool) => [tool.capability, false])
+  TOOL_DEFINITIONS.map((tool) => [tool.capability, tool.capability !== 'plan_research'])
 ));
 
 export const REGISTRATION_POLICY = Object.freeze({
-  enabledToolCount: 0,
+  enabledToolCount: 8,
   sameOriginOnly: true,
   singleAbortSignal: true,
   cleanUnregisterAll: true,

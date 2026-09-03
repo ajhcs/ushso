@@ -1,0 +1,26 @@
+{
+  "contract_version": "observatory-webmcp-tool.v1.2.0",
+  "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+  "catalog_version": "1.2.0",
+  "surface": "document.modelContext.registerTool",
+  "compatibility_surfaces": ["navigator.modelContext.registerTool"],
+  "registration_lifecycle": "AbortSignal",
+  "same_origin_json_api_prefix": "/api/machine/v1",
+  "read_only": true,
+  "source_network_allowed_at_invocation": false,
+  "payload_retrieval_allowed": false,
+  "enabled_tool_count": 8,
+  "tools": [
+    { "capability": "search_assets", "name": "observatory.search_assets", "method": "POST", "route": "/api/machine/v1/search-assets", "input_schema": "/contracts/machine-toolkit/v1.0.0/schemas/search-assets-input.schema.json", "registration_state": "active" },
+    { "capability": "get_asset", "name": "observatory.get_asset", "method": "GET", "route": "/api/machine/v1/assets/{record_id}", "input_schema": "/contracts/machine-toolkit/v1.0.0/schemas/get-asset-input.schema.json", "registration_state": "active" },
+    { "capability": "get_access_plan", "name": "observatory.get_access_plan", "method": "GET", "route": "/api/machine/v1/assets/{record_id}/access-plan", "input_schema": "/contracts/machine-toolkit/v1.0.0/schemas/get-access-plan-input.schema.json", "registration_state": "active" },
+    { "capability": "get_retrieval_recipe", "name": "observatory.get_retrieval_recipe", "method": "GET", "route": "/api/machine/v1/assets/{record_id}/retrieval-recipe", "input_schema": "/contracts/machine-toolkit/v1.0.0/schemas/get-retrieval-recipe-input.schema.json", "registration_state": "active" },
+    { "capability": "get_variables", "name": "observatory.get_variables", "method": "GET", "route": "/api/machine/v1/assets/{record_id}/variables", "input_schema": "/contracts/machine-toolkit/v1.0.0/schemas/get-variables-input.schema.json", "registration_state": "active" },
+    { "capability": "get_join_routes", "name": "observatory.get_join_routes", "method": "GET", "route": "/api/machine/v1/join-routes", "input_schema": "/contracts/machine-toolkit/v1.0.0/schemas/get-join-routes-input.schema.json", "registration_state": "active" },
+    { "capability": "compare_assets", "name": "observatory.compare_assets", "method": "POST", "route": "/api/machine/v1/compare-assets", "input_schema": "/contracts/machine-toolkit/v1.0.0/schemas/compare-assets-input.schema.json", "registration_state": "active" },
+    { "capability": "get_coverage_status", "name": "observatory.get_coverage_status", "method": "GET", "route": "/api/machine/v1/coverage-status", "input_schema": "/contracts/machine-toolkit/v1.0.0/schemas/get-coverage-status-input.schema.json", "registration_state": "active" }
+  ],
+  "disabled_tools": [
+    { "capability": "plan_research", "name": "observatory.plan_research", "registration_state": "disabled_pending_gates" }
+  ]
+}

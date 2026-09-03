@@ -168,12 +168,12 @@ function parseGetInput(capability, recordId, parameters) {
 }
 
 function matchRoute(pathname) {
-  if (pathname === '/api/discover') return { capability: 'search_assets', recordId: null };
-  if (pathname === '/api/compare-assets') return { capability: 'compare_assets', recordId: null };
-  if (pathname === '/api/plan') return { capability: 'plan_research', recordId: null };
-  if (pathname === '/api/join-routes') return { capability: 'get_join_routes', recordId: null };
-  if (pathname === '/api/coverage/status') return { capability: 'get_coverage_status', recordId: null };
-  const match = /^\/api\/datasets\/([^/]+)(?:\/(access-plan|retrieval-recipe|variables))?$/u.exec(pathname);
+  if (pathname === '/api/machine/v1/search-assets') return { capability: 'search_assets', recordId: null };
+  if (pathname === '/api/machine/v1/compare-assets') return { capability: 'compare_assets', recordId: null };
+  if (pathname === '/api/machine/v1/plan-research') return { capability: 'plan_research', recordId: null };
+  if (pathname === '/api/machine/v1/join-routes') return { capability: 'get_join_routes', recordId: null };
+  if (pathname === '/api/machine/v1/coverage-status') return { capability: 'get_coverage_status', recordId: null };
+  const match = /^\/api\/machine\/v1\/assets\/([^/]+)(?:\/(access-plan|retrieval-recipe|variables))?$/u.exec(pathname);
   if (!match) return null;
   let recordId;
   try { recordId = decodeURIComponent(match[1]); }

@@ -124,6 +124,7 @@ export function SearchResultsPage() {
   const countParts = bounds
     ? formatDiscoveryCountSummary({
       returnedCount: bounds.returnedCount,
+      totalMatches: bounds.totalMatches,
       hasMore: bounds.hasMore,
       filteredRecordCount: filteredRecords.length,
       filtersActive: state.filters.length > 0,

@@ -49,18 +49,17 @@ describe('result count copy', () => {
   it('names the bounded response instead of implying a complete catalog', () => {
     expect(formatDiscoveryCountSummary({
       returnedCount: 50,
+      totalMatches: 240,
       hasMore: true,
       filteredRecordCount: 50,
       filtersActive: false,
-    })).toEqual([
-      '50 returned records',
-      'more matches exist',
-    ])
+    })).toEqual(['50 of 240 matching records returned'])
   })
 
   it('distinguishes client-side filters from the backend bound', () => {
     expect(formatDiscoveryCountSummary({
       returnedCount: 50,
+      totalMatches: 240,
       hasMore: true,
       filteredRecordCount: 6,
       filtersActive: true,

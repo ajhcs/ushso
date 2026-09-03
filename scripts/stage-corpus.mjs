@@ -25,9 +25,37 @@ const files = [
   ['readiness/v0.1.0/state-readiness.json', 'state-readiness-v0.1.0.json']
 ];
 
+async function filesBelow(directory) {
+  const result = [];
+  for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
+    const absolute = path.join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...await filesBelow(absolute));
+    else result.push(absolute);
+  }
+  return result;
+}
+
+const liveVersionRoot = path.join(sourceRoot, 'versions/v1.2.0');
+for (const sourcePath of await filesBelow(liveVersionRoot)) {
+  const relative = path.relative(liveVersionRoot, sourcePath).replaceAll('\\', '/');
+  files.push([`versions/v1.2.0/${relative}`, `corpus-v1.2.0/${relative}`]);
+}
+files.push([
+  null,
+  'corpus-v1.2.0/webmcp-tool.json',
+  path.join(root, 'packages/machine-toolkit/public-webmcp-tool.json'),
+]);
+const toolkitSchemaRoot = path.join(root, 'contracts/machine-toolkit/v1.0.0/schemas');
+for (const sourcePath of await filesBelow(toolkitSchemaRoot)) {
+  const relative = path.relative(toolkitSchemaRoot, sourcePath).replaceAll('\\', '/');
+  files.push([null, `contracts/machine-toolkit/v1.0.0/schemas/${relative}`, sourcePath]);
+}
+
 await fs.mkdir(targetRoot, { recursive: true });
-for (const [source, target] of files) {
-  const sourcePath = path.join(sourceRoot, source);
+await fs.rm(path.join(targetRoot, 'corpus-v1.2.0'), { recursive: true, force: true });
+await fs.rm(path.join(targetRoot, 'contracts/machine-toolkit/v1.0.0/schemas'), { recursive: true, force: true });
+for (const [source, target, absoluteSource = null] of files) {
+  const sourcePath = absoluteSource ?? path.join(sourceRoot, source);
   const targetPath = path.join(targetRoot, target);
   await fs.mkdir(path.dirname(targetPath), { recursive: true });
   const content = await fs.readFile(sourcePath);

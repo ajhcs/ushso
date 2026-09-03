@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
 import { assertDiscoveryResult } from '../providers/discoveryProvider'
 import { adaptDiscoveryResponse } from './catalogAdapter'
+import { buildResearcherGuidance } from './researcherGuidance'
 
 const acceptedResponse = await loadAcceptedDiscoveryFixture()
 assertDiscoveryResult(acceptedResponse)
@@ -51,6 +52,16 @@ describe('canonical discovery response adapter', () => {
     expect(first.grain).toContain(first.reportingUnit)
     expect(first.accessStatusLabel).toBeTruthy()
     expect(first.categories.length).toBeGreaterThan(0)
+  })
+
+  it('does not reinterpret public catalog visibility as public payload access', () => {
+    const catalogOnly = structuredClone(acceptedResponse)
+    catalogOnly.results[0].record.access.status = 'public_catalog'
+    catalogOnly.results[0].record.access.mechanisms = ['unknown']
+    const first = adaptDiscoveryResponse(catalogOnly).records[0]
+    expect(first.accessStatus).toBe('Public catalog metadata; payload access unresolved')
+    expect(first.facetValues.access).toEqual(['catalog-metadata-only'])
+    expect(buildResearcherGuidance(first).accessPlan.accessClass).toBe('unknown')
   })
 
   it('builds stable details routes that do not depend on the discovery question', () => {

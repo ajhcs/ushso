@@ -41,3 +41,33 @@ Before activation on 2026-08-30:
 Do not delete or mutate the retained apex tunnel, `www` CNAME, or former origin as
 part of a Worker rollback. Cloudflare credentials and preview tokens must remain
 outside the repository.
+
+## v1.2 successor promotion gate
+
+The 3,434-record live-catalog successor is not promoted merely because it
+builds. Promotion must proceed in this order:
+
+1. Re-run `npm run test:catalog` and `npm run verify:catalog-runtime`; require
+   exact source counts, hashes, zero payload downloads, zero identity merges,
+   bounded shards, and the Worker memory/latency limits.
+2. Run the complete repository, web, Worker, connector, immutable-contract,
+   WP12 activation, production-build, release-audit, and Wrangler dry-run gates
+   against one exact commit.
+3. Upload that commit to an isolated preview hostname with no production routes.
+   Verify health, contract, catalog totals, representative searches, all eight
+   JSON inspection routes, error behavior, and static asset hashes.
+4. In a secure WebMCP-capable browser, prove native discovery of exactly eight
+   tools, prove at least one successful invocation per tool, and prove
+   `observatory.plan_research` is absent. Prefer `document.modelContext`; the
+   transitional `navigator.modelContext` surface remains supported for earlier
+   Chromium implementations.
+5. Only after those receipts agree may an explicitly authorized canary receive
+   production traffic. Any count, hash, safety, memory, route, schema, or native
+   invocation mismatch stops promotion and keeps the previous Worker version
+   available for rollback.
+
+The isolated successor uses `wrangler.staging.jsonc` and Worker name
+`ushso-catalog-recovery-v12`. That configuration has no custom routes, so it
+cannot attach the candidate to `ushso.org` or `www.ushso.org`. Production still
+uses `wrangler.jsonc`; never substitute the staging upload for an authorized
+production canary and release.

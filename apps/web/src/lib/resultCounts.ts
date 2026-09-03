@@ -9,6 +9,7 @@ export function discoveryBounds(result: DiscoveryResult) {
 
 export function formatDiscoveryCountSummary(input: {
   returnedCount: number
+  totalMatches: number
   hasMore: boolean
   filteredRecordCount: number
   filtersActive: boolean
@@ -18,6 +19,6 @@ export function formatDiscoveryCountSummary(input: {
     return [`${input.filteredRecordCount} of ${input.returnedCount} ${recordNoun} match these filters`]
   }
   return input.hasMore
-    ? [`${input.returnedCount} ${recordNoun}`, 'more matches exist']
+    ? [`${input.returnedCount} of ${input.totalMatches} matching records returned`]
     : [`${input.returnedCount} ${recordNoun}`]
 }

@@ -38,14 +38,18 @@ test('tool objects use frozen read-only/untrusted descriptors', () => {
   assert.ok(tools.every((tool) => tool.inputSchema.$ref.startsWith('https://ushso.org/contracts/machine-toolkit/v1.0.0/')));
 });
 
-test('all-false public activation registers no tools', async () => {
+test('public activation registers eight inspection tools and excludes the planner', async () => {
   const registered = [];
   const handle = await registerObservatoryToolkitWebMcp({
     modelContext: { registerTool(tool) { registered.push(tool); } },
     toolkit
   });
-  assert.deepEqual(registered, []);
-  assert.deepEqual(handle.names, []);
+  assert.equal(registered.length, 8);
+  assert.deepEqual(handle.names, [
+    'observatory.search_assets', 'observatory.get_asset', 'observatory.get_access_plan',
+    'observatory.get_retrieval_recipe', 'observatory.get_variables', 'observatory.get_join_routes',
+    'observatory.compare_assets', 'observatory.get_coverage_status'
+  ]);
   await handle.unregister();
   assert.equal(handle.signal.aborted, true);
 });

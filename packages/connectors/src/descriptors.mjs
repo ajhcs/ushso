@@ -122,7 +122,7 @@ export const CDC_SOCRATA_DESCRIPTOR = descriptor({
   hosts: ['data.cdc.gov'], namespace: 'cdc.socrata.views', strategy: 'modified_at_native_id', schemaMetadata: true,
   endpoints: [
     { endpoint_id: 'endpoint_cdc_socrata_metadata', base_url: 'https://data.cdc.gov', target_class: 'collection', routes: [
-      route('route_cdc_socrata_inventory', 'catalog_metadata', 'GET', '/api/views/metadata/v1', ['limit', 'offset'], ['catalog_collection', 'catalog_item_record']),
+      route('route_cdc_socrata_inventory', 'catalog_metadata', 'GET', '/api/views/metadata/v1', ['limit', 'page'], ['catalog_collection', 'catalog_item_record']),
     ] },
     { endpoint_id: 'endpoint_cdc_socrata_schema', base_url: 'https://data.cdc.gov', target_class: 'exact_item', routes: [
       route('route_cdc_socrata_view_schema', 'schema', 'GET', '/api/views/{id}', ['id'], ['schema_description', 'data_dictionary']),
@@ -228,7 +228,7 @@ export const PENNSYLVANIA_SOCRATA_DESCRIPTOR = descriptor({
   hosts: ['data.pa.gov'], namespace: 'pa.socrata.views', strategy: 'modified_at_native_id', schemaMetadata: true,
   endpoints: [
     { endpoint_id: 'endpoint_pa_socrata_inventory', base_url: 'https://data.pa.gov', target_class: 'collection', routes: [
-      route('route_pa_socrata_inventory', 'catalog_metadata', 'GET', '/api/views/metadata/v1', ['limit', 'offset'], ['catalog_collection', 'catalog_item_record']),
+      route('route_pa_socrata_inventory', 'catalog_metadata', 'GET', '/api/views/metadata/v1', ['limit', 'page'], ['catalog_collection', 'catalog_item_record']),
     ] },
     { endpoint_id: 'endpoint_pa_socrata_schema', base_url: 'https://data.pa.gov', target_class: 'exact_item', routes: [
       route('route_pa_socrata_schema', 'schema', 'GET', '/api/views/{id}', ['id'], ['schema_description', 'data_dictionary']),

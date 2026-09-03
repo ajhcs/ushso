@@ -4,7 +4,7 @@ export class SocrataCatalogConnector extends CatalogConnectorBase {
   initialRequest(_plan, resume = null) {
     return resume?.nextRequest ?? {
       endpointId: this.endpointId, templateId: this.templateId, purpose: 'catalog_metadata',
-      method: 'GET', targetClass: 'collection', pathParameters: {}, query: { limit: this.pageSize, offset: 0 },
+      method: 'GET', targetClass: 'collection', pathParameters: {}, query: { limit: this.pageSize, page: 1 },
     };
   }
 
@@ -30,15 +30,15 @@ export class SocrataCatalogConnector extends CatalogConnectorBase {
   parsePage({ parsed, capture, request }) {
     const records = this.assertRecordCount(parsed);
     const limit = Number(request.query?.limit ?? this.pageSize);
-    const offset = Number(request.query?.offset ?? 0);
-    const nextOffset = offset + records.length;
+    const page = Number(request.query?.page ?? 1);
+    const nextPage = page + 1;
     return {
       observations: records.map((item, index) => this.nativeObservation(item, index, capture)),
       nextRequest: records.length === limit ? {
         endpointId: this.endpointId, templateId: this.templateId, purpose: 'catalog_metadata',
-        method: 'GET', targetClass: 'pagination_cursor', pathParameters: {}, query: { limit, offset: nextOffset },
+        method: 'GET', targetClass: 'pagination_cursor', pathParameters: {}, query: { limit, page: nextPage },
       } : null,
-      cursor: records.length === limit ? String(nextOffset) : null,
+      cursor: records.length === limit ? String(nextPage) : null,
     };
   }
 

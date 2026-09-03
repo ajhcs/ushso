@@ -193,13 +193,17 @@ test('legacy static coverage is typed unknown and planner fails closed', async (
   });
 });
 
-test('explicit static rollback entry requires only the ASSETS binding', async () => {
+test('static asset-only entry requires only the ASSETS binding', async () => {
   const publicRoot = path.join(root, 'apps/web/public');
+  const catalogRoot = path.join(root, 'packages/retrieval/versions/v1.2.0');
   const assets = {
     async fetch(assetRequest) {
       const pathname = new URL(assetRequest.url).pathname;
       try {
-        const bytes = await fs.readFile(path.join(publicRoot, pathname.replace(/^\//, '')));
+        const sourcePath = pathname.startsWith('/corpus-v1.2.0/')
+          ? path.join(catalogRoot, pathname.slice('/corpus-v1.2.0/'.length))
+          : path.join(publicRoot, pathname.replace(/^\//, ''));
+        const bytes = await fs.readFile(sourcePath);
         return new Response(bytes, { status: 200 });
       } catch (error) {
         if (error?.code === 'ENOENT') return new Response('not found', { status: 404 });
@@ -216,15 +220,15 @@ test('explicit static rollback entry requires only the ASSETS binding', async ()
   const response = await staticWorker.fetch(request('https://ushso.org/api/catalog?limit=1'), env);
   const result = await response.json();
   assert.equal(response.status, 200);
-  assert.equal(result.corpus.record_count, 157);
+  assert.equal(result.corpus.record_count, 3434);
   assert.equal(result.result_count, 1);
 });
 
-test('static SearchBackend remains pinned to the promoted production retrieval module', async () => {
+test('historical v1.1 retrieval remains immutable while the Worker selects v1.2', async () => {
   const runtime = await fs.readFile(path.join(root, 'worker/retrieval-v1.1.0.mjs'));
   const digest = createHash('sha256').update(runtime).digest('hex');
   assert.equal(digest, 'fe6228e911f9d6d2ec0160f7d5eecdcaf571465f783515195f4e768a3b7f7363');
   const workerSource = await fs.readFile(path.join(root, 'worker/index.mjs'), 'utf8');
-  assert.match(workerSource, /from ['"]\.\/retrieval-v1\.1\.0\.mjs['"]/);
+  assert.match(workerSource, /from ['"]\.\/retrieval-v1\.2\.0\.mjs['"]/);
   assert.doesNotMatch(workerSource, /packages\/retrieval\/tools\/retrieval-core/);
 });

@@ -31,7 +31,15 @@ const engine = {
     return { ...result, query: { ...result.query, question: input.question } };
   }
 };
-const catalog = { records: [firstRecord], searchDocuments: [{}], joinRoutes: [], corpus: { corpus_id: 'fixture', corpus_version: '1.1.0' }, engine };
+const catalog = {
+  records: [firstRecord], searchDocuments: [{}], joinRoutes: [], engine,
+  corpus: {
+    corpus_id: 'fixture', corpus_version: '1.2.0', record_count: 1, search_document_count: 1,
+    join_route_count: 0, source_slices: { [firstRecord.identity.source.source_id]: 1 },
+    manifest_sha256: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+    publication: { generation: 'generation.worker-test', observed_at: '2026-09-03T12:00:00Z' },
+  },
+};
 const worker = createWorker({ loadEngine: async () => engine, loadCatalog: async () => catalog });
 const env = { ASSETS: { fetch: async () => new Response('{}', { status: 200 }) } };
 
@@ -81,6 +89,19 @@ test('catalog browsing and dataset dereferencing do not depend on a question', a
   assert.equal(direct.status, 200);
   assert.equal((await direct.json()).results[0].record_id, firstRecord.record_id);
   assert.equal((await worker.fetch(new Request('https://ushso.org/api/datasets/not-present'), env)).status, 404);
+});
+
+test('versioned machine routes return strict toolkit envelopes without touching legacy routes', async () => {
+  const response = await worker.fetch(new Request(
+    `https://ushso.org/api/machine/v1/assets/${encodeURIComponent(firstRecord.record_id)}?generation=generation.worker-test`,
+  ), env);
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.tool_contract_version, 'observatory-machine-toolkit.v1.0.0');
+  assert.equal(body.capability, 'get_asset');
+  assert.equal(body.transport_adapter, 'json_api');
+  assert.equal(body.ok, true);
+  assert.deepEqual(Object.values(body.truth_boundary), Array(6).fill(false));
 });
 
 test('serves machine files with their real types and gives unknown pages HTTP 404', async () => {

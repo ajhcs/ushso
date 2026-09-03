@@ -26,13 +26,21 @@ function linkSignals(signals) {
   };
 }
 
-export function createWebMcpToolset(toolkit, { lifecycleSignal } = {}) {
+function inputSchemaFor(definition, inputSchemas) {
+  const schema = inputSchemas?.[definition.capability] ?? definition.inputSchema;
+  if (!schema || typeof schema !== 'object' || Array.isArray(schema)) {
+    throw new TypeError(`MACHINE_TOOLKIT_INPUT_SCHEMA_REQUIRED:${definition.capability}`);
+  }
+  return schema;
+}
+
+export function createWebMcpToolset(toolkit, { lifecycleSignal, inputSchemas } = {}) {
   if (!toolkit || typeof toolkit.invokeWebMcp !== 'function') throw new TypeError('MACHINE_TOOLKIT_ADAPTER_REQUIRED');
   return Object.freeze(TOOL_DEFINITIONS.map((definition) => Object.freeze({
     name: definition.toolName,
     title: definition.title,
     description: definition.description,
-    inputSchema: definition.inputSchema,
+    inputSchema: inputSchemaFor(definition, inputSchemas),
     annotations: definition.annotations,
     async execute(input, options = {}) {
       const linked = linkSignals([lifecycleSignal, options.signal]);
@@ -71,7 +79,8 @@ async function registerToolset({
   modelContext,
   toolkit,
   activationFlags,
-  lifecycleSignal
+  lifecycleSignal,
+  inputSchemas
 }) {
   if (!modelContext || typeof modelContext.registerTool !== 'function') return null;
   const flags = assertedActivationFlags(activationFlags);
@@ -79,7 +88,7 @@ async function registerToolset({
   const externalAbort = () => lifecycle.abort(lifecycleSignal.reason);
   if (lifecycleSignal?.aborted) externalAbort();
   else lifecycleSignal?.addEventListener('abort', externalAbort, { once: true });
-  const tools = createWebMcpToolset(toolkit, { lifecycleSignal: lifecycle.signal });
+  const tools = createWebMcpToolset(toolkit, { lifecycleSignal: lifecycle.signal, inputSchemas });
   const registrations = [];
   try {
     for (const tool of tools) {
@@ -113,19 +122,19 @@ export function registerObservatoryToolkitWebMcp(options) {
   if (Object.hasOwn(options ?? {}, 'activationFlags') || Object.hasOwn(options ?? {}, 'candidateActivation')) {
     throw new TypeError('MACHINE_TOOLKIT_CALLER_ACTIVATION_FORBIDDEN');
   }
-  const { modelContext, toolkit, lifecycleSignal } = options ?? {};
+  const { modelContext, toolkit, lifecycleSignal, inputSchemas } = options ?? {};
   // The public registration entry point has no activation parameter. Promotion
   // therefore requires a reviewed code/manifest change, not caller input.
-  return registerToolset({ modelContext, toolkit, activationFlags: PUBLIC_CAPABILITY_FLAGS, lifecycleSignal });
+  return registerToolset({ modelContext, toolkit, activationFlags: PUBLIC_CAPABILITY_FLAGS, lifecycleSignal, inputSchemas });
 }
 
 export function registerObservatoryToolkitWebMcpCandidateForLocalVerification(options) {
   if (Object.hasOwn(options ?? {}, 'activationFlags') || Object.hasOwn(options ?? {}, 'candidateActivation')) {
     throw new TypeError('MACHINE_TOOLKIT_CALLER_ACTIVATION_FORBIDDEN');
   }
-  const { modelContext, toolkit, lifecycleSignal } = options ?? {};
+  const { modelContext, toolkit, lifecycleSignal, inputSchemas } = options ?? {};
   const activationFlags = Object.fromEntries(
     Object.keys(PUBLIC_CAPABILITY_FLAGS).map((capability) => [capability, capability !== 'plan_research'])
   );
-  return registerToolset({ modelContext, toolkit, activationFlags, lifecycleSignal });
+  return registerToolset({ modelContext, toolkit, activationFlags, lifecycleSignal, inputSchemas });
 }

@@ -60,7 +60,7 @@ function grainDisplay(record: ObservatoryRecord) {
 
 const ACCESS_STATUS_LABELS: Record<ObservatoryRecord['access']['status'], string> = {
   public_direct: 'Public direct',
-  public_catalog: 'Public catalog',
+  public_catalog: 'Public catalog metadata; payload access unresolved',
   registration_required: 'Registration required',
   application_required: 'Application required',
   dua_required: 'Data-use agreement required',
@@ -191,7 +191,7 @@ function geographyFacets(record: ObservatoryRecord) {
 function accessFacets(record: ObservatoryRecord) {
   const values = new Set<string>()
   const status = record.access.status
-  if (status === 'public_catalog') values.add('public-report')
+  if (status === 'public_catalog') values.add('catalog-metadata-only')
   if (status === 'public_direct' || record.access.mechanisms.some((value) => ['api', 'bulk_download', 'web_download'].includes(value))) values.add('open-data-api')
   if (status === 'registration_required' || status === 'application_required') values.add('application-required')
   if (status === 'licensed_paid' || record.access.requirements.includes('payment') || record.access.requirements.includes('license_agreement')) values.add('fee-license')
@@ -257,7 +257,7 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
     variablesCodebook: variables.summary ?? variables.expectedArtifacts.join(' · '),
     verification,
     variableDetails: variables,
-    accessStatus: sentenceCase(record.access.status),
+    accessStatus: accessStatusLabel(record),
     accessOptions: accessOptions(record),
     categories: topics,
     sourceName: record.identity.source.name,
