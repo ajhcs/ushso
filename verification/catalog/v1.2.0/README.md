@@ -15,7 +15,7 @@ the current stage and all affected downstream gates are rerun.
 | 4 | Serve the successor without hiding totals | PASS | on-demand projection; returned/total counts separated; bounded runtime gate |
 | 5 | Wire inspection tools | PASS | Chrome discovered exactly eight tools and invoked all eight through native WebMCP |
 | 6 | Freeze one exact release candidate | PASS | commit `ed7145d7…`, tree `a16fd1e3…`, independent exact-tree gate `20260903T230339Z-3585edda72cc` |
-| 7 | Preview, canary, and promote | PREVIEW PASS / PRODUCTION HOLD | isolated HTTPS preview and remote WebMCP pass; production unchanged pending explicit authorization |
+| 7 | Preview, canary, and promote | PASS | 0%-traffic version-override canary passed on both domains; production is candidate version `cc0ecaa4…` at 100% |
 
 ## Stage 0 — baseline and fault isolation
 
@@ -81,9 +81,9 @@ Automated acceptance covers registration, routing, schema parity, cancellation,
 strict response safety, and one safe response from every tool. Native Chrome
 149 then discovered exactly eight tools through its transitional
 `navigator.modelContext` surface and successfully invoked all eight against the
-isolated HTTPS staging Worker. Every input schema was self-contained, the
-planner was absent, and every response preserved all six false
-execution-boundary flags. The machine-readable evidence is
+isolated HTTPS staging Worker and again against production. Every input schema
+was self-contained, the planner was absent, and every response preserved all six
+false execution-boundary flags. The machine-readable production evidence is
 `native-webmcp-receipt.json`.
 
 ## Stage 6 — exact candidate
@@ -120,12 +120,23 @@ and CORS. Native Chrome then discovered and invoked all eight WebMCP tools on
 that HTTPS origin. The receipts are `staging-http-receipt.json`,
 `native-webmcp-receipt.json`, and `staging-deployment.json`.
 
-Production was queried after staging deployment and remains deployment
-`cc66a810-40b2-4ccf-98fb-b599482acb41`, version
-`374c623c-8946-4974-9739-11f4917baf1a`, at 100%. No production route,
-deployment, or traffic allocation changed. Canary and production promotion
-remain an explicit operational authorization boundary; they are not required
-to accept the isolated preview.
+After explicit production authorization, the exact Stage 6 candidate was
+uploaded to Worker `ushso` as version
+`cc0ecaa4-74ca-4125-acd2-1be2d1be23f0`. Upload alone did not change traffic.
+Deployment `e31f0b5d-e957-4d6c-bfb5-52b3e9cec286` then placed the candidate at
+0% and retained version `374c623c-8946-4974-9739-11f4917baf1a` at 100%.
+Cloudflare version overrides exercised the candidate through both production
+domains without exposing ordinary traffic. Both domains passed the complete
+HTTP suite and returned the expected 3,434-record generation.
+
+Deployment `7b25d8a6-469f-4e41-a58a-226cd0f221dc` then atomically promoted the
+candidate as the sole version at 100%, avoiding static-asset version skew.
+Unmodified post-promotion suites passed on `ushso.org` and `www.ushso.org`,
+and native Chrome discovered and invoked all eight WebMCP tools on
+`https://ushso.org`. No route, DNS, storage, binding, or trigger changed. The
+previous version remains the immediate rollback target. See
+`production-deployment.json`, `production-http-receipt.json`, and
+`production-www-http-receipt.json`.
 
 ## Reproduction
 

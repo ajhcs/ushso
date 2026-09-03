@@ -1,0 +1,63 @@
+{
+  "schema_version": "observatory-catalog-production-deployment.v1.0.0",
+  "status": "PASS",
+  "authorization": {
+    "authorized": true,
+    "evidence": "Explicit user instruction in the Codex task: Deploy catalog recovery to production."
+  },
+  "candidate": {
+    "commit": "ed7145d7effb29dba35add5e81814337958c39f0",
+    "tree": "a16fd1e39aab0ddf8993476592c977543978284d",
+    "release_gate_run_id": "20260903T230339Z-3585edda72cc",
+    "generation": "live-2026-09-03-85b50522b420",
+    "record_count": 3434
+  },
+  "worker": {
+    "name": "ushso",
+    "version_id": "cc0ecaa4-74ca-4125-acd2-1be2d1be23f0",
+    "version_tag": "catalog-recovery-v1-2-0-ed7145d",
+    "version_uploaded_at": "2026-09-03T23:23:45.413086Z",
+    "deployment_id": "7b25d8a6-469f-4e41-a58a-226cd0f221dc",
+    "deployed_at": "2026-09-03T23:26:58.330179Z",
+    "traffic_percentage": 100,
+    "routes_changed": 0,
+    "bindings": [
+      "ASSETS"
+    ],
+    "stateful_bindings": 0
+  },
+  "zero_traffic_canary": {
+    "deployment_id": "e31f0b5d-e957-4d6c-bfb5-52b3e9cec286",
+    "candidate_percentage": 0,
+    "previous_version_percentage": 100,
+    "method": "Cloudflare-Workers-Version-Overrides",
+    "domains": [
+      "https://ushso.org",
+      "https://www.ushso.org"
+    ],
+    "status": "PASS"
+  },
+  "post_promotion_verification": {
+    "status": "PASS",
+    "primary_http_receipt": {
+      "path": "verification/catalog/v1.2.0/production-http-receipt.json",
+      "sha256": "cfef6bef83e0997e8504b320287053533277dcedb682f255a88b9ad09c82dd6d"
+    },
+    "www_http_receipt": {
+      "path": "verification/catalog/v1.2.0/production-www-http-receipt.json",
+      "sha256": "14fc05d84491137e304ed435dea02232c9875e16b221a3438213dad8664181ee"
+    },
+    "native_webmcp_receipt": {
+      "path": "verification/catalog/v1.2.0/native-webmcp-receipt.json",
+      "sha256": "f663e1d42d04a007b7edef6673b00b155a4208f8be4dfb4861da94a95fd27dea",
+      "discovered_tools": 8,
+      "successful_invocations": 8
+    }
+  },
+  "rollback": {
+    "ready": true,
+    "version_id": "374c623c-8946-4974-9739-11f4917baf1a",
+    "previous_deployment_id": "cc66a810-40b2-4ccf-98fb-b599482acb41",
+    "command": "node scripts/run-wrangler.mjs rollback 374c623c-8946-4974-9739-11f4917baf1a --name ushso --message \"Rollback catalog recovery\" --yes"
+  }
+}
