@@ -40,6 +40,36 @@ The checked-in Cloudflare configuration serves the application at `ushso.org` an
 the deployed Worker; the verification commands above do not. See the
 [Cloudflare release and rollback record](docs/CLOUDFLARE_GO_LIVE.md).
 
+## WebMCP Challenge
+
+**Before August 25, 2026:** no code in this repository or public USHSO application
+existed; the repository's public history begins on August 30. The Observatory
+idea and its evidence-bound research requirements predated the implementation.
+
+**Added during the challenge:** the human research-navigator interface, published
+metadata corpus, deterministic same-origin API, and the proven
+`observatory.discover_sources` WebMCP tool. A broader successor toolkit remains
+disabled until its explicit planner and human gates are closed.
+
+- Live URL: [https://ushso.org](https://ushso.org)
+- Available tool: `observatory.discover_sources` finds relevant published source
+  metadata and access-route context.
+
+Copy/paste judge prompt:
+
+> Use `observatory.discover_sources` to find public sources for studying hospital
+> financials in Pennsylvania. Explain what the returned metadata says about
+> access, evidence, and limitations. Do not retrieve data or follow external
+> links.
+
+The browser registers the tool once on an abortable lifecycle. Execution uses
+the existing API-backed discovery provider at the relative `/api/discover`
+route on the page's origin. The tool is read-only, validates and bounds inputs
+and outputs, propagates cancellation, and returns deterministic published
+metadata. It makes no authoritative-source requests, acquires no data, performs
+no analysis, and does not authorize access or submit a human workflow.
+`observatory.plan_research` and the successor toolkit remain disabled.
+
 ## Access and safety
 
 - Public catalog visibility is never represented as data access.
@@ -48,6 +78,7 @@ the deployed Worker; the verification commands above do not. See the
 - Candidate or incompatible joins remain visibly non-exact.
 - A zero-result query is not evidence that no source exists.
 
-## License status
+## License
 
-No open-source license has been granted yet. The repository is public for review and release qualification; all rights remain reserved until the owner selects a license.
+Copyright 2026 United States Health Systems Observatory. Licensed under the
+[Apache License 2.0](LICENSE).
