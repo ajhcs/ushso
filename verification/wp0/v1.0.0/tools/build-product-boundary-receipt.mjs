@@ -52,13 +52,15 @@ async function inspectedFiles() {
     .sort((left, right) => repositoryPath(left).localeCompare(repositoryPath(right)));
 }
 
-async function buildReceipt() {
-  const testStream = run({ files: [TEST_PATH], isolation: 'none' });
-  let testSummary = null;
+export async function buildProductBoundaryReceipt({ verifiedTestSummary = null } = {}) {
+  let testSummary = verifiedTestSummary;
   const failures = [];
-  for await (const event of testStream) {
-    if (event.type === 'test:fail') failures.push(event.data.name);
-    if (event.type === 'test:summary') testSummary = event.data;
+  if (testSummary === null) {
+    const testStream = run({ files: [TEST_PATH], isolation: 'none' });
+    for await (const event of testStream) {
+      if (event.type === 'test:fail') failures.push(event.data.name);
+      if (event.type === 'test:summary') testSummary = event.data;
+    }
   }
   if (!testSummary?.success) throw new Error(`product boundary tests failed: ${failures.join(', ')}`);
 
@@ -128,18 +130,23 @@ async function buildReceipt() {
   };
 }
 
-const receipt = await buildReceipt();
-const rendered = `${JSON.stringify(receipt, null, 2)}\n`;
+async function main() {
+  const receipt = await buildProductBoundaryReceipt();
+  const rendered = `${JSON.stringify(receipt, null, 2)}\n`;
+  if (process.argv.includes('--check')) {
+    if (!existsSync(RECEIPT_PATH)) throw new Error(`missing receipt: ${repositoryPath(RECEIPT_PATH)}`);
+    const existing = await readFile(RECEIPT_PATH, 'utf8');
+    if (existing !== rendered) throw new Error('product-boundary receipt is stale; run the builder without --check');
+    process.stdout.write(`verified ${repositoryPath(RECEIPT_PATH)}\n`);
+  } else if (process.argv.includes('--stdout')) {
+    process.stdout.write(rendered);
+  } else {
+    await mkdir(path.dirname(RECEIPT_PATH), { recursive: true });
+    await writeFile(RECEIPT_PATH, rendered, 'utf8');
+    process.stdout.write(`wrote ${repositoryPath(RECEIPT_PATH)}\n`);
+  }
+}
 
-if (process.argv.includes('--check')) {
-  if (!existsSync(RECEIPT_PATH)) throw new Error(`missing receipt: ${repositoryPath(RECEIPT_PATH)}`);
-  const existing = await readFile(RECEIPT_PATH, 'utf8');
-  if (existing !== rendered) throw new Error('product-boundary receipt is stale; run the builder without --check');
-  process.stdout.write(`verified ${repositoryPath(RECEIPT_PATH)}\n`);
-} else if (process.argv.includes('--stdout')) {
-  process.stdout.write(rendered);
-} else {
-  await mkdir(path.dirname(RECEIPT_PATH), { recursive: true });
-  await writeFile(RECEIPT_PATH, rendered, 'utf8');
-  process.stdout.write(`wrote ${repositoryPath(RECEIPT_PATH)}\n`);
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await main();
 }

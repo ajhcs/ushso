@@ -1,0 +1,49 @@
+version = 1
+authority = "local-exact-tree"
+changed_from = "origin/main"
+artifacts = ["apps/web/dist/**"]
+
+[[stages]]
+name = "bootstrap"
+kind = "bootstrap"
+command = ["npm", "ci", "--ignore-scripts"]
+failure_class = "environment_blocked"
+quiet_seconds = 30
+
+[[stages]]
+name = "tests"
+kind = "unit_tests"
+command = ["npm", "run", "test"]
+failure_class = "product_test_failed"
+quiet_seconds = 30
+
+[[stages]]
+name = "build"
+kind = "build"
+command = ["npm", "run", "build"]
+artifacts = ["apps/web/dist/**"]
+failure_class = "product_test_failed"
+quiet_seconds = 30
+
+[[stages]]
+name = "local-e2e"
+kind = "browser_checks"
+command = ["node", "scripts/release-gate-e2e.mjs"]
+failure_class = "product_test_failed"
+quiet_seconds = 30
+env = { USHSO_RELEASE_GATE_PORT = "18787" }
+
+[[stages]]
+name = "release-audit"
+kind = "security_checks"
+command = ["npm", "run", "release:audit"]
+failure_class = "product_test_failed"
+quiet_seconds = 30
+
+[[stages]]
+name = "cloudflare-dry-run"
+kind = "artifact_verification"
+command = ["npm", "run", "cf:dry-run:artifact"]
+artifacts = ["apps/web/dist/**"]
+failure_class = "product_test_failed"
+quiet_seconds = 30

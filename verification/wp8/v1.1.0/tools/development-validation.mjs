@@ -241,7 +241,13 @@ export async function buildDevelopmentValidation() {
     },
     requireCompleteBenchmark: false
   });
-  return { report, summary: summary(report), pins, algorithm_version: retrievalModule.RETRIEVAL_V2_VERSION };
+  return {
+    report,
+    summary: summary(report),
+    pins,
+    algorithm_version: retrievalModule.RETRIEVAL_V2_VERSION,
+    evaluation_cases: input.cases
+  };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

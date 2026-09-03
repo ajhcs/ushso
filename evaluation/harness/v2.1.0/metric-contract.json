@@ -1,0 +1,41 @@
+{
+  "contract_version": "ushso-retrieval-evaluator-metric-contract.v2.1.0",
+  "parent_contract": {
+    "path": "evaluation/harness/v2.0.0/metric-contract.json",
+    "sha256": "32c826571c7e9d44dc567664030eed67c49ae60a3574850d9bd0209fa6498cda",
+    "preserved": true
+  },
+  "metric": {
+    "id": "present_source_normalized_dcg_at_5",
+    "display_name": "Present-source normalized DCG@5",
+    "k": 5,
+    "gains": {
+      "essential": 1,
+      "highly_relevant": 0.6666666666666666,
+      "conditionally_relevant": 0.3333333333333333,
+      "contextual": 0.16666666666666666
+    },
+    "discount": "gain / log2(physical_rank + 1)",
+    "question_formula": "DCG@5 divided by the ideal DCG@5 attainable from that question's present_search_eligible gold sources",
+    "aggregate_formula": "Unweighted mean over eligible questions; questions with zero present-source gold are excluded and counted.",
+    "duplicate_policy": "Only the first recommended result bound to a canonical gold source earns gain; every result retains its physical rank.",
+    "short_list_policy": "Unreturned ranks earn zero; the ideal denominator contains only available present-source gold and is not padded to five.",
+    "target": {
+      "operator": ">=",
+      "value": 0.7,
+      "required_cohorts": ["development", "validation", "combined"]
+    }
+  },
+  "historical_metric": {
+    "id": "present_source_graded_acceptable_precision_at_5",
+    "status": "preserved_for_history_not_used_as_successor_quality_gate",
+    "reason": "Its fixed five-slot denominator imposes a sparse-gold ceiling below its 0.70 target on the frozen development and validation cohort."
+  },
+  "unchanged_gates": {
+    "safety_zero_tolerance": true,
+    "held_out_single_use": true,
+    "auth_13_required": true,
+    "production_authorization": false
+  },
+  "rounding": { "decimal_places": 6, "round_only_at_report_boundary": true }
+}

@@ -1,0 +1,126 @@
+{
+  "schema_version": "ushso-research-navigator-reconciliation.v2026-09-03",
+  "recorded_at": "2026-09-03T00:00:00Z",
+  "deadline": {
+    "local": "2026-09-04 12:00 America/New_York",
+    "utc": "2026-09-04T16:00:00Z",
+    "delivery_target": "reviewable draft pull request; no production release claim"
+  },
+  "candidate": {
+    "repository": "ajhcs/ushso",
+    "branch": "codex/research-navigator-integration",
+    "approved_base_commit": "f613b685a8821fca2393ae1ef4863d7a3fd2d359",
+    "final_commit": "recorded by Git after this ledger is committed",
+    "final_tree": "recorded by the exact release-gate receipt",
+    "main_modified_by_this_work": false
+  },
+  "approval_boundary": {
+    "status": "approved_scoped",
+    "approved": [
+      "versioned WP0 v1.1 successor/reseal",
+      "versioned WP8 sparse-ranking metric correction subject to feasibility evidence",
+      "AUTH-10 push of the scoped branch and draft pull request creation"
+    ],
+    "not_authorized": [
+      "production deployment or public traffic change",
+      "managed infrastructure or credentials",
+      "live connector traffic",
+      "held-out retrieval evaluation under AUTH-13",
+      "repository exposure to Grok, Cursor, or another external co-engineer",
+      "pull request merge"
+    ],
+    "receipt": "verification/external-authorization/v1.1.0/receipts/auth-10-2026-09-03.json"
+  },
+  "resolved_deadline_blockers": [
+    {
+      "id": "WP0-AGGREGATE-STALE",
+      "status": "resolved_by_versioned_successor",
+      "evidence": "verification/wp0/v1.1.0/receipts/wp0-successor-aggregate.json",
+      "result": "PASS_SUCCESSOR_RESEAL",
+      "historical_v1_0_overwritten": false
+    },
+    {
+      "id": "WP8-PRECISION",
+      "status": "resolved_for_development_validation_by_versioned_metric_successor",
+      "evidence": "verification/wp8/v1.2.0/validation/validation-receipt.json",
+      "successor_metric": "present_source_normalized_dcg_at_5",
+      "target": 0.7,
+      "scores": {
+        "development": 0.890251,
+        "validation": 0.976999,
+        "combined": 0.929427
+      },
+      "historical_fixed_slot_metric": {
+        "observed": 0.223333,
+        "mathematical_ceiling": 0.23,
+        "historical_target": 0.7,
+        "preserved": true
+      }
+    },
+    {
+      "id": "AUTH-10",
+      "status": "authorized_scoped",
+      "evidence": "verification/external-authorization/v1.1.0/register.json",
+      "parent_register_preserved": true
+    }
+  ],
+  "local_verification": [
+    {
+      "command": "node scripts/run-contract-suites.mjs --verification",
+      "status": "PASS",
+      "result": "20 package suites verified; live authoritative-source requests forbidden"
+    },
+    {
+      "command": "npm run test:retrieval",
+      "status": "PASS",
+      "result": "6 test files"
+    },
+    {
+      "command": "npm run test:web",
+      "status": "PASS",
+      "result": "19 files, 98 tests"
+    },
+    {
+      "command": "npm run test:worker",
+      "status": "PASS",
+      "result": "7 test files"
+    },
+    {
+      "command": "npm run test:evaluation && npm run validate:evaluation",
+      "status": "PASS",
+      "result": "baseline suite and 60-question validation"
+    },
+    {
+      "command": "npm run cf:dry-run",
+      "status": "PASS",
+      "result": "production web build plus local Cloudflare deployment dry-run; no deployment"
+    },
+    {
+      "command": "npm run release:audit",
+      "status": "PASS",
+      "result": "1486 files; ignored artifacts, size, absolute paths, and credential patterns checked"
+    }
+  ],
+  "remaining_release_blockers": [
+    {
+      "id": "AUTH-13",
+      "status": "not_authorized",
+      "effect": "No independently owned held-out retrieval run and no final WP8 release claim."
+    },
+    {
+      "id": "AUTH-01-09,AUTH-11-12,AUTH-14-17",
+      "status": "not_authorized",
+      "effect": "Managed infrastructure, live canaries, production promotion, owner ratifications, and independent human studies remain pending."
+    },
+    {
+      "id": "PRODUCTION-ELIGIBILITY",
+      "status": "false",
+      "effect": "The branch is a local, reviewable implementation candidate only."
+    }
+  ],
+  "next_actions": [
+    "Run the repository release gate once against the final exact candidate.",
+    "Commit and push only the scoped branch after a secret-free change review.",
+    "Open or update a draft pull request targeting main and preserve every remaining gate in its description."
+  ]
+}
