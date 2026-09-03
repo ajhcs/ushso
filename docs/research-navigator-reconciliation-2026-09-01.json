@@ -1,0 +1,175 @@
+{
+  "$schema": "./research-navigator-reconciliation-2026-09-01.schema.json",
+  "schema_version": "ushso.research-navigator-reconciliation.v1.0.0",
+  "generated_at": "2026-09-01T19:01:50Z",
+  "candidate": {
+    "branch": "codex/research-navigator-integration",
+    "implementation_commit": "c680fb6b035848e0d74b5ed035bb33ac35092d65",
+    "implementation_tree": "943be7c718fce4dd102365c31d28bd468bb8cc02",
+    "working_tree": "clean",
+    "production_eligibility": false,
+    "remote_mutation": false,
+    "receipt_binding_rule": "Local receipts bind the implementation bytes they tested; reconciliation binds the clean parent snapshot. The final release gate must bind the exact final tree and must not repin historical receipts.",
+    "main_worktree_preservation": "The main worktree's user-owned RELEASE_PROVENANCE.json change and .serena state were preserved outside this candidate and were not exposed to providers."
+  },
+  "source_prs": [
+    { "number": 3, "tip": "db6ef95372910e63e3fba5bc8d6e6f58276af9ee", "tree": "121a4928b5c59dff29a3bbe077afdd84708e2cab", "relationship": "handoff base", "included": true },
+    { "number": 4, "tip": "01620e9b74580c6720f8d982aee1e39aae127592", "tree": "adab3cc0d7b01d601a890e30eab37ec1a62be0ab", "relationship": "successor descended from PR3", "included": true },
+    { "number": 5, "tip": "69c5e2fb3f71bda7dd0d9b7e7d745922b230f9d8", "tree": "21db2e59bfefe9870ccea0eb46d4914845ab43ed", "relationship": "connector safety descended from PR4", "included": true },
+    { "number": 6, "tip": "fd80c303ef8fcca8f5067434361ec3196408267c", "tree": "8af8e2cba04e7274da6a4a80140790e5b124e022", "relationship": "database attestation parallel to PR5; ledger overlap resolved manually", "included": true, "handling": "Kept current connector ledger truth and added the DB-attestation entry." },
+    { "number": 7, "tip": "d154e7db7bd3628cb45efbe5d12e7ab823880f73", "tree": "f1f9a722668e73d7b330408b49be701f222da9a5", "relationship": "database operations descended from PR6", "included": true },
+    { "number": 8, "tip": "f00394062e15522ec2cfd80b45a7defc6158d177", "tree": "99880f55f952e60160f31915d80e331abf51f6de", "relationship": "CAS hardening diverged; selectively ported and topology-attached", "included": true, "handling": "Four focused ports plus a content-neutral --no-ff topology merge preserve the v1.1 attestation ancestry; PR8 was not merged wholesale." }
+  ],
+  "integration_decisions": [
+    { "id": "PR3", "decision": "Merged the handoff foundation first from the clean e93ac2b baseline.", "evidence": ["a928a77"] },
+    { "id": "PR4", "decision": "Merged the successor only after PR3 so its reviewed ancestry remains visible.", "evidence": ["8deaf66"] },
+    { "id": "PR5", "decision": "Merged connector safety as the next descendant.", "evidence": ["b78d0f7"] },
+    { "id": "PR6", "decision": "Resolved the execution-ledger overlap by retaining connector current truth and adding database-attestation evidence.", "evidence": ["57e9515"], "conflict": true },
+    { "id": "PR7", "decision": "Merged database operations after the attestation slice.", "evidence": ["f5fc0d0"] },
+    { "id": "PR8", "decision": "Ported fixture CAS serialization, evidence, successor attestation, and Node 22 CI independently, then attached original PR8 ancestry with a clean topology merge.", "evidence": ["8f3b03f", "a993e15", "e89a36a", "1ef43ba", "49e5658"] },
+    { "id": "WP4", "decision": "Added dependency-injected scheduler/harvest entrypoint seams with inert defaults; this closes the local static composition marker without claiming a managed Cloudflare composition.", "evidence": ["63929b3"] }
+  ],
+  "evidence_semantics": {
+    "classes": ["current", "stale", "historical", "fixture_only", "integrated_candidate", "blocked_external_authorization"],
+    "corpus_hashes": {
+      "c143": {
+        "record_count": 143,
+        "manifest_file_sha256": "5622272ded52b0cbf039da47114142f8cb35ba634e8a6bbb9ee55b0ecd70511c",
+        "content_fingerprint_sha256": "0e676ada3d601275083615a3f7804781eef1c183cb1b7efcf7ec8044fce33b3d",
+        "algorithm_fingerprint_sha256": "0316cf544da21a5b6790d91c126fa1d348c080b77fcbf5225d81cbe09bebefa2"
+      },
+      "c157": {
+        "record_count": 157,
+        "manifest_file_sha256": "23f704ce3e421a6eb26c2b3677d616a1ae6b4f45226233257b9a1ff676caba2b",
+        "content_fingerprint_sha256": "adcfb56babc981a4c7dfc787af86d56f5fb2a31e84de02f9db8c93f0548b5d03",
+        "algorithm_fingerprint_sha256": "b17c49fcd3f5fd1a09c38902f8733437e366b75f1e764a92cadf3f9788116ae6"
+      }
+    },
+    "legacy_aliases": [
+      {
+        "path": "RELEASE_PROVENANCE.json",
+        "field": "corpus.manifest_sha256",
+        "value": "adcfb56babc981a4c7dfc787af86d56f5fb2a31e84de02f9db8c93f0548b5d03",
+        "actual_semantics": "content_fingerprint_sha256 for c157, not the SHA-256 of the corpus-manifest.json file",
+        "action": "Preserve the historical file unchanged; use explicit manifest_file_sha256 and content_fingerprint_sha256 fields for new evidence."
+      }
+    ]
+  },
+  "evidence_inventory": [
+    { "id": "candidate", "class": "integrated_candidate", "path": "git:c680fb6b", "status": "clean_exact_candidate_gate_failed", "sha256": null, "binding": "commit c680fb6b035848e0d74b5ed035bb33ac35092d65 / tree 943be7c718fce4dd102365c31d28bd468bb8cc02", "disposition": "Exact gate input; the gate failed on immutable WP0 aggregate receipt staleness. No release eligibility." },
+    { "id": "release-provenance", "class": "historical", "path": "RELEASE_PROVENANCE.json", "status": "LIVE historical production snapshot", "sha256": "4de10ddb0edd788e1f80639aa51059748f76573db0a6149fba5e6c5cfc2e9bf7", "disposition": "Historical provenance only; not candidate eligibility evidence." },
+    { "id": "bridge-receipt", "class": "current", "path": "evaluation/bridge/v1.0.0/receipts/bridge-receipt.json", "status": "PASS artifact generation / FAIL_PRE_TUNING release status", "sha256": "9f42e7a26555cb6ce1465a15ac9afa1913869039e01557778c768ee1120251b5", "disposition": "Bridge and hash semantics are valid; no consolidated v2 runtime or quality pass is claimed." },
+    { "id": "wp4-local", "class": "current", "path": "verification/wp4/v1.0.0", "status": "pass_local / pass_static_markers", "sha256": null, "disposition": "Local receipt regenerated against current bytes; managed worker composition remains external." },
+    { "id": "wp8-quality", "class": "current", "path": "verification/wp8/v1.0.0/receipts/retrieval-quality.json", "status": "FAIL_PRE_TUNING", "sha256": "3bb8c9c7499a81bd262ca28855472c2083f620208ed59c93626c1389970a0b44", "disposition": "Open local quality/tuning gate; AUTH-13 final holdout remains blocked." },
+    { "id": "wp8-scaffolding", "class": "current", "path": "verification/wp8/v1.0.0/receipts/wp8-scaffolding.json", "status": "PASS_OFFLINE_SCAFFOLDING", "sha256": "2b9cf6b68f9ca5b49e305c9074d61d71d5dca048b4915cd5b87e5a446110eaf4", "disposition": "Projection/lifecycle boundary only." },
+    { "id": "wp10a", "class": "current", "path": "verification/wp10a/v1.0.0/receipts/wp10a-receipt.json", "status": "technical PASS / governance pending / WP10B unauthorized", "sha256": "97db0e56fb576e5952a20ee6f56753662c96a8225a2eff7e5dfd803883d4fc20", "disposition": "Frozen technical package; do not activate planner compiler." },
+    { "id": "wp12", "class": "fixture_only", "path": "verification/wp12/v1.0.0/receipts/candidate-validation.json", "status": "NOT_ACCEPTED_PUBLIC_GATES_AND_ACTIVATION_PENDING", "sha256": "fc4443722d8ccb694c6f5596cb026171f54105ed286875fd4e6c14308c11203a", "disposition": "Candidate toolkit is unwired and all public flags remain disabled." },
+    { "id": "wp13", "class": "fixture_only", "path": "verification/wp13/v1.0.0/receipts/candidate-validation.json", "status": "NOT_ACCEPTED_PUBLIC_ACTIVATION_AND_PRODUCTION_CORPUS_GATES_PENDING", "sha256": "e3439006c4381e9cd1db073088c361050c48b290fcfee261acfc42ad16940189", "disposition": "Candidate SEO projection is not a public crawl or production corpus claim." },
+    { "id": "wp14-successor", "class": "fixture_only", "path": "verification/wp14/v1.1.0/receipts/successor-attestation.json", "status": "successor PASS bound to f2641a3; production false", "sha256": "0b3bd153e6e9b9199731a4a14088cf0781bdfb0f4c53b13b880a94ebb6d802cc", "disposition": "CAS fixture evidence; historical v1.0 receipt remains preserved." },
+    { "id": "auth-register", "class": "blocked_external_authorization", "path": "verification/external-authorization/v1.0.0/register.json", "status": "AUTH-01..AUTH-17 not_requested / unauthorized", "sha256": "335b7d3516594d2372cc545b16bf6bbc18e7f69420b4485f659b52a1cdff923b", "disposition": "Authoritative blocker register; unchanged." },
+    { "id": "exact-gate", "class": "current", "path": "release-gate receipt 20260901T185317Z-773cc4870771", "status": "failed / product_test_failed / WP0_AGGREGATE_RECEIPT_STALE", "sha256": null, "binding": "candidate key b64fa8dfc3406f4a4cade312efe4a0a5f9c16c1cfe929b1d90a9b9bb5ec01985; commit c680fb6b; tree 943be7c7", "disposition": "Independent exact-candidate failure; build, browser, and artifact stages were skipped after the first test failure." },
+    { "id": "security-scan", "class": "stale", "path": "/tmp/codex-security-scans-VxRsXg/research-navigator-integration/63929b341fa881a01d3b795c26b22faddca6ed8a_20260901T180839Z_us18z56_/report.md", "status": "sealed standard offline audit / zero reportable findings / partial coverage", "sha256": null, "binding": "scan e465021e-0450-4622-9630-25f7ae745133; target commit 63929b3; current gate candidate is c680fb6", "disposition": "Source audit and deferred-control inventory only; not a managed or production security approval." },
+    { "id": "historical-gate", "class": "stale", "path": "release-gate receipt 20260831T170024Z-3003695ba806", "status": "failed / product_test_failed for an older candidate", "sha256": null, "disposition": "Preserve as historical; not a result for this candidate." }
+  ],
+  "status_planes": [
+    { "plane": "local_implementation", "status": "partially_complete_exact_gate_failed", "authorized": true, "summary": "PR3–PR8 integration, WP4 local composition seam, local contract suites, receipts, and static security boundaries are present on the exact gate candidate; the gate failed on WP0 receipt staleness.", "blockers": ["WP8 post-freeze tuning remains incomplete", "WP0 v1.0.0 immutable aggregate receipt is stale for the integrated candidate", "Exact release gate failed before build/browser/artifact stages"] },
+    { "plane": "external_verification", "status": "blocked_external_authorization", "authorized": false, "summary": "Managed provider, live connector, holdout, human, canary, recovery, load, and soak evidence is absent by policy and register state.", "blockers": ["AUTH-01..AUTH-09", "AUTH-11", "AUTH-13..AUTH-17"] },
+    { "plane": "public_activation", "status": "blocked_external_authorization", "authorized": false, "summary": "Candidate routers, tools, live source manifests, production traffic, and public pointer changes remain disabled or unwired.", "blockers": ["AUTH-06", "AUTH-07", "AUTH-08", "AUTH-09", "WP8", "WP10B", "WP11 human evidence"] }
+  ],
+  "dependency_graph": {
+    "nodes": [
+      { "id": "historical-static", "status": "available_historical", "class": "historical" },
+      { "id": "static-fallback", "status": "current_unmodified", "class": "current" },
+      { "id": "integrated-candidate", "status": "clean_local_candidate", "class": "integrated_candidate" },
+      { "id": "managed-staging", "status": "blocked", "class": "blocked_external_authorization" },
+      { "id": "internal-canary", "status": "blocked", "class": "blocked_external_authorization" },
+      { "id": "public-cutover", "status": "blocked", "class": "blocked_external_authorization" },
+      { "id": "soak", "status": "blocked", "class": "blocked_external_authorization" },
+      { "id": "retirement", "status": "blocked", "class": "blocked_external_authorization" }
+    ],
+    "edges": [
+      { "from": "historical-static", "to": "static-fallback", "condition": "historical fallback remains available", "blockers": [] },
+      { "from": "static-fallback", "to": "integrated-candidate", "condition": "local integration and passing exact release gate", "blockers": ["WP8", "WP0-AGGREGATE-STALE"] },
+      { "from": "integrated-candidate", "to": "managed-staging", "condition": "authorized resources, secrets, migrations, and provider plan/apply", "blockers": ["AUTH-01", "AUTH-02", "AUTH-03", "AUTH-11"] },
+      { "from": "managed-staging", "to": "internal-canary", "condition": "recovery, connector, identity, coverage, load, and generation evidence", "blockers": ["AUTH-04", "AUTH-05", "AUTH-06", "AUTH-13", "AUTH-14", "AUTH-15"] },
+      { "from": "internal-canary", "to": "public-cutover", "condition": "owner-approved promotion and rollback packet", "blockers": ["AUTH-07"] },
+      { "from": "public-cutover", "to": "soak", "condition": "two launch cycles and rollback window", "blockers": ["AUTH-08"] },
+      { "from": "soak", "to": "retirement", "condition": "completed rollback window and healthy emergency artifact", "blockers": ["AUTH-09"] }
+    ]
+  },
+  "machine_blockers": [
+    { "id": "WP8-QUALITY-TUNING", "class": "local_implementation", "status": "pending_post_freeze_tuning", "authorized": true, "summary": "The v2 evaluator/cohorts/bridge are frozen, but the consolidated v2 ranking runtime has not been implemented or tuned on development and validation cohorts. Current bridge remains FAIL_PRE_TUNING.", "source": ["evaluation/bridge/v1.0.0/receipts/bridge-receipt.json", "verification/wp8/v1.0.0/receipts/retrieval-quality.json"], "unblocks": ["WP8 quality threshold evaluation"] },
+    { "id": "WP0-AGGREGATE-STALE", "class": "stale_evidence", "status": "exact_gate_failed_immutable_v1_receipt", "authorized": true, "summary": "The exact candidate gate rejected the integrated tree because the immutable WP0 v1.0.0 final aggregate receipt describes an older file inventory. It must not be overwritten or silently repinned.", "source": ["verification/wp0/v1.0.0/receipts/wp0-aggregate.json", "release-gate receipt 20260901T185317Z-773cc4870771"], "unblocks": ["passing exact release gate for a separately approved successor candidate"] },
+    { "id": "AUTH-01..AUTH-09", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "Paid resources, secrets, migrations, live canaries, recovery, internal canary, public cutover, soak, and retirement are not authorized.", "source": ["verification/external-authorization/v1.0.0/register.json"], "unblocks": ["managed staging through runtime retirement"] },
+    { "id": "AUTH-10", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "Remote pushes and review artifacts remain unperformed; local commits are available for review.", "source": ["verification/external-authorization/v1.0.0/register.json"], "unblocks": ["remote PR handoff"] },
+    { "id": "AUTH-11", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "Zero-traffic production foundation and forward migrations are not authorized.", "source": ["verification/external-authorization/v1.0.0/register.json"], "unblocks": ["production foundation"] },
+    { "id": "AUTH-12", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "WP10A is technically frozen, but owner ratification is absent; WP10B planner implementation and plan_research activation remain disabled.", "source": ["verification/external-authorization/v1.0.0/register.json", "verification/wp10a/v1.0.0/receipts/wp10a-receipt.json"], "unblocks": ["WP10B planner implementation"] },
+    { "id": "AUTH-13", "class": "blocked_external_authorization", "status": "not_requested", "authorized": false, "summary": "The fresh independently owned final holdout and one-time aggregate-only evaluation are absent.", "source": ["verification/external-authorization/v1.0.0/register.json", "verification/wp8/v1.0.0/receipts/final-holdout-prerequisite.json"], "unblocks": ["final retrieval gate"] },
+    { "id": "AUTH-14", "class": "human_evidence", "status": "not_requested", "authorized": false, "summary": "Independent identity adjudication and double-review evidence are absent.", "source": ["verification/external-authorization/v1.0.0/register.json", "verification/wp7/v1.0.0/receipts/identity-benchmark.json"], "unblocks": ["identity acceptance"] },
+    { "id": "AUTH-15", "class": "human_evidence", "status": "not_requested", "authorized": false, "summary": "Product-owner wording approval for public coverage is absent.", "source": ["verification/external-authorization/v1.0.0/register.json", "verification/wp9/v1.0.0/receipts/wp9-verification.json"], "unblocks": ["coverage acceptance"] },
+    { "id": "AUTH-16", "class": "human_evidence", "status": "not_requested", "authorized": false, "summary": "The researcher usability study is absent.", "source": ["verification/external-authorization/v1.0.0/register.json", "verification/wp11/v1.0.0/receipts/wp11-verification.json"], "unblocks": ["WP11 usability claim"] },
+    { "id": "AUTH-17", "class": "human_evidence", "status": "not_requested", "authorized": false, "summary": "Independent expert asset and Use-Card review is absent.", "source": ["verification/external-authorization/v1.0.0/register.json", "verification/wp11/v1.0.0/receipts/wp11-verification.json"], "unblocks": ["WP11 expert-review claim"] }
+  ],
+  "work_package_status": [
+    { "work_package": "WP3", "status": "local_static_pass_managed_pending", "evidence": ["verification/wp3/v1.0.0/receipts/cloudflare-config-validation.json", "verification/wp3/v1.0.0/receipts/least-privilege.json"], "remaining": ["managed provider catalog/role/ACL and recovery evidence", "authorized migration/application"], "authorization": "AUTH-01, AUTH-02, AUTH-03, AUTH-05, AUTH-11" },
+    { "work_package": "WP4", "status": "pass_local_static_composition_managed_pending", "evidence": ["verification/wp4/v1.0.0", "services/scheduler-worker/worker.mjs", "services/harvest-worker/worker.mjs", "63929b3"], "remaining": ["concrete authorized Cloudflare composition, queues, workflows, cron, DLQ sink, metrics, and managed fault injection"], "authorization": "AUTH-03, AUTH-05" },
+    { "work_package": "WP5", "status": "pass_fixture_only_live_pending", "evidence": ["verification/wp5/v1.0.0/receipts/fixture-matrix.json", "verification/wp5/v1.0.0/receipts/activation-status.json"], "remaining": ["actual socket pinning, live metadata-only canary, managed capture/R2 evidence"], "authorization": "AUTH-04" },
+    { "work_package": "WP6", "status": "pass_local_database_validation", "evidence": ["verification/wp6/v1.0.0/receipts/verification-receipt.json"], "remaining": ["managed migration through 0007 and isolated rollback"], "authorization": "AUTH-03, AUTH-05, AUTH-11" },
+    { "work_package": "WP7", "status": "local_contract_pass_external_adjudication_pending", "evidence": ["verification/wp7/v1.0.0/receipts/wp7-verification.json", "verification/wp7/v1.0.0/receipts/identity-benchmark.json"], "remaining": ["independent human adjudication and reversal evidence"], "authorization": "AUTH-14" },
+    { "work_package": "WP8", "status": "scaffolding_pass_quality_fail_pre_tuning", "evidence": ["evaluation/bridge/v1.0.0/receipts/bridge-receipt.json", "verification/wp8/v1.0.0/receipts/wp8-scaffolding.json"], "remaining": ["development/validation tuning, quality gate, query plans, migration 0010, fresh final holdout"], "authorization": "AUTH-13" },
+    { "work_package": "WP9", "status": "technical_pass_owner_wording_pending", "evidence": ["verification/wp9/v1.0.0/receipts/wp9-verification.json"], "remaining": ["product-owner coverage wording and production corpus evidence"], "authorization": "AUTH-15" },
+    { "work_package": "WP10A", "status": "technical_freeze_pass_governance_pending", "evidence": ["verification/wp10a/v1.0.0/receipts/wp10a-receipt.json"], "remaining": ["owner ratification before WP10B"], "authorization": "AUTH-12" },
+    { "work_package": "WP10B", "status": "not_started_by_design", "evidence": ["verification/wp10a/v1.0.0/receipts/wp10a-receipt.json"], "remaining": ["authorized deterministic planner, PA safety fixture, exact asset/evidence/DAG checks"], "authorization": "AUTH-12" },
+    { "work_package": "WP11", "status": "implemented_human_evidence_pending", "evidence": ["verification/wp11/v1.0.0/receipts/wp11-verification.json"], "remaining": ["researcher usability and expert asset review; approved activation"], "authorization": "AUTH-16, AUTH-17" },
+    { "work_package": "WP12", "status": "fixture_only_unwired", "evidence": ["verification/wp12/v1.0.0/receipts/candidate-validation.json"], "remaining": ["authorized manifest parity and production-like tool/capability review"], "authorization": "AUTH-06, AUTH-07, AUTH-12, AUTH-13, AUTH-14, AUTH-15" },
+    { "work_package": "WP13", "status": "fixture_only_unwired", "evidence": ["verification/wp13/v1.0.0/receipts/candidate-validation.json"], "remaining": ["exact production public corpus, crawler, sitemap and rollback canaries"], "authorization": "AUTH-06, AUTH-07" },
+    { "work_package": "WP14", "status": "fixture_state_machine_pass_exact_gate_failed_wp0", "evidence": ["verification/wp14/v1.1.0/receipts/successor-attestation.json", "verification/wp14/v1.1.0/tests", "release-gate receipt 20260901T185317Z-773cc4870771"], "remaining": ["separately approved WP0 successor/reseal, future exact gate for the changed candidate, managed canary/recovery/load/soak, promotion and retirement"], "authorization": "AUTH-05, AUTH-06, AUTH-07, AUTH-08, AUTH-09" }
+  ],
+  "local_verification": {
+    "aggregate_status": "PASS_LOCAL_WITH_EXPLICIT_EXTERNAL_AND_EXACT_GATE_BLOCKERS",
+    "commands": [
+      { "command": "npm test --prefix verification/wp4/v1.0.0", "status": "PASS", "result": "2 verification files pass; receipt status pass_local and service_composition pass_static_markers." },
+      { "command": "npm test --workspace @ushso/ingestion-control-plane", "status": "PASS", "result": "6 files / 6 tests." },
+      { "command": "npm test --prefix contracts/core/v1.0.0", "status": "PASS", "result": "8/8 core contract tests." },
+      { "command": "npm run test:verification", "status": "PASS", "result": "WP0, WP2, WP3, WP4, WP5, WP7, WP8, WP9, WP10A, WP11, WP12, WP13, WP14, program, authorization, and CI verification suites pass in the writable isolated clone." },
+      { "command": "npm test --prefix verification/wp6/v1.0.0", "status": "PASS", "result": "14 tests; local PostgreSQL validation and 7 migration stages." },
+      { "command": "npm test --prefix verification/wp8/v1.0.0", "status": "PASS", "result": "35 tests; quality remains FAIL_PRE_TUNING by design." },
+      { "command": "npm run verify --prefix verification/wp14/v1.1.0", "status": "PASS", "result": "24/24 successor attestation checks; bound to f2641a3 and no production claim." },
+      { "command": "npm run verify --prefix verification/wp12/v1.0.0", "status": "PASS", "result": "Fixture-only toolkit validation with public flags disabled." },
+      { "command": "npm run validate --prefix verification/wp13/v1.0.0", "status": "PASS", "result": "Candidate validation; final reseal and public crawler remain pending." },
+      { "command": "release-gate run --repo <exact-candidate> --receipt <local-receipt>", "status": "FAIL", "result": "Run 20260901T185317Z-773cc4870771; candidate key b64fa8dfc3406f4a4cade312efe4a0a5f9c16c1cfe929b1d90a9b9bb5ec01985; product_test_failed at WP0 with WP0_AGGREGATE_RECEIPT_STALE; exit 10." }
+    ],
+    "environment_notes": [
+      "Tests were run in a writable isolated clone because the /mnt/d checkout lacks root pg resolution and Vite cache writes are read-only there.",
+      "No development server was started; the required ss -tlnp preflight could not read netlink without escalation, so no port was bound.",
+      "Local database evidence is fixture/local evidence, not managed PostgreSQL or Hyperdrive evidence.",
+      "WP8 bridge inputs intentionally preserve the protected holdout boundary; no new final-holdout score was produced."
+    ]
+  },
+  "provider_lanes": [
+    { "lane": "cursor-local-aggregate-ushso-cursor-wave-0901", "provider": "Cursor Co-Engineer", "status": "dispatch_failed_before_provider_work", "files_sent": false, "remote_mutation": false, "summary": "Eight disjoint implementation/review lanes were submitted against the exact candidate base; authoritative decision_or_attention wait returned all eight unresolved dispatch_failed with no child worktrees, commits, artifacts, or remote effects." },
+    { "lane": "grok-safe-review-attempts", "provider": "Grok Co-Engineer", "status": "rejected_by_payload_safety", "files_sent": false, "remote_mutation": false, "summary": "A selected-path mirror and then a two-file CAS mirror were both rejected before dispatch because repository code was still classified as non-public organizational data. No retry or workaround was attempted; historical bounded Grok receipts remain review input only." },
+    { "lane": "historical-cursor-cas", "provider": "Cursor-local", "status": "completed_historical_review_input", "files_sent": true, "remote_mutation": false, "summary": "Sanitized two-file CAS task produced a proposed patch that was inspected and ported through PR8; it was not an approval." },
+    { "lane": "historical-cursor-connectors", "provider": "Cursor-local", "status": "completed_historical_review_input", "files_sent": true, "remote_mutation": false, "summary": "Sanitized connector task produced fixture safety improvements already represented in the integrated PR5 slice; no provider commit was accepted." }
+  ],
+  "no_claims": [
+    "No production deployment, public cutover, live connector request, managed database/provider mutation, paid resource procurement, secret creation, migration application, canary, soak, backup/restore, load, human review, identity adjudication, protected holdout score, or production eligibility.",
+    "The historical RELEASE_PROVENANCE.json LIVE status is not a release status for this candidate.",
+    "PASS local or fixture receipts do not satisfy managed, human, public, or production gates.",
+    "The WP4 worker.mjs files are disabled-by-default dependency seams, not proof of a concrete Cloudflare deployment composition.",
+    "The WP14 v1.1 attestation is bound to f2641a3 and does not attest the later integration tree.",
+    "No remote PR or push was created in this run because AUTH-10 remains false."
+  ],
+  "release_disposition": {
+    "status": "UNRESOLVED_NOT_RELEASE_ELIGIBLE",
+    "release_gate_pass": false,
+    "production_eligible": false,
+    "next_actions": [
+      "Complete or explicitly disposition local WP8 development/validation tuning without accessing the protected final holdout.",
+      "Resolve the immutable WP0 v1.0.0 receipt through a separately approved successor or exact-base reseal procedure; do not overwrite it.",
+      "Freeze the changed candidate and run its exact release gate once.",
+      "Obtain the scoped human/provider authorizations before managed staging, live canaries, planner activation, holdout, human studies, remote PR handoff, or public promotion.",
+      "If any historical receipt must be resealed, use a separately approved exact-base reseal procedure rather than repinning it silently."
+    ]
+  }
+}

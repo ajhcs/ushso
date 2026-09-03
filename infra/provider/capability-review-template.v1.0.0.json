@@ -1,0 +1,63 @@
+{
+  "schema_version": "ushso-provider-capability-review.v1.0.0",
+  "status": "pending_external_authorization",
+  "authorization": "AUTH-01",
+  "pinned_configuration": {
+    "terraform_cli": "1.16.0",
+    "cloudflare_provider": "5.24.0",
+    "neon_provider": "0.15.0",
+    "provider_init_validate": "local_backend_false_schema_pass_no_credentials_state_plan_apply_or_resources"
+  },
+  "selected_architecture": {
+    "postgresql": "Neon Business baseline or Scale if review requires",
+    "cloud": "AWS",
+    "region": "us-east-1",
+    "hyperdrive_origin": "direct non-pooled PostgreSQL endpoint over TLS",
+    "production_scale_to_zero": false,
+    "target_pitr_days": 30,
+    "postgresql_major_version": 16,
+    "production_compute_units": { "minimum": 1, "maximum": 4 },
+    "production_suspend_timeout_seconds": -1,
+    "projects_per_environment": 1,
+    "worker_login_roles_per_environment": 6,
+    "worker_login_creation": "audited_direct_sql_only_never_neon_api_console_cli_or_neon_role",
+    "prebinding_catalog_gate": "apply_time_fresh_max_15_minute_environment_project_branch_endpoint_direct_host_template_recomputed_evidence_and_six_login_bound_proof_with_elevated_attributes_false_zero_neon_superuser_recursive_membership_and_protected_schema_public_or_direct_login_acl",
+    "attestation_connection_source": "runner_resolves_project_branch_endpoint_and_direct_tls_host_from_exact_environment_terraform_outputs_without_cli_overrides",
+    "bootstrap_owner_path": "direct_endpoint_only_never_worker_or_hyperdrive",
+    "provisional_rpo_seconds_max": 300,
+    "provisional_rto_seconds_max": 1800
+  },
+  "security_deviation_2026_08_30": {
+    "primary_source": "https://neon.com/docs/reference/compatibility",
+    "endpoint_primary_source": "https://neon.com/docs/manage/endpoints/",
+    "source_checked_at": "2026-08-30",
+    "finding": "Neon Console CLI and API created roles automatically receive neon_superuser membership with privileges incompatible with Worker least privilege",
+    "rejected_design": "six kislerdm_neon_neon_role resources feeding Hyperdrive",
+    "selected_design": "Terraform creates only the project and direct bootstrap owner; six Worker LOGIN identities are created by audited direct SQL with explicit negative attributes",
+    "binding_gate": "no credential may enter Hyperdrive until the reviewed catalog query proves bounded attributes and memberships for all six roles",
+    "rollback": "remove_or_block_unsafe_hyperdrive_rotate_and_drop_or_recreate_unsafe_login_via_sql_then_reattest_before_rebinding"
+  },
+  "workflow_limits_review_2026_08_30": {
+    "primary_source": "https://developers.cloudflare.com/workflows/reference/limits/",
+    "source_updated_at": "2026-06-15",
+    "source_checked_at": "2026-08-30",
+    "completed_state_retention_max_days_paid": 30,
+    "selected_success_retention_days": 30,
+    "selected_error_retention_days": 30
+  },
+  "must_record_from_procured_terms_and_account": [
+    "service_tier",
+    "contractual_sla",
+    "high_availability_and_automatic_recovery",
+    "failover_behavior",
+    "pitr_window_and_restore_semantics",
+    "tls_and_certificate_behavior",
+    "compute_and_connection_caps",
+    "support_response",
+    "region_and_residency_approval",
+    "storage_and_io_limits",
+    "hyperdrive_cache_and_origin_connection_limits",
+    "queue_workflow_r2_and_observability_entitlements"
+  ],
+  "rejection_rule": "If the procured plan cannot satisfy isolation, residency, backup, restore, connection, support, or measured-capacity gates, write a superseding ADR; do not silently downgrade."
+}

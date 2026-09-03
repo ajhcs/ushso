@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.1.0/capture-reference.schema.json",
+  "title": "Private content-addressed metadata or documentation capture reference",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "capture_ref_id", "source_id", "run_id", "classification", "source_locator", "safe_response_headers", "media_type", "compressed_bytes", "decompressed_bytes", "raw_sha256", "semantic_sha256", "r2_key", "r2_conditional_write_confirmed", "connector_version", "evidence_ref_id", "clocks", "captured_at"],
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+    "capture_ref_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "source_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "classification": { "$ref": "common.schema.json#/$defs/CaptureClassification" },
+    "source_locator": {
+      "type": "object", "additionalProperties": false,
+      "required": ["endpoint_id", "template_id", "final_host", "final_path_class", "redacted_locator"],
+      "properties": {
+        "endpoint_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "template_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "final_host": { "type": "string", "format": "hostname" },
+        "final_path_class": { "$ref": "common.schema.json#/$defs/TargetClass" },
+        "redacted_locator": { "type": "string", "format": "https-uri", "maxLength": 2000 }
+      }
+    },
+    "safe_response_headers": {
+      "type": "object", "additionalProperties": false,
+      "required": ["etag", "last_modified", "content_type", "content_length", "cache_control"],
+      "properties": {
+        "etag": { "type": ["string", "null"], "maxLength": 512 },
+        "last_modified": { "type": ["string", "null"], "format": "http-date" },
+        "content_type": { "type": "string", "pattern": "^(application/(json|ld\\+json|xml)|text/(html|csv|plain)|application/vnd\\.[A-Za-z0-9.+-]+)(;.*)?$", "maxLength": 200 },
+        "content_length": { "type": ["integer", "null"], "minimum": 0 },
+        "cache_control": { "type": ["string", "null"], "maxLength": 500 }
+      }
+    },
+    "media_type": { "type": "string", "pattern": "^(application/(json|ld\\+json|xml)|text/(html|csv|plain)|application/vnd\\.[A-Za-z0-9.+-]+)$", "maxLength": 150 },
+    "compressed_bytes": { "type": "integer", "minimum": 1, "maximum": 52428800 },
+    "decompressed_bytes": { "type": "integer", "minimum": 1, "maximum": 104857600 },
+    "raw_sha256": { "$ref": "common.schema.json#/$defs/Sha256" },
+    "semantic_sha256": { "$ref": "common.schema.json#/$defs/Sha256" },
+    "r2_key": { "type": "string", "pattern": "^captures/sha256/[a-f0-9]{2}/[a-f0-9]{64}$" },
+    "r2_conditional_write_confirmed": { "const": true },
+    "connector_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "evidence_ref_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "clocks": { "$ref": "common.schema.json#/$defs/FourClocks" },
+    "captured_at": { "$ref": "common.schema.json#/$defs/Timestamp" }
+  }
+}

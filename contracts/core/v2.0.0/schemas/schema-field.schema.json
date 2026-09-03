@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/schema-field.schema.json",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/truthEnvelope" },
+    {
+      "type": "object",
+      "required": ["schema_field_id", "schema_snapshot_id", "source_name", "ordinal", "source_data_type", "description", "identifier_namespace", "field_role"],
+      "properties": {
+        "entity_type": { "const": "SchemaField" },
+        "schema_field_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "schema_snapshot_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "source_name": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "ordinal": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "source_data_type": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "description": {
+          "oneOf": [
+            { "type": "string", "minLength": 1, "maxLength": 5000 },
+            { "type": "null" }
+          ]
+        },
+        "identifier_namespace": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[a-z][a-z0-9._-]{1,79}$" },
+            { "type": "null" }
+          ]
+        },
+        "field_role": { "enum": ["identifier", "dimension", "measure_description", "date", "geography", "suppression_flag", "metadata", "unknown"] },
+        "native_identifiers": { "type": "array", "minItems": 1 },
+        "evidence_refs": { "type": "array", "minItems": 1 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

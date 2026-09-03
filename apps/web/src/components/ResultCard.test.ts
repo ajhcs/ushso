@@ -10,41 +10,38 @@ import { ResultCard } from './ResultCard'
 const acceptedResponse = await loadAcceptedDiscoveryFixture()
 assertDiscoveryResult(acceptedResponse)
 
-describe('result card presentation', () => {
-  const result = adaptDiscoveryResponse(acceptedResponse).records[0]
-  const markup = renderToStaticMarkup(createElement(
-    MemoryRouter,
-    {},
-    createElement(ResultCard, { result }),
-  ))
+describe('result card six-region presentation contract', () => {
+  it('shows exactly the six required scanning regions while keeping rich evidence one click down', () => {
+    const result = adaptDiscoveryResponse(acceptedResponse).records[0]
+    const markup = renderToStaticMarkup(createElement(
+      MemoryRouter,
+      {},
+      createElement(ResultCard, { result, displayRank: 1 }),
+    ))
 
-  it('keeps the default card to title, categories, geography, grain, time, status, and one action', () => {
-    expect(markup).toContain(result.title)
-    expect(markup).toContain(result.description)
-    expect(markup).toContain(result.geographicApplicability)
-    expect(markup).toContain(result.grain)
-    expect(markup).toContain(result.availableYears)
-    expect(markup).toContain(result.accessStatusLabel)
-    expect(markup).toContain('View details')
-    expect(markup).toContain(result.detailsUrl)
-    result.categories.slice(0, 3).forEach((category) => expect(markup).toContain(category))
-  })
-
-  it('moves rank, family, relevance, field summary, and access routes off the default card', () => {
-    expect(markup).not.toContain('result-card__rank')
-    expect(markup).not.toContain(result.familyStatus)
-    expect(markup).not.toContain(result.relationship)
-    expect(markup).not.toContain('What the fields tell you:')
+    expect(markup.match(/data-result-region=/g)).toHaveLength(6)
+    expect(markup).toContain(`aria-label="Result 1: ${result.title}"`)
+    expect(markup).toContain('data-result-region="title"')
+    expect(markup).toContain('data-result-region="description"')
+    expect(markup).toContain('data-result-region="why-match"')
+    expect(markup).toContain('data-result-region="geo-grain-time"')
+    expect(markup).toContain('data-result-region="access-evidence"')
+    expect(markup).toContain('data-result-region="details-action"')
+    expect(markup).toContain('<aside class="result-card__summary" aria-label="Verification and access status">')
+    expect(markup).toContain('<dl class="result-card__coverage" data-result-region="geo-grain-time">')
+    expect(markup).toContain('Scoped metadata route checked')
+    expect(markup).toContain('Access')
+    expect(markup).toContain('Geography')
+    expect(markup).toContain('Grain')
+    expect(markup).toContain('Time')
+    expect(markup).toContain('View evidence and access')
     expect(markup).not.toContain('Evidence source')
-    expect(markup).not.toContain('Why it matched')
-    expect(markup).not.toContain(result.canonicalResult.relevance.why_relevant[0] ?? '__missing__')
-    expect(markup).not.toContain('Record type')
+    expect(markup).not.toContain('What the fields tell you:')
+    expect(markup).not.toContain('Relationship:')
+    expect(markup).not.toContain('Relevance:')
     expect(markup).not.toContain('Variables documented')
-    expect(markup).not.toContain('Access and requirements')
-  })
-
-  it('shows live verification as a status, not the evidence dossier', () => {
-    expect(markup).toContain('Live verified')
-    expect(markup).not.toContain(`dateTime="${result.verification.metadataObservedAt}"`)
+    expect(markup).toContain('Why it matched')
+    expect(markup).toContain(result.canonicalResult.relevance.why_relevant[0] ?? 'No evidence-backed match explanation is available.')
+    expect(markup).not.toContain('Live verified')
   })
 })

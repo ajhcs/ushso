@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/normalization/v1.0.0/schemas/import-receipt.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receipt_version", "import_id", "status", "offline", "verification_scope", "source_manifest_file_sha256", "source_content_fingerprint", "normalizer_version", "reconciliation", "idempotency", "identity_safety", "projection_parity", "ingestion_boundary", "rollback", "canonical_counts", "bundle_fingerprint", "projection_fingerprint", "document_fingerprint", "integrity_authority", "database_execution", "plan_file_sha256", "errors"],
+  "properties": {
+    "receipt_version": { "const": "ushso-normalization-import-receipt.v1.1.0" },
+    "import_id": { "type": "string", "pattern": "^urn:ushso:import:" },
+    "status": { "const": "pass" }, "offline": { "const": true },
+    "verification_scope": { "const": "offline_deterministic_preflight_no_database_execution" },
+    "source_manifest_file_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "source_content_fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "normalizer_version": { "const": "1.0.0" },
+    "reconciliation": { "$ref": "#/$defs/reconciliation" }, "idempotency": { "$ref": "#/$defs/idempotency" },
+    "identity_safety": { "$ref": "#/$defs/identitySafety" }, "projection_parity": { "$ref": "#/$defs/projectionParity" },
+    "ingestion_boundary": { "$ref": "#/$defs/ingestionBoundary" },
+    "rollback": { "$ref": "#/$defs/rollback" },
+    "canonical_counts": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+    "bundle_fingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "projection_fingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "document_fingerprint": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "integrity_authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["authority_id", "canonicalization_version"],
+      "properties": {
+        "authority_id": { "const": "legacy-v1.1.0:legacy-corpus-normalizer@1.0.0" },
+        "canonicalization_version": { "const": "ushso-canonical-json-v1" }
+      }
+    },
+    "database_execution": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "required_receipt"],
+      "properties": {
+        "status": { "const": "not_executed_in_offline_package_validation" },
+        "required_receipt": { "const": "verification/wp6/v1.0.0/receipts/verification-receipt.json" }
+      }
+    },
+    "plan_file_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "errors": { "type": "array", "maxItems": 0 }
+  },
+  "$defs": {
+    "reconciliation": { "type": "object", "additionalProperties": false, "required": ["records_expected", "records_accepted", "records_rejected", "routes_expected", "routes_accepted", "routes_rejected", "unexplained_items"], "properties": { "records_expected": { "const": 157 }, "records_accepted": { "const": 157 }, "records_rejected": { "const": 0 }, "routes_expected": { "const": 14 }, "routes_accepted": { "const": 14 }, "routes_rejected": { "const": 0 }, "unexplained_items": { "const": 0 } } },
+    "idempotency": { "type": "object", "additionalProperties": false, "required": ["first_apply_status", "replay_status", "replay_new_logical_rows"], "properties": { "first_apply_status": { "const": "applied" }, "replay_status": { "const": "already_applied" }, "replay_new_logical_rows": { "const": 0 } } },
+    "identitySafety": { "type": "object", "additionalProperties": false, "required": ["canonical_asset_count", "canonical_source_count", "distinct_legacy_record_count", "automatic_merges", "open_review_candidates", "open_source_review_candidates"], "properties": { "canonical_asset_count": { "const": 157 }, "canonical_source_count": { "const": 157 }, "distinct_legacy_record_count": { "const": 157 }, "automatic_merges": { "const": 0 }, "open_review_candidates": { "type": "integer", "minimum": 1 }, "open_source_review_candidates": { "type": "integer", "minimum": 1 } } },
+    "projectionParity": { "type": "object", "additionalProperties": false, "required": ["records_exact", "search_documents_exact", "join_routes_exact", "stable_ids", "access_states", "evidence", "warnings", "zero_result_semantics"], "properties": { "records_exact": { "const": true }, "search_documents_exact": { "const": true }, "join_routes_exact": { "const": true }, "stable_ids": { "const": true }, "access_states": { "const": true }, "evidence": { "const": true }, "warnings": { "const": true }, "zero_result_semantics": { "const": true } } },
+    "ingestionBoundary": { "type": "object", "additionalProperties": false, "required": ["sealed_capture_count", "normalize_job_count", "relational_shape_reconciled", "normalization_requirement_count", "normalization_outbox_count", "aggregate_job_rejected", "missing_job_rejected", "duplicate_job_rejected"], "properties": { "sealed_capture_count": { "const": 2 }, "normalize_job_count": { "const": 2 }, "relational_shape_reconciled": { "const": true }, "normalization_requirement_count": { "const": 2 }, "normalization_outbox_count": { "const": 2 }, "aggregate_job_rejected": { "const": true }, "missing_job_rejected": { "const": true }, "duplicate_job_rejected": { "const": true } } },
+    "rollback": { "type": "object", "additionalProperties": false, "required": ["reject_batch_status", "deleted_rows", "entities_preserved", "revisions_preserved", "aliases_preserved", "audit_projection_preserved"], "properties": { "reject_batch_status": { "const": "rejected" }, "deleted_rows": { "const": 0 }, "entities_preserved": { "const": true }, "revisions_preserved": { "const": true }, "aliases_preserved": { "const": true }, "audit_projection_preserved": { "const": true } } }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/access-observation.schema.json",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/truthEnvelope" },
+    {
+      "type": "object",
+      "required": ["observation_id", "access_route_id", "catalog_visibility_state", "payload_access_state", "authorization_state", "infrastructure_state", "requirement_state", "freshness_state", "stale_at", "check_method", "access_workflow_submitted", "payloads_acquired", "raw_payload_stored"],
+      "properties": {
+        "entity_type": { "const": "AccessObservation" },
+        "observation_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "access_route_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "catalog_visibility_state": { "enum": ["visible", "not_visible", "blocked", "failed", "stale", "unknown", "excluded"] },
+        "payload_access_state": { "enum": ["not_tested", "metadata_only", "accessible", "restricted", "blocked", "failed", "stale", "unknown", "excluded"] },
+        "authorization_state": { "enum": ["not_required", "required", "denied", "externally_reported_authorized", "unknown"] },
+        "infrastructure_state": { "enum": ["not_tested", "reachable", "unreachable", "throttled", "authentication_required", "failed", "stale", "unknown"] },
+        "requirement_state": { "enum": ["none", "documented", "incomplete", "conflicting", "unknown"] },
+        "freshness_state": { "enum": ["current", "stale", "unknown", "not_applicable"] },
+        "stale_at": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/nullableDateTime" },
+        "check_method": { "enum": ["offline_fixture", "metadata_review", "head", "get_metadata_only", "maintainer_attestation", "external_report", "unknown"] },
+        "access_workflow_submitted": { "const": false },
+        "payloads_acquired": { "const": false },
+        "raw_payload_stored": { "const": false },
+        "native_identifiers": { "type": "array", "maxItems": 0 },
+        "evidence_refs": { "type": "array", "minItems": 1 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

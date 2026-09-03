@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/normalization/v1.0.0/schemas/package-manifest.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["manifest_version", "package", "version", "digest_taxonomy", "files"],
+  "properties": {
+    "manifest_version": { "const": "ushso-normalization-package-manifest.v1.0.0" },
+    "package": { "const": "@ushso/normalization" }, "version": { "const": "1.0.0" },
+    "digest_taxonomy": { "type": "object", "additionalProperties": false, "required": ["file_sha256", "content_fingerprint"], "properties": { "file_sha256": { "const": "SHA-256 over exact file bytes" }, "content_fingerprint": { "const": "SHA-256 over canonical JSON for JSON artifacts; null for non-JSON" } } },
+    "files": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["path", "bytes", "file_sha256", "content_fingerprint"], "properties": { "path": { "type": "string", "pattern": "^(?!/)(?!.*\\.\\.).+$" }, "bytes": { "type": "integer", "minimum": 1 }, "file_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }, "content_fingerprint": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" } } } }
+  }
+}

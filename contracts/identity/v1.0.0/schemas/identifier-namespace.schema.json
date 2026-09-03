@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/identity/v1.0.0/identifier-namespace.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "namespace_id",
+    "registry_revision_id",
+    "display_name",
+    "issuing_authority",
+    "scope",
+    "entity_types",
+    "grains",
+    "case_behavior",
+    "normalization_steps",
+    "check_rule",
+    "uniqueness_policy",
+    "reuse_policy",
+    "effective_date_policy",
+    "benchmark_gate",
+    "evidence_ids",
+    "lineage"
+  ],
+  "properties": {
+    "schema_version": {"const": "identity.identifier-namespace.v1.0.0"},
+    "namespace_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "registry_revision_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "display_name": {"type": "string", "minLength": 1, "maxLength": 160},
+    "issuing_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["organization_id", "name"],
+      "properties": {
+        "organization_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+        "name": {"type": "string", "minLength": 1, "maxLength": 240}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "source_id"],
+      "properties": {
+        "kind": {"enum": ["source_local", "cross_source_authoritative"]},
+        "source_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]}
+      }
+    },
+    "entity_types": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/entityType"}
+    },
+    "grains": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/grain"}
+    },
+    "case_behavior": {"enum": ["case_sensitive", "fold_upper", "fold_lower", "numeric"]},
+    "normalization_steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["order", "operation", "parameter"],
+        "properties": {
+          "order": {"type": "integer", "minimum": 1},
+          "operation": {"enum": ["trim", "case_fold", "remove_punctuation", "left_pad", "regex_replace", "identity"]},
+          "parameter": {"type": ["string", "null"], "maxLength": 160}
+        }
+      }
+    },
+    "check_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "expression", "version"],
+      "properties": {
+        "kind": {"enum": ["none", "regex", "check_digit", "registry_lookup"]},
+        "expression": {"type": ["string", "null"], "maxLength": 500},
+        "version": {"$ref": "common.schema.json#/$defs/semver"}
+      }
+    },
+    "uniqueness_policy": {"enum": ["unique_within_effective_period", "not_unique", "unknown"]},
+    "reuse_policy": {"enum": ["prohibited", "possible", "known_reuse", "unknown"]},
+    "effective_date_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["complete_intervals_required_for_auto_resolution", "overlap_required"],
+      "properties": {
+        "complete_intervals_required_for_auto_resolution": {"const": true},
+        "overlap_required": {"const": true}
+      }
+    },
+    "benchmark_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "stratum_id",
+        "sealed_benchmark_id",
+        "adjudicated_positive_pairs",
+        "hard_negative_pairs",
+        "temporal_reuse_conflict_cases",
+        "false_automatic_merges",
+        "candidate_recall",
+        "enablement_receipt_id"
+      ],
+      "properties": {
+        "state": {"enum": ["disabled_candidate_only", "enabled"]},
+        "stratum_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+        "sealed_benchmark_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]},
+        "adjudicated_positive_pairs": {"type": "integer", "minimum": 0},
+        "hard_negative_pairs": {"type": "integer", "minimum": 0},
+        "temporal_reuse_conflict_cases": {"type": "integer", "minimum": 0},
+        "false_automatic_merges": {"type": "integer", "minimum": 0},
+        "candidate_recall": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "enablement_receipt_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]}
+      }
+    },
+    "evidence_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "lineage": {"$ref": "common.schema.json#/$defs/lineage"}
+  }
+}

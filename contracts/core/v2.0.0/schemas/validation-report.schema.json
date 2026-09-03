@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/validation-report.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["report_version", "contract_version", "offline", "valid", "schema_count", "record_counts", "adversarial_case_count", "checks", "errors", "package_manifest_checked"],
+  "properties": {
+    "report_version": { "const": "observatory-core-validation.v2.0.0" },
+    "contract_version": { "const": "observatory-core.v2.0.0" },
+    "offline": { "const": true },
+    "valid": { "type": "boolean" },
+    "schema_count": { "type": "integer", "minimum": 18 },
+    "record_counts": {
+      "type": "object",
+      "minProperties": 13,
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "adversarial_case_count": { "type": "integer", "minimum": 8 },
+    "checks": {
+      "type": "array",
+      "minItems": 10,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "path", "message"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,79}$" },
+          "path": { "type": "string" },
+          "message": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "package_manifest_checked": { "type": "boolean" }
+  }
+}

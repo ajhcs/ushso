@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/coverage/v1.0.0/schemas/coverage-metric.schema.json",
+  "title": "Public coverage metric",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "metric_instance_id",
+    "metric_id",
+    "metric_version",
+    "unit",
+    "numerator_count",
+    "numerator_definition_version",
+    "denominator_count",
+    "denominator_definition",
+    "denominator_definition_version",
+    "denominator_status",
+    "rate",
+    "estimate_assertion",
+    "unknown_count",
+    "not_applicable_count",
+    "excluded_count",
+    "unclassified_count",
+    "as_of",
+    "reporting_window",
+    "revision_pins",
+    "cohort_filters",
+    "membership_manifest_id",
+    "membership_manifest_hash",
+    "partition_counts",
+    "overlap",
+    "parent_partition_metric_instance_id",
+    "absence_claim_permitted",
+    "absence_reason",
+    "partial_enumeration_label",
+    "display"
+  ],
+  "properties": {
+    "metric_instance_id": { "$ref": "common.schema.json#/$defs/Id" },
+    "metric_id": { "$ref": "common.schema.json#/$defs/MetricId" },
+    "metric_version": { "const": "1.0.0" },
+    "unit": { "$ref": "common.schema.json#/$defs/CountingUnit" },
+    "numerator_count": { "type": "integer", "minimum": 0 },
+    "numerator_definition_version": { "$ref": "common.schema.json#/$defs/Id" },
+    "denominator_count": {
+      "oneOf": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "null" }
+      ]
+    },
+    "denominator_definition": { "type": "string", "minLength": 12, "maxLength": 1200 },
+    "denominator_definition_version": {
+      "oneOf": [
+        { "$ref": "common.schema.json#/$defs/Id" },
+        { "type": "null" }
+      ]
+    },
+    "denominator_status": { "enum": ["known", "estimated", "unknown"] },
+    "rate": {
+      "oneOf": [
+        { "type": "number", "minimum": 0, "maximum": 1 },
+        { "type": "null" }
+      ]
+    },
+    "estimate_assertion": {
+      "oneOf": [
+        { "$ref": "common.schema.json#/$defs/EstimateAssertion" },
+        { "type": "null" }
+      ]
+    },
+    "unknown_count": { "type": "integer", "minimum": 0 },
+    "not_applicable_count": { "type": "integer", "minimum": 0 },
+    "excluded_count": { "type": "integer", "minimum": 0 },
+    "unclassified_count": { "type": "integer", "minimum": 0 },
+    "as_of": { "$ref": "common.schema.json#/$defs/UtcInstant" },
+    "reporting_window": { "$ref": "common.schema.json#/$defs/ReportingWindow" },
+    "revision_pins": { "$ref": "common.schema.json#/$defs/RevisionPins" },
+    "cohort_filters": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/CohortFilter" }
+    },
+    "membership_manifest_id": { "$ref": "common.schema.json#/$defs/Id" },
+    "membership_manifest_hash": { "$ref": "common.schema.json#/$defs/Sha256" },
+    "partition_counts": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["state", "count"],
+            "properties": {
+              "state": { "type": "string", "minLength": 2, "maxLength": 80 },
+              "count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      ]
+    },
+    "overlap": { "$ref": "common.schema.json#/$defs/OverlapDisclosure" },
+    "parent_partition_metric_instance_id": {
+      "oneOf": [
+        { "$ref": "common.schema.json#/$defs/Id" },
+        { "type": "null" }
+      ]
+    },
+    "absence_claim_permitted": { "type": "boolean" },
+    "absence_reason": {
+      "oneOf": [
+        { "$ref": "common.schema.json#/$defs/AbsenceReason" },
+        { "type": "null" }
+      ]
+    },
+    "partial_enumeration_label": {
+      "oneOf": [
+        { "const": "observed_processing_yield" },
+        { "type": "null" }
+      ]
+    },
+    "display": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["n_of_d", "unit_label", "why_this_denominator", "overlap_note"],
+      "properties": {
+        "n_of_d": { "type": "string", "minLength": 3, "maxLength": 200 },
+        "unit_label": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "why_this_denominator": { "type": "string", "minLength": 12, "maxLength": 1200 },
+        "overlap_note": { "type": "string", "minLength": 3, "maxLength": 500 }
+      }
+    }
+  }
+}

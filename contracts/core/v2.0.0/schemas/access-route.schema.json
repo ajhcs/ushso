@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/access-route.schema.json",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/truthEnvelope" },
+    {
+      "type": "object",
+      "required": ["access_route_id", "distribution_id", "route_kind", "access_class", "locator", "human_authorization_gate", "requirements", "stop_conditions", "execution_state", "access_workflow_submitted", "payloads_acquired"],
+      "properties": {
+        "entity_type": { "const": "AccessRoute" },
+        "access_route_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "distribution_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "route_kind": { "enum": ["download", "api", "query_service", "application", "dua_request", "license_request", "landing_page", "other"] },
+        "access_class": { "enum": ["public", "registration", "application", "dua", "licensed", "paid", "unknown"] },
+        "locator": {
+          "oneOf": [
+            { "type": "string", "format": "uri", "maxLength": 2000 },
+            { "type": "null" }
+          ]
+        },
+        "human_authorization_gate": { "type": "boolean" },
+        "requirements": {
+          "type": "array",
+          "items": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/accessRequirement" }
+        },
+        "stop_conditions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 500 }
+        },
+        "execution_state": { "const": "not_executed" },
+        "access_workflow_submitted": { "const": false },
+        "payloads_acquired": { "const": false },
+        "native_identifiers": { "type": "array", "minItems": 1 },
+        "evidence_refs": { "type": "array", "minItems": 1 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

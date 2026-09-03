@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/plan-research-input.schema.json",
+  "title": "observatory.plan_research input",
+  "$defs": {
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 6,
+      "required": ["geography_ids", "time_period", "grain", "access_classes", "machine_access_required", "intended_analyses"],
+      "properties": {
+        "geography_ids": { "type": "array", "maxItems": 20, "uniqueItems": true, "items": { "$ref": "common.schema.json#/$defs/stableId" } },
+        "time_period": { "oneOf": [{ "$ref": "common.schema.json#/$defs/timePeriod" }, { "type": "null" }] },
+        "grain": { "oneOf": [{ "enum": ["facility", "campus", "organization", "system", "county", "state", "national"] }, { "type": "null" }] },
+        "access_classes": { "type": "array", "maxItems": 20, "uniqueItems": true, "items": { "enum": ["public", "registration", "application", "dua", "licensed", "paid", "report_only", "unknown"] } },
+        "machine_access_required": { "type": "boolean" },
+        "intended_analyses": { "type": "array", "maxItems": 20, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 128 } }
+      }
+    },
+    "answer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question_id", "answer"],
+      "properties": {
+        "question_id": { "$ref": "common.schema.json#/$defs/stableId" },
+        "answer": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 5,
+      "required": ["contract_version", "mode", "research_need", "constraints", "expected_generation"],
+      "properties": {
+        "contract_version": { "const": "observatory.machine.plan-research.input.v1.0.0" },
+        "mode": { "const": "initial" },
+        "research_need": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "constraints": { "$ref": "#/$defs/constraints" },
+        "expected_generation": { "$ref": "common.schema.json#/$defs/nullableStableId" }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 8,
+      "required": ["contract_version", "mode", "prior_request_hash", "prior_plan_id", "clarification_token", "clarification_answers", "constraints", "expected_generation"],
+      "properties": {
+        "contract_version": { "const": "observatory.machine.plan-research.input.v1.0.0" },
+        "mode": { "const": "clarification" },
+        "prior_request_hash": { "$ref": "common.schema.json#/$defs/digest" },
+        "prior_plan_id": { "oneOf": [{ "$ref": "common.schema.json#/$defs/digest" }, { "type": "null" }] },
+        "clarification_token": { "type": "string", "minLength": 32, "maxLength": 2048, "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$" },
+        "clarification_answers": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/$defs/answer" } },
+        "constraints": { "$ref": "#/$defs/constraints" },
+        "expected_generation": { "$ref": "common.schema.json#/$defs/stableId" }
+      }
+    }
+  ]
+}

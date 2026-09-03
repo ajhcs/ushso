@@ -1,0 +1,183 @@
+{
+  "fixture_version": "identity.adversarial-cases.v1.0.0",
+  "cases": [
+    {
+      "case_id": "fuzzy-score-cannot-auto-merge",
+      "description": "A very high title score remains a candidate even if state fields are forged to automatic acceptance.",
+      "expected_code": "AUTOMATIC_FUZZY_EVIDENCE",
+      "mutations": [
+        {"collection": "candidates", "id_field": "candidate_id", "id": "candidate:fuzzy-open", "path": "resolution_mode", "operation": "replace", "value": "automatic_exact_policy"},
+        {"collection": "candidates", "id_field": "candidate_id", "id": "candidate:fuzzy-open", "path": "state", "operation": "replace", "value": "accepted"},
+        {"collection": "candidates", "id_field": "candidate_id", "id": "candidate:fuzzy-open", "path": "reviewed_at", "operation": "replace", "value": "2026-08-30T03:00:00Z"}
+      ]
+    },
+    {
+      "case_id": "reused-identifier-periods-do-not-overlap",
+      "description": "An exact value reused in a later effective period cannot imply equality.",
+      "expected_code": "EXACT_PERIODS_DO_NOT_OVERLAP",
+      "mutations": [
+        {"collection": "identifier_assertions", "id_field": "assertion_id", "id": "assertion:ccn.beta", "path": "effective_interval.start", "operation": "replace", "value": "2025-01-01"},
+        {"collection": "identifier_assertions", "id_field": "assertion_id", "id": "assertion:ccn.beta", "path": "effective_interval.end", "operation": "replace", "value": "2026-01-01"}
+      ]
+    },
+    {
+      "case_id": "exact-identifier-grain-conflict",
+      "description": "A facility identifier cannot collapse a campus observation.",
+      "expected_code": "EXACT_GRAIN_CONFLICT",
+      "mutations": [
+        {"collection": "identifier_assertions", "id_field": "assertion_id", "id": "assertion:ccn.beta", "path": "grain", "operation": "replace", "value": "campus"}
+      ]
+    },
+    {
+      "case_id": "exact-identifier-entity-conflict",
+      "description": "A hospital facility and consolidated health system are not interchangeable.",
+      "expected_code": "EXACT_ENTITY_CONFLICT",
+      "mutations": [
+        {"collection": "identifier_assertions", "id_field": "assertion_id", "id": "assertion:ccn.beta", "path": "entity_type", "operation": "replace", "value": "health_system"}
+      ]
+    },
+    {
+      "case_id": "family-relation-cannot-become-identity",
+      "description": "Automatic exact policy cannot project a mirror or family relation as equality.",
+      "expected_code": "AUTOMATIC_NON_IDENTITY",
+      "mutations": [
+        {"collection": "candidates", "id_field": "candidate_id", "id": "candidate:auto-exact", "path": "candidate_type", "operation": "replace", "value": "mirror"}
+      ]
+    },
+    {
+      "case_id": "same-named-field-candidate-cannot-be-documented",
+      "description": "A field-name inference cannot upgrade candidate join evidence to documented.",
+      "expected_code": "DOCUMENTED_ROUTE_EVIDENCE_INSUFFICIENT",
+      "mutations": [
+        {"collection": "transformation_steps", "id_field": "step_id", "id": "step:candidate.join", "path": "evidence_state", "operation": "replace", "value": "documented"}
+      ]
+    },
+    {
+      "case_id": "current-identity-snapshot-cannot-answer-historical-route",
+      "description": "A route applicable in 2020 cannot use a current 2026 identity snapshot.",
+      "expected_code": "CURRENT_IDENTITY_USED_HISTORICALLY",
+      "mutations": [
+        {"collection": "join_routes", "id_field": "revision_id", "id": "route-revision:main.1", "path": "identity_context.valid_at", "operation": "replace", "value": "2026-08-30"}
+      ]
+    },
+    {
+      "case_id": "aggregation-cannot-satisfy-crosswalk",
+      "description": "Changing a crosswalk operation into aggregation cannot satisfy the crosswalk requirement.",
+      "expected_code": "CROSSWALK_SATISFIED_BY_AGGREGATION",
+      "mutations": [
+        {"collection": "transformation_steps", "id_field": "step_id", "id": "step:main.crosswalk", "path": "operation_kind", "operation": "replace", "value": "aggregate"}
+      ]
+    },
+    {
+      "case_id": "review-decision-supersession-cycle",
+      "description": "Append-only review history rejects a decision cycle.",
+      "expected_code": "SUPERSESSION_CYCLE",
+      "mutations": [
+        {"collection": "review_decisions", "id_field": "decision_id", "id": "decision:reversed.old", "path": "supersedes_decision_id", "operation": "replace", "value": "decision:reversed.new"}
+      ]
+    },
+    {
+      "case_id": "reversal-must-retain-both-source-objects",
+      "description": "Reversal reconstruction cannot orphan either source-native observation.",
+      "expected_code": "REVERSAL_OBJECT_RETENTION_INCOMPLETE",
+      "mutations": [
+        {"collection": "reversal_plans", "id_field": "reversal_plan_id", "id": "reversal-plan:fixture.reversed", "path": "expected_retained_object_ids.1", "operation": "replace", "value": "object:asset.unrelated"}
+      ]
+    },
+    {
+      "case_id": "auto-rule-benchmark-floor",
+      "description": "An automatic namespace stratum with fewer than 50 adjudicated positives remains disabled.",
+      "expected_code": "AUTO_RULE_POSITIVE_FLOOR_NOT_MET",
+      "mutations": [
+        {"collection": "namespaces", "id_field": "namespace_id", "id": "namespace:cms.ccn", "path": "benchmark_gate.adjudicated_positive_pairs", "operation": "replace", "value": 49}
+      ]
+    },
+    {
+      "case_id": "auto-rule-needs-enable-receipt",
+      "description": "Passing fixture counts alone do not authorize a rule without an enablement receipt.",
+      "expected_code": "AUTO_RULE_ENABLEMENT_RECEIPT_MISSING",
+      "mutations": [
+        {"collection": "namespaces", "id_field": "namespace_id", "id": "namespace:cms.ccn", "path": "benchmark_gate.enablement_receipt_id", "operation": "replace", "value": null}
+      ]
+    },
+    {
+      "case_id": "conflicting-authoritative-id-quarantines",
+      "description": "A declared conflicting authoritative identifier prevents automatic acceptance.",
+      "expected_code": "AUTOMATIC_CONFLICTING_ASSERTION",
+      "mutations": [
+        {"collection": "candidates", "id_field": "candidate_id", "id": "candidate:auto-exact", "path": "conflicting_assertion_ids", "operation": "replace", "value": ["assertion:ccn.conflict"]}
+      ]
+    },
+    {
+      "case_id": "source-native-id-cannot-cross-sources",
+      "description": "A source-local identifier never becomes an authoritative cross-source identity key.",
+      "expected_code": "SOURCE_NATIVE_ID_CROSS_SOURCE",
+      "mutations": [
+        {"collection": "identifier_assertions", "id_field": "assertion_id", "id": "assertion:source.alpha.two", "path": "source_id", "operation": "replace", "value": "source:beta"},
+        {"collection": "candidates", "id_field": "candidate_id", "id": "candidate:source-local-open", "path": "resolution_mode", "operation": "replace", "value": "automatic_exact_policy"},
+        {"collection": "candidates", "id_field": "candidate_id", "id": "candidate:source-local-open", "path": "state", "operation": "replace", "value": "accepted"},
+        {"collection": "candidates", "id_field": "candidate_id", "id": "candidate:source-local-open", "path": "reviewed_at", "operation": "replace", "value": "2026-08-30T03:00:00Z"}
+      ]
+    },
+    {
+      "case_id": "missing-effective-period-forces-review",
+      "description": "Missing dates prevent exact automatic resolution even for equal normalized values.",
+      "expected_code": "EXACT_EFFECTIVE_PERIOD_INCOMPLETE",
+      "mutations": [
+        {"collection": "identifier_assertions", "id_field": "assertion_id", "id": "assertion:ccn.beta", "path": "effective_interval.start", "operation": "replace", "value": null},
+        {"collection": "identifier_assertions", "id_field": "assertion_id", "id": "assertion:ccn.beta", "path": "effective_interval.end", "operation": "replace", "value": null},
+        {"collection": "identifier_assertions", "id_field": "assertion_id", "id": "assertion:ccn.beta", "path": "effective_interval.completeness", "operation": "replace", "value": "unknown"}
+      ]
+    },
+    {
+      "case_id": "candidate-pair-order-is-deterministic",
+      "description": "Candidate pairs use one canonical lexical ordering.",
+      "expected_code": "CANDIDATE_PAIR_NOT_CANONICALLY_ORDERED",
+      "mutations": [
+        {"collection": "candidates", "id_field": "candidate_id", "id": "candidate:fuzzy-open", "path": "object_a_id", "operation": "replace", "value": "object:asset.gamma-mirror"},
+        {"collection": "candidates", "id_field": "candidate_id", "id": "candidate:fuzzy-open", "path": "object_b_id", "operation": "replace", "value": "object:asset.gamma"}
+      ]
+    },
+    {
+      "case_id": "family-edge-cannot-enter-identity-graph",
+      "description": "A reviewed mirror relationship remains in the family graph.",
+      "expected_code": "NON_IDENTITY_EDGE_IN_IDENTITY_GRAPH",
+      "mutations": [
+        {"collection": "relationship_projections", "id_field": "projection_id", "id": "projection:mirror", "path": "graph_kind", "operation": "replace", "value": "identity"}
+      ]
+    },
+    {
+      "case_id": "unresolved-candidate-cannot-project-equality",
+      "description": "Open candidate state cannot be presented publicly as accepted equality.",
+      "expected_code": "PROJECTION_EXACT_POLICY_NOT_ACCEPTED",
+      "mutations": [
+        {"collection": "relationship_projections", "id_field": "projection_id", "id": "projection:human-same", "path": "basis.kind", "operation": "replace", "value": "exact_authority_policy"},
+        {"collection": "relationship_projections", "id_field": "projection_id", "id": "projection:human-same", "path": "basis.reference_id", "operation": "replace", "value": "candidate:fuzzy-open"}
+      ]
+    },
+    {
+      "case_id": "open-blocker-derives-blocked",
+      "description": "Blocked is derived from unresolved blockers rather than encoded as compatibility.",
+      "expected_code": "DERIVED_READINESS_MISMATCH",
+      "mutations": [
+        {"collection": "transformation_steps", "id_field": "step_id", "id": "step:candidate.join", "path": "derived_readiness", "operation": "replace", "value": "unknown"}
+      ]
+    },
+    {
+      "case_id": "executed-needs-controlled-or-external-context",
+      "description": "Executed evidence requires an explicit non-public execution context.",
+      "expected_code": "EXECUTION_CONTEXT_MISSING",
+      "mutations": [
+        {"collection": "transformation_steps", "id_field": "step_id", "id": "step:temporal.executed", "path": "execution_context", "operation": "replace", "value": null}
+      ]
+    },
+    {
+      "case_id": "strict-schema-rejects-unexpected-property",
+      "description": "All production objects fail closed on unexpected properties.",
+      "expected_code": "SCHEMA_INVALID",
+      "mutations": [
+        {"collection": "candidates", "id_field": "candidate_id", "id": "candidate:fuzzy-open", "path": "silent_merge", "operation": "add", "value": true}
+      ]
+    }
+  ]
+}

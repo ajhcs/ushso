@@ -1,0 +1,178 @@
+{
+  "contract_version": "observatory-research-plan-adversarial-cases.v1.0.0",
+  "cases": [
+    {
+      "case_id": "adversarial:union-as-common",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/bundle_assessment/common_supported_coverage/period/start", "value": "2019-01-01"},
+      "expected_codes": ["COMMON_COVERAGE_EXCEEDS_INTERSECTION"]
+    },
+    {
+      "case_id": "adversarial:fiscal-calendar-collapse",
+      "base_plan_status": "ready_with_constraints",
+      "mutation": {"operation": "set", "json_pointer": "/bundle_assessment/common_supported_coverage/period/period_kind", "value": "calendar"},
+      "expected_codes": ["FISCAL_CALENDAR_COLLAPSE"]
+    },
+    {
+      "case_id": "adversarial:candidate-join-upgrade",
+      "base_plan_status": "ready_with_constraints",
+      "mutation": {"operation": "set", "json_pointer": "/operations/1/evidence_state", "value": "documented"},
+      "expected_codes": ["CANDIDATE_JOIN_UPGRADED"]
+    },
+    {
+      "case_id": "adversarial:grain-change-without-aggregation",
+      "base_plan_status": "ready_with_constraints",
+      "mutation": {"operation": "set", "json_pointer": "/operations/0/target_grain", "value": "system"},
+      "expected_codes": ["GRAIN_CHANGE_WITHOUT_AGGREGATION"]
+    },
+    {
+      "case_id": "adversarial:crosswalk-satisfied-by-aggregation",
+      "base_plan_status": "ready_with_constraints",
+      "mutation": {
+        "operation": "set",
+        "json_pointer": "/operations/1/requirements/0",
+        "value": {
+          "requirement_id": "requirement:phc4-label-ccn-crosswalk",
+          "kind": "crosswalk",
+          "state": "satisfied",
+          "description": "Incorrectly claims aggregation satisfies the crosswalk.",
+          "satisfied_by_operation_id": "operation:facility-to-system-aggregation",
+          "evidence_reference_ids": ["ev-main"]
+        }
+      },
+      "expected_codes": ["CROSSWALK_SATISFIED_BY_AGGREGATION"]
+    },
+    {
+      "case_id": "adversarial:current-identity-for-history",
+      "base_plan_status": "ready_with_constraints",
+      "mutation": {"operation": "set", "json_pointer": "/operations/0/identity_context/valid_from", "value": "2024-01-01"},
+      "expected_codes": ["CURRENT_IDENTITY_USED_HISTORICALLY"]
+    },
+    {
+      "case_id": "adversarial:restricted-access-as-authorized",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/asset_contributions/0/access/access_class", "value": "dua"},
+      "expected_codes": ["RESTRICTED_ACCESS_AUTHORIZATION_OVERCLAIM", "HUMAN_AUTHORIZATION_GATE_MISSING"]
+    },
+    {
+      "case_id": "adversarial:missing-human-gate",
+      "base_plan_status": "ready",
+      "mutation": {
+        "operation": "set",
+        "json_pointer": "/asset_contributions/0/access",
+        "value": {
+          "access_class": "application",
+          "visibility_state": "visible",
+          "payload_access_state": "restricted",
+          "authorization_state": "external_authorization_required",
+          "requirements": [],
+          "human_gates": [],
+          "evidence_reference_ids": ["ev-main"]
+        }
+      },
+      "expected_codes": ["HUMAN_AUTHORIZATION_GATE_MISSING"]
+    },
+    {
+      "case_id": "adversarial:unsupported-analysis-supported",
+      "base_plan_status": "unsupported",
+      "mutation": {"operation": "set", "json_pointer": "/downstream_handoff/analysis_decisions/0/classification", "value": "supported"},
+      "expected_codes": ["UNSUPPORTED_ANALYSIS_LABELED_SUPPORTED", "PRODUCT_BOUNDARY_ANALYSIS_OVERCLAIM"]
+    },
+    {
+      "case_id": "adversarial:operation-cycle",
+      "base_plan_status": "ready_with_constraints",
+      "mutation": {"operation": "set", "json_pointer": "/operations/0/depends_on", "value": ["operation:facility-to-system-aggregation"]},
+      "expected_codes": ["GRAPH_CYCLE"]
+    },
+    {
+      "case_id": "adversarial:acquisition-cycle",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/acquisition_plan/steps/0/depends_on", "value": ["acquire:contribution:finance"]},
+      "expected_codes": ["GRAPH_CYCLE", "ACQUISITION_SEQUENCE_NOT_TOPOLOGICAL"]
+    },
+    {
+      "case_id": "adversarial:missing-evidence",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/evidence_references", "value": []},
+      "expected_codes": ["AUDITABLE_CLAIM_EVIDENCE_MISSING", "EVIDENCE_REFERENCE_UNRESOLVED"]
+    },
+    {
+      "case_id": "adversarial:inadmissible-evidence",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/evidence_references/0/admissibility_state", "value": "inadmissible"},
+      "expected_codes": ["EVIDENCE_INADMISSIBLE", "EVIDENCE_NOT_RELEASE_ADMISSIBLE"]
+    },
+    {
+      "case_id": "adversarial:stale-evidence",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/evidence_references/0/staleness_state", "value": "stale"},
+      "expected_codes": ["EVIDENCE_STALE_OR_UNKNOWN", "EVIDENCE_NOT_RELEASE_ADMISSIBLE"]
+    },
+    {
+      "case_id": "adversarial:unreviewed-evidence",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/evidence_references/0/review_state", "value": "review_required"},
+      "expected_codes": ["EVIDENCE_REVIEW_REQUIRED", "EVIDENCE_NOT_RELEASE_ADMISSIBLE"]
+    },
+    {
+      "case_id": "adversarial:healthcare-row-payload",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/dataset_rows", "value": [{"patient": "sentinel"}]},
+      "expected_codes": ["SCHEMA_INVALID", "PRODUCT_BOUNDARY_FIELD_FORBIDDEN"]
+    },
+    {
+      "case_id": "adversarial:computed-results",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/downstream_handoff/computed_results", "value": [{"value": 42}]},
+      "expected_codes": ["SCHEMA_INVALID", "PRODUCT_BOUNDARY_FIELD_FORBIDDEN"]
+    },
+    {
+      "case_id": "adversarial:analytical-rankings",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/response/rankings", "value": ["best-hospital"]},
+      "expected_codes": ["SCHEMA_INVALID", "PRODUCT_BOUNDARY_FIELD_FORBIDDEN"]
+    },
+    {
+      "case_id": "adversarial:family-placeholder-ready",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/asset_contributions/0/selection_level", "value": "family_placeholder"},
+      "expected_codes": ["FAMILY_PLACEHOLDER_NOT_EXECUTABLE", "PLAN_STATUS_PRECEDENCE_MISMATCH"]
+    },
+    {
+      "case_id": "adversarial:source-placeholder-ready",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/asset_contributions/0/selection_level", "value": "source_placeholder"},
+      "expected_codes": ["SOURCE_PLACEHOLDER_NOT_EXECUTABLE", "PLAN_STATUS_PRECEDENCE_MISMATCH"]
+    },
+    {
+      "case_id": "adversarial:plan-digest-mismatch",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/plan_id", "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"},
+      "expected_codes": ["PLAN_DIGEST_MISMATCH"]
+    },
+    {
+      "case_id": "adversarial:status-precedence",
+      "base_plan_status": "clarification_required",
+      "mutation": {"operation": "set", "json_pointer": "/interpreted_need/boundary_state", "value": "outside_product_boundary"},
+      "expected_codes": ["PLAN_STATUS_PRECEDENCE_MISMATCH"]
+    },
+    {
+      "case_id": "adversarial:unsafe-nonadditive-aggregation",
+      "base_plan_status": "ready_with_constraints",
+      "mutation": {"operation": "set", "json_pointer": "/operations/2/measure_additivity", "value": "non_additive"},
+      "expected_codes": ["UNSAFE_AGGREGATION"]
+    },
+    {
+      "case_id": "adversarial:unknown-evidence-reference",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/asset_contributions/0/evidence_reference_ids", "value": ["ev-missing"]},
+      "expected_codes": ["EVIDENCE_REFERENCE_UNRESOLVED"]
+    },
+    {
+      "case_id": "adversarial:exact-release-missing",
+      "base_plan_status": "ready",
+      "mutation": {"operation": "set", "json_pointer": "/asset_contributions/0/release_id", "value": null},
+      "expected_codes": ["SCHEMA_INVALID", "EXACT_SELECTION_ID_MISSING"]
+    }
+  ]
+}

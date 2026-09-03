@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/identity/v1.0.0/common.schema.json",
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 200,
+      "pattern": "^[a-z][a-z0-9._-]*(?::[A-Za-z0-9._~-]+)+$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][A-Za-z0-9.-]+)?$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "effectiveInterval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end", "bounds", "completeness"],
+      "properties": {
+        "start": {"type": ["string", "null"], "format": "date"},
+        "end": {"type": ["string", "null"], "format": "date"},
+        "bounds": {"enum": ["[)", "[]", "(]", "()"]},
+        "completeness": {"enum": ["complete", "open_start", "open_end", "unknown"]}
+      }
+    },
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "evidence_class", "observed_at", "source_locator"],
+      "properties": {
+        "evidence_id": {"$ref": "#/$defs/opaqueId"},
+        "evidence_class": {
+          "enum": [
+            "identifier_assertion",
+            "authoritative_registry",
+            "authoritative_crosswalk",
+            "source_documentation",
+            "schema_snapshot",
+            "source_declared_lineage",
+            "review_decision",
+            "controlled_test",
+            "external_execution",
+            "observation",
+            "inferred_name_match"
+          ]
+        },
+        "observed_at": {"$ref": "#/$defs/dateTime"},
+        "source_locator": {"type": "string", "minLength": 1, "maxLength": 2048}
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["import_run_id", "normalizer_version", "recorded_at"],
+      "properties": {
+        "import_run_id": {"$ref": "#/$defs/opaqueId"},
+        "normalizer_version": {"$ref": "#/$defs/semver"},
+        "recorded_at": {"$ref": "#/$defs/dateTime"}
+      }
+    },
+    "grain": {
+      "enum": [
+        "legal_entity",
+        "consolidated_system",
+        "facility",
+        "campus",
+        "provider_organization",
+        "filing_entity",
+        "county",
+        "state",
+        "release",
+        "distribution",
+        "record"
+      ]
+    },
+    "entityType": {
+      "enum": [
+        "organization",
+        "health_system",
+        "hospital_facility",
+        "hospital_campus",
+        "provider_organization",
+        "legal_filer",
+        "geography",
+        "asset",
+        "release",
+        "distribution"
+      ]
+    }
+  }
+}

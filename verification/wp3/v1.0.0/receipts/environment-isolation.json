@@ -1,0 +1,20 @@
+{
+  "schema_version": "ushso-wp3-infra-receipt.v1.0.0",
+  "receipt_id": "environment-isolation",
+  "generated_at": "2026-08-30T23:05:07Z",
+  "scope": "Staging and production root, state, resource, binding, credential, identity, and zero-traffic fences",
+  "overall_status": "pending_external_authorization",
+  "local_configuration": {
+    "status": "pass",
+    "commands": ["node --test verification/wp3/v1.0.0/infra/tests/*.test.mjs", "node verification/wp3/v1.0.0/infra/tools/validate-foundation.mjs"],
+    "evidence": ["Separate Terraform roots and environment-named remote-state keys", "Each root declares one distinct environment-named Neon project and supports a project/bootstrap-only phase before Cloudflare foundation materialization", "Disjoint prefixes for Neon projects, endpoints/direct hosts, R2, Queues/DLQs, Hyperdrive, Workflows, Workers, Access, and secret ownership", "Six SQL-created Worker logins use exact environment-and-role names; a same-environment, exact-project, exact-branch, exact-endpoint, exact-direct-host catalog attestation gates each Hyperdrive config", "The attestation runner accepts only the environment and constructs the verify-full connection from that root's resolved Terraform outputs", "The attestation is valid for at most 15 minutes and apply-time timestamp must be inside its verification/expiry interval", "Terraform recomputes the SHA-256 of the full canonical envelope so a modified field cannot reuse the original digest", "No public-to-mutation Hyperdrive config reuse is possible", "Adversarial cross-environment, cross-project, cross-branch, cross-endpoint, wrong-host, stale saved-plan, future, same-digest mutation, cross-role, elevated-privilege, and API-created-role candidates are rejected", "Both environments have workers_dev false and empty routes"],
+    "input_sha256": { "infra/policy/environment-fence.v1.0.0.json": "fdd3b4c3c9ddd1d079164583fa7e1c9baccc6e0679a0de7b1f74e6db5ef522ed", "infra/cloudflare/manifests/resources.staging.json": "80835a588c1a51e01adfdfaf1f10d0b4ab93f5cc5920ddd4143227f540462946", "infra/cloudflare/manifests/resources.production.json": "410a9013761a616b3fc2c0e8331b05fae0be138c09d051e88c62bdd4f6b1a36e" }
+  },
+  "managed_rehearsal": {
+    "status": "pending_external_authorization",
+    "authorization_gates": ["AUTH-02", "AUTH-03", "AUTH-11"],
+    "required_evidence": ["Encrypted remote-state bucket and lock recovery evidence for each environment", "Terraform state/resource diff with no shared IDs", "Negative staging credentials and privilege-attestation receipts against production resources and inverse", "Distinct SQL-created managed service identities and database credentials with zero neon_superuser membership", "Zero-traffic production foundation apply receipt"]
+  },
+  "authorization_boundaries": { "AUTH-02": "create isolated control-plane state, identities, IDs, secrets, and Access", "AUTH-03": "apply and test staging only", "AUTH-11": "separate zero-traffic production foundation apply after staging acceptance; does not authorize routes, DNS, or traffic" },
+  "non_claims": ["No remote state exists from this work", "No Neon project, SQL login, credential, or privilege attestation was created or tested", "AUTH-03 staging apply was not run", "AUTH-11 production foundation apply was not run", "No production route, DNS record, or traffic change is authorized"]
+}

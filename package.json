@@ -2,14 +2,20 @@
   "name": "ushso",
   "version": "0.1.0",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"
   },
   "workspaces": [
     "apps/web",
-    "packages/retrieval"
+    "packages/*",
+    "packages/*/*/v*",
+    "contracts/*/v*",
+    "docs/feedback/v*",
+    "evaluation/*/v*",
+    "verification/*/v*",
+    "verification/testing/*/v*"
   ],
   "scripts": {
     "import:national": "node scripts/import-national-federal-evidence.mjs",
@@ -24,11 +30,23 @@
     "test:e2e": "node tests/e2e-smoke.mjs",
     "test:evaluation": "node --test evaluation/baseline/v0.1.0/tests/*.test.mjs",
     "validate:evaluation": "node evaluation/baseline/v0.1.0/tools/validate-baseline.mjs",
-    "test": "npm run test:retrieval && npm run test:web && npm run test:worker && npm run test:evaluation && npm run validate:evaluation",
+    "test:contracts": "node scripts/run-contract-suites.mjs --contracts",
+    "test:evaluator-v2": "node scripts/run-contract-suites.mjs --suite evaluator-v2",
+    "test:evaluator-bridge": "node scripts/run-contract-suites.mjs --suite evaluator-bridge",
+    "test:feedback": "node scripts/run-contract-suites.mjs --suite feedback",
+    "test:wp0": "node scripts/run-contract-suites.mjs --suite wp0",
+    "test:wp2": "node scripts/run-contract-suites.mjs --suite wp2",
+    "test:program-verification": "node scripts/run-contract-suites.mjs --suite program-verification",
+    "test:external-authorization": "node scripts/run-contract-suites.mjs --suite external-authorization",
+    "test:ci-verification": "node scripts/run-contract-suites.mjs --suite ci-verification",
+    "test:verification": "node scripts/run-contract-suites.mjs --verification",
+    "verify:research-navigator": "node scripts/run-contract-suites.mjs --all",
+    "test": "npm run test:retrieval && npm run test:web && npm run test:worker && npm run test:evaluation && npm run validate:evaluation && npm run verify:research-navigator",
     "build:web": "npm run stage:corpus && npm run build --workspace @ushso/observatory-web",
     "build": "npm run build:web",
     "cf:types": "node scripts/run-wrangler.mjs types",
-    "cf:dry-run": "npm run build && node scripts/run-wrangler.mjs deploy --dry-run --outdir .wrangler-dry-run",
+    "cf:dry-run:artifact": "node scripts/run-wrangler.mjs deploy --dry-run --outdir .wrangler-dry-run",
+    "cf:dry-run": "npm run build && npm run cf:dry-run:artifact",
     "cf:dev": "node scripts/run-wrangler.mjs dev --local --port 8787",
     "cf:deploy": "npm run build && node scripts/run-wrangler.mjs deploy"
   },

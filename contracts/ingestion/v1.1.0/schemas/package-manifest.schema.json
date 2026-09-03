@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.1.0/package-manifest.schema.json",
+  "title": "Ingestion contract package manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "package", "schema_dialect", "canonicalization", "digest_taxonomy", "compatibility", "file_count", "payload_bytes", "files"],
+  "properties": {
+    "manifest_version": { "const": "ingestion-package-manifest.v1" },
+    "package": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "version", "immutable"],
+      "properties": {
+        "name": { "const": "@ushso/ingestion-contract-v1-1" },
+        "version": { "const": "1.1.0" },
+        "immutable": { "const": true }
+      }
+    },
+    "schema_dialect": { "const": "https://json-schema.org/draft/2020-12/schema" },
+    "canonicalization": {
+      "type": "object", "additionalProperties": false,
+      "required": ["algorithm", "version", "encoding", "object_key_order", "array_order", "transport_exclusions"],
+      "properties": {
+        "algorithm": { "const": "ushso-canonical-json" },
+        "version": { "const": "1" },
+        "encoding": { "const": "UTF-8" },
+        "object_key_order": { "const": "Unicode-code-point-lexicographic" },
+        "array_order": { "const": "preserved" },
+        "transport_exclusions": { "type": "array", "maxItems": 0 }
+      }
+    },
+    "digest_taxonomy": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "prefixItems": [
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["digest_type", "algorithm", "scope"],
+          "properties": {
+            "digest_type": { "const": "raw_file_sha256" },
+            "algorithm": { "const": "SHA-256" },
+            "scope": { "const": "exact stored file bytes" }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["digest_type", "algorithm", "scope"],
+          "properties": {
+            "digest_type": { "const": "canonical_json_sha256" },
+            "algorithm": { "const": "SHA-256 over ushso-canonical-json v1 UTF-8 bytes" },
+            "scope": { "const": "parsed JSON value; not a file-byte digest" }
+          }
+        }
+      ],
+      "items": false
+    },
+    "compatibility": {
+      "type": "object", "additionalProperties": false,
+      "required": ["predecessor_package", "predecessor_version", "predecessor_manifest_raw_file_sha256", "predecessor_validation_receipt_raw_file_sha256", "relationship", "upgrade_rule", "downgrade_rule", "unsafe_legacy_action", "unexpected_properties", "enum_extension", "deprecation_state"],
+      "properties": {
+        "predecessor_package": { "const": "@ushso/ingestion-contract" },
+        "predecessor_version": { "const": "1.0.0" },
+        "predecessor_manifest_raw_file_sha256": { "const": "842888bae6092da9d00982bed4186a43ceb6aeace9f837947c5a4eb6e0da9886" },
+        "predecessor_validation_receipt_raw_file_sha256": { "const": "665174c8ec848ae93fdb8034010f03892b2771aa67b777b361526dd6f396f8e8" },
+        "relationship": { "const": "strict_subset_for_harvest_run_workflow_instance_id" },
+        "upgrade_rule": { "const": "replace_contract_version_only_when_workflow_instance_id_is_provider_compatible" },
+        "downgrade_rule": { "const": "replace_contract_version_only; every_valid_v1_1_record_preserves_v1_0_shape_and_semantics" },
+        "unsafe_legacy_action": { "const": "retain_as_v1_0_audit_record_and_do_not_create_or_remap_provider_instance" },
+        "unexpected_properties": { "const": "reject" },
+        "enum_extension": { "const": "breaking_without_version_change" },
+        "deprecation_state": { "const": "current_successor" }
+      }
+    },
+    "file_count": { "type": "integer", "minimum": 1 },
+    "payload_bytes": { "type": "integer", "minimum": 1 },
+    "files": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["path", "media_type", "bytes", "raw_file_sha256", "canonical_json_sha256"],
+        "properties": {
+          "path": { "type": "string", "pattern": "^(README\\.md|package\\.json|schemas/.+\\.json|fixtures/.+\\.json|tools/.+\\.mjs|tests/.+\\.test\\.mjs)$" },
+          "media_type": { "enum": ["application/json", "text/markdown", "text/javascript"] },
+          "bytes": { "type": "integer", "minimum": 1 },
+          "raw_file_sha256": { "$ref": "common.schema.json#/$defs/Sha256" },
+          "canonical_json_sha256": { "anyOf": [{ "$ref": "common.schema.json#/$defs/Sha256" }, { "type": "null" }] }
+        }
+      }
+    }
+  }
+}

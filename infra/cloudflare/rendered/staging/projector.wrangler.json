@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../node_modules/wrangler/config-schema.json",
+  "name": "ushso-staging-projector",
+  "main": "../../templates/foundation-placeholder.mjs",
+  "compatibility_date": "2026-08-30",
+  "compatibility_flags": [
+    "nodejs_compat_v2"
+  ],
+  "workers_dev": false,
+  "routes": [],
+  "vars": {
+    "USHSO_ENVIRONMENT": "staging",
+    "USHSO_WORKER_ROLE": "projector",
+    "FOUNDATION_INERT": "true",
+    "CONFIG_SCHEMA_VERSION": "ushso-worker-binding-manifest.v1.0.0"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 0.25,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.1
+    }
+  },
+  "hyperdrive": [
+    {
+      "binding": "HD_CORRECTNESS",
+      "id": "REPLACE_STAGING_PROJECTOR_HD_CORRECTNESS_ID"
+    },
+    {
+      "binding": "HD_IMMUTABLE_READ",
+      "id": "REPLACE_STAGING_PROJECTOR_HD_IMMUTABLE_READ_ID"
+    }
+  ],
+  "queues": {
+    "producers": [],
+    "consumers": [
+      {
+        "queue": "ushso-staging-project-index",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5,
+        "max_retries": 4,
+        "dead_letter_queue": "ushso-staging-project-index-dlq",
+        "max_concurrency": 2
+      }
+    ]
+  }
+}

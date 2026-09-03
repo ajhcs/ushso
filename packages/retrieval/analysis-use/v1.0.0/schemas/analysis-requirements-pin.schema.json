@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.ushso.org/retrieval/analysis-use/v1.0.0/analysis-requirements-pin.schema.json",
+  "title": "Pinned hc-metrics analysis requirements import",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source", "catalog", "schema", "authority"],
+  "properties": {
+    "schema_version": {"const": "observatory-analysis-requirements-pin.v1.0.0"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project_id", "origin_verified", "revision", "tracking_bead", "catalog_path", "catalog_blob_oid", "schema_path", "schema_blob_oid"],
+      "properties": {
+        "project_id": {"const": "ajhcs/healthcare-toolkit"},
+        "origin_verified": {"const": false},
+        "revision": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+        "tracking_bead": {"const": "healthcare-toolkit-672v"},
+        "catalog_path": {"const": "packages/hc-metrics/src/hc_metrics/data/analysis-requirements.v1.0.0.json"},
+        "catalog_blob_oid": {"$ref": "#/$defs/gitObjectId"},
+        "schema_path": {"const": "packages/hc-metrics/src/hc_metrics/schemas/analysis-requirements.v1.0.0.schema.json"},
+        "schema_blob_oid": {"$ref": "#/$defs/gitObjectId"}
+      }
+    },
+    "catalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "schema_version", "catalog_version", "bytes", "sha256"],
+      "properties": {
+        "path": {"const": "upstream/analysis-requirements.v1.0.0.json"},
+        "schema_version": {"const": "hc-metrics.analysis-requirements.v1.0.0"},
+        "catalog_version": {"const": "1.0.0"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "id", "bytes", "sha256"],
+      "properties": {
+        "path": {"const": "upstream/analysis-requirements.v1.0.0.schema.json"},
+        "id": {"const": "https://contracts.ushso.org/hc-metrics/analysis-requirements/v1.0.0/schema.json"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["discovery_guidance_only", "data_access_authorized", "calculation_authorized", "persistence_authorized", "publication_authorized"],
+      "properties": {
+        "discovery_guidance_only": {"const": true},
+        "data_access_authorized": {"const": false},
+        "calculation_authorized": {"const": false},
+        "persistence_authorized": {"const": false},
+        "publication_authorized": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "gitObjectId": {"type": "string", "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"}
+  }
+}

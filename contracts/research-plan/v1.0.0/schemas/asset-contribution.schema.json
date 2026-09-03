@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/asset-contribution.schema.json",
+  "title": "Exact asset contribution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contribution_id",
+    "role_id",
+    "role_kind",
+    "essential",
+    "recommendation_state",
+    "selection_level",
+    "asset_id",
+    "release_id",
+    "distribution_id",
+    "access_route_id",
+    "source_id",
+    "coverage",
+    "fitness",
+    "limitations",
+    "access",
+    "identity_context",
+    "evidence_reference_ids"
+  ],
+  "properties": {
+    "contribution_id": {"$ref": "common.schema.json#/$defs/stableId"},
+    "role_id": {"$ref": "common.schema.json#/$defs/stableId"},
+    "role_kind": {"enum": ["ownership_change", "utilization", "finance", "denominator", "organization_identity", "geography", "crosswalk", "clinical_context", "workforce", "other"]},
+    "essential": {"type": "boolean"},
+    "recommendation_state": {"enum": ["essential", "supporting", "conditional", "rejected", "unavailable"]},
+    "selection_level": {"enum": ["exact_distribution", "asset_placeholder", "family_placeholder", "source_placeholder", "unresolved"]},
+    "asset_id": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/assetId"},
+        {"type": "null"}
+      ]
+    },
+    "release_id": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/releaseId"},
+        {"type": "null"}
+      ]
+    },
+    "distribution_id": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/distributionId"},
+        {"type": "null"}
+      ]
+    },
+    "access_route_id": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/accessRouteId"},
+        {"type": "null"}
+      ]
+    },
+    "source_id": {"$ref": "common.schema.json#/$defs/sourceId"},
+    "coverage": {"$ref": "common.schema.json#/$defs/coverage"},
+    "fitness": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": {"$ref": "common.schema.json#/$defs/shortText"}
+    },
+    "limitations": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {"$ref": "common.schema.json#/$defs/maintainedText"}
+    },
+    "access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["access_class", "visibility_state", "payload_access_state", "authorization_state", "requirements", "human_gates", "evidence_reference_ids"],
+      "properties": {
+        "access_class": {"enum": ["public", "registration", "application", "dua", "licensed", "paid", "report_only", "unknown"]},
+        "visibility_state": {"enum": ["visible", "not_visible", "unknown"]},
+        "payload_access_state": {"enum": ["publicly_accessible", "restricted", "not_assessed", "failed", "blocked", "unknown"]},
+        "authorization_state": {"enum": ["not_authorized", "external_authorization_required", "satisfied_outside_ushso", "not_applicable", "unknown"]},
+        "requirements": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {"$ref": "common.schema.json#/$defs/requirement"}
+        },
+        "human_gates": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {"$ref": "common.schema.json#/$defs/humanGate"}
+        },
+        "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "identity_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity_snapshot_id", "valid_at", "resolution_state", "evidence_reference_ids"],
+      "properties": {
+        "identity_snapshot_id": {"$ref": "common.schema.json#/$defs/stableId"},
+        "valid_at": {"$ref": "common.schema.json#/$defs/date"},
+        "resolution_state": {"enum": ["accepted", "exact_policy", "candidate", "ambiguous", "unknown"]},
+        "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"selection_level": {"const": "exact_distribution"}}, "required": ["selection_level"]},
+      "then": {
+        "properties": {
+          "asset_id": {"$ref": "common.schema.json#/$defs/assetId"},
+          "release_id": {"$ref": "common.schema.json#/$defs/releaseId"},
+          "distribution_id": {"$ref": "common.schema.json#/$defs/distributionId"},
+          "access_route_id": {"$ref": "common.schema.json#/$defs/accessRouteId"}
+        }
+      }
+    }
+  ]
+}

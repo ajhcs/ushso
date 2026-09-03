@@ -1,0 +1,39 @@
+{
+  "$schema": "../../../../node_modules/wrangler/config-schema.json",
+  "name": "ushso-production-public",
+  "main": "../../templates/foundation-placeholder.mjs",
+  "compatibility_date": "2026-08-30",
+  "compatibility_flags": [
+    "nodejs_compat_v2"
+  ],
+  "workers_dev": false,
+  "routes": [],
+  "vars": {
+    "USHSO_ENVIRONMENT": "production",
+    "USHSO_WORKER_ROLE": "public",
+    "FOUNDATION_INERT": "true",
+    "CONFIG_SCHEMA_VERSION": "ushso-worker-binding-manifest.v1.0.0"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 0.1,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.05
+    }
+  },
+  "hyperdrive": [
+    {
+      "binding": "HD_CORRECTNESS",
+      "id": "REPLACE_PRODUCTION_PUBLIC_HD_CORRECTNESS_ID"
+    },
+    {
+      "binding": "HD_IMMUTABLE_READ",
+      "id": "REPLACE_PRODUCTION_PUBLIC_HD_IMMUTABLE_READ_ID"
+    }
+  ]
+}

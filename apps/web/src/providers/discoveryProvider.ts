@@ -1,4 +1,5 @@
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
+import { isSafeEvidenceLocator, safeExternalHttpsUrl } from '../lib/externalUrls'
 import type { DiscoveryQuery, DiscoveryResult } from '../types/discovery'
 
 export type DiscoveryProviderKind = 'fixture' | 'api'
@@ -69,7 +70,7 @@ function isVariableDocumentation(value: unknown) {
   if (value.variable_count !== null && (typeof value.variable_count !== 'number' || value.variable_count < 0)) return false
   if (!Array.isArray(value.variables) || !isStringArray(value.evidence_ids) || !isStringArray(value.limitations)) return false
   if (!evidenceStates.includes(String(value.evidence_state) as (typeof evidenceStates)[number])) return false
-  if (value.codebook !== null && (!isObject(value.codebook) || typeof value.codebook.title !== 'string' || typeof value.codebook.url !== 'string')) return false
+  if (value.codebook !== null && (!isObject(value.codebook) || typeof value.codebook.title !== 'string' || safeExternalHttpsUrl(value.codebook.url) === null)) return false
   return value.variables.every((variable) => {
     if (!isObject(variable) || typeof variable.name !== 'string' || typeof variable.description !== 'string') return false
     if (variable.label !== null && typeof variable.label !== 'string') return false
@@ -80,6 +81,21 @@ function isVariableDocumentation(value: unknown) {
   })
 }
 
+const retrievalActions = ['open', 'download', 'call_api', 'submit_request', 'accept_license', 'authenticate', 'inspect_metadata', 'contact_owner', 'stop_and_report'] as const
+
+function hasBoundedRetrieval(value: Record<string, unknown>) {
+  const retrieval = value.retrieval
+  if (!isObject(retrieval) || typeof retrieval.machine_actionable !== 'boolean') return false
+  if (!['download', 'api', 'portal', 'request_workflow', 'license_workflow', 'unknown'].includes(String(retrieval.preferred_interface))) return false
+  if (!Array.isArray(retrieval.instructions) || !isStringArray(retrieval.expected_artifacts) || !isNonEmptyString(retrieval.failure_policy)) return false
+  return retrieval.instructions.every((step, index) => {
+    if (!isObject(step) || !Number.isInteger(step.sequence) || step.sequence !== index + 1) return false
+    if (!retrievalActions.includes(String(step.action) as (typeof retrievalActions)[number])) return false
+    if (step.url !== null && safeExternalHttpsUrl(step.url) === null) return false
+    return typeof step.requires_human === 'boolean' && isNonEmptyString(step.instruction) && isNonEmptyString(step.expected_result)
+  })
+}
+
 function isCanonicalRecord(value: unknown, expectedRecordId: string) {
   if (!isObject(value)) return false
   if (value.schema_version !== 'observatory-record.v1.0.0' || value.record_id !== expectedRecordId || value.record_type !== 'dataset_asset') return false
@@ -87,6 +103,9 @@ function isCanonicalRecord(value: unknown, expectedRecordId: string) {
   if (!isObject(value.capabilities) || !isObject(value.freshness_verification) || !isObject(value.retrieval) || !isObject(value.join_compatibility)) return false
   if (!Array.isArray(value.provenance) || !Array.isArray(value.evidence) || !Array.isArray(value.unit_of_analysis)) return false
   if (!hasExplicitVerification(value)) return false
+  if (!hasBoundedRetrieval(value)) return false
+  if (value.authoritative_url !== undefined && safeExternalHttpsUrl(value.authoritative_url) === null) return false
+  if (!value.provenance.every((source) => isObject(source) && isSafeEvidenceLocator(source.locator))) return false
   if (value.variable_documentation !== undefined && !isVariableDocumentation(value.variable_documentation)) return false
   return typeof value.title === 'string' && typeof value.description === 'string'
 }

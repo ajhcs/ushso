@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/evidence-reference.schema.json",
+  "title": "Evidence reference attached to plan claims",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evidence_reference_id",
+    "evidence_id",
+    "claim_pointers",
+    "observed_at",
+    "evidence_state",
+    "admissibility_state",
+    "staleness_state",
+    "review_state",
+    "policy_id",
+    "derivation_lineage"
+  ],
+  "properties": {
+    "evidence_reference_id": {"$ref": "common.schema.json#/$defs/stableId"},
+    "evidence_id": {"$ref": "common.schema.json#/$defs/stableId"},
+    "claim_pointers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512,
+        "pattern": "^/(?:[^~/]|~0|~1)*(?:/(?:[^~/]|~0|~1)*)*$"
+      }
+    },
+    "observed_at": {"$ref": "common.schema.json#/$defs/dateTime"},
+    "evidence_state": {"enum": ["documented", "observed", "reviewed", "candidate", "ambiguous", "unknown"]},
+    "admissibility_state": {"enum": ["admissible", "inadmissible", "unassessed"]},
+    "staleness_state": {"enum": ["current", "stale", "unknown"]},
+    "review_state": {"enum": ["human_reviewed", "review_not_required", "review_required", "unknown"]},
+    "policy_id": {"$ref": "common.schema.json#/$defs/stableId"},
+    "derivation_lineage": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "reference_id"],
+        "properties": {
+          "kind": {"enum": ["source_capture", "canonical_assertion", "access_observation", "identity_decision", "join_route", "coverage_fact", "policy", "maintained_copy"]},
+          "reference_id": {"$ref": "common.schema.json#/$defs/stableId"}
+        }
+      }
+    }
+  }
+}

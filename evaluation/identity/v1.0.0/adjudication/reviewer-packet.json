@@ -1,0 +1,73 @@
+{
+  "schema_version": "identity.blind-review-packet.v1.0.0",
+  "packet_id": "identity-review-packet:wp7.v1",
+  "status": "prepared_not_authorized_for_review",
+  "immutable": true,
+  "benchmark": {
+    "benchmark_id": "identity-benchmark:wp7.conformance.v1",
+    "case_count": 720,
+    "case_sha256": "475d3cce5e712eb24f6d937b1f5aff69e192e67860f81474fa0fe9a926fdeb35",
+    "launch_critical_strata": 6,
+    "per_stratum_shape": {"positive": 50, "hard_negative": 50, "temporal_reuse_conflict": 20}
+  },
+  "reviewer_case_contract": {
+    "schema_version": "identity.blind-review-case.v1.0.0",
+    "case_count": 720,
+    "case_sha256": "70d67aebb844ed8b5eed70cb026b9e18152701fd04ff414967415150892dccc5",
+    "sort": "review_case_id_ascending",
+    "opaque_case_ids": true,
+    "omitted_controlled_fields": ["benchmark_case_id", "category", "scenario_kind", "synthetic_expected_relationship", "synthetic_expectation_is_adjudication", "adjudicated_label", "production_rule_eligible", "similarity_signal", "match_score", "algorithm_prediction", "automatic_resolution"]
+  },
+  "authorization_boundary": {
+    "reference": "AUTH-14",
+    "register_path": "verification/external-authorization/v1.0.0/register.json",
+    "register_byte_sha256": "335b7d3516594d2372cc545b16bf6bbc18e7f69420b4485f659b52a1cdff923b",
+    "environment": "identity_evaluation_governance",
+    "register_status": "not_requested",
+    "authorized": false,
+    "authorization_receipt_id": null,
+    "permission_granted": false,
+    "required_action": "Obtain explicit scoped authorization and reissue/reseal this packet before assigning or collecting human reviews."
+  },
+  "review_policy": {
+    "identified_humans_required": true,
+    "distinct_identity_receipts_required": true,
+    "distinct_independence_attestations_required": true,
+    "controlled_fixture_reviewers_accepted": false,
+    "controlled_labels_disclosed": false,
+    "algorithm_outputs_disclosed": false,
+    "minimum_double_reviewed_cases": 100,
+    "entire_eligible_set_when_smaller": true,
+    "eligible_case_count": 720,
+    "primary_secondary_distinct": true,
+    "third_distinct_adjudicator_required_for_conflict": true,
+    "unresolved_conflicts_silently_collapsed": false,
+    "minimum_percent_agreement": 0.9,
+    "minimum_cohens_kappa": 0.8,
+    "per_stratum_reporting_required": true,
+    "automatic_resolution_enablement": "disabled_candidate_only",
+    "automatic_enablement_required_for_candidate_only_release": false
+  },
+  "bounded_import": {
+    "maximum_input_bytes": 10485760,
+    "maximum_review_records": 3000,
+    "symlinks_allowed": false,
+    "network_requests": 0,
+    "database_writes": 0,
+    "source_payload_downloads": 0,
+    "receipt_status_on_future_success": "validated_ready_for_append_only_import",
+    "import_executed_by_validator": false
+  },
+  "artifact_bindings": [
+    {"path": "benchmark/manifest.json", "byte_sha256": "92f7fc1c0edc83bafa1fe9b978a9549565df73dbed1c0c0b2f63d5cc2a7db602"},
+    {"path": "src/cases.mjs", "byte_sha256": "e2896b9f5a52258f19485ada7227ee433fa35b9c88139cf2e24ba9b353f6ba30"},
+    {"path": "src/adjudication-packet.mjs", "byte_sha256": "a747f2dee6fec0a2a03d27cf677227d0611f1947654b8fa7700d1d062bb5ac4e"},
+    {"path": "src/adjudication-import.mjs", "byte_sha256": "7278a1d7a3c9272d4f919f3af6911b1aaa2be111fd7504cd81d2f26326a15db5"},
+    {"path": "adjudication/REVIEWER_INSTRUCTIONS.md", "byte_sha256": "cfc7c860cc9e04f8026f2e0d5012b2c08925eb6e6de176b19676c192beeff820"},
+    {"path": "schemas/adjudication-record.schema.json", "byte_sha256": "64d5c223326b8d6baafd147e8458f9cdeff3d5fb8efeace6e8bdc519e8aaedb3"},
+    {"path": "schemas/adjudication-submission.schema.json", "byte_sha256": "fbecac35dff96a62ef6f6b6ea8e3399ae10e4b188d48fc737db1a639b23eeb84"},
+    {"path": "schemas/adjudication-validation-receipt.schema.json", "byte_sha256": "ebc401d0dc33c9b09923a66af5e4da686e234942f444199f0453a8e26522caad"},
+    {"path": "tools/export-reviewer-packet.mjs", "byte_sha256": "19cb62f6be3d9fee4f6f2df42df39dfc8b83a0313ea34518b9b3fe68dc8d7916"},
+    {"path": "tools/validate-adjudication-import.mjs", "byte_sha256": "0d096f8e79871ee95547c1d61f4023d475ebac8922c009302308759ffb63052f"}
+  ]
+}

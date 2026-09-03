@@ -1,0 +1,115 @@
+{
+  "ledger_version": "wp13.web-discoverability-candidate.v1.0.0",
+  "scope": "protected_local_candidate",
+  "evidence_class": "fixture_only_local_integration",
+  "external_authorizations": [
+    {
+      "id": "AUTH-06",
+      "register": "verification/external-authorization/v1.0.0/register.json",
+      "environment": "production_internal_canary",
+      "status": "not_requested",
+      "authorized": false,
+      "blocks": ["Access-protected WP13 candidate traffic", "production pointer-race and crawler canary"]
+    },
+    {
+      "id": "AUTH-07",
+      "register": "verification/external-authorization/v1.0.0/register.json",
+      "environment": "production_public",
+      "status": "not_requested",
+      "authorized": false,
+      "blocks": ["public WP13 Worker wiring", "public deployment and gradual cutover"]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "WP13-SEO-PROJECTION",
+      "source": "section 15.5 item 1; WP13",
+      "status": "verified_local_candidate",
+      "evidence": ["packages/web-discoverability/src/projection.mjs", "packages/web-discoverability/tests/projection-crawler.test.mjs"]
+    },
+    {
+      "id": "WP13-NO-JS-HTML",
+      "source": "section 15.5 items 2, 3, and 8; WP13 acceptance",
+      "status": "verified_fixture_only_candidate_unwired",
+      "evidence": ["packages/web-discoverability/src/render.mjs", "worker/wp13-web-discoverability-candidate.mjs", "packages/web-discoverability/tests/projection-crawler.test.mjs"]
+    },
+    {
+      "id": "WP13-STRUCTURED-DATA",
+      "source": "section 15.5 item 4; WP13 acceptance",
+      "status": "verified_local_schema_org_and_evidence_gated_dcat_us_and_dcat3_offline_fixture",
+      "evidence": ["packages/web-discoverability/src/render.mjs", "packages/web-discoverability/conformance/dcat3-dataset.v1.0.0.json", "packages/web-discoverability/tests/projection-crawler.test.mjs", "packages/web-discoverability/tests/dcat3-conformance.test.mjs"]
+    },
+    {
+      "id": "WP13-ARTIFACT-READ-INTEGRITY",
+      "source": "WP13 immutable generation and rollback acceptance; validated release-blocking security finding",
+      "status": "verified_local_every_active_retained_and_static_rollback_read",
+      "evidence": ["packages/web-discoverability/src/projection.mjs", "packages/web-discoverability/src/service.mjs", "packages/web-discoverability/tests/artifact-integrity.test.mjs"]
+    },
+    {
+      "id": "WP13-CONTENT-NEGOTIATION",
+      "source": "section 15.5 public HTML contract; validated release-blocking standards finding",
+      "status": "verified_local_accept_before_method_and_vary_accept_on_negotiable_redirects",
+      "evidence": ["worker/wp13-web-discoverability-candidate.mjs", "packages/web-discoverability/tests/lifecycle-security.test.mjs"]
+    },
+    {
+      "id": "WP13-CANONICAL-ORIGIN",
+      "source": "sections 15.5 and 17; validated release-blocking trust-boundary finding",
+      "status": "verified_local_exact_deployment_owned_origin_composition",
+      "evidence": ["packages/web-discoverability/src/service.mjs", "packages/web-discoverability/tests/lifecycle-security.test.mjs"]
+    },
+    {
+      "id": "WP13-PUBLIC-LOCATOR-PROVENANCE",
+      "source": "sections 15.5 and 17; validated release-blocking disclosure finding",
+      "status": "verified_local_exact_attestation_and_secret_path_rejection",
+      "evidence": ["packages/web-discoverability/src/safety.mjs", "packages/web-discoverability/src/projection.mjs", "packages/web-discoverability/tests/bounds-and-portability.test.mjs"]
+    },
+    {
+      "id": "WP13-SITEMAP",
+      "source": "section 15.5 item 5; sections 22.6 and 23.6",
+      "status": "verified_local_exact_membership_and_generation_pinning",
+      "evidence": ["packages/web-discoverability/src/projection.mjs", "packages/web-discoverability/tests/generation-rollback.test.mjs", "packages/web-discoverability/tests/bounds-and-portability.test.mjs"]
+    },
+    {
+      "id": "WP13-ALIAS-LIFECYCLE",
+      "source": "section 15.5 items 6 and 7; section 22.6",
+      "status": "verified_local_non_enumerating",
+      "evidence": ["packages/web-discoverability/src/service.mjs", "packages/web-discoverability/tests/lifecycle-security.test.mjs"]
+    },
+    {
+      "id": "WP13-GENERATION-PARITY",
+      "source": "section 15.5 generation-pointer rule; sections 23.5 and 23.6",
+      "status": "verified_local_pointer_race_and_static_rollback",
+      "evidence": ["packages/web-discoverability/src/service.mjs", "packages/web-discoverability/tests/generation-rollback.test.mjs"]
+    },
+    {
+      "id": "WP13-UNTRUSTED-OUTPUT-SECURITY",
+      "source": "sections 15.5 and 17",
+      "status": "verified_local",
+      "evidence": ["packages/web-discoverability/src/safety.mjs", "packages/web-discoverability/tests/lifecycle-security.test.mjs", "packages/web-discoverability/tests/bounds-and-portability.test.mjs"]
+    },
+    {
+      "id": "TST-SEO-01",
+      "source": "tester feedback A paragraph A7; reconciliation receipt target sitemap-structured-data",
+      "status": "verified_fixture_only_candidate_full_public_corpus_pending",
+      "evidence": ["packages/web-discoverability/tests/projection-crawler.test.mjs", "verification/wp13/v1.0.0/receipts/candidate-validation.json"]
+    },
+    {
+      "id": "G23.6",
+      "source": "section 23.6 web discoverability gate",
+      "status": "provisional_local_invariants_pass_public_activation_and_full_corpus_pending",
+      "evidence": ["packages/web-discoverability/tests", "verification/wp13/v1.0.0/receipts/candidate-validation.json"]
+    },
+    {
+      "id": "DOD-15",
+      "source": "section 28 item 15",
+      "status": "not_satisfied_public_entry_unwired_and_production_corpus_not_promoted",
+      "evidence": ["worker/wp13-web-discoverability-candidate.mjs", "verification/wp13/v1.0.0/receipts/candidate-validation.json"]
+    },
+    {
+      "id": "WP13-PUBLIC-ACTIVATION",
+      "source": "WP13 to WP14 dependency; external authorization register",
+      "status": "pending_prerequisite_gates_AUTH-06_candidate_and_AUTH-07_cutover",
+      "evidence": ["verification/external-authorization/v1.0.0/register.json", "verification/wp13/v1.0.0/receipts/candidate-validation.json"]
+    }
+  ]
+}

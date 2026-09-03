@@ -199,8 +199,8 @@ export function SearchResultsPage() {
                 <p>{discovery.error.message}</p>
                 <Link className="button-link" to="/">Revise search</Link>
               </div>
-            ) : visibleItems.length > 0 ? visibleItems.map((result) => (
-              <ResultCard key={result.id} result={result} />
+            ) : visibleItems.length > 0 ? visibleItems.map((result, index) => (
+              <ResultCard key={result.id} result={result} displayRank={(safePage - 1) * PAGE_SIZE + index + 1} />
             )) : state.filters.length > 0 ? (
               <div className="empty-results">
                 <h2>No returned results match these filters.</h2>

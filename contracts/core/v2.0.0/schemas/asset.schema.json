@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/asset.schema.json",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/truthEnvelope" },
+    {
+      "type": "object",
+      "required": ["asset_id", "source_id", "responsible_organization_id", "title", "asset_kind", "summary", "identity_resolution_state", "family_resolution_state"],
+      "properties": {
+        "entity_type": { "const": "Asset" },
+        "asset_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "source_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "responsible_organization_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "asset_kind": { "enum": ["dataset", "product", "report_series", "registry", "collection", "crosswalk", "methodology", "other"] },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 5000 },
+        "identity_resolution_state": { "enum": ["source_scoped", "authoritatively_resolved", "review_pending", "conflicted", "unknown"] },
+        "family_resolution_state": { "enum": ["not_grouped", "candidate", "accepted", "conflicted", "unknown"] },
+        "native_identifiers": { "type": "array", "minItems": 1 },
+        "evidence_refs": { "type": "array", "minItems": 1 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": "ushso-test-strategy-evidence.v1.0.0",
+  "strategy_key": "search",
+  "plan_section": "§22.4",
+  "structural_status": "PASS",
+  "release_readiness": "BLOCKED",
+  "release_blockers": [
+    "database:migration-0010",
+    "authorization:AUTH-13",
+    "live:production-like-load"
+  ],
+  "execution_policy": { "offline": true, "repository_writes": 0, "receipt_writes": 0, "network_calls": 0, "external_actions": 0 },
+  "controls": [
+    { "id": "T22.4-01", "statement": "Projection schema, references, visibility, and checksum tests.", "evidence_status": "implemented_local", "evidence_scope": "local_unit", "evidence": [{ "kind": "test", "path": "verification/wp8/v1.0.0/tests/projection.test.mjs", "sha256": "6ac69afed2792ee6f94f88e9d58fe8b581a0d6c2d77a9eb17df28d24f9fd0c3d" }] },
+    { "id": "T22.4-02", "statement": "Full build versus incremental convergence.", "evidence_status": "implemented_local", "evidence_scope": "local_unit", "evidence": [{ "kind": "test", "path": "verification/wp8/v1.0.0/tests/projection.test.mjs", "sha256": "6ac69afed2792ee6f94f88e9d58fe8b581a0d6c2d77a9eb17df28d24f9fd0c3d" }] },
+    { "id": "T22.4-03", "statement": "Family-collapse and unresolved-candidate separation.", "evidence_status": "implemented_local", "evidence_scope": "local_unit", "evidence": [{ "kind": "test", "path": "verification/wp8/v1.0.0/tests/projection.test.mjs", "sha256": "6ac69afed2792ee6f94f88e9d58fe8b581a0d6c2d77a9eb17df28d24f9fd0c3d" }] },
+    { "id": "T22.4-04", "statement": "Field-level CCN/EIN/NPI/FIPS discovery.", "evidence_status": "pending_database", "evidence_scope": "local_static", "evidence": [{ "kind": "receipt", "path": "verification/wp8/v1.0.0/receipts/database-migration-readiness.json", "sha256": "05c304931c191d34aab31ee83f02b9f0e292fbe151662c755a01d536abd6524e" }] },
+    { "id": "T22.4-05", "statement": "Authority, negative-constraint, near-miss, and access-gate tests.", "evidence_status": "pending_authorization", "evidence_scope": "external_gate_record", "evidence": [{ "kind": "receipt", "path": "verification/wp8/v1.0.0/receipts/retrieval-quality.json", "sha256": "352f72d9bbec324d799471479dc1592321b546c5b1da752e597b41b493ddf220" }] },
+    { "id": "T22.4-06", "statement": "Exact temporal and partial-coverage tests.", "evidence_status": "implemented_local", "evidence_scope": "local_unit", "evidence": [{ "kind": "test", "path": "verification/wp8/v1.0.0/tests/projection.test.mjs", "sha256": "6ac69afed2792ee6f94f88e9d58fe8b581a0d6c2d77a9eb17df28d24f9fd0c3d" }] },
+    { "id": "T22.4-07", "statement": "Query-plan and production-like load tests.", "evidence_status": "pending_live", "evidence_scope": "external_gate_record", "evidence": [{ "kind": "receipt", "path": "verification/wp8/v1.0.0/receipts/query-plan-gate.json", "sha256": "75ba677d878a9cc2b62245e848508daa2b0e2cbbe99e3c1d11a45800edab54f0" }] },
+    { "id": "T22.4-08", "statement": "Generation promotion and rollback.", "evidence_status": "implemented_local", "evidence_scope": "local_unit", "evidence": [{ "kind": "test", "path": "verification/wp8/v1.0.0/tests/publication-lifecycle.test.mjs", "sha256": "3e1e8b75e16d4035e6a1cb47b1add6cd1ddd3dc97c416993b3a9c741057a653e" }] }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/coverage/v1.0.0/schemas/validation-receipt.schema.json",
+  "title": "Coverage contract validation receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "receipt_version",
+    "package",
+    "package_version",
+    "validated_at",
+    "valid",
+    "schema_count",
+    "metric_definition_count",
+    "metric_instance_count",
+    "membership_manifest_count",
+    "source_scope_count",
+    "stage_fact_count",
+    "matrix_cell_count",
+    "canonical_coverage_cell_states",
+    "adversarial_case_count",
+    "adversarial_cases_rejected",
+    "partition_equations_verified",
+    "external_requests",
+    "errors",
+    "package_manifest_sha256"
+  ],
+  "properties": {
+    "receipt_version": { "const": "1.0.0" },
+    "package": { "const": "@ushso/coverage-contract" },
+    "package_version": { "const": "1.0.0" },
+    "validated_at": { "$ref": "common.schema.json#/$defs/UtcInstant" },
+    "valid": { "type": "boolean" },
+    "schema_count": { "type": "integer", "minimum": 1 },
+    "metric_definition_count": { "type": "integer", "const": 18 },
+    "metric_instance_count": { "type": "integer", "const": 18 },
+    "membership_manifest_count": { "type": "integer", "const": 18 },
+    "source_scope_count": { "type": "integer", "minimum": 1 },
+    "stage_fact_count": { "type": "integer", "minimum": 1 },
+    "matrix_cell_count": { "type": "integer", "minimum": 7 },
+    "canonical_coverage_cell_states": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "uniqueItems": true,
+      "items": { "$ref": "common.schema.json#/$defs/CoverageCellState" }
+    },
+    "adversarial_case_count": { "type": "integer", "minimum": 10 },
+    "adversarial_cases_rejected": { "type": "integer", "minimum": 10 },
+    "partition_equations_verified": { "type": "integer", "const": 2 },
+    "external_requests": { "type": "integer", "const": 0 },
+    "errors": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "package_manifest_sha256": { "$ref": "common.schema.json#/$defs/Sha256" }
+  }
+}

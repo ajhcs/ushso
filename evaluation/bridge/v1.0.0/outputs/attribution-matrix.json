@@ -1,0 +1,2376 @@
+{
+  "matrix_version": "ushso-retrieval-attribution-matrix.v1",
+  "evaluator_version": "ushso-retrieval-evaluator.v2.0.0",
+  "generated_at": "2026-08-30T00:00:00.000Z",
+  "interpretation": {
+    "pre_tuning": true,
+    "consolidated_v2_algorithm_available": false,
+    "production_worker_lane": "Observed current production runtime, retained as an alternate pre-WP0 algorithm lane; it is not called a tuned or accepted v2 algorithm.",
+    "same_algorithm_corpus_bridge": "Compare c143_legacy with c157_legacy (or the two production-worker lanes) to attribute corpus/projection/vocabulary changes while holding algorithm bytes fixed.",
+    "algorithm_bridge": "Compare algorithms within a fixed corpus; do not attribute this delta to the corpus.",
+    "held_out_status": "The v0.1.0 held-out gold was already published and evaluated by the legacy baseline. These 20 questions remain audit-only and are not a sealed final-gate hold-out for tuning."
+  },
+  "release_gate_status": "FAIL_PRE_TUNING",
+  "release_gate_pass": false,
+  "unavailable_lanes": [
+    {
+      "lane_id": "c143_consolidated_v2_algorithm",
+      "corpus": "historical-evaluation-corpus-v1.0.1-143",
+      "status": "unavailable",
+      "reason": "No consolidated retrieval-v2 runtime exists in the repository. The bridge seals this absence and does not invent or tune one."
+    },
+    {
+      "lane_id": "c157_consolidated_v2_algorithm",
+      "corpus": "production-migration-seed-v1.1.0-157",
+      "status": "unavailable",
+      "reason": "No consolidated retrieval-v2 runtime exists in the repository. The bridge seals this absence and does not invent or tune one."
+    }
+  ],
+  "corpus_delta_summary": {
+    "added_records": 14,
+    "changed_existing_records": 0,
+    "changed_existing_search_documents": 37,
+    "vocabulary_changed": true,
+    "join_routes_identical": true
+  },
+  "lanes": [
+    {
+      "lane_id": "c143_legacy",
+      "corpus": "historical-evaluation-corpus-v1.0.1-143",
+      "corpus_manifest_sha256": "5622272ded52b0cbf039da47114142f8cb35ba634e8a6bbb9ee55b0ecd70511c",
+      "algorithm": "legacy-package-retrieval-runtime",
+      "algorithm_fingerprint_sha256": "4a42e30637bfef95f72ff7f0d57658804d48e540fc60c5a788219a67028914b3",
+      "metrics": {
+        "1": {
+          "full_essential_recall_macro": 0.21627,
+          "full_essential_recall_micro": 0.205128,
+          "full_legacy_acceptable_coverage_macro": 0.182692,
+          "full_strict_exact_gold_precision": 0.35,
+          "full_graded_acceptable_precision": 0.311111,
+          "present_essential_recall_macro": 0.333333,
+          "present_essential_recall_micro": 0.333333,
+          "present_strict_exact_gold_precision": 0.35,
+          "present_graded_acceptable_precision": 0.311111,
+          "present_required_role_coverage": 0.315789
+        },
+        "3": {
+          "full_essential_recall_macro": 0.323413,
+          "full_essential_recall_micro": 0.333333,
+          "full_legacy_acceptable_coverage_macro": 0.282051,
+          "full_strict_exact_gold_precision": 0.188889,
+          "full_graded_acceptable_precision": 0.166667,
+          "present_essential_recall_macro": 0.5,
+          "present_essential_recall_micro": 0.541667,
+          "present_strict_exact_gold_precision": 0.188889,
+          "present_graded_acceptable_precision": 0.166667,
+          "present_required_role_coverage": 0.552632
+        },
+        "5": {
+          "full_essential_recall_macro": 0.434524,
+          "full_essential_recall_micro": 0.448718,
+          "full_legacy_acceptable_coverage_macro": 0.362179,
+          "full_strict_exact_gold_precision": 0.143333,
+          "full_graded_acceptable_precision": 0.13,
+          "present_essential_recall_macro": 0.7,
+          "present_essential_recall_micro": 0.729167,
+          "present_strict_exact_gold_precision": 0.143333,
+          "present_graded_acceptable_precision": 0.13,
+          "present_required_role_coverage": 0.736842
+        },
+        "10": {
+          "full_essential_recall_macro": 0.5,
+          "full_essential_recall_micro": 0.525641,
+          "full_legacy_acceptable_coverage_macro": 0.459936,
+          "full_strict_exact_gold_precision": 0.091667,
+          "full_graded_acceptable_precision": 0.078611,
+          "present_essential_recall_macro": 0.805556,
+          "present_essential_recall_micro": 0.854167,
+          "present_strict_exact_gold_precision": 0.091667,
+          "present_graded_acceptable_precision": 0.078611,
+          "present_required_role_coverage": 0.868421
+        },
+        "20": {
+          "full_essential_recall_macro": 0.547619,
+          "full_essential_recall_micro": 0.551282,
+          "full_legacy_acceptable_coverage_macro": 0.533654,
+          "full_strict_exact_gold_precision": 0.050833,
+          "full_graded_acceptable_precision": 0.042222,
+          "present_essential_recall_macro": 0.872222,
+          "present_essential_recall_micro": 0.895833,
+          "present_strict_exact_gold_precision": 0.050833,
+          "present_graded_acceptable_precision": 0.042222,
+          "present_required_role_coverage": 0.868421
+        }
+      },
+      "metric_receipts": {
+        "1": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 9.083333,
+                "denominator": 42,
+                "score": 0.21627
+              },
+              "micro": {
+                "numerator": 16,
+                "denominator": 78,
+                "score": 0.205128
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 9.5,
+              "denominator": 52,
+              "score": 0.182692
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 21,
+              "denominator": 60,
+              "score": 0.35
+            },
+            "graded_acceptable_precision": {
+              "numerator": 18.666667,
+              "denominator": 60,
+              "score": 0.311111
+            },
+            "required_role_coverage": {
+              "numerator": 12,
+              "denominator": 60,
+              "score": 0.2,
+              "eligible_questions": 24
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 0,
+            "unmatched_result_count": 4
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 10,
+                "denominator": 30,
+                "score": 0.333333
+              },
+              "micro": {
+                "numerator": 16,
+                "denominator": 48,
+                "score": 0.333333
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 11.833333,
+              "denominator": 43,
+              "score": 0.275194
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 21,
+              "denominator": 60,
+              "score": 0.35
+            },
+            "graded_acceptable_precision": {
+              "numerator": 18.666667,
+              "denominator": 60,
+              "score": 0.311111
+            },
+            "required_role_coverage": {
+              "numerator": 12,
+              "denominator": 38,
+              "score": 0.315789,
+              "eligible_questions": 20
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 0,
+            "unmatched_result_count": 4
+          }
+        },
+        "3": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 13.583333,
+                "denominator": 42,
+                "score": 0.323413
+              },
+              "micro": {
+                "numerator": 26,
+                "denominator": 78,
+                "score": 0.333333
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 14.666667,
+              "denominator": 52,
+              "score": 0.282051
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 34,
+              "denominator": 180,
+              "score": 0.188889
+            },
+            "graded_acceptable_precision": {
+              "numerator": 30,
+              "denominator": 180,
+              "score": 0.166667
+            },
+            "required_role_coverage": {
+              "numerator": 21,
+              "denominator": 60,
+              "score": 0.35,
+              "eligible_questions": 24
+            },
+            "short_list_count": 5,
+            "duplicate_result_count": 9,
+            "unmatched_result_count": 17
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 15,
+                "denominator": 30,
+                "score": 0.5
+              },
+              "micro": {
+                "numerator": 26,
+                "denominator": 48,
+                "score": 0.541667
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 17.166667,
+              "denominator": 43,
+              "score": 0.399225
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 34,
+              "denominator": 180,
+              "score": 0.188889
+            },
+            "graded_acceptable_precision": {
+              "numerator": 30,
+              "denominator": 180,
+              "score": 0.166667
+            },
+            "required_role_coverage": {
+              "numerator": 21,
+              "denominator": 38,
+              "score": 0.552632,
+              "eligible_questions": 20
+            },
+            "short_list_count": 5,
+            "duplicate_result_count": 9,
+            "unmatched_result_count": 17
+          }
+        },
+        "5": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 18.25,
+                "denominator": 42,
+                "score": 0.434524
+              },
+              "micro": {
+                "numerator": 35,
+                "denominator": 78,
+                "score": 0.448718
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 18.833333,
+              "denominator": 52,
+              "score": 0.362179
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 43,
+              "denominator": 300,
+              "score": 0.143333
+            },
+            "graded_acceptable_precision": {
+              "numerator": 39,
+              "denominator": 300,
+              "score": 0.13
+            },
+            "required_role_coverage": {
+              "numerator": 28,
+              "denominator": 60,
+              "score": 0.466667,
+              "eligible_questions": 24
+            },
+            "short_list_count": 10,
+            "duplicate_result_count": 13,
+            "unmatched_result_count": 34
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 21,
+                "denominator": 30,
+                "score": 0.7
+              },
+              "micro": {
+                "numerator": 35,
+                "denominator": 48,
+                "score": 0.729167
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 22.833333,
+              "denominator": 43,
+              "score": 0.531008
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 43,
+              "denominator": 300,
+              "score": 0.143333
+            },
+            "graded_acceptable_precision": {
+              "numerator": 39,
+              "denominator": 300,
+              "score": 0.13
+            },
+            "required_role_coverage": {
+              "numerator": 28,
+              "denominator": 38,
+              "score": 0.736842,
+              "eligible_questions": 20
+            },
+            "short_list_count": 10,
+            "duplicate_result_count": 13,
+            "unmatched_result_count": 34
+          }
+        },
+        "10": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 21,
+                "denominator": 42,
+                "score": 0.5
+              },
+              "micro": {
+                "numerator": 41,
+                "denominator": 78,
+                "score": 0.525641
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 23.916667,
+              "denominator": 52,
+              "score": 0.459936
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 55,
+              "denominator": 600,
+              "score": 0.091667
+            },
+            "graded_acceptable_precision": {
+              "numerator": 47.166668,
+              "denominator": 600,
+              "score": 0.078611
+            },
+            "required_role_coverage": {
+              "numerator": 33,
+              "denominator": 60,
+              "score": 0.55,
+              "eligible_questions": 24
+            },
+            "short_list_count": 24,
+            "duplicate_result_count": 23,
+            "unmatched_result_count": 85
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 24.166667,
+                "denominator": 30,
+                "score": 0.805556
+              },
+              "micro": {
+                "numerator": 41,
+                "denominator": 48,
+                "score": 0.854167
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 29,
+              "denominator": 43,
+              "score": 0.674419
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 55,
+              "denominator": 600,
+              "score": 0.091667
+            },
+            "graded_acceptable_precision": {
+              "numerator": 47.166668,
+              "denominator": 600,
+              "score": 0.078611
+            },
+            "required_role_coverage": {
+              "numerator": 33,
+              "denominator": 38,
+              "score": 0.868421,
+              "eligible_questions": 20
+            },
+            "short_list_count": 24,
+            "duplicate_result_count": 23,
+            "unmatched_result_count": 85
+          }
+        },
+        "20": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 23,
+                "denominator": 42,
+                "score": 0.547619
+              },
+              "micro": {
+                "numerator": 43,
+                "denominator": 78,
+                "score": 0.551282
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 27.75,
+              "denominator": 52,
+              "score": 0.533654
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 61,
+              "denominator": 1200,
+              "score": 0.050833
+            },
+            "graded_acceptable_precision": {
+              "numerator": 50.666669,
+              "denominator": 1200,
+              "score": 0.042222
+            },
+            "required_role_coverage": {
+              "numerator": 33,
+              "denominator": 60,
+              "score": 0.55,
+              "eligible_questions": 24
+            },
+            "short_list_count": 41,
+            "duplicate_result_count": 26,
+            "unmatched_result_count": 224
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 26.166667,
+                "denominator": 30,
+                "score": 0.872222
+              },
+              "micro": {
+                "numerator": 43,
+                "denominator": 48,
+                "score": 0.895833
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 32.833333,
+              "denominator": 43,
+              "score": 0.763566
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 61,
+              "denominator": 1200,
+              "score": 0.050833
+            },
+            "graded_acceptable_precision": {
+              "numerator": 50.666669,
+              "denominator": 1200,
+              "score": 0.042222
+            },
+            "required_role_coverage": {
+              "numerator": 33,
+              "denominator": 38,
+              "score": 0.868421,
+              "eligible_questions": 20
+            },
+            "short_list_count": 41,
+            "duplicate_result_count": 26,
+            "unmatched_result_count": 224
+          }
+        }
+      },
+      "safety": {
+        "prohibited_by_access_recommendations": 6,
+        "unacceptable_recommendations": 25,
+        "unsupported_join_upgrades": 0,
+        "unresolved_identity_presented_as_exact": 0,
+        "zero_result_absence_claims": 0,
+        "top_five_without_match_reason": 0,
+        "zero_tolerance_pass": false
+      }
+    },
+    {
+      "lane_id": "c157_legacy",
+      "corpus": "production-migration-seed-v1.1.0-157",
+      "corpus_manifest_sha256": "23f704ce3e421a6eb26c2b3677d616a1ae6b4f45226233257b9a1ff676caba2b",
+      "algorithm": "legacy-package-retrieval-runtime",
+      "algorithm_fingerprint_sha256": "4a42e30637bfef95f72ff7f0d57658804d48e540fc60c5a788219a67028914b3",
+      "metrics": {
+        "1": {
+          "full_essential_recall_macro": 0.21627,
+          "full_essential_recall_micro": 0.205128,
+          "full_legacy_acceptable_coverage_macro": 0.182692,
+          "full_strict_exact_gold_precision": 0.35,
+          "full_graded_acceptable_precision": 0.311111,
+          "present_essential_recall_macro": 0.333333,
+          "present_essential_recall_micro": 0.333333,
+          "present_strict_exact_gold_precision": 0.35,
+          "present_graded_acceptable_precision": 0.311111,
+          "present_required_role_coverage": 0.315789
+        },
+        "3": {
+          "full_essential_recall_macro": 0.303571,
+          "full_essential_recall_micro": 0.307692,
+          "full_legacy_acceptable_coverage_macro": 0.269231,
+          "full_strict_exact_gold_precision": 0.177778,
+          "full_graded_acceptable_precision": 0.155556,
+          "present_essential_recall_macro": 0.455556,
+          "present_essential_recall_micro": 0.5,
+          "present_strict_exact_gold_precision": 0.177778,
+          "present_graded_acceptable_precision": 0.155556,
+          "present_required_role_coverage": 0.5
+        },
+        "5": {
+          "full_essential_recall_macro": 0.434524,
+          "full_essential_recall_micro": 0.448718,
+          "full_legacy_acceptable_coverage_macro": 0.371795,
+          "full_strict_exact_gold_precision": 0.146667,
+          "full_graded_acceptable_precision": 0.131111,
+          "present_essential_recall_macro": 0.7,
+          "present_essential_recall_micro": 0.729167,
+          "present_strict_exact_gold_precision": 0.146667,
+          "present_graded_acceptable_precision": 0.131111,
+          "present_required_role_coverage": 0.736842
+        },
+        "10": {
+          "full_essential_recall_macro": 0.492063,
+          "full_essential_recall_micro": 0.512821,
+          "full_legacy_acceptable_coverage_macro": 0.472756,
+          "full_strict_exact_gold_precision": 0.093333,
+          "full_graded_acceptable_precision": 0.078056,
+          "present_essential_recall_macro": 0.794444,
+          "present_essential_recall_micro": 0.833333,
+          "present_strict_exact_gold_precision": 0.093333,
+          "present_graded_acceptable_precision": 0.078056,
+          "present_required_role_coverage": 0.842105
+        },
+        "20": {
+          "full_essential_recall_macro": 0.535714,
+          "full_essential_recall_micro": 0.551282,
+          "full_legacy_acceptable_coverage_macro": 0.546474,
+          "full_strict_exact_gold_precision": 0.053333,
+          "full_graded_acceptable_precision": 0.043333,
+          "present_essential_recall_macro": 0.855556,
+          "present_essential_recall_micro": 0.895833,
+          "present_strict_exact_gold_precision": 0.053333,
+          "present_graded_acceptable_precision": 0.043333,
+          "present_required_role_coverage": 0.894737
+        }
+      },
+      "metric_receipts": {
+        "1": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 9.083333,
+                "denominator": 42,
+                "score": 0.21627
+              },
+              "micro": {
+                "numerator": 16,
+                "denominator": 78,
+                "score": 0.205128
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 9.5,
+              "denominator": 52,
+              "score": 0.182692
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 21,
+              "denominator": 60,
+              "score": 0.35
+            },
+            "graded_acceptable_precision": {
+              "numerator": 18.666667,
+              "denominator": 60,
+              "score": 0.311111
+            },
+            "required_role_coverage": {
+              "numerator": 12,
+              "denominator": 60,
+              "score": 0.2,
+              "eligible_questions": 24
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 0,
+            "unmatched_result_count": 5
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 10,
+                "denominator": 30,
+                "score": 0.333333
+              },
+              "micro": {
+                "numerator": 16,
+                "denominator": 48,
+                "score": 0.333333
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 11.833333,
+              "denominator": 43,
+              "score": 0.275194
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 21,
+              "denominator": 60,
+              "score": 0.35
+            },
+            "graded_acceptable_precision": {
+              "numerator": 18.666667,
+              "denominator": 60,
+              "score": 0.311111
+            },
+            "required_role_coverage": {
+              "numerator": 12,
+              "denominator": 38,
+              "score": 0.315789,
+              "eligible_questions": 20
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 0,
+            "unmatched_result_count": 5
+          }
+        },
+        "3": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 12.75,
+                "denominator": 42,
+                "score": 0.303571
+              },
+              "micro": {
+                "numerator": 24,
+                "denominator": 78,
+                "score": 0.307692
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 14,
+              "denominator": 52,
+              "score": 0.269231
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 32,
+              "denominator": 180,
+              "score": 0.177778
+            },
+            "graded_acceptable_precision": {
+              "numerator": 28,
+              "denominator": 180,
+              "score": 0.155556
+            },
+            "required_role_coverage": {
+              "numerator": 19,
+              "denominator": 60,
+              "score": 0.316667,
+              "eligible_questions": 24
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 21,
+            "unmatched_result_count": 18
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 13.666667,
+                "denominator": 30,
+                "score": 0.455556
+              },
+              "micro": {
+                "numerator": 24,
+                "denominator": 48,
+                "score": 0.5
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 16.333333,
+              "denominator": 43,
+              "score": 0.379845
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 32,
+              "denominator": 180,
+              "score": 0.177778
+            },
+            "graded_acceptable_precision": {
+              "numerator": 28,
+              "denominator": 180,
+              "score": 0.155556
+            },
+            "required_role_coverage": {
+              "numerator": 19,
+              "denominator": 38,
+              "score": 0.5,
+              "eligible_questions": 20
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 21,
+            "unmatched_result_count": 18
+          }
+        },
+        "5": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 18.25,
+                "denominator": 42,
+                "score": 0.434524
+              },
+              "micro": {
+                "numerator": 35,
+                "denominator": 78,
+                "score": 0.448718
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 19.333333,
+              "denominator": 52,
+              "score": 0.371795
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 44,
+              "denominator": 300,
+              "score": 0.146667
+            },
+            "graded_acceptable_precision": {
+              "numerator": 39.333333,
+              "denominator": 300,
+              "score": 0.131111
+            },
+            "required_role_coverage": {
+              "numerator": 28,
+              "denominator": 60,
+              "score": 0.466667,
+              "eligible_questions": 24
+            },
+            "short_list_count": 8,
+            "duplicate_result_count": 33,
+            "unmatched_result_count": 39
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 21,
+                "denominator": 30,
+                "score": 0.7
+              },
+              "micro": {
+                "numerator": 35,
+                "denominator": 48,
+                "score": 0.729167
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 23.333333,
+              "denominator": 43,
+              "score": 0.542636
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 44,
+              "denominator": 300,
+              "score": 0.146667
+            },
+            "graded_acceptable_precision": {
+              "numerator": 39.333333,
+              "denominator": 300,
+              "score": 0.131111
+            },
+            "required_role_coverage": {
+              "numerator": 28,
+              "denominator": 38,
+              "score": 0.736842,
+              "eligible_questions": 20
+            },
+            "short_list_count": 8,
+            "duplicate_result_count": 33,
+            "unmatched_result_count": 39
+          }
+        },
+        "10": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 20.666667,
+                "denominator": 42,
+                "score": 0.492063
+              },
+              "micro": {
+                "numerator": 40,
+                "denominator": 78,
+                "score": 0.512821
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 24.583333,
+              "denominator": 52,
+              "score": 0.472756
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 56,
+              "denominator": 600,
+              "score": 0.093333
+            },
+            "graded_acceptable_precision": {
+              "numerator": 46.833335,
+              "denominator": 600,
+              "score": 0.078056
+            },
+            "required_role_coverage": {
+              "numerator": 32,
+              "denominator": 60,
+              "score": 0.533333,
+              "eligible_questions": 24
+            },
+            "short_list_count": 11,
+            "duplicate_result_count": 85,
+            "unmatched_result_count": 93
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 23.833333,
+                "denominator": 30,
+                "score": 0.794444
+              },
+              "micro": {
+                "numerator": 40,
+                "denominator": 48,
+                "score": 0.833333
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 29.666667,
+              "denominator": 43,
+              "score": 0.689922
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 56,
+              "denominator": 600,
+              "score": 0.093333
+            },
+            "graded_acceptable_precision": {
+              "numerator": 46.833335,
+              "denominator": 600,
+              "score": 0.078056
+            },
+            "required_role_coverage": {
+              "numerator": 32,
+              "denominator": 38,
+              "score": 0.842105,
+              "eligible_questions": 20
+            },
+            "short_list_count": 11,
+            "duplicate_result_count": 85,
+            "unmatched_result_count": 93
+          }
+        },
+        "20": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 22.5,
+                "denominator": 42,
+                "score": 0.535714
+              },
+              "micro": {
+                "numerator": 43,
+                "denominator": 78,
+                "score": 0.551282
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 28.416667,
+              "denominator": 52,
+              "score": 0.546474
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 64,
+              "denominator": 1200,
+              "score": 0.053333
+            },
+            "graded_acceptable_precision": {
+              "numerator": 52.000003,
+              "denominator": 1200,
+              "score": 0.043333
+            },
+            "required_role_coverage": {
+              "numerator": 34,
+              "denominator": 60,
+              "score": 0.566667,
+              "eligible_questions": 24
+            },
+            "short_list_count": 39,
+            "duplicate_result_count": 140,
+            "unmatched_result_count": 241
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 25.666667,
+                "denominator": 30,
+                "score": 0.855556
+              },
+              "micro": {
+                "numerator": 43,
+                "denominator": 48,
+                "score": 0.895833
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 33.5,
+              "denominator": 43,
+              "score": 0.77907
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 64,
+              "denominator": 1200,
+              "score": 0.053333
+            },
+            "graded_acceptable_precision": {
+              "numerator": 52.000003,
+              "denominator": 1200,
+              "score": 0.043333
+            },
+            "required_role_coverage": {
+              "numerator": 34,
+              "denominator": 38,
+              "score": 0.894737,
+              "eligible_questions": 20
+            },
+            "short_list_count": 39,
+            "duplicate_result_count": 140,
+            "unmatched_result_count": 241
+          }
+        }
+      },
+      "safety": {
+        "prohibited_by_access_recommendations": 4,
+        "unacceptable_recommendations": 30,
+        "unsupported_join_upgrades": 0,
+        "unresolved_identity_presented_as_exact": 0,
+        "zero_result_absence_claims": 0,
+        "top_five_without_match_reason": 0,
+        "zero_tolerance_pass": false
+      }
+    },
+    {
+      "lane_id": "c143_production_worker",
+      "corpus": "historical-evaluation-corpus-v1.0.1-143",
+      "corpus_manifest_sha256": "5622272ded52b0cbf039da47114142f8cb35ba634e8a6bbb9ee55b0ecd70511c",
+      "algorithm": "production-worker-pre-wp0-runtime",
+      "algorithm_fingerprint_sha256": "b30376f8819d5335dab0f914f18bdbb540b67af9475267db1a6f9230479184e1",
+      "metrics": {
+        "1": {
+          "full_essential_recall_macro": 0.228175,
+          "full_essential_recall_micro": 0.205128,
+          "full_legacy_acceptable_coverage_macro": 0.19391,
+          "full_strict_exact_gold_precision": 0.35,
+          "full_graded_acceptable_precision": 0.311111,
+          "present_essential_recall_macro": 0.366667,
+          "present_essential_recall_micro": 0.333333,
+          "present_strict_exact_gold_precision": 0.35,
+          "present_graded_acceptable_precision": 0.311111,
+          "present_required_role_coverage": 0.289474
+        },
+        "3": {
+          "full_essential_recall_macro": 0.388889,
+          "full_essential_recall_micro": 0.384615,
+          "full_legacy_acceptable_coverage_macro": 0.323718,
+          "full_strict_exact_gold_precision": 0.205556,
+          "full_graded_acceptable_precision": 0.186111,
+          "present_essential_recall_macro": 0.622222,
+          "present_essential_recall_micro": 0.625,
+          "present_strict_exact_gold_precision": 0.205556,
+          "present_graded_acceptable_precision": 0.186111,
+          "present_required_role_coverage": 0.605263
+        },
+        "5": {
+          "full_essential_recall_macro": 0.452381,
+          "full_essential_recall_micro": 0.474359,
+          "full_legacy_acceptable_coverage_macro": 0.376603,
+          "full_strict_exact_gold_precision": 0.15,
+          "full_graded_acceptable_precision": 0.136111,
+          "present_essential_recall_macro": 0.738889,
+          "present_essential_recall_micro": 0.770833,
+          "present_strict_exact_gold_precision": 0.15,
+          "present_graded_acceptable_precision": 0.136111,
+          "present_required_role_coverage": 0.789474
+        },
+        "10": {
+          "full_essential_recall_macro": 0.52381,
+          "full_essential_recall_micro": 0.538462,
+          "full_legacy_acceptable_coverage_macro": 0.479167,
+          "full_strict_exact_gold_precision": 0.093333,
+          "full_graded_acceptable_precision": 0.080833,
+          "present_essential_recall_macro": 0.838889,
+          "present_essential_recall_micro": 0.875,
+          "present_strict_exact_gold_precision": 0.093333,
+          "present_graded_acceptable_precision": 0.080833,
+          "present_required_role_coverage": 0.868421
+        },
+        "20": {
+          "full_essential_recall_macro": 0.547619,
+          "full_essential_recall_micro": 0.551282,
+          "full_legacy_acceptable_coverage_macro": 0.544872,
+          "full_strict_exact_gold_precision": 0.0525,
+          "full_graded_acceptable_precision": 0.042917,
+          "present_essential_recall_macro": 0.872222,
+          "present_essential_recall_micro": 0.895833,
+          "present_strict_exact_gold_precision": 0.0525,
+          "present_graded_acceptable_precision": 0.042917,
+          "present_required_role_coverage": 0.868421
+        }
+      },
+      "metric_receipts": {
+        "1": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 9.583333,
+                "denominator": 42,
+                "score": 0.228175
+              },
+              "micro": {
+                "numerator": 16,
+                "denominator": 78,
+                "score": 0.205128
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 10.083333,
+              "denominator": 52,
+              "score": 0.19391
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 21,
+              "denominator": 60,
+              "score": 0.35
+            },
+            "graded_acceptable_precision": {
+              "numerator": 18.666667,
+              "denominator": 60,
+              "score": 0.311111
+            },
+            "required_role_coverage": {
+              "numerator": 11,
+              "denominator": 60,
+              "score": 0.183333,
+              "eligible_questions": 24
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 0,
+            "unmatched_result_count": 6
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 11,
+                "denominator": 30,
+                "score": 0.366667
+              },
+              "micro": {
+                "numerator": 16,
+                "denominator": 48,
+                "score": 0.333333
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 13,
+              "denominator": 43,
+              "score": 0.302326
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 21,
+              "denominator": 60,
+              "score": 0.35
+            },
+            "graded_acceptable_precision": {
+              "numerator": 18.666667,
+              "denominator": 60,
+              "score": 0.311111
+            },
+            "required_role_coverage": {
+              "numerator": 11,
+              "denominator": 38,
+              "score": 0.289474,
+              "eligible_questions": 20
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 0,
+            "unmatched_result_count": 6
+          }
+        },
+        "3": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 16.333333,
+                "denominator": 42,
+                "score": 0.388889
+              },
+              "micro": {
+                "numerator": 30,
+                "denominator": 78,
+                "score": 0.384615
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 16.833333,
+              "denominator": 52,
+              "score": 0.323718
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 37,
+              "denominator": 180,
+              "score": 0.205556
+            },
+            "graded_acceptable_precision": {
+              "numerator": 33.500001,
+              "denominator": 180,
+              "score": 0.186111
+            },
+            "required_role_coverage": {
+              "numerator": 23,
+              "denominator": 60,
+              "score": 0.383333,
+              "eligible_questions": 24
+            },
+            "short_list_count": 5,
+            "duplicate_result_count": 9,
+            "unmatched_result_count": 23
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 18.666667,
+                "denominator": 30,
+                "score": 0.622222
+              },
+              "micro": {
+                "numerator": 30,
+                "denominator": 48,
+                "score": 0.625
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 20.333333,
+              "denominator": 43,
+              "score": 0.472868
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 37,
+              "denominator": 180,
+              "score": 0.205556
+            },
+            "graded_acceptable_precision": {
+              "numerator": 33.500001,
+              "denominator": 180,
+              "score": 0.186111
+            },
+            "required_role_coverage": {
+              "numerator": 23,
+              "denominator": 38,
+              "score": 0.605263,
+              "eligible_questions": 20
+            },
+            "short_list_count": 5,
+            "duplicate_result_count": 9,
+            "unmatched_result_count": 23
+          }
+        },
+        "5": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 19,
+                "denominator": 42,
+                "score": 0.452381
+              },
+              "micro": {
+                "numerator": 37,
+                "denominator": 78,
+                "score": 0.474359
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 19.583333,
+              "denominator": 52,
+              "score": 0.376603
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 45,
+              "denominator": 300,
+              "score": 0.15
+            },
+            "graded_acceptable_precision": {
+              "numerator": 40.833334,
+              "denominator": 300,
+              "score": 0.136111
+            },
+            "required_role_coverage": {
+              "numerator": 30,
+              "denominator": 60,
+              "score": 0.5,
+              "eligible_questions": 24
+            },
+            "short_list_count": 9,
+            "duplicate_result_count": 11,
+            "unmatched_result_count": 42
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 22.166667,
+                "denominator": 30,
+                "score": 0.738889
+              },
+              "micro": {
+                "numerator": 37,
+                "denominator": 48,
+                "score": 0.770833
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 24,
+              "denominator": 43,
+              "score": 0.55814
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 45,
+              "denominator": 300,
+              "score": 0.15
+            },
+            "graded_acceptable_precision": {
+              "numerator": 40.833334,
+              "denominator": 300,
+              "score": 0.136111
+            },
+            "required_role_coverage": {
+              "numerator": 30,
+              "denominator": 38,
+              "score": 0.789474,
+              "eligible_questions": 20
+            },
+            "short_list_count": 9,
+            "duplicate_result_count": 11,
+            "unmatched_result_count": 42
+          }
+        },
+        "10": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 22,
+                "denominator": 42,
+                "score": 0.52381
+              },
+              "micro": {
+                "numerator": 42,
+                "denominator": 78,
+                "score": 0.538462
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 24.916667,
+              "denominator": 52,
+              "score": 0.479167
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 56,
+              "denominator": 600,
+              "score": 0.093333
+            },
+            "graded_acceptable_precision": {
+              "numerator": 48.500003,
+              "denominator": 600,
+              "score": 0.080833
+            },
+            "required_role_coverage": {
+              "numerator": 33,
+              "denominator": 60,
+              "score": 0.55,
+              "eligible_questions": 24
+            },
+            "short_list_count": 16,
+            "duplicate_result_count": 21,
+            "unmatched_result_count": 92
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 25.166667,
+                "denominator": 30,
+                "score": 0.838889
+              },
+              "micro": {
+                "numerator": 42,
+                "denominator": 48,
+                "score": 0.875
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 30,
+              "denominator": 43,
+              "score": 0.697674
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 56,
+              "denominator": 600,
+              "score": 0.093333
+            },
+            "graded_acceptable_precision": {
+              "numerator": 48.500003,
+              "denominator": 600,
+              "score": 0.080833
+            },
+            "required_role_coverage": {
+              "numerator": 33,
+              "denominator": 38,
+              "score": 0.868421,
+              "eligible_questions": 20
+            },
+            "short_list_count": 16,
+            "duplicate_result_count": 21,
+            "unmatched_result_count": 92
+          }
+        },
+        "20": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 23,
+                "denominator": 42,
+                "score": 0.547619
+              },
+              "micro": {
+                "numerator": 43,
+                "denominator": 78,
+                "score": 0.551282
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 28.333333,
+              "denominator": 52,
+              "score": 0.544872
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 63,
+              "denominator": 1200,
+              "score": 0.0525
+            },
+            "graded_acceptable_precision": {
+              "numerator": 51.500002,
+              "denominator": 1200,
+              "score": 0.042917
+            },
+            "required_role_coverage": {
+              "numerator": 33,
+              "denominator": 60,
+              "score": 0.55,
+              "eligible_questions": 24
+            },
+            "short_list_count": 40,
+            "duplicate_result_count": 26,
+            "unmatched_result_count": 226
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 26.166667,
+                "denominator": 30,
+                "score": 0.872222
+              },
+              "micro": {
+                "numerator": 43,
+                "denominator": 48,
+                "score": 0.895833
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 34.166667,
+              "denominator": 43,
+              "score": 0.794574
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 63,
+              "denominator": 1200,
+              "score": 0.0525
+            },
+            "graded_acceptable_precision": {
+              "numerator": 51.500002,
+              "denominator": 1200,
+              "score": 0.042917
+            },
+            "required_role_coverage": {
+              "numerator": 33,
+              "denominator": 38,
+              "score": 0.868421,
+              "eligible_questions": 20
+            },
+            "short_list_count": 40,
+            "duplicate_result_count": 26,
+            "unmatched_result_count": 226
+          }
+        }
+      },
+      "safety": {
+        "prohibited_by_access_recommendations": 4,
+        "unacceptable_recommendations": 26,
+        "unsupported_join_upgrades": 0,
+        "unresolved_identity_presented_as_exact": 0,
+        "zero_result_absence_claims": 0,
+        "top_five_without_match_reason": 0,
+        "zero_tolerance_pass": false
+      }
+    },
+    {
+      "lane_id": "c157_production_worker",
+      "corpus": "production-migration-seed-v1.1.0-157",
+      "corpus_manifest_sha256": "23f704ce3e421a6eb26c2b3677d616a1ae6b4f45226233257b9a1ff676caba2b",
+      "algorithm": "production-worker-pre-wp0-runtime",
+      "algorithm_fingerprint_sha256": "b30376f8819d5335dab0f914f18bdbb540b67af9475267db1a6f9230479184e1",
+      "metrics": {
+        "1": {
+          "full_essential_recall_macro": 0.251984,
+          "full_essential_recall_micro": 0.217949,
+          "full_legacy_acceptable_coverage_macro": 0.213141,
+          "full_strict_exact_gold_precision": 0.366667,
+          "full_graded_acceptable_precision": 0.327778,
+          "present_essential_recall_macro": 0.4,
+          "present_essential_recall_micro": 0.354167,
+          "present_strict_exact_gold_precision": 0.366667,
+          "present_graded_acceptable_precision": 0.327778,
+          "present_required_role_coverage": 0.289474
+        },
+        "3": {
+          "full_essential_recall_macro": 0.371032,
+          "full_essential_recall_micro": 0.358974,
+          "full_legacy_acceptable_coverage_macro": 0.331731,
+          "full_strict_exact_gold_precision": 0.205556,
+          "full_graded_acceptable_precision": 0.176852,
+          "present_essential_recall_macro": 0.572222,
+          "present_essential_recall_micro": 0.583333,
+          "present_strict_exact_gold_precision": 0.205556,
+          "present_graded_acceptable_precision": 0.176852,
+          "present_required_role_coverage": 0.552632
+        },
+        "5": {
+          "full_essential_recall_macro": 0.444444,
+          "full_essential_recall_micro": 0.461538,
+          "full_legacy_acceptable_coverage_macro": 0.397436,
+          "full_strict_exact_gold_precision": 0.156667,
+          "full_graded_acceptable_precision": 0.136111,
+          "present_essential_recall_macro": 0.705556,
+          "present_essential_recall_micro": 0.75,
+          "present_strict_exact_gold_precision": 0.156667,
+          "present_graded_acceptable_precision": 0.136111,
+          "present_required_role_coverage": 0.763158
+        },
+        "10": {
+          "full_essential_recall_macro": 0.515873,
+          "full_essential_recall_micro": 0.525641,
+          "full_legacy_acceptable_coverage_macro": 0.508013,
+          "full_strict_exact_gold_precision": 0.098333,
+          "full_graded_acceptable_precision": 0.081389,
+          "present_essential_recall_macro": 0.827778,
+          "present_essential_recall_micro": 0.854167,
+          "present_strict_exact_gold_precision": 0.098333,
+          "present_graded_acceptable_precision": 0.081389,
+          "present_required_role_coverage": 0.842105
+        },
+        "20": {
+          "full_essential_recall_macro": 0.559524,
+          "full_essential_recall_micro": 0.564103,
+          "full_legacy_acceptable_coverage_macro": 0.572115,
+          "full_strict_exact_gold_precision": 0.055,
+          "full_graded_acceptable_precision": 0.044028,
+          "present_essential_recall_macro": 0.888889,
+          "present_essential_recall_micro": 0.916667,
+          "present_strict_exact_gold_precision": 0.055,
+          "present_graded_acceptable_precision": 0.044028,
+          "present_required_role_coverage": 0.894737
+        }
+      },
+      "metric_receipts": {
+        "1": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 10.583333,
+                "denominator": 42,
+                "score": 0.251984
+              },
+              "micro": {
+                "numerator": 17,
+                "denominator": 78,
+                "score": 0.217949
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 11.083333,
+              "denominator": 52,
+              "score": 0.213141
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 22,
+              "denominator": 60,
+              "score": 0.366667
+            },
+            "graded_acceptable_precision": {
+              "numerator": 19.666667,
+              "denominator": 60,
+              "score": 0.327778
+            },
+            "required_role_coverage": {
+              "numerator": 11,
+              "denominator": 60,
+              "score": 0.183333,
+              "eligible_questions": 24
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 0,
+            "unmatched_result_count": 7
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 12,
+                "denominator": 30,
+                "score": 0.4
+              },
+              "micro": {
+                "numerator": 17,
+                "denominator": 48,
+                "score": 0.354167
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 14,
+              "denominator": 43,
+              "score": 0.325581
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 22,
+              "denominator": 60,
+              "score": 0.366667
+            },
+            "graded_acceptable_precision": {
+              "numerator": 19.666667,
+              "denominator": 60,
+              "score": 0.327778
+            },
+            "required_role_coverage": {
+              "numerator": 11,
+              "denominator": 38,
+              "score": 0.289474,
+              "eligible_questions": 20
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 0,
+            "unmatched_result_count": 7
+          }
+        },
+        "3": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 15.583333,
+                "denominator": 42,
+                "score": 0.371032
+              },
+              "micro": {
+                "numerator": 28,
+                "denominator": 78,
+                "score": 0.358974
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 17.25,
+              "denominator": 52,
+              "score": 0.331731
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 37,
+              "denominator": 180,
+              "score": 0.205556
+            },
+            "graded_acceptable_precision": {
+              "numerator": 31.833333,
+              "denominator": 180,
+              "score": 0.176852
+            },
+            "required_role_coverage": {
+              "numerator": 21,
+              "denominator": 60,
+              "score": 0.35,
+              "eligible_questions": 24
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 22,
+            "unmatched_result_count": 22
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 17.166667,
+                "denominator": 30,
+                "score": 0.572222
+              },
+              "micro": {
+                "numerator": 28,
+                "denominator": 48,
+                "score": 0.583333
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 20.333333,
+              "denominator": 43,
+              "score": 0.472868
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 37,
+              "denominator": 180,
+              "score": 0.205556
+            },
+            "graded_acceptable_precision": {
+              "numerator": 31.833333,
+              "denominator": 180,
+              "score": 0.176852
+            },
+            "required_role_coverage": {
+              "numerator": 21,
+              "denominator": 38,
+              "score": 0.552632,
+              "eligible_questions": 20
+            },
+            "short_list_count": 1,
+            "duplicate_result_count": 22,
+            "unmatched_result_count": 22
+          }
+        },
+        "5": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 18.666667,
+                "denominator": 42,
+                "score": 0.444444
+              },
+              "micro": {
+                "numerator": 36,
+                "denominator": 78,
+                "score": 0.461538
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 20.666667,
+              "denominator": 52,
+              "score": 0.397436
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 47,
+              "denominator": 300,
+              "score": 0.156667
+            },
+            "graded_acceptable_precision": {
+              "numerator": 40.833333,
+              "denominator": 300,
+              "score": 0.136111
+            },
+            "required_role_coverage": {
+              "numerator": 29,
+              "denominator": 60,
+              "score": 0.483333,
+              "eligible_questions": 24
+            },
+            "short_list_count": 8,
+            "duplicate_result_count": 37,
+            "unmatched_result_count": 52
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 21.166667,
+                "denominator": 30,
+                "score": 0.705556
+              },
+              "micro": {
+                "numerator": 36,
+                "denominator": 48,
+                "score": 0.75
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 24.333333,
+              "denominator": 43,
+              "score": 0.565891
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 47,
+              "denominator": 300,
+              "score": 0.156667
+            },
+            "graded_acceptable_precision": {
+              "numerator": 40.833333,
+              "denominator": 300,
+              "score": 0.136111
+            },
+            "required_role_coverage": {
+              "numerator": 29,
+              "denominator": 38,
+              "score": 0.763158,
+              "eligible_questions": 20
+            },
+            "short_list_count": 8,
+            "duplicate_result_count": 37,
+            "unmatched_result_count": 52
+          }
+        },
+        "10": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 21.666667,
+                "denominator": 42,
+                "score": 0.515873
+              },
+              "micro": {
+                "numerator": 41,
+                "denominator": 78,
+                "score": 0.525641
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 26.416667,
+              "denominator": 52,
+              "score": 0.508013
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 59,
+              "denominator": 600,
+              "score": 0.098333
+            },
+            "graded_acceptable_precision": {
+              "numerator": 48.833336,
+              "denominator": 600,
+              "score": 0.081389
+            },
+            "required_role_coverage": {
+              "numerator": 32,
+              "denominator": 60,
+              "score": 0.533333,
+              "eligible_questions": 24
+            },
+            "short_list_count": 11,
+            "duplicate_result_count": 86,
+            "unmatched_result_count": 103
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 24.833333,
+                "denominator": 30,
+                "score": 0.827778
+              },
+              "micro": {
+                "numerator": 41,
+                "denominator": 48,
+                "score": 0.854167
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 31.5,
+              "denominator": 43,
+              "score": 0.732558
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 59,
+              "denominator": 600,
+              "score": 0.098333
+            },
+            "graded_acceptable_precision": {
+              "numerator": 48.833336,
+              "denominator": 600,
+              "score": 0.081389
+            },
+            "required_role_coverage": {
+              "numerator": 32,
+              "denominator": 38,
+              "score": 0.842105,
+              "eligible_questions": 20
+            },
+            "short_list_count": 11,
+            "duplicate_result_count": 86,
+            "unmatched_result_count": 103
+          }
+        },
+        "20": {
+          "full_benchmark": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 23.5,
+                "denominator": 42,
+                "score": 0.559524
+              },
+              "micro": {
+                "numerator": 44,
+                "denominator": 78,
+                "score": 0.564103
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 29.75,
+              "denominator": 52,
+              "score": 0.572115
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 66,
+              "denominator": 1200,
+              "score": 0.055
+            },
+            "graded_acceptable_precision": {
+              "numerator": 52.833336,
+              "denominator": 1200,
+              "score": 0.044028
+            },
+            "required_role_coverage": {
+              "numerator": 34,
+              "denominator": 60,
+              "score": 0.566667,
+              "eligible_questions": 24
+            },
+            "short_list_count": 29,
+            "duplicate_result_count": 175,
+            "unmatched_result_count": 234
+          },
+          "present_source": {
+            "essential_recall": {
+              "macro": {
+                "numerator": 26.666667,
+                "denominator": 30,
+                "score": 0.888889
+              },
+              "micro": {
+                "numerator": 44,
+                "denominator": 48,
+                "score": 0.916667
+              }
+            },
+            "legacy_acceptable_source_coverage": {
+              "numerator": 34.833333,
+              "denominator": 43,
+              "score": 0.810078
+            },
+            "strict_exact_gold_precision": {
+              "numerator": 66,
+              "denominator": 1200,
+              "score": 0.055
+            },
+            "graded_acceptable_precision": {
+              "numerator": 52.833336,
+              "denominator": 1200,
+              "score": 0.044028
+            },
+            "required_role_coverage": {
+              "numerator": 34,
+              "denominator": 38,
+              "score": 0.894737,
+              "eligible_questions": 20
+            },
+            "short_list_count": 29,
+            "duplicate_result_count": 175,
+            "unmatched_result_count": 234
+          }
+        }
+      },
+      "safety": {
+        "prohibited_by_access_recommendations": 3,
+        "unacceptable_recommendations": 29,
+        "unsupported_join_upgrades": 0,
+        "unresolved_identity_presented_as_exact": 0,
+        "zero_result_absence_claims": 0,
+        "top_five_without_match_reason": 0,
+        "zero_tolerance_pass": false
+      }
+    }
+  ],
+  "deltas": {
+    "1": {
+      "corpus_effect_under_legacy_algorithm": {
+        "full_essential_recall_macro": 0,
+        "full_essential_recall_micro": 0,
+        "full_legacy_acceptable_coverage_macro": 0,
+        "full_strict_exact_gold_precision": 0,
+        "full_graded_acceptable_precision": 0,
+        "present_essential_recall_macro": 0,
+        "present_essential_recall_micro": 0,
+        "present_strict_exact_gold_precision": 0,
+        "present_graded_acceptable_precision": 0,
+        "present_required_role_coverage": 0
+      },
+      "corpus_effect_under_production_worker": {
+        "full_essential_recall_macro": 0.023809,
+        "full_essential_recall_micro": 0.012821,
+        "full_legacy_acceptable_coverage_macro": 0.019231,
+        "full_strict_exact_gold_precision": 0.016667,
+        "full_graded_acceptable_precision": 0.016667,
+        "present_essential_recall_macro": 0.033333,
+        "present_essential_recall_micro": 0.020834,
+        "present_strict_exact_gold_precision": 0.016667,
+        "present_graded_acceptable_precision": 0.016667,
+        "present_required_role_coverage": 0
+      },
+      "algorithm_effect_on_143_corpus": {
+        "full_essential_recall_macro": 0.011905,
+        "full_essential_recall_micro": 0,
+        "full_legacy_acceptable_coverage_macro": 0.011218,
+        "full_strict_exact_gold_precision": 0,
+        "full_graded_acceptable_precision": 0,
+        "present_essential_recall_macro": 0.033334,
+        "present_essential_recall_micro": 0,
+        "present_strict_exact_gold_precision": 0,
+        "present_graded_acceptable_precision": 0,
+        "present_required_role_coverage": -0.026315
+      },
+      "algorithm_effect_on_157_corpus": {
+        "full_essential_recall_macro": 0.035714,
+        "full_essential_recall_micro": 0.012821,
+        "full_legacy_acceptable_coverage_macro": 0.030449,
+        "full_strict_exact_gold_precision": 0.016667,
+        "full_graded_acceptable_precision": 0.016667,
+        "present_essential_recall_macro": 0.066667,
+        "present_essential_recall_micro": 0.020834,
+        "present_strict_exact_gold_precision": 0.016667,
+        "present_graded_acceptable_precision": 0.016667,
+        "present_required_role_coverage": -0.026315
+      },
+      "corpus_algorithm_interaction": {
+        "full_essential_recall_macro": 0.023809,
+        "full_essential_recall_micro": 0.012821,
+        "full_legacy_acceptable_coverage_macro": 0.019231,
+        "full_strict_exact_gold_precision": 0.016667,
+        "full_graded_acceptable_precision": 0.016667,
+        "present_essential_recall_macro": 0.033333,
+        "present_essential_recall_micro": 0.020834,
+        "present_strict_exact_gold_precision": 0.016667,
+        "present_graded_acceptable_precision": 0.016667,
+        "present_required_role_coverage": 0
+      }
+    },
+    "3": {
+      "corpus_effect_under_legacy_algorithm": {
+        "full_essential_recall_macro": -0.019842,
+        "full_essential_recall_micro": -0.025641,
+        "full_legacy_acceptable_coverage_macro": -0.01282,
+        "full_strict_exact_gold_precision": -0.011111,
+        "full_graded_acceptable_precision": -0.011111,
+        "present_essential_recall_macro": -0.044444,
+        "present_essential_recall_micro": -0.041667,
+        "present_strict_exact_gold_precision": -0.011111,
+        "present_graded_acceptable_precision": -0.011111,
+        "present_required_role_coverage": -0.052632
+      },
+      "corpus_effect_under_production_worker": {
+        "full_essential_recall_macro": -0.017857,
+        "full_essential_recall_micro": -0.025641,
+        "full_legacy_acceptable_coverage_macro": 0.008013,
+        "full_strict_exact_gold_precision": 0,
+        "full_graded_acceptable_precision": -0.009259,
+        "present_essential_recall_macro": -0.05,
+        "present_essential_recall_micro": -0.041667,
+        "present_strict_exact_gold_precision": 0,
+        "present_graded_acceptable_precision": -0.009259,
+        "present_required_role_coverage": -0.052631
+      },
+      "algorithm_effect_on_143_corpus": {
+        "full_essential_recall_macro": 0.065476,
+        "full_essential_recall_micro": 0.051282,
+        "full_legacy_acceptable_coverage_macro": 0.041667,
+        "full_strict_exact_gold_precision": 0.016667,
+        "full_graded_acceptable_precision": 0.019444,
+        "present_essential_recall_macro": 0.122222,
+        "present_essential_recall_micro": 0.083333,
+        "present_strict_exact_gold_precision": 0.016667,
+        "present_graded_acceptable_precision": 0.019444,
+        "present_required_role_coverage": 0.052631
+      },
+      "algorithm_effect_on_157_corpus": {
+        "full_essential_recall_macro": 0.067461,
+        "full_essential_recall_micro": 0.051282,
+        "full_legacy_acceptable_coverage_macro": 0.0625,
+        "full_strict_exact_gold_precision": 0.027778,
+        "full_graded_acceptable_precision": 0.021296,
+        "present_essential_recall_macro": 0.116666,
+        "present_essential_recall_micro": 0.083333,
+        "present_strict_exact_gold_precision": 0.027778,
+        "present_graded_acceptable_precision": 0.021296,
+        "present_required_role_coverage": 0.052632
+      },
+      "corpus_algorithm_interaction": {
+        "full_essential_recall_macro": 0.001985,
+        "full_essential_recall_micro": 0,
+        "full_legacy_acceptable_coverage_macro": 0.020833,
+        "full_strict_exact_gold_precision": 0.011111,
+        "full_graded_acceptable_precision": 0.001852,
+        "present_essential_recall_macro": -0.005556,
+        "present_essential_recall_micro": 0,
+        "present_strict_exact_gold_precision": 0.011111,
+        "present_graded_acceptable_precision": 0.001852,
+        "present_required_role_coverage": 0.000001
+      }
+    },
+    "5": {
+      "corpus_effect_under_legacy_algorithm": {
+        "full_essential_recall_macro": 0,
+        "full_essential_recall_micro": 0,
+        "full_legacy_acceptable_coverage_macro": 0.009616,
+        "full_strict_exact_gold_precision": 0.003334,
+        "full_graded_acceptable_precision": 0.001111,
+        "present_essential_recall_macro": 0,
+        "present_essential_recall_micro": 0,
+        "present_strict_exact_gold_precision": 0.003334,
+        "present_graded_acceptable_precision": 0.001111,
+        "present_required_role_coverage": 0
+      },
+      "corpus_effect_under_production_worker": {
+        "full_essential_recall_macro": -0.007937,
+        "full_essential_recall_micro": -0.012821,
+        "full_legacy_acceptable_coverage_macro": 0.020833,
+        "full_strict_exact_gold_precision": 0.006667,
+        "full_graded_acceptable_precision": 0,
+        "present_essential_recall_macro": -0.033333,
+        "present_essential_recall_micro": -0.020833,
+        "present_strict_exact_gold_precision": 0.006667,
+        "present_graded_acceptable_precision": 0,
+        "present_required_role_coverage": -0.026316
+      },
+      "algorithm_effect_on_143_corpus": {
+        "full_essential_recall_macro": 0.017857,
+        "full_essential_recall_micro": 0.025641,
+        "full_legacy_acceptable_coverage_macro": 0.014424,
+        "full_strict_exact_gold_precision": 0.006667,
+        "full_graded_acceptable_precision": 0.006111,
+        "present_essential_recall_macro": 0.038889,
+        "present_essential_recall_micro": 0.041666,
+        "present_strict_exact_gold_precision": 0.006667,
+        "present_graded_acceptable_precision": 0.006111,
+        "present_required_role_coverage": 0.052632
+      },
+      "algorithm_effect_on_157_corpus": {
+        "full_essential_recall_macro": 0.00992,
+        "full_essential_recall_micro": 0.01282,
+        "full_legacy_acceptable_coverage_macro": 0.025641,
+        "full_strict_exact_gold_precision": 0.01,
+        "full_graded_acceptable_precision": 0.005,
+        "present_essential_recall_macro": 0.005556,
+        "present_essential_recall_micro": 0.020833,
+        "present_strict_exact_gold_precision": 0.01,
+        "present_graded_acceptable_precision": 0.005,
+        "present_required_role_coverage": 0.026316
+      },
+      "corpus_algorithm_interaction": {
+        "full_essential_recall_macro": -0.007937,
+        "full_essential_recall_micro": -0.012821,
+        "full_legacy_acceptable_coverage_macro": 0.011217,
+        "full_strict_exact_gold_precision": 0.003333,
+        "full_graded_acceptable_precision": -0.001111,
+        "present_essential_recall_macro": -0.033333,
+        "present_essential_recall_micro": -0.020833,
+        "present_strict_exact_gold_precision": 0.003333,
+        "present_graded_acceptable_precision": -0.001111,
+        "present_required_role_coverage": -0.026316
+      }
+    },
+    "10": {
+      "corpus_effect_under_legacy_algorithm": {
+        "full_essential_recall_macro": -0.007937,
+        "full_essential_recall_micro": -0.01282,
+        "full_legacy_acceptable_coverage_macro": 0.01282,
+        "full_strict_exact_gold_precision": 0.001666,
+        "full_graded_acceptable_precision": -0.000555,
+        "present_essential_recall_macro": -0.011112,
+        "present_essential_recall_micro": -0.020834,
+        "present_strict_exact_gold_precision": 0.001666,
+        "present_graded_acceptable_precision": -0.000555,
+        "present_required_role_coverage": -0.026316
+      },
+      "corpus_effect_under_production_worker": {
+        "full_essential_recall_macro": -0.007937,
+        "full_essential_recall_micro": -0.012821,
+        "full_legacy_acceptable_coverage_macro": 0.028846,
+        "full_strict_exact_gold_precision": 0.005,
+        "full_graded_acceptable_precision": 0.000556,
+        "present_essential_recall_macro": -0.011111,
+        "present_essential_recall_micro": -0.020833,
+        "present_strict_exact_gold_precision": 0.005,
+        "present_graded_acceptable_precision": 0.000556,
+        "present_required_role_coverage": -0.026316
+      },
+      "algorithm_effect_on_143_corpus": {
+        "full_essential_recall_macro": 0.02381,
+        "full_essential_recall_micro": 0.012821,
+        "full_legacy_acceptable_coverage_macro": 0.019231,
+        "full_strict_exact_gold_precision": 0.001666,
+        "full_graded_acceptable_precision": 0.002222,
+        "present_essential_recall_macro": 0.033333,
+        "present_essential_recall_micro": 0.020833,
+        "present_strict_exact_gold_precision": 0.001666,
+        "present_graded_acceptable_precision": 0.002222,
+        "present_required_role_coverage": 0
+      },
+      "algorithm_effect_on_157_corpus": {
+        "full_essential_recall_macro": 0.02381,
+        "full_essential_recall_micro": 0.01282,
+        "full_legacy_acceptable_coverage_macro": 0.035257,
+        "full_strict_exact_gold_precision": 0.005,
+        "full_graded_acceptable_precision": 0.003333,
+        "present_essential_recall_macro": 0.033334,
+        "present_essential_recall_micro": 0.020834,
+        "present_strict_exact_gold_precision": 0.005,
+        "present_graded_acceptable_precision": 0.003333,
+        "present_required_role_coverage": 0
+      },
+      "corpus_algorithm_interaction": {
+        "full_essential_recall_macro": 0,
+        "full_essential_recall_micro": -0.000001,
+        "full_legacy_acceptable_coverage_macro": 0.016026,
+        "full_strict_exact_gold_precision": 0.003334,
+        "full_graded_acceptable_precision": 0.001111,
+        "present_essential_recall_macro": 0.000001,
+        "present_essential_recall_micro": 0.000001,
+        "present_strict_exact_gold_precision": 0.003334,
+        "present_graded_acceptable_precision": 0.001111,
+        "present_required_role_coverage": 0
+      }
+    },
+    "20": {
+      "corpus_effect_under_legacy_algorithm": {
+        "full_essential_recall_macro": -0.011905,
+        "full_essential_recall_micro": 0,
+        "full_legacy_acceptable_coverage_macro": 0.01282,
+        "full_strict_exact_gold_precision": 0.0025,
+        "full_graded_acceptable_precision": 0.001111,
+        "present_essential_recall_macro": -0.016666,
+        "present_essential_recall_micro": 0,
+        "present_strict_exact_gold_precision": 0.0025,
+        "present_graded_acceptable_precision": 0.001111,
+        "present_required_role_coverage": 0.026316
+      },
+      "corpus_effect_under_production_worker": {
+        "full_essential_recall_macro": 0.011905,
+        "full_essential_recall_micro": 0.012821,
+        "full_legacy_acceptable_coverage_macro": 0.027243,
+        "full_strict_exact_gold_precision": 0.0025,
+        "full_graded_acceptable_precision": 0.001111,
+        "present_essential_recall_macro": 0.016667,
+        "present_essential_recall_micro": 0.020834,
+        "present_strict_exact_gold_precision": 0.0025,
+        "present_graded_acceptable_precision": 0.001111,
+        "present_required_role_coverage": 0.026316
+      },
+      "algorithm_effect_on_143_corpus": {
+        "full_essential_recall_macro": 0,
+        "full_essential_recall_micro": 0,
+        "full_legacy_acceptable_coverage_macro": 0.011218,
+        "full_strict_exact_gold_precision": 0.001667,
+        "full_graded_acceptable_precision": 0.000695,
+        "present_essential_recall_macro": 0,
+        "present_essential_recall_micro": 0,
+        "present_strict_exact_gold_precision": 0.001667,
+        "present_graded_acceptable_precision": 0.000695,
+        "present_required_role_coverage": 0
+      },
+      "algorithm_effect_on_157_corpus": {
+        "full_essential_recall_macro": 0.02381,
+        "full_essential_recall_micro": 0.012821,
+        "full_legacy_acceptable_coverage_macro": 0.025641,
+        "full_strict_exact_gold_precision": 0.001667,
+        "full_graded_acceptable_precision": 0.000695,
+        "present_essential_recall_macro": 0.033333,
+        "present_essential_recall_micro": 0.020834,
+        "present_strict_exact_gold_precision": 0.001667,
+        "present_graded_acceptable_precision": 0.000695,
+        "present_required_role_coverage": 0
+      },
+      "corpus_algorithm_interaction": {
+        "full_essential_recall_macro": 0.02381,
+        "full_essential_recall_micro": 0.012821,
+        "full_legacy_acceptable_coverage_macro": 0.014423,
+        "full_strict_exact_gold_precision": 0,
+        "full_graded_acceptable_precision": 0,
+        "present_essential_recall_macro": 0.033333,
+        "present_essential_recall_micro": 0.020834,
+        "present_strict_exact_gold_precision": 0,
+        "present_graded_acceptable_precision": 0,
+        "present_required_role_coverage": 0
+      }
+    }
+  },
+  "gate_receipts": {
+    "historical_bridge": {
+      "lane_id": "c143_legacy",
+      "historical_recall_at_10": {
+        "target": 0.5,
+        "actual": 0.5,
+        "pass": true
+      },
+      "full_recall_at_3": {
+        "target": 0.45,
+        "actual": 0.323413,
+        "pass": false
+      },
+      "full_acceptable_coverage_at_3": {
+        "target": 0.4,
+        "actual": 0.282051,
+        "pass": false
+      },
+      "present_recall_at_3": {
+        "target": 0.7,
+        "actual": 0.5,
+        "pass": false
+      },
+      "present_recall_at_5": {
+        "target": 0.8,
+        "actual": 0.7,
+        "pass": false
+      },
+      "present_recall_at_10": {
+        "target": 0.9,
+        "actual": 0.805556,
+        "pass": false
+      },
+      "present_graded_precision_at_5": {
+        "target": 0.7,
+        "actual": 0.13,
+        "pass": false
+      },
+      "present_role_coverage_at_10": {
+        "target": 0.9,
+        "actual": 0.868421,
+        "pass": false
+      },
+      "safety_zero_tolerance": {
+        "target": true,
+        "actual": false,
+        "pass": false
+      }
+    },
+    "current_same_algorithm_bridge": {
+      "lane_id": "c157_legacy",
+      "historical_recall_at_10": {
+        "target": 0.5,
+        "actual": 0.492063,
+        "pass": false
+      },
+      "full_recall_at_3": {
+        "target": 0.45,
+        "actual": 0.303571,
+        "pass": false
+      },
+      "full_acceptable_coverage_at_3": {
+        "target": 0.4,
+        "actual": 0.269231,
+        "pass": false
+      },
+      "present_recall_at_3": {
+        "target": 0.7,
+        "actual": 0.455556,
+        "pass": false
+      },
+      "present_recall_at_5": {
+        "target": 0.8,
+        "actual": 0.7,
+        "pass": false
+      },
+      "present_recall_at_10": {
+        "target": 0.9,
+        "actual": 0.794444,
+        "pass": false
+      },
+      "present_graded_precision_at_5": {
+        "target": 0.7,
+        "actual": 0.131111,
+        "pass": false
+      },
+      "present_role_coverage_at_10": {
+        "target": 0.9,
+        "actual": 0.842105,
+        "pass": false
+      },
+      "safety_zero_tolerance": {
+        "target": true,
+        "actual": false,
+        "pass": false
+      }
+    },
+    "current_production_observation": {
+      "lane_id": "c157_production_worker",
+      "historical_recall_at_10": {
+        "target": 0.5,
+        "actual": 0.515873,
+        "pass": true
+      },
+      "full_recall_at_3": {
+        "target": 0.45,
+        "actual": 0.371032,
+        "pass": false
+      },
+      "full_acceptable_coverage_at_3": {
+        "target": 0.4,
+        "actual": 0.331731,
+        "pass": false
+      },
+      "present_recall_at_3": {
+        "target": 0.7,
+        "actual": 0.572222,
+        "pass": false
+      },
+      "present_recall_at_5": {
+        "target": 0.8,
+        "actual": 0.705556,
+        "pass": false
+      },
+      "present_recall_at_10": {
+        "target": 0.9,
+        "actual": 0.827778,
+        "pass": false
+      },
+      "present_graded_precision_at_5": {
+        "target": 0.7,
+        "actual": 0.136111,
+        "pass": false
+      },
+      "present_role_coverage_at_10": {
+        "target": 0.9,
+        "actual": 0.842105,
+        "pass": false
+      },
+      "safety_zero_tolerance": {
+        "target": true,
+        "actual": false,
+        "pass": false
+      }
+    }
+  }
+}

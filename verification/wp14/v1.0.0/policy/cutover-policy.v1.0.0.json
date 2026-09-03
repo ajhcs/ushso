@@ -1,0 +1,157 @@
+{
+  "schema_version": "ushso-wp14-cutover-policy.v1.0.0",
+  "policy_id": "wp14-cutover-retirement-2026-08-30",
+  "authority": "RESEARCH_NAVIGATOR_IMPLEMENTATION_PLAN.md section 24 and WP14",
+  "default_public_backend": "immutable_static_jsonl",
+  "default_public_traffic_percent": 0,
+  "production_promotion_steps_percent": [0, 1, 5, 25, 50, 100],
+  "event_clock_skew_seconds": 5,
+  "receipt_max_validity_seconds": {
+    "authorization": 86400,
+    "production_gate": 86400,
+    "promotion_telemetry": 300,
+    "rollback_bundle": 86400,
+    "launch_cycle": 3600,
+    "release_candidate": 86400,
+    "retirement": 3600
+  },
+  "required_rollback_resource_roles": [
+    "worker_n_minus_one",
+    "worker_n",
+    "hyperdrive_correctness",
+    "hyperdrive_immutable_read",
+    "r2_capture",
+    "r2_archive",
+    "queue_primary",
+    "queue_dlq",
+    "workflow",
+    "publication_manifest_n_minus_one",
+    "publication_manifest_n",
+    "search_generation_n_minus_one",
+    "search_generation_n",
+    "asset_bundle_n_minus_one",
+    "asset_bundle_n",
+    "static_emergency_artifact"
+  ],
+  "required_digest_roles": [
+    "authorization_register",
+    "configuration",
+    "migration_bundle",
+    "search_generation",
+    "static_artifact",
+    "coverage",
+    "planner",
+    "machine_toolkit",
+    "seo"
+  ],
+  "central_authorization_gates": {
+    "expand_apply": ["AUTH-11"],
+    "backfill": ["AUTH-03", "AUTH-11"],
+    "managed_staging_and_shadow": ["AUTH-03"],
+    "managed_recovery": ["AUTH-05"],
+    "internal_canary": ["AUTH-03", "AUTH-06", "AUTH-11"],
+    "public_promotion": ["AUTH-03", "AUTH-05", "AUTH-06", "AUTH-07", "AUTH-11"],
+    "production_soak": ["AUTH-08"],
+    "jsonl_retirement": ["AUTH-09"]
+  },
+  "authorization_environments": {
+    "AUTH-03": "staging",
+    "AUTH-05": "production_like_isolated_recovery",
+    "AUTH-06": "production_internal_canary",
+    "AUTH-07": "production_public",
+    "AUTH-08": "production_soak",
+    "AUTH-09": "production_runtime",
+    "AUTH-11": "production_foundation_no_traffic"
+  },
+  "stages": [
+    {
+      "number": 1,
+      "id": "expand",
+      "public_read_backend": "immutable_static_jsonl",
+      "rollback": "leave the unchanged static Worker serving public reads",
+      "requirements": ["additive and backwards-compatible resources", "no public read change", "exact candidate and configuration pins"]
+    },
+    {
+      "number": 2,
+      "id": "backfill",
+      "public_read_backend": "immutable_static_jsonl",
+      "rollback": "reject the import batch and rebuild isolated staging objects; never discard shared PostgreSQL history, evidence, audit, outbox, runs, or R2 captures",
+      "requirements": ["corpus v1.1.0", "aliases and unresolved identity preserved", "import receipt", "forward-only migrations"]
+    },
+    {
+      "number": 3,
+      "id": "shadow",
+      "public_read_backend": "immutable_static_jsonl",
+      "rollback": "pause connectors and projectors without changing public reads",
+      "requirements": ["candidate generations not public", "static/candidate fixture parity", "frozen or synthetic planner inputs only"]
+    },
+    {
+      "number": 4,
+      "id": "internal_canary",
+      "public_read_backend": "immutable_static_jsonl",
+      "rollback": "disable the server-side canary flag and return internal reads to static",
+      "requirements": ["candidate exists at zero percent", "Access-protected hostname or facade", "server-injected version", "public override headers forbidden"]
+    },
+    {
+      "number": 5,
+      "id": "public_promotion",
+      "public_read_backend": "gradual_database_candidate",
+      "rollback": "bad generation: pointer rollback; bad Worker: Worker plus asset rollback; database path failure: immutable static emergency artifact",
+      "requirements": ["complete N-1 bundle", "N-1 Worker/current schema and bindings compatibility", "zero cross-version asset 404", "measured managed recovery", "production-like quality and load gates"]
+    },
+    {
+      "number": 6,
+      "id": "soak",
+      "public_read_backend": "database_generation_pinned",
+      "rollback": "retain N-1 Worker, bindings, additive schema, immutable generations, assets, and static emergency artifact through the entire window",
+      "requirements": ["at least 30 days after 100 percent", "two live connector reconciliation cycles", "two live rebuild/promote/rollback cycles", "no unresolved Sev1/Sev2 or coverage/visibility incident"]
+    },
+    {
+      "number": 7,
+      "id": "retire_jsonl_runtime",
+      "public_read_backend": "database_generation_pinned",
+      "rollback": "normal generation rollback plus periodically rebuilt static emergency artifact",
+      "requirements": ["AUTH-09", "completed soak receipt", "N-1 dependency audit", "JSONL retained for fixtures, evaluation, audit, and disaster recovery"]
+    }
+  ],
+  "observability_abort_thresholds": {
+    "contract_error_count": {"operator": "<=", "value": 0},
+    "visibility_safety_violation_count": {"operator": "<=", "value": 0},
+    "generation_consistency_error_count": {"operator": "<=", "value": 0},
+    "asset_404_count": {"operator": "<=", "value": 0},
+    "coverage_partition_reconciliation_failures": {"operator": "<=", "value": 0},
+    "raw_user_question_persist_count": {"operator": "<=", "value": 0},
+    "source_or_analysis_action_count": {"operator": "<=", "value": 0},
+    "public_error_rate": {"operator": "<=", "value": 0.01},
+    "search_p95_ms": {"operator": "<=", "value": 600},
+    "search_p99_ms": {"operator": "<=", "value": 1500},
+    "planner_p95_ms_if_enabled": {"operator": "<=", "value": 1200},
+    "planner_p99_ms_if_enabled": {"operator": "<=", "value": 3000},
+    "outbox_oldest_pending_seconds": {"operator": "<=", "value": 300},
+    "dlq_unresolved_count": {"operator": "<=", "value": 0},
+    "workflow_terminal_error_count_5m": {"operator": "<=", "value": 0}
+  },
+  "recovery_objectives": {
+    "rpo_seconds_max": 300,
+    "rto_seconds_max": 1800,
+    "generation_rollback_seconds_max": 900
+  },
+  "soak": {
+    "minimum_days_after_100_percent": 30,
+    "minimum_live_connector_reconciliation_cycles": 2,
+    "minimum_live_rebuild_promote_rollback_cycles": 2,
+    "fixture_cycles_count_toward_production_soak": false,
+    "rollback_window_starts": "first_public_database_canary",
+    "destructive_schema_changes_allowed_during_window": false,
+    "n_minus_one_resource_removal_allowed_during_window": false
+  },
+  "privacy_and_product_boundary": {
+    "raw_user_queries_may_be_persisted": false,
+    "source_payloads_may_be_acquired_by_this_tool": false,
+    "source_requests_may_be_made_by_this_tool": false,
+    "analyses_may_be_executed_by_this_tool": false,
+    "market_share_or_financial_benchmarks_may_be_computed": false,
+    "public_override_headers_allowed": false,
+    "fixture_rehearsal_authorizes_production_action": false
+  }
+}

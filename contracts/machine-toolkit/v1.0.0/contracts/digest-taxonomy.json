@@ -1,0 +1,35 @@
+{
+  "contract_version": "observatory-machine-toolkit-digests.v1.0.0",
+  "canonicalization": {
+    "algorithm": "rfc8785-jcs",
+    "encoding": "utf-8",
+    "array_order": "preserved",
+    "object_key_order": "utf-16-code-unit-ascending"
+  },
+  "digest_classes": [
+    {
+      "name": "file_sha256",
+      "prefix": "none",
+      "covers": "SHA-256 of the exact stored file bytes, including whitespace and line endings.",
+      "excludes": []
+    },
+    {
+      "name": "canonical_json_sha256",
+      "prefix": "sha256:",
+      "covers": "SHA-256 of RFC 8785 canonical JSON UTF-8 bytes for one complete JSON value.",
+      "excludes": []
+    },
+    {
+      "name": "result_snapshot_id",
+      "prefix": "sha256:",
+      "covers": "Reusable machine-tool response semantics and immutable publication pins.",
+      "excludes": ["/request_id", "/response_generated_at", "/transport_adapter", "/result_snapshot_id", "/candidate_snapshot_id", "/rate_limit/remaining", "/rate_limit/reset_at", "/rate_limit/retry_after_seconds"]
+    },
+    {
+      "name": "candidate_snapshot_id",
+      "prefix": "sha256:",
+      "covers": "The deterministic candidate set and canonical plan semantics returned by plan_research.",
+      "excludes": ["/request_id", "/response_generated_at", "/transport_adapter", "/result_snapshot_id", "/candidate_snapshot_id", "/rate_limit/remaining", "/rate_limit/reset_at", "/rate_limit/retry_after_seconds"]
+    }
+  ]
+}

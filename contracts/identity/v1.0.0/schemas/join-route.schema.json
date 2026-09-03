@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/identity/v1.0.0/join-route.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "route_id",
+    "revision_id",
+    "research_purpose",
+    "source_endpoint",
+    "target_endpoint",
+    "applicability",
+    "identity_context",
+    "step_ids",
+    "evidence_ids",
+    "state",
+    "supersedes_revision_id",
+    "superseded_by_revision_id",
+    "observed_at",
+    "recorded_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "identity.join-route.v1.0.0"},
+    "route_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "revision_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "research_purpose": {"type": "string", "minLength": 10, "maxLength": 1000},
+    "source_endpoint": {"$ref": "#/$defs/exactEndpoint"},
+    "target_endpoint": {"$ref": "#/$defs/exactEndpoint"},
+    "applicability": {"$ref": "common.schema.json#/$defs/effectiveInterval"},
+    "identity_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["graph_revision_id", "valid_at", "assertion_ids"],
+      "properties": {
+        "graph_revision_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+        "valid_at": {"$ref": "common.schema.json#/$defs/date"},
+        "assertion_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+        }
+      }
+    },
+    "step_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "evidence_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "state": {"enum": ["active", "superseded", "withdrawn"]},
+    "supersedes_revision_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]},
+    "superseded_by_revision_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]},
+    "observed_at": {"$ref": "common.schema.json#/$defs/dateTime"},
+    "recorded_at": {"$ref": "common.schema.json#/$defs/dateTime"}
+  },
+  "$defs": {
+    "exactEndpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["object_id", "release_id", "distribution_id", "schema_snapshot_id", "schema_field_id", "field_revision_id", "entity_type", "grain"],
+      "properties": {
+        "object_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+        "release_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+        "distribution_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+        "schema_snapshot_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+        "schema_field_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+        "field_revision_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+        "entity_type": {"$ref": "common.schema.json#/$defs/entityType"},
+        "grain": {"$ref": "common.schema.json#/$defs/grain"}
+      }
+    }
+  }
+}

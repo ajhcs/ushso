@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.0.0/schemas/validation-receipt.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "status", "validated_package_content_digest", "dependency_schema_file_sha256", "commands", "counts", "checks"],
+  "properties": {
+    "contract_version": { "const": "observatory-machine-toolkit-validation-receipt.v1.0.0" },
+    "status": { "const": "pass" },
+    "validated_package_content_digest": { "$ref": "common.schema.json#/$defs/digest" },
+    "dependency_schema_file_sha256": { "type": "string", "minLength": 64, "maxLength": 64, "pattern": "^[a-f0-9]{64}$" },
+    "commands": { "type": "array", "minItems": 3, "maxItems": 10, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["local_schemas", "dependency_schemas", "tools", "conformance_cases", "adversarial_cases", "semantic_checks", "parity_cases", "bound_findings", "validation_errors"],
+      "properties": {
+        "local_schemas": { "type": "integer", "minimum": 1, "maximum": 200 },
+        "dependency_schemas": { "type": "integer", "minimum": 1, "maximum": 200 },
+        "tools": { "const": 9 },
+        "conformance_cases": { "type": "integer", "minimum": 13, "maximum": 100 },
+        "adversarial_cases": { "type": "integer", "minimum": 20, "maximum": 200 },
+        "semantic_checks": { "type": "integer", "minimum": 20, "maximum": 10000 },
+        "parity_cases": { "type": "integer", "minimum": 13, "maximum": 100 },
+        "bound_findings": { "const": 0 },
+        "validation_errors": { "const": 0 }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 100,
+      "uniqueItems": true,
+      "items": { "enum": ["draft_2020_12_schema_compilation", "strict_public_schema_bounds", "nine_capability_manifest", "legacy_alias_disabled_pending_audit", "input_and_output_byte_caps", "cardinality_limits", "response_schema_conformance", "json_api_webmcp_parity", "snapshot_digest_integrity", "generation_and_cursor_pinning", "evidence_resolution", "typed_unknown_and_unavailable", "truth_boundary_zero_action", "credential_and_locator_redaction", "source_payload_prohibition", "analysis_prohibition", "safety_atomic_failure", "coverage_absence_invariant", "planner_gate_invariant", "error_privacy", "rate_limit_envelope", "research_plan_dependency_pin", "adversarial_fail_closed"] }
+    }
+  }
+}

@@ -1,0 +1,288 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.ushso.org/retrieval/analysis-use/v1.0.0/analysis-use-card.schema.json",
+  "title": "USHSO analysis Use Card",
+  "description": "A requirement-derived discovery claim about analytical fit. It contains no metric result and grants no access or calculation authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "compiler_version",
+    "use_card_id",
+    "analysis_id",
+    "analysis_family",
+    "label",
+    "methodology",
+    "implementation_methodology",
+    "question_patterns",
+    "acceptable_grains",
+    "upstream_analysis_ids",
+    "requirement_catalog_sha256",
+    "requirement_sha256",
+    "evidence_sha256",
+    "support_status",
+    "research_set",
+    "input_coverage",
+    "property_coverage",
+    "join_coverage",
+    "temporal_requirements",
+    "limitations",
+    "truth_boundary"
+  ],
+  "properties": {
+    "schema_version": {"const": "observatory-analysis-use-card.v1.0.0"},
+    "compiler_version": {"const": "observatory-analysis-use-compiler.v1.0.0"},
+    "use_card_id": {"type": "string", "pattern": "^obs:analysis-use-card:[a-z][a-z0-9_]*:[a-f0-9]{16}$"},
+    "analysis_id": {"$ref": "#/$defs/token"},
+    "analysis_family": {"$ref": "#/$defs/token"},
+    "label": {"$ref": "#/$defs/nonEmptyString"},
+    "methodology": {"type": "string", "pattern": "^hc-metrics:[a-z][a-z0-9_]*:[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "implementation_methodology": {"$ref": "#/$defs/token"},
+    "question_patterns": {"$ref": "#/$defs/nonEmptyStringSet"},
+    "acceptable_grains": {"$ref": "#/$defs/nonEmptyStringSet"},
+    "upstream_analysis_ids": {"$ref": "#/$defs/tokenSet"},
+    "requirement_catalog_sha256": {"$ref": "#/$defs/digest"},
+    "requirement_sha256": {"$ref": "#/$defs/digest"},
+    "evidence_sha256": {"$ref": "#/$defs/digest"},
+    "support_status": {"enum": ["supported", "partial", "unsupported"]},
+    "research_set": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/researchSetItem"}
+    },
+    "input_coverage": {"$ref": "#/$defs/inputCoverage"},
+    "property_coverage": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/propertyCoverage"}
+    },
+    "join_coverage": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/joinCoverage"}
+    },
+    "temporal_requirements": {"$ref": "#/$defs/temporalRequirements"},
+    "limitations": {"$ref": "#/$defs/nonEmptyStringSet"},
+    "truth_boundary": {"$ref": "#/$defs/truthBoundary"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"support_status": {"const": "supported"}}},
+      "then": {
+        "properties": {
+          "input_coverage": {
+            "type": "object",
+            "properties": {
+              "missing_input_ids": {"type": "array", "maxItems": 0},
+              "unverified_input_ids": {"type": "array", "maxItems": 0}
+            }
+          },
+          "property_coverage": {
+            "type": "array",
+            "items": {"type": "object", "properties": {"state": {"const": "documented"}}}
+          },
+          "join_coverage": {
+            "type": "array",
+            "items": {"type": "object", "properties": {"state": {"enum": ["documented", "not_required"]}}}
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "token": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "nonEmptyString": {"type": "string", "minLength": 1},
+    "stringSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "nonEmptyStringSet": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/nonEmptyString"}
+    },
+    "tokenSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/token"}
+    },
+    "researchSetItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_id", "profile_id", "supplied_input_ids", "limitations"],
+      "properties": {
+        "record_id": {"$ref": "#/$defs/nonEmptyString"},
+        "profile_id": {"$ref": "#/$defs/nonEmptyString"},
+        "supplied_input_ids": {"$ref": "#/$defs/tokenSet"},
+        "limitations": {"$ref": "#/$defs/stringSet"}
+      }
+    },
+    "inputBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_id", "record_id", "profile_id", "availability", "field_refs", "observation_grain", "value_kind", "measurement_unit", "domain_compatibility", "domain_constraints", "derivation", "evidence_ids", "limitations"],
+      "properties": {
+        "input_id": {"$ref": "#/$defs/token"},
+        "record_id": {"$ref": "#/$defs/nonEmptyString"},
+        "profile_id": {"$ref": "#/$defs/nonEmptyString"},
+        "availability": {"enum": ["source_reported", "derivable"]},
+        "field_refs": {"$ref": "#/$defs/nonEmptyStringSet"},
+        "observation_grain": {"$ref": "#/$defs/nonEmptyString"},
+        "value_kind": {"enum": ["identifier", "category", "integer", "decimal", "currency", "percent", "rate", "period"]},
+        "measurement_unit": {"$ref": "#/$defs/nonEmptyString"},
+        "domain_compatibility": {"const": "documented"},
+        "domain_constraints": {"$ref": "#/$defs/domainConstraints"},
+        "derivation": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/derivation"}
+          ]
+        },
+        "evidence_ids": {"$ref": "#/$defs/nonEmptyStringSet"},
+        "limitations": {"$ref": "#/$defs/stringSet"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"availability": {"const": "derivable"}}, "required": ["availability"]},
+          "then": {"properties": {"derivation": {"$ref": "#/$defs/derivation"}}}
+        },
+        {
+          "if": {"properties": {"availability": {"const": "source_reported"}}, "required": ["availability"]},
+          "then": {"properties": {"derivation": {"type": "null"}}}
+        }
+      ]
+    },
+    "derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["derivation_id", "description", "evidence_ids"],
+      "properties": {
+        "derivation_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._:-]{2,191}$"},
+        "description": {"$ref": "#/$defs/nonEmptyString"},
+        "evidence_ids": {"$ref": "#/$defs/nonEmptyStringSet"}
+      }
+    },
+    "domainConstraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_values", "conditional_ranges"],
+      "properties": {
+        "allowed_values": {"$ref": "#/$defs/stringSet"},
+        "conditional_ranges": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/conditionalRange"}
+        }
+      }
+    },
+    "conditionalRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["when_input_id", "equals", "minimum", "maximum"],
+      "properties": {
+        "when_input_id": {"$ref": "#/$defs/token"},
+        "equals": {"$ref": "#/$defs/nonEmptyString"},
+        "minimum": {"type": "number"},
+        "maximum": {"type": "number"}
+      }
+    },
+    "inputCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_count", "covered_count", "covered_input_ids", "missing_input_ids", "unverified_input_ids", "bindings"],
+      "properties": {
+        "required_count": {"type": "integer", "minimum": 1},
+        "covered_count": {"type": "integer", "minimum": 0},
+        "covered_input_ids": {"$ref": "#/$defs/tokenSet"},
+        "missing_input_ids": {"$ref": "#/$defs/tokenSet"},
+        "unverified_input_ids": {"$ref": "#/$defs/tokenSet"},
+        "bindings": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/inputBinding"}
+        }
+      }
+    },
+    "propertyCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["property_id", "state", "evidence_ids", "limitations"],
+      "properties": {
+        "property_id": {"$ref": "#/$defs/token"},
+        "state": {"enum": ["documented", "candidate", "unknown", "not_satisfied", "missing"]},
+        "evidence_ids": {"$ref": "#/$defs/stringSet"},
+        "limitations": {"$ref": "#/$defs/stringSet"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "documented"}}, "required": ["state"]},
+          "then": {"properties": {"evidence_ids": {"type": "array", "minItems": 1}}}
+        }
+      ]
+    },
+    "joinCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["join_id", "state", "supporting_edges", "route_ids", "evidence_ids", "limitations"],
+      "properties": {
+        "join_id": {"$ref": "#/$defs/token"},
+        "state": {"enum": ["documented", "candidate", "ambiguous", "incompatible", "unknown", "missing", "not_required"]},
+        "supporting_edges": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/supportingEdge"}
+        },
+        "route_ids": {"$ref": "#/$defs/stringSet"},
+        "evidence_ids": {"$ref": "#/$defs/stringSet"},
+        "limitations": {"$ref": "#/$defs/stringSet"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"state": {"const": "documented"}}, "required": ["state"]},
+          "then": {
+            "properties": {
+              "supporting_edges": {"type": "array", "minItems": 1},
+              "route_ids": {"type": "array", "minItems": 1},
+              "evidence_ids": {"type": "array", "minItems": 1}
+            }
+          }
+        }
+      ]
+    },
+    "supportingEdge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["route_id", "alternative_id", "from_record_id", "to_record_id"],
+      "properties": {
+        "route_id": {"$ref": "#/$defs/nonEmptyString"},
+        "alternative_id": {"$ref": "#/$defs/token"},
+        "from_record_id": {"$ref": "#/$defs/nonEmptyString"},
+        "to_record_id": {"$ref": "#/$defs/nonEmptyString"}
+      }
+    },
+    "temporalRequirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["period_input_ids", "same_period_required"],
+      "properties": {
+        "period_input_ids": {"$ref": "#/$defs/tokenSet"},
+        "same_period_required": {"type": "boolean"}
+      }
+    },
+    "truthBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assertion_type", "source_truth_separate", "field_inference_allowed", "data_access_authorized", "calculation_authorized", "persistence_authorized", "publication_authorized"],
+      "properties": {
+        "assertion_type": {"const": "requirement_derived_analytical_fit_not_source_truth"},
+        "source_truth_separate": {"const": true},
+        "field_inference_allowed": {"const": false},
+        "data_access_authorized": {"const": false},
+        "calculation_authorized": {"const": false},
+        "persistence_authorized": {"const": false},
+        "publication_authorized": {"const": false}
+      }
+    }
+  }
+}

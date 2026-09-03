@@ -1,0 +1,40 @@
+{
+  "schema_version": "ushso-terraform-plan-redaction.v1.0.0",
+  "replacement": "[REDACTED]",
+  "sensitive_key_patterns": [
+    "password",
+    "secret",
+    "token",
+    "api_key",
+    "private_key",
+    "connection_string",
+    "database_url",
+    "database_origins",
+    "access_key",
+    "account_id",
+    "project_id",
+    "hostname",
+    "host",
+    "audience"
+  ],
+  "sensitive_terraform_paths": [
+    "planned_values.root_module.resources[*].values.origin.password",
+    "planned_values.root_module.child_modules[*].resources[*].values.origin.password",
+    "configuration.provider_config.*.expressions.api_token",
+    "variables.cloudflare_account_id.value",
+    "variables.neon_organization_id.value",
+    "planned_values.root_module.child_modules[*].resources[neon_project.this].values.database_password",
+    "planned_values.root_module.child_modules[*].resources[neon_project.this].values.database_uri",
+    "planned_values.root_module.child_modules[*].resources[cloudflare_hyperdrive_config.role_scoped].values.origin",
+    "variables.database_origins.value",
+    "variables.database_origin_attestation.value",
+    "module.neon.bootstrap_maintenance_connection"
+  ],
+  "review_rules": [
+    "redact_before_persistence_or_review_upload",
+    "do_not_use_redacted_plan_as_apply_artifact",
+    "review_unredacted_plan_only_in_approved_ephemeral_secret_context",
+    "fail_if_high_entropy_or_uri_credentials_remain",
+    "record_plan_digest_separately_from_redacted_digest"
+  ]
+}

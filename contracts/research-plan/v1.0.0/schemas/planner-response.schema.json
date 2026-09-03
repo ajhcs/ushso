@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/planner-response.schema.json",
+  "title": "Research planner transport envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["request_id", "response_generated_at", "clarification_token", "plan", "truth_boundary"],
+  "properties": {
+    "request_id": {"$ref": "common.schema.json#/$defs/stableId"},
+    "response_generated_at": {"$ref": "common.schema.json#/$defs/dateTime"},
+    "clarification_token": {
+      "oneOf": [
+        {"type": "string", "minLength": 32, "maxLength": 2048, "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$"},
+        {"type": "null"}
+      ]
+    },
+    "plan": {"$ref": "research-plan.schema.json"},
+    "truth_boundary": {"$ref": "common.schema.json#/$defs/truthBoundary"}
+  }
+}

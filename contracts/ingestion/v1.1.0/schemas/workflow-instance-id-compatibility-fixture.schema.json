@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.1.0/workflow-instance-id-compatibility-fixture.schema.json",
+  "title": "Workflow instance ID v1.0 to v1.1 compatibility fixtures",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixture_version", "provider_pattern", "provider_max_length", "cases"],
+  "properties": {
+    "fixture_version": { "const": "ingestion.workflow-instance-id-compatibility.v1" },
+    "provider_pattern": { "const": "^[A-Za-z0-9_][A-Za-z0-9_-]*$" },
+    "provider_max_length": { "const": 100 },
+    "cases": {
+      "type": "array",
+      "minItems": 5,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["case_id", "run_id", "active_attempt", "instance_id", "expected_v1_0_valid", "expected_v1_1_valid", "expected_upgrade_action"],
+        "properties": {
+          "case_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]{2,79}$" },
+          "run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+          "active_attempt": { "type": "integer", "minimum": 1 },
+          "instance_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "expected_v1_0_valid": { "const": true },
+          "expected_v1_1_valid": { "type": "boolean" },
+          "expected_upgrade_action": { "enum": ["version_only", "retain_v1_0_audit_only"] }
+        }
+      }
+    }
+  }
+}

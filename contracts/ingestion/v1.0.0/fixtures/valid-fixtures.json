@@ -1,0 +1,360 @@
+{
+  "fixture_version": "ingestion-valid-fixtures.v1.0.0",
+  "records": [
+    {
+      "fixture_id": "valid_source_descriptor",
+      "schema": "source-descriptor.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0",
+        "descriptor_id": "descriptor_cms_catalog_v1",
+        "source_id": "source_cms_catalog",
+        "connector_name": "dcat-catalog",
+        "connector_version": "1.0.0",
+        "configuration_revision": 1,
+        "authority_type": "federal_agency",
+        "responsible_organization": { "organization_id": "organization_cms", "name": "Centers for Medicare & Medicaid Services" },
+        "allowed_hosts": ["data.cms.gov", "www.cms.gov"],
+        "redirect_policy": "allowlisted_hosts",
+        "endpoints": [
+          {
+            "endpoint_id": "endpoint_cms_catalog",
+            "base_url": "https://data.cms.gov",
+            "target_class": "collection",
+            "routes": [
+              {
+                "template_id": "route_cms_catalog_page",
+                "purpose": "catalog_metadata",
+                "method": "GET",
+                "path_template": "/data-api/v1/dataset/{cursor}",
+                "allowed_parameters": ["cursor", "limit"],
+                "expected_content_classes": ["catalog_collection", "catalog_item_record"],
+                "forbidden_route_classes": ["source_data_payload", "query_execution", "data_download", "archive_member", "form_submission", "login", "payment", "authorization_workflow"]
+              },
+              {
+                "template_id": "route_cms_schema",
+                "purpose": "schema",
+                "method": "GET",
+                "path_template": "/data-api/v1/dataset/{id}/schema",
+                "allowed_parameters": ["id"],
+                "expected_content_classes": ["data_dictionary", "schema_description"],
+                "forbidden_route_classes": ["source_data_payload", "query_execution", "data_download", "archive_member", "form_submission", "login", "payment", "authorization_workflow"]
+              }
+            ]
+          },
+          {
+            "endpoint_id": "endpoint_cms_docs",
+            "base_url": "https://www.cms.gov",
+            "target_class": "documentation",
+            "routes": [
+              {
+                "template_id": "route_cms_docs",
+                "purpose": "documentation",
+                "method": "GET",
+                "path_template": "/research-statistics-data-and-systems/{slug}",
+                "allowed_parameters": ["slug"],
+                "expected_content_classes": ["documentation_page"],
+                "forbidden_route_classes": ["source_data_payload", "query_execution", "data_download", "archive_member", "form_submission", "login", "payment", "authorization_workflow"]
+              },
+              {
+                "template_id": "route_cms_access_probe",
+                "purpose": "access_probe",
+                "method": "HEAD",
+                "path_template": "/files/{distribution}",
+                "allowed_parameters": ["distribution"],
+                "expected_content_classes": ["access_status_headers"],
+                "forbidden_route_classes": ["source_data_payload", "query_execution", "data_download", "archive_member", "form_submission", "login", "payment", "authorization_workflow"]
+              }
+            ]
+          }
+        ],
+        "scopes": [
+          {
+            "scope_id": "scope_cms_public_catalog",
+            "unit": "source_scope",
+            "description": "Every item returned by the configured CMS public catalog collection.",
+            "endpoint_ids": ["endpoint_cms_catalog", "endpoint_cms_docs"],
+            "denominator": {
+              "unit": "enumerated_item",
+              "inclusion_rule": "Count each unique source-native item in a complete sealed enumeration.",
+              "unknown_handling": "preserve_unknown",
+              "exclusions_visible": true
+            },
+            "completeness_evidence_strategy": "both",
+            "keyword_search_is_denominator": false
+          }
+        ],
+        "native_identifier": { "namespace": "cms.data.catalog", "case_behavior": "sensitive" },
+        "checkpoint_policy": { "strategy": "modified_at_native_id", "opaque_cursor_durability": "run_local", "overlap_seconds": 3600, "full_enumeration_interval_seconds": 604800 },
+        "refresh_policy": { "interval_seconds": 86400, "jitter_seconds": 1800, "stale_after_seconds": 172800, "policy_version": "refresh.v1" },
+        "bounds": { "maximum_pages": 1000, "maximum_response_bytes": 5242880, "maximum_decompressed_bytes": 10485760, "maximum_run_seconds": 7200, "maximum_redirects": 2 },
+        "origin_policy": { "maximum_concurrency": 2, "requests_per_second": 1, "burst": 2, "minimum_retry_delay_seconds": 5, "maximum_retry_delay_seconds": 900, "circuit_policy_version": "origin.v1" },
+        "credential_secret_locator": "cloudflare-secret://ushso/prod/cms-catalog-token",
+        "supported_object_roles": ["asset", "release", "distribution", "documentation", "schema", "access_route"],
+        "capabilities": { "schema_metadata": true, "documentation": true, "access_probe": true },
+        "exclusion_policy": { "policy_version": "exclusion.v1", "rules": [], "exclusions_visible_upstream": true },
+        "legal_review": { "state": "approved", "reviewed_at": "2026-08-01T00:00:00.000Z", "reviewer_role": "data-governance", "terms_locator": "https://data.cms.gov/terms" },
+        "capture_retention_policy": { "policy_version": "capture-retention.v1", "active_days": 90, "override_rationale": null, "review_at": null },
+        "source_state": "active"
+      }
+    },
+    {
+      "fixture_id": "valid_failure_policy",
+      "schema": "failure-policy.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0",
+        "retry_policy_version": "retry.v1",
+        "stage_policies": [
+          { "stage": "harvest_page", "maximum_delivery_attempts": 6, "transport_max_retries": 5, "minimum_delay_seconds": 5, "maximum_delay_seconds": 900, "full_jitter": true, "honor_bounded_retry_after": true, "exhausted_outcome": "durable_dlq_and_partial_unpublished" },
+          { "stage": "normalize_record", "maximum_delivery_attempts": 5, "transport_max_retries": 4, "minimum_delay_seconds": 2, "maximum_delay_seconds": 300, "full_jitter": true, "honor_bounded_retry_after": true, "exhausted_outcome": "quarantine_and_durable_dlq" },
+          { "stage": "enrich_schema", "maximum_delivery_attempts": 4, "transport_max_retries": 3, "minimum_delay_seconds": 10, "maximum_delay_seconds": 1800, "full_jitter": true, "honor_bounded_retry_after": true, "exhausted_outcome": "quarantine_and_durable_dlq" },
+          { "stage": "access_check", "maximum_delivery_attempts": 4, "transport_max_retries": 3, "minimum_delay_seconds": 30, "maximum_delay_seconds": 1800, "full_jitter": true, "honor_bounded_retry_after": true, "exhausted_outcome": "typed_stale_or_failed_observation_and_durable_dlq" },
+          { "stage": "project_index", "maximum_delivery_attempts": 5, "transport_max_retries": 4, "minimum_delay_seconds": 2, "maximum_delay_seconds": 300, "full_jitter": true, "honor_bounded_retry_after": true, "exhausted_outcome": "reject_generation_and_durable_dlq" }
+        ],
+        "failure_rules": [
+          { "failure_type": "rate_limited", "default_disposition": "retry", "catalog_enumeration_disposition": "retry", "exact_target_disposition": "retry", "circuit_effect": "consume_shared_budget", "transport_retry_allowed": true },
+          { "failure_type": "upstream_5xx", "default_disposition": "retry", "catalog_enumeration_disposition": "retry", "exact_target_disposition": "retry", "circuit_effect": "consume_shared_budget", "transport_retry_allowed": true },
+          { "failure_type": "timeout", "default_disposition": "retry", "catalog_enumeration_disposition": "retry", "exact_target_disposition": "retry", "circuit_effect": "consume_shared_budget", "transport_retry_allowed": true },
+          { "failure_type": "dns_failure", "default_disposition": "retry", "catalog_enumeration_disposition": "retry", "exact_target_disposition": "retry", "circuit_effect": "consume_shared_budget", "transport_retry_allowed": true },
+          { "failure_type": "tls_failure", "default_disposition": "retry", "catalog_enumeration_disposition": "retry", "exact_target_disposition": "retry", "circuit_effect": "consume_shared_budget", "transport_retry_allowed": true },
+          { "failure_type": "catalog_auth_misconfigured", "default_disposition": "pause_source", "catalog_enumeration_disposition": "pause_source", "exact_target_disposition": "pause_source", "circuit_effect": "open_source_circuit", "transport_retry_allowed": false },
+          { "failure_type": "expected_access_restriction", "default_disposition": "typed_observation", "catalog_enumeration_disposition": "fail_enumeration", "exact_target_disposition": "typed_observation", "circuit_effect": "none", "transport_retry_allowed": false },
+          { "failure_type": "not_found", "default_disposition": "typed_observation", "catalog_enumeration_disposition": "fail_enumeration", "exact_target_disposition": "typed_observation", "circuit_effect": "none", "transport_retry_allowed": false },
+          { "failure_type": "gone", "default_disposition": "typed_observation", "catalog_enumeration_disposition": "fail_enumeration", "exact_target_disposition": "typed_observation", "circuit_effect": "none", "transport_retry_allowed": false },
+          { "failure_type": "redirect_unapproved", "default_disposition": "quarantine", "catalog_enumeration_disposition": "quarantine", "exact_target_disposition": "quarantine", "circuit_effect": "none", "transport_retry_allowed": false },
+          { "failure_type": "schema_drift", "default_disposition": "quarantine", "catalog_enumeration_disposition": "quarantine", "exact_target_disposition": "quarantine", "circuit_effect": "open_source_circuit", "transport_retry_allowed": false },
+          { "failure_type": "parse_failure", "default_disposition": "quarantine", "catalog_enumeration_disposition": "quarantine", "exact_target_disposition": "quarantine", "circuit_effect": "none", "transport_retry_allowed": false },
+          { "failure_type": "unexpected_content_type", "default_disposition": "quarantine", "catalog_enumeration_disposition": "quarantine", "exact_target_disposition": "quarantine", "circuit_effect": "none", "transport_retry_allowed": false },
+          { "failure_type": "response_too_large", "default_disposition": "quarantine", "catalog_enumeration_disposition": "quarantine", "exact_target_disposition": "quarantine", "circuit_effect": "none", "transport_retry_allowed": false },
+          { "failure_type": "policy_blocked", "default_disposition": "pause_source", "catalog_enumeration_disposition": "pause_source", "exact_target_disposition": "pause_source", "circuit_effect": "open_source_circuit", "transport_retry_allowed": false },
+          { "failure_type": "canonical_invariant_failure", "default_disposition": "quarantine", "catalog_enumeration_disposition": "quarantine", "exact_target_disposition": "quarantine", "circuit_effect": "none", "transport_retry_allowed": false },
+          { "failure_type": "internal_failure", "default_disposition": "retry", "catalog_enumeration_disposition": "retry", "exact_target_disposition": "retry", "circuit_effect": "consume_shared_budget", "transport_retry_allowed": true },
+          { "failure_type": "cursor_expired", "default_disposition": "fail_enumeration", "catalog_enumeration_disposition": "fail_enumeration", "exact_target_disposition": "quarantine", "circuit_effect": "none", "transport_retry_allowed": false }
+        ],
+        "circuit_open_transport_behavior": "commit_retry_wait_and_delayed_outbox_then_ack",
+        "dlq_replay_resets_history": false
+      }
+    },
+    {
+      "fixture_id": "valid_harvest_plan",
+      "schema": "harvest-plan.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0",
+        "plan_id": "plan_cms_20260830",
+        "source_id": "source_cms_catalog",
+        "endpoint_id": "endpoint_cms_catalog",
+        "source_configuration_revision": 1,
+        "mode": "full_membership",
+        "scheduled_slot": "2026-08-30T00:00:00.000Z",
+        "scope_ids": ["scope_cms_public_catalog"],
+        "prior_checkpoint_id": "checkpoint_cms_previous",
+        "prior_checkpoint_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "conditional_http": { "enabled": true, "reuse_not_modified_capture": true, "validator_source": "checkpoint_capture" },
+        "bounded_by": { "maximum_pages": 1000, "maximum_response_bytes": 5242880, "maximum_decompressed_bytes": 10485760, "deadline_at": "2026-08-30T02:00:00.000Z" },
+        "created_at": "2026-08-30T00:00:01.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_harvest_run",
+      "schema": "harvest-run.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0",
+        "run_id": "run_cms_20260830",
+        "plan_id": "plan_cms_20260830",
+        "source_id": "source_cms_catalog",
+        "endpoint_id": "endpoint_cms_catalog",
+        "source_configuration_revision": 1,
+        "scheduled_slot": "2026-08-30T00:00:00.000Z",
+        "mode": "full_membership",
+        "run_idempotency_key": "run:endpoint_cms_catalog:2026-08-30T00:00:00.000Z:full_membership:r1",
+        "state": "succeeded",
+        "active_attempt": 1,
+        "workflow": { "instance_id": "harvest-run_cms_20260830-1", "workflow_version": "1.0.0", "platform_state": "complete", "created_at": "2026-08-30T00:00:02.000Z", "retention_expires_at": "2026-09-29T00:00:02.000Z" },
+        "replay_of_run_id": null,
+        "state_changed_at": "2026-08-30T00:20:00.000Z",
+        "terminal_at": "2026-08-30T00:20:00.000Z",
+        "enumeration_seal_id": "seal_cms_20260830",
+        "candidate_publication_id": "publication_candidate_20260830",
+        "last_known_good_publication_id": "publication_generation_previous"
+      }
+    },
+    {
+      "fixture_id": "valid_page_job_leased",
+      "schema": "ingest-job.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0",
+        "job_id": "job_cms_page_001",
+        "run_id": "run_cms_20260830",
+        "job_type": "harvest_page",
+        "state": "leased",
+        "idempotency_key": "page:run_cms_20260830:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "identity": { "cursor_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "capture_sha256": null, "normalizer_version": null, "canonical_id": null, "canonical_revision_id": null, "recipe_version": null, "distribution_id": null, "scheduled_slot": null, "projection_version": null },
+        "active_run_attempt": 1,
+        "attempt_count": 1,
+        "maximum_delivery_attempts": 6,
+        "lease": { "owner_id": "worker_harvest_01", "lease_token": "LeaseToken_abcdefghijklmn1234", "epoch": 3, "acquired_at": "2026-08-30T00:01:00.000Z", "expires_at": "2026-08-30T00:02:00.000Z" },
+        "delivery_fence": { "run_attempt": 1, "lease_epoch": 3 },
+        "retry_policy_version": "retry.v1",
+        "first_attempt_at": "2026-08-30T00:01:00.000Z",
+        "next_eligible_at": null,
+        "outbox_event_id": "event_harvest_page_001",
+        "updated_at": "2026-08-30T00:01:00.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_normalize_job",
+      "schema": "ingest-job.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0",
+        "job_id": "job_normalize_001",
+        "run_id": "run_cms_20260830",
+        "job_type": "normalize_record",
+        "state": "succeeded",
+        "idempotency_key": "normalize:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:2.0.0",
+        "identity": { "cursor_sha256": null, "capture_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "normalizer_version": "2.0.0", "canonical_id": null, "canonical_revision_id": null, "recipe_version": null, "distribution_id": null, "scheduled_slot": null, "projection_version": null },
+        "active_run_attempt": 1, "attempt_count": 1, "maximum_delivery_attempts": 5, "lease": null,
+        "delivery_fence": { "run_attempt": 1, "lease_epoch": 1 }, "retry_policy_version": "retry.v1",
+        "first_attempt_at": "2026-08-30T00:06:00.000Z", "next_eligible_at": null,
+        "outbox_event_id": "event_normalize_001", "updated_at": "2026-08-30T00:07:00.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_schema_job",
+      "schema": "ingest-job.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "job_id": "job_schema_001", "run_id": "run_cms_20260830", "job_type": "enrich_schema", "state": "succeeded",
+        "idempotency_key": "schema:revision_asset_001:schema.v1",
+        "identity": { "cursor_sha256": null, "capture_sha256": null, "normalizer_version": null, "canonical_id": "asset_cms_001", "canonical_revision_id": "revision_asset_001", "recipe_version": "schema.v1", "distribution_id": null, "scheduled_slot": null, "projection_version": null },
+        "active_run_attempt": 1, "attempt_count": 1, "maximum_delivery_attempts": 4, "lease": null, "delivery_fence": { "run_attempt": 1, "lease_epoch": 1 }, "retry_policy_version": "retry.v1", "first_attempt_at": "2026-08-30T00:08:00.000Z", "next_eligible_at": null, "outbox_event_id": "event_schema_001", "updated_at": "2026-08-30T00:09:00.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_access_job",
+      "schema": "ingest-job.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "job_id": "job_access_001", "run_id": "run_cms_20260830", "job_type": "access_check", "state": "succeeded",
+        "idempotency_key": "access:distribution_cms_001:access.v1:2026-08-30T00:00:00.000Z",
+        "identity": { "cursor_sha256": null, "capture_sha256": null, "normalizer_version": null, "canonical_id": null, "canonical_revision_id": null, "recipe_version": "access.v1", "distribution_id": "distribution_cms_001", "scheduled_slot": "2026-08-30T00:00:00.000Z", "projection_version": null },
+        "active_run_attempt": 1, "attempt_count": 1, "maximum_delivery_attempts": 4, "lease": null, "delivery_fence": { "run_attempt": 1, "lease_epoch": 1 }, "retry_policy_version": "retry.v1", "first_attempt_at": "2026-08-30T00:10:00.000Z", "next_eligible_at": null, "outbox_event_id": "event_access_001", "updated_at": "2026-08-30T00:11:00.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_projection_job",
+      "schema": "ingest-job.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "job_id": "job_projection_001", "run_id": "run_cms_20260830", "job_type": "project_index", "state": "succeeded",
+        "idempotency_key": "projection:asset_cms_001:revision_asset_001:1.0.0",
+        "identity": { "cursor_sha256": null, "capture_sha256": null, "normalizer_version": null, "canonical_id": "asset_cms_001", "canonical_revision_id": "revision_asset_001", "recipe_version": null, "distribution_id": null, "scheduled_slot": null, "projection_version": "1.0.0" },
+        "active_run_attempt": 1, "attempt_count": 1, "maximum_delivery_attempts": 5, "lease": null, "delivery_fence": { "run_attempt": 1, "lease_epoch": 1 }, "retry_policy_version": "retry.v1", "first_attempt_at": "2026-08-30T00:12:00.000Z", "next_eligible_at": null, "outbox_event_id": "event_projection_001", "updated_at": "2026-08-30T00:13:00.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_attempt_success",
+      "schema": "ingest-attempt.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "attempt_id": "attempt_page_001", "job_id": "job_cms_page_001", "run_id": "run_cms_20260830",
+        "delivery_attempt": 1, "maximum_delivery_attempts": 6, "retry_policy_version": "retry.v1", "first_attempt_at": "2026-08-30T00:01:00.000Z", "started_at": "2026-08-30T00:01:00.000Z", "finished_at": "2026-08-30T00:01:03.000Z", "delivery_fence": { "run_attempt": 1, "lease_epoch": 3 }, "failure": null, "retry_after_seconds": null, "computed_delay_seconds": null, "next_eligible_at": null, "database_transaction_committed": true, "transport_action": "ack_after_commit", "durable_dead_letter_id": null
+      }
+    },
+    {
+      "fixture_id": "valid_attempt_reledgered",
+      "schema": "ingest-attempt.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "attempt_id": "attempt_page_002", "job_id": "job_cms_page_002", "run_id": "run_cms_20260830",
+        "delivery_attempt": 2, "maximum_delivery_attempts": 6, "retry_policy_version": "retry.v1", "first_attempt_at": "2026-08-30T00:01:00.000Z", "started_at": "2026-08-30T00:02:00.000Z", "finished_at": "2026-08-30T00:02:01.000Z", "delivery_fence": { "run_attempt": 1, "lease_epoch": 4 },
+        "failure": { "failure_type": "rate_limited", "retry_class": "transient", "target_class": "collection", "safe_detail_code": "UPSTREAM_RATE_LIMIT", "http_status": 429, "observed_at": "2026-08-30T00:02:01.000Z" },
+        "retry_after_seconds": 30, "computed_delay_seconds": 30, "next_eligible_at": "2026-08-30T00:02:31.000Z", "database_transaction_committed": true, "transport_action": "ack_reledgered_after_commit", "durable_dead_letter_id": null
+      }
+    },
+    {
+      "fixture_id": "valid_checkpoint",
+      "schema": "checkpoint.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "checkpoint_id": "checkpoint_cms_current", "source_id": "source_cms_catalog", "scope_id": "scope_cms_public_catalog", "configuration_revision": 1, "strategy": "modified_at_native_id",
+        "position": { "publisher_modified_at": "2026-08-29T12:00:00.000Z", "native_id": "cms-asset-157", "opaque_cursor_ref_id": null, "full_enumeration_sequence": null, "position_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" },
+        "state": "committed", "prior_checkpoint_id": "checkpoint_cms_previous", "prior_checkpoint_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "checkpoint_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "proposed_by_run_id": "run_cms_20260830", "enumeration_seal_id": "seal_cms_20260830", "downstream_outbox_committed": true, "committed_at": "2026-08-30T00:05:00.000Z", "superseded_at": null
+      }
+    },
+    {
+      "fixture_id": "valid_capture_reference",
+      "schema": "capture-reference.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "capture_ref_id": "capture_cms_page_001", "source_id": "source_cms_catalog", "run_id": "run_cms_20260830", "classification": "catalog_metadata",
+        "source_locator": { "endpoint_id": "endpoint_cms_catalog", "template_id": "route_cms_catalog_page", "final_host": "data.cms.gov", "final_path_class": "collection", "redacted_locator": "https://data.cms.gov/data-api/v1/dataset/page-1" },
+        "safe_response_headers": { "etag": "\"catalog-v157\"", "last_modified": "Sat, 29 Aug 2026 12:00:00 GMT", "content_type": "application/json", "content_length": 512, "cache_control": "public, max-age=300" },
+        "media_type": "application/json", "compressed_bytes": 512, "decompressed_bytes": 512,
+        "raw_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "semantic_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "r2_key": "captures/sha256/aa/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "r2_conditional_write_confirmed": true, "connector_version": "1.0.0", "evidence_ref_id": "evidence_capture_cms_001",
+        "clocks": { "data_coverage": { "state": "known", "start": "2025-01-01", "end": "2025-12-31", "semantics": "calendar" }, "publisher_time": { "state": "known", "released_at": "2026-08-28T00:00:00.000Z", "modified_at": "2026-08-29T12:00:00.000Z" }, "observed_at": "2026-08-30T00:01:03.000Z", "recorded_at": "2026-08-30T00:01:04.000Z", "superseded_at": null },
+        "captured_at": "2026-08-30T00:01:03.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_fetch_captured",
+      "schema": "metadata-fetch.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "fetch_id": "fetch_cms_page_001", "run_id": "run_cms_20260830", "job_id": "job_cms_page_001", "endpoint_id": "endpoint_cms_catalog", "template_id": "route_cms_catalog_page", "purpose": "catalog_metadata", "target_class": "collection", "request_validators": { "etag": "\"catalog-v156\"", "last_modified": "Fri, 28 Aug 2026 12:00:00 GMT" }, "response_status": 200, "outcome": "captured", "capture_ref_id": "capture_cms_page_001", "reused_capture_ref_id": null, "failure": null, "response_bytes": 512, "decompressed_bytes": 512, "redirect_count": 0, "observed_at": "2026-08-30T00:01:03.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_fetch_not_modified",
+      "schema": "metadata-fetch.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "fetch_id": "fetch_cms_page_304", "run_id": "run_cms_20260830", "job_id": "job_cms_page_304", "endpoint_id": "endpoint_cms_catalog", "template_id": "route_cms_catalog_page", "purpose": "catalog_metadata", "target_class": "collection", "request_validators": { "etag": "\"catalog-v157\"", "last_modified": "Sat, 29 Aug 2026 12:00:00 GMT" }, "response_status": 304, "outcome": "not_modified", "capture_ref_id": null, "reused_capture_ref_id": "capture_cms_page_001", "failure": null, "response_bytes": 0, "decompressed_bytes": 0, "redirect_count": 0, "observed_at": "2026-08-30T01:01:03.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_outbox_event",
+      "schema": "event-ledger.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "record_kind": "outbox_event", "event_id": "event_harvest_page_001", "event_type": "harvest_page_requested", "producer": "workflow", "idempotency_key": "event:harvest_page_requested:job_cms_page_001", "state": "published",
+        "references": { "run_id": "run_cms_20260830", "job_id": "job_cms_page_001", "capture_ref_id": null, "checkpoint_id": null, "canonical_id": null, "canonical_revision_id": null, "r2_key": null, "cursor_ref_id": "cursor_cms_page_001" },
+        "trace_id": "Trace_20260830_abcdefghijkl", "attempt_count": 1, "maximum_delivery_attempts": 6, "lease": null, "first_attempt_at": "2026-08-30T00:00:10.000Z", "next_eligible_at": null, "created_at": "2026-08-30T00:00:05.000Z", "published_at": "2026-08-30T00:00:10.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_processed_event",
+      "schema": "event-ledger.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "record_kind": "processed_event", "processed_event_id": "processed_page_001", "consumer_name": "harvest_page_consumer", "event_id": "event_harvest_page_001", "effect_idempotency_key": "effect:page:run_cms_20260830:page-1", "business_effect_digest": "1111111111111111111111111111111111111111111111111111111111111111", "downstream_outbox_event_ids": ["event_normalize_001"], "transaction_committed_at": "2026-08-30T00:01:04.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_dead_letter",
+      "schema": "event-ledger.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "record_kind": "durable_dead_letter", "dead_letter_id": "deadletter_page_999", "queue_name": "harvest-page-dlq", "original_event_id": "event_harvest_page_999", "source_id": "source_cms_catalog", "run_id": "run_cms_failed_20260829", "job_id": "job_cms_page_999",
+        "failure": { "failure_type": "parse_failure", "retry_class": "quarantine", "target_class": "collection", "safe_detail_code": "CATALOG_PARSE_FAILED", "http_status": 200, "observed_at": "2026-08-29T00:15:00.000Z" },
+        "transport_delivery_attempts": 6, "database_attempts": 6, "retry_policy_version": "retry.v1",
+        "message_references": { "run_id": "run_cms_failed_20260829", "job_id": "job_cms_page_999", "capture_ref_id": "capture_cms_page_999", "checkpoint_id": null, "canonical_id": null, "canonical_revision_id": null, "r2_key": "captures/sha256/99/9999999999999999999999999999999999999999999999999999999999999999", "cursor_ref_id": "cursor_cms_page_999" },
+        "attempt_ids": ["attempt_page_994", "attempt_page_995", "attempt_page_996", "attempt_page_997", "attempt_page_998", "attempt_page_999"], "replay_state": "replayed", "persisted_at": "2026-08-29T00:15:01.000Z", "sink_transaction_committed": true
+      }
+    },
+    {
+      "fixture_id": "valid_replay_lineage",
+      "schema": "event-ledger.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "record_kind": "replay_lineage", "replay_id": "replay_page_999", "original_dead_letter_id": "deadletter_page_999", "original_event_id": "event_harvest_page_999", "original_run_id": "run_cms_failed_20260829", "new_run_id": "run_cms_replay_20260830", "new_event_id": "event_harvest_page_replay_999", "original_retry_policy_version": "retry.v1", "replay_policy_version": "replay.v1", "requested_by_audit_event_id": "audit_replay_999", "requested_at": "2026-08-30T02:00:00.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_enumeration_seal",
+      "schema": "enumeration-control.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "record_kind": "enumeration_seal", "enumeration_seal_id": "seal_cms_20260830", "run_id": "run_cms_20260830", "source_id": "source_cms_catalog", "scope_id": "scope_cms_public_catalog", "status": "sealed", "pages_discovered": 4, "pages_committed": 4, "items_discovered": 157, "discoveries_committed": 157, "page_dead_letter_count": 0, "cursor_expired": false, "population_digest": "2222222222222222222222222222222222222222222222222222222222222222", "completeness_evidence_ref_id": "evidence_enumeration_20260830", "sealed_at": "2026-08-30T00:04:00.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_publication_barrier",
+      "schema": "enumeration-control.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "record_kind": "publication_barrier", "barrier_id": "barrier_cms_20260830", "run_id": "run_cms_20260830", "run_outcome": "succeeded", "enumerations_complete_and_sealed": true, "membership_checkpoint_committed": true, "normalization_terminal_count": 157, "observed_revision_count": 157, "w1_revision_manifest_sealed": true, "eligible_projection_count": 157, "projection_acknowledgement_count": 157, "references_resolved": true, "checksums_verified": true, "visibility_verified": true, "coverage_reconciled": true, "required_dead_letter_count": 0, "optional_degradations": [], "candidate_publication_id": "publication_candidate_20260830", "last_known_good_publication_id": "publication_generation_previous", "active_publication_id": "publication_candidate_20260830", "evaluated_at": "2026-08-30T00:19:00.000Z"
+      }
+    },
+    {
+      "fixture_id": "valid_source_paused",
+      "schema": "enumeration-control.schema.json",
+      "value": {
+        "contract_version": "ingestion.v1.0.0", "record_kind": "source_control", "source_control_id": "control_cms_pause_001", "source_id": "source_cms_catalog", "previous_state": "draining", "state": "paused", "configuration_revision": 1, "requested_by_audit_event_id": "audit_pause_cms_001", "remediation_evidence_ref_id": null, "pause_requested_at": "2026-08-30T03:00:00.000Z", "drain_started_at": "2026-08-30T03:00:01.000Z", "drain_completed_at": "2026-08-30T03:01:00.000Z", "in_flight_work_count": 0, "durably_reledgered_work_count": 2, "new_fetches_after_pause_effective": 0, "updated_at": "2026-08-30T03:01:00.000Z"
+      }
+    }
+  ]
+}

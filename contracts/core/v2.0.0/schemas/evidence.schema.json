@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/evidence.schema.json",
+  "type": "object",
+  "allOf": [
+    { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/truthEnvelope" },
+    {
+      "type": "object",
+      "required": ["evidence_id", "source_id", "evidence_class", "locator", "captured_content_digest", "media_type", "availability_state", "description", "payload_included"],
+      "properties": {
+        "entity_type": { "const": "Evidence" },
+        "evidence_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "source_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+        "evidence_class": { "enum": ["authoritative_identifier", "publisher_metadata", "catalog_record", "documentation", "schema_observation", "access_check", "review_decision", "controlled_test", "external_execution_record"] },
+        "locator": {
+          "oneOf": [
+            { "type": "string", "format": "uri", "maxLength": 2000 },
+            { "type": "null" }
+          ]
+        },
+        "captured_content_digest": {
+          "oneOf": [
+            { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/sha256" },
+            { "type": "null" }
+          ]
+        },
+        "media_type": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[a-z0-9.+-]+/[a-z0-9.+-]+$" },
+            { "type": "null" }
+          ]
+        },
+        "availability_state": { "enum": ["available", "unavailable", "restricted", "stale", "unknown"] },
+        "description": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "payload_included": { "const": false },
+        "native_identifiers": { "type": "array", "maxItems": 0 },
+        "evidence_refs": { "type": "array", "maxItems": 0 },
+        "assertion_refs": { "type": "array", "maxItems": 0 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

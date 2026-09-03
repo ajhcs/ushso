@@ -1,0 +1,20 @@
+{
+  "schema_version": "ushso-wp3-infra-receipt.v1.0.0",
+  "receipt_id": "capacity-and-connection-budget",
+  "generated_at": "2026-08-30T21:52:41Z",
+  "scope": "Privacy-safe workload, PostgreSQL/Hyperdrive connections, storage/IO, Queue throughput, and 30-minute 2x candidate",
+  "overall_status": "pending_external_authorization",
+  "local_configuration": {
+    "status": "pass",
+    "commands": ["node --test verification/wp3/v1.0.0/infra/tests/*.test.mjs", "node verification/wp3/v1.0.0/infra/tools/validate-foundation.mjs"],
+    "evidence": ["Four strict JSON Schema 2020-12 capacity contracts validate", "Synthetic/frozen route mix sums exactly to one and stores no questions or user identifiers", "Candidate allocates 30 origin connections against a required account cap of at least 45 with at least one-third headroom", "Every Queue 2x rate equals twice its conservative candidate and is bounded by explicit batch/concurrency settings", "Storage forecast includes PostgreSQL growth, 30-day PITR, 90-day active captures, archive, IO, and dependency-aware retention"],
+    "input_sha256": { "infra/capacity/candidate.v1.0.0.json": "6295b63d374a377ccbb7d3f12810cd88e9a5b90ef608629adae91bf363b1161f" }
+  },
+  "managed_rehearsal": {
+    "status": "pending_external_authorization",
+    "authorization_gates": ["AUTH-01", "AUTH-03"],
+    "required_evidence": ["Account-specific Neon and Hyperdrive connection caps", "Measured query and transaction durations under final indexes", "Measured storage and IO growth from representative staging imports", "Thirty continuous minutes at twice the ratified production-like workload", "Queue oldest age, DLQ, backlog drain, Worker duration, origin connections, errors, and SLO result", "Reviewed autoscaling and Worker Placement decision"]
+  },
+  "authorization_boundaries": { "AUTH-01": "procured limits and entitlements", "AUTH-03": "production-like staging load and measurement" },
+  "non_claims": ["The 1-4 compute-unit range is a candidate, not a capacity claim", "The 45-connection prerequisite is not confirmed", "No load generator contacted a managed service", "The required 30-minute 2x test has not run"]
+}

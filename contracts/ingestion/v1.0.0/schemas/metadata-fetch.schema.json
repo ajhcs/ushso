@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.0.0/metadata-fetch.schema.json",
+  "title": "Bounded conditional metadata fetch result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "fetch_id", "run_id", "job_id", "endpoint_id", "template_id", "purpose", "target_class", "request_validators", "response_status", "outcome", "capture_ref_id", "reused_capture_ref_id", "failure", "response_bytes", "decompressed_bytes", "redirect_count", "observed_at"],
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+    "fetch_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "job_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "endpoint_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "template_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+    "purpose": { "enum": ["catalog_metadata", "documentation", "schema", "access_probe"] },
+    "target_class": { "$ref": "common.schema.json#/$defs/TargetClass" },
+    "request_validators": { "$ref": "common.schema.json#/$defs/HttpValidators" },
+    "response_status": { "type": ["integer", "null"], "minimum": 100, "maximum": 599 },
+    "outcome": { "enum": ["captured", "not_modified", "typed_failure"] },
+    "capture_ref_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+    "reused_capture_ref_id": { "anyOf": [{ "$ref": "common.schema.json#/$defs/OpaqueId" }, { "type": "null" }] },
+    "failure": { "$ref": "common.schema.json#/$defs/Failure" },
+    "response_bytes": { "type": "integer", "minimum": 0, "maximum": 52428800 },
+    "decompressed_bytes": { "type": "integer", "minimum": 0, "maximum": 104857600 },
+    "redirect_count": { "type": "integer", "minimum": 0, "maximum": 5 },
+    "observed_at": { "$ref": "common.schema.json#/$defs/Timestamp" }
+  }
+}

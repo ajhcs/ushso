@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/identity/v1.0.0/retrieval-recipe.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "recipe_id", "asset_id", "release_id", "distribution_id", "access_route_id", "steps", "expected_artifacts", "typed_failures", "evidence_ids", "observed_at", "immutable", "boundary"],
+  "properties": {
+    "schema_version": {"const": "identity.retrieval-recipe.v1.0.0"},
+    "recipe_id": {"type": "string", "minLength": 3},
+    "asset_id": {"type": "string", "minLength": 3},
+    "release_id": {"type": "string", "minLength": 3},
+    "distribution_id": {"type": "string", "minLength": 3},
+    "access_route_id": {"type": "string", "minLength": 3},
+    "steps": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["sequence", "instruction", "execution_allowed", "stop_conditions"],
+        "properties": {
+          "sequence": {"type": "integer", "minimum": 1},
+          "instruction": {"type": "string", "minLength": 10},
+          "execution_allowed": {"const": false},
+          "stop_conditions": {"type": "array", "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "expected_artifacts": {"type": "array", "minItems": 1},
+    "typed_failures": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["outcome", "translate_to_not_found"],
+        "properties": {
+          "outcome": {"enum": ["authorization_required", "authentication_required", "registration_required", "application_required", "dua_required", "payment_required", "license_required", "rate_limited", "timed_out", "transport_failure", "malformed_response", "cancelled", "unavailable", "unresolved"]},
+          "translate_to_not_found": {"const": false}
+        }
+      }
+    },
+    "evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 3}},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "immutable": {"const": true},
+    "boundary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["execution_allowed", "payload_acquisition_claimed", "authorization_claimed"],
+      "properties": {
+        "execution_allowed": {"const": false},
+        "payload_acquisition_claimed": {"const": false},
+        "authorization_claimed": {"const": false}
+      }
+    }
+  }
+}

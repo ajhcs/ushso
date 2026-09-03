@@ -1,0 +1,52 @@
+{
+  "fixture_version": "ingestion.workflow-instance-id-compatibility.v1",
+  "provider_pattern": "^[A-Za-z0-9_][A-Za-z0-9_-]*$",
+  "provider_max_length": 100,
+  "cases": [
+    {
+      "case_id": "wp4_generated_id",
+      "run_id": "run_0123456789abcdef0123456789abcdef",
+      "active_attempt": 1,
+      "instance_id": "harvest-run_0123456789abcdef0123456789abcdef-1",
+      "expected_v1_0_valid": true,
+      "expected_v1_1_valid": true,
+      "expected_upgrade_action": "version_only"
+    },
+    {
+      "case_id": "provider_length_boundary_100",
+      "run_id": "run_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "active_attempt": 1,
+      "instance_id": "harvest-run_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-1",
+      "expected_v1_0_valid": true,
+      "expected_v1_1_valid": true,
+      "expected_upgrade_action": "version_only"
+    },
+    {
+      "case_id": "legacy_dot_is_audit_only",
+      "run_id": "run_legacy.with.dot",
+      "active_attempt": 1,
+      "instance_id": "harvest-run_legacy.with.dot-1",
+      "expected_v1_0_valid": true,
+      "expected_v1_1_valid": false,
+      "expected_upgrade_action": "retain_v1_0_audit_only"
+    },
+    {
+      "case_id": "legacy_colon_is_audit_only",
+      "run_id": "run_legacy:with:colon",
+      "active_attempt": 1,
+      "instance_id": "harvest-run_legacy:with:colon-1",
+      "expected_v1_0_valid": true,
+      "expected_v1_1_valid": false,
+      "expected_upgrade_action": "retain_v1_0_audit_only"
+    },
+    {
+      "case_id": "legacy_length_101_is_audit_only",
+      "run_id": "run_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "active_attempt": 1,
+      "instance_id": "harvest-run_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-1",
+      "expected_v1_0_valid": true,
+      "expected_v1_1_valid": false,
+      "expected_upgrade_action": "retain_v1_0_audit_only"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/schemas/infra/storage-io.v1.0.0.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "postgresql", "r2", "io_candidate", "retention_guard"],
+  "properties": {
+    "schema_version": { "const": "ushso-storage-io.v1.0.0" },
+    "status": { "const": "planning_candidate_unverified" },
+    "postgresql": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initial_gib", "monthly_growth_gib", "pitr_days", "compute_units_min", "compute_units_max"],
+      "properties": {
+        "initial_gib": { "type": "number", "minimum": 0 },
+        "monthly_growth_gib": { "type": "number", "minimum": 0 },
+        "pitr_days": { "const": 30 },
+        "compute_units_min": { "const": 1 },
+        "compute_units_max": { "const": 4 }
+      }
+    },
+    "r2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capture_mib_per_day", "capture_active_days", "archive_gib_per_year", "content_addressed", "public_access"],
+      "properties": {
+        "capture_mib_per_day": { "type": "number", "minimum": 0 },
+        "capture_active_days": { "const": 90 },
+        "archive_gib_per_year": { "type": "number", "minimum": 0 },
+        "content_addressed": { "const": true },
+        "public_access": { "const": false }
+      }
+    },
+    "io_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["steady_read_ops_per_second", "steady_write_ops_per_second", "two_x_read_ops_per_second", "two_x_write_ops_per_second"],
+      "properties": {
+        "steady_read_ops_per_second": { "type": "integer", "minimum": 0 },
+        "steady_write_ops_per_second": { "type": "integer", "minimum": 0 },
+        "two_x_read_ops_per_second": { "type": "integer", "minimum": 0 },
+        "two_x_write_ops_per_second": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "retention_guard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blind_lifecycle_deletion", "dependency_reconciliation", "security_audit_minimum_days", "planner_ledger_minimum_days"],
+      "properties": {
+        "blind_lifecycle_deletion": { "const": false },
+        "dependency_reconciliation": { "const": true },
+        "security_audit_minimum_days": { "minimum": 365 },
+        "planner_ledger_minimum_days": { "minimum": 90 }
+      }
+    }
+  }
+}

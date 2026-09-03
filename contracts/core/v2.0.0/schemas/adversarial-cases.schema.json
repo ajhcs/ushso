@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/core/v2.0.0/schemas/adversarial-cases.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixture_version", "cases"],
+  "properties": {
+    "fixture_version": { "const": "observatory-core-adversarial.v2.0.0" },
+    "cases": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["case_id", "title", "target_collection", "target_revision_id", "mutations", "expected_error_codes"],
+        "properties": {
+          "case_id": { "type": "string", "pattern": "^ADV-[A-Z0-9-]{3,60}$" },
+          "title": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "target_collection": { "enum": ["organizations", "sources", "assets", "releases", "distributions", "documentation", "schema_snapshots", "schema_fields", "access_routes", "access_observations", "evidence", "assertions", "relationships"] },
+          "target_revision_id": { "$ref": "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/opaqueId" },
+          "mutations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["op", "path"],
+              "properties": {
+                "op": { "enum": ["set", "remove", "append"] },
+                "path": { "type": "string", "pattern": "^/(?:[^~/]|~[01])+(?:/(?:[^~/]|~[01])*)*$", "maxLength": 300 },
+                "value": true
+              }
+            }
+          },
+          "expected_error_codes": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,79}$" }
+          }
+        }
+      }
+    }
+  }
+}

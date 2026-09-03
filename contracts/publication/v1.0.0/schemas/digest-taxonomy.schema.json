@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/publication/v1.0.0/digest-taxonomy.schema.json",
+  "title": "USHSO canonical digest taxonomy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["taxonomy_version", "canonicalization", "algorithm", "domains", "immutable"],
+  "properties": {
+    "taxonomy_version": {"const": "publication-digest-taxonomy.v1"},
+    "canonicalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "encoding", "object_key_order", "array_order", "whitespace", "number_and_scalar_encoding", "domain_separation"],
+      "properties": {
+        "name": {"const": "ushso-canonical-json-v1"},
+        "encoding": {"const": "utf-8"},
+        "object_key_order": {"const": "unicode-code-point-ascending"},
+        "array_order": {"const": "preserved"},
+        "whitespace": {"const": "none"},
+        "number_and_scalar_encoding": {"const": "ecmascript-json-stringify"},
+        "domain_separation": {"const": "utf8(domain_prefix + newline + canonical_json)"}
+      }
+    },
+    "algorithm": {"const": "sha256"},
+    "domains": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "prefix", "canonical_value", "excluded_paths"],
+        "properties": {
+          "name": {"$ref": "common.schema.json#/$defs/digestDomain"},
+          "prefix": {"type": "string", "pattern": "^ushso:publication:[a-z_]+:v1$"},
+          "canonical_value": {"type": "string", "minLength": 3},
+          "excluded_paths": {"type": "array", "items": {"type": "string", "pattern": "^/"}, "uniqueItems": true}
+        }
+      }
+    },
+    "immutable": {"const": true}
+  }
+}

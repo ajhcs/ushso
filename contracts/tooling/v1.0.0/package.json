@@ -1,0 +1,31 @@
+{
+  "name": "@ushso/contract-tooling",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic, strict JSON Schema 2020-12 contract tooling for USHSO contract packages.",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "ajv": "8.20.0"
+  },
+  "exports": {
+    ".": "./src/index.mjs",
+    "./canonical-json": "./src/canonical-json.mjs",
+    "./digests": "./src/digests.mjs",
+    "./evidence": "./src/evidence.mjs",
+    "./fixtures": "./src/fixture-runner.mjs",
+    "./graph": "./src/graph.mjs",
+    "./manifest": "./src/manifest.mjs",
+    "./public-schema-audit": "./src/bounds-audit.mjs",
+    "./schema-registry": "./src/schema-registry.mjs",
+    "./strict-json": "./src/strict-json.mjs"
+  },
+  "scripts": {
+    "manifest": "node tools/build-manifest.mjs",
+    "validate": "node tools/validate-package.mjs",
+    "receipt": "node tools/validate-package.mjs --write-receipt",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

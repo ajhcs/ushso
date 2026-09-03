@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/identity/v1.0.0/reversal-plan.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "reversal_plan_id",
+    "superseding_decision_id",
+    "superseded_decision_id",
+    "candidate_id",
+    "input_graph_revision_id",
+    "output_graph_revision_id",
+    "rebuild_targets",
+    "expected_removed_projection_ids",
+    "expected_retained_object_ids",
+    "retain_source_observations",
+    "retain_identifier_assertions",
+    "destructive_deletes_allowed",
+    "orphaned_lineage_allowed",
+    "canonical_input_sha256",
+    "expected_output_sha256",
+    "planner_fixture_ids",
+    "recorded_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "identity.reversal-plan.v1.0.0"},
+    "reversal_plan_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "superseding_decision_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "superseded_decision_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "candidate_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "input_graph_revision_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "output_graph_revision_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "rebuild_targets": {
+      "type": "array",
+      "minItems": 5,
+      "uniqueItems": true,
+      "items": {"enum": ["identity_clusters", "aliases", "search_projections", "join_views", "plan_fixtures"]}
+    },
+    "expected_removed_projection_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "expected_retained_object_ids": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "retain_source_observations": {"const": true},
+    "retain_identifier_assertions": {"const": true},
+    "destructive_deletes_allowed": {"const": false},
+    "orphaned_lineage_allowed": {"const": false},
+    "canonical_input_sha256": {"$ref": "common.schema.json#/$defs/sha256"},
+    "expected_output_sha256": {"$ref": "common.schema.json#/$defs/sha256"},
+    "planner_fixture_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "recorded_at": {"$ref": "common.schema.json#/$defs/dateTime"}
+  }
+}

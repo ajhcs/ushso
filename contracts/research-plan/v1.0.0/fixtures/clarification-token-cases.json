@@ -1,0 +1,44 @@
+{
+  "contract_version": "observatory-clarification-token-cases.v1.0.0",
+  "keys": [
+    {
+      "key_version": "clarification-key-v2",
+      "state": "active",
+      "test_secret": "TEST_ONLY_active_clarification_secret_32bytes"
+    },
+    {
+      "key_version": "clarification-key-v1",
+      "state": "verify_only",
+      "test_secret": "TEST_ONLY_verify_only_clarification_secret"
+    },
+    {
+      "key_version": "clarification-key-retired",
+      "state": "retired",
+      "test_secret": "TEST_ONLY_retired_clarification_secret_32"
+    }
+  ],
+  "base_claims": {
+    "contract_version": "observatory-clarification-token-claims.v1.0.0",
+    "key_version": "clarification-key-v2",
+    "request_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "question_set_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "expected_generation": "obs:index-generation:fixture-v1",
+    "issued_at": "2026-08-30T00:00:00Z",
+    "expires_at": "2026-08-30T12:00:00Z"
+  },
+  "verification_context": {
+    "now": "2026-08-30T06:00:00Z",
+    "request_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "question_set_hash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "expected_generation": "obs:index-generation:fixture-v1"
+  },
+  "cases": [
+    {"case_id": "token:valid", "scenario": "valid", "expected_code": "TOKEN_VALID"},
+    {"case_id": "token:tampered", "scenario": "tampered", "expected_code": "TOKEN_SIGNATURE_INVALID"},
+    {"case_id": "token:expired", "scenario": "expired", "expected_code": "TOKEN_EXPIRED"},
+    {"case_id": "token:key-rotation", "scenario": "verify_only_rotation", "expected_code": "TOKEN_VALID"},
+    {"case_id": "token:stale-generation", "scenario": "stale_generation", "expected_code": "GENERATION_MISMATCH"},
+    {"case_id": "token:changed-request", "scenario": "changed_request_hash", "expected_code": "REQUEST_HASH_MISMATCH"},
+    {"case_id": "token:changed-question-set", "scenario": "changed_question_set", "expected_code": "QUESTION_SET_HASH_MISMATCH"}
+  ]
+}

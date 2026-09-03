@@ -1,0 +1,424 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/research-plan.schema.json",
+  "title": "Canonical USHSO research plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "plan_id",
+    "plan_status",
+    "plan_status_reason_codes",
+    "generated_from",
+    "interpreted_need",
+    "clarifications",
+    "response",
+    "asset_contributions",
+    "bundle_assessment",
+    "operations",
+    "acquisition_plan",
+    "downstream_handoff",
+    "important_limitations",
+    "unresolved_gaps",
+    "conditions_not_recommend",
+    "evidence_references",
+    "truth_boundary"
+  ],
+  "properties": {
+    "contract_version": {"const": "observatory-research-plan.v1.0.0"},
+    "plan_id": {"$ref": "common.schema.json#/$defs/digest"},
+    "plan_status": {"enum": ["unsupported", "clarification_required", "incomplete", "ready_with_constraints", "ready"]},
+    "plan_status_reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/stableId"}
+    },
+    "generated_from": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publication_manifest_id",
+        "registry_revision_id",
+        "index_generation",
+        "coverage_snapshot_id",
+        "candidate_snapshot_id",
+        "source_manifest_ids",
+        "normalized_request_hash",
+        "canonical_as_of",
+        "claim_manifest_id",
+        "planner_fingerprint"
+      ],
+      "properties": {
+        "publication_manifest_id": {"$ref": "common.schema.json#/$defs/stableId"},
+        "registry_revision_id": {"$ref": "common.schema.json#/$defs/stableId"},
+        "index_generation": {"$ref": "common.schema.json#/$defs/stableId"},
+        "coverage_snapshot_id": {"$ref": "common.schema.json#/$defs/stableId"},
+        "candidate_snapshot_id": {"$ref": "common.schema.json#/$defs/digest"},
+        "source_manifest_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "uniqueItems": true,
+          "items": {"$ref": "common.schema.json#/$defs/stableId"}
+        },
+        "normalized_request_hash": {"$ref": "common.schema.json#/$defs/digest"},
+        "canonical_as_of": {"$ref": "common.schema.json#/$defs/dateTime"},
+        "claim_manifest_id": {"const": "obs:claim-manifest:research-plan:v1.0.0"},
+        "planner_fingerprint": {"$ref": "planner-fingerprint.schema.json"}
+      }
+    },
+    "interpreted_need": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["boundary_state", "summary", "geographies", "requested_period", "requested_grain", "required_roles", "intended_analyses", "evidence_reference_ids"],
+      "properties": {
+        "boundary_state": {"enum": ["in_scope", "outside_product_boundary", "unknown"]},
+        "summary": {"$ref": "common.schema.json#/$defs/maintainedText"},
+        "geographies": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {"$ref": "common.schema.json#/$defs/stableId"}
+        },
+        "requested_period": {
+          "oneOf": [
+            {"$ref": "common.schema.json#/$defs/period"},
+            {"type": "null"}
+          ]
+        },
+        "requested_grain": {
+          "oneOf": [
+            {"enum": ["facility", "campus", "organization", "system", "county", "state", "national"]},
+            {"type": "null"}
+          ]
+        },
+        "required_roles": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["role_id", "role_kind", "essential", "description", "evidence_reference_ids"],
+            "properties": {
+              "role_id": {"$ref": "common.schema.json#/$defs/stableId"},
+              "role_kind": {"enum": ["ownership_change", "utilization", "finance", "denominator", "organization_identity", "geography", "crosswalk", "clinical_context", "workforce", "other"]},
+              "essential": {"type": "boolean"},
+              "description": {"$ref": "common.schema.json#/$defs/maintainedText"},
+              "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+            }
+          }
+        },
+        "intended_analyses": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["analysis_id", "description", "evidence_reference_ids"],
+            "properties": {
+              "analysis_id": {"$ref": "common.schema.json#/$defs/stableId"},
+              "description": {"$ref": "common.schema.json#/$defs/maintainedText"},
+              "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+            }
+          }
+        },
+        "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "clarifications": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "question_set_hash", "questions", "answers", "prior_plan_id", "evidence_reference_ids"],
+      "properties": {
+        "state": {"enum": ["not_required", "open", "answered", "invalidated"]},
+        "question_set_hash": {"$ref": "common.schema.json#/$defs/digest"},
+        "questions": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {"$ref": "clarification.schema.json#/$defs/question"}
+        },
+        "answers": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {"$ref": "clarification.schema.json#/$defs/answer"}
+        },
+        "prior_plan_id": {
+          "oneOf": [
+            {"$ref": "common.schema.json#/$defs/digest"},
+            {"type": "null"}
+          ]
+        },
+        "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lead", "summary", "recommendation_confidence", "critical_claim_projection", "critical_claim_digest", "evidence_reference_ids"],
+      "properties": {
+        "lead": {"$ref": "common.schema.json#/$defs/maintainedText"},
+        "summary": {"$ref": "common.schema.json#/$defs/maintainedText"},
+        "recommendation_confidence": {"enum": ["none", "partial", "constrained", "confident"]},
+        "critical_claim_projection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["plan_status", "plan_status_reason_codes", "essential_role_ids", "exact_contribution_ids", "exact_selections", "coverage", "access", "operations", "downstream_support", "limitation_ids", "gap_ids", "truth_boundary"],
+          "properties": {
+            "plan_status": {"enum": ["unsupported", "clarification_required", "incomplete", "ready_with_constraints", "ready"]},
+            "plan_status_reason_codes": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 20,
+              "uniqueItems": true,
+              "items": {"$ref": "common.schema.json#/$defs/stableId"}
+            },
+            "essential_role_ids": {"$ref": "common.schema.json#/$defs/idArray"},
+            "exact_contribution_ids": {"$ref": "common.schema.json#/$defs/idArray"},
+            "exact_selections": {
+              "type": "array",
+              "maxItems": 12,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["contribution_id", "role_id", "asset_id", "release_id", "distribution_id", "access_route_id", "source_id"],
+                "properties": {
+                  "contribution_id": {"$ref": "common.schema.json#/$defs/stableId"},
+                  "role_id": {"$ref": "common.schema.json#/$defs/stableId"},
+                  "asset_id": {"$ref": "common.schema.json#/$defs/assetId"},
+                  "release_id": {"$ref": "common.schema.json#/$defs/releaseId"},
+                  "distribution_id": {"$ref": "common.schema.json#/$defs/distributionId"},
+                  "access_route_id": {"$ref": "common.schema.json#/$defs/accessRouteId"},
+                  "source_id": {"$ref": "common.schema.json#/$defs/sourceId"}
+                }
+              }
+            },
+            "coverage": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["requested", "source_supported", "common_supported"],
+              "properties": {
+                "requested": {"oneOf": [{"$ref": "common.schema.json#/$defs/coverage"}, {"type": "null"}]},
+                "source_supported": {
+                  "type": "array",
+                  "maxItems": 12,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["contribution_id", "coverage", "evidence_reference_ids"],
+                    "properties": {
+                      "contribution_id": {"$ref": "common.schema.json#/$defs/stableId"},
+                      "coverage": {"$ref": "common.schema.json#/$defs/coverage"},
+                      "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+                    }
+                  }
+                },
+                "common_supported": {"oneOf": [{"$ref": "common.schema.json#/$defs/coverage"}, {"type": "null"}]}
+              }
+            },
+            "access": {
+              "type": "array",
+              "maxItems": 12,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["contribution_id", "access_class", "authorization_state", "requirements", "human_gates"],
+                "properties": {
+                  "contribution_id": {"$ref": "common.schema.json#/$defs/stableId"},
+                  "access_class": {"enum": ["public", "registration", "application", "dua", "licensed", "paid", "report_only", "unknown"]},
+                  "authorization_state": {"enum": ["not_authorized", "external_authorization_required", "satisfied_outside_ushso", "not_applicable", "unknown"]},
+                  "requirements": {
+                    "type": "array", "maxItems": 50,
+                    "items": {
+                      "type": "object", "additionalProperties": false, "required": ["requirement_id", "kind", "state"],
+                      "properties": {
+                        "requirement_id": {"$ref": "common.schema.json#/$defs/stableId"},
+                        "kind": {"enum": ["crosswalk", "aggregation", "normalization", "temporal_alignment", "measure_harmonization", "authorization", "application", "dua", "fee", "eligibility", "manual_review", "other"]},
+                        "state": {"enum": ["satisfied", "unsatisfied", "external", "unknown", "not_applicable"]}
+                      }
+                    }
+                  },
+                  "human_gates": {
+                    "type": "array", "maxItems": 20,
+                    "items": {
+                      "type": "object", "additionalProperties": false, "required": ["gate_id", "kind", "state"],
+                      "properties": {
+                        "gate_id": {"$ref": "common.schema.json#/$defs/stableId"},
+                        "kind": {"enum": ["registration", "application", "dua", "fee", "eligibility_review", "login", "institutional_approval", "manual_source_action"]},
+                        "state": {"enum": ["not_started", "external_required", "satisfied_outside_ushso", "not_applicable", "unknown"]}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "operations": {
+              "type": "array",
+              "maxItems": 50,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["operation_id", "operation_kind", "evidence_state", "basis_evidence_state", "compatibility", "requirements", "blockers"],
+                "properties": {
+                  "operation_id": {"$ref": "common.schema.json#/$defs/stableId"},
+                  "operation_kind": {"enum": ["join", "crosswalk", "aggregate", "filter", "temporal_alignment", "measure_harmonization"]},
+                  "evidence_state": {"enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven"]},
+                  "basis_evidence_state": {"enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven"]},
+                  "compatibility": {"enum": ["compatible", "conditional", "incompatible", "unknown"]},
+                  "requirements": {
+                    "type": "array", "maxItems": 50,
+                    "items": {
+                      "type": "object", "additionalProperties": false, "required": ["requirement_id", "kind", "state"],
+                      "properties": {
+                        "requirement_id": {"$ref": "common.schema.json#/$defs/stableId"},
+                        "kind": {"enum": ["crosswalk", "aggregation", "normalization", "temporal_alignment", "measure_harmonization", "authorization", "application", "dua", "fee", "eligibility", "manual_review", "other"]},
+                        "state": {"enum": ["satisfied", "unsatisfied", "external", "unknown", "not_applicable"]}
+                      }
+                    }
+                  },
+                  "blockers": {
+                    "type": "array", "maxItems": 50,
+                    "items": {
+                      "type": "object", "additionalProperties": false, "required": ["blocker_id", "kind", "state", "fatal"],
+                      "properties": {
+                        "blocker_id": {"$ref": "common.schema.json#/$defs/stableId"},
+                        "kind": {"enum": ["missing_asset", "missing_release", "missing_distribution", "missing_access_route", "missing_crosswalk", "identity_uncertain", "access_restricted", "authorization_required", "coverage_gap", "incompatible_grain", "unsupported_analysis", "evidence_missing", "evidence_stale", "other"]},
+                        "state": {"enum": ["open", "resolved", "external", "unknown"]},
+                        "fatal": {"type": "boolean"}
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "downstream_support": {
+              "type": "array",
+              "maxItems": 20,
+              "items": {
+                "type": "object", "additionalProperties": false, "required": ["analysis_id", "classification", "source_support_state"],
+                "properties": {
+                  "analysis_id": {"$ref": "common.schema.json#/$defs/stableId"},
+                  "classification": {"enum": ["supported", "conditional", "blocked", "unsupported"]},
+                  "source_support_state": {"enum": ["supported", "conditional", "blocked", "unsupported", "unknown"]}
+                }
+              }
+            },
+            "limitation_ids": {"$ref": "common.schema.json#/$defs/idArray"},
+            "gap_ids": {"$ref": "common.schema.json#/$defs/idArray"},
+            "truth_boundary": {"$ref": "common.schema.json#/$defs/truthBoundary"}
+          }
+        },
+        "critical_claim_digest": {"$ref": "common.schema.json#/$defs/digest"},
+        "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "asset_contributions": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {"$ref": "asset-contribution.schema.json"}
+    },
+    "bundle_assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requested_coverage", "source_supported_coverage", "common_supported_coverage", "common_coverage_method", "compatibility", "essential_contribution_ids", "constraints", "evidence_reference_ids"],
+      "properties": {
+        "requested_coverage": {
+          "oneOf": [
+            {"$ref": "common.schema.json#/$defs/coverage"},
+            {"type": "null"}
+          ]
+        },
+        "source_supported_coverage": {
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["contribution_id", "coverage", "evidence_reference_ids"],
+            "properties": {
+              "contribution_id": {"$ref": "common.schema.json#/$defs/stableId"},
+              "coverage": {"$ref": "common.schema.json#/$defs/coverage"},
+              "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+            }
+          }
+        },
+        "common_supported_coverage": {
+          "oneOf": [
+            {"$ref": "common.schema.json#/$defs/coverage"},
+            {"type": "null"}
+          ]
+        },
+        "common_coverage_method": {"const": "intersection"},
+        "compatibility": {"enum": ["compatible", "conditional", "incompatible", "unknown"]},
+        "essential_contribution_ids": {"$ref": "common.schema.json#/$defs/idArray"},
+        "constraints": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {"$ref": "common.schema.json#/$defs/claim"}
+        },
+        "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "operations": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {"$ref": "operation.schema.json"}
+    },
+    "acquisition_plan": {"$ref": "acquisition-plan.schema.json"},
+    "downstream_handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["analysis_decisions", "handoff_format", "execution_location", "evidence_reference_ids"],
+      "properties": {
+        "analysis_decisions": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["analysis_id", "label", "classification", "source_support_state", "required_operation_ids", "limitations", "evidence_reference_ids"],
+            "properties": {
+              "analysis_id": {"$ref": "common.schema.json#/$defs/stableId"},
+              "label": {"$ref": "common.schema.json#/$defs/shortText"},
+              "classification": {"enum": ["supported", "conditional", "blocked", "unsupported"]},
+              "source_support_state": {"enum": ["supported", "conditional", "blocked", "unsupported", "unknown"]},
+              "required_operation_ids": {"$ref": "common.schema.json#/$defs/idArray"},
+              "limitations": {
+                "type": "array",
+                "maxItems": 50,
+                "items": {"$ref": "common.schema.json#/$defs/maintainedText"}
+              },
+              "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+            }
+          }
+        },
+        "handoff_format": {"enum": ["instructions_only", "machine_readable_plan"]},
+        "execution_location": {"const": "outside_ushso"},
+        "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "important_limitations": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {"$ref": "common.schema.json#/$defs/claim"}
+    },
+    "unresolved_gaps": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {"$ref": "common.schema.json#/$defs/claim"}
+    },
+    "conditions_not_recommend": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {"$ref": "common.schema.json#/$defs/claim"}
+    },
+    "evidence_references": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": {"$ref": "evidence-reference.schema.json"}
+    },
+    "truth_boundary": {"$ref": "common.schema.json#/$defs/truthBoundary"}
+  }
+}

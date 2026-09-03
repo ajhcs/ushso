@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.1.0/event-ledger.schema.json",
+  "title": "Transactional outbox, processed-event, durable dead-letter, and replay-lineage records",
+  "oneOf": [
+    { "$ref": "#/$defs/OutboxEvent" },
+    { "$ref": "#/$defs/ProcessedEvent" },
+    { "$ref": "#/$defs/DeadLetter" },
+    { "$ref": "#/$defs/ReplayLineage" }
+  ],
+  "$defs": {
+    "OutboxEvent": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract_version", "record_kind", "event_id", "event_type", "producer", "idempotency_key", "state", "references", "trace_id", "attempt_count", "maximum_delivery_attempts", "lease", "first_attempt_at", "next_eligible_at", "created_at", "published_at"],
+      "properties": {
+        "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+        "record_kind": { "const": "outbox_event" },
+        "event_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "event_type": { "enum": ["workflow_start_requested", "harvest_page_requested", "normalize_requested", "schema_enrichment_requested", "access_check_requested", "projection_requested", "delayed_redelivery_requested"] },
+        "producer": { "enum": ["scheduler", "workflow", "harvest", "normalize", "projector", "ops"] },
+        "idempotency_key": { "type": "string", "pattern": "^event:[a-z_]+:[A-Za-z0-9._:-]+$", "maxLength": 700 },
+        "state": { "enum": ["pending", "leased", "published", "retry_wait", "dead"] },
+        "references": { "$ref": "common.schema.json#/$defs/SafeReferences" },
+        "trace_id": { "type": "string", "pattern": "^[A-Za-z0-9_-]{16,128}$" },
+        "attempt_count": { "type": "integer", "minimum": 0, "maximum": 20 },
+        "maximum_delivery_attempts": { "type": "integer", "minimum": 1, "maximum": 20 },
+        "lease": { "$ref": "common.schema.json#/$defs/Lease" },
+        "first_attempt_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+        "next_eligible_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" },
+        "created_at": { "$ref": "common.schema.json#/$defs/Timestamp" },
+        "published_at": { "$ref": "common.schema.json#/$defs/NullableTimestamp" }
+      }
+    },
+    "ProcessedEvent": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract_version", "record_kind", "processed_event_id", "consumer_name", "event_id", "effect_idempotency_key", "business_effect_digest", "downstream_outbox_event_ids", "transaction_committed_at"],
+      "properties": {
+        "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+        "record_kind": { "const": "processed_event" },
+        "processed_event_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "consumer_name": { "enum": ["workflow_start_dispatcher", "harvest_page_consumer", "normalize_consumer", "schema_consumer", "access_consumer", "projection_consumer", "dlq_sink"] },
+        "event_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "effect_idempotency_key": { "type": "string", "pattern": "^effect:[A-Za-z0-9._:-]+$", "maxLength": 700 },
+        "business_effect_digest": { "$ref": "common.schema.json#/$defs/Sha256" },
+        "downstream_outbox_event_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "common.schema.json#/$defs/OpaqueId" } },
+        "transaction_committed_at": { "$ref": "common.schema.json#/$defs/Timestamp" }
+      }
+    },
+    "DeadLetter": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract_version", "record_kind", "dead_letter_id", "queue_name", "original_event_id", "source_id", "run_id", "job_id", "failure", "transport_delivery_attempts", "database_attempts", "retry_policy_version", "message_references", "attempt_ids", "replay_state", "persisted_at", "sink_transaction_committed"],
+      "properties": {
+        "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+        "record_kind": { "const": "durable_dead_letter" },
+        "dead_letter_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "queue_name": { "enum": ["harvest-page-dlq", "normalize-record-dlq", "enrich-schema-dlq", "access-check-dlq", "project-index-dlq"] },
+        "original_event_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "source_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "job_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "failure": { "$ref": "common.schema.json#/$defs/Failure" },
+        "transport_delivery_attempts": { "type": "integer", "minimum": 1, "maximum": 20 },
+        "database_attempts": { "type": "integer", "minimum": 1, "maximum": 20 },
+        "retry_policy_version": { "type": "string", "pattern": "^[a-z0-9._-]{3,64}$" },
+        "message_references": { "$ref": "common.schema.json#/$defs/SafeReferences" },
+        "attempt_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "common.schema.json#/$defs/OpaqueId" } },
+        "replay_state": { "enum": ["not_requested", "requested", "replayed", "closed_without_replay"] },
+        "persisted_at": { "$ref": "common.schema.json#/$defs/Timestamp" },
+        "sink_transaction_committed": { "const": true }
+      }
+    },
+    "ReplayLineage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract_version", "record_kind", "replay_id", "original_dead_letter_id", "original_event_id", "original_run_id", "new_run_id", "new_event_id", "original_retry_policy_version", "replay_policy_version", "requested_by_audit_event_id", "requested_at"],
+      "properties": {
+        "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+        "record_kind": { "const": "replay_lineage" },
+        "replay_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "original_dead_letter_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "original_event_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "original_run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "new_run_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "new_event_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "original_retry_policy_version": { "type": "string", "pattern": "^[a-z0-9._-]{3,64}$" },
+        "replay_policy_version": { "type": "string", "pattern": "^[a-z0-9._-]{3,64}$" },
+        "requested_by_audit_event_id": { "$ref": "common.schema.json#/$defs/OpaqueId" },
+        "requested_at": { "$ref": "common.schema.json#/$defs/Timestamp" }
+      }
+    }
+  }
+}

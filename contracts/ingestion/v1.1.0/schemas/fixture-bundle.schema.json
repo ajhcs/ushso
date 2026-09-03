@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.1.0/fixture-bundle.schema.json",
+  "title": "Ingestion contract fixture bundle",
+  "$defs": {
+    "Mutation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["op", "path", "value"],
+      "properties": {
+        "op": { "enum": ["set", "delete"] },
+        "path": { "type": "string", "pattern": "^(/([^/~]|~[01])*)+$" },
+        "value": true
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object", "additionalProperties": false,
+      "required": ["fixture_version", "records"],
+      "properties": {
+        "fixture_version": { "const": "ingestion-valid-fixtures.v1.1.0" },
+        "records": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["fixture_id", "schema", "value"],
+            "properties": {
+              "fixture_id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]{2,127}$" },
+              "schema": { "enum": ["source-descriptor.schema.json", "failure-policy.schema.json", "harvest-plan.schema.json", "harvest-run.schema.json", "ingest-job.schema.json", "ingest-attempt.schema.json", "checkpoint.schema.json", "capture-reference.schema.json", "metadata-fetch.schema.json", "event-ledger.schema.json", "enumeration-control.schema.json"] },
+              "value": { "type": "object" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object", "additionalProperties": false,
+      "required": ["fixture_version", "cases"],
+      "properties": {
+        "fixture_version": { "const": "ingestion-adversarial-fixtures.v1.1.0" },
+        "cases": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["case_id", "kind", "base_fixture_id", "mutations", "semantic_rule", "context", "expected_code"],
+            "properties": {
+              "case_id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]{2,127}$" },
+              "kind": { "enum": ["record", "transition", "record_set"] },
+              "base_fixture_id": { "type": ["string", "null"], "pattern": "^[a-z][a-z0-9_-]{2,127}$" },
+              "mutations": { "type": "array", "items": { "$ref": "#/$defs/Mutation" } },
+              "semantic_rule": { "type": "string", "pattern": "^[a-z][a-z0-9_]{2,63}$" },
+              "context": { "type": "object", "additionalProperties": { "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }, { "type": "null" }] } },
+              "expected_code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

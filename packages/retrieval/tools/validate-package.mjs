@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { semanticErrors } from '../../../index/v1.0.0/tools/semantics.mjs';
+import { semanticErrors } from './record-semantics.mjs';
 import { createRetrievalEngine } from './retrieval-core.mjs';
 import {
   PACKAGE_ROOT,

@@ -1,0 +1,337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/observatory/retrieval/v1.0.1/schemas/observatory-record-compatibility.v1.0.1.schema.json",
+  "title": "Observatory record v1.0.1 strict compatibility successor",
+  "description": "A versioned, strict local schema for validating the existing observatory-record.v1.0.0 wire records. This schema is not the byte-equivalent historical v1.0.0 schema and does not replace its historical manifest pin.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "access",
+    "authoritative_url",
+    "capabilities",
+    "description",
+    "evidence",
+    "freshness_verification",
+    "geography",
+    "identity",
+    "join_compatibility",
+    "provenance",
+    "record_id",
+    "record_type",
+    "retrieval",
+    "schema_version",
+    "time_coverage",
+    "title",
+    "unit_of_analysis"
+  ],
+  "properties": {
+    "access": { "$ref": "#/$defs/access" },
+    "authoritative_url": { "$ref": "#/$defs/non_empty_string" },
+    "capabilities": { "$ref": "#/$defs/capabilities" },
+    "description": { "type": "string" },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "freshness_verification": { "$ref": "#/$defs/freshness_verification" },
+    "geography": { "$ref": "#/$defs/geography" },
+    "identity": { "$ref": "#/$defs/identity" },
+    "join_compatibility": { "$ref": "#/$defs/join_compatibility" },
+    "provenance": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/provenance" }
+    },
+    "record_id": { "$ref": "#/$defs/non_empty_string" },
+    "record_type": { "$ref": "#/$defs/non_empty_string" },
+    "retrieval": { "$ref": "#/$defs/retrieval" },
+    "schema_version": { "const": "observatory-record.v1.0.0" },
+    "time_coverage": { "$ref": "#/$defs/time_coverage" },
+    "title": { "type": "string" },
+    "unit_of_analysis": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/non_empty_string" }
+    }
+  },
+  "$defs": {
+    "non_empty_string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "string_array": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/non_empty_string" }
+    },
+    "nullable_string": {
+      "anyOf": [
+        { "$ref": "#/$defs/non_empty_string" },
+        { "type": "null" }
+      ]
+    },
+    "access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_ids",
+        "evidence_state",
+        "infrastructure_state",
+        "mechanisms",
+        "requirements",
+        "restriction_note",
+        "status"
+      ],
+      "properties": {
+        "evidence_ids": { "$ref": "#/$defs/string_array" },
+        "evidence_state": { "$ref": "#/$defs/non_empty_string" },
+        "infrastructure_state": { "$ref": "#/$defs/non_empty_string" },
+        "mechanisms": { "$ref": "#/$defs/string_array" },
+        "requirements": { "$ref": "#/$defs/string_array" },
+        "restriction_note": { "type": "string" },
+        "status": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_ids", "evidence_state", "fitness", "id", "label", "rationale"],
+      "properties": {
+        "evidence_ids": { "$ref": "#/$defs/string_array" },
+        "evidence_state": { "$ref": "#/$defs/non_empty_string" },
+        "fitness": { "$ref": "#/$defs/non_empty_string" },
+        "id": { "$ref": "#/$defs/non_empty_string" },
+        "label": { "$ref": "#/$defs/non_empty_string" },
+        "rationale": { "type": "string" }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["topics", "use_cases"],
+      "properties": {
+        "topics": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/capability" }
+        },
+        "use_cases": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/capability" }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim", "evidence_id", "limitations", "provenance_ids", "state"],
+      "properties": {
+        "claim": { "type": "string" },
+        "evidence_id": { "$ref": "#/$defs/non_empty_string" },
+        "limitations": { "$ref": "#/$defs/string_array" },
+        "provenance_ids": { "$ref": "#/$defs/string_array" },
+        "state": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "freshness_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "data_through",
+        "metadata_observed_at",
+        "next_review_due",
+        "update_frequency",
+        "verification_method",
+        "verification_status"
+      ],
+      "properties": {
+        "data_through": { "$ref": "#/$defs/nullable_string" },
+        "metadata_observed_at": { "$ref": "#/$defs/non_empty_string" },
+        "next_review_due": { "$ref": "#/$defs/nullable_string" },
+        "update_frequency": { "$ref": "#/$defs/non_empty_string" },
+        "verification_method": { "$ref": "#/$defs/non_empty_string" },
+        "verification_status": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "geography": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coverage_level", "evidence_ids", "evidence_state", "jurisdictions", "rurality_support"],
+      "properties": {
+        "coverage_level": { "$ref": "#/$defs/non_empty_string" },
+        "evidence_ids": { "$ref": "#/$defs/string_array" },
+        "evidence_state": { "$ref": "#/$defs/non_empty_string" },
+        "jurisdictions": { "$ref": "#/$defs/string_array" },
+        "rurality_support": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset", "family", "identity_index_binding", "match_fields", "source"],
+      "properties": {
+        "asset": { "$ref": "#/$defs/asset" },
+        "family": { "$ref": "#/$defs/family" },
+        "identity_index_binding": { "$ref": "#/$defs/identity_index_binding" },
+        "match_fields": { "$ref": "#/$defs/match_fields" },
+        "source": { "$ref": "#/$defs/source" }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_id", "asset_type", "name", "version_label", "version_state"],
+      "properties": {
+        "asset_id": { "$ref": "#/$defs/non_empty_string" },
+        "asset_type": { "$ref": "#/$defs/non_empty_string" },
+        "name": { "type": "string" },
+        "version_label": { "$ref": "#/$defs/nullable_string" },
+        "version_state": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_family_ids", "evidence_ids", "family_id", "name", "resolution_state"],
+      "properties": {
+        "candidate_family_ids": { "$ref": "#/$defs/string_array" },
+        "evidence_ids": { "$ref": "#/$defs/string_array" },
+        "family_id": { "$ref": "#/$defs/non_empty_string" },
+        "name": { "type": "string" },
+        "resolution_state": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "identity_index_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity_record_id", "rationale", "state"],
+      "properties": {
+        "identity_record_id": { "$ref": "#/$defs/nullable_string" },
+        "rationale": { "type": "string" },
+        "state": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "match_fields": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonical_url", "doi", "normalized_title", "normalized_url", "publisher", "source_id", "source_portal"],
+      "properties": {
+        "canonical_url": { "$ref": "#/$defs/non_empty_string" },
+        "doi": { "$ref": "#/$defs/nullable_string" },
+        "normalized_title": { "type": "string" },
+        "normalized_url": { "$ref": "#/$defs/non_empty_string" },
+        "publisher": { "$ref": "#/$defs/nullable_string" },
+        "source_id": { "$ref": "#/$defs/non_empty_string" },
+        "source_portal": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "source_id"],
+      "properties": {
+        "name": { "type": "string" },
+        "source_id": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "join_compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["keys", "notes", "state"],
+      "properties": {
+        "keys": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/join_key" }
+        },
+        "notes": { "$ref": "#/$defs/string_array" },
+        "state": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "join_key": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cardinality",
+        "compatibility_state",
+        "confidence",
+        "entity",
+        "evidence_ids",
+        "fields",
+        "key_id",
+        "limitations",
+        "namespace",
+        "normalization",
+        "target_record_ids"
+      ],
+      "properties": {
+        "cardinality": { "$ref": "#/$defs/non_empty_string" },
+        "compatibility_state": { "$ref": "#/$defs/non_empty_string" },
+        "confidence": { "$ref": "#/$defs/non_empty_string" },
+        "entity": { "$ref": "#/$defs/non_empty_string" },
+        "evidence_ids": { "$ref": "#/$defs/string_array" },
+        "fields": { "$ref": "#/$defs/string_array" },
+        "key_id": { "$ref": "#/$defs/non_empty_string" },
+        "limitations": { "$ref": "#/$defs/string_array" },
+        "namespace": { "$ref": "#/$defs/non_empty_string" },
+        "normalization": { "$ref": "#/$defs/non_empty_string" },
+        "target_record_ids": { "$ref": "#/$defs/string_array" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capture_state", "content_sha256", "kind", "locator", "observed_at", "provenance_id"],
+      "properties": {
+        "capture_state": { "$ref": "#/$defs/non_empty_string" },
+        "content_sha256": { "$ref": "#/$defs/nullable_string" },
+        "kind": { "$ref": "#/$defs/non_empty_string" },
+        "locator": { "$ref": "#/$defs/non_empty_string" },
+        "observed_at": { "$ref": "#/$defs/non_empty_string" },
+        "provenance_id": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "retrieval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected_artifacts", "failure_policy", "instructions", "machine_actionable", "preferred_interface"],
+      "properties": {
+        "expected_artifacts": { "$ref": "#/$defs/string_array" },
+        "failure_policy": { "$ref": "#/$defs/non_empty_string" },
+        "instructions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/instruction" }
+        },
+        "machine_actionable": { "type": "boolean" },
+        "preferred_interface": { "$ref": "#/$defs/non_empty_string" }
+      }
+    },
+    "instruction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "expected_result", "instruction", "requires_human", "sequence", "url"],
+      "properties": {
+        "action": { "$ref": "#/$defs/non_empty_string" },
+        "expected_result": { "type": "string" },
+        "instruction": { "type": "string" },
+        "requires_human": { "type": "boolean" },
+        "sequence": { "type": "integer", "minimum": 1 },
+        "url": { "$ref": "#/$defs/nullable_string" }
+      }
+    },
+    "time_coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["end", "evidence_ids", "evidence_state", "start", "state", "temporal_granularity"],
+      "properties": {
+        "end": { "$ref": "#/$defs/nullable_string" },
+        "evidence_ids": { "$ref": "#/$defs/string_array" },
+        "evidence_state": { "$ref": "#/$defs/non_empty_string" },
+        "start": { "$ref": "#/$defs/nullable_string" },
+        "state": { "$ref": "#/$defs/non_empty_string" },
+        "temporal_granularity": { "$ref": "#/$defs/non_empty_string" }
+      }
+    }
+  }
+}

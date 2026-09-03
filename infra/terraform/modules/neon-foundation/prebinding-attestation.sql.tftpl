@@ -1,0 +1,226 @@
+\set ON_ERROR_STOP on
+
+-- This value-free check emits one non-secret catalog receipt and exits nonzero
+-- unless all six SQL-created logins have only their matching capability-role
+-- membership and no elevated PostgreSQL/Neon role attribute.
+SELECT (
+  current_user = :'bootstrap_login'
+  AND current_database() = :'database_name'
+  AND EXISTS (
+    SELECT 1 FROM pg_stat_ssl
+    WHERE pid = pg_backend_pid() AND ssl
+  )
+) AS resolved_connection_pass \gset
+
+\if :resolved_connection_pass
+  \echo 'PASS runner connected as the state-resolved bootstrap owner over TLS'
+\else
+  \echo 'FAIL connection is not the state-resolved bootstrap owner/database over TLS'
+  \quit 2
+\endif
+
+WITH RECURSIVE expected(role_key, login_user, database_role) AS (
+  VALUES
+    ('public', :'public_login', 'ushso_public'),
+    ('scheduler', :'scheduler_login', 'ushso_scheduler'),
+    ('harvest', :'harvest_login', 'ushso_harvest'),
+    ('normalize', :'normalize_login', 'ushso_normalize'),
+    ('projector', :'projector_login', 'ushso_projector'),
+    ('ops', :'ops_login', 'ushso_ops')
+), membership_closure(login_oid, granted_oid) AS (
+  SELECT memberships.member, memberships.roleid
+  FROM pg_auth_members memberships
+  UNION
+  SELECT closure.login_oid, memberships.roleid
+  FROM membership_closure closure
+  JOIN pg_auth_members memberships ON memberships.member = closure.granted_oid
+), protected_acl_grantees(grantee) AS (
+  SELECT privileges.grantee
+  FROM pg_namespace namespaces
+  CROSS JOIN LATERAL aclexplode(coalesce(namespaces.nspacl, acldefault('n', namespaces.nspowner))) privileges
+  WHERE namespaces.nspname IN ('registry', 'ingest', 'catalog', 'identity', 'search', 'ops')
+  UNION ALL
+  SELECT privileges.grantee
+  FROM pg_class relations
+  JOIN pg_namespace namespaces ON namespaces.oid = relations.relnamespace
+  CROSS JOIN LATERAL aclexplode(coalesce(
+    relations.relacl,
+    CASE WHEN relations.relkind = 'S'
+      THEN acldefault('S', relations.relowner)
+      ELSE acldefault('r', relations.relowner)
+    END
+  )) privileges
+  WHERE namespaces.nspname IN ('registry', 'ingest', 'catalog', 'identity', 'search', 'ops')
+  UNION ALL
+  SELECT privileges.grantee
+  FROM pg_proc procedures
+  JOIN pg_namespace namespaces ON namespaces.oid = procedures.pronamespace
+  CROSS JOIN LATERAL aclexplode(coalesce(procedures.proacl, acldefault('f', procedures.proowner))) privileges
+  WHERE namespaces.nspname IN ('registry', 'ingest', 'catalog', 'identity', 'search', 'ops')
+  UNION ALL
+  SELECT privileges.grantee
+  FROM pg_default_acl defaults
+  LEFT JOIN pg_namespace namespaces ON namespaces.oid = defaults.defaclnamespace
+  CROSS JOIN LATERAL aclexplode(coalesce(defaults.defaclacl, '{}'::aclitem[])) privileges
+  WHERE defaults.defaclnamespace = 0
+     OR namespaces.nspname IN ('registry', 'ingest', 'catalog', 'identity', 'search', 'ops')
+), role_state AS (
+  SELECT
+    expected.role_key,
+    expected.login_user,
+    expected.database_role,
+    roles.rolsuper,
+    roles.rolbypassrls,
+    roles.rolreplication,
+    roles.rolcreatedb,
+    roles.rolcreaterole,
+    roles.rolcanlogin,
+    roles.rolinherit,
+    EXISTS (
+      SELECT 1
+      FROM pg_auth_members memberships
+      JOIN pg_roles granted_role ON granted_role.oid = memberships.roleid
+      WHERE memberships.member = roles.oid
+        AND granted_role.rolname = 'neon_superuser'
+    ) AS neon_superuser_member,
+    EXISTS (
+      SELECT 1
+      FROM pg_auth_members memberships
+      JOIN pg_roles granted_role ON granted_role.oid = memberships.roleid
+      WHERE memberships.member = roles.oid
+        AND granted_role.rolname = expected.database_role
+    ) AS capability_member,
+    EXISTS (
+      SELECT 1
+      FROM membership_closure closure
+      JOIN pg_roles granted_role ON granted_role.oid = closure.granted_oid
+      WHERE closure.login_oid = roles.oid
+        AND granted_role.rolname <> expected.database_role
+    ) AS unexpected_membership,
+    EXISTS (
+      SELECT 1
+      FROM protected_acl_grantees privileges
+      WHERE privileges.grantee = 0 OR privileges.grantee = roles.oid
+    ) AS unexpected_acl
+  FROM expected
+  LEFT JOIN pg_roles roles ON roles.rolname = expected.login_user
+), attestation AS (
+  SELECT
+    count(*) = 6
+      AND count(*) FILTER (WHERE rolcanlogin) = 6
+      AND bool_and(NOT rolsuper)
+      AND bool_and(NOT rolbypassrls)
+      AND bool_and(NOT rolreplication)
+      AND bool_and(NOT rolcreatedb)
+      AND bool_and(NOT rolcreaterole)
+      AND bool_and(rolinherit)
+      AND bool_and(NOT neon_superuser_member)
+      AND bool_and(capability_member)
+      AND bool_and(NOT unexpected_membership)
+      AND bool_and(NOT unexpected_acl) AS privilege_attestation_pass,
+    jsonb_object_agg(
+      role_key,
+      to_jsonb(role_state) - 'role_key' - 'rolcanlogin' - 'rolinherit'
+      ORDER BY role_key
+    ) AS role_catalog_evidence
+  FROM role_state
+)
+SELECT privilege_attestation_pass, role_catalog_evidence
+FROM attestation \gset
+
+\echo :role_catalog_evidence
+\if :privilege_attestation_pass
+  \echo 'PASS six SQL-created Worker logins have bounded capabilities'
+\else
+  \echo 'FAIL Worker login privilege attestation; Hyperdrive binding is prohibited'
+  \quit 3
+\endif
+
+SELECT EXISTS (
+  SELECT 1
+  FROM pg_roles bootstrap
+  JOIN pg_auth_members memberships ON memberships.member = bootstrap.oid
+  JOIN pg_roles granted_role ON granted_role.oid = memberships.roleid
+  WHERE bootstrap.rolname = :'bootstrap_login'
+    AND granted_role.rolname = 'ushso_maintenance'
+) AS bootstrap_maintenance_member \gset
+
+\if :bootstrap_maintenance_member
+  \echo 'PASS direct bootstrap owner may assume ushso_maintenance'
+\else
+  \echo 'FAIL direct bootstrap owner lacks ushso_maintenance membership'
+  \quit 4
+\endif
+
+SELECT (
+  :'verified_at_utc'::timestamptz <= clock_timestamp()
+  AND :'expires_at_utc'::timestamptz > clock_timestamp()
+  AND :'expires_at_utc'::timestamptz <= :'verified_at_utc'::timestamptz + interval '15 minutes'
+) AS temporal_attestation_pass \gset
+
+\if :temporal_attestation_pass
+  \echo 'PASS attestation is current and valid for no more than 15 minutes'
+\else
+  \echo 'FAIL attestation is future-dated, expired, or valid for longer than 15 minutes'
+  \quit 5
+\endif
+
+-- The runner SHA-256 hashes this exact UTF-8, newline-delimited material.
+-- Terraform independently reconstructs and hashes the same fixed field order.
+WITH role_evidence AS (
+  SELECT key AS role_key, value
+  FROM jsonb_each(:'role_catalog_evidence'::jsonb)
+), canonical AS (
+  SELECT concat_ws(E'\n',
+    'ushso-database-origin-attestation.v1',
+    'environment=' || :'environment',
+    'neon_project_id=' || :'neon_project_id',
+    'neon_branch_id=' || :'neon_branch_id',
+    'neon_endpoint_id=' || :'neon_endpoint_id',
+    'direct_host=' || :'direct_host',
+    'verified_at_utc=' || :'verified_at_utc',
+    'expires_at_utc=' || :'expires_at_utc',
+    'template_sha256=' || :'template_sha256',
+    (
+      SELECT string_agg(concat_ws(E'\n',
+        'roles.' || role_key || '.database_role=' || (value ->> 'database_role'),
+        'roles.' || role_key || '.login_user=' || (value ->> 'login_user'),
+        'roles.' || role_key || '.rolsuper=' || (value ->> 'rolsuper'),
+        'roles.' || role_key || '.rolbypassrls=' || (value ->> 'rolbypassrls'),
+        'roles.' || role_key || '.rolreplication=' || (value ->> 'rolreplication'),
+        'roles.' || role_key || '.rolcreatedb=' || (value ->> 'rolcreatedb'),
+        'roles.' || role_key || '.rolcreaterole=' || (value ->> 'rolcreaterole'),
+        'roles.' || role_key || '.capability_member=' || (value ->> 'capability_member'),
+        'roles.' || role_key || '.neon_superuser_member=' || (value ->> 'neon_superuser_member'),
+        'roles.' || role_key || '.unexpected_membership=' || (value ->> 'unexpected_membership'),
+        'roles.' || role_key || '.unexpected_acl=' || (value ->> 'unexpected_acl')
+      ), E'\n' ORDER BY CASE role_key
+        WHEN 'public' THEN 1
+        WHEN 'scheduler' THEN 2
+        WHEN 'harvest' THEN 3
+        WHEN 'normalize' THEN 4
+        WHEN 'projector' THEN 5
+        WHEN 'ops' THEN 6
+      END)
+      FROM role_evidence
+    )
+  ) AS evidence_material
+), envelope AS (
+  SELECT jsonb_build_object(
+    'environment', :'environment',
+    'neon_project_id', :'neon_project_id',
+    'neon_branch_id', :'neon_branch_id',
+    'neon_endpoint_id', :'neon_endpoint_id',
+    'direct_host', :'direct_host',
+    'verified_at_utc', :'verified_at_utc',
+    'expires_at_utc', :'expires_at_utc',
+    'template_sha256', :'template_sha256',
+    'roles', :'role_catalog_evidence'::jsonb
+  ) AS value
+)
+SELECT 'USHSO_ATTESTATION_MATERIAL_BASE64=' ||
+  replace(encode(convert_to(canonical.evidence_material, 'UTF8'), 'base64'), E'\n', '')
+FROM canonical
+UNION ALL
+SELECT 'USHSO_ATTESTATION_ENVELOPE=' || envelope.value::text
+FROM envelope;

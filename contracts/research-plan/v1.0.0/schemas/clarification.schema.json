@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/clarification.schema.json",
+  "title": "Stateless clarification contracts",
+  "$defs": {
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "label"],
+      "properties": {
+        "value": {"type": "string", "minLength": 1, "maxLength": 128},
+        "label": {"type": "string", "minLength": 1, "maxLength": 256}
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question_id", "prompt", "answer_kind", "required", "options", "material_effects", "answered", "evidence_reference_ids"],
+      "properties": {
+        "question_id": {"$ref": "common.schema.json#/$defs/stableId"},
+        "prompt": {"type": "string", "minLength": 1, "maxLength": 2000},
+        "answer_kind": {"enum": ["single_choice", "multi_choice", "bounded_text", "date", "boolean"]},
+        "required": {"type": "boolean"},
+        "options": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {"$ref": "#/$defs/option"}
+        },
+        "material_effects": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {"enum": ["essential_roles", "bundle", "coverage", "access", "grain", "time", "safety"]}
+        },
+        "answered": {"type": "boolean"},
+        "evidence_reference_ids": {"$ref": "common.schema.json#/$defs/evidenceReferenceIds"}
+      }
+    },
+    "answer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question_id", "values"],
+      "properties": {
+        "question_id": {"$ref": "common.schema.json#/$defs/stableId"},
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 2000}
+        }
+      }
+    },
+    "tokenClaims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_version", "key_version", "request_hash", "question_set_hash", "expected_generation", "issued_at", "expires_at"],
+      "properties": {
+        "contract_version": {"const": "observatory-clarification-token-claims.v1.0.0"},
+        "key_version": {"type": "string", "minLength": 3, "maxLength": 64, "pattern": "^[A-Za-z0-9._:-]+$"},
+        "request_hash": {"$ref": "common.schema.json#/$defs/digest"},
+        "question_set_hash": {"$ref": "common.schema.json#/$defs/digest"},
+        "expected_generation": {"$ref": "common.schema.json#/$defs/stableId"},
+        "issued_at": {"$ref": "common.schema.json#/$defs/dateTime"},
+        "expires_at": {"$ref": "common.schema.json#/$defs/dateTime"}
+      }
+    }
+  }
+}

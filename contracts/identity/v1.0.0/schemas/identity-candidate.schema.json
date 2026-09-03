@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/identity/v1.0.0/identity-candidate.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "object_a_id",
+    "object_b_id",
+    "candidate_type",
+    "algorithm_version",
+    "feature_version",
+    "features",
+    "match_score",
+    "epistemic_confidence",
+    "supporting_assertion_ids",
+    "conflicting_assertion_ids",
+    "state",
+    "resolution_mode",
+    "created_at",
+    "reviewed_at",
+    "supersedes_candidate_id",
+    "superseded_by_candidate_id",
+    "lineage"
+  ],
+  "properties": {
+    "schema_version": {"const": "identity.candidate.v1.0.0"},
+    "candidate_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "object_a_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "object_b_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "candidate_type": {"enum": ["same_identity", "mirror", "successor", "collection", "version", "format_variant"]},
+    "algorithm_version": {"$ref": "common.schema.json#/$defs/semver"},
+    "feature_version": {"$ref": "common.schema.json#/$defs/semver"},
+    "features": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["feature_kind", "value", "evidence_ids"],
+        "properties": {
+          "feature_kind": {
+            "enum": [
+              "exact_identifier",
+              "locator_similarity",
+              "title_similarity",
+              "publisher_similarity",
+              "description_similarity",
+              "url_similarity",
+              "embedding_similarity",
+              "temporal_overlap",
+              "source_declared_lineage",
+              "semantic_similarity"
+            ]
+          },
+          "value": {"oneOf": [{"type": "number"}, {"type": "string"}, {"type": "boolean"}]},
+          "evidence_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+          }
+        }
+      }
+    },
+    "match_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "epistemic_confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "basis"],
+      "properties": {
+        "level": {"enum": ["unknown", "low", "medium", "high"]},
+        "basis": {"type": "string", "minLength": 1, "maxLength": 500}
+      }
+    },
+    "supporting_assertion_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "conflicting_assertion_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "state": {"enum": ["open", "accepted", "rejected", "deferred", "superseded"]},
+    "resolution_mode": {"enum": ["candidate_only", "human_review", "automatic_exact_policy"]},
+    "created_at": {"$ref": "common.schema.json#/$defs/dateTime"},
+    "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
+    "supersedes_candidate_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]},
+    "superseded_by_candidate_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]},
+    "lineage": {"$ref": "common.schema.json#/$defs/lineage"}
+  }
+}

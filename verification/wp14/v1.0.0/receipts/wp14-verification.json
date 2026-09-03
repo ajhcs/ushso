@@ -1,0 +1,145 @@
+{
+  "schema_version": "ushso-wp14-verification-receipt.v1.0.0",
+  "work_package": "WP14",
+  "recorded_at": "2026-08-30T00:00:00.000Z",
+  "technical_foundation_status": "PASS_LOCAL_ZERO_TRAFFIC_FOUNDATION",
+  "work_package_acceptance_status": "BLOCKED_EXTERNAL_AND_PREDECESSOR_GATES",
+  "evidence_class": "fixture_only_local_zero_traffic",
+  "exact_candidate": {
+    "candidate_digest_sha256": "sha256:e22d8e320e3a08a0e08abc3280b6e790ca13f8d60f96db3e8507a99bbd391736",
+    "candidate_content_manifest_sha256": "sha256:e4cd2709e3786a526d36a1afcf40b8e05072d9a922ad523375ab6430e7594439",
+    "git_head_commit": "f6edbb0b31530cdcf3391e8bddf85015d5d30265",
+    "git_head_tree_oid": "956320f2ce36a195250b55d627c174a3c2a2eefc",
+    "exact_candidate_tree_sealed": false,
+    "production_eligibility": false
+  },
+  "deterministic_seals": {
+    "candidate_envelope_sha256": "sha256:e22d8e320e3a08a0e08abc3280b6e790ca13f8d60f96db3e8507a99bbd391736",
+    "zero_traffic_rehearsal_sha256": "sha256:73dfaeac027ee197c10177a80e690930de81c4317d853357651a1b5ca5466892",
+    "implementation_manifest_sha256": "sha256:59b1fa10220d29bef49b2811890b88b20f0d95d128ef280f749c0ebea476d8db",
+    "release_gate_plan_fingerprint_sha256": "sha256:886170d2355e59531b1647795b298eeb7d503eaa0b22ee487a4be26bd5c3b0fc",
+    "wp13_seo_artifact_seal_sha256": "sha256:c823baab000811e3b7ba39d3f110b9be25203fb017d30266ca9a84ddb0d1dcd9"
+  },
+  "release_gate": {
+    "authority": "local-exact-tree",
+    "policy_source": "detected",
+    "plan_fingerprint_sha256": "sha256:886170d2355e59531b1647795b298eeb7d503eaa0b22ee487a4be26bd5c3b0fc",
+    "exact_candidate_run_performed": false,
+    "status": "PLAN_ONLY_SHARED_DIRTY_TREE_NOT_A_RELEASE_CANDIDATE"
+  },
+  "fixture_rehearsal": {
+    "shadow_parity_case_count": 5,
+    "shadow_parity_pass": true,
+    "connector_refresh_cycles": 2,
+    "rebuild_promote_rollback_cycles": 2,
+    "fixture_cycles_count_toward_production_soak": false,
+    "generation_pointer_rollback_rehearsed": true,
+    "worker_and_asset_rollback_rehearsed": true,
+    "static_fallback_rehearsed": true,
+    "pointer_changes_non_noop": true,
+    "n_minus_one_rollback_bundle_pass": true,
+    "cross_version_asset_404_count": 0,
+    "failure_injection_cases": 30,
+    "failure_injection_pass": true,
+    "final_public_traffic_percent": 0,
+    "final_public_backend": "immutable_static_jsonl",
+    "runtime_jsonl_active": true
+  },
+  "verification": [
+    {
+      "command": "npm test --prefix verification/wp14/v1.0.0",
+      "status": "PASS",
+      "result": "All discovered WP14 Node tests passed; see the separately captured command receipt for the exact count."
+    },
+    {
+      "command": "npm run verify --prefix verification/wp14/v1.0.0",
+      "status": "PASS",
+      "result": "50 deterministic package, boundary, gate, receipt, rehearsal, and no-action checks passed; 0 failed"
+    },
+    {
+      "command": "npm run validate --prefix verification/wp14/v1.0.0",
+      "status": "PASS",
+      "result": "validate aliases the non-mutating deterministic verifier"
+    }
+  ],
+  "authorization_status": {
+    "AUTH-03": {
+      "environment": "staging",
+      "status": "not_requested",
+      "authorized": false
+    },
+    "AUTH-05": {
+      "environment": "production_like_isolated_recovery",
+      "status": "not_requested",
+      "authorized": false
+    },
+    "AUTH-06": {
+      "environment": "production_internal_canary",
+      "status": "not_requested",
+      "authorized": false
+    },
+    "AUTH-07": {
+      "environment": "production_public",
+      "status": "not_requested",
+      "authorized": false
+    },
+    "AUTH-08": {
+      "environment": "production_soak",
+      "status": "not_requested",
+      "authorized": false
+    },
+    "AUTH-09": {
+      "environment": "production_runtime",
+      "status": "not_requested",
+      "authorized": false
+    },
+    "AUTH-11": {
+      "environment": "production_foundation_no_traffic",
+      "status": "not_requested",
+      "authorized": false
+    }
+  },
+  "production_status": {
+    "deployment_performed": false,
+    "provider_mutation_performed": false,
+    "source_or_public_requests_made": 0,
+    "production_like_load_executed": false,
+    "live_shadow_executed": false,
+    "live_internal_canary_executed": false,
+    "public_cutover_executed": false,
+    "rollback_window_started": false,
+    "production_soak_started": false,
+    "production_soak_elapsed": false,
+    "qualifying_live_connector_cycles": 0,
+    "qualifying_live_rebuild_cycles": 0,
+    "managed_recovery_executed": false,
+    "runtime_jsonl_retired": false
+  },
+  "runtime_boundary": {
+    "worker_entry_modified_by_wp14": false,
+    "runtime_jsonl_modified_by_wp14": false,
+    "runtime_jsonl_active": true,
+    "pins": "verification/wp14/v1.0.0/receipts/runtime-boundary-pins.json"
+  },
+  "residual_gates": [
+    "Integrate a stable clean candidate and run the exact-candidate release gate once.",
+    "Compose and review an authoritative transactional durable-store implementation; the checked-in transition tool intentionally uses only an ephemeral fixture adapter and rejects production state.",
+    "Complete WP8 retrieval/final-holdout and production-like search/query-plan gates.",
+    "Complete AUTH-12 planner governance, WP10B compiler, and planner release evaluation.",
+    "Complete AUTH-15 coverage wording approval and relevant identity/toolkit/SEO public gates.",
+    "Obtain AUTH-03 and AUTH-11 before managed staging or zero-traffic production foundation apply.",
+    "Obtain AUTH-05 and perform measured isolated recovery drills.",
+    "Obtain AUTH-06 before Access-protected internal canary traffic.",
+    "Obtain AUTH-07 before gradual public promotion and preserve the exact N-1 rollback bundle.",
+    "Obtain AUTH-08, reach 100 percent, then operate at least 30 days plus two qualifying live cycles of each required type.",
+    "Obtain AUTH-09 only after the full soak receipt, then review a separate runtime JSONL removal while retaining fixtures/evaluation/audit/DR copies."
+  ],
+  "rollback": {
+    "current": "No runtime rollback is needed because WP14 made no runtime or external change.",
+    "bad_generation": "Atomically restore the retained exact N-1 publication pointer; do not revert canonical storage.",
+    "bad_worker": "Restore the prior Worker and matching asset bundle; do not claim PostgreSQL or R2 rollback.",
+    "database_path": "Activate the pinned immutable database-independent static artifact for every public surface.",
+    "migrations": "Keep additive schema; never use a destructive down migration as operational rollback."
+  },
+  "receipt_sha256": "sha256:d8975f03e34c09370a4f70ae180de8a009de9237d81d6de82796efa1a6aff08b"
+}

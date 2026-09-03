@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.1.0/common.schema.json",
+  "title": "USHSO ingestion common definitions",
+  "$defs": {
+    "OpaqueId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,31}_[A-Za-z0-9][A-Za-z0-9._:-]{1,126}$"
+    },
+    "Sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "Timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "NullableTimestamp": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "ContractVersion": {
+      "const": "ingestion.v1.1.0"
+    },
+    "CloudflareWorkflowInstanceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_][A-Za-z0-9_-]*$"
+    },
+    "SecretLocator": {
+      "type": ["string", "null"],
+      "pattern": "^(secret|cloudflare-secret)://[A-Za-z0-9][A-Za-z0-9/_-]{2,190}$"
+    },
+    "FailureType": {
+      "enum": [
+        "rate_limited",
+        "upstream_5xx",
+        "timeout",
+        "dns_failure",
+        "tls_failure",
+        "catalog_auth_misconfigured",
+        "expected_access_restriction",
+        "not_found",
+        "gone",
+        "redirect_unapproved",
+        "schema_drift",
+        "parse_failure",
+        "unexpected_content_type",
+        "response_too_large",
+        "policy_blocked",
+        "canonical_invariant_failure",
+        "internal_failure",
+        "cursor_expired"
+      ]
+    },
+    "Failure": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["failure_type", "retry_class", "target_class", "safe_detail_code", "observed_at"],
+      "properties": {
+        "failure_type": { "$ref": "#/$defs/FailureType" },
+        "retry_class": { "enum": ["transient", "terminal_observation", "quarantine", "pause_source", "enumeration_terminal"] },
+        "target_class": { "enum": ["catalog_root", "collection", "pagination_cursor", "exact_item", "exact_distribution", "documentation"] },
+        "safe_detail_code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$" },
+        "http_status": { "type": ["integer", "null"], "minimum": 100, "maximum": 599 },
+        "observed_at": { "$ref": "#/$defs/Timestamp" }
+      }
+    },
+    "FourClocks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["data_coverage", "publisher_time", "observed_at", "recorded_at", "superseded_at"],
+      "properties": {
+        "data_coverage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "start", "end", "semantics"],
+          "properties": {
+            "state": { "enum": ["known", "unknown", "not_applicable"] },
+            "start": { "type": ["string", "null"], "format": "date" },
+            "end": { "type": ["string", "null"], "format": "date" },
+            "semantics": { "enum": ["calendar", "fiscal", "rolling", "as_reported", "unknown", "not_applicable"] }
+          }
+        },
+        "publisher_time": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["state", "released_at", "modified_at"],
+          "properties": {
+            "state": { "enum": ["known", "unknown", "not_applicable"] },
+            "released_at": { "$ref": "#/$defs/NullableTimestamp" },
+            "modified_at": { "$ref": "#/$defs/NullableTimestamp" }
+          }
+        },
+        "observed_at": { "$ref": "#/$defs/Timestamp" },
+        "recorded_at": { "$ref": "#/$defs/Timestamp" },
+        "superseded_at": { "$ref": "#/$defs/NullableTimestamp" }
+      }
+    },
+    "Lease": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["owner_id", "lease_token", "epoch", "acquired_at", "expires_at"],
+      "properties": {
+        "owner_id": { "$ref": "#/$defs/OpaqueId" },
+        "lease_token": { "type": "string", "pattern": "^[A-Za-z0-9_-]{24,128}$" },
+        "epoch": { "type": "integer", "minimum": 1 },
+        "acquired_at": { "$ref": "#/$defs/Timestamp" },
+        "expires_at": { "$ref": "#/$defs/Timestamp" }
+      }
+    },
+    "DeliveryFence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_attempt", "lease_epoch"],
+      "properties": {
+        "run_attempt": { "type": "integer", "minimum": 1 },
+        "lease_epoch": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "HttpValidators": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["etag", "last_modified"],
+      "properties": {
+        "etag": { "type": ["string", "null"], "minLength": 1, "maxLength": 512 },
+        "last_modified": { "type": ["string", "null"], "format": "http-date" }
+      }
+    },
+    "CaptureClassification": {
+      "enum": ["catalog_metadata", "documentation", "schema_metadata"]
+    },
+    "TargetClass": {
+      "enum": ["catalog_root", "collection", "pagination_cursor", "exact_item", "exact_distribution", "documentation"]
+    },
+    "SafeReferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "job_id", "capture_ref_id", "checkpoint_id", "canonical_id", "canonical_revision_id", "r2_key", "cursor_ref_id"],
+      "properties": {
+        "run_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] },
+        "job_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] },
+        "capture_ref_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] },
+        "checkpoint_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] },
+        "canonical_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] },
+        "canonical_revision_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] },
+        "r2_key": { "type": ["string", "null"], "pattern": "^captures/sha256/[a-f0-9]{2}/[a-f0-9]{64}$" },
+        "cursor_ref_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] }
+      }
+    }
+  }
+}

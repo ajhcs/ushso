@@ -1,0 +1,143 @@
+[
+  {
+    "schema_version": "observatory-analysis-input-profile.v1.0.0",
+    "profile_id": "example:analysis-input-profile:pa-inpatient-utilization:hhi",
+    "analysis_id": "market_concentration_hhi",
+    "record_id": "example:dataset:pa-inpatient-utilization",
+    "requirement_catalog_sha256": "sha256:7f5c77645c8609021cc15ff7dd8a78d6d1edda75d79fa1d0753ed4534406b33c",
+    "requirement_sha256": "sha256:78037d84f591b493b8c36897648e1172b774615b9d716cc964ce29413df9d2b6",
+    "inputs": [
+      {
+        "input_id": "facility_id",
+        "availability": "source_reported",
+        "field_refs": ["facility_id"],
+        "observation_grain": "facility",
+        "value_kind": "identifier",
+        "measurement_unit": "identifier",
+        "domain_compatibility": "documented",
+        "evidence_ids": ["example:evidence:utilization-data-dictionary"],
+        "limitations": []
+      },
+      {
+        "input_id": "system_id",
+        "availability": "unverified",
+        "field_refs": [],
+        "observation_grain": "facility",
+        "value_kind": "identifier",
+        "measurement_unit": "identifier",
+        "domain_compatibility": "unknown",
+        "evidence_ids": ["example:evidence:utilization-data-dictionary"],
+        "limitations": ["The example utilization source does not document health-system membership."]
+      },
+      {
+        "input_id": "service_line",
+        "availability": "source_reported",
+        "field_refs": ["service_line"],
+        "observation_grain": "facility",
+        "value_kind": "category",
+        "measurement_unit": "category",
+        "domain_compatibility": "documented",
+        "evidence_ids": ["example:evidence:utilization-data-dictionary"],
+        "limitations": []
+      },
+      {
+        "input_id": "period",
+        "availability": "source_reported",
+        "field_refs": ["reporting_year"],
+        "observation_grain": "facility",
+        "value_kind": "period",
+        "measurement_unit": "calendar_year",
+        "domain_compatibility": "documented",
+        "evidence_ids": ["example:evidence:utilization-data-dictionary"],
+        "limitations": []
+      },
+      {
+        "input_id": "utilization_volume",
+        "availability": "source_reported",
+        "field_refs": ["inpatient_discharges"],
+        "observation_grain": "facility",
+        "value_kind": "integer",
+        "measurement_unit": "discharges",
+        "domain_compatibility": "documented",
+        "evidence_ids": ["example:evidence:utilization-data-dictionary"],
+        "limitations": ["The example volume represents inpatient discharges only."]
+      }
+    ],
+    "properties": [
+      {
+        "property_id": "consistent_market_definition",
+        "state": "documented",
+        "evidence_ids": ["example:evidence:hhi-review-protocol"],
+        "limitations": ["The market definition still requires an analyst-selected geography and service line."]
+      },
+      {
+        "property_id": "same_period",
+        "state": "documented",
+        "evidence_ids": ["example:evidence:utilization-data-dictionary"],
+        "limitations": ["Use one reporting year per comparison."]
+      },
+      {
+        "property_id": "complete_competitor_observation",
+        "state": "documented",
+        "evidence_ids": ["example:evidence:hhi-review-protocol"],
+        "limitations": ["Completeness applies to the synthetic inpatient competitor universe only."]
+      }
+    ],
+    "limitations": [
+      "Synthetic conformance fixture; it is not an assertion about a currently cataloged source.",
+      "Outpatient and other unobserved market activity are not represented."
+    ],
+    "truth_boundary": {
+      "assertion_type": "evidence_reviewed_field_mapping_not_source_truth",
+      "source_truth_separate": true,
+      "field_inference_allowed": false
+    }
+  },
+  {
+    "schema_version": "observatory-analysis-input-profile.v1.0.0",
+    "profile_id": "example:analysis-input-profile:facility-system-crosswalk:hhi",
+    "analysis_id": "market_concentration_hhi",
+    "record_id": "example:dataset:facility-system-crosswalk",
+    "requirement_catalog_sha256": "sha256:7f5c77645c8609021cc15ff7dd8a78d6d1edda75d79fa1d0753ed4534406b33c",
+    "requirement_sha256": "sha256:78037d84f591b493b8c36897648e1172b774615b9d716cc964ce29413df9d2b6",
+    "inputs": [
+      {
+        "input_id": "facility_id",
+        "availability": "derivable",
+        "field_refs": ["facility_key"],
+        "observation_grain": "facility",
+        "value_kind": "identifier",
+        "measurement_unit": "identifier",
+        "domain_compatibility": "documented",
+        "derivation": {
+          "derivation_id": "example:derivation:crosswalk-facility-key",
+          "description": "Normalize the source-native facility key through the documented synthetic join route.",
+          "evidence_ids": ["example:evidence:crosswalk-data-dictionary"]
+        },
+        "evidence_ids": ["example:evidence:crosswalk-data-dictionary"],
+        "limitations": ["The source-native facility key must be normalized through the documented route."]
+      },
+      {
+        "input_id": "system_id",
+        "availability": "source_reported",
+        "field_refs": ["health_system_id"],
+        "observation_grain": "facility",
+        "value_kind": "identifier",
+        "measurement_unit": "identifier",
+        "domain_compatibility": "documented",
+        "evidence_ids": ["example:evidence:crosswalk-data-dictionary"],
+        "limitations": ["Membership must be evaluated for the selected reporting year."]
+      }
+    ],
+    "properties": [],
+    "limitations": [
+      "Synthetic conformance fixture; it is not an assertion about a currently cataloged source.",
+      "Organizational relationships may change over time."
+    ],
+    "truth_boundary": {
+      "assertion_type": "evidence_reviewed_field_mapping_not_source_truth",
+      "source_truth_separate": true,
+      "field_inference_allowed": false
+    }
+  }
+]

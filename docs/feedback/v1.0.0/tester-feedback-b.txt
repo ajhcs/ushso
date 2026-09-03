@@ -1,0 +1,501 @@
+I would move from one search tool to a small, composable USHSO research toolkit.
+
+Something like:
+
+observatory.search_sources
+observatory.get_source
+observatory.get_access_plan
+observatory.get_variables
+observatory.get_join_routes
+observatory.compare_sources
+observatory.get_retrieval_recipe
+observatory.get_coverage_status
+
+Not dozens of tools. Probably 6–8 extremely well-defined tools.
+
+The division is important.
+
+1. search_sources
+
+This would be today's tool, tightened around one purpose:
+
+“Given a research need, identify the most relevant sources.”
+
+Return summaries rather than enormous complete records.
+
+For example:
+
+{
+  "research_need": {
+    "subjects": ["hospital_financials", "ownership"],
+    "geography": ["US-PA"],
+    "unit": ["facility"]
+  },
+  "sources": [
+    {
+      "record_id": "cms-hcris",
+      "title": "CMS HCRIS",
+      "why_relevant": "...",
+      "access_class": "open_download",
+      "grain": "facility-period",
+      "confidence": "high"
+    }
+  ]
+}
+
+Then the agent can inspect whichever record matters.
+
+That reduces context/token consumption substantially.
+
+2. get_source
+
+This should accept a stable record_id and return the complete canonical USHSO record.
+
+You already have the backend endpoint:
+
+GET /api/datasets/{record_id}
+
+So this is almost entirely an interface addition.
+
+This creates the basic agent pattern:
+
+search
+   ↓
+choose
+   ↓
+dereference
+
+rather than:
+
+search
+   ↓
+search again with slightly different words
+   ↓
+search again
+
+That distinction becomes very important as agents operate autonomously.
+
+3. get_access_plan
+
+This is probably the highest-value new tool.
+
+Right now an agent can discover that something has an API, DUA, download, report, application, fee, etc.
+
+But an agent ultimately needs to know:
+
+What exactly do I do next?
+
+I would create a canonical machine-readable access object.
+
+For an open API:
+
+{
+  "record_id": "...",
+  "access_class": "open_api",
+  "authoritative_source": "CMS",
+  "requires_account": false,
+
+  "machine_access": {
+    "protocol": "https",
+    "method": "GET",
+    "endpoint": "...",
+    "documentation": "...",
+    "authentication": "none",
+    "pagination": {
+      "type": "offset_limit"
+    },
+    "response_formats": ["json", "csv"]
+  },
+
+  "human_access": {
+    "landing_page": "..."
+  },
+
+  "verified_at": "...",
+  "evidence_state": "verified_first_party"
+}
+
+For a restricted source:
+
+{
+  "access_class": "application_required",
+
+  "requirements": {
+    "account_required": true,
+    "application_required": true,
+    "dua_required": true,
+    "fee": "possible",
+    "institutional_approval": "unknown"
+  },
+
+  "process": [
+    {
+      "step": 1,
+      "action": "Create research account",
+      "url": "..."
+    },
+    {
+      "step": 2,
+      "action": "Submit data request",
+      "url": "..."
+    }
+  ]
+}
+
+That would make USHSO dramatically more valuable to AI agents.
+
+Today you mostly answer:
+
+Where is it?
+
+You want to eventually answer:
+
+How does software get from here to usable data?
+
+4. get_retrieval_recipe
+
+Closely related, but I would keep this separate from the access rules.
+
+Access tells the agent whether/how it is allowed to obtain the data.
+
+Retrieval tells it technically how to retrieve it.
+
+For every machine-accessible asset, build something like:
+
+{
+  "interface": "bulk_download",
+
+  "request": {
+    "method": "GET",
+    "url_template": "...",
+    "headers": {}
+  },
+
+  "response": {
+    "content_type": "text/csv",
+    "compression": "zip",
+    "approximate_size": "1.2 GB"
+  },
+
+  "update_behavior": {
+    "cadence": "annual",
+    "latest_release": "2025",
+    "stable_urls": false
+  },
+
+  "parser_hints": {
+    "encoding": "utf-8",
+    "delimiter": ",",
+    "grain": ["ccn", "fiscal_year"]
+  }
+}
+
+And for APIs:
+
+{
+  "interface": "rest_api",
+  "endpoint": "...",
+  "parameters": [...],
+  "pagination": "...",
+  "rate_limit": "...",
+  "sample_request": {...}
+}
+
+This is the difference between:
+
+“An API exists.”
+
+and
+
+“An agent can actually use the API.”
+
+5. get_variables
+
+You already have a surprisingly good variable documentation model.
+
+The details page exposes variable name, label, description, datatype, unit, allowed values, codebook, evidence state and limitations.
+
+Expose that independently.
+
+Then an agent can ask:
+
+Does this dataset contain net patient service revenue?
+
+without pulling the entire dataset record into context.
+
+Even better, permit:
+
+get_variables(
+    record_id,
+    query="net patient revenue"
+)
+
+and return only potentially relevant variables.
+
+For large administrative datasets with thousands of fields, this becomes essential.
+
+6. get_join_routes
+
+This may eventually become one of USHSO's killer features.
+
+An agent should be able to ask:
+
+Can I connect this hospital financial dataset
+to this ownership dataset?
+
+and call:
+
+observatory.get_join_routes(
+    from_record="...",
+    to_record="..."
+)
+
+Then receive:
+
+{
+  "compatibility": "candidate",
+
+  "entity": "facility",
+
+  "keys": [
+    {
+      "left_namespace": "CCN",
+      "left_field": "provider_number",
+
+      "right_namespace": "CCN",
+      "right_field": "ccn"
+    }
+  ],
+
+  "cardinality": "many-to-one",
+
+  "temporal_alignment": "required",
+
+  "caveats": [
+    "Facility identity may change across ownership events."
+  ],
+
+  "confidence": "...",
+
+  "evidence": [...]
+}
+
+You already have most of this structure.
+
+The WebMCP surface just needs to expose it as a direct question an agent can ask.
+
+7. compare_sources
+
+This would allow an agent to make a research decision rather than independently reading five records.
+
+Input:
+
+record_ids = [A, B, C]
+
+Output:
+
+Dimension	A	B	C
+Grain	Facility-year	Claim	Facility
+Geography	US	PA	US
+Years	1996–2025	2019–2024	Current
+Access	Open	Application	Open
+Variables	Finance	Utilization	Ownership
+Join compatibility	CCN	candidate CCN	CCN
+
+That would also power a human comparison interface later.
+
+One backend capability; two consumers.
+
+8. get_coverage_status
+
+Agents particularly need to know what USHSO does not know.
+
+For example:
+
+get_coverage_status(
+    geography="US-FL",
+    subject="hospital_financials"
+)
+
+might return:
+
+{
+  "federal_baseline": "validated",
+  "state_overlay": "navigation_only_not_asset_ready",
+  "completeness": "unknown",
+
+  "interpretation": 
+    "USHSO has validated federal sources applicable to Florida,
+     but the Florida-specific asset inventory is not yet complete.",
+
+  "absence_claim_permitted": false
+}
+
+You already maintain this distinction in the state-readiness artifact.
+
+Making it directly queryable would stop agents from making one of the most dangerous conclusions possible:
+
+“USHSO returned nothing, therefore the dataset doesn't exist.”
+
+There is an even bigger opportunity: return an agent research plan
+
+Eventually I would add:
+
+observatory.plan_research
+
+But not yet.
+
+This could transform:
+
+“I want to study whether hospital acquisitions caused changes in operating margins and utilization in Pennsylvania.”
+
+into:
+
+Research objective
+│
+├── Ownership / transaction timing
+│      └── Source A
+│
+├── Hospital identity
+│      └── Source B / crosswalk
+│
+├── Financial performance
+│      └── CMS HCRIS
+│
+├── Utilization
+│      └── PHC4
+│
+└── Required joins
+       ├── A → B : documented
+       └── B → PHC4 : candidate / validation required
+
+With machine output:
+
+{
+  "evidence_plan": [
+    {
+      "role": "exposure",
+      "construct": "ownership change",
+      "recommended_sources": [...]
+    },
+    {
+      "role": "outcome",
+      "construct": "financial performance",
+      "recommended_sources": [...]
+    },
+    {
+      "role": "outcome",
+      "construct": "utilization",
+      "recommended_sources": [...]
+    }
+  ],
+
+  "join_plan": [...],
+
+  "coverage_gaps": [...],
+
+  "access_blockers": [...]
+}
+
+That is where USHSO stops being a catalog that agents can query and becomes a research infrastructure layer for agents.
+
+I would also change how you describe “machine usability”
+
+Each source should eventually have a machine-readiness classification.
+
+For example:
+
+A0 — human-readable report only
+A1 — direct downloadable file
+A2 — documented API
+A3 — documented API + schema
+A4 — fully agent-ready retrieval recipe
+A5 — agent-ready + joins + validation examples
+
+Not literally those names necessarily, but the concept is useful.
+
+An agent searching USHSO could then request:
+
+"I need machine-accessible hospital utilization data."
+
+And the retrieval engine could strongly prefer records with known executable access paths.
+
+Keep WebMCP and the normal API together
+
+One thing I would not do is turn WebMCP into its own parallel architecture.
+
+You have the right pattern now:
+
+                        ┌── Human UI
+                        │
+Canonical services ─────┼── REST/JSON API
+                        │
+                        └── WebMCP
+
+Not:
+
+Human backend
+Agent backend
+WebMCP backend
+API backend
+
+Your tests explicitly ensure that WebMCP executes over the same DiscoveryProvider contract as the site.
+
+Keep that.
+
+The WebMCP layer should essentially be an ergonomic tool vocabulary over the same underlying USHSO contracts.
+
+One subtle but important limitation
+
+WebMCP does not mean that every AI agent on the internet can automatically call USHSO.
+
+It is browser-native: the site's page registers tools into a WebMCP-aware browser environment. The WebMCP spec describes agents discovering registered tools via the page/browser's model context.
+
+So you correctly also have:
+
+/api/*
+/agents
+/llms.txt
+
+for agents that interact over HTTP rather than from a WebMCP-capable browser.
+
+I would explicitly describe USHSO as offering three machine interfaces:
+
+1. WebMCP
+   → browser-native agents
+
+2. JSON API
+   → autonomous/server-side agents
+
+3. llms.txt + human documentation
+   → discovery/bootstrap
+
+All three should describe the same capabilities and contracts.
+
+The end-state I'd target
+
+An agent should eventually be able to arrive at ushso.org knowing nothing about American health data and do this:
+
+1. What sources could answer this question?
+                 ↓
+2. Which ones are actually appropriate?
+                 ↓
+3. What does each contain?
+                 ↓
+4. Can I access them?
+                 ↓
+5. Exactly how do I access them?
+                 ↓
+6. What fields do I need?
+                 ↓
+7. Can these sources be joined?
+                 ↓
+8. What identifiers/crosswalks are required?
+                 ↓
+9. What limitations must I preserve?
+                 ↓
+10. Give me the authoritative URLs and retrieval recipe.
+
+USHSO currently handles roughly #1–4 and pieces of #6–8.
+
+The next WebMCP phase should make #5–10 deterministic, structured, independently callable tools.

@@ -1,0 +1,236 @@
+{
+  "contract_version": "observatory-machine-toolkit-adversarial.v1.0.0",
+  "cases": [
+    {
+      "case_id": "unknown-property",
+      "base_case_id": "search.search.success",
+      "mutation": "input_unknown_property",
+      "expected_failure_code": "SCHEMA_INVALID",
+      "expected_layer": "schema"
+    },
+    {
+      "case_id": "input-over-cap",
+      "base_case_id": "search.search.success",
+      "mutation": "input_over_20k",
+      "expected_failure_code": "INPUT_BYTES_EXCEEDED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "output-over-cap",
+      "base_case_id": "search.search.success",
+      "mutation": "output_over_cap",
+      "expected_failure_code": "OUTPUT_BYTES_EXCEEDED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "truth-flip",
+      "base_case_id": "search.search.success",
+      "mutation": "truth_boundary_flip",
+      "expected_failure_code": "TRUTH_BOUNDARY_VIOLATION",
+      "expected_layer": "schema"
+    },
+    {
+      "case_id": "parity-drift",
+      "base_case_id": "search.search.success",
+      "mutation": "transport_parity_drift",
+      "expected_failure_code": "TRANSPORT_PARITY_MISMATCH",
+      "expected_layer": "parity"
+    },
+    {
+      "case_id": "snapshot-drift",
+      "base_case_id": "search.search.success",
+      "mutation": "snapshot_digest_drift",
+      "expected_failure_code": "SNAPSHOT_DIGEST_MISMATCH",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "generation-drift",
+      "base_case_id": "search.search.success",
+      "mutation": "generation_pin_drift",
+      "expected_failure_code": "GENERATION_PIN_MISMATCH",
+      "expected_layer": "parity"
+    },
+    {
+      "case_id": "cursor-without-truncation",
+      "base_case_id": "search.search.success",
+      "mutation": "cursor_without_truncation",
+      "expected_failure_code": "PAGINATION_INCONSISTENT",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "cursor-too-long-lived",
+      "base_case_id": "search.search.success",
+      "mutation": "cursor_ttl_over_30m",
+      "expected_failure_code": "CURSOR_TTL_EXCEEDED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "cursor-retention-overrun",
+      "base_case_id": "search.search.success",
+      "mutation": "cursor_beyond_generation_retention",
+      "expected_failure_code": "CONTINUATION_AFTER_RETENTION",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "cursor-expiry-no-restart",
+      "base_case_id": "search.cursor-expired",
+      "mutation": "cursor_expired_without_restart",
+      "expected_failure_code": "RESTART_REQUIRED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "silent-repin",
+      "base_case_id": "search.cursor-expired",
+      "mutation": "silent_generation_repin",
+      "expected_failure_code": "SILENT_GENERATION_REPIN",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "missing-evidence",
+      "base_case_id": "asset.partial.success",
+      "mutation": "missing_evidence",
+      "expected_failure_code": "EVIDENCE_UNRESOLVED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "duplicate-evidence",
+      "base_case_id": "asset.partial.success",
+      "mutation": "duplicate_evidence_id",
+      "expected_failure_code": "EVIDENCE_ID_DUPLICATE",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "credential",
+      "base_case_id": "retrieval.success",
+      "mutation": "credential_field",
+      "expected_failure_code": "SECRET_FIELD_PROHIBITED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "signed-url",
+      "base_case_id": "retrieval.success",
+      "mutation": "secret_query_parameter",
+      "expected_failure_code": "SECRET_QUERY_PROHIBITED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "payload",
+      "base_case_id": "retrieval.success",
+      "mutation": "source_payload_field",
+      "expected_failure_code": "SOURCE_PAYLOAD_PROHIBITED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "analysis",
+      "base_case_id": "compare.success",
+      "mutation": "analysis_payload_field",
+      "expected_failure_code": "ANALYSIS_RESULT_PROHIBITED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "eligibility-overclaim",
+      "base_case_id": "access.success",
+      "mutation": "access_eligibility_overclaim",
+      "expected_failure_code": "ACCESS_ELIGIBILITY_OVERCLAIM",
+      "expected_layer": "schema"
+    },
+    {
+      "case_id": "access-submitted",
+      "base_case_id": "access.success",
+      "mutation": "access_submission_overclaim",
+      "expected_failure_code": "ACCESS_EXECUTION_PROHIBITED",
+      "expected_layer": "schema"
+    },
+    {
+      "case_id": "retrieval-executed",
+      "base_case_id": "retrieval.success",
+      "mutation": "retrieval_execution_overclaim",
+      "expected_failure_code": "RETRIEVAL_EXECUTION_PROHIBITED",
+      "expected_layer": "schema"
+    },
+    {
+      "case_id": "sample-response",
+      "base_case_id": "retrieval.success",
+      "mutation": "sample_response_payload",
+      "expected_failure_code": "SAMPLE_RESPONSE_PROHIBITED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "join-upgrade",
+      "base_case_id": "joins.success",
+      "mutation": "join_documented_as_executed",
+      "expected_failure_code": "JOIN_EVIDENCE_UPGRADE",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "ranking",
+      "base_case_id": "compare.success",
+      "mutation": "compare_ranking",
+      "expected_failure_code": "ANALYTICAL_RANKING_PROHIBITED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "source-values",
+      "base_case_id": "compare.success",
+      "mutation": "compare_source_values",
+      "expected_failure_code": "SOURCE_VALUE_COMPARISON_PROHIBITED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "absence-overclaim",
+      "base_case_id": "coverage.unknown.success",
+      "mutation": "coverage_absence_without_complete_denominator",
+      "expected_failure_code": "ABSENCE_CLAIM_UNSUPPORTED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "unknown-collapse",
+      "base_case_id": "coverage.unknown.success",
+      "mutation": "coverage_unknown_collapsed",
+      "expected_failure_code": "UNKNOWN_COLLAPSE",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "planner-truth",
+      "base_case_id": "planner.gated",
+      "mutation": "planner_truth_overclaim",
+      "expected_failure_code": "TRUTH_BOUNDARY_VIOLATION",
+      "expected_layer": "schema"
+    },
+    {
+      "case_id": "planner-advertised",
+      "base_case_id": "planner.disabled",
+      "mutation": "planner_disabled_advertised_active",
+      "expected_failure_code": "DISABLED_TOOL_ADVERTISED",
+      "expected_layer": "manifest"
+    },
+    {
+      "case_id": "legacy-clipped",
+      "base_case_id": "search.search.success",
+      "mutation": "legacy_limit_silently_clipped",
+      "expected_failure_code": "LEGACY_LIMIT_CLIPPED",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "privacy-leak",
+      "base_case_id": "asset.unavailable",
+      "mutation": "unsafe_record_error_leak",
+      "expected_failure_code": "PUBLIC_ERROR_PRIVACY_LEAK",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "rate-inconsistent",
+      "base_case_id": "search.rate-limited",
+      "mutation": "rate_limit_inconsistent",
+      "expected_failure_code": "RATE_LIMIT_INCONSISTENT",
+      "expected_layer": "semantic"
+    },
+    {
+      "case_id": "partial-atomic",
+      "base_case_id": "access.success",
+      "mutation": "partial_safety_atomic_response",
+      "expected_failure_code": "SAFETY_ATOMIC_PARTIAL",
+      "expected_layer": "semantic"
+    }
+  ]
+}

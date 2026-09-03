@@ -1,0 +1,45 @@
+{
+  "taxonomy_version": "1.0.0",
+  "canonical_json": {
+    "algorithm_id": "ushso_canonical_json_v1",
+    "encoding": "UTF-8",
+    "object_keys": "lexicographic Unicode code-point order; no insignificant whitespace",
+    "arrays": "order preserved",
+    "numbers": "finite JSON numbers only; -0 normalized to 0",
+    "terminal_newline": false
+  },
+  "digests": [
+    {
+      "digest_id": "package_file_bytes_sha256/v1",
+      "algorithm": "sha256",
+      "input": "exact_file_bytes",
+      "domain_separator": "",
+      "exclusions": [],
+      "purpose": "Integrity of one physical package file including its exact whitespace and newline bytes."
+    },
+    {
+      "digest_id": "canonical_json_sha256/v1",
+      "algorithm": "sha256",
+      "input": "ushso_canonical_json_v1",
+      "domain_separator": "ushso:canonical-json:v1\n",
+      "exclusions": [],
+      "purpose": "A generic logical JSON object digest independent of source formatting."
+    },
+    {
+      "digest_id": "coverage_membership_manifest_sha256/v1",
+      "algorithm": "sha256",
+      "input": "ushso_canonical_json_v1",
+      "domain_separator": "ushso:coverage-membership-manifest:v1\n",
+      "exclusions": [],
+      "purpose": "Content address for the complete immutable metric-membership evidence object."
+    },
+    {
+      "digest_id": "coverage_snapshot_sha256/v1",
+      "algorithm": "sha256",
+      "input": "ushso_canonical_json_v1",
+      "domain_separator": "ushso:coverage-snapshot:v1\n",
+      "exclusions": ["/immutability/canonical_digest"],
+      "purpose": "Content address for the immutable public snapshot with only its self-referential digest field excluded."
+    }
+  ]
+}

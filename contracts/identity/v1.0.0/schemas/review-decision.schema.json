@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/identity/v1.0.0/review-decision.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "decision_id",
+    "candidate_id",
+    "decision",
+    "reviewer",
+    "rationale",
+    "evidence_ids",
+    "algorithm_version",
+    "decided_at",
+    "recorded_at",
+    "state",
+    "supersedes_decision_id",
+    "superseded_by_decision_id"
+  ],
+  "properties": {
+    "schema_version": {"const": "identity.review-decision.v1.0.0"},
+    "decision_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "candidate_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+    "decision": {"enum": ["same_identity", "not_same_identity", "family_member", "mirror_of", "successor_of", "defer", "needs_more_evidence"]},
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewer_id", "role", "human"],
+      "properties": {
+        "reviewer_id": {"$ref": "common.schema.json#/$defs/opaqueId"},
+        "role": {"type": "string", "minLength": 1, "maxLength": 120},
+        "human": {"const": true}
+      }
+    },
+    "rationale": {"type": "string", "minLength": 20, "maxLength": 4000},
+    "evidence_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/opaqueId"}
+    },
+    "algorithm_version": {"$ref": "common.schema.json#/$defs/semver"},
+    "decided_at": {"$ref": "common.schema.json#/$defs/dateTime"},
+    "recorded_at": {"$ref": "common.schema.json#/$defs/dateTime"},
+    "state": {"enum": ["current", "superseded"]},
+    "supersedes_decision_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]},
+    "superseded_by_decision_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/opaqueId"}, {"type": "null"}]}
+  }
+}

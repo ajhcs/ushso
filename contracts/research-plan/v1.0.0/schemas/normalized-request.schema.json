@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/normalized-request.schema.json",
+  "title": "Privacy-minimized normalized research request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "normalized_request_hash",
+    "question_hash",
+    "boundary_state",
+    "geographies",
+    "time_period",
+    "grain",
+    "access_classes",
+    "machine_access_required",
+    "intended_analyses",
+    "required_roles",
+    "clarification_question_ids",
+    "normalizer_fingerprint"
+  ],
+  "properties": {
+    "contract_version": {"const": "observatory-normalized-research-request.v1.0.0"},
+    "normalized_request_hash": {"$ref": "common.schema.json#/$defs/digest"},
+    "question_hash": {"$ref": "common.schema.json#/$defs/digest"},
+    "boundary_state": {"enum": ["in_scope", "outside_product_boundary", "unknown"]},
+    "geographies": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/stableId"}
+    },
+    "time_period": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/period"},
+        {"type": "null"}
+      ]
+    },
+    "grain": {
+      "oneOf": [
+        {"enum": ["facility", "campus", "organization", "system", "county", "state", "national"]},
+        {"type": "null"}
+      ]
+    },
+    "access_classes": {
+      "type": "array",
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {"enum": ["public", "registration", "application", "dua", "licensed", "paid", "report_only", "unknown"]}
+    },
+    "machine_access_required": {"type": "boolean"},
+    "intended_analyses": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 128}
+    },
+    "required_roles": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/stableId"}
+    },
+    "clarification_question_ids": {
+      "type": "array",
+      "maxItems": 20,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/stableId"}
+    },
+    "normalizer_fingerprint": {"$ref": "common.schema.json#/$defs/digest"}
+  }
+}

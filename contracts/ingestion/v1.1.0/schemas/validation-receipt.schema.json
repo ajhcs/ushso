@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.1.0/validation-receipt.schema.json",
+  "title": "Deterministic ingestion contract validation receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receipt_version", "package_version", "mode", "offline", "valid", "schema_count", "valid_fixture_count", "adversarial_fixture_count", "compatibility_fixture_count", "transition_case_count", "transition_state_count", "positive_check_count", "negative_check_count", "failed_count", "manifest_verified", "manifest_raw_file_sha256", "manifest_canonical_json_sha256", "canonicalization_algorithm", "commands", "checks", "predecessor_verification", "compatibility_results", "adversarial_results", "zero_action_counters", "errors", "immutable"],
+  "properties": {
+    "receipt_version": { "const": "ingestion-validation.v1" },
+    "package_version": { "const": "1.1.0" },
+    "mode": { "const": "fixture_offline" },
+    "offline": { "const": true },
+    "valid": { "type": "boolean" },
+    "schema_count": { "type": "integer", "minimum": 1 },
+    "valid_fixture_count": { "type": "integer", "minimum": 1 },
+    "adversarial_fixture_count": { "type": "integer", "minimum": 1 },
+    "compatibility_fixture_count": { "type": "integer", "minimum": 1 },
+    "transition_case_count": { "type": "integer", "minimum": 1 },
+    "transition_state_count": { "type": "integer", "minimum": 1 },
+    "positive_check_count": { "type": "integer", "minimum": 1 },
+    "negative_check_count": { "type": "integer", "minimum": 1 },
+    "failed_count": { "type": "integer", "minimum": 0 },
+    "manifest_verified": { "type": "boolean" },
+    "manifest_raw_file_sha256": { "$ref": "common.schema.json#/$defs/Sha256" },
+    "manifest_canonical_json_sha256": { "$ref": "common.schema.json#/$defs/Sha256" },
+    "canonicalization_algorithm": { "const": "ushso-canonical-json.v1" },
+    "commands": {
+      "type": "array", "minItems": 2, "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+    },
+    "checks": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z0-9-]{3,100}$" } },
+    "predecessor_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_version", "manifest_raw_file_sha256", "validation_receipt_raw_file_sha256", "harvest_run_schema_raw_file_sha256", "semantics_raw_file_sha256", "successor_semantics_raw_file_sha256", "predecessor_validation_valid", "non_erratum_schema_count", "non_erratum_schemas_match", "all_match"],
+      "properties": {
+        "package_version": { "const": "1.0.0" },
+        "manifest_raw_file_sha256": { "const": "842888bae6092da9d00982bed4186a43ceb6aeace9f837947c5a4eb6e0da9886" },
+        "validation_receipt_raw_file_sha256": { "const": "665174c8ec848ae93fdb8034010f03892b2771aa67b777b361526dd6f396f8e8" },
+        "harvest_run_schema_raw_file_sha256": { "const": "9ff550bc27f9e70e418c8a586b0798eeafa122357ec8e9d99c4dc2a4b566f959" },
+        "semantics_raw_file_sha256": { "const": "26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639" },
+        "successor_semantics_raw_file_sha256": { "const": "26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639" },
+        "predecessor_validation_valid": { "const": true },
+        "non_erratum_schema_count": { "type": "integer", "minimum": 1 },
+        "non_erratum_schemas_match": { "const": true },
+        "all_match": { "const": true }
+      }
+    },
+    "compatibility_results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["case_id", "expected_v1_0_valid", "observed_v1_0_valid", "expected_v1_1_valid", "observed_v1_1_valid", "expected_upgrade_action", "observed_upgrade_action", "observed_error_code", "passed"],
+        "properties": {
+          "case_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]{2,79}$" },
+          "expected_v1_0_valid": { "type": "boolean" },
+          "observed_v1_0_valid": { "type": "boolean" },
+          "expected_v1_1_valid": { "type": "boolean" },
+          "observed_v1_1_valid": { "type": "boolean" },
+          "expected_upgrade_action": { "enum": ["version_only", "retain_v1_0_audit_only"] },
+          "observed_upgrade_action": { "enum": ["version_only", "retain_v1_0_audit_only", "unexpected_error"] },
+          "observed_error_code": { "type": ["string", "null"], "pattern": "^[A-Z][A-Z0-9_]{2,79}$" },
+          "passed": { "type": "boolean" }
+        }
+      }
+    },
+    "adversarial_results": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["case_id", "expected_code", "observed_code", "passed"],
+        "properties": {
+          "case_id": { "type": "string" },
+          "expected_code": { "type": "string" },
+          "observed_code": { "type": "string" },
+          "passed": { "type": "boolean" }
+        }
+      }
+    },
+    "zero_action_counters": {
+      "type": "object", "additionalProperties": false,
+      "required": ["external_requests", "source_payload_downloads", "source_data_rows_captured", "authorization_submissions", "identity_merges", "analyses_executed", "raw_questions_persisted", "secret_values_persisted"],
+      "properties": {
+        "external_requests": { "const": 0 },
+        "source_payload_downloads": { "const": 0 },
+        "source_data_rows_captured": { "const": 0 },
+        "authorization_submissions": { "const": 0 },
+        "identity_merges": { "const": 0 },
+        "analyses_executed": { "const": 0 },
+        "raw_questions_persisted": { "const": 0 },
+        "secret_values_persisted": { "const": 0 }
+      }
+    },
+    "errors": { "type": "array", "items": { "type": "string" } },
+    "immutable": { "const": true }
+  }
+}

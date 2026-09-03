@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/schemas/infra/workload.v1.0.0.json",
+  "title": "USHSO privacy-safe workload candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "candidate_id", "status", "source", "public", "pipeline", "load_test"],
+  "properties": {
+    "schema_version": { "const": "ushso-workload.v1.0.0" },
+    "candidate_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$" },
+    "status": { "const": "planning_candidate_unverified" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "contains_raw_questions", "contains_user_identifiers", "ratification"],
+      "properties": {
+        "kind": { "enum": ["synthetic_and_frozen_benchmark", "privacy_safe_aggregate"] },
+        "contains_raw_questions": { "const": false },
+        "contains_user_identifiers": { "const": false },
+        "ratification": { "const": "pending_external_authorization" }
+      }
+    },
+    "public": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_peak_requests_per_second", "candidate_concurrent_requests", "cold_cache_ratio", "route_mix"],
+      "properties": {
+        "candidate_peak_requests_per_second": { "type": "integer", "minimum": 1 },
+        "candidate_concurrent_requests": { "type": "integer", "minimum": 1 },
+        "cold_cache_ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "route_mix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["discovery", "record_search", "record_detail", "bundle_plan", "coverage", "json_webmcp"],
+          "properties": {
+            "discovery": { "type": "number", "minimum": 0, "maximum": 1 },
+            "record_search": { "type": "number", "minimum": 0, "maximum": 1 },
+            "record_detail": { "type": "number", "minimum": 0, "maximum": 1 },
+            "bundle_plan": { "type": "number", "minimum": 0, "maximum": 1 },
+            "coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+            "json_webmcp": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "pipeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["concurrent_harvest_runs", "concurrent_normalize_batches", "concurrent_projection_builds", "maximum_capture_bytes"],
+      "properties": {
+        "concurrent_harvest_runs": { "type": "integer", "minimum": 0 },
+        "concurrent_normalize_batches": { "type": "integer", "minimum": 0 },
+        "concurrent_projection_builds": { "type": "integer", "minimum": 0 },
+        "maximum_capture_bytes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "load_test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["multiplier", "duration_minutes", "environment", "status", "authorization"],
+      "properties": {
+        "multiplier": { "const": 2 },
+        "duration_minutes": { "const": 30 },
+        "environment": { "const": "production_like_isolated" },
+        "status": { "const": "pending_external_authorization" },
+        "authorization": { "enum": ["AUTH-03", "AUTH-05"] }
+      }
+    }
+  }
+}

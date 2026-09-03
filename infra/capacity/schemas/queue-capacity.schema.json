@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/schemas/infra/queue-capacity.v1.0.0.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "stages", "load_test"],
+  "properties": {
+    "schema_version": { "const": "ushso-queue-capacity.v1.0.0" },
+    "status": { "const": "planning_candidate_unverified" },
+    "stages": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stage", "candidate_messages_per_minute", "two_x_messages_per_minute", "max_batch_size", "max_concurrency", "target_backlog_drain_minutes"],
+        "properties": {
+          "stage": { "enum": ["harvest_page", "normalize_record", "schema_enrichment", "access_check", "index_projection"] },
+          "candidate_messages_per_minute": { "type": "integer", "minimum": 1 },
+          "two_x_messages_per_minute": { "type": "integer", "minimum": 2 },
+          "max_batch_size": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "max_concurrency": { "type": "integer", "minimum": 1 },
+          "target_backlog_drain_minutes": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "load_test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["duration_minutes", "multiplier", "status", "required_measurements"],
+      "properties": {
+        "duration_minutes": { "const": 30 },
+        "multiplier": { "const": 2 },
+        "status": { "const": "pending_external_authorization" },
+        "required_measurements": { "type": "array", "minItems": 5, "items": { "type": "string" }, "uniqueItems": true }
+      }
+    }
+  }
+}

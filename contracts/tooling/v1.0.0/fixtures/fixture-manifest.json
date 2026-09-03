@@ -1,0 +1,19 @@
+{
+  "fixture_manifest_version": "ushso.fixture-manifest.v1",
+  "package_version": "1.0.0",
+  "offline": true,
+  "entries": [
+    {"id": "dependency-pin.valid", "path": "contracts/dependency-pin.json", "schema_id": "https://ushso.local/contracts/tooling/v1.0.0/dependency-pin.schema.json", "expectation": "valid", "expected_rejection": null, "semantic_validator": null},
+    {"id": "fixture-manifest.valid", "path": "fixtures/valid/fixture-manifest.json", "schema_id": "https://ushso.local/contracts/tooling/v1.0.0/fixture-manifest.schema.json", "expectation": "valid", "expected_rejection": null, "semantic_validator": null},
+    {"id": "package-manifest.valid", "path": "fixtures/valid/package-manifest.json", "schema_id": "https://ushso.local/contracts/tooling/v1.0.0/package-manifest.schema.json", "expectation": "valid", "expected_rejection": null, "semantic_validator": null},
+    {"id": "semantic-validator.valid", "path": "fixtures/valid/package-manifest.json", "schema_id": "https://ushso.local/contracts/tooling/v1.0.0/package-manifest.schema.json", "expectation": "valid", "expected_rejection": null, "semantic_validator": "tooling.semantic.accept"},
+    {"id": "validation-receipt.valid", "path": "fixtures/valid/validation-receipt.json", "schema_id": "https://ushso.local/contracts/tooling/v1.0.0/validation-receipt.schema.json", "expectation": "valid", "expected_rejection": null, "semantic_validator": null},
+    {"id": "duplicate-key.rejected", "path": "fixtures/adversarial/duplicate-key.json.txt", "schema_id": "https://ushso.local/contracts/tooling/v1.0.0/package-manifest.schema.json", "expectation": "rejected", "expected_rejection": {"phase": "parse", "code": "JSON_DUPLICATE_KEY"}, "semantic_validator": null},
+    {"id": "dependency-version.rejected", "path": "fixtures/adversarial/dependency-unpinned-version.json", "schema_id": "https://ushso.local/contracts/tooling/v1.0.0/dependency-pin.schema.json", "expectation": "rejected", "expected_rejection": {"phase": "schema", "code": "const"}, "semantic_validator": null},
+    {"id": "fixture-path.rejected", "path": "fixtures/adversarial/fixture-unsafe-path.json", "schema_id": "https://ushso.local/contracts/tooling/v1.0.0/fixture-manifest.schema.json", "expectation": "rejected", "expected_rejection": {"phase": "schema", "code": "pattern"}, "semantic_validator": null},
+    {"id": "package-extra.rejected", "path": "fixtures/adversarial/package-unexpected-property.json", "schema_id": "https://ushso.local/contracts/tooling/v1.0.0/package-manifest.schema.json", "expectation": "rejected", "expected_rejection": {"phase": "schema", "code": "additionalProperties"}, "semantic_validator": null},
+    {"id": "receipt-digest.rejected", "path": "fixtures/adversarial/receipt-bad-digest.json", "schema_id": "https://ushso.local/contracts/tooling/v1.0.0/validation-receipt.schema.json", "expectation": "rejected", "expected_rejection": {"phase": "schema", "code": "format"}, "semantic_validator": null},
+    {"id": "semantic-validator.rejected", "path": "fixtures/valid/package-manifest.json", "schema_id": "https://ushso.local/contracts/tooling/v1.0.0/package-manifest.schema.json", "expectation": "rejected", "expected_rejection": {"phase": "semantic", "code": "SYNTHETIC_SEMANTIC_REJECTION"}, "semantic_validator": "tooling.semantic.reject"}
+  ],
+  "immutable": true
+}

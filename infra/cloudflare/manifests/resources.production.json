@@ -1,0 +1,99 @@
+{
+  "schema_version": "ushso-cloudflare-resource-manifest.v1.0.0",
+  "environment": "production",
+  "resource_prefix": "ushso-production",
+  "deployment_mode": "zero_traffic_foundation",
+  "workers_dev": false,
+  "routes": [],
+  "neon": {
+    "service_class": "business_or_scale",
+    "region": "aws-us-east-1",
+    "project_name": "ushso-production",
+    "project_isolation": "dedicated_production_project",
+    "pg_version": 16,
+    "default_branch": "main",
+    "database_name": "ushso",
+    "endpoint_type": "default_read_write",
+    "endpoint": "direct_non_pooled_tls",
+    "scale_to_zero": "disabled",
+    "suspend_timeout_seconds": -1,
+    "compute_units": { "minimum": 1, "maximum": 4, "status": "selected_zero_traffic_configuration" },
+    "pitr_days": 30,
+    "history_retention_seconds": 2592000,
+    "bootstrap_owner": "ushso_production_bootstrap",
+    "bootstrap_worker_binding": false,
+    "worker_login_roles": ["public", "scheduler", "harvest", "normalize", "projector", "ops"],
+    "worker_login_creation": "audited_direct_sql_only",
+    "neon_api_worker_role_creation": false,
+    "hyperdrive_prebinding_attestation": ["environment_exact", "neon_project_id_exact", "neon_branch_id_exact", "neon_endpoint_id_exact", "direct_tls_host_exact", "verified_at_not_future_at_apply", "expires_at_not_past_at_apply", "validity_window_max_900_seconds", "template_sha256_exact", "evidence_sha256_recomputed_exact", "rolsuper_false", "rolbypassrls_false", "rolreplication_false", "rolcreatedb_false", "rolcreaterole_false", "capability_member_true", "neon_superuser_member_false", "unexpected_membership_false", "unexpected_acl_false"],
+    "attestation_max_validity_seconds": 900
+  },
+  "hyperdrive_semantic_profiles": [
+    { "id": "correctness", "binding": "HD_CORRECTNESS", "cache": { "disabled": true }, "rule": "writes_leases_read_after_write_and_mutable_pointer_operations_only_as_granted_to_the_origin_role" },
+    { "id": "immutable_read", "binding": "HD_IMMUTABLE_READ", "cache": { "disabled": false, "max_age_seconds": 60, "stale_while_revalidate_seconds": 15 }, "rule": "immutable_generation_pinned_reads_only" }
+  ],
+  "hyperdrive_configs": [
+    { "worker_role": "public", "database_role": "ushso_public", "semantic_profile": "correctness", "binding": "HD_CORRECTNESS", "name": "ushso-production-public-correctness", "id_placeholder": "REPLACE_PRODUCTION_PUBLIC_HD_CORRECTNESS_ID", "candidate_origin_connection_limit": 1, "allowed_operations": ["active_pointer_resolve", "published_manifest_read"] },
+    { "worker_role": "public", "database_role": "ushso_public", "semantic_profile": "immutable_read", "binding": "HD_IMMUTABLE_READ", "name": "ushso-production-public-immutable-read", "id_placeholder": "REPLACE_PRODUCTION_PUBLIC_HD_IMMUTABLE_READ_ID", "candidate_origin_connection_limit": 8, "allowed_operations": ["immutable_generation_pinned_read"] },
+    { "worker_role": "scheduler", "database_role": "ushso_scheduler", "semantic_profile": "correctness", "binding": "HD_CORRECTNESS", "name": "ushso-production-scheduler-correctness", "id_placeholder": "REPLACE_PRODUCTION_SCHEDULER_HD_CORRECTNESS_ID", "candidate_origin_connection_limit": 1, "allowed_operations": ["schedule_read", "lease", "run_and_outbox_write", "read_after_write"] },
+    { "worker_role": "harvest", "database_role": "ushso_harvest", "semantic_profile": "correctness", "binding": "HD_CORRECTNESS", "name": "ushso-production-harvest-correctness", "id_placeholder": "REPLACE_PRODUCTION_HARVEST_HD_CORRECTNESS_ID", "candidate_origin_connection_limit": 2, "allowed_operations": ["ingestion_state_write", "capture_reference_write", "read_after_write"] },
+    { "worker_role": "normalize", "database_role": "ushso_normalize", "semantic_profile": "correctness", "binding": "HD_CORRECTNESS", "name": "ushso-production-normalize-correctness", "id_placeholder": "REPLACE_PRODUCTION_NORMALIZE_HD_CORRECTNESS_ID", "candidate_origin_connection_limit": 2, "allowed_operations": ["canonical_proposal_write", "revision_write", "read_after_write"] },
+    { "worker_role": "projector", "database_role": "ushso_projector", "semantic_profile": "correctness", "binding": "HD_CORRECTNESS", "name": "ushso-production-projector-correctness", "id_placeholder": "REPLACE_PRODUCTION_PROJECTOR_HD_CORRECTNESS_ID", "candidate_origin_connection_limit": 1, "allowed_operations": ["candidate_projection_write", "candidate_validation_read", "read_after_write"] },
+    { "worker_role": "projector", "database_role": "ushso_projector", "semantic_profile": "immutable_read", "binding": "HD_IMMUTABLE_READ", "name": "ushso-production-projector-immutable-read", "id_placeholder": "REPLACE_PRODUCTION_PROJECTOR_HD_IMMUTABLE_READ_ID", "candidate_origin_connection_limit": 4, "allowed_operations": ["immutable_generation_pinned_read"] },
+    { "worker_role": "ops", "database_role": "ushso_ops", "semantic_profile": "correctness", "binding": "HD_CORRECTNESS", "name": "ushso-production-ops-correctness", "id_placeholder": "REPLACE_PRODUCTION_OPS_HD_CORRECTNESS_ID", "candidate_origin_connection_limit": 1, "allowed_operations": ["audited_control_write", "publication_history", "active_pointer_resolve", "active_pointer_change", "read_after_write"] }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_CAPTURE",
+      "purpose": "capture",
+      "name": "ushso-production-capture",
+      "location": "ENAM",
+      "public_access": false,
+      "custom_domain": null,
+      "content_addressed": true,
+      "automatic_lifecycle_deletion": false
+    },
+    {
+      "binding": "R2_ARCHIVE",
+      "purpose": "archive",
+      "name": "ushso-production-archive",
+      "location": "ENAM",
+      "public_access": false,
+      "custom_domain": null,
+      "content_addressed": true,
+      "automatic_lifecycle_deletion": false
+    }
+  ],
+  "dlq_sink": {
+    "consumer_worker_role": "ops",
+    "applies_to": ["harvest-page-dlq", "normalize-record-dlq", "enrich-schema-dlq", "access-check-dlq", "project-index-dlq"],
+    "maximum_delivery_attempts": 6,
+    "transport_max_retries": 5,
+    "retry_delays_seconds_by_retry": [30, 60, 120, 240, 300],
+    "wrangler_default_retry_delay_seconds": 30,
+    "max_batch_size": 1,
+    "max_batch_timeout_seconds": 5,
+    "max_concurrency": 1,
+    "acknowledgement": "ack_only_after_postgresql_durable_dead_letter_incident_transaction_commits",
+    "second_dead_letter_queue": null,
+    "terminal_failure": "cloudflare_permanently_deletes_message_after_initial_delivery_plus_five_failed_retries",
+    "terminal_control": "page_dlq_nonempty_alert_and_reconstruct_from_postgresql_control_plane_ledger_and_evidence",
+    "durability_contract_refs": ["contracts/ingestion/v1.0.0/schemas/event-ledger.schema.json", "db/migrations/0003_ops_outbox_processed_events_dead_letters.sql"]
+  },
+  "queues": [
+    { "stage": "harvest_page", "name": "harvest-page", "dead_letter_queue": "harvest-page-dlq", "maximum_delivery_attempts": 6, "transport_max_retries": 5, "max_batch_size": 5, "max_batch_timeout_seconds": 5, "max_concurrency": 2 },
+    { "stage": "normalize_record", "name": "normalize-record", "dead_letter_queue": "normalize-record-dlq", "maximum_delivery_attempts": 5, "transport_max_retries": 4, "max_batch_size": 10, "max_batch_timeout_seconds": 5, "max_concurrency": 2 },
+    { "stage": "schema_enrichment", "name": "enrich-schema", "dead_letter_queue": "enrich-schema-dlq", "maximum_delivery_attempts": 4, "transport_max_retries": 3, "max_batch_size": 10, "max_batch_timeout_seconds": 10, "max_concurrency": 1 },
+    { "stage": "access_check", "name": "access-check", "dead_letter_queue": "access-check-dlq", "maximum_delivery_attempts": 4, "transport_max_retries": 3, "max_batch_size": 10, "max_batch_timeout_seconds": 10, "max_concurrency": 1 },
+    { "stage": "index_projection", "name": "project-index", "dead_letter_queue": "project-index-dlq", "maximum_delivery_attempts": 5, "transport_max_retries": 4, "max_batch_size": 10, "max_batch_timeout_seconds": 5, "max_concurrency": 2 }
+  ],
+  "workflow": {
+    "binding": "HARVEST_WORKFLOW",
+    "name": "ushso-production-harvest",
+    "class_name": "HarvestWorkflow",
+    "concurrency_limit": 2,
+    "success_retention": "30 days",
+    "error_retention": "30 days"
+  },
+  "cron": { "worker": "ushso-scheduler", "schedule_utc": "*/5 * * * *", "database_slot_idempotency": true }
+}

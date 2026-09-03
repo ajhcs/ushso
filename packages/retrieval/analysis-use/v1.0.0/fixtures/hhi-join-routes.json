@@ -1,0 +1,49 @@
+[
+  {
+    "route_id": "example:join:pa-utilization:facility-system:facility-id",
+    "from_record_id": "example:dataset:pa-inpatient-utilization",
+    "to_record_id": "example:dataset:facility-system-crosswalk",
+    "direction": "bidirectional",
+    "entity": "facility",
+    "match_strategy": "normalized_key",
+    "key_pairs": [
+      {
+        "from_fields": ["facility_id"],
+        "to_fields": ["facility_key"],
+        "from_namespace": "example-utilization-facility-id",
+        "to_namespace": "example-crosswalk-facility-key",
+        "normalization_steps": [
+          "Retain source values",
+          "Apply the synthetic fixture's documented identifier normalization",
+          "Align relationship effective year to utilization reporting year"
+        ]
+      }
+    ],
+    "cardinality": "many_to_one",
+    "compatibility_state": "documented",
+    "confidence": "high",
+    "preconditions": [
+      "Use only the synthetic conformance records",
+      "Require equal utilization and relationship years"
+    ],
+    "caveats": [
+      "This route is synthetic and makes no claim about a live Observatory source.",
+      "Organizational relationships may change between reporting years."
+    ],
+    "evidence_refs": [
+      {
+        "record_id": "example:dataset:pa-inpatient-utilization",
+        "evidence_ids": ["example:evidence:utilization-data-dictionary"],
+        "provenance_ids": ["example:provenance:utilization-fixture"],
+        "state": "verified_first_party"
+      },
+      {
+        "record_id": "example:dataset:facility-system-crosswalk",
+        "evidence_ids": ["example:evidence:crosswalk-data-dictionary"],
+        "provenance_ids": ["example:provenance:crosswalk-fixture"],
+        "state": "verified_first_party"
+      }
+    ],
+    "blocked_reason": null
+  }
+]

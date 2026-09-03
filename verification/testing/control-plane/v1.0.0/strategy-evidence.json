@@ -1,0 +1,25 @@
+{
+  "schema_version": "ushso-test-strategy-evidence.v1.0.0",
+  "strategy_key": "control-plane",
+  "plan_section": "§22.3",
+  "structural_status": "PASS",
+  "release_readiness": "BLOCKED",
+  "release_blockers": [
+    "database:managed-postgresql-integration",
+    "authorization:AUTH-03",
+    "authorization:AUTH-05",
+    "live:backup-restore-and-outage-recovery"
+  ],
+  "execution_policy": { "offline": true, "repository_writes": 0, "receipt_writes": 0, "network_calls": 0, "external_actions": 0 },
+  "controls": [
+    { "id": "T22.3-01", "statement": "Clean migrations and N−1 upgrades.", "evidence_status": "pending_database", "evidence_scope": "local_database_receipt", "evidence": [{ "kind": "receipt", "path": "verification/wp3/v1.0.0/receipts/migration-suite.json", "sha256": "cc4c076e6c7e555c294c89a6b141e97e2e83c57ded218446895dfd0c01f14775" }] },
+    { "id": "T22.3-02", "statement": "Unique constraints and idempotent replays.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "test", "path": "packages/ingestion/tests/adversarial-control-plane.test.mjs", "sha256": "0aa14897a8f768b432bba659230bad51a9c7b4e61b1f92590b9d9da96b81c8cc" }] },
+    { "id": "T22.3-03", "statement": "Transactional outbox crash matrix.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "test", "path": "packages/ingestion/tests/outbox-queue-dlq.test.mjs", "sha256": "0e1a182246e024b32a8ffe0dc4132de85bec4b60a4a3394beb5dfba4342144c9" }] },
+    { "id": "T22.3-04", "statement": "Queue redelivery and DLQ persistence.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "test", "path": "packages/ingestion/tests/outbox-queue-dlq.test.mjs", "sha256": "0e1a182246e024b32a8ffe0dc4132de85bec4b60a4a3394beb5dfba4342144c9" }] },
+    { "id": "T22.3-05", "statement": "Workflow resume and barrier behavior.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "test", "path": "packages/ingestion/tests/scheduler-workflow.test.mjs", "sha256": "e20761bd0495c48e5b1ab9cc181f2a2508ac4ca6585b97dd62b8d47e6b773c61" }] },
+    { "id": "T22.3-06", "statement": "`partial_unpublished` versus `succeeded_with_optional_degradation` barrier fixtures; no incomplete generation can become active.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "test", "path": "packages/ingestion/tests/scheduler-workflow.test.mjs", "sha256": "e20761bd0495c48e5b1ab9cc181f2a2508ac4ca6585b97dd62b8d47e6b773c61" }] },
+    { "id": "T22.3-07", "statement": "R2 orphan and checksum behavior.", "evidence_status": "implemented_local", "evidence_scope": "local_integration", "evidence": [{ "kind": "receipt", "path": "verification/wp5/v1.0.0/receipts/fixture-matrix.json", "sha256": "b96046ff89328e75c5905be5001cc92b8d723f27b9f22eaaf8dad6ebfb093a53" }] },
+    { "id": "T22.3-08", "statement": "PostgreSQL outage and recovery.", "evidence_status": "pending_live", "evidence_scope": "external_gate_record", "evidence": [{ "kind": "receipt", "path": "verification/wp3/v1.0.0/receipts/recovery-drills.json", "sha256": "5c8834f3bc325ba6c79c08907968317cf2b5ae1bdd0aee64026bef03551688d9" }] },
+    { "id": "T22.3-09", "statement": "Backup/restore rehearsal.", "evidence_status": "pending_authorization", "evidence_scope": "external_gate_record", "evidence": [{ "kind": "receipt", "path": "verification/wp3/v1.0.0/receipts/recovery-drills.json", "sha256": "5c8834f3bc325ba6c79c08907968317cf2b5ae1bdd0aee64026bef03551688d9" }] }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/tooling/v1.0.0/validation-receipt.schema.json",
+  "title": "Offline contract-tooling validation receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receipt_version", "package_name", "package_version", "validator_version", "valid", "offline", "schema_count", "fixture_count", "valid_fixture_count", "adversarial_fixture_count", "passed_fixture_count", "dependency_pins_verified", "formats_verified", "public_bounds_verified", "schema_keyword_negatives_verified", "manifest_verified", "manifest_byte_digest", "package_content_digest", "fixture_manifest_digest", "checks", "errors", "external_requests", "immutable"],
+  "properties": {
+    "receipt_version": {"const": "ushso.tooling-validation-receipt.v1"},
+    "package_name": {"const": "@ushso/contract-tooling"},
+    "package_version": {"const": "1.0.0"},
+    "validator_version": {"const": "ushso.contract-tooling-validator.v1"},
+    "valid": {"type": "boolean"},
+    "offline": {"const": true},
+    "schema_count": {"type": "integer", "minimum": 5, "maximum": 64},
+    "fixture_count": {"type": "integer", "minimum": 1, "maximum": 512},
+    "valid_fixture_count": {"type": "integer", "minimum": 1, "maximum": 512},
+    "adversarial_fixture_count": {"type": "integer", "minimum": 1, "maximum": 512},
+    "passed_fixture_count": {"type": "integer", "minimum": 0, "maximum": 512},
+    "dependency_pins_verified": {"type": "boolean"},
+    "formats_verified": {"type": "boolean"},
+    "public_bounds_verified": {"type": "boolean"},
+    "schema_keyword_negatives_verified": {"type": "boolean"},
+    "manifest_verified": {"type": "boolean"},
+    "manifest_byte_digest": {"$ref": "common.schema.json#/$defs/ByteDigest"},
+    "package_content_digest": {"$ref": "common.schema.json#/$defs/PackageDigest"},
+    "fixture_manifest_digest": {"$ref": "common.schema.json#/$defs/CanonicalDigest"},
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 128}
+    },
+    "errors": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {"type": "string", "minLength": 1, "maxLength": 1024}
+    },
+    "external_requests": {"const": 0},
+    "immutable": {"const": true}
+  }
+}

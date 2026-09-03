@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/evaluation/planner/held-out-authorization.v1.0.0.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "release_candidate_id", "code_digest", "planner_policy_digest", "benchmark_manifest_digest",
+    "evaluator_contract_digest", "threshold_digest", "first_run_attested",
+    "no_post_result_tuning_attested", "publish_failure_receipt"
+  ],
+  "properties": {
+    "release_candidate_id": {"type": "string", "minLength": 1, "maxLength": 160},
+    "code_digest": {"$ref": "#/$defs/digest"},
+    "planner_policy_digest": {"$ref": "#/$defs/digest"},
+    "benchmark_manifest_digest": {"$ref": "#/$defs/digest"},
+    "evaluator_contract_digest": {"$ref": "#/$defs/digest"},
+    "threshold_digest": {"$ref": "#/$defs/digest"},
+    "first_run_attested": {"const": true},
+    "no_post_result_tuning_attested": {"const": true},
+    "publish_failure_receipt": {"const": true}
+  },
+  "$defs": {"digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}}
+}

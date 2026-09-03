@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/wp14/evidence-receipt.v1.0.0.schema.json",
+  "title": "WP14 candidate and environment bound evidence receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "receipt_id", "receipt_kind", "subject_id", "candidate_digest_sha256", "environment", "issued_at", "expires_at", "nonce", "decision", "evidence_sha256", "proof", "receipt_sha256"],
+  "properties": {
+    "schema_version": {"const": "ushso-wp14-evidence-receipt.v1.0.0"},
+    "receipt_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,159}$"},
+    "receipt_kind": {"enum": ["authorization", "production_gate", "promotion_telemetry", "rollback_bundle", "launch_cycle", "release_candidate", "retirement"]},
+    "subject_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:%/-]{0,199}$"},
+    "candidate_digest_sha256": {"$ref": "#/$defs/sha256"},
+    "environment": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,79}$"},
+    "issued_at": {"$ref": "#/$defs/timestamp"},
+    "expires_at": {"$ref": "#/$defs/timestamp"},
+    "nonce": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{15,127}$"},
+    "decision": {"enum": ["PASS", "authorized"]},
+    "evidence_sha256": {"$ref": "#/$defs/sha256"},
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "key_id", "signature"],
+      "properties": {
+        "method": {"enum": ["fixture_digest_v1", "trusted_external_v1", "hmac_sha256_test_v1"]},
+        "key_id": {"type": "string", "minLength": 1, "maxLength": 160},
+        "signature": {"type": "string", "pattern": "^(?:sha256:)?[a-f0-9]{64}$"}
+      }
+    },
+    "receipt_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"}
+  }
+}

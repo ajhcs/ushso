@@ -1,0 +1,52 @@
+{
+  "schema_version": "ushso-observability-contract.v1.0.0",
+  "privacy": {
+    "allowed": "identifiers_status_timing_counts_and_versions_only",
+    "forbidden": ["raw_source_body", "credential", "public_question_text", "user_identifier"],
+    "managed_sink_status": "pending_external_authorization"
+  },
+  "event_fields": [
+    { "name": "trace_id", "type": "string", "classification": "operational_identifier" },
+    { "name": "run_id", "type": ["string", "null"], "classification": "operational_identifier" },
+    { "name": "workflow_instance_id", "type": ["string", "null"], "classification": "operational_identifier" },
+    { "name": "event_id", "type": "string", "classification": "operational_identifier" },
+    { "name": "source_id", "type": ["string", "null"], "classification": "public_registry_identifier" },
+    { "name": "endpoint_id", "type": ["string", "null"], "classification": "public_registry_identifier" },
+    { "name": "connector_version", "type": ["string", "null"], "classification": "software_version" },
+    { "name": "stage", "type": "string", "classification": "operational_state" },
+    { "name": "attempt", "type": "integer", "classification": "operational_count" },
+    { "name": "outcome", "type": "string", "classification": "operational_state" },
+    { "name": "duration_ms", "type": "integer", "classification": "performance_measurement" },
+    { "name": "rows_or_bytes", "type": "integer", "classification": "bounded_count" },
+    { "name": "error_class", "type": ["string", "null"], "classification": "typed_error" },
+    { "name": "worker_version", "type": "string", "classification": "software_version" }
+  ],
+  "alerts": [
+    { "id": "scheduler_heartbeat_missing", "signal": "last_scheduler_heartbeat_age_seconds", "condition": "> 900", "severity": "page", "runbook": "ALERT-01", "managed_status": "pending_external_authorization" },
+    { "id": "due_source_overdue", "signal": "due_scope_start_lag_seconds", "condition": "> max(900, cadence_seconds * 0.1)", "severity": "page", "runbook": "ALERT-02", "managed_status": "pending_external_authorization" },
+    { "id": "queue_oldest_message_age", "signal": "queue_oldest_message_age_seconds_by_stage", "condition": "> stage_sla_seconds", "severity": "page", "runbook": "ALERT-03", "managed_status": "pending_external_authorization" },
+    { "id": "dlq_nonempty", "signal": "dlq_visible_messages_by_stage_or_sink_final_failed_delivery_count", "condition": "> 0", "severity": "page", "runbook": "ALERT-04", "terminal_sink_failure_control": "page_before_or_on_initial_plus_five_delivery_exhaustion_and_reconstruct_from_postgresql_control_plane_ledger_and_evidence", "managed_status": "pending_external_authorization" },
+    { "id": "outbox_oldest_pending", "signal": "outbox_oldest_pending_age_seconds", "condition": "> 300", "severity": "page", "runbook": "ALERT-05", "managed_status": "pending_external_authorization" },
+    { "id": "workflow_errored_or_terminated", "signal": "workflow_terminal_error_count", "condition": "> 0 over 5m", "severity": "page", "runbook": "ALERT-06", "managed_status": "pending_external_authorization" },
+    { "id": "connector_auth_or_schema_pause", "signal": "source_pause_reason_count{reason=auth|schema_drift}", "condition": "> 0", "severity": "ticket", "runbook": "ALERT-07", "managed_status": "pending_external_authorization" },
+    { "id": "catalog_count_collapse", "signal": "catalog_count_ratio_to_last_accepted", "condition": "< 0.8 unless approved_source_event", "severity": "page", "runbook": "ALERT-08", "managed_status": "pending_external_authorization" },
+    { "id": "canonical_index_lag_or_generation_age", "signal": "canonical_index_lag_seconds_or_generation_age_seconds", "condition": "> objective", "severity": "page", "runbook": "ALERT-09", "managed_status": "pending_external_authorization" },
+    { "id": "postgresql_connectivity_storage_backup_pitr", "signal": "postgresql_provider_health_bundle", "condition": "any critical component unhealthy", "severity": "page", "runbook": "ALERT-10", "managed_status": "pending_external_authorization" },
+    { "id": "r2_checksum_or_write_failure", "signal": "r2_capture_integrity_failure_count", "condition": "> 0", "severity": "page", "runbook": "ALERT-11", "managed_status": "pending_external_authorization" },
+    { "id": "coverage_snapshot_reconciliation_failure", "signal": "coverage_partition_reconciliation_failures", "condition": "> 0", "severity": "page", "runbook": "ALERT-12", "managed_status": "pending_external_authorization" },
+    { "id": "excluded_or_quarantined_result_leak", "signal": "visibility_safety_violation_count", "condition": "> 0", "severity": "critical", "runbook": "ALERT-13", "managed_status": "pending_external_authorization" }
+  ],
+  "slos": [
+    { "id": "discovery_availability", "objective": "99.9% successful responses per valid request monthly", "measurement": "valid_discovery_requests", "runbook": "SLO-01", "status": "provisional_until_ratified" },
+    { "id": "record_search_latency", "objective": "p95 <= 600ms and p99 <= 1500ms", "measurement": "record_search_duration_ms", "runbook": "SLO-02", "status": "provisional_until_ratified" },
+    { "id": "bundle_plan_latency", "objective": "p95 <= 1200ms and p99 <= 3000ms", "measurement": "bundle_plan_duration_ms", "runbook": "SLO-03", "status": "provisional_until_ratified" },
+    { "id": "canonical_to_index_lag", "objective": "99% <= 10m and 99.9% <= 30m", "measurement": "accepted_revision_to_generation_seconds", "runbook": "SLO-04", "status": "provisional_until_ratified" },
+    { "id": "scheduler_timeliness", "objective": "99% start by scheduled_at + max(15m, 10% cadence)", "measurement": "due_scope_start_lag_seconds", "runbook": "SLO-05", "status": "provisional_until_ratified" },
+    { "id": "normalization_timeliness", "objective": "99% eligible revisions resolved within 1h", "measurement": "eligible_revision_resolution_seconds", "runbook": "SLO-06", "status": "provisional_until_ratified" },
+    { "id": "coverage_snapshot_timeliness", "objective": "daily snapshot within 2h of cutoff 99% monthly", "measurement": "coverage_cutoff_to_snapshot_seconds", "runbook": "SLO-07", "status": "provisional_until_ratified" },
+    { "id": "index_consistency", "objective": "100% eligible objects represented at promoted watermark", "measurement": "eligible_projection_reconciliation", "runbook": "SLO-08", "status": "provisional_until_ratified" },
+    { "id": "visibility_safety", "objective": "zero excluded or quarantined result leaks", "measurement": "visibility_safety_violation_count", "runbook": "SLO-09", "status": "provisional_until_ratified" },
+    { "id": "generation_rollback", "objective": "previous generation restored within 15m", "measurement": "rollback_request_to_verified_restore_seconds", "runbook": "SLO-10", "status": "provisional_until_ratified" },
+    { "id": "coverage_reconciliation", "objective": "100% stage partitions reconcile", "measurement": "coverage_partition_reconciliation", "runbook": "SLO-11", "status": "provisional_until_ratified" }
+  ]
+}

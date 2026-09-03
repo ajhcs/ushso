@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/ingestion/v1.0.0/failure-policy.schema.json",
+  "title": "Versioned retry, failure disposition, and DLQ policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "retry_policy_version", "stage_policies", "failure_rules", "circuit_open_transport_behavior", "dlq_replay_resets_history"],
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/ContractVersion" },
+    "retry_policy_version": { "type": "string", "pattern": "^[a-z0-9._-]{3,64}$" },
+    "stage_policies": {
+      "type": "array", "minItems": 5, "maxItems": 5,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["stage", "maximum_delivery_attempts", "transport_max_retries", "minimum_delay_seconds", "maximum_delay_seconds", "full_jitter", "honor_bounded_retry_after", "exhausted_outcome"],
+        "properties": {
+          "stage": { "enum": ["harvest_page", "normalize_record", "enrich_schema", "access_check", "project_index"] },
+          "maximum_delivery_attempts": { "type": "integer", "minimum": 1, "maximum": 10 },
+          "transport_max_retries": { "type": "integer", "minimum": 0, "maximum": 9 },
+          "minimum_delay_seconds": { "type": "integer", "minimum": 1, "maximum": 3600 },
+          "maximum_delay_seconds": { "type": "integer", "minimum": 1, "maximum": 86400 },
+          "full_jitter": { "const": true },
+          "honor_bounded_retry_after": { "const": true },
+          "exhausted_outcome": { "enum": ["durable_dlq_and_partial_unpublished", "quarantine_and_durable_dlq", "typed_stale_or_failed_observation_and_durable_dlq", "reject_generation_and_durable_dlq"] }
+        }
+      }
+    },
+    "failure_rules": {
+      "type": "array", "minItems": 18, "maxItems": 18,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["failure_type", "default_disposition", "catalog_enumeration_disposition", "exact_target_disposition", "circuit_effect", "transport_retry_allowed"],
+        "properties": {
+          "failure_type": { "$ref": "common.schema.json#/$defs/FailureType" },
+          "default_disposition": { "enum": ["retry", "typed_observation", "quarantine", "fail_enumeration", "pause_source"] },
+          "catalog_enumeration_disposition": { "enum": ["retry", "typed_observation", "quarantine", "fail_enumeration", "pause_source"] },
+          "exact_target_disposition": { "enum": ["retry", "typed_observation", "quarantine", "fail_enumeration", "pause_source"] },
+          "circuit_effect": { "enum": ["none", "consume_shared_budget", "open_source_circuit"] },
+          "transport_retry_allowed": { "type": "boolean" }
+        }
+      }
+    },
+    "circuit_open_transport_behavior": { "const": "commit_retry_wait_and_delayed_outbox_then_ack" },
+    "dlq_replay_resets_history": { "const": false }
+  }
+}

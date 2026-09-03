@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/research-plan/v1.0.0/schemas/research-plan-request.schema.json",
+  "title": "Research plan request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "question", "constraints", "clarification_answers", "expected_generation", "normalized_request_hash", "clarification_token", "prior_plan_id"],
+  "properties": {
+    "contract_version": {"const": "observatory-research-plan-request.v1.0.0"},
+    "question": {"type": "string", "minLength": 10, "maxLength": 4000},
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["geographies", "time_period", "grain", "access_classes", "machine_access_required", "intended_analyses"],
+      "properties": {
+        "geographies": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {"$ref": "common.schema.json#/$defs/stableId"}
+        },
+        "time_period": {
+          "oneOf": [
+            {"$ref": "common.schema.json#/$defs/period"},
+            {"type": "null"}
+          ]
+        },
+        "grain": {
+          "oneOf": [
+            {"enum": ["facility", "campus", "organization", "system", "county", "state", "national"]},
+            {"type": "null"}
+          ]
+        },
+        "access_classes": {
+          "type": "array",
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {"enum": ["public", "registration", "application", "dua", "licensed", "paid", "report_only", "unknown"]}
+        },
+        "machine_access_required": {"type": "boolean"},
+        "intended_analyses": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 128}
+        }
+      }
+    },
+    "clarification_answers": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {"$ref": "clarification.schema.json#/$defs/answer"}
+    },
+    "expected_generation": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/stableId"},
+        {"type": "null"}
+      ]
+    },
+    "normalized_request_hash": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/digest"},
+        {"type": "null"}
+      ]
+    },
+    "clarification_token": {
+      "oneOf": [
+        {"type": "string", "minLength": 32, "maxLength": 2048, "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$"},
+        {"type": "null"}
+      ]
+    },
+    "prior_plan_id": {
+      "oneOf": [
+        {"$ref": "common.schema.json#/$defs/digest"},
+        {"type": "null"}
+      ]
+    }
+  }
+}

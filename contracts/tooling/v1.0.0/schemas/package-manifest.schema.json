@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.local/contracts/tooling/v1.0.0/package-manifest.schema.json",
+  "title": "Deterministic contract package inventory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "package_name", "package_version", "canonicalization", "digest_taxonomy_version", "excludes", "file_count", "payload_bytes", "files", "package_content_digest", "immutable"],
+  "properties": {
+    "manifest_version": {"const": "ushso.package-manifest.v1"},
+    "package_name": {"type": "string", "minLength": 3, "maxLength": 128, "pattern": "^@ushso/[a-z0-9-]+$"},
+    "package_version": {"type": "string", "format": "semver", "minLength": 5, "maxLength": 64},
+    "canonicalization": {"const": "rfc8785-jcs"},
+    "digest_taxonomy_version": {"const": "ushso.digest-taxonomy.v1"},
+    "excludes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": {"$ref": "common.schema.json#/$defs/SafeRelativePath"}
+    },
+    "file_count": {"type": "integer", "minimum": 1, "maximum": 10000},
+    "payload_bytes": {"type": "integer", "minimum": 1, "maximum": 1099511627776},
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "artifact_kind", "media_type", "bytes", "byte_digest", "semantic_kind", "semantic_digest"],
+        "properties": {
+          "path": {"$ref": "common.schema.json#/$defs/SafeRelativePath"},
+          "artifact_kind": {"enum": ["schema", "fixture", "test", "tool", "documentation", "package_metadata", "other"]},
+          "media_type": {"type": "string", "format": "media-type", "minLength": 3, "maxLength": 128},
+          "bytes": {"type": "integer", "minimum": 0, "maximum": 1073741824},
+          "byte_digest": {"$ref": "common.schema.json#/$defs/ByteDigest"},
+          "semantic_kind": {"enum": ["none", "canonical_json", "jsonl_set"]},
+          "semantic_digest": {
+            "oneOf": [
+              {"type": "null"},
+              {"$ref": "common.schema.json#/$defs/CanonicalDigest"},
+              {"$ref": "common.schema.json#/$defs/JsonlSetDigest"}
+            ]
+          }
+        }
+      }
+    },
+    "package_content_digest": {"$ref": "common.schema.json#/$defs/PackageDigest"},
+    "immutable": {"const": true}
+  }
+}

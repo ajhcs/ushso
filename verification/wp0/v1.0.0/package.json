@@ -1,0 +1,13 @@
+{
+  "name": "@ushso/wp0-verification-v1",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Fail-closed aggregate verification for the USHSO Research Navigator WP0 freeze.",
+  "scripts": {
+    "test": "node --test tests/wp0-aggregate.test.mjs ../../../tests/product-boundary.test.mjs",
+    "validate": "node tools/validate-wp0-aggregate.mjs",
+    "receipt:provisional": "node tools/validate-wp0-aggregate.mjs --write-receipt --allow-blocked",
+    "receipt:finalize": "node tools/validate-wp0-aggregate.mjs --write-receipt --promote-provisional"
+  }
+}

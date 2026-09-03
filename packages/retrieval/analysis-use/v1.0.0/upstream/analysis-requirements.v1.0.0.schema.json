@@ -1,0 +1,444 @@
+{
+  "$defs": {
+    "analysisRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptable_grains": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "analysis_family": {
+          "$ref": "#/$defs/identifier"
+        },
+        "analysis_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "calculation_entrypoint": {
+          "pattern": "^hc_metrics\\.[a-z][a-z0-9_]*$",
+          "type": "string"
+        },
+        "implementation_methodology": {
+          "$ref": "#/$defs/identifier"
+        },
+        "join_requirements": {
+          "items": {
+            "$ref": "#/$defs/joinRequirement"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "label": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "limitations": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "methodology": {
+          "pattern": "^hc-metrics:[a-z][a-z0-9_]*:[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "type": "string"
+        },
+        "methodology_key": {
+          "$ref": "#/$defs/identifier"
+        },
+        "methodology_version": {
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "type": "string"
+        },
+        "question_patterns": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "required_inputs": {
+          "items": {
+            "$ref": "#/$defs/inputRequirement"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "required_properties": {
+          "items": {
+            "$ref": "#/$defs/propertyRequirement"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "schema_version": {
+          "const": "hc-metrics.analysis-requirement.v1.0.0"
+        },
+        "upstream_analysis_ids": {
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "schema_version",
+        "analysis_id",
+        "analysis_family",
+        "label",
+        "calculation_entrypoint",
+        "methodology_key",
+        "methodology_version",
+        "methodology",
+        "implementation_methodology",
+        "question_patterns",
+        "required_inputs",
+        "required_properties",
+        "acceptable_grains",
+        "join_requirements",
+        "upstream_analysis_ids",
+        "limitations"
+      ],
+      "type": "object"
+    },
+    "authority": {
+      "additionalProperties": false,
+      "properties": {
+        "calculation_authorized": {
+          "const": false
+        },
+        "data_access_authorized": {
+          "const": false
+        },
+        "discovery_guidance_only": {
+          "const": true
+        },
+        "persistence_authorized": {
+          "const": false
+        },
+        "publication_authorized": {
+          "const": false
+        }
+      },
+      "required": [
+        "discovery_guidance_only",
+        "data_access_authorized",
+        "calculation_authorized",
+        "persistence_authorized",
+        "publication_authorized"
+      ],
+      "type": "object"
+    },
+    "conditionalRange": {
+      "additionalProperties": false,
+      "properties": {
+        "equals": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "when_input_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      },
+      "required": [
+        "when_input_id",
+        "equals",
+        "minimum",
+        "maximum"
+      ],
+      "type": "object"
+    },
+    "identifier": {
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "type": "string"
+    },
+    "identifierSet": {
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "inputRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_values": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "conditional_ranges": {
+          "items": {
+            "$ref": "#/$defs/conditionalRange"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "input_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "label": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "measurement_unit": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "observation_grains": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "role": {
+          "enum": [
+            "identifier",
+            "dimension",
+            "measure",
+            "denominator",
+            "period"
+          ]
+        },
+        "source_fields": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "value_kind": {
+          "enum": [
+            "identifier",
+            "category",
+            "integer",
+            "decimal",
+            "currency",
+            "percent",
+            "rate",
+            "period"
+          ]
+        }
+      },
+      "required": [
+        "input_id",
+        "label",
+        "description",
+        "source_fields",
+        "role",
+        "value_kind",
+        "measurement_unit",
+        "observation_grains"
+      ],
+      "type": "object"
+    },
+    "joinAlternative": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "cardinality_orientation": {
+                "const": "left_to_right"
+              }
+            },
+            "required": [
+              "cardinality_orientation"
+            ]
+          },
+          "then": {
+            "required": [
+              "left_discriminator_input_ids",
+              "right_discriminator_input_ids"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cardinality_orientation": {
+                "const": "symmetric"
+              }
+            },
+            "required": [
+              "cardinality_orientation"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "left_discriminator_input_ids"
+                  ]
+                },
+                {
+                  "required": [
+                    "right_discriminator_input_ids"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "cardinality": {
+                "const": "one_to_one"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "alternative_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "cardinality": {
+          "$ref": "#/$defs/joinCardinality"
+        },
+        "cardinality_orientation": {
+          "enum": [
+            "left_to_right",
+            "symmetric"
+          ]
+        },
+        "entity": {
+          "$ref": "#/$defs/joinEntity"
+        },
+        "key_input_set": {
+          "$ref": "#/$defs/identifierSet"
+        },
+        "left_discriminator_input_ids": {
+          "$ref": "#/$defs/identifierSet"
+        },
+        "right_discriminator_input_ids": {
+          "$ref": "#/$defs/identifierSet"
+        }
+      },
+      "required": [
+        "alternative_id",
+        "entity",
+        "key_input_set",
+        "cardinality_orientation",
+        "cardinality"
+      ],
+      "type": "object"
+    },
+    "joinCardinality": {
+      "enum": [
+        "one_to_one",
+        "one_to_many",
+        "many_to_one"
+      ]
+    },
+    "joinEntity": {
+      "enum": [
+        "facility",
+        "hospital",
+        "provider",
+        "county",
+        "state",
+        "health_system",
+        "date",
+        "event",
+        "other"
+      ]
+    },
+    "joinRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "alternatives": {
+          "items": {
+            "$ref": "#/$defs/joinAlternative"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "input_ids": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "join_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "minimum_state": {
+          "const": "documented"
+        },
+        "period_alignment": {
+          "enum": [
+            "required",
+            "not_required"
+          ]
+        },
+        "when": {
+          "const": "inputs_span_assets"
+        }
+      },
+      "required": [
+        "join_id",
+        "input_ids",
+        "alternatives",
+        "minimum_state",
+        "when",
+        "period_alignment",
+        "description"
+      ],
+      "type": "object"
+    },
+    "nonEmptyString": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "propertyRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "property_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      },
+      "required": [
+        "property_id",
+        "description"
+      ],
+      "type": "object"
+    },
+    "stringSet": {
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "$id": "https://contracts.ushso.org/hc-metrics/analysis-requirements/v1.0.0/schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Strict discovery-guidance contract describing source inputs required by hc-metrics analyses. It grants no data-access, calculation, persistence, or publication authority.",
+  "properties": {
+    "authority": {
+      "$ref": "#/$defs/authority"
+    },
+    "catalog_id": {
+      "const": "hc-metrics:analysis-requirements"
+    },
+    "catalog_version": {
+      "const": "1.0.0"
+    },
+    "requirements": {
+      "items": {
+        "$ref": "#/$defs/analysisRequirement"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "schema_version": {
+      "const": "hc-metrics.analysis-requirements.v1.0.0"
+    }
+  },
+  "required": [
+    "schema_version",
+    "catalog_id",
+    "catalog_version",
+    "requirements",
+    "authority"
+  ],
+  "title": "hc-metrics analysis requirements catalog v1.0.0",
+  "type": "object"
+}
