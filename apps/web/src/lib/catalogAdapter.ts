@@ -49,13 +49,9 @@ function geographyDisplay(record: ObservatoryRecord) {
 }
 
 function grainDisplay(record: ObservatoryRecord) {
-  const units = record.unit_of_analysis.map(sentenceCase).filter(Boolean)
-  const granularity = record.time_coverage.temporal_granularity
-  const grain = units.join(', ') || 'Unit unresolved'
-  if (granularity && granularity !== 'unknown' && granularity !== 'not_applicable') {
-    return `${grain} · ${sentenceCase(granularity)}`
-  }
-  return grain
+  // unit_of_analysis is an inferred search projection in the current wire
+  // contract and has no claim-level evidence linkage.
+  return 'Observation grain unresolved'
 }
 
 const ACCESS_STATUS_LABELS: Record<ObservatoryRecord['access']['status'], string> = {
@@ -228,7 +224,6 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
   const { record } = result
   const joinRoutes = response.join_routes.filter((route) => route.from_record_id === result.record_id || route.to_record_id === result.record_id)
   const familyStatus = familyCount > 1 ? 'Family' : 'Single-record family'
-  const units = record.unit_of_analysis.map(sentenceCase)
   const topics = record.capabilities.topics.map((topic) => topic.label)
   const latestRelease = record.freshness_verification.data_through
     ? `${record.freshness_verification.data_through} (${sentenceCase(record.freshness_verification.verification_status)})`
@@ -249,9 +244,9 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
     recordType: sentenceCase(record.identity.asset.asset_type),
     geographicApplicability: geographyDisplay(record),
     grain: grainDisplay(record),
-    reportingUnit: units.join(', ') || 'Unit unresolved',
+    reportingUnit: grainDisplay(record),
     accessStatusLabel: accessStatusLabel(record),
-    populationFacilityScope: units.join(', ') || 'Scope unresolved',
+    populationFacilityScope: 'Scope unresolved',
     availableYears: timeDisplay(record),
     latestVerifiedRelease: latestRelease,
     variablesCodebook: variables.summary ?? variables.expectedArtifacts.join(' · '),

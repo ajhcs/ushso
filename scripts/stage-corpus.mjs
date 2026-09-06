@@ -6,6 +6,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceRoot = path.join(root, 'packages/retrieval');
 const targetRoot = path.join(root, 'apps/web/public');
 const files = [
+  ['fixtures/named-source-registry.v1.0.0.json', 'corpus-v1.1.0/named-source-registry.json'],
   ['corpus/records.jsonl', 'corpus/records.jsonl'],
   ['corpus/search-documents.jsonl', 'corpus/search-documents.jsonl'],
   ['corpus/join-routes.jsonl', 'corpus/join-routes.jsonl'],
@@ -40,6 +41,7 @@ for (const sourcePath of await filesBelow(liveVersionRoot)) {
   const relative = path.relative(liveVersionRoot, sourcePath).replaceAll('\\', '/');
   files.push([`versions/v1.2.0/${relative}`, `corpus-v1.2.0/${relative}`]);
 }
+files.push(['fixtures/named-source-registry.v1.0.0.json', 'corpus-v1.2.0/fixtures/named-source-registry.json']);
 files.push([
   null,
   'corpus-v1.2.0/webmcp-tool.json',

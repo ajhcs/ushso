@@ -10,14 +10,14 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = path => JSON.parse(readFileSync(join(root, path), 'utf8'));
 const readJsonl = path => readFileSync(join(root, path), 'utf8').trim().split(/\r?\n/).filter(Boolean).map(JSON.parse);
 
-test('production verification receipt enriches exactly its 15 matched corpus records', () => {
+test('historical verification receipt enriches exactly its 15 matched v1.0.1 records', () => {
   const records = readJsonl('packages/retrieval/corpus/records.jsonl');
   const receipt = readJson('verification/v0.1.0/receipts/live-verification-2026-08-30.json');
   const enriched = applyLiveVerificationReceipt(records, receipt);
   const receiptIds = new Set(receipt.records.map(record => record.record_id));
   const verified = enriched.filter(record => record.freshness_verification.verification_method === 'first_party_live');
 
-  assert.equal(enriched.length, 143);
+  assert.equal(enriched.length, records.length);
   assert.equal(receiptIds.size, 15);
   assert.equal(verified.length, 15);
   assert.ok(verified.every(record => receiptIds.has(record.record_id) && record.variable_documentation?.evidence_state === 'verified_first_party'));

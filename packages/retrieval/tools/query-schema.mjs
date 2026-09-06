@@ -16,6 +16,16 @@ export const DISCOVERY_QUERY_SCHEMA = Object.freeze({
     units_of_analysis: { type: 'array', uniqueItems: true, items: { type: 'string', minLength: 1, maxLength: 80 } },
     access_statuses: { type: 'array', uniqueItems: true, items: { type: 'string', minLength: 1, maxLength: 80 } },
     include_restricted: { type: 'boolean', default: true },
+    exclusions: { type: 'array', uniqueItems: true, items: { type: 'string', minLength: 1, maxLength: 80 } },
+    sort: { enum: ['canonical_relevance', 'title_asc', 'release_newest', 'observation_latest'], default: 'canonical_relevance' },
+    cursor: { type: ['string', 'null'], minLength: 8, maxLength: 512 },
+    generation: { type: ['string', 'null'], minLength: 1, maxLength: 160 },
+    facet_filters: {
+      type: 'object',
+      additionalProperties: false,
+      properties: Object.fromEntries(['source', 'geography', 'access_status', 'unit_of_analysis', 'capability']
+        .map(key => [key, { type: 'array', uniqueItems: true, items: { type: 'string', minLength: 1, maxLength: 160 } }]))
+    },
     time_window: {
       type: 'object',
       additionalProperties: false,
@@ -24,6 +34,7 @@ export const DISCOVERY_QUERY_SCHEMA = Object.freeze({
         end_year: { type: 'integer', minimum: 1800, maximum: 2200 }
       }
     },
-    limit: { type: 'integer', minimum: 1, maximum: 50, default: 10 }
+    limit: { type: 'integer', minimum: 1, maximum: 200, default: 10 },
+    page_size: { type: 'integer', minimum: 1, maximum: 200, default: 10 }
   }
 });

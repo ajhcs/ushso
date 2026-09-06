@@ -3,12 +3,13 @@ import { createWorkerMachineToolkit } from './machine-toolkit-adapter.mjs';
 import { createMachineToolkitRouter } from './machine-toolkit-router.mjs';
 import { createStaticPublicQueryService } from './static-composition.mjs';
 import { createStaticMachineToolkitRuntime } from './static-machine-toolkit-service.mjs';
+import { validateCatalogRecords } from '../packages/retrieval/tools/catalog-contract.mjs';
 
 const MAX_REQUEST_BYTES = 20 * 1024;
 const CORPUS_RESOURCE_BASE = '/corpus-v1.2.0';
 const CORPUS_BASE = `${CORPUS_RESOURCE_BASE}/corpus`;
 const catalogByAssets = new WeakMap();
-const SPA_ROUTES = new Set(['/', '/search', '/agents', '/sources', '/about', '/privacy', '/terms', '/contact']);
+const SPA_ROUTES = new Set(['/', '/search', '/agents', '/sources', '/about', '/methods', '/plan', '/privacy', '/terms', '/contact']);
 const STATIC_PATHS = new Set(['/favicon.svg', '/observatory-lighthouse.png', '/state-readiness-v0.1.0.json', '/_headers']);
 
 function responseHeaders(init = {}) {
@@ -71,10 +72,11 @@ export async function loadCatalogFromAssets(request, env) {
   if (!env?.ASSETS || typeof env.ASSETS.fetch !== 'function') throw new Error('STATIC_ASSET_BINDING_REQUIRED');
   if (!catalogByAssets.has(env.ASSETS)) {
     catalogByAssets.set(env.ASSETS, (async () => {
-      const [routesText, vocabularyText, corpusText] = await Promise.all([
+      const [routesText, vocabularyText, corpusText, namedSourceRegistryText] = await Promise.all([
         assetText(request, env, `${CORPUS_BASE}/join-routes.jsonl`),
         assetText(request, env, `${CORPUS_RESOURCE_BASE}/fixtures/controlled-vocabulary.json`),
         assetText(request, env, `${CORPUS_BASE}/corpus.json`),
+        assetText(request, env, `${CORPUS_RESOURCE_BASE}/fixtures/named-source-registry.json`).catch(() => null),
       ]);
       const corpus = JSON.parse(corpusText);
       if (!Array.isArray(corpus.record_files) || !Array.isArray(corpus.search_document_files)) throw new Error('CORPUS_SHARD_MANIFEST_REQUIRED');
@@ -82,18 +84,30 @@ export async function loadCatalogFromAssets(request, env) {
         Promise.all(corpus.record_files.map(file => assetText(request, env, `${CORPUS_BASE}/${file}`))),
         Promise.all(corpus.search_document_files.map(file => assetText(request, env, `${CORPUS_BASE}/${file}`))),
       ]);
-      const records = recordShards.flatMap((text, index) => parseJsonl(text, `records:${corpus.record_files[index]}`));
-      const searchDocuments = searchDocumentShards.flatMap((text, index) => parseJsonl(text, `search-documents:${corpus.search_document_files[index]}`));
+      const rawRecords = recordShards.flatMap((text, index) => parseJsonl(text, `records:${corpus.record_files[index]}`));
+      const catalogValidation = validateCatalogRecords(rawRecords);
+      const records = catalogValidation.valid;
+      // Search-document projections duplicate most catalog strings and push the
+      // isolate over its memory ceiling during repeated broad queries. The
+      // runtime validates their published line count, then builds a compact,
+      // bounded text index from the canonical records instead.
+      const searchDocumentCount = searchDocumentShards.reduce((total, text) =>
+        total + text.split(/\r?\n/).filter(Boolean).length, 0);
       const joinRoutes = parseJsonl(routesText, 'join-routes');
       const vocabulary = JSON.parse(vocabularyText);
-      if (records.length !== corpus.record_count || searchDocuments.length !== corpus.search_document_count) throw new Error('CORPUS_SHARD_COUNT_MISMATCH');
+      const namedSourceRegistry = namedSourceRegistryText ? JSON.parse(namedSourceRegistryText) : null;
+      if (rawRecords.length !== corpus.record_count || searchDocumentCount !== corpus.search_document_count) throw new Error('CORPUS_SHARD_COUNT_MISMATCH');
       return {
         records,
-        searchDocuments,
+        catalogIssues: catalogValidation.invalid,
+        // Preserve the repository bundle contract. This generation publishes
+        // no projection shards; the engine uses its compact canonical index.
+        searchDocuments: [],
         joinRoutes,
         vocabulary,
         corpus,
-        engine: createRetrievalEngine({ records, searchDocuments, joinRoutes, vocabulary, corpus })
+        namedSourceRegistry,
+        engine: createRetrievalEngine({ records, searchDocuments: null, joinRoutes, vocabulary, corpus, namedSourceRegistry, catalogValidation })
       };
     })());
   }
@@ -104,10 +118,37 @@ export async function loadEngineFromAssets(request, env) {
   return (await loadCatalogFromAssets(request, env)).engine;
 }
 
-function parseLimit(url) {
-  const requested = Number(url.searchParams.get('limit') ?? 200);
-  if (!Number.isInteger(requested) || requested < 1) return 200;
+function parsePageSize(value, fallback = 20) {
+  const requested = Number(value ?? fallback);
+  if (!Number.isInteger(requested) || requested < 1) return fallback;
   return Math.min(requested, 200);
+}
+
+function catalogOptions(url) {
+  const sort = url.searchParams.get('sort') ?? 'canonical_relevance';
+  if (!new Set(['canonical_relevance', 'title_asc', 'release_newest', 'observation_latest']).has(sort)) {
+    const error = new TypeError(`Unsupported sort: ${sort}`);
+    error.code = 'unsupported_sort';
+    throw error;
+  }
+  const facetFilters = {};
+  for (const filter of url.searchParams.getAll('filter')) {
+    const separator = filter.indexOf(':');
+    if (separator < 1 || separator === filter.length - 1) {
+      const error = new TypeError(`Invalid facet filter: ${filter}`);
+      error.code = 'invalid_filter';
+      throw error;
+    }
+    const key = filter.slice(0, separator);
+    facetFilters[key] = [...(facetFilters[key] ?? []), filter.slice(separator + 1)];
+  }
+  return {
+    page_size: parsePageSize(url.searchParams.get('page_size') ?? url.searchParams.get('limit')),
+    sort,
+    facet_filters: facetFilters,
+    cursor: url.searchParams.get('cursor') ?? null,
+    generation: url.searchParams.get('generation') ?? null,
+  };
 }
 
 function isSpaPath(pathname) {
@@ -183,8 +224,10 @@ export function createWorker({
         if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
         try {
           const session = await publicQueryService.openRequest({ request, env });
-          return jsonResponse(await publicQueryService.browse(session, parseLimit(url)), { cacheControl: 'public, max-age=300', head });
-        } catch {
+          return jsonResponse(await publicQueryService.browse(session, catalogOptions(url)), { cacheControl: 'public, max-age=300', head });
+        } catch (error) {
+          if (error?.code === 'generation_unavailable') return errorResponse(410, 'generation_unavailable', error.message, { head });
+          if (error instanceof TypeError) return errorResponse(400, error.code ?? 'invalid_catalog_query', error.message, { head });
           return errorResponse(503, 'catalog_unavailable', 'The published discovery catalog could not be loaded.', { head });
         }
       }
@@ -220,6 +263,7 @@ export function createWorker({
           const session = await publicQueryService.openRequest({ request, env });
           return jsonResponse(await publicQueryService.discover(session, input));
         } catch (error) {
+          if (error?.code === 'generation_unavailable') return errorResponse(410, 'generation_unavailable', error.message);
           if (error instanceof TypeError) return errorResponse(400, 'invalid_query', error.message);
           return errorResponse(503, 'retrieval_unavailable', 'The published discovery corpus could not be queried.');
         }

@@ -1,30 +1,116 @@
 {
   "contract_version": "observatory-discovery-result.v1.0.0",
+  "corpus": {
+    "corpus_version": "1.2.0",
+    "record_count": 3434,
+    "generation": "live-2026-09-03-85b50522b420"
+  },
   "query": {
+    "question": "CMS HCRIS hospital cost reports by state",
     "interpretation": {
-      "geographies": [
+      "geographies": [],
+      "subjects": [
         {
-          "id": "US-PA",
-          "label": "Pennsylvania",
-          "kind": "geography",
+          "id": "hospital_financials",
+          "label": "Hospital financials",
+          "kind": "subject",
           "matched_aliases": [
-            "pennsylvania"
+            "cost reports",
+            "hcris"
           ],
           "evidence": "controlled_vocabulary"
         }
-      ]
+      ],
+      "units_of_analysis": [
+        {
+          "id": "hospital",
+          "label": "Hospital",
+          "kind": "unit",
+          "matched_aliases": [
+            "hospital"
+          ],
+          "evidence": "controlled_vocabulary"
+        },
+        {
+          "id": "state",
+          "label": "State",
+          "kind": "unit",
+          "matched_aliases": [
+            "state"
+          ],
+          "evidence": "controlled_vocabulary"
+        },
+        {
+          "id": "facility",
+          "label": "Facility",
+          "kind": "unit",
+          "matched_aliases": [
+            "implied_by:hospital_financials"
+          ],
+          "evidence": "controlled_vocabulary"
+        }
+      ],
+      "time_window": null,
+      "access_intent": {
+        "include_restricted": true,
+        "public_only": false,
+        "accepts_restricted": false,
+        "match_basis": "question_or_default",
+        "payload_requirement": "unspecified",
+        "cost_requirement": "unspecified",
+        "ambiguity": null,
+        "matched_phrases": [],
+        "interpretation_note": null
+      },
+      "exclusions": [],
+      "named_sources": [
+        {
+          "source_id": "cms-hcris",
+          "name": "Healthcare Cost Report Information System",
+          "matched_aliases": [
+            "hcris",
+            "cms hcris"
+          ],
+          "indexed_record_ids": [
+            "obs:asset:cms-hcris-hospital-cost-reports",
+            "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+          ],
+          "official_discovery_url": "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report",
+          "registry_evidence_state": "verified_first_party"
+        }
+      ],
+      "positive_terms": [
+        "hospital",
+        "cost",
+        "reports",
+        "by",
+        "state"
+      ],
+      "interpretation_warnings": []
     }
   },
-  "result_count": 14,
+  "ranking": {
+    "version": "observatory-canonical-ranking.v1.2.0",
+    "sort": "canonical_relevance",
+    "ordered_ids": [
+      "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+    ]
+  },
+  "result_count": 1,
+  "total_matches": 1,
   "results": [
     {
-      "record_id": "obs:asset:cms-hospital-all-owners",
+      "rank": 1,
+      "record_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+      "match_state": "contextual",
       "record": {
-        "authoritative_url": "https://data.cms.gov/provider-characteristics/hospitals-and-other-facilities/hospital-all-owners"
+        "title": "Hospital Provider Cost Report",
+        "authoritative_url": "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report"
       }
     }
   ],
   "warnings": [
+    "4 incompatible catalog item(s) were isolated; valid partial results remain available.",
     "Results describe indexed metadata and retrieval routes; they do not prove current endpoint availability or authorize access."
   ]
 }

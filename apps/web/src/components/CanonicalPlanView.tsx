@@ -160,10 +160,10 @@ export function CanonicalPlanView({ plan }: { plan: CanonicalResearchPlan }) {
           <div><dt>Canonical as of</dt><dd><time dateTime={plan.generated_from.canonical_as_of}>{plan.generated_from.canonical_as_of}</time></dd></div>
           <div><dt>Critical-claim digest</dt><dd>{plan.response.critical_claim_digest}</dd></div>
         </dl>
-        <aside className="plan-public-coverage-note" aria-label="Current public coverage accounting reference" data-current-coverage-snapshot={coveragePositioning.coverageSnapshotId}>
-          <strong>Current public coverage reference — separate from this plan’s pinned snapshot</strong>
+        <aside className="plan-public-coverage-note" aria-label="Historical sealed coverage accounting reference" data-historical-coverage-snapshot={coveragePositioning.coverageSnapshotId}>
+          <strong>Historical sealed coverage reference — not the current production corpus</strong>
           <p>As of <time dateTime={coveragePositioning.asOf}>{coveragePositioning.asOf}</time>: {coveragePositioning.nonAdditivity}</p>
-          <small>Product-owner approval for this public wording remains pending.</small>
+          <small>This v1.1.0 snapshot is preserved for plan provenance. Current candidate acceptance uses the 3,434-record v1.2.0 production corpus. Product-owner approval of this historical WP9 coverage wording remains pending (AUTH-15); this reference is not approved current coverage wording.</small>
         </aside>
         <p className="plan-truth-boundary"><strong>Truth boundary:</strong> no source request, access authorization, retrieval, payload acquisition, analysis, or identity merge was performed by USHSO.</p>
       </section>

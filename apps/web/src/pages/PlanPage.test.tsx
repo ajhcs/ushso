@@ -39,7 +39,9 @@ describe('/plan canonical presentation', () => {
       }
       expect(markup).toContain('Copy plan JSON')
       expect(markup).toContain('Download plan JSON')
-      expect(markup).toContain('Product-owner approval for this public wording remains pending.')
+      expect(markup).toContain('Historical sealed coverage reference — not the current production corpus')
+      expect(markup).toContain('Current candidate acceptance uses the 3,434-record v1.2.0 production corpus.')
+      expect(markup).toContain('Product-owner approval of this historical WP9 coverage wording remains pending (AUTH-15); this reference is not approved current coverage wording.')
     }
   })
 

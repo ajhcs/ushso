@@ -1,0 +1,1006 @@
+{
+  "report_version": "ushso-live-audit-candidate-replay.v1.0.0",
+  "generated_at": "2026-09-06T20:27:07.858Z",
+  "target": "http://127.0.0.1:8794",
+  "inputs": {
+    "original_audit_question_count": 42,
+    "homepage_example_count": 5,
+    "acceptance_basis": "Release-candidate Worker plus the 3,434-record v1.2.0 production manifest. Historical 143/157-record counts and old ordering are diagnostic history, not candidate acceptance expectations."
+  },
+  "candidate": {
+    "corpus": {
+      "corpus_id": "ushso-live-catalog-2026-09-03",
+      "corpus_version": "1.2.0",
+      "evidence_mode": "live_first_party_metadata",
+      "manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e",
+      "algorithm_fingerprint_sha256": "df3891067d6c1d50bf45c7efc7a73c30167486289f8c3039781266f583e0f714",
+      "record_count": 3434,
+      "search_document_count": 0,
+      "join_route_count": 0,
+      "record_files": [
+        "records-0001.jsonl",
+        "records-0002.jsonl",
+        "records-0003.jsonl"
+      ],
+      "search_document_files": [],
+      "runtime_search_projection": "on_demand",
+      "source_slices": {
+        "cms-data-catalog": 159,
+        "cdc-socrata": 1472,
+        "census-api": 1803
+      },
+      "publication": {
+        "generation": "live-2026-09-03-85b50522b420",
+        "observed_at": "2026-09-03T22:22:33.908Z",
+        "all_public_records_live_verified": true
+      },
+      "build_boundary": {
+        "fixture_only": false,
+        "external_requests": 17,
+        "payload_downloads": 0,
+        "identity_index_queries": 0,
+        "heavy_analysis_lock_touched": false,
+        "coverage_cells_executed": 3,
+        "accepted_upstream_metadata_requests": 17
+      },
+      "generation": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e"
+    },
+    "searchable_record_count": 3430,
+    "partial_results": {
+      "is_partial": true,
+      "invalid_item_count": 4,
+      "issues": [
+        {
+          "index": 20,
+          "record_id": "obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b",
+          "code": "invalid_catalog_record",
+          "errors": [
+            "description must be a non-empty string"
+          ]
+        },
+        {
+          "index": 54,
+          "record_id": "obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250",
+          "code": "invalid_catalog_record",
+          "errors": [
+            "description must be a non-empty string"
+          ]
+        },
+        {
+          "index": 109,
+          "record_id": "obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e",
+          "code": "invalid_catalog_record",
+          "errors": [
+            "description must be a non-empty string"
+          ]
+        },
+        {
+          "index": 1282,
+          "record_id": "obs:asset:cdc-socrata:va9e-d8re-c845d9bfb921e339",
+          "code": "invalid_catalog_record",
+          "errors": [
+            "description must be a non-empty string"
+          ]
+        }
+      ]
+    }
+  },
+  "summary": {
+    "requests_completed": 5,
+    "original_audit_requests_completed": 0,
+    "homepage_requests_completed": 5,
+    "contract_checks_passed": 35,
+    "contract_checks_failed": 0,
+    "homepage_leading_expectations_passed": 5,
+    "homepage_leading_expectations_failed": 0
+  },
+  "original_audit_results": [],
+  "homepage_results": [
+    {
+      "kind": "homepage_example",
+      "number": 1,
+      "question": "CMS HCRIS hospital cost reports by state",
+      "http_status": 200,
+      "total_matches": 1,
+      "top": [
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+          "title": "Hospital Provider Cost Report",
+          "match_state": "contextual",
+          "named_source_role": "direct_source",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        }
+      ],
+      "sections": {
+        "supported": 0,
+        "uncertain": 0,
+        "contextual": 1
+      },
+      "interpreted_constraints": {
+        "geographies": [],
+        "subjects": [
+          {
+            "id": "hospital_financials",
+            "label": "Hospital financials",
+            "kind": "subject",
+            "matched_aliases": [
+              "cost reports",
+              "hcris"
+            ],
+            "evidence": "controlled_vocabulary"
+          }
+        ],
+        "units_of_analysis": [
+          {
+            "id": "hospital",
+            "label": "Hospital",
+            "kind": "unit",
+            "matched_aliases": [
+              "hospital"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "state",
+            "label": "State",
+            "kind": "unit",
+            "matched_aliases": [
+              "state"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "facility",
+            "label": "Facility",
+            "kind": "unit",
+            "matched_aliases": [
+              "implied_by:hospital_financials"
+            ],
+            "evidence": "controlled_vocabulary"
+          }
+        ],
+        "time_window": null,
+        "access_intent": {
+          "include_restricted": true,
+          "public_only": false,
+          "accepts_restricted": false,
+          "match_basis": "question_or_default",
+          "payload_requirement": "unspecified",
+          "cost_requirement": "unspecified",
+          "ambiguity": null,
+          "matched_phrases": [],
+          "interpretation_note": null
+        },
+        "exclusions": [],
+        "named_sources": [
+          {
+            "source_id": "cms-hcris",
+            "name": "Healthcare Cost Report Information System",
+            "matched_aliases": [
+              "hcris",
+              "cms hcris"
+            ],
+            "indexed_record_ids": [
+              "obs:asset:cms-hcris-hospital-cost-reports",
+              "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+            ],
+            "official_discovery_url": "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report",
+            "registry_evidence_state": "verified_first_party"
+          }
+        ],
+        "positive_terms": [
+          "hospital",
+          "cost",
+          "reports",
+          "by",
+          "state"
+        ],
+        "interpretation_warnings": []
+      },
+      "named_source_resolution": [
+        {
+          "source_id": "cms-hcris",
+          "name": "Healthcare Cost Report Information System",
+          "state": "indexed",
+          "indexed_record_ids": [
+            "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+          ],
+          "official_discovery_url": "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report",
+          "message": "The requested source is represented by a direct catalog record."
+        }
+      ],
+      "warnings": [
+        "4 incompatible catalog item(s) were isolated; valid partial results remain available.",
+        "Results describe indexed metadata and retrieval routes; they do not prove current endpoint availability or authorize access."
+      ],
+      "partial_results": {
+        "is_partial": true,
+        "invalid_item_count": 4,
+        "issues": [
+          {
+            "index": 20,
+            "record_id": "obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 54,
+            "record_id": "obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 109,
+            "record_id": "obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 1282,
+            "record_id": "obs:asset:cdc-socrata:va9e-d8re-c845d9bfb921e339",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          }
+        ]
+      },
+      "checks": {
+        "http_200": true,
+        "production_corpus_3434": true,
+        "production_version_1_2_0": true,
+        "source_slices_3434": true,
+        "ordered_ids_match_page": true,
+        "invalid_records_isolated": true,
+        "expected_homepage_leader": true
+      },
+      "expected_leading_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+    },
+    {
+      "kind": "homepage_example",
+      "number": 2,
+      "question": "CDC maternal mortality data",
+      "http_status": 200,
+      "total_matches": 29,
+      "top": [
+        {
+          "id": "obs:asset:cdc-socrata:e2d5-ggg7-de73391d5d45d504",
+          "title": "VSRR Provisional Maternal Death Counts and Rates",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:cdc-socrata:ddsk-zebd-4a9806447a6a118c",
+          "title": "NCHS - Infant Mortality Rates, by Race: United States, 1915-2013",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:cdc-socrata:epev-k6ss-88fb2fc7a0c6ba87",
+          "title": "NCHS - Infant and neonatal mortality rates: United States, 1915-2013",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:cdc-socrata:j7ym-uwqy-1a110f54bc2e95e5",
+          "title": "DQS Infant, neonatal, and postneonatal mortality rates, by detailed race and Hispanic origin of mother: United States",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:cdc-socrata:nfuu-hu6j-dc5b26ef4f9e4106",
+          "title": "Infant, neonatal, postneonatal, fetal, and perinatal mortality rates, by detailed race and Hispanic origin of mother: United States",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        }
+      ],
+      "sections": {
+        "supported": 0,
+        "uncertain": 0,
+        "contextual": 10
+      },
+      "interpreted_constraints": {
+        "geographies": [],
+        "subjects": [
+          {
+            "id": "maternal_child_health",
+            "label": "Maternal and child health",
+            "kind": "subject",
+            "matched_aliases": [
+              "maternal mortality"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "quality",
+            "label": "Quality and outcomes",
+            "kind": "subject",
+            "matched_aliases": [
+              "mortality"
+            ],
+            "evidence": "controlled_vocabulary"
+          }
+        ],
+        "units_of_analysis": [
+          {
+            "id": "hospital",
+            "label": "Hospital",
+            "kind": "unit",
+            "matched_aliases": [
+              "implied_by:quality"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "facility",
+            "label": "Facility",
+            "kind": "unit",
+            "matched_aliases": [
+              "implied_by:quality"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "provider",
+            "label": "Provider",
+            "kind": "unit",
+            "matched_aliases": [
+              "implied_by:quality"
+            ],
+            "evidence": "controlled_vocabulary"
+          }
+        ],
+        "time_window": null,
+        "access_intent": {
+          "include_restricted": true,
+          "public_only": false,
+          "accepts_restricted": false,
+          "match_basis": "question_or_default",
+          "payload_requirement": "unspecified",
+          "cost_requirement": "unspecified",
+          "ambiguity": null,
+          "matched_phrases": [],
+          "interpretation_note": null
+        },
+        "exclusions": [],
+        "named_sources": [],
+        "positive_terms": [
+          "cdc",
+          "maternal",
+          "mortality",
+          "data"
+        ],
+        "interpretation_warnings": []
+      },
+      "named_source_resolution": [],
+      "warnings": [
+        "4 incompatible catalog item(s) were isolated; valid partial results remain available.",
+        "Results describe indexed metadata and retrieval routes; they do not prove current endpoint availability or authorize access."
+      ],
+      "partial_results": {
+        "is_partial": true,
+        "invalid_item_count": 4,
+        "issues": [
+          {
+            "index": 20,
+            "record_id": "obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 54,
+            "record_id": "obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 109,
+            "record_id": "obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 1282,
+            "record_id": "obs:asset:cdc-socrata:va9e-d8re-c845d9bfb921e339",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          }
+        ]
+      },
+      "checks": {
+        "http_200": true,
+        "production_corpus_3434": true,
+        "production_version_1_2_0": true,
+        "source_slices_3434": true,
+        "ordered_ids_match_page": true,
+        "invalid_records_isolated": true,
+        "expected_homepage_leader": true
+      },
+      "expected_leading_id": "obs:asset:cdc-socrata:e2d5-ggg7-de73391d5d45d504"
+    },
+    {
+      "kind": "homepage_example",
+      "number": 3,
+      "question": "What CMS sources describe hospital ownership in Pennsylvania?",
+      "http_status": 200,
+      "total_matches": 99,
+      "top": [
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-60625-369694b51de508f8",
+          "title": "Hospital Change of Ownership - Owner Information",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "unknown",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-c0403-2fde704e1839cb5a",
+          "title": "Hospital Change of Ownership",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "unknown",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-029c1-8c321ddb3d36cb40",
+          "title": "Hospital All Owners",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "unknown",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:cdc-socrata:4q35-rqzk-f417b67e759f4f3b",
+          "title": "DQS Hospital admission, average length of stay, outpatient visits, and outpatient surgery by type of ownership and size of hospital: United States",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "unknown",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:census-api:api.census.gov-data-id-ecnhosp2012-ed32cede4e1522bb",
+          "title": "Health Care and Social Assistance: Subject Series - Misc Subjects: Ownership and Control of Government Hospitals for the U.S.: 2012",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "unknown",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        }
+      ],
+      "sections": {
+        "supported": 0,
+        "uncertain": 0,
+        "contextual": 10
+      },
+      "interpreted_constraints": {
+        "geographies": [
+          {
+            "id": "US-PA",
+            "label": "Pennsylvania",
+            "kind": "geography",
+            "matched_aliases": [
+              "pennsylvania"
+            ],
+            "evidence": "controlled_vocabulary"
+          }
+        ],
+        "subjects": [
+          {
+            "id": "ownership",
+            "label": "Ownership and organizational relationships",
+            "kind": "subject",
+            "matched_aliases": [
+              "hospital ownership"
+            ],
+            "evidence": "controlled_vocabulary"
+          }
+        ],
+        "units_of_analysis": [
+          {
+            "id": "hospital",
+            "label": "Hospital",
+            "kind": "unit",
+            "matched_aliases": [
+              "hospital"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "facility",
+            "label": "Facility",
+            "kind": "unit",
+            "matched_aliases": [
+              "implied_by:ownership"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "health_system",
+            "label": "Health system",
+            "kind": "unit",
+            "matched_aliases": [
+              "implied_by:ownership"
+            ],
+            "evidence": "controlled_vocabulary"
+          }
+        ],
+        "time_window": null,
+        "access_intent": {
+          "include_restricted": true,
+          "public_only": false,
+          "accepts_restricted": false,
+          "match_basis": "question_or_default",
+          "payload_requirement": "unspecified",
+          "cost_requirement": "unspecified",
+          "ambiguity": null,
+          "matched_phrases": [],
+          "interpretation_note": null
+        },
+        "exclusions": [],
+        "named_sources": [],
+        "positive_terms": [
+          "what",
+          "cms",
+          "sources",
+          "describe",
+          "hospital",
+          "ownership",
+          "in",
+          "pennsylvania"
+        ],
+        "interpretation_warnings": []
+      },
+      "named_source_resolution": [],
+      "warnings": [
+        "4 incompatible catalog item(s) were isolated; valid partial results remain available.",
+        "Results describe indexed metadata and retrieval routes; they do not prove current endpoint availability or authorize access."
+      ],
+      "partial_results": {
+        "is_partial": true,
+        "invalid_item_count": 4,
+        "issues": [
+          {
+            "index": 20,
+            "record_id": "obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 54,
+            "record_id": "obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 109,
+            "record_id": "obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 1282,
+            "record_id": "obs:asset:cdc-socrata:va9e-d8re-c845d9bfb921e339",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          }
+        ]
+      },
+      "checks": {
+        "http_200": true,
+        "production_corpus_3434": true,
+        "production_version_1_2_0": true,
+        "source_slices_3434": true,
+        "ordered_ids_match_page": true,
+        "invalid_records_isolated": true,
+        "expected_homepage_leader": true
+      },
+      "expected_leading_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-60625-369694b51de508f8"
+    },
+    {
+      "kind": "homepage_example",
+      "number": 4,
+      "question": "Public-use hospital utilization data",
+      "http_status": 200,
+      "total_matches": 149,
+      "top": [
+        {
+          "id": "obs:asset:cdc-socrata:tqpr-vcrm-4aa4061557d57dc8",
+          "title": "National Hospital Ambulatory Medical Care Survey, Public-use data 1992-2022",
+          "match_state": "supported",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "supported"
+        },
+        {
+          "id": "obs:asset:cdc-socrata:jdch-es95-2e0a305a08049cc0",
+          "title": "National Hospital Care Survey, 2020-2022 public-use data",
+          "match_state": "supported",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "supported"
+        },
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-2935c-803422f6c6899cd6",
+          "title": "Medicare Post-Acute Care Utilization - Long-Term Care Hospital by Geography and Provider",
+          "match_state": "uncertain",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "unknown"
+        },
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-1e1be-2e19bf0aa4756bb2",
+          "title": "CMS Program Statistics - Medicare Inpatient Hospital",
+          "match_state": "uncertain",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "unknown"
+        },
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+          "title": "Hospital Provider Cost Report",
+          "match_state": "uncertain",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "unknown"
+        }
+      ],
+      "sections": {
+        "supported": 2,
+        "uncertain": 8,
+        "contextual": 0
+      },
+      "interpreted_constraints": {
+        "geographies": [],
+        "subjects": [
+          {
+            "id": "utilization",
+            "label": "Hospital and provider utilization",
+            "kind": "subject",
+            "matched_aliases": [
+              "utilization"
+            ],
+            "evidence": "controlled_vocabulary"
+          }
+        ],
+        "units_of_analysis": [
+          {
+            "id": "hospital",
+            "label": "Hospital",
+            "kind": "unit",
+            "matched_aliases": [
+              "hospital"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "facility",
+            "label": "Facility",
+            "kind": "unit",
+            "matched_aliases": [
+              "implied_by:utilization"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "provider",
+            "label": "Provider",
+            "kind": "unit",
+            "matched_aliases": [
+              "implied_by:utilization"
+            ],
+            "evidence": "controlled_vocabulary"
+          }
+        ],
+        "time_window": null,
+        "access_intent": {
+          "include_restricted": false,
+          "public_only": true,
+          "accepts_restricted": false,
+          "match_basis": "question_or_default",
+          "payload_requirement": "documented_public_payload",
+          "cost_requirement": "unspecified",
+          "ambiguity": null,
+          "matched_phrases": [
+            "public use"
+          ],
+          "interpretation_note": "Catalog visibility alone does not satisfy this request; only documented public payload access is a confirmed match."
+        },
+        "exclusions": [],
+        "named_sources": [],
+        "positive_terms": [
+          "hospital",
+          "utilization",
+          "data"
+        ],
+        "interpretation_warnings": []
+      },
+      "named_source_resolution": [],
+      "warnings": [
+        "4 incompatible catalog item(s) were isolated; valid partial results remain available.",
+        "Results describe indexed metadata and retrieval routes; they do not prove current endpoint availability or authorize access."
+      ],
+      "partial_results": {
+        "is_partial": true,
+        "invalid_item_count": 4,
+        "issues": [
+          {
+            "index": 20,
+            "record_id": "obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 54,
+            "record_id": "obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 109,
+            "record_id": "obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 1282,
+            "record_id": "obs:asset:cdc-socrata:va9e-d8re-c845d9bfb921e339",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          }
+        ]
+      },
+      "checks": {
+        "http_200": true,
+        "production_corpus_3434": true,
+        "production_version_1_2_0": true,
+        "source_slices_3434": true,
+        "ordered_ids_match_page": true,
+        "invalid_records_isolated": true,
+        "expected_homepage_leader": true
+      },
+      "expected_leading_id": "obs:asset:cdc-socrata:tqpr-vcrm-4aa4061557d57dc8"
+    },
+    {
+      "kind": "homepage_example",
+      "number": 5,
+      "question": "CMS Medicare inpatient hospital utilization",
+      "http_status": 200,
+      "total_matches": 62,
+      "top": [
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-1e1be-2e19bf0aa4756bb2",
+          "title": "CMS Program Statistics - Medicare Inpatient Hospital",
+          "match_state": "supported",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-f7bc5-9eb6d5d80ed3dc6c",
+          "title": "CMS Program Statistics - Medicare Advantage-Inpatient Hospital",
+          "match_state": "supported",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-41d96-35022dd17ccdb29a",
+          "title": "CMS Program Statistics - Medicare Outpatient Facility",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-b8135-acfd8573ccca59d1",
+          "title": "CMS Program Statistics - Medicare Home Health Agency",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        },
+        {
+          "id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-7f93a-fa98c533196d4882",
+          "title": "CMS Program Statistics - Medicare Hospice",
+          "match_state": "contextual",
+          "named_source_role": "not_applicable",
+          "geographic_compatibility": "not_requested",
+          "observation_time_compatibility": "not_requested",
+          "access_compatibility": "not_requested"
+        }
+      ],
+      "sections": {
+        "supported": 2,
+        "uncertain": 0,
+        "contextual": 8
+      },
+      "interpreted_constraints": {
+        "geographies": [],
+        "subjects": [
+          {
+            "id": "payer",
+            "label": "Payer and coverage",
+            "kind": "subject",
+            "matched_aliases": [
+              "medicare"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "utilization",
+            "label": "Hospital and provider utilization",
+            "kind": "subject",
+            "matched_aliases": [
+              "utilization"
+            ],
+            "evidence": "controlled_vocabulary"
+          }
+        ],
+        "units_of_analysis": [
+          {
+            "id": "hospital",
+            "label": "Hospital",
+            "kind": "unit",
+            "matched_aliases": [
+              "hospital"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "facility",
+            "label": "Facility",
+            "kind": "unit",
+            "matched_aliases": [
+              "implied_by:utilization"
+            ],
+            "evidence": "controlled_vocabulary"
+          },
+          {
+            "id": "provider",
+            "label": "Provider",
+            "kind": "unit",
+            "matched_aliases": [
+              "implied_by:utilization"
+            ],
+            "evidence": "controlled_vocabulary"
+          }
+        ],
+        "time_window": null,
+        "access_intent": {
+          "include_restricted": true,
+          "public_only": false,
+          "accepts_restricted": false,
+          "match_basis": "question_or_default",
+          "payload_requirement": "unspecified",
+          "cost_requirement": "unspecified",
+          "ambiguity": null,
+          "matched_phrases": [],
+          "interpretation_note": null
+        },
+        "exclusions": [],
+        "named_sources": [],
+        "positive_terms": [
+          "cms",
+          "medicare",
+          "inpatient",
+          "hospital",
+          "utilization"
+        ],
+        "interpretation_warnings": []
+      },
+      "named_source_resolution": [],
+      "warnings": [
+        "4 incompatible catalog item(s) were isolated; valid partial results remain available.",
+        "Results describe indexed metadata and retrieval routes; they do not prove current endpoint availability or authorize access."
+      ],
+      "partial_results": {
+        "is_partial": true,
+        "invalid_item_count": 4,
+        "issues": [
+          {
+            "index": 20,
+            "record_id": "obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 54,
+            "record_id": "obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 109,
+            "record_id": "obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          },
+          {
+            "index": 1282,
+            "record_id": "obs:asset:cdc-socrata:va9e-d8re-c845d9bfb921e339",
+            "code": "invalid_catalog_record",
+            "errors": [
+              "description must be a non-empty string"
+            ]
+          }
+        ]
+      },
+      "checks": {
+        "http_200": true,
+        "production_corpus_3434": true,
+        "production_version_1_2_0": true,
+        "source_slices_3434": true,
+        "ordered_ids_match_page": true,
+        "invalid_records_isolated": true,
+        "expected_homepage_leader": true
+      },
+      "expected_leading_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-1e1be-2e19bf0aa4756bb2"
+    }
+  ]
+}

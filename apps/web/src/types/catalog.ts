@@ -11,7 +11,7 @@ import type {
 export type Relevance = 'High' | 'Medium' | 'Low' | 'Browse'
 export type Relationship = 'Confirmed family' | 'Possible relation' | 'Standalone record'
 export type GroupMode = 'family' | 'record'
-export type SortMode = 'best' | 'title' | 'newest'
+export type SortMode = 'canonical_relevance' | 'title_asc' | 'release_newest' | 'observation_latest'
 
 export interface AccessOption {
   id: string

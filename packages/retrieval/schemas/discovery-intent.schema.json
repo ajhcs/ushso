@@ -12,13 +12,17 @@
     "interpretation": {
       "type":"object",
       "additionalProperties":false,
-      "required":["geographies","subjects","units_of_analysis","time_window","access_intent"],
+      "required":["geographies","subjects","units_of_analysis","time_window","access_intent","exclusions","named_sources","interpretation_warnings"],
       "properties": {
         "geographies":{"$ref":"#/$defs/conceptMatches"},
         "subjects":{"$ref":"#/$defs/conceptMatches"},
         "units_of_analysis":{"$ref":"#/$defs/conceptMatches"},
         "time_window":{"type":["object","null"]},
-        "access_intent":{"type":"object"}
+        "access_intent":{"type":"object"},
+        "positive_terms":{"type":"array","items":{"type":"string"}},
+        "exclusions":{"type":"array","items":{"type":"object"}},
+        "named_sources":{"type":"array","items":{"type":"object"}},
+        "interpretation_warnings":{"type":"array","items":{"type":"string"}}
       }
     },
     "filters":{"type":"object"},

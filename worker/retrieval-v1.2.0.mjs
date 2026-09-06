@@ -3,6 +3,7 @@
 import { compileDiscoveryIntent } from '../packages/retrieval/tools/intent-compiler.mjs';
 import { selectJoinRoutes, validateJoinRoute } from '../packages/retrieval/tools/join-routes.mjs';
 import { normalizeText } from '../packages/retrieval/tools/question-parser.mjs';
+import { createRetrievalEngine as createCurrentRetrievalEngine } from '../packages/retrieval/tools/retrieval-core-v1.2.mjs';
 
 const RESTRICTED = new Set(['registration_required', 'application_required', 'dua_required', 'licensed_paid', 'controlled']);
 const STOPWORDS = new Set(['a', 'an', 'and', 'are', 'can', 'data', 'dataset', 'datasets', 'for', 'from', 'i', 'in', 'is', 'me', 'need', 'of', 'on', 'source', 'sources', 'study', 'the', 'to', 'use', 'what', 'which', 'with']);
@@ -138,7 +139,7 @@ function explain(item) {
   return reasons.length ? [...new Set(reasons)] : ['Record passed explicit filters but has only weak lexical relevance in the bounded catalog metadata.'];
 }
 
-export function createRetrievalEngine({ records, searchDocuments = [], joinRoutes = [], vocabulary, corpus }) {
+function createLegacyRetrievalEngine({ records, searchDocuments = [], joinRoutes = [], vocabulary, corpus }) {
   if (!Array.isArray(records) || records.length === 0) throw new TypeError('records must be a non-empty array');
   if (!Array.isArray(searchDocuments) || searchDocuments.length !== 0) throw new TypeError('v1.2 runtime requires on-demand search projection');
   if (!vocabulary || !Array.isArray(vocabulary.subjects) || !Array.isArray(vocabulary.geographies) || !Array.isArray(vocabulary.units)) throw new TypeError('vocabulary must define subjects, geographies, and units');
@@ -212,4 +213,10 @@ export function createRetrievalEngine({ records, searchDocuments = [], joinRoute
       };
     },
   });
+}
+
+// The live v1.2 catalog uses the same validated ranking and traversal engine as
+// the browser fixture, with canonical record text projected only on demand.
+export function createRetrievalEngine({ records, searchDocuments: _searchDocuments = [], joinRoutes = [], vocabulary, corpus, namedSourceRegistry = null, catalogValidation = null }) {
+  return createCurrentRetrievalEngine({ records, searchDocuments: null, joinRoutes, vocabulary, corpus, namedSourceRegistry, catalogValidation });
 }

@@ -4,7 +4,7 @@ import { readSearchState, writeSearchState } from './searchParams'
 describe('search URL state', () => {
   it('leaves geography interpretation to the canonical discovery response', () => {
     const state = readSearchState(new URLSearchParams('q=test'))
-    expect(state.group).toBe('family')
+    expect(state.group).toBe('record')
     expect(state.filters).toEqual([])
   })
 
@@ -15,7 +15,7 @@ describe('search URL state', () => {
   })
 
   it('round-trips explicit ungrouped and cleared-filter state', () => {
-    const encoded = writeSearchState({ q: 'hospital data', group: 'record', sort: 'title', page: 3, filters: [] })
-    expect(readSearchState(encoded)).toEqual({ q: 'hospital data', group: 'record', sort: 'title', page: 3, filters: [] })
+    const encoded = writeSearchState({ q: 'hospital data', group: 'record', sort: 'title_asc', page: 3, filters: [], cursor: null, generation: null })
+    expect(readSearchState(encoded)).toEqual({ q: 'hospital data', group: 'record', sort: 'title_asc', page: 3, filters: [], cursor: null, generation: null })
   })
 })

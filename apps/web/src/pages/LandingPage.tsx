@@ -4,6 +4,7 @@ import { HowItWorks } from '../components/HowItWorks'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { SearchBox } from '../components/SearchBox'
+import { PageTitle } from '../components/PageTitle'
 
 export function LandingPage() {
   const navigate = useNavigate()
@@ -16,13 +17,14 @@ export function LandingPage() {
 
   return (
     <div className="landing-page">
+      <PageTitle label="Health data source discovery" />
       <ObservatoryHeader />
       <main id="main-content">
         <section className="landing-hero" aria-labelledby="landing-title">
           <div className="landing-hero__inner">
             <h1 id="landing-title">Find the health-systems data<br />{' '}that answers your question.</h1>
             <span className="gold-rule" aria-hidden="true" />
-            <p>Discover what data exists, where it lives, what it contains,<br />and how to access it.</p>
+            <p>Discover what data exists, where it lives, what it contains,<br />{' '}and how to access it.</p>
             <SearchBox initialQuery={params.get('q') ?? ''} onSubmit={search} />
             <DiscoveryDimensions />
           </div>
