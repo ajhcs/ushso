@@ -17,6 +17,9 @@ import tarfile
 import tempfile
 import unittest
 
+# Dynamic imports must not mutate the exact candidate during verification.
+sys.dont_write_bytecode = True
+
 
 TEST_ROOT = Path(__file__).resolve().parent
 BUILDER = TEST_ROOT / "build-research-archive.py"
