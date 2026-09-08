@@ -11,7 +11,7 @@ export function ContactPage() {
         <header className="information-page__heading">
           <p>Contact and corrections</p>
           <h1>Report a catalog issue</h1>
-          <p>Use the public repository’s issue form for source corrections, access observations, and product feedback.</p>
+          <p>Email info@ushso.org for source corrections, access observations, and product feedback. USHSO is operated by The American Journal of Healthcare Strategy.</p>
         </header>
         <section aria-labelledby="contact-public-heading">
           <h2 id="contact-public-heading">Public issue route</h2>
@@ -20,7 +20,7 @@ export function ContactPage() {
         </section>
         <section aria-labelledby="contact-private-heading">
           <h2 id="contact-private-heading">Private contact</h2>
-          <p><strong>Status: not yet published.</strong> The owner has not supplied a verified private email address or form for this release. Do not put protected health information, credentials, embargoed material, or sensitive security details in a public issue.</p>
+          <p><a className="button-link" href="mailto:info@ushso.org">Email info@ushso.org</a></p><p>Include the record ID, affected field, and a supporting publisher link. Do not send protected health information, credentials, or restricted datasets. An acknowledgement time has not yet been established.</p>
         </section>
       </main>
       <ObservatoryFooter />

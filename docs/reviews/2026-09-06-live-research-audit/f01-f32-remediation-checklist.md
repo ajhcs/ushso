@@ -1,5 +1,7 @@
 # F01–F32 release-candidate remediation checklist
 
+**Historical remediation baseline, not current research-candidate acceptance.** [Current follow-up](../../research-automation/MUSE-FOLLOWUP-20260907.md) records successor changes and remaining work. Verified labels below apply only to the identified historical candidate, not the changed candidate or its scientific completeness.
+
 Candidate: `codex/audit-remediation-production-20260906`; corpus v1.2.0; published inventory 3,434; searchable records 3,430; isolated incompatible records 4; generation `live-2026-09-03-85b50522b420`.
 
 Status meanings: **Verified** means implemented and exercised on the candidate. **Partial** means the safe product behavior is implemented but evidence enrichment or research review remains. **Owner** means completion requires authorized owner input and is not claimed here.

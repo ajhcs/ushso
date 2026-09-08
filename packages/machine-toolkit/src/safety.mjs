@@ -227,7 +227,7 @@ function semanticIssues(core, input) {
   if (input.expected_generation && core.index_generation !== input.expected_generation) issues.push(issue('GENERATION_PIN_MISMATCH', '/index_generation'));
   if (core.error?.code === 'record_unavailable_in_generation' && core.error.scope?.record_id == null) issues.push(issue('PUBLIC_RECORD_SCOPE_REQUIRED', '/error/scope/record_id'));
   if (core.error && SAFE_ERROR_PRIVACY.test(`${core.error.safe_message} ${core.error.corrective_guidance}`)) issues.push(issue('PUBLIC_ERROR_PRIVACY_LEAK', '/error/safe_message'));
-  if (core.error?.code === 'rate_limited' && (core.error.retryable !== true || core.error.retry_after_seconds === null || core.error.retry_after_seconds !== core.rate_limit?.retry_after_seconds)) issues.push(issue('RATE_LIMIT_INCONSISTENT', '/error/retry_after_seconds'));
+  if (core.error?.code === 'rate_limited' && (core.rate_limit?.state === 'unknown' || core.error.retryable !== true || core.error.retry_after_seconds === null || core.error.retry_after_seconds !== core.rate_limit?.retry_after_seconds)) issues.push(issue('RATE_LIMIT_INCONSISTENT', '/error/retry_after_seconds'));
   if ((core.rate_limit?.remaining ?? 0) > (core.rate_limit?.limit ?? 0)) issues.push(issue('RATE_LIMIT_INCONSISTENT', '/rate_limit/remaining'));
   if (core.capability === 'search_assets' && core.ok) {
     if (core.result.mode !== input.mode) issues.push(issue('SEARCH_MODE_MISMATCH', '/result/mode'));
@@ -273,7 +273,7 @@ export function validateCanonicalCore(core, capability, input, options = {}) {
   if (!core || typeof core !== 'object' || Array.isArray(core)) return [issue('CORE_NOT_OBJECT', '/')];
   for (const field of CORE_REQUIRED) if (!Object.hasOwn(core, field)) issues.push(issue('CORE_FIELD_MISSING', `/${field}`));
   for (const field of TRANSPORT_FIELDS) if (Object.hasOwn(core, field)) issues.push(issue('TRANSPORT_FIELD_IN_CANONICAL_CORE', `/${field}`));
-  if (core.tool_contract_version !== 'observatory-machine-toolkit.v1.0.0') issues.push(issue('CONTRACT_VERSION_MISMATCH', '/tool_contract_version'));
+  if (!['observatory-machine-toolkit.v1.0.0', 'observatory-machine-toolkit.v1.1.0'].includes(core.tool_contract_version)) issues.push(issue('CONTRACT_VERSION_MISMATCH', '/tool_contract_version'));
   if (core.capability !== capability) issues.push(issue('CAPABILITY_MISMATCH', '/capability'));
   if (!Array.isArray(core.evidence_references) || core.evidence_references.length > (capability === 'plan_research' ? 200 : 100)) issues.push(issue('EVIDENCE_CARDINALITY_EXCEEDED', '/evidence_references'));
   if (!Array.isArray(core.warnings) || core.warnings.length > 50) issues.push(issue('WARNING_CARDINALITY_EXCEEDED', '/warnings'));

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
+import {verifyAdvertisedSchemas} from '../scripts/verify-advertised-schemas.mjs';
 
 const baseIndex = process.argv.indexOf('--base');
 const receiptIndex = process.argv.indexOf('--receipt');
@@ -53,6 +54,7 @@ assert.equal(contract.tools.length, 8);
 assert.deepEqual(contract.disabled_tools.map(tool => tool.capability), ['plan_research']);
 assert.equal(contract.source_network_allowed_at_invocation, false);
 assert.equal(contract.payload_retrieval_allowed, false);
+const advertisedSchemas = await verifyAdvertisedSchemas(base, contract);
 
 const { response: discoverResponse, body: discovery } = await jsonResponse(`${base}/api/discover`, {
   method: 'POST',
@@ -137,7 +139,11 @@ const machineResults = [];
 for (const [capability, url, init] of machineCalls) {
   const { response, body } = await jsonResponse(url, init);
   assert.equal(response.status, 200, capability);
-  assertInspectionResponse(body, capability);
+  advertisedSchemas.validate(capability, body);
+  assert.ok(Object.values(body.truth_boundary).every(flag=>flag===false));
+  if (['get_access_plan','get_retrieval_recipe','get_variables'].includes(capability)) assert.equal(typeof body.ok,'boolean');
+  else assertInspectionResponse(body, capability);
+  if (capability === 'get_asset') assert.equal(advertisedSchemas.legacy(body),false,'strict v1.0 response consumer must reject successor');
   machineResults.push({ capability, status: response.status, result_state: body.result_state });
 }
 
@@ -193,6 +199,7 @@ const receipt = {
   contract: contract.contract_version,
   enabled_tool_count: contract.enabled_tool_count,
   machine_results: machineResults,
+  advertised_schema_ids: advertisedSchemas.schema_ids,
   planner_status: planner.status,
   zero_results: zero.result_count,
   repeated_discovery: {

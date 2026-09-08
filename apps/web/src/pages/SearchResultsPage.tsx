@@ -11,9 +11,11 @@ import { adaptDiscoveryResponse } from '../lib/catalogAdapter'
 import { searchDocumentTitle, setDocumentTitle } from '../lib/documentTitle'
 import { createSearchReturnContext, datasetDetailsHref, parseReturnContext, serializeReturnContext, resultAnchorId } from '../lib/returnContext'
 import { createSearchReceipt, downloadSearchReceipt } from '../lib/searchReceipt'
+import { createSearchAssessment } from '../lib/searchAssessment'
 import { readSearchState, writeSearchState, type SearchRouteState } from '../lib/searchParams'
 import { useDiscoveryResult } from '../providers/DiscoveryProviderContext'
 import type { DatasetRecord, FacetSectionConfig } from '../types/catalog'
+import type { DiscoveryResult } from '../types/discovery'
 
 const PAGE_SIZE = 10
 
@@ -46,6 +48,12 @@ function interpretationLines(result: NonNullable<ReturnType<typeof adaptDiscover
 
 export function displayedRecordIds(records: DatasetRecord[]) {
   return records.map((record) => record.canonicalResult.record_id)
+}
+
+export function SearchIdentityNote({ result }: { result: DiscoveryResult }) {
+  const generation = result.pagination?.generation ?? result.corpus.generation
+    ?? `${result.corpus.corpus_id} ${result.corpus.corpus_version}`
+  return <p className="results-footnote"><Info aria-hidden="true" /><span>Results are scoped to catalog generation {generation}. Ranking version: {result.ranking?.version ?? 'not reported by this response'}. Confirm content, coverage, and access at the publisher source.</span></p>
 }
 
 export function OrderedResultCards({ records, firstDisplayRank = 1, detailsHref, onDetailsClick }: {
@@ -155,7 +163,7 @@ export function SearchResultsPage() {
     const context = createSearchReturnContext(location, record.id, window.scrollY)
     // Capture at activation, not render time; preserve React Router's history fields.
     window.history.replaceState({ ...window.history.state, usr: { ...location.state, searchReturn: serializeReturnContext(context) } }, '')
-    navigate(datasetDetailsHref(record.id, context))
+    navigate(datasetDetailsHref(record.id, context), { state: { searchAssessment: discovery.status === 'ready' ? createSearchAssessment(discovery.result, record) : null } })
   }
   const changePage = (page: number) => {
     if (page === state.page) return
@@ -196,7 +204,7 @@ export function SearchResultsPage() {
                     : <div className="empty-results"><h2>No indexed source matched this question.</h2><p>This is not evidence that no source exists. Try broader terms or remove a constraint.</p><Link className="button-link" to="/">Revise search</Link></div>}
           </div>
 
-          {discovery.status === 'ready' && <p className="results-footnote"><Info aria-hidden="true" /><span>Results are scoped to catalog generation {pagination?.generation ?? `${discovery.result.corpus.corpus_id} ${discovery.result.corpus.corpus_version}`}. Confirm content, coverage, and access at the publisher source.</span></p>}
+          {discovery.status === 'ready' && <SearchIdentityNote result={discovery.result} />}
           {discovery.status === 'ready' && pageCount > 1 && <Pagination currentPage={state.page} pageCount={pageCount} onChange={changePage} />}
         </div>
         {catalog && <div className="desktop-facets"><FacetSidebar sections={facets} selected={state.filters} onToggle={toggleFilter} onClear={() => resetTraversal({ filters: [] })} /></div>}

@@ -3,6 +3,19 @@ import type { ObservatoryToolkitAdapter } from './registerObservatoryToolkit'
 type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 type JsonObject = Record<string, unknown>
 
+// Deliberately small transport boundary. Complete schema validation runs against
+// advertised artifact schemas in verification, not on every browser request.
+function checkResponse(value: unknown, capability: string) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('USHSO_INVALID_RESPONSE_ENVELOPE')
+  const envelope = value as JsonObject
+  if (envelope.tool_contract_version !== 'observatory-machine-toolkit.v1.1.0') throw new Error('USHSO_UNSUPPORTED_RESPONSE_VERSION')
+  if (envelope.capability !== capability || typeof envelope.ok !== 'boolean') throw new Error('USHSO_INVALID_RESPONSE_ENVELOPE')
+  const quota = envelope.rate_limit as JsonObject | undefined
+  if (!quota || quota.state !== 'unknown') throw new Error('USHSO_INVALID_QUOTA_ENVELOPE')
+  if (quota.state === 'unknown' && ['policy_id', 'limit', 'remaining', 'reset_at', 'retry_after_seconds'].some(key => quota[key] !== null)) throw new Error('USHSO_INVALID_QUOTA_ENVELOPE')
+  return value
+}
+
 function append(parameters: URLSearchParams, name: string, value: unknown) {
   if (value === null || value === undefined) return
   parameters.append(name, typeof value === 'string' ? value : JSON.stringify(value))
@@ -83,7 +96,7 @@ export function createBrowserMachineToolkitClient(fetchImpl: FetchLike = globalT
         signal: options.signal,
       })
       if (!response.ok) throw new Error(`USHSO machine toolkit returned HTTP ${response.status}`)
-      return response.json()
+      return checkResponse(await response.json(), capability)
     },
   })
 }

@@ -2,9 +2,9 @@
 
 The published historical baseline evaluates the immutable **143-record corpus
 v1.0.1** against 60 frozen health-systems discovery questions before ranking
-optimization. It is not an evaluation of the **157-record production and
-migration-seed corpus v1.1.0**. The benchmark contains 36 source identities; the
-historical validation receipt finds 18 represented by matching source-native
+optimization. It is not an evaluation of the historical **157-record production
+and migration-seed corpus v1.1.0**. The benchmark contains 36 source identities;
+the historical validation receipt finds 18 represented by matching source-native
 IDs. Missing benchmark coverage is not treated as evidence that a source does
 not exist.
 

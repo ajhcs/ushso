@@ -5,6 +5,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { createMachineToolkit } from '../packages/machine-toolkit/src/index.mjs';
 import { createStaticMachineToolkitRuntime } from '../worker/static-machine-toolkit-service.mjs';
+import { createMachineCursorSigner } from '../worker/machine-cursor.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const versionRoot = path.join(root, 'packages/retrieval/versions/v1.2.0');
@@ -26,7 +27,10 @@ const filters = {
 
 test('all eight public inspection operations return contract-safe envelopes', async () => {
   const catalog = await loadCatalog();
-  const runtime = createStaticMachineToolkitRuntime(catalog, { now: new Date('2026-09-03T12:00:00Z') });
+  const runtime = createStaticMachineToolkitRuntime(catalog, {
+    now: new Date('2026-09-03T12:00:00Z'),
+    cursorSigner: createMachineCursorSigner({ clock: () => Date.parse('2026-09-03T12:00:00Z') }),
+  });
   const toolkit = createMachineToolkit({
     service: runtime.operations,
     responseContext: runtime.context,
@@ -53,11 +57,18 @@ test('all eight public inspection operations return contract-safe envelopes', as
     const safetyFailures = [];
     const response = await toolkit.invokeJsonApi(capability, input, { onSafetyFailure: failure => safetyFailures.push(failure) });
     assert.deepEqual(safetyFailures, [], `${capability}: ${JSON.stringify(safetyFailures)}`);
-    assert.equal(response.ok, true, `${capability}: ${JSON.stringify(response.error)}`);
+    const unavailableCode = { get_access_plan: 'route_not_documented', get_retrieval_recipe: 'route_not_documented', get_variables: 'schema_context_required' }[capability];
+    assert.equal(response.ok, !unavailableCode, `${capability}: ${JSON.stringify(response.error)}`);
+    if (unavailableCode) {
+      assert.equal(response.error.code, unavailableCode);
+      assert.equal(response.result_state, 'unknown');
+      assert.equal(response.result, null);
+    }
     assert.equal(response.capability, capability);
     assert.equal(response.transport_adapter, 'json_api');
     assert.equal(response.index_generation, generation);
-    assert.ok(response.result_snapshot_id?.startsWith('sha256:'));
+    if (response.ok) assert.ok(response.result_snapshot_id?.startsWith('sha256:'));
+    else assert.equal(response.result_snapshot_id, null);
     assert.deepEqual(Object.values(response.truth_boundary), Array(6).fill(false));
   }
 });

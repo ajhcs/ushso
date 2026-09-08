@@ -28,6 +28,7 @@ function normalizeContext(context, now) {
   const value = typeof context === 'function' ? context() : context;
   const generatedAt = now;
   const defaults = {
+    tool_contract_version: value?.tool_contract_version ?? (value?.rate_limit && value.rate_limit.state !== 'unknown' ? 'observatory-machine-toolkit.v1.0.0' : 'observatory-machine-toolkit.v1.1.0'),
     registry_revision: 'registry.unavailable',
     index_generation: 'generation.unavailable',
     publication_manifest_id: 'publication.unavailable',
@@ -35,14 +36,16 @@ function normalizeContext(context, now) {
     coverage_snapshot_id: null,
     generation_retention_expires_at: null,
     rate_limit: {
-      policy_id: 'public-machine-read.v1',
-      limit: 1,
-      remaining: 1,
-      reset_at: generatedAt,
+      state: 'unknown',
+      policy_id: null,
+      limit: null,
+      remaining: null,
+      reset_at: null,
       retry_after_seconds: null
     }
   };
   const result = { ...defaults, ...(value ?? {}), rate_limit: { ...defaults.rate_limit, ...(value?.rate_limit ?? {}) } };
+  if (result.tool_contract_version === 'observatory-machine-toolkit.v1.0.0' && !Object.hasOwn(value?.rate_limit ?? {}, 'state')) delete result.rate_limit.state;
   for (const key of ['registry_revision', 'index_generation', 'publication_manifest_id']) if (!STABLE_ID.test(result[key])) throw new TypeError(`MACHINE_TOOLKIT_CONTEXT_INVALID:${key}`);
   return cloneJson(result);
 }
@@ -50,6 +53,7 @@ function normalizeContext(context, now) {
 function errorMessages(code) {
   switch (code) {
     case 'invalid_input': return ['The request does not conform to the bounded machine-toolkit input contract.', 'Correct the public input fields and retry.'];
+    case 'cursor_expired': return ['The continuation cursor cannot be used for this traversal.', 'Restart the request without a cursor, preserving any valid generation pin.'];
     case 'response_limit_exceeded': return ['The complete safety-atomic response exceeds this capability output limit.', 'Narrow the request or use a documented cursor; no partial safety section was returned.'];
     case 'planner_unavailable': return ['The research-plan compiler is not enabled in the public capability manifest.', 'Use the inspection capabilities while plan_research remains disabled.'];
     default: return ['The bounded metadata service could not safely return this result.', 'Retry later without changing a valid generation pin.'];
@@ -61,7 +65,7 @@ export function createDomainErrorCore({ capability, code, input = {}, context, r
   const [safeMessage, guidance] = errorMessages(code);
   const recordId = typeof input.record_id === 'string' && STABLE_ID.test(input.record_id) ? input.record_id : null;
   return {
-    tool_contract_version: 'observatory-machine-toolkit.v1.0.0',
+    tool_contract_version: context.tool_contract_version ?? 'observatory-machine-toolkit.v1.0.0',
     capability,
     ok: false,
     registry_revision: context.registry_revision,

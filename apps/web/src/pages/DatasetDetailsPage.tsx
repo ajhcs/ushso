@@ -1,15 +1,18 @@
 import { AlertTriangle, Clock3, ExternalLink, Flag, Info, ShieldCheck } from 'lucide-react'
-import { type ReactNode, useEffect } from 'react'
+import { type ReactNode, lazy, Suspense, useEffect } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { ResearcherDecisionSummary } from '../components/ResearcherDecisionSummary'
+import { DictionaryReviewPanel } from '../components/DictionaryReviewPanel'
 import { findDatasetInResponse } from '../lib/catalogAdapter'
 import { datasetDocumentTitle, setDocumentTitle } from '../lib/documentTitle'
 import { safeExternalHttpsUrl } from '../lib/externalUrls'
 import { parseReturnContext, resultAnchorId, safeReturnDestination } from '../lib/returnContext'
+import { assessmentGeneration, readSearchAssessment } from '../lib/searchAssessment'
 import { useDatasetResult } from '../providers/DiscoveryProviderContext'
 import type { ObservatoryRecord } from '../types/discovery'
+const ScientificReviewPanel = lazy(() => import('../components/ScientificReviewPanel'))
 
 function formatDate(value: string) {
   const date = new Date(value)
@@ -120,7 +123,8 @@ export function DatasetDetailsPage() {
   const stopConditions = metadata?.retrieval_plan.stop_conditions ?? record.retrieval.instructions.filter((step) => step.action === 'stop_and_report')
   const routeParams = new URLSearchParams(location.search)
   const returnContext = parseReturnContext(routeParams.get('return'))
-  const contextualQuestion = returnContext ? new URLSearchParams(returnContext.search).get('q') : null
+  const contextualQuestion = returnContext?.selected_record_id.replace(/^obs:asset:/, '') === record.record_id.replace(/^obs:asset:/, '') ? new URLSearchParams(returnContext.search).get('q') : null
+  const searchAssessment = contextualQuestion ? readSearchAssessment(location.state?.searchAssessment, record.record_id, contextualQuestion, assessmentGeneration(discovery.result)) : null
   const safeBackDestination = `${safeReturnDestination(routeParams.get('return'))}${returnContext ? `#${resultAnchorId(returnContext.selected_record_id)}` : ''}`
   const sourceDocuments = [
     ...accessRoutes.map((step) => ({ label: 'Verified navigation route', url: step.url })),
@@ -132,7 +136,7 @@ export function DatasetDetailsPage() {
     .filter((item, index, items) => items.findIndex((candidate) => candidate.url === item.url) === index)
   const pageUrl = typeof window === 'undefined' ? `/datasets/${encodeURIComponent(datasetId)}` : window.location.href.split('?')[0]
   const correctionBody = [`Record ID: ${record.record_id}`, `Catalog generation: ${discovery.result.corpus.corpus_id} ${discovery.result.corpus.corpus_version}`, `Page URL: ${pageUrl}`, 'Affected field: ', '', 'Authoritative supporting link: ', '', 'Correction description: ', '', 'Do not include protected health information.'].join('\n')
-  const correctionHref = `https://github.com/ajhcs/ushso/issues/new?title=${encodeURIComponent(`Metadata correction: ${record.record_id}`)}&body=${encodeURIComponent(correctionBody)}`
+  const correctionHref = `mailto:info@ushso.org?subject=${encodeURIComponent(`Metadata correction: ${record.record_id}`)}&body=${encodeURIComponent(correctionBody)}`
   const displayedDescription = metadata?.description_quality.display_description ?? record.description
   const corrupted = metadata ? metadata.description_quality.state === 'suspected_encoding_corruption' : descriptionHasEncodingDamage(record.description)
   const dimensions = metadata?.dimensions
@@ -149,7 +153,7 @@ export function DatasetDetailsPage() {
           {corrupted && <div className="text-quality-notice" role="note"><AlertTriangle aria-hidden="true" /><p><strong>Source text may contain encoding damage.</strong> The captured wording is preserved without guessing at missing symbols. {metadata?.description_quality.authoritative_url && <a href={metadata.description_quality.authoritative_url} target="_blank" rel="noreferrer">Check the publisher’s current page <ExternalLink aria-hidden="true" /></a>}</p></div>}
         </header>
 
-         {contextualQuestion && <section className="context-relevance" aria-label="Search relevance context"><strong>{dataset.relevance} relevance for this search</strong><p>Question: “{contextualQuestion}”</p><p>This assessment explains retrieval for this question; it is not a scientific-quality or fitness rating.</p></section>}
+         {contextualQuestion && <section className="context-relevance" aria-label="Search relevance context"><strong>{searchAssessment ? `${searchAssessment.relevance} relevance in the originating search` : 'Originating search context'}</strong><p>Question: “{contextualQuestion}”</p>{searchAssessment ? <><p>Ranking version: {searchAssessment.ranking_version}. Catalog generation: {searchAssessment.generation}.</p><ul>{searchAssessment.reasons.map((reason, index) => <li key={index}>{reason}</li>)}</ul><p>This is the assessment saved from the originating search, not a scientific-quality or fitness rating.</p></> : <p>No matching search assessment is available on this record lookup. Return to the search results to inspect relevance; no relevance rating is inferred.</p>}</section>}
 
         <ResearcherDecisionSummary dataset={dataset} />
 
@@ -214,7 +218,9 @@ export function DatasetDetailsPage() {
 
         <details className="technical-details"><summary>Machine fields, identity, variables, and join routes</summary><div className="technical-details__content"><section aria-labelledby="technical-identity-heading"><h2 id="technical-identity-heading">Technical identity</h2><dl><div><dt>Record ID</dt><dd>{record.record_id}</dd></div><div><dt>Family resolution</dt><dd>{sentenceCase(record.identity.family.resolution_state)} · {relationshipSummary(record, dataset.familySiblingCount)}</dd></div><div><dt>Retrieval interface</dt><dd>{sentenceCase(record.retrieval.preferred_interface)}</dd></div><div><dt>Catalog generation</dt><dd>{discovery.result.corpus.corpus_id} · {discovery.result.corpus.corpus_version}</dd></div></dl></section><section aria-labelledby="technical-variable-heading"><h2 id="technical-variable-heading">Variables</h2>{dataset.variableDetails.variables.length === 0 ? <p>No variable list is captured.</p> : <dl className="variable-list">{dataset.variableDetails.variables.map((variable) => <div key={variable.name}><dt>{variable.label ?? variable.name}</dt><dd><p>{variable.description}</p><small>{[variable.data_type, variable.unit].filter(Boolean).join(' · ') || 'Source-defined field'}</small></dd></div>)}</dl>}</section><section aria-labelledby="technical-joins-heading"><h2 id="technical-joins-heading">Join routes</h2>{dataset.joinRoutes.length === 0 ? <p>No join route is documented for this record.</p> : dataset.joinRoutes.map((route) => <article className="join-route" key={route.route_id}><h3>{route.entity}: {route.compatibility_state}</h3><dl><div><dt>Route</dt><dd>{route.from_record_id} → {route.to_record_id}</dd></div><div><dt>Strategy</dt><dd>{route.match_strategy}</dd></div><div><dt>Cardinality</dt><dd>{route.cardinality}</dd></div><div><dt>Prerequisites</dt><dd>{route.preconditions.join(' · ') || 'None documented.'}</dd></div><div><dt>Caveats</dt><dd>{route.caveats.join(' · ') || 'None documented.'}</dd></div></dl></article>)}</section></div></details>
 
-        <section className="record-correction" aria-labelledby="record-correction-heading"><Flag aria-hidden="true" /><div><h2 id="record-correction-heading">See a metadata problem?</h2><p>The public correction form includes this record and catalog generation, but not your research question. Do not include protected health information or sensitive security details.</p><a href={correctionHref} target="_blank" rel="noreferrer">Report a metadata issue <ExternalLink aria-hidden="true" /></a></div></section>
+        <DictionaryReviewPanel key={record.record_id} recordId={record.record_id} />
+        {new URLSearchParams(location.search).get('scientific_review') === '1' && typeof discovery.result.corpus.publication?.generation === 'string' ? <Suspense fallback={<p role="status">Loading scientific review panel…</p>}><ScientificReviewPanel key={record.record_id} recordId={record.record_id} generation={discovery.result.corpus.publication.generation} /></Suspense> : null}
+        <section className="record-correction" aria-labelledby="record-correction-heading"><Flag aria-hidden="true" /><div><h2 id="record-correction-heading">See a metadata problem?</h2><p>The correction email includes this record and catalog generation, but not your research question. Do not include protected health information or sensitive security details.</p><a href={correctionHref} target="_blank" rel="noreferrer">Report a metadata issue <ExternalLink aria-hidden="true" /></a></div></section>
       </main>
       <ObservatoryFooter results />
     </div>

@@ -4,8 +4,8 @@ import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { PageTitle } from '../components/PageTitle'
 
 const disclosures = [
-  ['Operator and legal entity', 'Not yet disclosed by the owner. The public repository is maintained under the ajhcs GitHub account, but a repository account is not evidence of a legal entity or institutional operator.'],
-  ['Editorial responsibility', 'No named research editor, scientific reviewer, or correction decision-maker has been published for this release.'],
+  ['Operator', 'The American Journal of Healthcare Strategy operates USHSO.'],
+  ['Editorial responsibility', 'The site owner retains final approval of publication and research guidance. Automated checks and model-assisted reviews inform that decision; they do not replace it.'],
   ['Institutional affiliations', 'Not disclosed. The Observatory name does not imply affiliation with or endorsement by the United States government, a university, or any source publisher.'],
   ['Funding and conflicts', 'Funding sources, financial interests, and conflict-of-interest declarations have not been supplied for publication.'],
 ] as const
@@ -30,7 +30,7 @@ export function AboutPage() {
 
         <section aria-labelledby="about-governance-heading">
           <h2 id="about-governance-heading">Governance and disclosures</h2>
-          <p className="disclosure-intro">The following unknowns are published plainly so the site does not imply authority that has not been evidenced.</p>
+          <p className="disclosure-intro">Our operator and approval responsibilities are stated below. Disclosures not yet supplied remain explicit.</p>
           <dl className="disclosure-list">
             {disclosures.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
           </dl>
@@ -40,7 +40,7 @@ export function AboutPage() {
           <h2 id="about-corrections-heading">Corrections and accountability</h2>
           <p>Metadata corrections can be proposed in the public issue tracker and should identify the affected record and field. Do not post protected health information, credentials, embargoed material, or sensitive security details in a public issue.</p>
           <a className="button-link" href="https://github.com/ajhcs/ushso/issues/new?title=USHSO%20metadata%20correction" target="_blank" rel="noreferrer">Open a metadata-correction issue</a>
-          <p>A verified private-contact route has not yet been supplied by the owner. Until one is published, do not send sensitive material through the public issue tracker.</p>
+          <p>For private corrections, email info@ushso.org. Do not send protected health information or credentials.</p>
         </section>
       </main>
       <ObservatoryFooter />

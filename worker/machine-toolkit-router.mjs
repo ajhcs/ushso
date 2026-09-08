@@ -1,4 +1,9 @@
 import { PUBLIC_CAPABILITY_FLAGS, TOOL_BY_CAPABILITY } from '../packages/machine-toolkit/src/index.mjs';
+import {
+  discardRequestBody,
+  readBoundedBytes,
+  RequestBodyTooLargeError,
+} from './bounded-request-body.mjs';
 
 const MAX_INPUT_BYTES = 20480;
 const encoder = new TextEncoder();
@@ -33,32 +38,28 @@ function httpError(error) {
 
 async function readBoundedJson(request) {
   const contentType = request.headers.get('content-type')?.split(';', 1)[0].trim().toLowerCase();
-  if (contentType !== 'application/json') throw new HttpInputError(415, 'unsupported_media_type', 'Content-Type must be application/json.');
-  const contentEncoding = request.headers.get('content-encoding');
-  if (contentEncoding && contentEncoding.toLowerCase() !== 'identity') throw new HttpInputError(415, 'content_encoding_not_supported', 'Compressed request bodies are not accepted.');
-  const declared = request.headers.get('content-length');
-  if (declared && (!/^\d+$/u.test(declared) || Number(declared) > MAX_INPUT_BYTES)) throw new HttpInputError(413, 'input_limit_exceeded', 'Decoded input exceeds 20480 bytes.');
-  if (!request.body) throw new HttpInputError(400, 'invalid_json', 'A JSON request body is required.');
-  const reader = request.body.getReader();
-  const chunks = [];
-  let bytes = 0;
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      bytes += value.byteLength;
-      if (bytes > MAX_INPUT_BYTES) {
-        await reader.cancel('input limit exceeded');
-        throw new HttpInputError(413, 'input_limit_exceeded', 'Decoded input exceeds 20480 bytes.');
-      }
-      chunks.push(value);
-    }
-  } finally {
-    reader.releaseLock();
+  if (contentType !== 'application/json') {
+    await discardRequestBody(request, MAX_INPUT_BYTES);
+    throw new HttpInputError(415, 'unsupported_media_type', 'Content-Type must be application/json.');
   }
-  const combined = new Uint8Array(bytes);
-  let offset = 0;
-  for (const chunk of chunks) { combined.set(chunk, offset); offset += chunk.byteLength; }
+  const contentEncoding = request.headers.get('content-encoding');
+  if (contentEncoding && contentEncoding.toLowerCase() !== 'identity') {
+    await discardRequestBody(request, MAX_INPUT_BYTES);
+    throw new HttpInputError(415, 'content_encoding_not_supported', 'Compressed request bodies are not accepted.');
+  }
+  const declared = request.headers.get('content-length');
+  if (declared && (!/^\d+$/u.test(declared) || Number(declared) > MAX_INPUT_BYTES)) {
+    await discardRequestBody(request, MAX_INPUT_BYTES);
+    throw new HttpInputError(413, 'input_limit_exceeded', 'Decoded input exceeds 20480 bytes.');
+  }
+  if (!request.body) throw new HttpInputError(400, 'invalid_json', 'A JSON request body is required.');
+  let combined;
+  try {
+    combined = await readBoundedBytes(request, MAX_INPUT_BYTES);
+  } catch (error) {
+    if (error instanceof RequestBodyTooLargeError) throw new HttpInputError(413, 'input_limit_exceeded', 'Decoded input exceeds 20480 bytes.');
+    throw new HttpInputError(400, 'invalid_json', 'The request body could not be decoded safely.');
+  }
   let text;
   try { text = new TextDecoder('utf-8', { fatal: true }).decode(combined); }
   catch { throw new HttpInputError(400, 'invalid_utf8', 'The JSON body must be valid UTF-8.'); }
@@ -192,15 +193,33 @@ function createRouter({ toolkit, expectedOrigin, flags }) {
       let url;
       try { url = new URL(request.url); }
       catch { return httpError(new HttpInputError(400, 'invalid_url', 'The request URL is invalid.')); }
-      if (url.origin !== origin) return httpError(new HttpInputError(403, 'cross_origin_forbidden', 'Machine-toolkit routes are same-origin only.'));
-      if (encoder.encode(url.href).byteLength > MAX_INPUT_BYTES) return httpError(new HttpInputError(413, 'input_limit_exceeded', 'The request URL exceeds 20480 bytes.'));
+      if (url.origin !== origin) {
+        await discardRequestBody(request, MAX_INPUT_BYTES);
+        return httpError(new HttpInputError(403, 'cross_origin_forbidden', 'Machine-toolkit routes are same-origin only.'));
+      }
+      if (encoder.encode(url.href).byteLength > MAX_INPUT_BYTES) {
+        await discardRequestBody(request, MAX_INPUT_BYTES);
+        return httpError(new HttpInputError(413, 'input_limit_exceeded', 'The request URL exceeds 20480 bytes.'));
+      }
       let route;
       try { route = matchRoute(url.pathname); }
-      catch (error) { return httpError(error); }
-      if (!route) return null;
+      catch (error) {
+        await discardRequestBody(request, MAX_INPUT_BYTES);
+        return httpError(error);
+      }
+      if (!route) {
+        await discardRequestBody(request, MAX_INPUT_BYTES);
+        return null;
+      }
       const tool = TOOL_BY_CAPABILITY.get(route.capability);
-      if (!flags[route.capability]) return jsonResponse({ error: 'capability_unavailable' }, 404);
-      if (request.method !== tool.jsonApi.method) return jsonResponse({ error: 'method_not_allowed' }, 405, { Allow: tool.jsonApi.method });
+      if (!flags[route.capability]) {
+        await discardRequestBody(request, MAX_INPUT_BYTES);
+        return jsonResponse({ error: 'capability_unavailable' }, 404);
+      }
+      if (request.method !== tool.jsonApi.method) {
+        await discardRequestBody(request, MAX_INPUT_BYTES);
+        return jsonResponse({ error: 'method_not_allowed' }, 405, { Allow: tool.jsonApi.method });
+      }
       try {
         const input = request.method === 'POST' ? await readBoundedJson(request) : parseGetInput(route.capability, route.recordId, url.searchParams);
         const response = await toolkit.invokeJsonApi(route.capability, input, { signal: request.signal });

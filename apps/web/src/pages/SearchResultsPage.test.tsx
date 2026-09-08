@@ -8,7 +8,7 @@ import { createSearchReceipt } from '../lib/searchReceipt'
 import { assertDiscoveryResult } from '../providers/discoveryProvider'
 import type { DatasetRecord } from '../types/catalog'
 import type { DiscoveryResult, DiscoverySort } from '../types/discovery'
-import { displayedRecordIds, OrderedResultCards } from './SearchResultsPage'
+import { displayedRecordIds, OrderedResultCards, SearchIdentityNote } from './SearchResultsPage'
 
 function renderedCardsMarkup(records: DatasetRecord[]) {
   return renderToStaticMarkup(createElement(
@@ -47,6 +47,18 @@ function responseInOrder(source: DiscoveryResult, records: DatasetRecord[], sort
 }
 
 describe('search result display and receipt ordering', () => {
+  it('displays the response ranking version and catalog pin without inventing a missing version', async () => {
+    const response = await loadAcceptedDiscoveryFixture()
+    assertDiscoveryResult(response)
+    const pinned = { ...response, corpus: { ...response.corpus, generation: 'exact-generation-test' }, pagination: undefined,
+      ranking: { version: 'exact-ranking-test', sort: 'title_asc' as const, ordered_ids: [] } }
+    const markup = renderToStaticMarkup(createElement(SearchIdentityNote, { result: pinned }))
+    expect(markup).toContain('exact-generation-test')
+    expect(markup).toContain('Ranking version: exact-ranking-test')
+    const missing = renderToStaticMarkup(createElement(SearchIdentityNote, { result: { ...pinned, ranking: undefined } }))
+    expect(missing).toContain('not reported by this response')
+    expect(missing).not.toContain('exact-ranking-test')
+  })
   it('preserves the exact API sequence across relevance, alphabetical, and chronological sorts', async () => {
     const source = await loadAcceptedDiscoveryFixture()
     assertDiscoveryResult(source)

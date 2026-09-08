@@ -14,7 +14,9 @@ const webMcpContract = webMcpContractJson as {
   surface: string
   compatibility_surfaces: string[]
   enabled_tool_count: number
-  tools: Array<{ name: string; method: string; route: string }>
+  input_contract_version: string
+  response_contract_version: string
+  tools: Array<{ name: string; method: string; route: string; input_schema: string; response_schema: string }>
   disabled_tools: Array<{ name: string }>
 }
 
@@ -60,11 +62,12 @@ export function AgentsPage() {
 
         <section className="api-guide" aria-labelledby="machine-routes">
           <h2 id="machine-routes">Versioned machine inspection routes</h2>
+          <p>Inputs remain <code>{webMcpContract.input_contract_version}</code>; current responses use <code>{webMcpContract.response_contract_version}</code>. Unknown quota is explicit, with null counters; it does not mean zero or unlimited. Strict v1.0 response consumers must migrate to v1.1. The legacy <code>tool_contract_version</code> discovery field identifies the input toolkit only.</p>
           <dl>
             {webMcpContract.tools.map(tool => (
               <div key={tool.name}>
                 <dt><code>{tool.method} {tool.route}</code></dt>
-                <dd>JSON transport for <code>{tool.name}</code>.</dd>
+                <dd>JSON transport for <code>{tool.name}</code>. <a href={tool.input_schema}>Input schema</a>; <a href={tool.response_schema}>response schema</a>.</dd>
               </div>
             ))}
           </dl>

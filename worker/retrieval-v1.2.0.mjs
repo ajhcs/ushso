@@ -217,6 +217,6 @@ function createLegacyRetrievalEngine({ records, searchDocuments = [], joinRoutes
 
 // The live v1.2 catalog uses the same validated ranking and traversal engine as
 // the browser fixture, with canonical record text projected only on demand.
-export function createRetrievalEngine({ records, searchDocuments: _searchDocuments = [], joinRoutes = [], vocabulary, corpus, namedSourceRegistry = null, catalogValidation = null }) {
-  return createCurrentRetrievalEngine({ records, searchDocuments: null, joinRoutes, vocabulary, corpus, namedSourceRegistry, catalogValidation });
+export function createRetrievalEngine({ diagnostic = null, lexicalArtifact = null, records, searchDocuments: _searchDocuments = [], joinRoutes = [], vocabulary, corpus, namedSourceRegistry = null, catalogValidation = null }) {
+  return createCurrentRetrievalEngine({ diagnostic, lexicalArtifact, records, searchDocuments: null, joinRoutes, vocabulary, corpus, namedSourceRegistry, catalogValidation });
 }

@@ -97,7 +97,8 @@ test('versioned machine routes return strict toolkit envelopes without touching 
   ), env);
   const body = await response.json();
   assert.equal(response.status, 200);
-  assert.equal(body.tool_contract_version, 'observatory-machine-toolkit.v1.0.0');
+  assert.equal(body.tool_contract_version, 'observatory-machine-toolkit.v1.1.0');
+  assert.deepEqual(body.rate_limit, { state: 'unknown', policy_id: null, limit: null, remaining: null, reset_at: null, retry_after_seconds: null });
   assert.equal(body.capability, 'get_asset');
   assert.equal(body.transport_adapter, 'json_api');
   assert.equal(body.ok, true);

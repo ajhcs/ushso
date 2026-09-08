@@ -4,8 +4,10 @@
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
+  "packageManager": "npm@11.19.1",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.15.0",
+    "npm": ">=11.19.1 <12"
   },
   "workspaces": [
     "apps/web",
@@ -46,14 +48,18 @@
     "test:verification": "node scripts/run-contract-suites.mjs --verification",
     "verify:research-navigator": "node scripts/run-contract-suites.mjs --all",
     "test": "npm run test:retrieval && npm run test:web && npm run test:worker && npm run test:evaluation && npm run validate:evaluation && npm run verify:research-navigator",
-    "build:web": "npm run stage:corpus && npm run build --workspace @ushso/observatory-web",
+    "build:web": "npm run stage:corpus && npm run stage:research && npm run build --workspace @ushso/observatory-web",
     "build": "npm run build:web",
     "cf:types": "node scripts/run-wrangler.mjs types",
     "cf:dry-run:artifact": "node scripts/run-wrangler.mjs deploy --dry-run --outdir .wrangler-dry-run",
     "cf:dry-run": "npm run build && npm run cf:dry-run:artifact",
     "cf:dev": "node scripts/run-wrangler.mjs dev --local --port 8787",
     "cf:deploy:staging": "npm run build && node scripts/run-wrangler.mjs deploy --config wrangler.staging.jsonc",
-    "cf:deploy": "npm run build && node scripts/run-wrangler.mjs deploy"
+    "cf:deploy": "npm run build && node scripts/run-wrangler.mjs deploy",
+    "stage:research": "node scripts/prepare-research-assets.mjs"
+  },
+  "overrides": {
+    "ajv": "8.20.0"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"

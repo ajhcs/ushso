@@ -6,8 +6,15 @@ artifacts = ["apps/web/dist/**", ".wrangler-dry-run/**", "wrangler.jsonc"]
 [[stages]]
 name = "bootstrap"
 kind = "bootstrap"
-command = ["npm", "ci", "--ignore-scripts"]
+command = ["npx", "--yes", "npm@11.19.1", "ci", "--ignore-scripts"]
 failure_class = "environment_blocked"
+quiet_seconds = 30
+
+[[stages]]
+name = "dependency-tree"
+kind = "static_diagnostics"
+command = ["npx", "--yes", "npm@11.19.1", "ls", "ajv", "--all"]
+failure_class = "product_test_failed"
 quiet_seconds = 30
 
 [[stages]]

@@ -125,6 +125,11 @@ try {
   };
 
   const invocations = [];
+  const expectedUnknown = {
+    'observatory.get_access_plan': 'route_not_documented',
+    'observatory.get_retrieval_recipe': 'route_not_documented',
+    'observatory.get_variables': 'schema_context_required',
+  };
   for (const [name, input] of Object.entries(inputs)) {
     const value = await evaluate(client, `(async () => {
       const tools = await ${surface}.getTools();
@@ -132,9 +137,14 @@ try {
       if (!tool) throw new Error('TOOL_NOT_DISCOVERED');
       const serialized = await ${surface}.executeTool(tool, ${JSON.stringify(JSON.stringify(input))});
       const response = JSON.parse(serialized);
-      return { name: tool.name, capability: response.capability, ok: response.ok, result_state: response.result_state, truth_boundary: response.truth_boundary };
+      return { name: tool.name, capability: response.capability, ok: response.ok, result_state: response.result_state, error_code: response.error?.code ?? null, result_is_null: response.result === null, truth_boundary: response.truth_boundary };
     })()`);
-    if (!value?.ok || Object.values(value.truth_boundary ?? {}).some(Boolean)) {
+    const unknownCode = expectedUnknown[name];
+    const expectedOutcome = unknownCode
+      ? value?.ok === false && value.result_state === 'unknown' && value.error_code === unknownCode && value.result_is_null
+      : value?.ok === true && value.error_code === null && !value.result_is_null;
+    const boundaryKeys = ['source_requests_made', 'execution_authorized_by_ushso', 'retrieval_executed', 'payloads_acquired', 'analysis_executed', 'identity_merges_performed'];
+    if (!expectedOutcome || boundaryKeys.some(key => value?.truth_boundary?.[key] !== false)) {
       throw new Error(`NATIVE_TOOL_INVOCATION_FAILED:${name}:${JSON.stringify(value)}`);
     }
     invocations.push(value);
@@ -156,6 +166,9 @@ try {
     planner_absent: !names.includes('observatory.plan_research'),
     all_schemas_self_contained: discovered.every(tool => tool.schema_self_contained),
     successful_invocation_count: invocations.length,
+    positive_result_count: invocations.filter(value => value.ok).length,
+    verified_unknown_context_count: invocations.filter(value => !value.ok).length,
+    invocation_count_meaning: 'Eight protocol invocations with exact expected outcomes; invented access/schema contexts must return three typed unknown results, not successful data.',
     invocations,
   };
   if (receipt.discovered_tool_count !== 8 || !receipt.planner_absent || !receipt.all_schemas_self_contained || receipt.successful_invocation_count !== 8) {

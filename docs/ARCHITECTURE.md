@@ -43,13 +43,13 @@ capture, or access workflow; it is not forced into a generic `Dataset` class.
 
 The Cloudflare Worker and browser use the same immutable retrieval modules and
 the same staged corpus. `POST /api/discover` returns exactly the canonical
-discovery-result contract used by the frontend provider. The v1.2 successor
-candidate also exposes eight read-only inspection operations through versioned
+discovery-result contract used by the frontend provider. The v1.2.0 candidate
+runtime exposes eight read-only inspection operations through versioned
 `/api/machine/v1/*` routes and registers the same operations with WebMCP when a
 secure browser exposes `document.modelContext`. `plan_research` remains disabled
 in code.
 
-Neither the production runtime nor the v1.2 candidate makes source-discovery
+Neither the production runtime nor the v1.2.0 candidate makes source-discovery
 requests or invokes an LLM in the request path. Source enumeration happens only
 in the bounded build-time harvester. The indexed records contain authoritative
 locators, but catalog-metadata verification does not prove payload, schema,
@@ -60,11 +60,15 @@ is always scoped to the published corpus and never asserted as source absence.
 
 - Core contract: `contracts/core/v1.0.0`
 - Use-card and access-recipe contract: `contracts/use-access/v1.0.0`
-- Production and migration-seed baseline: `packages/retrieval/versions/v1.1.0`
-  (157 records and 14 join routes)
-- Live-catalog successor candidate: `packages/retrieval/versions/v1.2.0`
-  (3,434 records from complete CMS, CDC, and Census catalog enumerations; zero
-  payload downloads and zero identity merges)
+- Historical production and migration-seed baseline:
+  `packages/retrieval/versions/v1.1.0` (157 records and 14 join routes)
+- Current candidate live catalog (this snapshot):
+  `packages/retrieval/versions/v1.2.0` (3,434 published records; 3,430
+  searchable with four isolated; from complete CMS, CDC, and Census catalog
+  enumerations; zero payload downloads and zero identity merges). The last
+  recorded production catalog on 2026-09-03 was also 3,434; that live state is
+  not independently re-verified in this review. This snapshot does not assert
+  release approval, gate pass, or scientific promotion.
 - Historical evaluator corpus: `packages/retrieval` (`v1.0.1`, 143 records and
   14 join routes)
 - Frozen 60-question benchmark: `evaluation/benchmark/v0.1.0`
@@ -75,9 +79,9 @@ is always scoped to the published corpus and never asserted as source absence.
 
 ## Baseline naming invariant
 
-The production runtime and the PostgreSQL migration seed are corpus **v1.1.0**:
-157 records, 157 search documents, and 14 join routes. Its corpus-manifest file
-SHA-256 is
+The historical production runtime and the PostgreSQL migration seed were corpus
+**v1.1.0**: 157 records, 157 search documents, and 14 join routes. Its
+corpus-manifest file SHA-256 is
 `23f704ce3e421a6eb26c2b3677d616a1ae6b4f45226233257b9a1ff676caba2b`;
 its content and algorithm fingerprints are respectively
 `adcfb56babc981a4c7dfc787af86d56f5fb2a31e84de02f9db8c93f0548b5d03`

@@ -1,3 +1,4 @@
+import {consumeLexicalArtifact} from './lexical-artifact.mjs';
 import { containsNormalizedPhrase, normalizeText, parseQuestion, recordSearchText } from './question-parser-v1.2.mjs';
 import { selectJoinRoutes, validateJoinRoute } from './join-routes.mjs';
 import { compileDiscoveryIntent } from './intent-compiler-v1.2.mjs';
@@ -55,6 +56,7 @@ function boundedRecordSearchText(record) {
 }
 
 function normalizedPhrasePresent(normalizedText, normalizedPhrase) {
+  if (!normalizedPhrase.length) return false;
   let offset = normalizedText.indexOf(normalizedPhrase);
   while (offset !== -1) {
     const end = offset + normalizedPhrase.length;
@@ -96,28 +98,33 @@ function prepareScoring(parsed, vocabulary) {
   return { lexicalTokens, essentialTerms, subjects, supportedExclusions };
 }
 
-function subjectScore(record, preparedSubjects, searchText) {
+function prepareRecordScoring(record, lexicalIndex) {
+  return {
+    directTokenBases: `${lexicalIndex[0].text} ${lexicalIndex[1].text}`,
+    capabilities: capabilityRows(record).map(capability => ({
+      capability,
+      text: JSON.parse(JSON.stringify(normalizeText([capability.id, capability.label, capability.rationale].join(' ')))),
+      id: normalizeText(capability.id).replace(/^topic /, '')
+    }))
+  };
+}
+
+function subjectScore(record, preparedSubjects, searchText, recordScoring) {
   const document = searchText ?? recordSearchText(record);
-  const directDocument = normalizeText([record.title, record.description].join(' '));
   const components = [];
   const matchedSubjects = [];
   const supportedSubjects = [];
   for (const { subjectMatch, terms, directAliasTokens } of preparedSubjects) {
-    const matchingCapabilities = capabilityRows(record).filter(capability => {
-      const capabilityText = normalizeText([capability.id, capability.label, capability.rationale].join(' '));
-      return terms.some(term => normalizedPhrasePresent(capabilityText, term));
-    });
-    const matchedTerms = terms.filter(term => normalizedPhrasePresent(document, term));
-    if (!matchingCapabilities.length && !matchedTerms.length) continue;
+    const matchingEntries = recordScoring.capabilities.filter(entry => terms.some(term => normalizedPhrasePresent(entry.text, term)));
+    const matchingCapabilities = matchingEntries.map(entry => entry.capability);
+    if (!matchingCapabilities.length && !terms.some(term => normalizedPhrasePresent(document, term))) continue;
     matchedSubjects.push(subjectMatch.id);
-    const directTokens = directDocument.split(' ').filter(Boolean);
-    const directTextMatch = directAliasTokens.some(aliasTokens => aliasTokens.every(term => tokenMatch(term, directTokens)));
-    const identityCapability = matchingCapabilities.find(capability => {
-      const id = normalizeText(capability.id).replace(/^topic /, '');
+    const directTextMatch = directAliasTokens.some(aliasTokens => aliasTokens.every(term => normalizedPhrasePresent(recordScoring.directTokenBases, singularToken(term))));
+    const identityCapability = matchingEntries.find(({ capability, id }) => {
       return id === normalizeText(subjectMatch.id).replaceAll('_', ' ')
         && ['primary', 'supporting'].includes(capability.fitness)
         && ['verified_first_party', 'source_asserted'].includes(capability.evidence_state);
-    });
+    })?.capability;
     if (directTextMatch || identityCapability) supportedSubjects.push(subjectMatch.id);
     if (identityCapability) {
       const best = identityCapability;
@@ -198,13 +205,20 @@ function timeScore(record, interpretation) {
   return { eligible: true, compatibility: 'supported', uncertainty: [], components: [{ kind: 'time_overlap', value: 8, reason: `Documented observation coverage ${start}-${end} overlaps the requested window.`, evidence_state: record.time_coverage?.evidence_state ?? 'unresolved' }] };
 }
 
-function accessScore(record, parsed) {
+function cachedAccessDimensions(record, recordScoring) {
+  if (recordScoring?.accessDimensions) return recordScoring.accessDimensions;
+  const dimensions = accessDimensions(record);
+  if (recordScoring) recordScoring.accessDimensions = dimensions;
+  return dimensions;
+}
+
+function accessScore(record, parsed, recordScoring = null) {
   const status = record.access?.status ?? 'unknown';
   if (parsed.raw.access_statuses.length && !parsed.raw.access_statuses.includes(status)) return { eligible: false, components: [], compatibility: 'incompatible', uncertainty: [] };
   if (!parsed.interpretation.access_intent.include_restricted && RESTRICTED.has(status)) return { eligible: false, components: [], compatibility: 'incompatible', uncertainty: [] };
   const publicRequested = parsed.interpretation.access_intent.public_only;
   const costRequested = parsed.interpretation.access_intent.cost_requirement === 'documented_no_fee';
-  const dimensions = publicRequested || costRequested ? accessDimensions(record) : null;
+  const dimensions = publicRequested || costRequested ? cachedAccessDimensions(record, recordScoring) : null;
   if (publicRequested && dimensions.payload_access === 'documented_restricted') return { eligible: false, components: [], compatibility: 'incompatible', uncertainty: [] };
   const documentedPublic = publicRequested ? dimensions.payload_access === 'documented_public' : false;
   const publicCompatibility = !publicRequested ? 'not_requested' : documentedPublic ? 'supported' : 'unknown';
@@ -262,17 +276,22 @@ function tokenMatch(queryToken, fieldTokens) {
   return null;
 }
 
-function lexicalScore(record, tokens, searchText) {
-  const document = searchText ?? recordSearchText(record);
-  const fields = [
-    { kind: 'title', weight: 10, tokens: normalizeText(record.title).split(' ').filter(Boolean) },
-    { kind: 'description', weight: 4, tokens: normalizeText(record.description).split(' ').filter(Boolean) },
-    { kind: 'record', weight: 2, tokens: document.split(' ').filter(Boolean) }
+function compactLexicalIndex(record, document) {
+  const compact = text => [...new Set([...new Set(text.split(' ').filter(Boolean))].map(singularToken))].join(' ');
+  return [
+    { kind: 'title', weight: 10, text: compact(normalizeText(record.title)) },
+    { kind: 'description', weight: 4, text: compact(normalizeText(record.description)) },
+    { kind: 'record', weight: 2, text: compact(document) }
   ];
+}
+
+function lexicalScore(record, tokens, searchText, lexicalIndex) {
+  const document = searchText ?? recordSearchText(record);
+  const fields = lexicalIndex ?? compactLexicalIndex(record, document);
   const matchedRows = tokens.map(token => {
-    const candidates = fields.map(field => ({ field, match: tokenMatch(token, field.tokens) })).filter(value => value.match)
-      .sort((a, b) => b.field.weight - a.field.weight || a.field.kind.localeCompare(b.field.kind));
-    return candidates.length ? { query: token, ...candidates[0] } : null;
+    const base = singularToken(token);
+    const field = fields.find(field => normalizedPhrasePresent(field.text, base));
+    return field ? { query: token, field } : null;
   }).filter(Boolean);
   const matched = matchedRows.map(row => row.query);
   const components = [];
@@ -305,7 +324,7 @@ function explain(record, scoreComponents, matchedSubjects) {
   return reasons;
 }
 
-function scoreRecord(record, parsed, prepared, searchText) {
+function scoreRecord(record, parsed, prepared, searchText, lexicalIndex, recordScoring) {
   const document = searchText ?? recordSearchText(record);
   const geography = geographyScore(record, parsed.interpretation);
   if (!geography.eligible) return null;
@@ -313,10 +332,10 @@ function scoreRecord(record, parsed, prepared, searchText) {
   if (!unit.eligible) return null;
   const time = timeScore(record, parsed.interpretation);
   if (!time.eligible) return null;
-  const access = accessScore(record, parsed);
+  const access = accessScore(record, parsed, recordScoring);
   if (!access.eligible) return null;
-  const subject = subjectScore(record, prepared.subjects, document);
-  const lexical = lexicalScore(record, prepared.lexicalTokens, document);
+  const subject = subjectScore(record, prepared.subjects, document, recordScoring);
+  const lexical = lexicalScore(record, prepared.lexicalTokens, document, lexicalIndex);
   if (prepared.supportedExclusions.length) {
     const exclusionText = document.split(' ').map(singularToken).join(' ');
     if (prepared.supportedExclusions.some(phrase => containsNormalizedPhrase(exclusionText, phrase))) return null;
@@ -333,8 +352,7 @@ function scoreRecord(record, parsed, prepared, searchText) {
   if (subjectRequired && subject.matchedSubjects.length !== parsed.interpretation.subjects.length) return null;
   const explicitGeographyFilterMatched = parsed.raw.geography.codes.length > 0 && geography.matched.length > 0;
   if (!subjectRequired && !lexical.matched.length && !unit.matched.length && !explicitGeographyFilterMatched) return null;
-  const directText = normalizeText([record.title, record.description].join(' '));
-  const essentialConceptsSupported = prepared.essentialTerms.length > 0 && prepared.essentialTerms.every(term => tokenMatch(term, directText.split(' ')));
+  const essentialConceptsSupported = prepared.essentialTerms.length > 0 && prepared.essentialTerms.every(term => normalizedPhrasePresent(recordScoring.directTokenBases, singularToken(term)));
   const subjectsSupported = !subjectRequired || subject.supportedSubjects.length === parsed.interpretation.subjects.length;
   const namedSourceSupported = !namedSources.length || directNamedSources.length === namedSources.length;
   const semanticSupport = essentialConceptsSupported && subjectsSupported && namedSourceSupported && !parsed.interpretation.access_intent.ambiguity;
@@ -431,11 +449,15 @@ function stableResultId(parsed, ranked, corpusId) {
   return `retrieval-${stableHash(seed)}`;
 }
 
-export function createRetrievalEngine({ records, searchDocuments, joinRoutes = [], vocabulary, corpus, namedSourceRegistry = null, catalogValidation: suppliedCatalogValidation = null }) {
+export function createRetrievalEngine({ lexicalArtifact = null, diagnostic = null, records, searchDocuments, joinRoutes = [], vocabulary, corpus, namedSourceRegistry = null, catalogValidation: suppliedCatalogValidation = null }) {
+  const mark = stage => { if(typeof diagnostic === 'function') diagnostic({stage, wall_ms: performance.now()}); };
+  mark('engine_start');
   if (!Array.isArray(records) || records.length === 0) throw new TypeError('records must be a non-empty array');
   if (!vocabulary || !Array.isArray(vocabulary.subjects) || !Array.isArray(vocabulary.geographies) || !Array.isArray(vocabulary.units)) throw new TypeError('vocabulary must define subjects, geographies, and units');
   const catalogValidation = suppliedCatalogValidation ?? validateCatalogRecords(records);
   if (!catalogValidation.valid.length) throw new TypeError('catalog contains no browser-compatible records');
+  mark('validation_complete');
+  if (lexicalArtifact && searchDocuments !== null) throw new TypeError('LEXICAL_PROJECTION_MODE_MISMATCH');
   const recordIds = new Set(catalogValidation.valid.map(record => record.record_id));
   const routeIssues = [];
   const acceptedRoutes = [];
@@ -489,6 +511,14 @@ export function createRetrievalEngine({ records, searchDocuments, joinRoutes = [
   const frozenVocabulary = structuredClone(vocabulary);
   const frozenNamedSources = structuredClone(namedSourceRegistry);
   const frozenCorpus = structuredClone(corpus ?? { corpus_id: 'observatory-offline-fixture', corpus_version: '1.0.0', evidence_mode: 'published_offline_evidence' });
+  mark('search_text_complete');
+  const lexicalIndexes = lexicalArtifact ? consumeLexicalArtifact(lexicalArtifact, frozenRecords.map(record => record.record_id)) : new Map(frozenRecords.map(record => [record.record_id,
+    compactLexicalIndex(record, searchDocumentByRecord.get(record.record_id)?.search_text ?? recordSearchText(record))]));
+  mark('lexical_index_complete');
+  // Private immutable-catalog cache: one entry per accepted record, never per query.
+  // Retain compact normalized text; token arrays remain request-local to bound heap.
+  const recordScoring = new Map(frozenRecords.map(record => [record.record_id, prepareRecordScoring(record, lexicalIndexes.get(record.record_id))]));
+  mark('scoring_cache_complete');
   const generation = frozenCorpus.manifest_sha256 ?? `${frozenCorpus.corpus_id}@${frozenCorpus.corpus_version}`;
   const partialIssues = [...catalogValidation.invalid, ...routeIssues, ...documentIssues];
   return Object.freeze({
@@ -543,7 +573,7 @@ export function createRetrievalEngine({ records, searchDocuments, joinRoutes = [
         }))
         : frozenRecords
           .map(record => scoreRecord(record, parsed, preparedScoring,
-            searchDocumentByRecord.get(record.record_id)?.search_text))
+            searchDocumentByRecord.get(record.record_id)?.search_text, lexicalIndexes.get(record.record_id), recordScoring.get(record.record_id)))
           .filter(Boolean)
           .filter(item => item.score > 0);
       const facetValues = (item, key) => key === 'source' ? [item.record.identity?.source?.source_id]
@@ -587,7 +617,7 @@ export function createRetrievalEngine({ records, searchDocuments, joinRoutes = [
         metadata: {
           dimensions: metadataDimensions(item.record),
           dates: dateDimensions(item.record),
-          access: accessDimensions(item.record),
+          access: { ...(cachedAccessDimensions(item.record, recordScoring.get(item.record.record_id))) },
           freshness: freshnessState(item.record, effectiveNow),
           description_quality: descriptionQuality(item.record),
           claim_evidence: auditEvidence(item.record),
@@ -670,3 +700,5 @@ export function createRetrievalEngine({ records, searchDocuments, joinRoutes = [
     }
   });
 }
+
+export function buildLexicalEntries(records) { return records.map(record => [record.record_id, compactLexicalIndex(record, boundedRecordSearchText(record))]); }

@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { collectSchemaAssets, SUPPORTED_TOOLKIT_CONTRACTS } from './schema-assets.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceRoot = path.join(root, 'packages/retrieval');
@@ -28,7 +29,7 @@ const files = [
 
 async function filesBelow(directory) {
   const result = [];
-  for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
+  for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a,b)=>a.name.localeCompare(b.name))) {
     const absolute = path.join(directory, entry.name);
     if (entry.isDirectory()) result.push(...await filesBelow(absolute));
     else result.push(absolute);
@@ -47,15 +48,13 @@ files.push([
   'corpus-v1.2.0/webmcp-tool.json',
   path.join(root, 'packages/machine-toolkit/public-webmcp-tool.json'),
 ]);
-const toolkitSchemaRoot = path.join(root, 'contracts/machine-toolkit/v1.0.0/schemas');
-for (const sourcePath of await filesBelow(toolkitSchemaRoot)) {
-  const relative = path.relative(toolkitSchemaRoot, sourcePath).replaceAll('\\', '/');
-  files.push([null, `contracts/machine-toolkit/v1.0.0/schemas/${relative}`, sourcePath]);
-}
+// Verify the entire local dependency graph before touching generated output.
+const schemaAssets = await collectSchemaAssets(root);
+for (const asset of schemaAssets) files.push([null, asset.relative, asset.absolute]);
 
 await fs.mkdir(targetRoot, { recursive: true });
 await fs.rm(path.join(targetRoot, 'corpus-v1.2.0'), { recursive: true, force: true });
-await fs.rm(path.join(targetRoot, 'contracts/machine-toolkit/v1.0.0/schemas'), { recursive: true, force: true });
+for (const version of SUPPORTED_TOOLKIT_CONTRACTS) await fs.rm(path.join(targetRoot, `contracts/machine-toolkit/${version}/schemas`), { recursive: true, force: true });
 for (const [source, target, absoluteSource = null] of files) {
   const sourcePath = absoluteSource ?? path.join(sourceRoot, source);
   const targetPath = path.join(targetRoot, target);

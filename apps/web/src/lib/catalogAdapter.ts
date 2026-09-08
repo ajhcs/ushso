@@ -305,5 +305,5 @@ export function adaptDiscoveryResponse(response: DiscoveryResult): CatalogSearch
 
 export function findDatasetInResponse(response: DiscoveryResult, id: string) {
   const adapted = adaptDiscoveryResponse(response)
-  return adapted.records.find((item) => item.id === id) ?? adapted.families.find((item) => item.id === id)
+  return adapted.records.find((item) => item.id === id || item.canonicalResult.record_id === id) ?? adapted.families.find((item) => item.id === id)
 }

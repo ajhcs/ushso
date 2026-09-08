@@ -379,6 +379,7 @@ export interface DiscoveryResult {
     join_route_count: number
     manifest_sha256?: string | null
     source_slices?: Record<string, number>
+    publication?: { generation: string }
     generation?: string
   }
   query: {

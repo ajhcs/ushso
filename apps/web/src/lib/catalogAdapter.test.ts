@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
 import { assertDiscoveryResult } from '../providers/discoveryProvider'
-import { adaptDiscoveryResponse } from './catalogAdapter'
+import { adaptDiscoveryResponse, findDatasetInResponse } from './catalogAdapter'
 import { buildResearcherGuidance } from './researcherGuidance'
 
 const acceptedResponse = await loadAcceptedDiscoveryFixture()
 assertDiscoveryResult(acceptedResponse)
 
 describe('canonical discovery response adapter', () => {
+  it('resolves full canonical and shortened UI record IDs to the same exact record', () => {
+    const record = adaptDiscoveryResponse(acceptedResponse).records[0]
+    expect(findDatasetInResponse(acceptedResponse, record.id)?.canonicalResult.record_id).toBe(record.canonicalResult.record_id)
+    expect(findDatasetInResponse(acceptedResponse, record.canonicalResult.record_id)?.canonicalResult.record_id).toBe(record.canonicalResult.record_id)
+    expect(findDatasetInResponse(acceptedResponse, `${record.canonicalResult.record_id}-wrong`)).toBeUndefined()
+  })
   it('preserves every ranked canonical result and its evidence-bearing fields', () => {
     const adapted = adaptDiscoveryResponse(acceptedResponse)
 
