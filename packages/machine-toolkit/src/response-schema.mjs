@@ -734,7 +734,17 @@ function errorObject(value, path, issues) {
   }, issues);
 }
 
-function rateLimit(value, path, issues) {
+function rateLimit(value, path, issues, version) {
+  if (version === 'observatory-machine-toolkit.v1.1.0') {
+    object(value, path, {
+      required: ['state', ...RATE_LIMIT_KEYS],
+      fields: {
+        state: (entry, at, errors) => enumValue(entry, at, errors, new Set(['unknown'])),
+        ...Object.fromEntries(RATE_LIMIT_KEYS.map(key => [key, (entry, at, errors) => { if (entry !== null) issue(errors, at, 'unknown quota requires null, not a fabricated allowance'); }]))
+      }
+    }, issues);
+    return;
+  }
   object(value, path, {
     required: RATE_LIMIT_KEYS,
     fields: {
@@ -816,7 +826,7 @@ export function responseSchemaIssues(core, capability) {
   if (core.continuation_expires_at !== null) dateTime(core.continuation_expires_at, '/continuation_expires_at', issues);
   if (core.generation_retention_expires_at !== null) dateTime(core.generation_retention_expires_at, '/generation_retention_expires_at', issues);
   boolean(core.restart_required, '/restart_required', issues);
-  rateLimit(core.rate_limit, '/rate_limit', issues);
+  rateLimit(core.rate_limit, '/rate_limit', issues, core.tool_contract_version);
   truthBoundary(core.truth_boundary, '/truth_boundary', issues);
   return issues;
 }

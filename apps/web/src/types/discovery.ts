@@ -14,6 +14,81 @@ export interface DiscoveryQuery {
   include_restricted?: boolean
   time_window?: { start_year?: number; end_year?: number }
   limit?: number
+  /** Opaque server cursor; valid only with the same generation, question, filters, and sort. */
+  cursor?: string
+  /** Requested server page size. The service applies its own documented upper bound. */
+  page_size?: number
+  /** Immutable catalog generation pin copied from a prior response. */
+  generation?: string
+  sort?: DiscoverySort
+  /** Facet selections encoded as `<facet-id>:<value>`. */
+  facet_filters?: Record<string, string[]>
+  /** Explicit exclusions; unsupported interpretations remain visible as warnings. */
+  exclusions?: string[]
+}
+
+export type DiscoverySort = 'canonical_relevance' | 'title_asc' | 'release_newest' | 'observation_latest'
+
+export interface DiscoveryFacetOption {
+  value: string
+  label: string
+  count: number
+}
+
+export interface DiscoveryFacetSection {
+  id: string
+  label: string
+  options: DiscoveryFacetOption[]
+}
+
+export interface DiscoveryFacets {
+  count_basis: 'records' | 'families'
+  collection_scope: 'all_matching_records_before_pagination' | string
+  approximate: boolean
+  sections: DiscoveryFacetSection[]
+}
+
+export interface DiscoveryPagination {
+  generation: string
+  cursor: string | null
+  next_cursor: string | null
+  has_more: boolean
+  page_size: number
+  total_matches: number
+}
+
+export interface DiscoveryRanking {
+  version: string
+  sort: DiscoverySort | string
+  ordered_ids: string[]
+}
+
+export interface DiscoverySections {
+  supported: string[]
+  uncertain: string[]
+  contextual?: string[]
+  incompatible?: string[]
+}
+
+export interface DiscoveryPartialResults {
+  is_partial: boolean
+  invalid_item_count: number
+  issues: Array<{ index?: number; record_id?: string | null; route_id?: string | null; code: string; errors: string[] }>
+}
+
+export interface DiscoverySearchManifest {
+  manifest_version: 'observatory-search-manifest.v1.0.0'
+  scope: 'current_page'
+  question: string
+  interpreted_constraints: DiscoveryResult['query']['interpretation']
+  filters: Record<string, unknown>
+  sort: string
+  displayed_ordered_ids: string[]
+  ranking_version: string
+  catalog_generation: string
+  generated_at: string
+  citations: Array<{ record_id: string; title: string; source_url?: string | null; evidence_ids: string[] }>
+  limitations: string[]
 }
 
 export interface ConceptMatch {
@@ -175,6 +250,77 @@ export interface ScoreComponent {
   evidence_state: EvidenceState
 }
 
+export interface DiscoveryDimensionClaim {
+  values: string[]
+  state: EvidenceState
+}
+
+export interface DiscoveryResultMetadata {
+  dimensions: {
+    observation_grain: DiscoveryDimensionClaim
+    sampled_entity: DiscoveryDimensionClaim
+    reporting_organization: DiscoveryDimensionClaim
+    population_universe: DiscoveryDimensionClaim
+    geographic_dimensions: DiscoveryDimensionClaim
+    inferred_search_tags: string[]
+  }
+  dates: {
+    observation_period: { start: string | null; end: string | null; state: string; evidence_state: EvidenceState }
+    publisher_release_date: string | null
+    publisher_revision_date: string | null
+    projection_horizon: string | null
+    metadata_observed_at: string | null
+  }
+  access: {
+    catalog_visibility: 'indexed'
+    payload_access: 'documented_public' | 'documented_restricted' | 'unknown'
+    cost_state: 'documented_free' | 'payment_required' | 'unknown'
+    source_status: ObservatoryRecord['access']['status'] | 'unknown'
+    evidence_state: EvidenceState
+  }
+  freshness: {
+    verification_status: ObservatoryRecord['freshness_verification']['verification_status'] | 'unknown'
+    last_checked: string | null
+    next_review_due: string | null
+    freshness_state: 'deadline_unknown' | 'overdue' | 'within_review_window'
+    failed_refresh_state: string
+    note: string
+  }
+  description_quality: {
+    raw_description: string
+    state: 'suspected_encoding_corruption' | 'no_corruption_detected'
+    indicators: string[]
+    display_description: string
+    repair_state: 'unresolved_no_verified_repair' | 'not_needed'
+    authoritative_url: string | null
+    original_authoritative_url?: string | null
+  }
+  claim_evidence: Array<{
+    evidence_id: string
+    claim: string
+    evidence_state: EvidenceState
+    references: Array<{
+      provenance_id: string
+      source_locator: string | null
+      captured_at: string | null
+      content_sha256: string | null
+      excerpt: null
+      excerpt_state: 'not_preserved'
+    }>
+    limitations: string[]
+  }>
+  retrieval_plan: {
+    access_routes: ObservatoryRetrievalStep[]
+    stop_conditions: ObservatoryRetrievalStep[]
+    unresolved_routes: ObservatoryRetrievalStep[]
+    route_state: 'route_available' | 'route_unresolved' | 'no_route'
+  }
+  named_source_role: 'direct_source' | 'secondary_mention' | 'not_applicable'
+  geographic_compatibility: string
+  observation_time_compatibility: string
+  access_compatibility: string
+}
+
 export interface DiscoveryResultItem {
   rank: number
   score: number
@@ -188,6 +334,9 @@ export interface DiscoveryResultItem {
     why_relevant: string[]
   }
   record: ObservatoryRecord
+  match_state?: 'supported' | 'uncertain' | 'contextual' | 'incompatible'
+  uncertainty_reasons?: string[]
+  metadata?: DiscoveryResultMetadata
 }
 
 export interface DiscoveryJoinRoute {
@@ -230,6 +379,8 @@ export interface DiscoveryResult {
     join_route_count: number
     manifest_sha256?: string | null
     source_slices?: Record<string, number>
+    publication?: { generation: string }
+    generation?: string
   }
   query: {
     question: string
@@ -244,7 +395,28 @@ export interface DiscoveryResult {
         public_only: boolean
         accepts_restricted: boolean
         match_basis: string
+        payload_requirement?: 'documented_public_payload' | 'unspecified'
+        cost_requirement?: 'documented_no_fee' | 'unspecified'
+        ambiguity?: 'public_access_or_ownership' | null
+        matched_phrases?: string[]
+        interpretation_note?: string | null
       }
+      exclusions?: Array<{
+        phrase: string
+        normalized_phrase: string
+        match_basis: 'explicit_filter' | 'question_text'
+        support: 'supported' | 'unsupported'
+      }>
+      named_sources?: Array<{
+        source_id: string
+        name: string
+        matched_aliases: string[]
+        indexed_record_ids: string[]
+        official_discovery_url: string | null
+        registry_evidence_state: EvidenceState
+      }>
+      positive_terms?: string[]
+      interpretation_warnings?: string[]
     }
     filters: Record<string, unknown>
   }
@@ -252,6 +424,20 @@ export interface DiscoveryResult {
   returned_count?: number
   total_matches?: number
   has_more?: boolean
+  ranking?: DiscoveryRanking
+  pagination?: DiscoveryPagination
+  facets?: DiscoveryFacets
+  sections?: DiscoverySections
+  partial_results?: DiscoveryPartialResults
+  named_source_resolution?: Array<{
+    source_id: string
+    name: string
+    state: 'indexed' | 'coverage_gap'
+    indexed_record_ids: string[]
+    official_discovery_url: string | null
+    message: string
+  }>
+  receipt?: DiscoverySearchManifest
   results: DiscoveryResultItem[]
   join_routes: DiscoveryJoinRoute[]
   warnings: string[]

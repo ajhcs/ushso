@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/schemas/research-assets-lock.v1.json",
+  "title": "USHSO research asset staging lock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "source", "packages", "cloudflare"],
+  "properties": {
+    "format": { "const": "ushso.research-assets-lock.v1" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["archive"],
+      "properties": {
+        "archive": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "bytes"],
+          "properties": {
+            "path": { "type": "string", "minLength": 1 },
+            "url": { "type": "string", "pattern": "^https://" },
+            "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "bytes": { "type": "integer", "minimum": 1, "maximum": 8589934592 }
+          }
+        }
+      }
+    },
+    "packages": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id", "kind", "prefix", "manifest_path", "manifest_sha256",
+          "tree_sha256", "file_count", "bytes", "generation", "status"
+        ],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,63}$" },
+          "kind": { "enum": ["dictionary", "scientific-review", "scientific-conflicts"] },
+          "prefix": { "type": "string", "pattern": "^[A-Za-z0-9._~+@%:-]+$" },
+          "manifest_path": { "type": "string" },
+          "manifest_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "tree_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "file_count": { "type": "integer", "minimum": 1, "maximum": 100000 },
+          "bytes": { "type": "integer", "minimum": 1, "maximum": 8589934592 },
+          "generation": { "type": "string", "minLength": 1, "maxLength": 256 },
+          "record_count": { "type": "integer", "minimum": 0, "maximum": 100000 },
+          "claim_count": { "type": "integer", "minimum": 0, "maximum": 4 },
+          "status": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["review_status", "publication_authorized", "scientific_applicability"],
+            "properties": {
+              "review_status": { "const": "pending_owner_review" },
+              "publication_authorized": { "const": false },
+              "scientific_applicability": { "const": "unresolved" }
+            }
+          }
+        }
+      }
+    },
+    "cloudflare": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_files", "max_file_bytes", "plan_qualification"],
+      "properties": {
+        "max_files": { "const": 100000 },
+        "max_file_bytes": { "const": 26214400 },
+        "plan_qualification": { "const": "required_before_deployment" }
+      }
+    }
+  }
+}

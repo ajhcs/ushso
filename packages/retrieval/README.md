@@ -1,14 +1,15 @@
-# Observatory Retrieval v1.0.1
+# Observatory Retrieval v1.1.0
 
 This immutable offline successor converts evidence-backed asset records into non-authoritative search documents, compiles questions with a deterministic controlled vocabulary, ranks candidate assets, preserves access and provenance, and returns explicit join-route objects through one discovery-result contract shared by the browser and agent surfaces.
 
-The successor fixes the v1.0.0 validation failure in which an inferred geography name could count as the only lexical relevance signal. In v1.0.1, geography aliases are removed from lexical evidence; geography-only retrieval is permitted only through an explicit structured geography filter. A zero-result response remains explicitly non-evidence of corpus-wide absence.
+The additive v1.1 contract keeps the `observatory-discovery-result.v1.0.0` compatibility envelope while adding canonical ranking provenance, generation-pinned cursor traversal, complete-collection record facets, partial-catalog notices, tri-state geography/time/access compatibility, named-source coverage gaps, separate metadata dimensions and dates, freshness, text-quality flags, and a page-scoped search receipt. Geography aliases remain excluded from lexical evidence, and a national record is never promoted to documented state coverage without evidence.
 
 ## Offline fixture workflow
 
 ```bash
 npm install --ignore-scripts
 npm test
+npm run validate:publication
 npm run build:fixture
 npm run validate
 npm run example
@@ -51,3 +52,9 @@ authenticate a remote, verify a signed commit or tag, or independently anchor
 the revision and blob IDs. A production import must add an independently
 trusted revision or artifact-signature anchor before treating upstream origin
 as attested.
+
+## Publication and traversal validation
+
+`validate:publication` reads the production v1.2 manifest and all declared record shards, checks every record against the same canonical contract imported by the browser, and verifies the manifest row count. Runtime loading repeats that check per record: an incompatible item is isolated and disclosed through `partial_results` while valid records remain searchable. This is defense in depth; the current four incompatible production records remain an explicit release blocker even though runtime isolation keeps the other 3,430 searchable.
+
+Cursor traversal is pinned to the catalog generation, normalized question, structured constraints, facet filters, selected sort, and page size. `ranking.ordered_ids` always describes the current page. Facet counts use records across the complete filtered match collection before pagination and are never approximate.

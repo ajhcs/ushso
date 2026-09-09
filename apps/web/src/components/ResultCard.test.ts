@@ -30,6 +30,8 @@ describe('result card six-region presentation contract', () => {
     expect(markup).toContain('<aside class="result-card__summary" aria-label="Verification and access status">')
     expect(markup).toContain('<dl class="result-card__coverage" data-result-region="geo-grain-time">')
     expect(markup).toContain('Scoped metadata route checked')
+    expect(markup).toContain('Question match')
+    expect(markup).toContain('Documented match')
     expect(markup).toContain('Access')
     expect(markup).toContain('Geography')
     expect(markup).toContain('Grain')

@@ -1,12 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
 import { assertDiscoveryResult } from '../providers/discoveryProvider'
-import { adaptDiscoveryResponse } from './catalogAdapter'
+import { adaptDiscoveryResponse, findDatasetInResponse } from './catalogAdapter'
+import { buildResearcherGuidance } from './researcherGuidance'
 
 const acceptedResponse = await loadAcceptedDiscoveryFixture()
 assertDiscoveryResult(acceptedResponse)
 
 describe('canonical discovery response adapter', () => {
+  it('resolves full canonical and shortened UI record IDs to the same exact record', () => {
+    const record = adaptDiscoveryResponse(acceptedResponse).records[0]
+    expect(findDatasetInResponse(acceptedResponse, record.id)?.canonicalResult.record_id).toBe(record.canonicalResult.record_id)
+    expect(findDatasetInResponse(acceptedResponse, record.canonicalResult.record_id)?.canonicalResult.record_id).toBe(record.canonicalResult.record_id)
+    expect(findDatasetInResponse(acceptedResponse, `${record.canonicalResult.record_id}-wrong`)).toBeUndefined()
+  })
   it('preserves every ranked canonical result and its evidence-bearing fields', () => {
     const adapted = adaptDiscoveryResponse(acceptedResponse)
 
@@ -48,9 +55,20 @@ describe('canonical discovery response adapter', () => {
   it('exposes scan-card grain and access status without inventing coverage', () => {
     const adapted = adaptDiscoveryResponse(acceptedResponse)
     const first = adapted.records[0]
-    expect(first.grain).toContain(first.reportingUnit)
+    expect(first.grain).toBe('Observation grain unresolved')
+    expect(first.reportingUnit).toBe('Observation grain unresolved')
     expect(first.accessStatusLabel).toBeTruthy()
     expect(first.categories.length).toBeGreaterThan(0)
+  })
+
+  it('does not reinterpret public catalog visibility as public payload access', () => {
+    const catalogOnly = structuredClone(acceptedResponse)
+    catalogOnly.results[0].record.access.status = 'public_catalog'
+    catalogOnly.results[0].record.access.mechanisms = ['unknown']
+    const first = adaptDiscoveryResponse(catalogOnly).records[0]
+    expect(first.accessStatus).toBe('Public catalog metadata; payload access unresolved')
+    expect(first.facetValues.access).toEqual(['catalog-metadata-only'])
+    expect(buildResearcherGuidance(first).accessPlan.accessClass).toBe('unknown')
   })
 
   it('builds stable details routes that do not depend on the discovery question', () => {

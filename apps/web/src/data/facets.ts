@@ -49,6 +49,7 @@ function optionLabel(sectionId: string, value: string, items: DatasetFamily[]) {
     pennsylvania: 'Pennsylvania',
     'other-states': 'Other states',
     'public-report': 'Public report',
+    'catalog-metadata-only': 'Catalog metadata only',
     'open-data-api': 'Open data/API',
     'application-required': 'Application required',
     'fee-license': 'Fee or license',
@@ -56,7 +57,7 @@ function optionLabel(sectionId: string, value: string, items: DatasetFamily[]) {
     'access-unresolved': 'Access unresolved',
     'health-system': 'Health system',
     'facility-period': 'Facility-period',
-    'current-verified': 'Current — live verified',
+    'current-verified': 'Current — metadata observed live',
     'not-live-verified': 'Not live verified',
   }
   return labels[value] ?? sentenceCase(value)

@@ -45,7 +45,7 @@ test('runtime descriptors remain pinned to the frozen manifest and exact WebMCP 
       registration_state: frozen.registration_state
     });
   }
-  assert.deepEqual(Object.values(PUBLIC_CAPABILITY_FLAGS), Array(9).fill(false));
+  assert.deepEqual(Object.values(PUBLIC_CAPABILITY_FLAGS), [...Array(8).fill(true), false]);
 });
 
 test('every frozen request passes the dependency-free strict runtime validator', async () => {

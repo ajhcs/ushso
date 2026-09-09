@@ -1,8 +1,26 @@
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
+import fs from 'node:fs/promises';
+import {verifyAdvertisedSchemas} from '../scripts/verify-advertised-schemas.mjs';
 
 const baseIndex = process.argv.indexOf('--base');
+const receiptIndex = process.argv.indexOf('--receipt');
 const base = baseIndex === -1 ? 'http://127.0.0.1:8787' : process.argv[baseIndex + 1];
-if (!base) throw new Error('Usage: node tests/e2e-smoke.mjs [--base <url>]');
+const receiptPath = receiptIndex === -1 ? null : process.argv[receiptIndex + 1];
+if (!base) throw new Error('Usage: node tests/e2e-smoke.mjs [--base <url>] [--receipt <path>]');
+if (receiptIndex !== -1 && !receiptPath) throw new Error('--receipt requires a path');
+
+async function jsonResponse(url, init) {
+  const response = await fetch(url, init);
+  const body = await response.json();
+  return { response, body };
+}
+
+function assertInspectionResponse(value, capability) {
+  assert.equal(value.ok, true, capability);
+  assert.equal(value.capability, capability);
+  assert.ok(Object.values(value.truth_boundary).every(flag => flag === false), capability);
+}
 
 const index = await fetch(`${base}/`);
 const html = await index.text();
@@ -12,25 +30,37 @@ const csp = index.headers.get('content-security-policy') ?? '';
 assert.match(csp, /default-src 'self'/);
 assert.equal(index.headers.get('x-content-type-options'), 'nosniff');
 
-const healthResponse = await fetch(`${base}/api/health`);
-const health = await healthResponse.json();
+const assetPaths = [...new Set(html.match(/\/assets\/[^"']+\.(?:js|css)/gu) ?? [])].sort();
+assert.ok(assetPaths.length >= 2);
+const assetHashes = {};
+for (const assetPath of assetPaths) {
+  const response = await fetch(`${base}${assetPath}`);
+  const content = Buffer.from(await response.arrayBuffer());
+  assert.equal(response.status, 200, assetPath);
+  assetHashes[assetPath] = crypto.createHash('sha256').update(content).digest('hex');
+}
+
+const { response: healthResponse, body: health } = await jsonResponse(`${base}/api/health`);
 assert.equal(healthResponse.status, 200);
 assert.equal(health.status, 'ok');
 assert.equal(health.compiler.llm_used, false);
 assert.equal(health.compiler.external_requests, 0);
 
-const contractResponse = await fetch(`${base}/api/contract`);
-const contract = await contractResponse.json();
+const { response: contractResponse, body: contract } = await jsonResponse(`${base}/api/contract`);
 assert.equal(contractResponse.status, 200);
-assert.equal(contract.tool.annotations.readOnlyHint, true);
+assert.equal(contract.read_only, true);
+assert.equal(contract.enabled_tool_count, 8);
+assert.equal(contract.tools.length, 8);
+assert.deepEqual(contract.disabled_tools.map(tool => tool.capability), ['plan_research']);
+assert.equal(contract.source_network_allowed_at_invocation, false);
+assert.equal(contract.payload_retrieval_allowed, false);
+const advertisedSchemas = await verifyAdvertisedSchemas(base, contract);
 
-const discoverResponse = await fetch(`${base}/api/discover`, {
+const { response: discoverResponse, body: discovery } = await jsonResponse(`${base}/api/discover`, {
   method: 'POST',
   headers: { 'content-type': 'application/json' },
-  body: JSON.stringify({ question: 'I need hospital financial and utilization data for Pennsylvania', limit: 15 })
+  body: JSON.stringify({ question: 'hospital', limit: 15 })
 });
-const discovery = await discoverResponse.json();
-const ids = discovery.results.map(item => item.record.identity?.match_fields?.source_id ?? item.record_id);
 assert.equal(discoverResponse.status, 200);
 assert.equal(discovery.contract_version, 'observatory-discovery-result.v1.0.0');
 assert.equal(discovery.returned_count, discovery.results.length);
@@ -38,20 +68,84 @@ assert.equal(discovery.result_count, discovery.returned_count);
 assert.equal(typeof discovery.total_matches, 'number');
 assert.ok(discovery.total_matches >= discovery.returned_count);
 assert.equal(discovery.has_more, discovery.total_matches > discovery.returned_count);
-assert.equal(discovery.corpus.record_count, 157);
-assert.ok(ids.includes('cms_hcris_cost_reports'));
-assert.ok(ids.includes('pa_phc4_financial_ownership'));
-assert.ok(discovery.join_routes.length > 0);
+assert.equal(discovery.corpus.record_count, 3434);
+assert.equal(discovery.corpus.publication.all_public_records_live_verified, true);
+assert.ok(discovery.results.length > 0);
+assert.ok(discovery.results.every(result => result.record.freshness_verification.verification_status === 'current_verified'));
 
-const zeroResponse = await fetch(`${base}/api/discover`, {
+const repeatedDiscovery = [];
+for (let index = 0; index < 20; index += 1) {
+  const started = performance.now();
+  const { response, body } = await jsonResponse(`${base}/api/discover`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ question: 'hospital cost reports', limit: 10 })
+  });
+  assert.equal(response.status, 200, `repeated discovery request ${index + 1}`);
+  assert.equal(body.corpus.record_count, 3434, `repeated discovery request ${index + 1}`);
+  repeatedDiscovery.push(Math.round(performance.now() - started));
+}
+assert.equal((await fetch(`${base}/api/health`)).status, 200, 'Worker must remain alive after repeated discovery');
+
+const { response: quickStartResponse, body: quickStart } = await jsonResponse(base + '/api/discover', {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  body: JSON.stringify({ question: 'CMS HCRIS hospital cost reports by state', limit: 10 })
+});
+assert.equal(quickStartResponse.status, 200);
+assert.equal(quickStart.corpus.record_count, 3434);
+assert.equal(quickStart.results[0]?.record_id, 'obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17');
+
+const { response: zeroResponse, body: zero } = await jsonResponse(`${base}/api/discover`, {
   method: 'POST',
   headers: { 'content-type': 'application/json' },
   body: JSON.stringify({ question: 'Pennsylvania flibbertigibbet qzxwvu' })
 });
-const zero = await zeroResponse.json();
 assert.equal(zeroResponse.status, 200);
 assert.equal(zero.result_count, 0);
 assert.ok(zero.warnings.some(value => /not evidence that no source exists/i.test(value)));
+
+const { body: catalog } = await jsonResponse(`${base}/api/catalog?limit=2`);
+assert.equal(catalog.corpus.record_count, 3434);
+assert.equal(catalog.returned_count, 2);
+assert.equal(Object.values(catalog.corpus.source_slices).reduce((sum, value) => sum + value, 0), catalog.corpus.record_count);
+assert.equal(catalog.partial_results.is_partial, true);
+assert.equal(catalog.total_matches + catalog.partial_results.invalid_item_count, catalog.corpus.record_count);
+const [first, second] = catalog.results.map(item => item.record_id);
+assert.ok(first && second);
+const generation = catalog.corpus.publication.generation;
+const filters = {
+  geography_ids: [], subject_ids: [], grain: [], access_classes: [], authority_levels: [],
+  machine_readiness: [], time_period: null, negative_constraints: [], dimensions: []
+};
+
+const machineCalls = [
+  ['search_assets', `${base}/api/machine/v1/search-assets`, {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ contract_version: 'observatory.machine.search-assets.input.v1.0.0', mode: 'browse', filters, sort: 'title_asc', grouping: 'none', limit: 2, cursor: null, expected_generation: generation })
+  }],
+  ['get_asset', `${base}/api/machine/v1/assets/${encodeURIComponent(first)}?generation=${encodeURIComponent(generation)}`],
+  ['get_access_plan', `${base}/api/machine/v1/assets/${encodeURIComponent(first)}/access-plan?release_id=release.smoke&distribution_id=distribution.smoke&access_route_id=access.smoke&generation=${encodeURIComponent(generation)}`],
+  ['get_retrieval_recipe', `${base}/api/machine/v1/assets/${encodeURIComponent(first)}/retrieval-recipe?release_id=release.smoke&distribution_id=distribution.smoke&access_route_id=access.smoke&generation=${encodeURIComponent(generation)}`],
+  ['get_variables', `${base}/api/machine/v1/assets/${encodeURIComponent(first)}/variables?release_id=release.smoke&distribution_id=distribution.smoke&schema_id=schema.smoke&generation=${encodeURIComponent(generation)}`],
+  ['get_join_routes', `${base}/api/machine/v1/join-routes?from_id=${encodeURIComponent(first)}&to_id=${encodeURIComponent(second)}&generation=${encodeURIComponent(generation)}`],
+  ['compare_assets', `${base}/api/machine/v1/compare-assets`, {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ contract_version: 'observatory.machine.compare-assets.input.v1.0.0', asset_ids: [first, second], dimensions: ['access', 'freshness'], expected_generation: generation })
+  }],
+  ['get_coverage_status', `${base}/api/machine/v1/coverage-status?geography_id=geo.us&authority_level=authoritative&generation=${encodeURIComponent(generation)}`]
+];
+const machineResults = [];
+for (const [capability, url, init] of machineCalls) {
+  const { response, body } = await jsonResponse(url, init);
+  assert.equal(response.status, 200, capability);
+  advertisedSchemas.validate(capability, body);
+  assert.ok(Object.values(body.truth_boundary).every(flag=>flag===false));
+  if (['get_access_plan','get_retrieval_recipe','get_variables'].includes(capability)) assert.equal(typeof body.ok,'boolean');
+  else assertInspectionResponse(body, capability);
+  if (capability === 'get_asset') assert.equal(advertisedSchemas.legacy(body),false,'strict v1.0 response consumer must reject successor');
+  machineResults.push({ capability, status: response.status, result_state: body.result_state });
+}
 
 const invalid = await fetch(`${base}/api/discover`, {
   method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}'
@@ -60,10 +154,17 @@ const wrongType = await fetch(`${base}/api/discover`, { method: 'POST', body: '{
 const oversized = await fetch(`${base}/api/discover`, {
   method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ question: 'x'.repeat(21_000) })
 });
+const malformedMachine = await fetch(`${base}/api/machine/v1/search-assets`, {
+  method: 'POST', headers: { 'content-type': 'application/json' }, body: '{'
+});
+const oversizedMachine = await fetch(`${base}/api/machine/v1/search-assets`, {
+  method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ padding: 'x'.repeat(21_000) })
+});
+const planner = await fetch(`${base}/api/machine/v1/plan-research`, {
+  method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}'
+});
 const deepLink = await fetch(`${base}/search?q=hospital`);
-const catalog = await (await fetch(`${base}/api/catalog`)).json();
-const stableId = catalog.results.find(item => item.record_id.startsWith('us-federal:')).record_id;
-const stableRecord = await fetch(`${base}/api/datasets/${encodeURIComponent(stableId)}`);
+const stableRecord = await fetch(`${base}/api/datasets/${encodeURIComponent(first)}`);
 const healthHead = await fetch(`${base}/api/health`, { method: 'HEAD' });
 const preflight = await fetch(`${base}/api/discover`, { method: 'OPTIONS' });
 const machineGuide = await fetch(`${base}/llms.txt`);
@@ -71,8 +172,10 @@ const unknownPage = await fetch(`${base}/definitely-not-a-page`);
 assert.equal(invalid.status, 400);
 assert.equal(wrongType.status, 415);
 assert.equal(oversized.status, 413);
+assert.equal(malformedMachine.status, 400);
+assert.equal(oversizedMachine.status, 413);
+assert.equal(planner.status, 404);
 assert.equal(deepLink.status, 200);
-assert.equal(catalog.corpus.record_count, 157);
 assert.equal(stableRecord.status, 200);
 assert.equal(healthHead.status, 200);
 assert.equal(preflight.status, 204);
@@ -80,19 +183,42 @@ assert.equal(preflight.headers.get('access-control-allow-origin'), '*');
 assert.match(machineGuide.headers.get('content-type') ?? '', /^text\/plain/);
 assert.equal(unknownPage.status, 404);
 
-process.stdout.write(`${JSON.stringify({
+const receipt = {
+  schema_version: 'observatory-staging-http-receipt.v1.0.0',
   status: 'PASS',
+  observed_at: new Date().toISOString(),
   base,
+  generation,
+  record_count: catalog.corpus.record_count,
+  returned_count: catalog.returned_count,
+  total_matches: catalog.total_matches,
+  source_slices: catalog.corpus.source_slices,
   security_headers: { content_security_policy: true, nosniff: true },
+  static_asset_sha256: assetHashes,
   health: health.status,
   contract: contract.contract_version,
-  records: discovery.corpus.record_count,
-  results: discovery.result_count,
-  join_routes: discovery.join_routes.length,
+  enabled_tool_count: contract.enabled_tool_count,
+  machine_results: machineResults,
+  advertised_schema_ids: advertisedSchemas.schema_ids,
+  planner_status: planner.status,
   zero_results: zero.result_count,
-  guards: { invalid: invalid.status, media_type: wrongType.status, oversized: oversized.status },
+  repeated_discovery: {
+    request_count: repeatedDiscovery.length,
+    maximum_ms: Math.max(...repeatedDiscovery),
+    mean_ms: Math.round(repeatedDiscovery.reduce((sum, value) => sum + value, 0) / repeatedDiscovery.length)
+  },
+  guards: {
+    invalid: invalid.status,
+    media_type: wrongType.status,
+    oversized: oversized.status,
+    malformed_machine: malformedMachine.status,
+    oversized_machine: oversizedMachine.status
+  },
   spa_deep_link: deepLink.status,
   stable_record: stableRecord.status,
-  machine_routes: { llms: machineGuide.status, unknown: unknownPage.status },
+  machine_guide: machineGuide.status,
+  unknown_route: unknownPage.status,
   cors_preflight: preflight.status
-}, null, 2)}\n`);
+};
+if (receiptPath) await fs.writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
+process.stdout.write(`${JSON.stringify(receipt, null, 2)}\n`);

@@ -1,5 +1,7 @@
 import { spawn } from 'node:child_process';
 import net from 'node:net';
+import fs from 'node:fs/promises';
+import { verifyResearchRelease, verifyScientificReviewRelease } from './research-release-smoke.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -83,6 +85,10 @@ try {
   });
   result = await waitForExit(test);
   if (result.code !== 0) throw new Error(`RELEASE_GATE_E2E_FAILED:${result.code ?? result.signal}`);
+  const lock = JSON.parse(await fs.readFile(path.join(repositoryRoot, 'config/research-assets.lock.json'), 'utf8'));
+  const research = await verifyResearchRelease(base, lock.packages.find(pkg => pkg.kind === 'dictionary').generation);
+  const scientific = await verifyScientificReviewRelease(base, lock.packages.find(pkg => pkg.kind === 'dictionary').generation);
+  process.stdout.write(`${JSON.stringify({ research, scientific })}\n`);
 } finally {
   await stop(server);
 }

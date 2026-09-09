@@ -1,13 +1,20 @@
 version = 1
 authority = "local-exact-tree"
 changed_from = "origin/main"
-artifacts = ["apps/web/dist/**"]
+artifacts = ["apps/web/dist/**", ".wrangler-dry-run/**", "wrangler.jsonc"]
 
 [[stages]]
 name = "bootstrap"
 kind = "bootstrap"
-command = ["npm", "ci", "--ignore-scripts"]
+command = ["npx", "--yes", "npm@11.19.1", "ci", "--ignore-scripts"]
 failure_class = "environment_blocked"
+quiet_seconds = 30
+
+[[stages]]
+name = "dependency-tree"
+kind = "static_diagnostics"
+command = ["npx", "--yes", "npm@11.19.1", "ls", "ajv", "--all"]
+failure_class = "product_test_failed"
 quiet_seconds = 30
 
 [[stages]]
@@ -47,3 +54,10 @@ command = ["npm", "run", "cf:dry-run:artifact"]
 artifacts = ["apps/web/dist/**"]
 failure_class = "product_test_failed"
 quiet_seconds = 30
+
+# A command-bearing artifact stage does not invoke the CLI's built-in copier.
+# Retain and hash the actual dry-run Worker output and the tested static assets.
+[[stages]]
+name = "retain-deployable-artifacts"
+kind = "artifact_verification"
+failure_class = "product_test_failed"

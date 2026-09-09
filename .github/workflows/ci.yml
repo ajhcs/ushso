@@ -31,9 +31,11 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
-          node-version: '22.12.0'
+          node-version: '22.15.0'
           cache: npm
+      - run: npm install --global npm@11.19.1 --ignore-scripts --no-audit --no-fund
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm ls ajv --all
       - run: npm run release:audit
       - run: npm test
 
@@ -50,6 +52,8 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - run: npm install --global npm@11.19.1 --ignore-scripts --no-audit --no-fund
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm ls ajv --all
       - run: npm run build
       - run: npm run cf:dry-run:artifact

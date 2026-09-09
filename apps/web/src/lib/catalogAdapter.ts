@@ -49,18 +49,14 @@ function geographyDisplay(record: ObservatoryRecord) {
 }
 
 function grainDisplay(record: ObservatoryRecord) {
-  const units = record.unit_of_analysis.map(sentenceCase).filter(Boolean)
-  const granularity = record.time_coverage.temporal_granularity
-  const grain = units.join(', ') || 'Unit unresolved'
-  if (granularity && granularity !== 'unknown' && granularity !== 'not_applicable') {
-    return `${grain} · ${sentenceCase(granularity)}`
-  }
-  return grain
+  // unit_of_analysis is an inferred search projection in the current wire
+  // contract and has no claim-level evidence linkage.
+  return 'Observation grain unresolved'
 }
 
 const ACCESS_STATUS_LABELS: Record<ObservatoryRecord['access']['status'], string> = {
   public_direct: 'Public direct',
-  public_catalog: 'Public catalog',
+  public_catalog: 'Public catalog metadata; payload access unresolved',
   registration_required: 'Registration required',
   application_required: 'Application required',
   dua_required: 'Data-use agreement required',
@@ -191,7 +187,7 @@ function geographyFacets(record: ObservatoryRecord) {
 function accessFacets(record: ObservatoryRecord) {
   const values = new Set<string>()
   const status = record.access.status
-  if (status === 'public_catalog') values.add('public-report')
+  if (status === 'public_catalog') values.add('catalog-metadata-only')
   if (status === 'public_direct' || record.access.mechanisms.some((value) => ['api', 'bulk_download', 'web_download'].includes(value))) values.add('open-data-api')
   if (status === 'registration_required' || status === 'application_required') values.add('application-required')
   if (status === 'licensed_paid' || record.access.requirements.includes('payment') || record.access.requirements.includes('license_agreement')) values.add('fee-license')
@@ -228,7 +224,6 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
   const { record } = result
   const joinRoutes = response.join_routes.filter((route) => route.from_record_id === result.record_id || route.to_record_id === result.record_id)
   const familyStatus = familyCount > 1 ? 'Family' : 'Single-record family'
-  const units = record.unit_of_analysis.map(sentenceCase)
   const topics = record.capabilities.topics.map((topic) => topic.label)
   const latestRelease = record.freshness_verification.data_through
     ? `${record.freshness_verification.data_through} (${sentenceCase(record.freshness_verification.verification_status)})`
@@ -249,15 +244,15 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
     recordType: sentenceCase(record.identity.asset.asset_type),
     geographicApplicability: geographyDisplay(record),
     grain: grainDisplay(record),
-    reportingUnit: units.join(', ') || 'Unit unresolved',
+    reportingUnit: grainDisplay(record),
     accessStatusLabel: accessStatusLabel(record),
-    populationFacilityScope: units.join(', ') || 'Scope unresolved',
+    populationFacilityScope: 'Scope unresolved',
     availableYears: timeDisplay(record),
     latestVerifiedRelease: latestRelease,
     variablesCodebook: variables.summary ?? variables.expectedArtifacts.join(' · '),
     verification,
     variableDetails: variables,
-    accessStatus: sentenceCase(record.access.status),
+    accessStatus: accessStatusLabel(record),
     accessOptions: accessOptions(record),
     categories: topics,
     sourceName: record.identity.source.name,
@@ -310,5 +305,5 @@ export function adaptDiscoveryResponse(response: DiscoveryResult): CatalogSearch
 
 export function findDatasetInResponse(response: DiscoveryResult, id: string) {
   const adapted = adaptDiscoveryResponse(response)
-  return adapted.records.find((item) => item.id === id) ?? adapted.families.find((item) => item.id === id)
+  return adapted.records.find((item) => item.id === id || item.canonicalResult.record_id === id) ?? adapted.families.find((item) => item.id === id)
 }

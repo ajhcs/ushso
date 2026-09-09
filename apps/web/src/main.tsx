@@ -8,7 +8,8 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { DiscoveryProviderBoundary } from './providers/DiscoveryProviderContext'
-import { registerAvailableWebMcp } from './providers/registerWebMcp'
+import { createBrowserMachineToolkitClient } from './providers/machineToolkitClient'
+import { registerAvailableObservatoryToolkit } from './providers/registerObservatoryToolkit'
 import './styles.css'
 
 createRoot(document.getElementById('root')!).render(
@@ -21,6 +22,6 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 )
 
-void registerAvailableWebMcp().catch((error: unknown) => {
+void registerAvailableObservatoryToolkit(createBrowserMachineToolkitClient()).catch((error: unknown) => {
   console.warn('USHSO WebMCP registration failed.', error)
 })

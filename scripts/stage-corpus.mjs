@@ -1,11 +1,13 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { collectSchemaAssets, SUPPORTED_TOOLKIT_CONTRACTS } from './schema-assets.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceRoot = path.join(root, 'packages/retrieval');
 const targetRoot = path.join(root, 'apps/web/public');
 const files = [
+  ['fixtures/named-source-registry.v1.0.0.json', 'corpus-v1.1.0/named-source-registry.json'],
   ['corpus/records.jsonl', 'corpus/records.jsonl'],
   ['corpus/search-documents.jsonl', 'corpus/search-documents.jsonl'],
   ['corpus/join-routes.jsonl', 'corpus/join-routes.jsonl'],
@@ -25,9 +27,36 @@ const files = [
   ['readiness/v0.1.0/state-readiness.json', 'state-readiness-v0.1.0.json']
 ];
 
+async function filesBelow(directory) {
+  const result = [];
+  for (const entry of (await fs.readdir(directory, { withFileTypes: true })).sort((a,b)=>a.name.localeCompare(b.name))) {
+    const absolute = path.join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...await filesBelow(absolute));
+    else result.push(absolute);
+  }
+  return result;
+}
+
+const liveVersionRoot = path.join(sourceRoot, 'versions/v1.2.0');
+for (const sourcePath of await filesBelow(liveVersionRoot)) {
+  const relative = path.relative(liveVersionRoot, sourcePath).replaceAll('\\', '/');
+  files.push([`versions/v1.2.0/${relative}`, `corpus-v1.2.0/${relative}`]);
+}
+files.push(['fixtures/named-source-registry.v1.0.0.json', 'corpus-v1.2.0/fixtures/named-source-registry.json']);
+files.push([
+  null,
+  'corpus-v1.2.0/webmcp-tool.json',
+  path.join(root, 'packages/machine-toolkit/public-webmcp-tool.json'),
+]);
+// Verify the entire local dependency graph before touching generated output.
+const schemaAssets = await collectSchemaAssets(root);
+for (const asset of schemaAssets) files.push([null, asset.relative, asset.absolute]);
+
 await fs.mkdir(targetRoot, { recursive: true });
-for (const [source, target] of files) {
-  const sourcePath = path.join(sourceRoot, source);
+await fs.rm(path.join(targetRoot, 'corpus-v1.2.0'), { recursive: true, force: true });
+for (const version of SUPPORTED_TOOLKIT_CONTRACTS) await fs.rm(path.join(targetRoot, `contracts/machine-toolkit/${version}/schemas`), { recursive: true, force: true });
+for (const [source, target, absoluteSource = null] of files) {
+  const sourcePath = absoluteSource ?? path.join(sourceRoot, source);
   const targetPath = path.join(targetRoot, target);
   await fs.mkdir(path.dirname(targetPath), { recursive: true });
   const content = await fs.readFile(sourcePath);

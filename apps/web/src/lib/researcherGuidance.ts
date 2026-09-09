@@ -68,7 +68,7 @@ function matchingOrUnknown(values: string[], pattern: RegExp, unknown: string) {
 function accessClass(record: ObservatoryRecord): ResearcherGuidance['accessPlan']['accessClass'] {
   const mapping: Record<ObservatoryRecord['access']['status'], ResearcherGuidance['accessPlan']['accessClass']> = {
     public_direct: 'public',
-    public_catalog: 'public',
+    public_catalog: 'unknown',
     registration_required: 'registration',
     application_required: 'application',
     dua_required: 'dua',

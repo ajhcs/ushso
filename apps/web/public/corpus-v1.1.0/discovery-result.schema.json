@@ -4,7 +4,7 @@
   "title": "Canonical Observatory discovery result shared by UI and WebMCP",
   "type": "object",
   "additionalProperties": false,
-  "required": ["contract_version","retrieval_id","evidence_mode","corpus","query","result_count","results","join_routes","warnings"],
+  "required": ["contract_version","retrieval_id","evidence_mode","corpus","query","ranking","pagination","facets","sections","named_source_resolution","partial_results","receipt","result_count","returned_count","total_matches","has_more","results","join_routes","warnings"],
   "properties": {
     "contract_version":{"const":"observatory-discovery-result.v1.0.0"},
     "retrieval_id":{"type":"string","pattern":"^retrieval-[a-f0-9]{16}$"},
@@ -28,7 +28,7 @@
         "normalized_question":{"type":"string","minLength":1},
         "interpretation":{
           "type":"object","additionalProperties":false,
-          "required":["geographies","subjects","units_of_analysis","time_window","access_intent"],
+          "required":["geographies","subjects","units_of_analysis","time_window","access_intent","exclusions","named_sources","interpretation_warnings"],
           "properties":{
             "geographies":{"$ref":"#/$defs/conceptMatches"},
             "subjects":{"$ref":"#/$defs/conceptMatches"},
@@ -48,9 +48,18 @@
                 "include_restricted":{"type":"boolean"},
                 "public_only":{"type":"boolean"},
                 "accepts_restricted":{"type":"boolean"},
-                "match_basis":{"type":"string"}
+                "match_basis":{"type":"string"},
+                "payload_requirement":{"enum":["documented_public_payload","unspecified"]},
+                "cost_requirement":{"enum":["documented_no_fee","unspecified"]},
+                "ambiguity":{"type":["string","null"]},
+                "matched_phrases":{"type":"array","items":{"type":"string"}},
+                "interpretation_note":{"type":["string","null"]}
               }
-            }
+            },
+            "exclusions":{"type":"array","items":{"type":"object"}},
+            "named_sources":{"type":"array","items":{"type":"object"}},
+            "positive_terms":{"type":"array","items":{"type":"string"}},
+            "interpretation_warnings":{"type":"array","items":{"type":"string"}}
           }
         },
         "filters":{"type":"object"}
@@ -60,14 +69,24 @@
     "returned_count":{"type":"integer","minimum":0,"description":"Number of records included in this bounded response."},
     "total_matches":{"type":"integer","minimum":0,"description":"Number of scored matches before the request limit was applied. This is not a claim that the Observatory contains only these records."},
     "has_more":{"type":"boolean","description":"True when total_matches exceeds returned_count because discovery is bounded by limit."},
+    "ranking":{"type":"object","additionalProperties":false,"required":["version","sort","ordered_ids"],"properties":{"version":{"type":"string"},"sort":{"enum":["canonical_relevance","title_asc","release_newest","observation_latest"]},"ordered_ids":{"type":"array","uniqueItems":true,"items":{"type":"string"}}}},
+    "pagination":{"type":"object","additionalProperties":false,"required":["generation","cursor","next_cursor","has_more","page_size","total_matches"],"properties":{"generation":{"type":"string"},"cursor":{"type":["string","null"]},"next_cursor":{"type":["string","null"]},"has_more":{"type":"boolean"},"page_size":{"type":"integer","minimum":1,"maximum":200},"total_matches":{"type":"integer","minimum":0}}},
+    "facets":{"type":"object","additionalProperties":false,"required":["count_basis","collection_scope","approximate","sections"],"properties":{"count_basis":{"const":"records"},"collection_scope":{"const":"all_matching_records_before_pagination"},"approximate":{"const":false},"sections":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["id","label","options"],"properties":{"id":{"type":"string"},"label":{"type":"string"},"options":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["value","label","count"],"properties":{"value":{"type":"string"},"label":{"type":"string"},"count":{"type":"integer","minimum":0}}}}}}}}},
+    "sections":{"type":"object","additionalProperties":false,"required":["supported","uncertain","contextual"],"properties":{"supported":{"$ref":"#/$defs/stringSet"},"uncertain":{"$ref":"#/$defs/stringSet"},"contextual":{"$ref":"#/$defs/stringSet"}}},
+    "named_source_resolution":{"type":"array","items":{"type":"object"}},
+    "partial_results":{"type":"object","additionalProperties":false,"required":["is_partial","invalid_item_count","issues"],"properties":{"is_partial":{"type":"boolean"},"invalid_item_count":{"type":"integer","minimum":0},"issues":{"type":"array","items":{"type":"object"}}}},
+    "receipt":{"type":"object"},
     "results":{
       "type":"array","items":{
         "type":"object","additionalProperties":false,
-        "required":["rank","score","record_id","relevance","record"],
+        "required":["rank","score","record_id","match_state","uncertainty_reasons","metadata","relevance","record"],
         "properties":{
           "rank":{"type":"integer","minimum":1},
           "score":{"type":"integer","minimum":1},
           "record_id":{"type":"string","minLength":1},
+          "match_state":{"enum":["supported","uncertain","contextual"]},
+          "uncertainty_reasons":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+          "metadata":{"type":"object"},
           "relevance":{
             "type":"object","additionalProperties":false,
             "required":["matched_subjects","matched_geographies","matched_units","matched_terms","score_components","why_relevant"],
@@ -99,6 +118,7 @@
     "warnings":{"type":"array","items":{"type":"string","minLength":1}}
   },
   "$defs":{
+    "stringSet":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
     "conceptMatches":{
       "type":"array","items":{
         "type":"object","additionalProperties":false,

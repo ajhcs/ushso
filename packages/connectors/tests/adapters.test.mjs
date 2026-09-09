@@ -45,11 +45,11 @@ test('Socrata adapter uses metadata endpoints and never SODA row routes', async 
   const descriptor = makeFixtureDescriptor({ connectorName: 'socrata-catalog' });
   const connector = new SocrataCatalogConnector({ descriptor, endpointId: 'endpoint_fixture_catalog', templateId: 'route_fixture_catalog', pageSize: 2 });
   const harness = makeHarness({ descriptor });
-  harness.transport.add('GET', 'https://catalog.example.gov/data.json?limit=2&offset=0', jsonResponse([
+  harness.transport.add('GET', 'https://catalog.example.gov/data.json?limit=2&page=1', jsonResponse([
     { id: 'abcd-1234', name: 'Metadata one', rowsUpdatedAt: 1_787_875_200 },
     { id: 'efgh-5678', name: 'Metadata two', rowsUpdatedAt: 1_787_875_201 },
   ]));
-  harness.transport.add('GET', 'https://catalog.example.gov/data.json?limit=2&offset=2', jsonResponse([]));
+  harness.transport.add('GET', 'https://catalog.example.gov/data.json?limit=2&page=2', jsonResponse([]));
   const result = await harness.runner.run({ connector, runId: 'run_socrata_adapter', scheduledSlot: SLOT, mode: 'full_membership' });
   assert.equal(result.outcome, 'succeeded');
   assert.equal(result.seal.discoveriesCommitted, 2);

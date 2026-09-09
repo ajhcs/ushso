@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig({
+  cacheDir: fileURLToPath(new URL('../../node_modules/.cache/ushso-web/vite', import.meta.url)),
   plugins: [react()],
   server: {
     host: '127.0.0.1',
