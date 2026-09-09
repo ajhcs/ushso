@@ -5,7 +5,7 @@ import { assertCurrentEvidence, assertPredecessorPreserved, assertPreviousSucces
 
 test('successor inventory retains structural discovery and workspace invariants', async () => {
   const result = await buildTechnicalEvidence()
-  assert.equal(result.package_version, '1.2.0')
+  assert.equal(result.package_version, '1.3.0')
   assert.equal(result.package_lock.status, 'PASS')
   assert.ok(result.verification_suites.some(item => item.path === 'verification/testing/ci/v1.3.0'))
   assert.ok(result.contract_packages.every(item => item.node_test_file_count > 0))

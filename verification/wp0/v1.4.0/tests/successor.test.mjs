@@ -50,7 +50,7 @@ test('CLI rejects ambiguous flags and never issues a receipt for missing or expl
 test('historical path remapping cannot substitute current algorithms', async () => {
   await assert.rejects(validateHistoricalLanes({ mapping: { ...historicalMapping, 'packages/retrieval/tools/query-schema.mjs': 'packages/retrieval/tools/query-schema.mjs' } }), /WP0_HISTORICAL_MAPPING_CHANGED/);
 });
-for (const id of [packageId, '@ushso/wp11-verification-v1.2.0@1.2.0', '@ushso/ci-verification-successor-v1-2@1.2.0']) {
+for (const id of [packageId, '@ushso/wp11-verification-v1.3.0@1.3.0', '@ushso/ci-verification-successor-v1-3@1.3.0']) {
   test(`${id}: shared approval boundary refuses missing, stale, wrong-scope and tampered evidence`, () => {
     const draft = createDraft(id, { status: 'PASS', fixture: 'unit-test-only; no real authority' });
     const reviewerId = 'codex:01a07447-eb7a-7b01-9e2e-aec860f57763';

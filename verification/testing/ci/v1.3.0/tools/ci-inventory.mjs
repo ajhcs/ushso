@@ -210,8 +210,8 @@ export async function buildCiIntegrationReceipt() {
   ].map(pin))
 
   return {
-    receipt_version: 'ushso.ci-integration-receipt.v1.2',
-    package_version: '1.2.0',
+    receipt_version: 'ushso.ci-integration-receipt.v1.3',
+    package_version: '1.3.0',
     status: 'PASS',
     contract_package_count: contracts.length,
     contract_packages: contracts.map(compactDescriptor),
