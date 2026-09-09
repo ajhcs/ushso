@@ -292,7 +292,7 @@ export function assertSuccessfulChildExecution(execution, label) {
 
 function offlineEnvironment() {
   const environment = {}
-  for (const name of ['PATH', 'HOME', 'USERPROFILE', 'SystemRoot', 'WINDIR', 'COMSPEC', 'PATHEXT', 'TMPDIR', 'TMP', 'TEMP', 'LANG', 'LC_ALL']) {
+  for (const name of ['PATH', 'HOME', 'USERPROFILE', 'SystemRoot', 'WINDIR', 'COMSPEC', 'PATHEXT', 'TMPDIR', 'TMP', 'TEMP', 'RUNNER_TEMP', 'GITHUB_ACTIONS', 'LANG', 'LC_ALL']) {
     if (process.env[name] !== undefined) environment[name] = process.env[name]
   }
   return {
