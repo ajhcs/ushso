@@ -1,0 +1,146 @@
+{
+  "format": "ushso.research-program.pr-001.baseline-evidence.v1",
+  "pr_id": "PR-001",
+  "recorded_at": "2026-09-10T15:59:00Z",
+  "status": "producer_checked",
+  "base": {
+    "sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+    "tree": "35de194e7182a67a0275cc180f2b021da184aacd",
+    "branch": "codex/pr-001-release-baseline"
+  },
+  "decisive_checks": [
+    {
+      "id": "check-001",
+      "agentctl_command_id": "cmd-0019-b743735d",
+      "command": "python3 verification/research-program/pr-001/verify.py --repo /mnt/d/worktrees/plumbob/ushso-pr-001-release-baseline --live-dir /mnt/d/tmp/plumbob/ushso-research-program-20260910/baseline-live --readback /mnt/d/tmp/plumbob/ushso-research-program-20260910/worker-readback/deployment-readback.json --preservation-manifest /mnt/d/tmp/plumbob/ushso-research-program-20260910/original-workspace-manifest.json --audit-csv /mnt/d/Coding Projects/ushso/docs/reviews/2026-09-10-product-data-audit/evidence/dictionary-completeness.csv --dictionary-manifest /mnt/d/tmp/plumbob/release-gate-state/repositories/ushso-375cca760f7dab38/runs/20260910T151617Z-acbebf5e6fad/artifacts/files/apps/web/dist/research-dictionaries-v1/manifest.json --original-repo /mnt/d/Coding Projects/ushso",
+      "exit_code": 0,
+      "expected": "The replayable verifier parses the quoted audit CSV and validates the selected base/tree, source tree, four public corpus files, 3434 records, public contract/catalog identities, control-plane deployment/version, preservation manifest, locked review assets, and runtime paths.",
+      "actual": {
+        "base_sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+        "base_tree": "35de194e7182a67a0275cc180f2b021da184aacd",
+        "base_is_ancestor": true,
+        "source_tree": "35de194e7182a67a0275cc180f2b021da184aacd",
+        "corpus_files_byte_equal": true,
+        "record_count": 3434,
+        "unique_record_id_count": 3434,
+        "searchable_record_count": 3430,
+        "isolated_count": 4,
+        "public_requests": 8,
+        "all_http_200": true,
+        "catalog_total_matches": 3430,
+        "catalog_invalid_item_count": 4,
+        "contract_version": "observatory-webmcp-tool.v1.3.0",
+        "enabled_tool_count": 8,
+        "disabled_plan_research": true,
+        "deployment_id": "d0e89eef-5bf4-43d0-a0ba-20fbdc128c81",
+        "version_id": "ecc1603f-9eb4-4a1b-a566-bd9d7a415de4",
+        "traffic_percent": 100,
+        "preservation_manifest_sha256": "3946fa64ea2803477195f999aca4b58c00be467fb3cdec552f9dd374542decd7",
+        "audit_rows": 3434,
+        "dictionary_present_rows": 2905,
+        "dictionary_not_present_rows": 529,
+        "proposal_record_count": 2905,
+        "proposal_isolated_count": 95,
+        "proposal_variables": 1573847,
+        "proposal_pages": 34081,
+        "research_asset_lock_sha256": "75f362a1545f469a74bef00b7d7126fd03ffbfc79e4e6421bafe9fcf62db6c3b",
+        "runtime_paths": true
+      }
+    },
+    {
+      "id": "check-002",
+      "agentctl_command_id": "cmd-0017-eb9b3253",
+      "command": "sha256sum worker/index.mjs worker/static-composition.mjs packages/search/static-search-backend.mjs worker/dictionary-review-router.mjs scripts/research/package-dictionary-review.mjs scripts/research/compose-dictionary-review.mjs",
+      "exit_code": 0,
+      "expected": "The selected runtime entrypoint, static composition/search adapter, dictionary route, and review package builders have the recorded source identities.",
+      "actual": {
+        "worker/index.mjs": "0be15165ba0deb5d3cc94e9d02f5bf63394aea84a74f474d26854bceadf760c4",
+        "worker/static-composition.mjs": "c2109bd1d9a3c36e9ec4ed5b0b925afdbb5f3deb9a0bdc77245a5db39075ba02",
+        "packages/search/static-search-backend.mjs": "67f1a77845e6a5ed1efe180a367725218c3feb0159cdf236d9f199658b1a32cb",
+        "worker/dictionary-review-router.mjs": "86ca4bc252dd7fff65c59070d59bde672317f56cb8dcff8708a18f7df0ac429e",
+        "scripts/research/package-dictionary-review.mjs": "2695ceee0fa15348567bd3fdb199f1534e8ac42e18c11fe42b8b634224890fbb",
+        "scripts/research/compose-dictionary-review.mjs": "93db2830ad09f029023f325cb3e6d6eaa3a118d9efee4146946361505661975b"
+      }
+    },
+    {
+      "id": "check-003",
+      "agentctl_command_id": "cmd-0018-42ca74d9",
+      "command": "git -C /mnt/d/worktrees/plumbob/ushso-pr-001-release-baseline rev-parse 45210704b8de2d7b1360b6d32657cd17791bdd77; git -C /mnt/d/worktrees/plumbob/ushso-pr-001-release-baseline rev-parse 45210704b8de2d7b1360b6d32657cd17791bdd77^{tree}; sha256sum /mnt/d/tmp/plumbob/ushso-research-program-20260910/original-workspace-manifest.json; git -C '/mnt/d/Coding Projects/ushso' status --porcelain",
+      "exit_code": 0,
+      "expected": "The selected base/tree and preservation manifest match the dispatch packet while the original workspace remains dirty.",
+      "actual": {
+        "base_sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+        "base_tree": "35de194e7182a67a0275cc180f2b021da184aacd",
+        "original_preservation_manifest_sha256": "3946fa64ea2803477195f999aca4b58c00be467fb3cdec552f9dd374542decd7",
+        "original_status_lines": 71
+      }
+    },
+    {
+      "id": "check-004",
+      "agentctl_command_id": "cmd-0013-378575ff/cmd-0014-ac256eea",
+      "command": "node --version; /mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm --version",
+      "exit_code": 0,
+      "expected": "Node is at least 22.15 and task-local npm is the pinned 11.19.1.",
+      "actual": {
+        "node": "v24.14.0",
+        "npm": "11.19.1"
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/baseline-live/receipts.json",
+      "sha256": "c5731fdfcba1fef9d6f804711366e6bd52d9eae3ed5cf7cdcf68765aaec42031",
+      "status": "retained_local_sanitized"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/worker-readback/deployment-readback.json",
+      "sha256": "519ce34ef3bbc11651c480463e35970c79a8e9e24c9df3c2d1b3f55a81cec8f3",
+      "status": "retained_local_sanitized"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/original-workspace-manifest.json",
+      "sha256": "3946fa64ea2803477195f999aca4b58c00be467fb3cdec552f9dd374542decd7",
+      "status": "retained_local_preservation_index"
+    },
+    {
+      "path": "/mnt/d/Coding Projects/ushso/docs/reviews/2026-09-10-product-data-audit/evidence/evidence-manifest.json",
+      "sha256": "abad7422abbf451b85049c592546ed74ba7e84f496ac8d2dcf5acbc594c02d1e",
+      "status": "retained_local_audit_index"
+    },
+    {
+      "path": "/mnt/d/Coding Projects/ushso/docs/reviews/2026-09-10-product-data-audit/evidence/dictionary-completeness.csv",
+      "sha256": "66305284c61924ea96f9ef7a62545d5cea28bc3819d2ae5cac97e8b1f3430ee9",
+      "status": "retained_local_audit_csv_parsed_with_csv_reader"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/release-gate-state/repositories/ushso-375cca760f7dab38/runs/20260910T151617Z-acbebf5e6fad/artifacts/files/apps/web/dist/research-dictionaries-v1/manifest.json",
+      "sha256": "0f10c6b764d054cd15324c4a1d93d6da191d86b792976d9573cdf27feceecb6b",
+      "status": "retained_local_public_pending_review_asset_manifest"
+    },
+    {
+      "path": "config/research-assets.lock.json",
+      "sha256": "75f362a1545f469a74bef00b7d7126fd03ffbfc79e4e6421bafe9fcf62db6c3b",
+      "status": "tracked_release_asset_lock"
+    },
+    {
+      "path": "verification/research-program/pr-001/verify.py",
+      "sha256": "47b53309a297d649c9acc1913f30a08414d5a29ef8a19d2dd84dbeef33fe2076",
+      "status": "tracked_replayable_decisive_check"
+    }
+  ],
+  "limitations": [
+    "Public endpoint and control-plane identity do not establish Worker byte identity; binary_identity remains unverified.",
+    "The v1.2 corpus is metadata-only, has no canonical dictionary/search-document manifest, and has zero join routes.",
+    "The catalog response isolates four records with empty descriptions; they remain typed invalid items rather than silently searchable records.",
+    "The audit's dictionary pages and raw bodies remain local and are not committed.",
+    "No production mutation, source payload retrieval, model/provider call, scientific approval, or external authorization was performed."
+  ],
+  "agentctl": {
+    "task_id": "pr-001-release-baseline-luna-max-20260910",
+    "state_dir": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr-001/agentctl-state",
+    "receipt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr-001/agentctl-state/tasks/pr-001-release-baseline-luna-max-20260910/receipt.json",
+    "receipt_digest_at_start": "93f6345a6eb40c5d536ce733133174c5e8972265af2361b42fd8f3e5bcd93031",
+    "note": "The final receipt digest is emitted after the three commits and agentctl finish and is supplied to the controller out of band to avoid a self-referential commit."
+  }
+}
