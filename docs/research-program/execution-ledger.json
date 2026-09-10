@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T20:51:10.469725+00:00",
+  "updated_at": "2026-09-10T21:05:22.226988+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "80d897a6135e0cbbb27aff2e67139b26d17f51347487ba452335b56914557703",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -64,10 +64,11 @@
       "latest_run": {
         "run_id": "ushso-pr002-c3-recovery-20260910",
         "assignment_id": "grok-c3-recovery",
-        "status": "running",
+        "status": "completed",
         "role": "recover_and_complete_C-002-3",
-        "base_sha": "997070bd94864fabedf73acecd422c6e15a3ed7e",
-        "acceptance": "C3_pending_final_head_independent_review"
+        "head_sha": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+        "acceptance": "changes_requested",
+        "cleanup": "normal/inactive_empty/unlocked"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
@@ -220,7 +221,7 @@
     {
       "pr_id": "PR-002",
       "status": "in_progress",
-      "owner": "ce-ushso-pr002-c3-recovery--grok-c3-recovery-ef22973f85dc-2ed34837",
+      "owner": "ushso-pr002-c3-corrections-20260910-luna-max",
       "dependencies": [
         "PR-001"
       ],
@@ -232,19 +233,19 @@
         "evaluation/research-program/tasks.json",
         "docs/research-program/acceptance.md"
       ],
-      "head_sha": "997070bd94864fabedf73acecd422c6e15a3ed7e",
+      "head_sha": "7593591037d37a7105770ab6d4875a40dd9db3a0",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-002.json",
       "evidence_directory": "verification/research-program/pr-002/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/14",
       "blockers": [],
       "prerequisites_satisfied": true,
-      "dispatch_preparation": "Grok is finishing a hash-bound snapshot of the cancelled C3 run in a fresh managed worktree on accepted C2. Prior work, timestamps and cleanup are retained. C3 remains pending final commit and independent review; all R01-R16 remain unaccepted.",
-      "provider": "grok",
-      "actual_model": "grok-4",
-      "base_sha": "997070bd94864fabedf73acecd422c6e15a3ed7e",
-      "branch": "codex/ce-ushso-pr002-c3-recovery--grok-c3-recovery-ef22973f85dc-2ed34837",
-      "dispatch_evidence": "verification/research-program/bootstrap/pr002-c3-recovery-grok-dispatch.json",
+      "dispatch_preparation": "Luna Max is assigned one additive correction on the completed Grok C3. Fix complete sealed-binding/denominator validation and the one ambiguous historical whole-file hash binding. Frozen cohort/task/acceptance bytes and producer history must remain unchanged. Whole PR002 is not accepted.",
+      "provider": "native Codex sub-agent",
+      "actual_model": "gpt-5.6-luna",
+      "base_sha": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+      "branch": "codex/ushso-pr002-c3-corrections-20260910",
+      "dispatch_evidence": null,
       "run_history": [
         {
           "run_id": "ushso-pr002-cohort-freeze-20260910",
@@ -333,35 +334,67 @@
           },
           "evidence": "verification/research-program/bootstrap/pr002-c3-partial-terminal.json",
           "partial_snapshot": "verification/research-program/bootstrap/pr002-c3-partial-snapshot-manifest.json"
+        },
+        {
+          "run_id": "ushso-pr002-c3-recovery-20260910",
+          "task_id": "ce-ushso-pr002-c3-recovery--grok-c3-recovery-ef22973f85dc-2ed34837",
+          "provider": "grok",
+          "model": "grok-4",
+          "status": "completed_c3_changes_requested",
+          "head_sha": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+          "tree": "ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94",
+          "commits": 1,
+          "finished_at": "2026-09-10T20:57:36.377Z",
+          "cleanup": {
+            "status": "normal",
+            "boundary": "inactive_empty",
+            "lock": "unlocked"
+          },
+          "evidence": "verification/research-program/bootstrap/pr002-c3-grok-completion.json"
         }
       ],
-      "active_atomic_commit": "C-002-3",
-      "remaining_atomic_commits": [
-        "C-002-3"
-      ],
-      "reasoning": null,
-      "review_evidence": "verification/research-program/bootstrap/pr002-c2-acceptance-997070b.json",
+      "active_atomic_commit": "C3-REVIEW-CORRECTION",
+      "remaining_atomic_commits": [],
+      "reasoning": "max",
+      "review_evidence": "verification/research-program/bootstrap/pr002-c3-review-7593591.json",
       "accepted_atomic_commits": [
         "C-002-1",
         "C-002-2"
       ],
       "implemented_atomic_commits": [
         "C-002-1",
-        "C-002-2"
+        "C-002-2",
+        "C-002-3"
       ],
       "supplemental_review_evidence": "verification/research-program/bootstrap/pr002-c2-handoff-review-8fe6e6b.json",
-      "open_review_findings": [],
-      "run_id": "ushso-pr002-c3-recovery-20260910",
-      "provider_task_id": "ce-ushso-pr002-c3-recovery--grok-c3-recovery-ef22973f85dc-2ed34837",
-      "expected_duration_ms": 1800000,
-      "deadline_at": "2026-09-10T21:21:48.474Z",
+      "open_review_findings": [
+        {
+          "id": "PR002-C3-001",
+          "summary": "Complete sealed pilot/family record and denominator flag validation; ten independent negative mutations were accepted by the partial validator.",
+          "status": "assigned_to_luna_correction"
+        },
+        {
+          "id": "PR002-C3-002",
+          "summary": "Bind or remove the redundant historical C1 whole-file hash entry lacking its original Git commit/tree.",
+          "status": "assigned_to_luna_correction"
+        }
+      ],
+      "run_id": "ushso-pr002-c3-corrections-20260910-luna-max",
+      "provider_task_id": null,
+      "expected_duration_ms": null,
+      "deadline_at": null,
       "precommit_observations": {
         "source": "cancelled_partial_snapshot_not_final_candidate",
         "evidence": "verification/research-program/bootstrap/pr002-c3-partial-review-observations.json",
         "finding_ids": [
           "PR002-C3-PRE-001"
         ],
-        "final_head_disposition_pending": true
+        "final_head_disposition_pending": false,
+        "final_disposition": "Confirmed validator gaps at Grok final head 7593591; assigned correction."
+      },
+      "review_environment_note": {
+        "evidence": "verification/research-program/bootstrap/pr002-c3-plan-review-addendum-7593591.json",
+        "scope": "Initial in-candidate plan replay could not write deterministic validation artifacts in the read-only worktree. Exact committed-plan scratch replay passed; no producer plan failure is assigned."
       }
     },
     {
