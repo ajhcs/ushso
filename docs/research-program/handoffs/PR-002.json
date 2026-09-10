@@ -1,0 +1,252 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-002",
+  "status": "partial_C1_complete",
+  "pending": ["C-002-2", "C-002-3"],
+  "owner": "Grok",
+  "reviewer": "Astra",
+  "provider": "grok",
+  "actual_model": "grok-4",
+  "author_provider_envelope": "grok-4",
+  "run_id": "ushso-pr002-c1-recovery-20260910",
+  "assignment_id": "grok-c1-recovery",
+  "base_sha": "83f7d1bad39acb6a7eede95a404179c511296efa",
+  "base_tree": "691d0a375144bd9d215988d7f70c604af505abf9",
+  "head_sha": null,
+  "head_sha_note": "This C-002-1 packet does not self-identify a final commit hash. Root binds the actual head and tree after the commit lands.",
+  "dependency_merge_shas": {
+    "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8"
+  },
+  "dependency_producer_shas": {
+    "PR-001": "8fc2fbbbaf1016da4c3951ccd238918ce645f4fe"
+  },
+  "branch": "codex/ce-ushso-pr002-c1-recovery--grok-c1-recovery-7c8a9fe5dfc7-d648775d",
+  "github_pr_url": null,
+  "changed_files": [
+    "docs/research-program/handoffs/PR-002.json",
+    "evaluation/research-program/cohorts.json",
+    "verification/research-program/pr-002/build.py",
+    "verification/research-program/pr-002/c1-build-receipt.json",
+    "verification/research-program/pr-002/c1-verify-receipt.json",
+    "verification/research-program/pr-002/c1_lib.py",
+    "verification/research-program/pr-002/product_catalog.py",
+    "verification/research-program/pr-002/verify.py"
+  ],
+  "problem": "PR-002 C-002-1 identities were not frozen. Predecessor run ushso-pr002-cohort-freeze-20260910 reached a 100-product declaration then failed with no commit.",
+  "resulting_behavior": "One C-002-1 packet defines the 100-product cohort across ten domains, binds representative catalog anchors or named intake tasks, and seeds all 3434 baseline record IDs. C-002-2/C-002-3, task labels, acceptance.md, and MRF 25/10 selection are not in this commit. R01-R16 are not accepted.",
+  "commits": [
+    {
+      "id": "C-002-1",
+      "sha": null,
+      "parent": "83f7d1bad39acb6a7eede95a404179c511296efa",
+      "tree": null,
+      "subject": "docs(research): define cohort identities (PR-002 C-002-1)",
+      "identity_convention": "Imperative docs(research) subject plus (PR-002 C-002-1), matching PR-001 producer commits. Root records the resulting sha/tree."
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "integration_base",
+      "sha": "83f7d1bad39acb6a7eede95a404179c511296efa",
+      "tree": "691d0a375144bd9d215988d7f70c604af505abf9"
+    },
+    {
+      "kind": "pr001_producer",
+      "sha": "8fc2fbbbaf1016da4c3951ccd238918ce645f4fe"
+    },
+    {
+      "kind": "pr001_merge",
+      "sha": "035465f3f16d15f02467679d96451d4440a36ca8"
+    },
+    {
+      "kind": "canonical_corpus",
+      "corpus_id": "ushso-live-catalog-2026-09-03",
+      "version": "1.2.0",
+      "generation": "live-2026-09-03-85b50522b420",
+      "manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e",
+      "record_count": 3434,
+      "source_slices": {
+        "cms-data-catalog": 159,
+        "cdc-socrata": 1472,
+        "census-api": 1803
+      },
+      "isolated_record_ids": [
+        "obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b",
+        "obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250",
+        "obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e",
+        "obs:asset:cdc-socrata:va9e-d8re-c845d9bfb921e339"
+      ],
+      "shards": {
+        "records-0001.jsonl": "8b7403e0d0d363ea5879a9dc2e0e2a774ea31e5cd556bf1826ec02706cd33202",
+        "records-0002.jsonl": "d6b5962ed075ffc8526d766499a04c685ab89231d1d71226ea87eff7e432c579",
+        "records-0003.jsonl": "772e6c3fcc9fd98c98b1e0a33abf5c77998ca5352fc02295b9fb554af35be082"
+      }
+    },
+    {
+      "kind": "retained_partial_declaration",
+      "failed_run_id": "ushso-pr002-cohort-freeze-20260910",
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-grok-partial/product_catalog.py",
+      "sha256": "5183f7ac32aeaaa0402965c9658ca1e048ebcbaea18a57cc20a542850e222684",
+      "bytes": 73829,
+      "manifest_sha256": "6a764fd4157b4dcf0a8b44a977364d8bccc2c6f88b5e87c05711e1cde39377e6",
+      "contribution": "Copied the retained 100-product declaration; did not reconstruct product rows. Predecessor probes were not committed."
+    }
+  ],
+  "commands": [
+    {
+      "command": "sha256sum /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-grok-partial/product_catalog.py && cp -a that file to verification/research-program/pr-002/product_catalog.py",
+      "exit_code": 0,
+      "observed_at": "2026-09-10T17:33:00Z",
+      "result": "Retained catalog SHA256 5183f7ac32aeaaa0402965c9658ca1e048ebcbaea18a57cc20a542850e222684, 73829 bytes; copy matched."
+    },
+    {
+      "command": "python3 verification/research-program/pr-002/build.py --repo .",
+      "exit_code": 0,
+      "observed_at": "2026-09-10T17:43:00Z",
+      "result": "Wrote cohorts.json SHA256 3d50afef67780b131d6a2556ada07021510ffe7dd7107d4d539381e5a4e5d1fe; 100 products; 3434 baseline IDs; failed_selectors []; cms_duplicate_title_groups []; selectors 63/13/10/14."
+    },
+    {
+      "command": "python3 verification/research-program/pr-002/verify.py --repo .",
+      "exit_code": 0,
+      "observed_at": "2026-09-10T17:44:56Z",
+      "result": "All C-002-1 identity checks passed against local shards and the rebuilt payload."
+    },
+    {
+      "command": "python3 -m py_compile verification/research-program/pr-002/*.py && python3 -m json.tool evaluation/research-program/cohorts.json >/dev/null && python3 -m json.tool verification/research-program/pr-002/c1-build-receipt.json >/dev/null && python3 -m json.tool verification/research-program/pr-002/c1-verify-receipt.json >/dev/null",
+      "exit_code": 0,
+      "observed_at": "2026-09-10T17:44:56Z",
+      "result": "Python compile and JSON parse succeeded."
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "evaluation/research-program/cohorts.json",
+      "sha256": "3d50afef67780b131d6a2556ada07021510ffe7dd7107d4d539381e5a4e5d1fe",
+      "bytes": 1945622
+    },
+    {
+      "path": "verification/research-program/pr-002/product_catalog.py",
+      "sha256": "5183f7ac32aeaaa0402965c9658ca1e048ebcbaea18a57cc20a542850e222684",
+      "bytes": 73829
+    },
+    {
+      "path": "verification/research-program/pr-002/c1_lib.py",
+      "sha256": "78686945af30f7dd8295d41b2102e30f8cf5f47578aa887094f32cd59cdf9adb"
+    },
+    {
+      "path": "verification/research-program/pr-002/build.py",
+      "sha256": "82ee85101acb0f20df39582abfe8485e945a6bc5d33c9da017be5ea172084836"
+    },
+    {
+      "path": "verification/research-program/pr-002/verify.py",
+      "sha256": "9cba929fd5d973df6475fb02225f3d3f6a879c9b18b7f46e56aadb7688d397e2"
+    },
+    {
+      "path": "verification/research-program/pr-002/c1-build-receipt.json",
+      "sha256": "2ba397df272e68495111a2fb1a6e93daa7be68136ffbf12a68bd31bb335d2acc"
+    },
+    {
+      "path": "verification/research-program/pr-002/c1-verify-receipt.json",
+      "sha256": "5c5dbf00063d08f36250b4bd53b82e45ccd15240b672f47b307cc2d312b1a7f9"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-002-1",
+      "status": "producer_checked",
+      "result": "100 unique product keys, ten per domain; 86 catalog anchors resolve; 14 named intake tasks; 3434 unique baseline IDs with source_id and native_id; generation live-2026-09-03-85b50522b420 and catalog manifest 85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e bound; annual/GIS related releases recorded and not counted as extra products."
+    },
+    {
+      "id": "R01",
+      "status": "not_accepted_on_C-002-1",
+      "result": "Baseline identity set is seeded with source_run_disposition not_attempted. Catalog membership is not payload access or a completed source run."
+    },
+    {
+      "id": "R04",
+      "status": "not_accepted_on_C-002-1",
+      "result": "Product identities are declared. No public-sample success, restricted-route verification, or core-readiness score is claimed."
+    },
+    {
+      "id": "R07",
+      "status": "not_accepted_on_C-002-1",
+      "result": "Out of scope for C-002-1."
+    },
+    {
+      "id": "R09",
+      "status": "not_accepted_on_C-002-1",
+      "result": "Twelve named families are intake pointers only; locators are unverified."
+    },
+    {
+      "id": "R10",
+      "status": "not_accepted_on_C-002-1",
+      "result": "Hospital and payer MRF family entries are not the 25/10 pilot entities."
+    },
+    {
+      "id": "R12",
+      "status": "not_accepted_on_C-002-1",
+      "result": "Out of scope for C-002-1."
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "check": "CMS duplicate-title grouping",
+      "status": "observed_empty",
+      "reason": "The v1.2.0 CMS catalog has 159 unique titles and 0 duplicate-title groups. The duplicate-title path is implemented and recorded as empty rather than invented."
+    },
+    {
+      "check": "failed or unsupported selectors",
+      "status": "observed_empty",
+      "reason": "All 63 cms_title, 13 census_dataset, and 10 cdc_native selectors resolved to exactly one catalog record. 14 intake selectors are named later intake, not failed matches."
+    },
+    {
+      "check": "full npm test, npm run build, npm run cf:dry-run",
+      "status": "skipped",
+      "reason": "C-002-1 is identity/evidence only. Integration/release candidate owns the full gate."
+    },
+    {
+      "check": "C-002-2 task freeze, C-002-3 MRF/expansion, acceptance.md, push/PR/merge/deploy",
+      "status": "skipped",
+      "reason": "Bounded C1 recovery. Root arranges the remaining two planned commits after C1 review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "claim": "Payload access, authorization, schema, join fitness",
+      "state": "not_established",
+      "evidence": "Access expectation is expectation only. Catalog metadata evidence is not a payload test."
+    },
+    {
+      "claim": "State APCD and facility licensure",
+      "state": "needs_jurisdiction_source_intake",
+      "evidence": "Family entries only; PR-044 must select actual jurisdictions/sources."
+    },
+    {
+      "claim": "CDC/ATSDR SVI versus HHS ASPE SVI",
+      "state": "explicitly_split",
+      "evidence": "ypqf-r5qs is the ASPE catalog product. ATSDR SVI remains named intake PR-043 C-043-1."
+    },
+    {
+      "claim": "Proposed intake locators",
+      "state": "unverified_locator",
+      "evidence": "Locator strings are not fetched, available, or current."
+    },
+    {
+      "claim": "R01-R16 empirical targets",
+      "state": "not_accepted",
+      "evidence": "No requirement becomes accepted on this commit."
+    }
+  ],
+  "next_consumer": "Astra/controller, then C-002-2",
+  "next_action": "C2_C3_pending after C-002-1 independent review. Do not treat this as full PR-002 completion. Do not push, open PR, merge, or deploy from this packet.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [
+      "python3 verification/research-program/pr-002/verify.py --repo ."
+    ],
+    "limitations": [
+      "Producer-checked C-002-1 identities only.",
+      "No task labels, acceptance document, MRF 25/10 selection, source endpoint tests, or payload retrieval."
+    ]
+  }
+}
