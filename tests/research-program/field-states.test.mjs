@@ -12,13 +12,16 @@ import {
   deriveFieldObservation,
   validateFieldObservation
 } from '../../packages/normalization/src/index.mjs';
+import { assertCompletenessView, buildCompletenessView, createOfflineCompletenessConsumer } from '../../packages/coverage/index.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const OBSERVED_AT = '2026-09-03T22:22:33.908Z';
 const schema = JSON.parse(await fs.readFile(path.join(ROOT, 'packages/normalization/schemas/field-observation.schema.json'), 'utf8'));
+const completenessSchema = JSON.parse(await fs.readFile(path.join(ROOT, 'packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json'), 'utf8'));
 const ajv = new Ajv2020({ strict: true, strictSchema: true, strictTypes: true, allErrors: true });
 ajv.addFormat('date-time', value => typeof value === 'string' && Number.isFinite(Date.parse(value)));
 const validateSchema = ajv.compile(schema);
+const validateCompletenessSchema = ajv.compile(completenessSchema);
 
 function evidence(id = 'evidence:field-state.fixture', observedAt = OBSERVED_AT) {
   return {
@@ -180,4 +183,85 @@ test('documented requirements and access observations remain separate and conser
   assert.throws(() => createFieldObservation({ ...documented, access_facts: { ...documented.access_facts, cost: { ...documented.access_facts.cost, amount: 0 } } }), { code: 'field_observation_invalid' });
   assert.throws(() => createFieldObservation({ ...documented, access_facts: { ...documented.access_facts, usage_limit: { ...documented.access_facts.usage_limit, limit: 0 } } }), { code: 'field_observation_invalid' });
   assert.throws(() => createFieldObservation({ ...documented, access_facts: { ...documented.access_facts, credential_requirements: [{ ...documented.access_facts.credential_requirements[0], name: 'api_key=secret-value' }] } }), { code: 'field_observation_invalid' });
+});
+
+test('coverage is derived from frozen membership and keeps isolated records in every partition', () => {
+  const membership = [
+    { record_id: 'record:001', source_id: 'source:catalog', isolated: false, evidence_ids: ['evidence:membership:001'], source_observed_at: OBSERVED_AT },
+    { record_id: 'record:002', source_id: 'source:catalog', isolated: false, evidence_ids: ['evidence:membership:002'], source_observed_at: OBSERVED_AT },
+    { record_id: 'record:003', source_id: 'source:catalog', isolated: true, isolation_reason: 'description_missing', evidence_ids: ['evidence:membership:003'], source_observed_at: OBSERVED_AT }
+  ];
+  const definitions = [
+    { field_id: 'record.identifier', field_role: 'identifier', unit: null, required_for_readiness: true, description: 'Stable source identifier.' },
+    { field_id: 'payload.value', field_role: 'measure_description', unit: 'item', required_for_readiness: true, description: 'Payload value when a scoped check supports it.' }
+  ];
+  const observations = [
+    field({ record_id: 'record:001', source_id: 'source:catalog', field_id: 'record.identifier', field_role: 'identifier', unit: null, value: { kind: 'identifier', value: 'record:001' }, reason_codes: ['metadata_identity_observed'], endpoint_scope: { endpoint_id: 'endpoint:catalog', resource: 'resource:metadata', operation: 'metadata_read' } }),
+    field({ record_id: 'record:001', source_id: 'source:catalog', field_id: 'payload.value', value: { kind: 'integer', value: 5 }, reason_codes: ['payload_check_succeeded'] }),
+    field({ record_id: 'record:002', source_id: 'source:catalog', field_id: 'record.identifier', field_role: 'identifier', unit: null, value: { kind: 'identifier', value: 'record:002' }, reason_codes: ['metadata_identity_observed'], endpoint_scope: { endpoint_id: 'endpoint:catalog', resource: 'resource:metadata', operation: 'metadata_read' } }),
+    field({ record_id: 'record:002', source_id: 'source:catalog', field_id: 'payload.value', value: { kind: 'unknown', value: null }, value_state: 'unknown', applicability_state: 'supported', attempt_state: 'restricted', attempted_at: OBSERVED_AT, reason_codes: ['credential_required'] })
+  ];
+  const view = buildCompletenessView({
+    membership,
+    observations,
+    fieldDefinitions: definitions,
+    cohort: 'PR-002 accepted baseline_records',
+    generation: 'live-2026-09-03-85b50522b420',
+    asOf: '2026-09-04T00:00:00.000Z',
+    generatedAt: '2026-09-04T00:00:00.000Z'
+  });
+  assertCompletenessView(view);
+  assert.equal(validateCompletenessSchema(view), true, JSON.stringify(validateCompletenessSchema.errors));
+  assert.equal(view.membership.record_count, 3);
+  assert.equal(view.membership.source_membership_count, 3);
+  assert.equal(view.membership.isolated_count, 1);
+  assert.equal(view.records.length, 3);
+  assert.equal(view.records.find(record => record.record_id === 'record:003').isolated, true);
+  const missing = view.records.find(record => record.record_id === 'record:003').source_vectors[0].fields.find(item => item.field_id === 'payload.value').observation;
+  assert.equal(missing.applicability_state, 'missing');
+  assert.equal(missing.attempt_state, 'not_attempted');
+  assert.equal(missing.value_state, 'unknown');
+  assert.equal(view.records.find(record => record.record_id === 'record:002').readiness_state, 'not_ready');
+  const payloadMetric = view.aggregates.metrics.find(metric => metric.metric_id === 'field.applicability.payload.value');
+  assert.equal(payloadMetric.denominator_count, 3);
+  assert.equal(payloadMetric.partitions.reduce((sum, item) => sum + item.count, 0), 3);
+  assert.equal(payloadMetric.partitions.find(item => item.state === 'supported').count, 2);
+  assert.equal(payloadMetric.rate_context.cohort_definition, 'PR-002 accepted baseline_records');
+  assert.equal(payloadMetric.rate_context.generation, 'live-2026-09-03-85b50522b420');
+  assert.equal(payloadMetric.rate_context.membership_hash, view.membership.membership_hash);
+  assert.equal(view.aggregates.metrics.find(metric => metric.metric_id === 'research.readiness').partitions.reduce((sum, item) => sum + item.count, 0), 3);
+});
+
+test('offline coverage consumer is bounded and rejects digest drift or unknown metrics', () => {
+  const membership = [
+    { record_id: 'record:consumer-1', source_id: 'source:consumer', isolated: false, evidence_ids: ['evidence:consumer:1'], source_observed_at: OBSERVED_AT },
+    { record_id: 'record:consumer-2', source_id: 'source:consumer', isolated: false, evidence_ids: ['evidence:consumer:2'], source_observed_at: OBSERVED_AT }
+  ];
+  const view = buildCompletenessView({
+    membership,
+    fieldDefinitions: [{ field_id: 'record.identifier', field_role: 'identifier', unit: null, description: 'Identifier.' }],
+    cohort: 'consumer fixture',
+    generation: 'generation-fixture',
+    asOf: '2026-09-04T00:00:00.000Z',
+    generatedAt: '2026-09-04T00:00:00.000Z'
+  });
+  assert.equal(validateCompletenessSchema(view), true, JSON.stringify(validateCompletenessSchema.errors));
+  const consumer = createOfflineCompletenessConsumer(view, { expectedDigest: view.artifact_digest, maxPageSize: 1 });
+  assert.equal(consumer.getSummary().membership.record_count, 2);
+  assert.equal(consumer.listRecords({ limit: 1 }).records.length, 1);
+  assert.equal(consumer.listRecords({ offset: 1, limit: 1 }).records[0].record_id, 'record:consumer-2');
+  assert.equal(consumer.getMetric('not-a-real-metric'), null);
+  assert.equal(consumer.getRecord('record:consumer-1').record_id, 'record:consumer-1');
+  assert.throws(() => createOfflineCompletenessConsumer(view, { expectedDigest: 'sha256:' + '0'.repeat(64) }), { code: 'completeness_expected_digest_mismatch' });
+  assert.throws(() => consumer.listRecords({ limit: 2 }), { code: 'completeness_limit_invalid' });
+  const unknownDenominator = buildCompletenessView({
+    membership,
+    fieldDefinitions: [{ field_id: 'record.identifier', field_role: 'identifier', unit: null, description: 'Identifier.' }],
+    cohort: 'unknown denominator fixture',
+    generation: 'generation-fixture',
+    asOf: '2026-09-04T00:00:00.000Z',
+    generatedAt: '2026-09-04T00:00:00.000Z',
+    denominatorStatus: 'unknown'
+  });
+  assert.equal(unknownDenominator.aggregates.metrics.every(metric => metric.rate === null), true);
 });
