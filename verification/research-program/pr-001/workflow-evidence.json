@@ -1,0 +1,194 @@
+{
+  "format": "ushso.research-program.pr-001.workflow-evidence.v1",
+  "pr_id": "PR-001",
+  "recorded_at": "2026-09-10T16:18:00Z",
+  "status": "producer_checked",
+  "task": {
+    "name": "pr-001-release-baseline",
+    "worktree": "/mnt/d/worktrees/plumbob/ushso-pr-001-release-baseline",
+    "branch": "codex/pr-001-release-baseline",
+    "wrapper": "worktree-bootstrap launch pr-001-release-baseline --repo /mnt/d/worktrees/plumbob/ushso-pr-001-release-baseline -- bash",
+    "worktree_bootstrap_task": "pr-001-release-baseline",
+    "writer_lock_id": "1904854087714bf3bfcd7ef7d8d9d3b0",
+    "require_writer_verification": "worktree-bootstrap verify \"$WORKTREE_BOOTSTRAP_TASK\" --repo . --require-writer",
+    "start_sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+    "original_workspace": "/mnt/d/Coding Projects/ushso",
+    "original_workspace_policy": "read_only_dirty_workspace_preserved; no reset or stash"
+  },
+  "storage_and_toolchain": {
+    "storage_policy": "Development worktree and task scratch use prescribed /mnt/d storage. Operational commands were run inside the writer wrapper; no new development artifact was created under literal /tmp or /home.",
+    "task_scratch": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr-001",
+    "node": "v24.14.0",
+    "npm": "11.19.1",
+    "npm_note": "Initial bootstrap reported global npm 11.9.0 below the pinned 11.19.1. The task-local pinned npm is available and was checked; npm ci was not claimed or rerun for this documentation-only PR."
+  },
+  "preservation": {
+    "manifest_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/original-workspace-manifest.json",
+    "manifest_sha256": "3946fa64ea2803477195f999aca4b58c00be467fb3cdec552f9dd374542decd7",
+    "hashed_dirty_or_untracked_files": 1483,
+    "original_status_lines_observed": 71,
+    "raw_patch_retained_local": true
+  },
+  "atomic_commits": [
+    {
+      "id": "C-001-1",
+      "subject": "docs(research): record current release subject (PR-001 C-001-1)",
+      "sha": "2e515893a12287cf02db7f4b089d6254f4a88c70",
+      "tree": "20fb67328200d8ec13317d6ec3e7fb9792f1689a",
+      "parent": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+      "verification": "cmd-0019-b743735d replay verifier passed before this commit; the committed verifier and evidence contain the exact command and result."
+    },
+    {
+      "id": "C-001-2",
+      "subject": "docs(research): map legacy work and constraints (PR-001 C-001-2)",
+      "sha": "1b572930ce010373de2e19dabb5faf27cfef5c69",
+      "tree": "eac26fb9274bd8e8c575cebb4c134f1c35088eb4",
+      "parent": "2e515893a12287cf02db7f4b089d6254f4a88c70",
+      "verification": "Crosswalk checks cmd-0020-c260465b through cmd-0027-ce94155d passed before this commit; their exact IDs are retained in crosswalk-evidence.json."
+    },
+    {
+      "id": "C-001-3",
+      "subject": "docs(research): document isolated integration workflow (PR-001 C-001-3)",
+      "sha": null,
+      "sha_note": "Final commit hash is supplied to the controller out of band after commit creation to avoid a self-referential handoff.",
+      "parent": "1b572930ce010373de2e19dabb5faf27cfef5c69"
+    }
+  ],
+  "scope": {
+    "changed_tracked_paths": [
+      "docs/research-program/baseline.json",
+      "docs/research-program/legacy-crosswalk.json",
+      "docs/research-program/handoffs/PR-001.json",
+      "verification/research-program/pr-001/baseline-identity.json",
+      "verification/research-program/pr-001/crosswalk-evidence.json",
+      "verification/research-program/pr-001/pr-body.md",
+      "verification/research-program/pr-001/verify.py",
+      "verification/research-program/pr-001/workflow-evidence.json"
+    ],
+    "generated_semp_views_changed": false,
+    "central_execution_ledger_changed": false,
+    "planning_package_changed": false,
+    "runtime_source_changed": false
+  },
+  "checks": [
+    {
+      "id": "workflow-wrapper",
+      "command": "worktree-bootstrap verify \"$WORKTREE_BOOTSTRAP_TASK\" --repo . --require-writer",
+      "exit_code": 0,
+      "observed_at": "2026-09-10T16:11:21.752759Z",
+      "actual": {
+        "branch": "codex/pr-001-release-baseline",
+        "start_sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+        "writer_lock_state": "active"
+      }
+    },
+    {
+      "id": "workflow-status-after-c001-2",
+      "command": "git status --short --branch",
+      "exit_code": 0,
+      "observed_at": "2026-09-10T16:11:21Z",
+      "actual": {
+        "branch": "codex/pr-001-release-baseline",
+        "working_tree": "clean"
+      }
+    },
+    {
+      "id": "baseline-replay",
+      "command": "python3 verification/research-program/pr-001/verify.py --repo /mnt/d/worktrees/plumbob/ushso-pr-001-release-baseline --live-dir /mnt/d/tmp/plumbob/ushso-research-program-20260910/baseline-live --readback /mnt/d/tmp/plumbob/ushso-research-program-20260910/worker-readback/deployment-readback.json --preservation-manifest /mnt/d/tmp/plumbob/ushso-research-program-20260910/original-workspace-manifest.json --audit-csv '/mnt/d/Coding Projects/ushso/docs/reviews/2026-09-10-product-data-audit/evidence/dictionary-completeness.csv' --dictionary-manifest /mnt/d/tmp/plumbob/release-gate-state/repositories/ushso-375cca760f7dab38/runs/20260910T151617Z-acbebf5e6fad/artifacts/files/apps/web/dist/research-dictionaries-v1/manifest.json --original-repo '/mnt/d/Coding Projects/ushso'",
+      "agentctl_command_id": "cmd-0019-b743735d",
+      "exit_code": 0,
+      "actual": "All verifier checks pass: selected base/tree and source tree, four byte-equal corpus files, 3434 records and 4 isolated IDs, eight HTTP 200 content-checked responses, contract/catalog identities, deployment/version/100% traffic readback, preservation manifest, CSV counts 2905/529, dictionary proposal manifest, locked asset archive identity, and runtime paths."
+    },
+    {
+      "id": "crosswalk-replay",
+      "command": "node --input-type=module -e 'const fs = await import(\"node:fs/promises\"); const p = \"docs/research-program/legacy-crosswalk.json\"; const d = JSON.parse(await fs.readFile(p, \"utf8\")); console.log({format:d.format, work_packages:d.work_packages.length, adrs:d.source_inventory.adrs.length, boundaries:d.production_boundaries.length, unmerged_refs:d.unmerged_refs.length});'",
+      "agentctl_command_id": "cmd-0027-ce94155d",
+      "exit_code": 0,
+      "actual": {
+        "work_packages": 16,
+        "adrs": 8,
+        "boundaries": 13,
+        "unmerged_refs": 12
+      }
+    },
+    {
+      "id": "crosswalk-boundary-destinations",
+      "command": "python3 -c 'import json; d=json.load(open(\"docs/research-program/legacy-crosswalk.json\")); assert all(b[\"destination_prs\"] and b[\"constraints\"] for b in d[\"production_boundaries\"]); print(\"all named boundaries have destinations and constraints\")'",
+      "agentctl_command_id": "cmd-0026-ea252413",
+      "exit_code": 0,
+      "actual": {
+        "boundaries": 13,
+        "with_destinations": 13,
+        "with_constraints": 13
+      }
+    },
+    {
+      "id": "semp-write-scope",
+      "command": "git diff --name-only 45210704b8de2d7b1360b6d32657cd17791bdd77 -- docs/semp",
+      "agentctl_command_id": "cmd-0025-5cacc639",
+      "exit_code": 0,
+      "actual": {
+        "changed_paths": []
+      }
+    },
+    {
+      "id": "baseline-final-replay",
+      "command": "python3 verification/research-program/pr-001/verify.py --repo /mnt/d/worktrees/plumbob/ushso-pr-001-release-baseline --live-dir /mnt/d/tmp/plumbob/ushso-research-program-20260910/baseline-live --readback /mnt/d/tmp/plumbob/ushso-research-program-20260910/worker-readback/deployment-readback.json --preservation-manifest /mnt/d/tmp/plumbob/ushso-research-program-20260910/original-workspace-manifest.json --audit-csv '/mnt/d/Coding Projects/ushso/docs/reviews/2026-09-10-product-data-audit/evidence/dictionary-completeness.csv' --dictionary-manifest /mnt/d/tmp/plumbob/release-gate-state/repositories/ushso-375cca760f7dab38/runs/20260910T151617Z-acbebf5e6fad/artifacts/files/apps/web/dist/research-dictionaries-v1/manifest.json --original-repo '/mnt/d/Coding Projects/ushso'",
+      "agentctl_command_id": "cmd-0028-7d226af4",
+      "exit_code": 0,
+      "actual": "Final replay passed at the pre-C-001-3 head; all identity, byte, count, CSV, lock, deployment-readback, preservation, and runtime-path checks passed."
+    },
+    {
+      "id": "final-packet-json-and-body",
+      "command": "for p in docs/research-program/baseline.json docs/research-program/legacy-crosswalk.json docs/research-program/handoffs/PR-001.json verification/research-program/pr-001/baseline-identity.json verification/research-program/pr-001/crosswalk-evidence.json verification/research-program/pr-001/workflow-evidence.json; do python3 -m json.tool $p >/dev/null; done; test -f verification/research-program/pr-001/pr-body.md; grep -q ^# verification/research-program/pr-001/pr-body.md",
+      "agentctl_command_id": "cmd-0033-952a5aed",
+      "exit_code": 0,
+      "actual": {
+        "json_files": 6,
+        "body_present": true
+      }
+    },
+    {
+      "id": "final-whitespace-check",
+      "command": "git diff --check",
+      "agentctl_command_id": "cmd-0030-9279b2c1",
+      "exit_code": 0,
+      "actual": "No whitespace errors."
+    },
+    {
+      "id": "final-writer-verify",
+      "command": "worktree-bootstrap verify pr-001-release-baseline --repo /mnt/d/worktrees/plumbob/ushso-pr-001-release-baseline --require-writer",
+      "agentctl_command_id": "cmd-0031-2558d976",
+      "exit_code": 0,
+      "actual": "Active writer lock, expected branch, and selected start SHA verified."
+    },
+    {
+      "id": "final-staged-scope",
+      "command": "git diff --cached --name-only",
+      "agentctl_command_id": "cmd-0034-de799be4",
+      "exit_code": 0,
+      "actual": {
+        "changed_paths": [
+          "docs/research-program/handoffs/PR-001.json",
+          "verification/research-program/pr-001/baseline-identity.json",
+          "verification/research-program/pr-001/pr-body.md",
+          "verification/research-program/pr-001/workflow-evidence.json"
+        ]
+      }
+    }
+  ],
+  "publication_and_mutation": {
+    "branch_push": "controller_owned_after_integration_branch_publication",
+    "github_pr_creation": "controller_owned",
+    "production_deploy": "not_performed",
+    "provider_or_source_mutation": "not_performed",
+    "project_publication_approval": "owner_approved_public_code_plans_and_sanitized_evidence; separate from scientific/external authorization and does not authorize product or deployment changes"
+  },
+  "limitations": [
+    "The isolated branch is not pushed by this implementer and has no implementer-owned GitHub PR URL.",
+    "Full npm test, npm run build, and npm run cf:dry-run are integration/release checks and were skipped for this documentation/evidence-only scope; the controller's integration candidate runs the full gate.",
+    "Worker deployment/version/traffic identity is control-plane verified, but Worker binary byte identity remains unverified.",
+    "The canonical corpus is metadata-only with zero search-document files and zero join routes; public dictionary/scientific review assets remain pending and schema applicability is unresolved.",
+    "Independent review, scientific approval, production cutover, rollback rehearsal, source payload retrieval, and paid enrichment remain outstanding."
+  ]
+}
