@@ -1,0 +1,426 @@
+{
+  "corpus": {
+    "corpus_file_manifest_sha256": "7909b624d33bdf1d6b0091c0655ce6b7c17751e52023d5404fa57be46c50048f",
+    "corpus_id": "ushso-live-catalog-2026-09-03",
+    "corpus_json_sha256": "56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633",
+    "corpus_version": "1.2.0",
+    "generation": "live-2026-09-03-85b50522b420",
+    "manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e",
+    "record_count": 3434,
+    "source_slices": {
+      "cdc-socrata": 1472,
+      "census-api": 1803,
+      "cms-data-catalog": 159
+    }
+  },
+  "counts": {
+    "baseline_anchor_instances": 31,
+    "by_audience": {
+      "advanced": 17,
+      "machine": 13,
+      "novice": 10
+    },
+    "by_domain": {
+      "finance": 4,
+      "geography": 4,
+      "insurance": 4,
+      "ownership": 4,
+      "population": 4,
+      "prices": 4,
+      "public health": 4,
+      "quality": 4,
+      "utilization": 4,
+      "workforce": 4
+    },
+    "mrf_pilot_slots": 1,
+    "multi_intent_tasks": 4,
+    "named_missing_family_slots": 17,
+    "reviewed_unique_anchor_descriptions": 16,
+    "tasks": 40,
+    "tasks_with_baseline_anchors": 26,
+    "unique_missing_families": 12,
+    "zero_baseline_anchor_tasks": 14
+  },
+  "custody_and_policy": "Opaque task index and generation-aware scoring rules only. Raw query text, labels, expected IDs and description facts remain private. R07 governs current-generation frozen present-source recall@10 \u22650.90 and judged precision@5 \u22650.80, with zero critical forbidden matches; task macro governs and target/item micro is reported alongside. Complete independent blind judgment of every returned top-five item is required before precision acceptance. Full-intention recall covers 49 frozen task slots across all 40 tasks and is reported separately without a numeric threshold; 3,434 is catalog accounting only. Baseline anchors are exact exemplars; release/alias alternatives require pre-evaluation evidence binding, and named vintages are strict. Root has sealed the task intentions, source-anchored input bindings and scoring rules; missing-family and MRF slots require versioned independent bindings before present-source scoring or tuning.",
+  "evaluation_policy": {
+    "aggregation": {
+      "multi_intent": "Score each frozen target slot separately. A repeated baseline ID or missing family under a different task intent is a distinct task slot; within-task exact duplicates are deduplicated. Per-task recall is hit target slots divided by that task's slot count. Multiple named intake slots remain separate slots and never receive fabricated IDs.",
+      "target_micro": "Report target micro alongside the governing task macro: current-generation present-source recall micro over independently frozen eligible target instances, and adaptive judged precision micro as sum(C_t)/sum(J_t). Full-intention recall micro is sum of retrieved relevant task-target slots / 49 and is reported separately without an acceptance threshold.",
+      "task_macro": "For R07, the current-generation frozen present-source recall@10 task macro is the governing recall metric and must be at least 0.90 over all eligible present-source tasks; the adaptive judged precision@5 task macro is the governing precision metric and must be at least 0.80 only after complete independent blind judgment of every returned top-five item. Report target micro metrics alongside each governing task macro. Full-intention recall remains a separate all-40-task/49-slot report with no numeric threshold; source-absence, zero and undefined cases remain visible."
+    },
+    "denominators": {
+      "all_task_denominator": {
+        "rule": "All tasks remain included, including source-absence, unresolved and named-intake cases; no denominator shrinkage after results are seen.",
+        "task_count": 40
+      },
+      "full_universe_recall": {
+        "binding_rule": "Later independently verified intake bindings are versioned and frozen before scoring, never selected from result ranks; a binding can make its existing intention slot scoreable without changing the 49-slot task universe.",
+        "catalog_accounting_record_denominator": 3434,
+        "catalog_accounting_rule": "The fixed 3,434-record 1.2.0 catalog universe remains an accounting/disposition denominator only; it is not substituted for relevant retrieval target slots.",
+        "definition": "Full-universe retrieval recall covers every frozen task intention across all 40 tasks, including baseline anchors and named later-intake slots. For task t, hit_slots_t / intention_slots_t uses all slots assigned to that task; an unbound, absent or unresolved slot contributes zero retrieval credit until it has an independently versioned binding before evaluation. This is a retrieval-task denominator, separate from catalog record accounting.",
+        "fixed_task_intention_denominator": 49,
+        "missing_and_unresolved_rule": "Missing-family, MRF-pilot, source-absence and unresolved slots remain in the 49-slot/full-40 denominator and are separately reported for abstention and intake status.",
+        "slot_breakdown": {
+          "baseline_anchor_instances": 31,
+          "mrf_pilot_slots": 1,
+          "named_missing_family_slots": 17,
+          "total": 49,
+          "unique_baseline_record_ids_initial_slice": 16
+        },
+        "slot_count_rule": "The denominator counts task-target slots, not unique corpus IDs: a baseline source ID repeated under distinct task intents is one target slot per task because recall is scored per task. Within a task, exact identities are counted once; baseline, named-missing-family and MRF-pilot lanes are disjoint. Repeated missing families across different tasks remain distinct task slots and are also reported as 12 unique families.",
+        "task_denominator": 40
+      },
+      "present_source_recall_at_10": {
+        "definition": "For evaluation generation g, freeze the set of source-native target slots with independently verified bindings available before scoring, then count independently judged target IDs retrieved in top ten divided by that generation-specific eligible target instances. Report task macro over tasks with at least one eligible present target and target-instance micro, alongside the full 40-task/intention recall.",
+        "generation_rule": "Any later verified missing-family or MRF binding is added to the generation-specific eligible set only after versioned identity/source/release/access/schema/evidence capture before evaluation; it is never chosen from result ranks.",
+        "governing_metric": "Current-generation frozen present-source recall@10 task macro; target-instance micro is reported alongside and does not replace the task macro.",
+        "governing_task_macro_threshold": 0.9,
+        "historical_initial_slice": {
+          "baseline_anchor_instances": 31,
+          "eligible_tasks": 26,
+          "status": "initial baseline snapshot only; later independently verified intake bindings are not permanently excluded",
+          "unique_baseline_record_ids": 16
+        },
+        "missing_family_handling": "Unbound named intake slots remain in the full-intention denominator and missing-slot lane; they do not become present-source targets until independently bound.",
+        "no_eligible_tasks_behavior": "No R07 acceptance is possible when the current generation has no eligible present-source tasks; all 40 task statuses and the separate full-intention denominator remain reported."
+      }
+    },
+    "freeze_and_binding": {
+      "baseline_anchor": "A baseline target is an exact source-native record ID in the fixed 1.2.0 corpus generation and its cited evidence pointer.",
+      "binding_version": "Before evaluation, any later intake must receive a versioned binding containing source-native identity, source/release, access state, evidence path/hash/pointer and independent verification.",
+      "named_intake_intention": "A named family or pilot slot without a verified source-native ID remains an intention/missing slot; no ID is fabricated from a title, keyword or related result.",
+      "rank_independence": "Later intake bindings and target sets are frozen before scoring and are never chosen from result ranks.",
+      "target_group_and_release_rule": {
+        "baseline_exemplars": "The 31 exact source-native baseline anchor instances remain the frozen exemplar bindings for this draft; release alternatives are aliases within an existing task slot, not new denominator slots.",
+        "explicit_vintage": "When a query names a vintage or release, the target binding must satisfy that stated vintage/release.",
+        "predeclared_alternative_binding": "Alternative releases/source-native IDs must be declared, versioned and evidence-bound before evaluation, using exact dataset IDs and documented release/family identity where available (including Census). Alternatives are never generated from result ranks.",
+        "unreviewed_alternative": "Until an alternative binding is independently reviewed, its label remains uncertain and qualified scoring for that alternative is blocked; a result is not marked scientifically wrong solely because it is a verified suitable release alternative to the representative baseline year.",
+        "unspecified_vintage": "When a query does not name a vintage, a verified release or alias of the same source-native product may satisfy it only when its documented release/family identity and the task's recency or coverage intent support the substitution. A title match alone is insufficient."
+      }
+    },
+    "judge_controls": {
+      "blind_independent_judging": "Other retrieved results and critical errors require independent blind judging before implementer tuning.",
+      "critical_error_examples": "Wrong source family, grain, time interval, price meaning, unsupported authorization/access claim or prohibited CCN=NPI/name-only join.",
+      "model_gold_boundary": "Model-derived labels and implementer agreement cannot serve as their own gold set or establish scientific precision.",
+      "selected_anchor_scope": "The selected anchor list is a target input for this draft, not exhaustive relevance gold for every other result."
+    },
+    "precision_and_judgment": {
+      "acceptance_gate": {
+        "empty_results": "A task with no returned top-five items has no returned item to judge, but its empty slots and zero-result/abstention outcome remain reported separately.",
+        "governing_metric": "Adaptive judged precision@5 task macro; item micro is reported alongside.",
+        "no_judged_returned_items_behavior": "No R07 acceptance is possible when no returned top-five item has an independent judgment, even if other metrics are available.",
+        "no_selective_judging": "Do not judge only easy hits or stop after target recovery. Report all returned positions, including apparent errors, duplicates, forbidden substitutions and items from other source families.",
+        "r07_precision_threshold": 0.8,
+        "top_five_judgment_coverage": "Every returned result in ranks 1-5 for every evaluated task must have an independent blind judgment before any precision acceptance statement; any unresolved returned top-five item blocks precision acceptance.",
+        "unresolved_judgment_behavior": "Any unresolved returned top-five judgment blocks the precision acceptance decision; no selective judging of easy hits is permitted."
+      },
+      "adaptive_returned_item_precision_at_5": {
+        "definition": "For task t, inspect result positions 1 through 5. Let R_t be returned positions, J_t the returned positions with an independent blind judgment, and C_t the judged returned positions relevant to the task intent and free of critical error. Adaptive judged precision is P_t=C_t/J_t only when J_t>0. Report R_t, J_t, C_t, empty_t=5-R_t and unjudged_t=R_t-J_t for every task; empty positions and unjudged returned positions never enter J_t.",
+        "macro_and_micro": "Report the arithmetic mean of defined P_t values with defined-task count and the full 40-task table count; report item micro precision as sum(C_t)/sum(J_t). Tasks with J_t=0 are undefined/unjudged for adaptive precision and remain visible rather than being silently removed.",
+        "rationale": "This measures the quality of returned, judgeable items without making a one-anchor task's precision cap a function of unfilled slots. It does not award recall, abstention, or research-success credit."
+      },
+      "missing_slots": {
+        "family_task_slots_in_this_draft": 17,
+        "mrf_pilot_slots_in_this_draft": 1,
+        "rule": "Report missing-family and pilot coverage separately; they become scoreable source targets only after versioned independent intake binding.",
+        "unique_missing_families": 12
+      },
+      "outcome_lanes": {
+        "abstention": "Zero-anchor, source-absence and unresolved cases are evaluated for typed abstention and avoidance of forbidden substitutions/claims. An empty result alone receives no automatic success credit.",
+        "research_success": "Research or scientific success requires separate independent evidence and domain judgment; retrieval ranks, model agreement and these retrieval metrics cannot establish it.",
+        "retrieval_positive": "Exact source-native baseline IDs recovered in the declared recall lane are retrieval positives; named-intake intentions do not become positives before independently versioned binding."
+      },
+      "strict_fixed_k_audit": {
+        "definition": "Also report fixed-k occupancy R_t/5 and strict fixed-k credited score C_t/5 for all tasks, with empty and unjudged positions receiving no fixed-k credit. Keep these raw counts and scores separate from adaptive judged precision; this strict lower-bound audit metric is not a substitute for independent judgments.",
+        "empty_positive_failure": "For each present-source task, report baseline target IDs missing from top five and top ten, plus empty slots. A missing target is a retrieval coverage/recall failure and does not change the adaptive precision denominator."
+      },
+      "unjudged_cases": "Results without an independent judgment are reported as unjudged, excluded from adaptive judged-precision credit and retained in the raw returned-slot counts; they are not silently treated as relevant or wrong.",
+      "zero_result_negatives": "The 14 tasks without baseline anchors remain denominator cases. Evaluate typed abstention, forbidden substitutions/claims and empty-positive behavior in the abstention lane; arbitrary empty output receives no automatic relevance credit."
+    },
+    "threshold_governance": {
+      "acceptance_prerequisites": {
+        "all_tasks": "All 40 tasks remain in the evaluation table, including source-absence, zero-result, missing-slot, unresolved and undefined cases.",
+        "precision": "At least one returned top-five item with a judgment is required, and every returned top-five item must be independently blindly judged; any unresolved item blocks precision acceptance.",
+        "present_source": "At least one eligible current-generation present-source task is required; otherwise no R07 acceptance.",
+        "separate_outcomes": "Retrieval positives, typed abstention/source absence, and research/scientific success are distinct outcomes."
+      },
+      "correction_record": "This final candidate corrects the earlier draft governance wording: R07 adopted thresholds govern current-generation present-source recall and judged precision; full-intention recall is reporting-only. No threshold was reduced or newly invented.",
+      "full_intention_reporting": "Report full-intention recall over the fixed 49 task-target slots across 40 tasks, plus source absence, with no numeric acceptance threshold. The catalog 3,434-record universe remains accounting only.",
+      "r07_governing_metrics": {
+        "critical_forbidden_matches": {
+          "rule": "Zero critical forbidden matches in the evaluated returned results; report task-level failures and reviewer uncertainty.",
+          "threshold": 0
+        },
+        "judged_precision_at_5": {
+          "eligibility": "Adaptive C_t/J_t over returned top-five items with independent blind judgments, only after 100% judgment coverage of all returned top-five items.",
+          "item_micro": "Report item micro alongside the task macro.",
+          "task_macro_governs": true,
+          "threshold": 0.8
+        },
+        "present_source_recall_at_10": {
+          "eligibility": "Current-generation frozen present-source target bindings, versioned before scoring.",
+          "target_micro": "Report target-instance micro alongside the task macro.",
+          "task_macro_governs": true,
+          "threshold": 0.9
+        }
+      },
+      "source": {
+        "path": "docs/master-plan/2026-09-10/MASTER-PLAN.md",
+        "pointer": "R07 row, line 37 in the reviewed base file",
+        "sha256": "eaa8adc671eb44c176ff899f2ee138ec6f2e420444170c32ff757bac9a716aff",
+        "text": "Current-generation, frozen present-source recall@10 \u22650.90; judged precision@5 \u22650.80; zero critical forbidden matches; separately report full-universe recall and source absence. Publish task-level failures and reviewer uncertainty"
+      }
+    },
+    "version": "ushso.pr-002.evaluator-scoring-policy.v6"
+  },
+  "evaluator_owner": "Luna Max evaluator; Codex root source and methodology adjudication",
+  "format": "ushso.pr-002.evaluator-freeze-manifest.v3",
+  "private_artifact": {
+    "sha256": "1e346b7a1d1e0fda6d2fdd858926b50cf835e4a5d6bae33a7d280b82dcf7433f",
+    "size_bytes": 270861
+  },
+  "reviewed_base": {
+    "commit": "035465f3f16d15f02467679d96451d4440a36ca8",
+    "tree": "3f1497ac66ae6ef91be875928379f0cdea3a52f0"
+  },
+  "status": "sealed_evaluator_inputs",
+  "supersedes_manifest_sha256": "2564335feed8c3d5c0395d6116edffe420d69fdaf69e8f58ff189613c733b545",
+  "task_index": [
+    {
+      "audience": "novice",
+      "domain": "finance",
+      "taskID": "T-001"
+    },
+    {
+      "audience": "advanced",
+      "domain": "finance",
+      "taskID": "T-002"
+    },
+    {
+      "audience": "machine",
+      "domain": "finance",
+      "taskID": "T-003"
+    },
+    {
+      "audience": "advanced",
+      "domain": "finance",
+      "taskID": "T-004"
+    },
+    {
+      "audience": "novice",
+      "domain": "ownership",
+      "taskID": "T-005"
+    },
+    {
+      "audience": "advanced",
+      "domain": "ownership",
+      "taskID": "T-006"
+    },
+    {
+      "audience": "machine",
+      "domain": "ownership",
+      "taskID": "T-007"
+    },
+    {
+      "audience": "advanced",
+      "domain": "ownership",
+      "taskID": "T-008"
+    },
+    {
+      "audience": "novice",
+      "domain": "quality",
+      "taskID": "T-009"
+    },
+    {
+      "audience": "machine",
+      "domain": "quality",
+      "taskID": "T-010"
+    },
+    {
+      "audience": "advanced",
+      "domain": "quality",
+      "taskID": "T-011"
+    },
+    {
+      "audience": "machine",
+      "domain": "quality",
+      "taskID": "T-012"
+    },
+    {
+      "audience": "novice",
+      "domain": "utilization",
+      "taskID": "T-013"
+    },
+    {
+      "audience": "advanced",
+      "domain": "utilization",
+      "taskID": "T-014"
+    },
+    {
+      "audience": "machine",
+      "domain": "utilization",
+      "taskID": "T-015"
+    },
+    {
+      "audience": "advanced",
+      "domain": "utilization",
+      "taskID": "T-016"
+    },
+    {
+      "audience": "novice",
+      "domain": "workforce",
+      "taskID": "T-017"
+    },
+    {
+      "audience": "machine",
+      "domain": "workforce",
+      "taskID": "T-018"
+    },
+    {
+      "audience": "advanced",
+      "domain": "workforce",
+      "taskID": "T-019"
+    },
+    {
+      "audience": "machine",
+      "domain": "workforce",
+      "taskID": "T-020"
+    },
+    {
+      "audience": "novice",
+      "domain": "insurance",
+      "taskID": "T-021"
+    },
+    {
+      "audience": "advanced",
+      "domain": "insurance",
+      "taskID": "T-022"
+    },
+    {
+      "audience": "machine",
+      "domain": "insurance",
+      "taskID": "T-023"
+    },
+    {
+      "audience": "advanced",
+      "domain": "insurance",
+      "taskID": "T-024"
+    },
+    {
+      "audience": "novice",
+      "domain": "population",
+      "taskID": "T-025"
+    },
+    {
+      "audience": "advanced",
+      "domain": "population",
+      "taskID": "T-026"
+    },
+    {
+      "audience": "machine",
+      "domain": "population",
+      "taskID": "T-027"
+    },
+    {
+      "audience": "advanced",
+      "domain": "population",
+      "taskID": "T-028"
+    },
+    {
+      "audience": "novice",
+      "domain": "geography",
+      "taskID": "T-029"
+    },
+    {
+      "audience": "machine",
+      "domain": "geography",
+      "taskID": "T-030"
+    },
+    {
+      "audience": "advanced",
+      "domain": "geography",
+      "taskID": "T-031"
+    },
+    {
+      "audience": "machine",
+      "domain": "geography",
+      "taskID": "T-032"
+    },
+    {
+      "audience": "novice",
+      "domain": "public health",
+      "taskID": "T-033"
+    },
+    {
+      "audience": "advanced",
+      "domain": "public health",
+      "taskID": "T-034"
+    },
+    {
+      "audience": "machine",
+      "domain": "public health",
+      "taskID": "T-035"
+    },
+    {
+      "audience": "advanced",
+      "domain": "public health",
+      "taskID": "T-036"
+    },
+    {
+      "audience": "novice",
+      "domain": "prices",
+      "taskID": "T-037"
+    },
+    {
+      "audience": "advanced",
+      "domain": "prices",
+      "taskID": "T-038"
+    },
+    {
+      "audience": "machine",
+      "domain": "prices",
+      "taskID": "T-039"
+    },
+    {
+      "audience": "advanced",
+      "domain": "prices",
+      "taskID": "T-040"
+    }
+  ],
+  "freeze_id": "ushso-research-tasks-20260910-v1",
+  "root_adjudication": {
+    "reviewer": "codex-root",
+    "sealed_at": "2026-09-10T18:09:09.407077+00:00",
+    "source_base": {
+      "commit": "035465f3f16d15f02467679d96451d4440a36ca8",
+      "tree": "3f1497ac66ae6ef91be875928379f0cdea3a52f0"
+    },
+    "controller_checkout_at_seal": {
+      "head": "b9eca64b87ecb4a4279d37504582ecfe2caf1691",
+      "tree": "3de5203366130ca369a107d47f43a7b580b3360f",
+      "clean": true
+    },
+    "scope": "Freeze of evaluator-owned retrieval task inputs and scoring methodology only. Scientific relevance gold for every possible result and empirical acceptance are not established.",
+    "immutable_private_candidate": "The referenced candidate bytes are preserved. This external root decision supersedes their pending-root workflow flag for input freezing only; draft scientific labels are not upgraded.",
+    "custody_review_sha256": "d5012b9d1e12f02785bec35c776b88bf3e6e2b995755bc7a17ca0e2000a372d6",
+    "custody_check_count": 3863,
+    "content_review": {
+      "task_queries_reviewed": 40,
+      "selected_publisher_descriptions_reviewed": 16,
+      "disposition": "accepted_as_frozen_evaluator_inputs",
+      "corrections_reviewed": [
+        "Natural research questions preserve intentions without requiring a predetermined unresolved outcome.",
+        "Literal publisher facts retain record-level scope and complete definitions; payload, schema, identity and fitness uncertainty remain separate.",
+        "Target slots, absence, ranked-result judgment and release bindings have explicit denominators and evidence boundaries.",
+        "R07 thresholds govern current-generation present-source recall and judged precision; full-intention recall remains separately reported."
+      ]
+    },
+    "governance_history": "An earlier root instruction incorrectly made full-intention recall govern the recall threshold. The final candidate restores the master plan R07 present-source threshold before implementation tuning; no task, intention, anchor or numeric threshold was removed or lowered.",
+    "limitations": [
+      "No retrieval run, scientific claim qualification, R14 model evaluation, participant study or production release was performed.",
+      "Additional returned results require independent blind judgments; selected exemplars are not exhaustive relevance gold.",
+      "Later source/release alternatives and intake bindings require independent evidence and a versioned freeze before ranks are observed.",
+      "Private raw queries, labels and expected IDs remain outside Git and implementer prompts. Same-user filesystem permissions are not claimed as hostile-process isolation."
+    ]
+  }
+}
