@@ -1,0 +1,143 @@
+{
+  "format": "ushso.pr003.c003-2.handoff-check.v1",
+  "tool": "scripts/research-program/check-handoff.mjs",
+  "ok": true,
+  "outcome": "accepted",
+  "handoff": {
+    "path": "docs/research-program/handoffs/PR-003.json",
+    "sha256": "e22117106a64d6d1d2b508eb5b484daa11faff6b5b26208af0aee8d8e1cd1894",
+    "pr_id": "PR-003",
+    "advertised_status": "producer_checked"
+  },
+  "authorities": {
+    "task_binding": null,
+    "execution_ledger": {
+      "path": "docs/research-program/execution-ledger.json",
+      "sha256": "f4fa4adc39add96954ad6d32e03d54658331e90e6f3f57fb31e50eb85d9b7198",
+      "task_found": true
+    }
+  },
+  "binding_source": "execution-ledger",
+  "checks": [
+    {
+      "id": "input_path_containment",
+      "status": "passed",
+      "detail": "docs/research-program/handoffs/PR-003.json stays inside the repository root"
+    },
+    {
+      "id": "handoff_readable",
+      "status": "passed",
+      "detail": "docs/research-program/handoffs/PR-003.json parsed as JSON"
+    },
+    {
+      "id": "handoff_schema",
+      "status": "passed",
+      "detail": "handoff.schema.json (Ajv 2020-12) accepted the packet"
+    },
+    {
+      "id": "task_binding",
+      "status": "passed",
+      "detail": "handoff bound using execution-ledger"
+    },
+    {
+      "id": "dependency_sha_binding",
+      "status": "passed",
+      "detail": "2 dependency SHA(s) match the task binding"
+    },
+    {
+      "id": "base_sha_binding",
+      "status": "not_applicable",
+      "detail": "the resolved authority has no base SHA; base is verified only as a local commit"
+    },
+    {
+      "id": "git_commit_binding",
+      "status": "passed",
+      "detail": "base is a local commit and every dependency SHA is a local ancestor of it"
+    },
+    {
+      "id": "command_result_resolution",
+      "status": "passed",
+      "detail": "every success claim resolves to a command with a non-empty result"
+    },
+    {
+      "id": "artifact_reference_resolution",
+      "status": "passed",
+      "detail": "every referenced artifact id resolves"
+    },
+    {
+      "id": "artifact_path_containment",
+      "status": "passed",
+      "detail": "all artifact paths stay inside the repository root"
+    },
+    {
+      "id": "artifact_file_existence",
+      "status": "passed",
+      "detail": "all referenced artifacts exist as regular files"
+    },
+    {
+      "id": "artifact_sha256_binding",
+      "status": "passed",
+      "detail": "all declared artifact SHA-256 (and byte) bindings match on-disk bytes"
+    },
+    {
+      "id": "source_identity_binding",
+      "status": "passed",
+      "detail": "5 repository-path source identity hash(es) match on-disk bytes"
+    },
+    {
+      "id": "changed_file_containment",
+      "status": "passed",
+      "detail": "all changed-file records are repository-contained"
+    }
+  ],
+  "findings": [],
+  "notes": [
+    {
+      "rule": "base_sha_unbound_to_task_binding",
+      "status": "unresolved",
+      "detail": "no task binding supplied an expected base SHA, so exact base matching did not run"
+    },
+    {
+      "rule": "head_sha_pending",
+      "status": "unresolved",
+      "detail": "head_sha is null (one-shot slice); the controller records the committed head later"
+    }
+  ],
+  "preserved_outcomes": {
+    "non_pass_acceptance_results": [
+      {
+        "id": "acc-independent-review",
+        "status": "pending"
+      }
+    ],
+    "declared_unresolved_claims": [
+      {
+        "id": "head-sha-pending-controller-commit",
+        "status": "unresolved"
+      },
+      {
+        "id": "independent-review-not-started",
+        "status": "open"
+      },
+      {
+        "id": "post-write-receipt-hashes-external",
+        "status": "unresolved"
+      }
+    ],
+    "declared_failures_and_skipped_checks": [
+      {
+        "id": "full-npm-test-not-run",
+        "status": "skipped"
+      },
+      {
+        "id": "github-draft-pr-not-opened",
+        "status": "unavailable"
+      }
+    ],
+    "head_sha_pending": true
+  },
+  "independent_review": {
+    "status": "not_claimed",
+    "detail": "Producer-side packet validation only. A passing packet is complete and evidence-bound; it is not independent verification."
+  }
+}

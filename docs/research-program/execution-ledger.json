@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T22:03:30.340886+00:00",
+  "updated_at": "2026-09-10T22:30:15.386459+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "c33a82b5784796ccca730d8b0c5f499f2971c6b13ffabf5fd71d11a871ebd167",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -80,8 +80,8 @@
     },
     {
       "requested": "DeepSeek",
-      "actual_interface": "native DSH0.1.0-rc.7 headless on a dedicated read-only worktree",
-      "status": "available_native_review",
+      "actual_interface": "native DSH headless one-shot in worktree-bootstrap with root commit transport",
+      "status": "available_native_implementation",
       "advertised_models": [
         "meta/muse-spark-1.3-contributor",
         "stealth/ox-alpha"
@@ -89,14 +89,20 @@
       "dispatched": true,
       "native_configuration": "deepseek/deepseek-v4.1-flash",
       "native_configuration_validation": "isolated startup passed; no provider request made",
-      "native_route_status": "one bounded read-only review completed; provider/model and usage observed in native session",
+      "native_route_status": "Three bounded implementation slices completed with configured deepseek/deepseek-v4.1-flash; exact invocation/commit/terminal receipts retained.",
       "limitation": "Installed Co-Engineer 3.4.2 still cannot dispatch DeepSeek through its closed DSH model allowlist. Native CLI has distinct worktree, lifecycle and token-budget semantics.",
       "model": "deepseek/deepseek-v4.1-flash",
       "reasoning_effort": "high",
       "native_implementation_writer_status": "v3_template_independently_reviewed_pending_full_PR002",
       "latest_review_receipt": "verification/research-program/provider-reviews/deepseek-cohort-design-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/deepseek-cohort-design-disposition.json",
-      "native_implementation_writer_review": "verification/research-program/bootstrap/pr003-native-launcher-v3-review.json"
+      "native_implementation_writer_review": "verification/research-program/bootstrap/pr003-native-launcher-v3-review.json",
+      "latest_implementation": {
+        "task_id": "ushso-pr003-deepseek-20260910t220020z",
+        "head_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+        "status": "producer_completed_changes_requested",
+        "evidence": "verification/research-program/bootstrap/pr003-native-completion-f62ce35.json"
+      }
     }
   ],
   "requirements": [
@@ -415,7 +421,7 @@
     },
     {
       "pr_id": "PR-003",
-      "status": "in_progress",
+      "status": "changes_requested",
       "owner": "ushso-pr003-deepseek-20260910t220020z",
       "dependencies": [
         "PR-001",
@@ -432,13 +438,15 @@
         "package.json",
         ".github/pull_request_template.md"
       ],
-      "head_sha": null,
+      "head_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-003.json",
       "evidence_directory": "verification/research-program/pr-003/",
       "github_pr_url": null,
-      "blockers": [],
-      "dispatch_preparation": "Workspace ready and dispatch initiated; actual model/preflight and execution receipts will establish provider usage.",
+      "blockers": [
+        "Validator accepts missing/failed command outcomes, an unknown head commit, a missing nested command receipt and ambiguous duplicate command IDs. Bounded corrections and final-head independent review required."
+      ],
+      "dispatch_preparation": "Three native DeepSeek slices completed; clean terminal lifecycle and producer final head are recorded.",
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-002": "verification/research-program/pr-002/controller/integration-handoff.json"
@@ -448,10 +456,12 @@
       "provider": "native DSH",
       "selected_model": "deepseek/deepseek-v4.1-flash",
       "selected_reasoning": "high",
-      "actual_model": null,
+      "actual_model": "deepseek/deepseek-v4.1-flash",
       "run_id": "ushso-pr003-deepseek-20260910t220020z",
       "dispatch_evidence": "verification/research-program/bootstrap/pr003-pr004-dispatch.json",
-      "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence."
+      "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
+      "producer_completion": "verification/research-program/bootstrap/pr003-native-completion-f62ce35.json",
+      "independent_review": "verification/research-program/bootstrap/pr003-first-review-f62ce35.json"
     },
     {
       "pr_id": "PR-004",
@@ -2446,7 +2456,12 @@
     "authorization": "Owner explicitly approved project-wide publication of code, plans and sanitized evidence.",
     "qualified_bootstrap_commit": "c92465f97df11a1e231983237f27e8c86db792b2",
     "gate_summary": "verification/research-program/bootstrap/gate-c92465f.json",
-    "pr002_draft_url": "https://github.com/ajhcs/ushso/pull/14"
+    "pr002_draft_url": "https://github.com/ajhcs/ushso/pull/14",
+    "qualified_pr002_integration_commit": "38e5c5fdfec69a893602b9d7fc37c159caf4cf6b",
+    "pr002_integration_gate_summary": "verification/research-program/bootstrap/gate-38e5c5f.json",
+    "pr002_url": "https://github.com/ajhcs/ushso/pull/14",
+    "pr002_state": "merged",
+    "pr002_merge_sha": "5647e81457b606bb36456e75c48f990ce21e9c6c"
   },
   "prepared_inputs": [
     {
@@ -2533,7 +2548,11 @@
       ],
       "dependencies_and_thresholds_unchanged": true,
       "evidence": "verification/research-program/bootstrap/public-directory-plan-refinement.json",
-      "supplemental_intake_policy": "docs/research-program/supplemental-source-intake.md"
+      "supplemental_intake_policy": "docs/research-program/supplemental-source-intake.md",
+      "independent_review": "verification/research-program/bootstrap/public-directory-independent-plan-review.json",
+      "controller_disposition": "verification/research-program/bootstrap/public-directory-controller-review.json",
+      "publication_review": "verification/research-program/bootstrap/public-directory-publication-review.json",
+      "supplemental_proposal_register": "docs/research-program/supplemental-source-proposals.json"
     }
   ]
 }
