@@ -1,0 +1,493 @@
+{
+  "format": "ushso.research-program.baseline.v1",
+  "pr_id": "PR-001",
+  "status": "producer_checked",
+  "recorded_at": "2026-09-10T15:32:40Z",
+  "purpose": "Establish one exact integration base and the evidence-bounded identity of the current public release.",
+  "integration_base": {
+    "repository": "https://github.com/ajhcs/ushso",
+    "remote_ref": "origin/main",
+    "sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+    "tree": "35de194e7182a67a0275cc180f2b021da184aacd",
+    "dependencies": {},
+    "selection": "The merge-base candidate and current origin/main identity were checked against the dispatched SHA and tree. No dirty checkout was reset or stashed.",
+    "fetch_evidence": {
+      "command": "git fetch origin main",
+      "status": "succeeded",
+      "observed_on": "2026-09-10",
+      "note": "The controller supplied a fresh fetch and API identity; this worktree independently rechecked the selected commit and tree. A cached ref was not used as a freshness claim."
+    }
+  },
+  "source_candidate": {
+    "repository": "https://github.com/ajhcs/ushso",
+    "candidate_sha": "11b268c17b5b65261041734abca456720b0d9706",
+    "candidate_tree": "35de194e7182a67a0275cc180f2b021da184aacd",
+    "relationship_to_base": "The retained v1.2 successor candidate has the same tree as the selected main merge commit. This is an exact tree comparison, not a claim that the candidate is a parent of the merge commit."
+  },
+  "deployment_identity": {
+    "status": "control_plane_readback_verified",
+    "worker_name": "ushso",
+    "deployment_id": "d0e89eef-5bf4-43d0-a0ba-20fbdc128c81",
+    "version_id": "ecc1603f-9eb4-4a1b-a566-bd9d7a415de4",
+    "traffic_percent": 100,
+    "readback": {
+      "artifact_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/worker-readback/deployment-readback.json",
+      "artifact_sha256": "519ce34ef3bbc11651c480463e35970c79a8e9e24c9df3c2d1b3f55a81cec8f3",
+      "command": "node scripts/run-wrangler.mjs deployments list --name ushso --json",
+      "started_at": "2026-09-10T15:14:48.966572+00:00",
+      "finished_at": "2026-09-10T15:14:51.694395+00:00",
+      "exit_code": 0,
+      "mutation": false,
+      "status": "observed"
+    },
+    "binary_identity": {
+      "status": "unverified",
+      "sha256": null,
+      "reason": "The read-only control-plane response proves deployment, version, and traffic identities but does not expose Worker bytes or a byte hash. The retained host note is recorded as host-note-only evidence and is not promoted to binary identity.",
+      "host_note": {
+        "path": "/home/plumbob/.codex/memories/plumbob-server/ushso-prod.md",
+        "sha256": "d8e3680282d992c2e73742ba8b814c6e7a740ebbd7ee3cef03988d558ddffc25",
+        "evidence_class": "host_note_only"
+      }
+    }
+  },
+  "runtime_paths": {
+    "wrangler_main": "worker/index.mjs",
+    "asset_directory": "./apps/web/dist",
+    "catalog_loader": "worker/index.mjs: loadCatalogFromAssets reads env.ASSETS, corpus.record_files, and the JSONL shards",
+    "dictionary_review_route": "/api/research/v1/dictionary-review",
+    "dictionary_review_binding": "USHSO_DICTIONARY_REVIEW=enabled in the checked release configuration",
+    "source_files": [
+      {
+        "path": "worker/index.mjs",
+        "sha256": "0be15165ba0deb5d3cc94e9d02f5bf63394aea84a74f474d26854bceadf760c4"
+      },
+      {
+        "path": "worker/dictionary-review-router.mjs",
+        "sha256": "86ca4bc252dd7fff65c59070d59bde672317f56cb8dcff8708a18f7df0ac429e"
+      },
+      {
+        "path": "worker/static-composition.mjs",
+        "sha256": "c2109bd1d9a3c36e9ec4ed5b0b925afdbb5f3deb9a0bdc77245a5db39075ba02"
+      },
+      {
+        "path": "packages/search/static-search-backend.mjs",
+        "sha256": "67f1a77845e6a5ed1efe180a367725218c3feb0159cdf236d9f199658b1a32cb"
+      },
+      {
+        "path": "scripts/research/package-dictionary-review.mjs",
+        "sha256": "2695ceee0fa15348567bd3fdb199f1534e8ac42e18c11fe42b8b634224890fbb"
+      },
+      {
+        "path": "scripts/research/compose-dictionary-review.mjs",
+        "sha256": "93db2830ad09f029023f325cb3e6d6eaa3a118d9efee4146946361505661975b"
+      }
+    ],
+    "architecture_note": "The wrangler entrypoint is worker/index.mjs, which composes StaticAssetCatalogRepository and StaticSearchBackend through worker/static-composition.mjs. ADR-0005 prohibits public unbounded JSONL loading for the target search architecture. The selected base still uses the static ASSETS/JSONL lane as current and emergency fallback; no architecture waiver or retirement is inferred."
+  },
+  "research_asset_lock": {
+    "path": "config/research-assets.lock.json",
+    "sha256": "75f362a1545f469a74bef00b7d7126fd03ffbfc79e4e6421bafe9fcf62db6c3b",
+    "stager": {
+      "path": "scripts/stage-research-assets.mjs",
+      "sha256": "ace44a192a281d806f831fbceffc345b6c4f2ba8e500b5d3f42f9891a3c16a83"
+    },
+    "archive": {
+      "sha256": "153f7b8c8934095882e46f134334ddb5f6ef29a03aed8358d71878f92ac4a76f",
+      "bytes": 163540588,
+      "url": "https://github.com/ajhcs/ushso/releases/download/research-assets-153f7b8c89340958/research-assets-153f7b8c8934095882e46f134334ddb5f6ef29a03aed8358d71878f92ac4a76f.tar.gz"
+    },
+    "packages": [
+      {
+        "id": "dictionary-review-package",
+        "prefix": "research-dictionaries-v1",
+        "manifest_sha256": "0f10c6b764d054cd15324c4a1d93d6da191d86b792976d9573cdf27feceecb6b",
+        "tree_sha256": "f06d3190d5fc4a3a36b51dd2c1d722d0e790e6c628213fb7cd9c700f1d3d79e5",
+        "file_count": 41715,
+        "bytes": 1310115812,
+        "record_count": 2905,
+        "generation": "live-2026-09-03-85b50522b420",
+        "review_status": "pending_owner_review",
+        "publication_authorized": false,
+        "scientific_applicability": "unresolved"
+      },
+      {
+        "id": "scientific-review-review-package",
+        "prefix": "scientific-review-v1",
+        "manifest_sha256": "533cd4c0ede0d6c39c19c16a9d8a3cb0161e3d51dc567c8b3826c2f1d04442df",
+        "tree_sha256": "9642e3f4714e1f78063ce52d0c67ff0e65ca0267743dc8c87d1c93bb99ceab24",
+        "file_count": 1,
+        "bytes": 22905,
+        "claim_count": 4,
+        "generation": "live-2026-09-03-85b50522b420",
+        "review_status": "pending_owner_review",
+        "publication_authorized": false,
+        "scientific_applicability": "unresolved"
+      },
+      {
+        "id": "scientific-conflicts-review-package",
+        "prefix": "scientific-conflicts-v1",
+        "manifest_sha256": "2882d2d56d76a2a23123d54e83cec2d71519dc2bbead7cd7841e4bdeab5f858d",
+        "tree_sha256": "6934eb95e1166cf80e035395428b00d6c7176e5554b9b23098feb057c255aea2",
+        "file_count": 23,
+        "bytes": 486011,
+        "record_count": 7,
+        "generation": "live-2026-09-03-85b50522b420",
+        "review_status": "pending_owner_review",
+        "publication_authorized": false,
+        "scientific_applicability": "unresolved"
+      }
+    ],
+    "claim_boundary": "The lock identifies the retained release asset archive and its pending dictionary/scientific review packages. It is a transport and provenance identity; pending assets do not establish schema applicability, scientific approval, canonical promotion, or permission to change production data."
+  },
+  "public_observation": {
+    "capture_status": "content_checked",
+    "capture_artifact": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/baseline-live/receipts.json",
+      "sha256": "c5731fdfcba1fef9d6f804711366e6bd52d9eae3ed5cf7cdcf68765aaec42031",
+      "request_count": 8,
+      "window": {
+        "started_at": "2026-09-10T15:05:40.268747+00:00",
+        "finished_at": "2026-09-10T15:05:52.184851+00:00"
+      }
+    },
+    "requests": [
+      {
+        "name": "health",
+        "url": "https://ushso.org/api/health",
+        "status": 200,
+        "bytes": 383,
+        "body_sha256": "ad2dbd5b65f138d8bfe2999c7f8f929e7bb1a142ae64605a5131e1530daab6d3",
+        "started_at": "2026-09-10T15:05:40.268747+00:00",
+        "finished_at": "2026-09-10T15:05:43.435851+00:00"
+      },
+      {
+        "name": "www-health",
+        "url": "https://www.ushso.org/api/health",
+        "status": 200,
+        "bytes": 383,
+        "body_sha256": "ad2dbd5b65f138d8bfe2999c7f8f929e7bb1a142ae64605a5131e1530daab6d3",
+        "started_at": "2026-09-10T15:05:43.686202+00:00",
+        "finished_at": "2026-09-10T15:05:46.471321+00:00"
+      },
+      {
+        "name": "contract",
+        "url": "https://ushso.org/api/contract",
+        "status": 200,
+        "bytes": 3557,
+        "body_sha256": "b08042e577ab605b60ba498e5652a24c40698331315a0bba81c1ef32af57791d",
+        "started_at": "2026-09-10T15:05:46.721582+00:00",
+        "finished_at": "2026-09-10T15:05:46.876094+00:00"
+      },
+      {
+        "name": "catalog-first",
+        "url": "https://ushso.org/api/catalog",
+        "status": 200,
+        "bytes": 281293,
+        "body_sha256": "e9d9856063f725f669265c6c837446808762bf40fa473f41da06960002f48c25",
+        "started_at": "2026-09-10T15:05:47.126428+00:00",
+        "finished_at": "2026-09-10T15:05:49.962506+00:00"
+      },
+      {
+        "name": "published-corpus",
+        "url": "https://ushso.org/corpus-v1.2.0/corpus/corpus.json",
+        "status": 200,
+        "bytes": 1110,
+        "body_sha256": "56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633",
+        "etag": "\"ab3c679841dc43076837ae93864bdd97\"",
+        "started_at": "2026-09-10T15:05:50.213036+00:00",
+        "finished_at": "2026-09-10T15:05:50.336205+00:00"
+      },
+      {
+        "name": "records-0001",
+        "url": "https://ushso.org/corpus-v1.2.0/corpus/records-0001.jsonl",
+        "status": 200,
+        "bytes": 8383528,
+        "body_sha256": "8b7403e0d0d363ea5879a9dc2e0e2a774ea31e5cd556bf1826ec02706cd33202",
+        "etag": "\"344bb42466eb86ed16758b5e99902eef\"",
+        "started_at": "2026-09-10T15:05:50.586570+00:00",
+        "finished_at": "2026-09-10T15:05:50.967131+00:00"
+      },
+      {
+        "name": "records-0002",
+        "url": "https://ushso.org/corpus-v1.2.0/corpus/records-0002.jsonl",
+        "status": 200,
+        "bytes": 8383443,
+        "body_sha256": "d6b5962ed075ffc8526d766499a04c685ab89231d1d71226ea87eff7e432c579",
+        "etag": "\"c2c960a6fd33f4e564092e4a69a8b578\"",
+        "started_at": "2026-09-10T15:05:51.217471+00:00",
+        "finished_at": "2026-09-10T15:05:51.604469+00:00"
+      },
+      {
+        "name": "records-0003",
+        "url": "https://ushso.org/corpus-v1.2.0/corpus/records-0003.jsonl",
+        "status": 200,
+        "bytes": 5654682,
+        "body_sha256": "772e6c3fcc9fd98c98b1e0a33abf5c77998ca5352fc02295b9fb554af35be082",
+        "etag": "\"8e0e22210b1f148443194d6fa489797c\"",
+        "started_at": "2026-09-10T15:05:51.854982+00:00",
+        "finished_at": "2026-09-10T15:05:52.184851+00:00"
+      }
+    ],
+    "parsed_identities": {
+      "health": {
+        "status": "ok",
+        "service": "ushso-discovery",
+        "contract_version": "observatory-discovery-result.v1.0.0",
+        "compiler_mode": "deterministic_controlled_vocabulary",
+        "llm_used": false,
+        "external_requests": 0,
+        "unknowns": [
+          "geography_not_resolved",
+          "subject_not_resolved",
+          "unit_of_analysis_not_resolved",
+          "time_window_not_specified"
+        ]
+      },
+      "contract": {
+        "contract_version": "observatory-webmcp-tool.v1.3.0",
+        "tool_contract_version": "observatory-machine-toolkit.v1.0.0",
+        "response_contract_version": "observatory-machine-toolkit.v1.1.0",
+        "catalog_version": "1.2.0",
+        "surface": "document.modelContext.registerTool",
+        "compatibility_surfaces": [
+          "navigator.modelContext.registerTool"
+        ],
+        "read_only": true,
+        "source_network_allowed_at_invocation": false,
+        "payload_retrieval_allowed": false,
+        "enabled_tool_count": 8,
+        "disabled_tools": [
+          {
+            "name": "observatory.plan_research",
+            "registration_state": "disabled_pending_gates"
+          }
+        ]
+      },
+      "catalog": {
+        "contract_version": "observatory-discovery-result.v1.0.0",
+        "retrieval_id": "retrieval-3b0b61f073e3c62c",
+        "evidence_mode": "published_offline_evidence",
+        "corpus_generation": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e",
+        "ranking_version": "observatory-canonical-ranking.v1.2.0",
+        "total_matches": 3430,
+        "partial_results": {
+          "is_partial": true,
+          "invalid_item_count": 4,
+          "error": "description must be a non-empty string",
+          "isolated_record_ids": [
+            "obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b",
+            "obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250",
+            "obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e",
+            "obs:asset:cdc-socrata:va9e-d8re-c845d9bfb921e339"
+          ]
+        }
+      }
+    },
+    "claim_boundary": "The requests prove the captured public HTTP responses and their content identities. They do not prove publisher payload access, authorization, schema compatibility, join fitness, scientific approval, or Worker byte identity."
+  },
+  "corpus": {
+    "corpus_id": "ushso-live-catalog-2026-09-03",
+    "corpus_version": "1.2.0",
+    "evidence_mode": "live_first_party_metadata",
+    "manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e",
+    "algorithm_fingerprint_sha256": "df3891067d6c1d50bf45c7efc7a73c30167486289f8c3039781266f583e0f714",
+    "generation": "live-2026-09-03-85b50522b420",
+    "observed_at": "2026-09-03T22:22:33.908Z",
+    "record_count": 3434,
+    "unique_record_id_count": 3434,
+    "searchable_record_count": 3430,
+    "search_document_count": 0,
+    "join_route_count": 0,
+    "runtime_search_projection": "on_demand",
+    "source_slices": {
+      "cms-data-catalog": 159,
+      "cdc-socrata": 1472,
+      "census-api": 1803
+    },
+    "isolated_records": [
+      {
+        "record_id": "obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b",
+        "reason": "description must be a non-empty string"
+      },
+      {
+        "record_id": "obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250",
+        "reason": "description must be a non-empty string"
+      },
+      {
+        "record_id": "obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e",
+        "reason": "description must be a non-empty string"
+      },
+      {
+        "record_id": "obs:asset:cdc-socrata:va9e-d8re-c845d9bfb921e339",
+        "reason": "description must be a non-empty string"
+      }
+    ],
+    "files": [
+      {
+        "path": "corpus/corpus.json",
+        "bytes": 1110,
+        "sha256": "56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633",
+        "live_comparison": "byte_equal"
+      },
+      {
+        "path": "corpus/join-routes.jsonl",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "live_comparison": "not_requested"
+      },
+      {
+        "path": "corpus/records-0001.jsonl",
+        "bytes": 8383528,
+        "sha256": "8b7403e0d0d363ea5879a9dc2e0e2a774ea31e5cd556bf1826ec02706cd33202",
+        "live_comparison": "byte_equal"
+      },
+      {
+        "path": "corpus/records-0002.jsonl",
+        "bytes": 8383443,
+        "sha256": "d6b5962ed075ffc8526d766499a04c685ab89231d1d71226ea87eff7e432c579",
+        "live_comparison": "byte_equal"
+      },
+      {
+        "path": "corpus/records-0003.jsonl",
+        "bytes": 5654682,
+        "sha256": "772e6c3fcc9fd98c98b1e0a33abf5c77998ca5352fc02295b9fb554af35be082",
+        "live_comparison": "byte_equal"
+      },
+      {
+        "path": "fixtures/controlled-vocabulary.json",
+        "bytes": 18188,
+        "sha256": "2907709f3805744a57d395554f911981e5e3e3c7a25af40419ec2c2b26954151",
+        "live_comparison": "not_requested"
+      },
+      {
+        "path": "validation/validation-report.json",
+        "bytes": 818,
+        "sha256": "87908fa3af93b6d1805f76f530bca8150128b639500c01714cc29dde51ad1fa1",
+        "live_comparison": "not_requested"
+      }
+    ],
+    "safety_flags": {
+      "minimum_1000_records": true,
+      "all_public_records_current_verified": true,
+      "unique_record_ids": true,
+      "source_native_ids_unique_within_source": true,
+      "record_semantics": true,
+      "complete_source_enumerations": true,
+      "metadata_only_zero_payloads": true,
+      "zero_identity_merges": true
+    },
+    "safety_flags_provenance": "These booleans are retained generation and validation assertions from the v1.2.0 package. PR-001 did not revalidate publisher freshness; the dated audit reports that all records were past their review deadline. They do not establish current payload access, authorization, schema fitness, or scientific approval."
+  },
+  "dictionary_evidence": {
+    "canonical_v1_2": {
+      "status": "absent_from_published_corpus",
+      "manifest_path": null,
+      "search_document_files": [],
+      "note": "v1.2.0 publishes no canonical dictionary manifest or search-document shard. No audit dictionary is silently promoted into the release."
+    },
+    "public_proposal_assets": {
+      "status": "served_as_pending_review_assets",
+      "route": "/api/research/v1/dictionary-review",
+      "manifest": {
+        "path": "/mnt/d/tmp/plumbob/release-gate-state/repositories/ushso-375cca760f7dab38/runs/20260910T151617Z-acbebf5e6fad/artifacts/files/apps/web/dist/research-dictionaries-v1/manifest.json",
+        "sha256": "0f10c6b764d054cd15324c4a1d93d6da191d86b792976d9573cdf27feceecb6b",
+        "generation": "live-2026-09-03-85b50522b420",
+        "review_status": "pending_owner_review",
+        "publication_authorized": false,
+        "canonical_records_changed": 0,
+        "record_count": 2905,
+        "isolated_count": 95,
+        "variable_count": 1573847,
+        "page_count": 34081,
+        "maximum_page_bytes": 65535
+      },
+      "claim_boundary": "These are public, generation-bound proposal assets outside the canonical v1.2 corpus. Their schema applicability is unresolved and they are not resolved dictionaries, scientific approval, or permission to alter canonical records."
+    },
+    "audit_inventory": {
+      "status": "retained_local_not_promoted",
+      "completeness_csv": {
+        "path": "/mnt/d/Coding Projects/ushso/docs/reviews/2026-09-10-product-data-audit/evidence/dictionary-completeness.csv",
+        "bytes": 623628,
+        "sha256": "66305284c61924ea96f9ef7a62545d5cea28bc3819d2ae5cac97e8b1f3430ee9",
+        "data_rows": 3434,
+        "dictionary_present_rows": 2905,
+        "dictionary_not_present_rows": 529
+      },
+      "raw_page_count": 34081,
+      "raw_page_status": "local_evidence_only",
+      "claim_boundary": "The audit inventory is retained evidence for later qualification and is not a canonical release dictionary, schema, or scientific promotion."
+    }
+  },
+  "historical_predecessor": {
+    "status": "retained_historical_superseded",
+    "path": "RELEASE_PROVENANCE.json",
+    "sha256": "4de10ddb0edd788e1f80639aa51059748f76573db0a6149fba5e6c5cfc2e9bf7",
+    "release": "ushso-observatory-national-federal-1.1.0",
+    "source_commit": "6eeca2a47d4dba7eee05e9b43b15fa03f231ac6a",
+    "corpus_version": "1.1.0",
+    "record_count": 157,
+    "reason": "This is an earlier release subject with a different corpus and source commit. It is retained for provenance and is not mixed into the v1.2 baseline."
+  },
+  "retained_technical_attestation": {
+    "path": "verification/wp0/v1.2.0/receipts/approved.json",
+    "sha256": "3accfe1144e793087b29b391972bacec8cd105c6dfedceca548bfa4e656cbdac",
+    "status": "technical_successor_attestation_reference_only",
+    "note": "Its v1.2 integrity evidence is preserved unchanged. It is not treated as a deployment, scientific, or final program approval."
+  },
+  "authorization_and_disabled_boundaries": {
+    "owner_direction": {
+      "path": "docs/research-automation/owner-direction.json",
+      "sha256": "44d654c2abed4155f8ea5b6e2ccf242d638fa3d96383c1b7800ddd80330ba866",
+      "publication_authorized": false
+    },
+    "external_authorization_register": {
+      "path": "verification/external-authorization/v1.0.0/register.json",
+      "sha256": "335b7d3516594d2372cc545b16bf6bbc18e7f69420b4485f659b52a1cdff923b",
+      "entry_count": 17,
+      "authorized_count": 0,
+      "status": "all_not_requested"
+    },
+    "effective_successor_overlay": {
+      "path": "verification/external-authorization/v1.1.0/register.json",
+      "sha256": "4e372ca7cc0f42378d8893600aaf6c2f68154e9a3a84a7cb361b95116a97a1db",
+      "parent_sha256": "335b7d3516594d2372cc545b16bf6bbc18e7f69420b4485f659b52a1cdff923b",
+      "delta": {
+        "id": "AUTH-10",
+        "status": "authorized_scoped",
+        "authorized": true,
+        "receipt_path": "verification/external-authorization/v1.1.0/receipts/auth-10-2026-09-03.json",
+        "receipt_sha256": "1c90ed77371272139bd4282ee3ab9a8d81ade32482d0945d5cba7a77e34c0a6d",
+        "repository": "ajhcs/ushso",
+        "branch": "codex/research-navigator-integration",
+        "base_commit": "f613b685a8821fca2393ae1ef4863d7a3fd2d359",
+        "expires_at": "2026-09-04T16:00:00Z"
+      },
+      "current_disposition": "expired_and_out_of_scope",
+      "reason": "The historical overlay is scoped to a different branch and its expiry predates this baseline. Its effective-register loader validates the parent and delta but does not enforce expires_at, so this baseline does not treat AUTH-10 as current authorization."
+    },
+    "planner": {
+      "name": "observatory.plan_research",
+      "status": "disabled_pending_gates"
+    },
+    "research_data_rule": "No model inference, provider call, payload retrieval, identity merge, or scientific/schema promotion is part of this baseline."
+  },
+  "preservation": {
+    "original_workspace_manifest": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/original-workspace-manifest.json",
+      "sha256": "3946fa64ea2803477195f999aca4b58c00be467fb3cdec552f9dd374542decd7",
+      "scope": "1483 dirty or untracked files hashed by the preservation inventory",
+      "original_workspace": "read_only"
+    },
+    "implementation_worktree": {
+      "path": "/mnt/d/worktrees/plumbob/ushso-pr-001-release-baseline",
+      "branch": "codex/pr-001-release-baseline",
+      "writer_lock": "worktree-bootstrap task pr-001-release-baseline"
+    }
+  },
+  "verification": {
+    "evidence_index": "verification/research-program/pr-001/baseline-identity.json",
+    "independent_review": "not_started",
+    "producer_claim": "This file records checked identities and bounded observations; it does not authorize release, deployment, scientific approval, or source payload access."
+  }
+}
