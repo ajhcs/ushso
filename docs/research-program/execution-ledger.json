@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T20:19:57.371347+00:00",
+  "updated_at": "2026-09-10T20:23:29.716272+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "80d897a6135e0cbbb27aff2e67139b26d17f51347487ba452335b56914557703",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -60,13 +60,14 @@
       "dispatched": true,
       "model_recorded_by_interface": "grok-4",
       "model_reported_by_reviewer": "Grok 4.6",
-      "model_identity_note": "The managed interface records grok-4; the provider report names Grok 4.6. Retain both instead of asserting they are identical.",
+      "model_identity_note": "The active managed interface records grok-4. The retained Grok 4.6 self-report belongs only to the earlier read-only boundary review and is not asserted for later implementation runs.",
       "latest_run": {
-        "run_id": "ushso-pr001-boundary-review-20260910",
-        "assignment_id": "grok-boundary-inventory",
-        "status": "completed",
-        "role": "read_only_boundary_inventory",
-        "acceptance": "supporting_review_checked_with_corrections; final PR-001 acceptance pending"
+        "run_id": "ushso-pr002-c3-20260910",
+        "assignment_id": "grok-c3",
+        "status": "running",
+        "role": "implement_C-002-3",
+        "base_sha": "997070bd94864fabedf73acecd422c6e15a3ed7e",
+        "acceptance": "C3_pending_independent_review"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json"
@@ -214,7 +215,7 @@
     {
       "pr_id": "PR-002",
       "status": "in_progress",
-      "owner": null,
+      "owner": "ce-ushso-pr002-c3-20260910-grok-c3-ce2e8fd091bf-1d277397",
       "dependencies": [
         "PR-001"
       ],
@@ -233,12 +234,12 @@
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/14",
       "blockers": [],
       "prerequisites_satisfied": true,
-      "dispatch_preparation": "C1 and corrected C2 independently accepted. Dispatch Grok for C3 only using the sealed public 25/10 pilot inputs and twelve missing-family intake contracts. Full PR002 remains incomplete.",
-      "provider": null,
-      "actual_model": null,
+      "dispatch_preparation": "Grok is implementing the single remaining C3 commit from independently accepted C1/C2 at 997070b. Exact pre-endpoint 25/10 selection and twelve families are fixed; no replacement, endpoint tests or R01-R16 acceptance.",
+      "provider": "grok",
+      "actual_model": "grok-4",
       "base_sha": "997070bd94864fabedf73acecd422c6e15a3ed7e",
-      "branch": "codex/ushso-pr002-c2-corrections-20260910",
-      "dispatch_evidence": "verification/research-program/bootstrap/pr002-c2-c3-grok-dispatch.json",
+      "branch": "codex/ce-ushso-pr002-c3-20260910-grok-c3-ce2e8fd091bf-1d277397",
+      "dispatch_evidence": "verification/research-program/bootstrap/pr002-c3-grok-dispatch.json",
       "run_history": [
         {
           "run_id": "ushso-pr002-cohort-freeze-20260910",
@@ -312,7 +313,7 @@
           "lifecycle_verification": "verification/research-program/bootstrap/pr002-c2-luna-lifecycle-997070b.json"
         }
       ],
-      "active_atomic_commit": null,
+      "active_atomic_commit": "C-002-3",
       "remaining_atomic_commits": [
         "C-002-3"
       ],
@@ -327,7 +328,11 @@
         "C-002-2"
       ],
       "supplemental_review_evidence": "verification/research-program/bootstrap/pr002-c2-handoff-review-8fe6e6b.json",
-      "open_review_findings": []
+      "open_review_findings": [],
+      "run_id": "ushso-pr002-c3-20260910",
+      "provider_task_id": "ce-ushso-pr002-c3-20260910-grok-c3-ce2e8fd091bf-1d277397",
+      "expected_duration_ms": 900000,
+      "deadline_at": "2026-09-10T20:38:56.483Z"
     },
     {
       "pr_id": "PR-003",
@@ -2386,6 +2391,18 @@
       "prepared_from": "5e27efe63f472483eb25f69c44929c6d3ffb869e",
       "dispatch_allowed": false,
       "next_action": "Recheck source pins on the accepted full PR002 integration base and assign three atomic field-state, ledger and offline-view commits."
+    },
+    {
+      "for_pr": "PR-005",
+      "kind": "freshness_and_grain_reuse_and_regression_map",
+      "status": "read_only_preparation_dependency_and_scope_gated",
+      "source_head": "6c5007faa80632864e87d592b695fa2e7d75d47d",
+      "evidence": "verification/research-program/bootstrap/pr005-reuse-preparation.md",
+      "source_pins": "verification/research-program/bootstrap/pr005-source-pins.json",
+      "test_matrix": "verification/research-program/bootstrap/pr005-test-preparation.json",
+      "tests_run": false,
+      "dispatch_allowed": false,
+      "next_action": "After PR004 fixes its field-state interface, resolve the static-search adapter and direct UI/type ownership gaps in PR005 scope before implementation; retain deterministic benchmark clock behavior."
     }
   ]
 }

@@ -1,0 +1,92 @@
+{
+  "artifact_kind": "pr005_decisive_before_after_test_matrix",
+  "pinned_commit": "6c5007faa80632864e87d592b695fa2e7d75d47d",
+  "pinned_tree": "434a0b977570ad4828bcc7ef03034f5ed462a175",
+  "status": "preparation_only",
+  "tests_run": false,
+  "actual_result_policy": "No before/after result is claimed. Every row remains not_run_preparation_only until an authorized PR-005 implementation and isolated verification run.",
+  "rows": [
+    {
+      "id": "C0051-live-clock",
+      "requirement": "C-005-1 / F07",
+      "fixture": "Synthetic record with next_review_due=2026-09-05T00:00:00Z; evaluate at 2026-09-04 and 2026-09-10 without changing record evidence or hash.",
+      "current_before_behavior": "Direct engine accepts an explicit now and classifies before/after correctly, but public static search drops the clock and core falls back to corpus published_at/built_at or 1970. The v1.2 corpus has no published_at/built_at, so a live call can report within_review_window after the deadline.",
+      "expected_after_behavior": "Public request evaluation time reaches freshness projection; 2026-09-10 is overdue and 2026-09-04 remains within_review_window. Invalid/missing due dates stay deadline_unknown. Source observation/evidence fields and hashes are byte-stable.",
+      "existing_reuse": [
+        "packages/retrieval/tests/release-contract.test.mjs:271-284",
+        "tests/wp1-repository-abstraction.test.mjs:155-169"
+      ],
+      "planned_decisive_command": "node --test tests/research-program/freshness-and-grain.test.mjs",
+      "status": "not_run_preparation_only"
+    },
+    {
+      "id": "C0051-frozen-default",
+      "requirement": "PR acceptance: frozen benchmark results remain deterministic",
+      "fixture": "Existing direct-base and receipt replay fixtures with a fixed corpus generation and no wall-clock dependency.",
+      "current_before_behavior": "Direct engine defaults to the frozen corpus published_at/built_at fallback (or epoch when absent); explicit now changes only derived freshness/receipt time, not source records or ranking.",
+      "expected_after_behavior": "Direct benchmark calls remain byte-stable across repeated runs; only the public request seam supplies a live evaluation clock. Generation, ranking, ordered IDs, interpretation and evidence hashes remain unchanged.",
+      "existing_reuse": [
+        "packages/retrieval/tests/search-receipt-replay.test.mjs:12-29",
+        "tests/direct-base-regression.test.mjs:1-4",
+        "packages/retrieval/tests/lexical-index.test.mjs:12-17"
+      ],
+      "planned_decisive_command": "node --test packages/retrieval/tests/search-receipt-replay.test.mjs tests/direct-base-regression.test.mjs",
+      "status": "not_run_preparation_only"
+    },
+    {
+      "id": "C0052-grain-label",
+      "requirement": "C-005-2 / F06 / F08",
+      "fixture": "Audited HCRIS-style record carrying unit_of_analysis tags (hospital/facility/provider/state) without claim-level observation-grain evidence; include a question whose subject has implied units.",
+      "current_before_behavior": "Parser vocabulary can infer units directly or via subject implied_units; retrieval scores matched tags as inferred, metadataDimensions leaves observation_grain unresolved, and facets say Inferred unit tag. researcherGuidance.ts nevertheless renders Typical unit with source_asserted evidence.",
+      "expected_after_behavior": "Typical unit/grain wording remains unresolved unless explicit claim-level evidence exists. Inferred categories remain visibly search aids, cannot establish scientific grain, and cannot be promoted to supported source claims or a scientific grain facet.",
+      "existing_reuse": [
+        "packages/retrieval/tests/release-contract.test.mjs:171-173",
+        "packages/retrieval/tests/release-contract.test.mjs:286-297",
+        "apps/web/src/lib/catalogAdapter.test.ts:55-62",
+        "apps/web/src/lib/researcherGuidance.test.tsx:14-33"
+      ],
+      "planned_decisive_command": "node --test tests/research-program/freshness-and-grain.test.mjs",
+      "status": "not_run_preparation_only"
+    },
+    {
+      "id": "C0053-freshness-scope",
+      "requirement": "C-005-3 / F07 / R02",
+      "fixture": "One result containing historical catalog metadata observation, a latest refresh attempt (success/failure/unavailable), and no payload check; render search card and detail panel from the same response.",
+      "current_before_behavior": "ResultCard shows a verification target, one last-checked value and overdue state. DatasetDetailsPage shows last checked, historical status, failed refresh and data-through, but direct dataset API responses omit derived freshness and neither UI path renders latest attempt or a catalog-vs-payload check state. Local Date.now fallbacks can diverge from API evaluation time.",
+      "expected_after_behavior": "Existing ResultCard/detail visual components show last successful metadata check, latest attempt and stale status together, with catalog metadata check explicitly distinct from payload check/unavailable. All rendered status values use the response/request evaluation clock; no payload success is inferred from catalog metadata.",
+      "existing_reuse": [
+        "apps/web/src/components/ResultCard.test.ts:13-48",
+        "apps/web/src/lib/researcherGuidance.test.tsx:45-58",
+        "tests/wp1-repository-abstraction.test.mjs:155-169"
+      ],
+      "ownership_blocker": "ResultCard.tsx, DatasetDetailsPage.tsx, discovery.ts types/schema and static-search-backend clock forwarding are outside PR-005's four owned paths. Resolve before claiming full C-005-3 acceptance.",
+      "planned_decisive_command": "npm run test:web && node --test tests/research-program/freshness-and-grain.test.mjs",
+      "status": "not_run_preparation_only"
+    },
+    {
+      "id": "api-ui-hash-stability",
+      "requirement": "C-005-1/C-005-3 evidence preservation",
+      "fixture": "Advance only the request evaluation clock over a September 5 deadline while retaining the same fixture/corpus bytes.",
+      "current_before_behavior": "Core-derived metadata freshness changes only when explicit now is supplied; source record, claim evidence, provenance pointers and content hashes are preserved. UI fallback paths independently call Date.now.",
+      "expected_after_behavior": "API and UI status changes with clock advancement while canonical record/evidence/provenance bytes and hashes remain identical; catalog metadata visibility never becomes payload availability.",
+      "existing_reuse": [
+        "packages/retrieval/tests/release-contract.test.mjs:271-284",
+        "apps/web/src/lib/catalogAdapter.test.ts:17-30",
+        "apps/web/src/lib/catalogAdapter.test.ts:64-72"
+      ],
+      "planned_decisive_command": "node --test tests/research-program/freshness-and-grain.test.mjs && npm run test:web",
+      "status": "not_run_preparation_only"
+    }
+  ],
+  "planned_pr_commands_from_packet": [
+    "node --test tests/research-program/freshness-and-grain.test.mjs",
+    "npm run test:web",
+    "npm run test:retrieval",
+    "npm run test:worker"
+  ],
+  "dependency": {
+    "pr": "PR-004",
+    "required_state": "accepted before PR-005 dispatch",
+    "pinned_commit_state": "PR-005 remains planned in the pinned execution ledger; no PR-004 merge SHA is recorded there"
+  }
+}
