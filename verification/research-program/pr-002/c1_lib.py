@@ -46,9 +46,31 @@ YEAR_SUFFIX = re.compile(r"(19|20)\d{2}$")
 INTAKE_LIMITS = {
     "state-apcd-programs": "Family-level freeze only; actual jurisdiction/source intake is later (PR-044).",
     "state-facility-licensure": "Family-level freeze only; actual jurisdiction/source intake is later (PR-044). CMS certification is not state licensure.",
-    "hospital-price-transparency-mrfs": "Family entry is not the 25-hospital MRF pilot; PR-046 selects those entities later.",
-    "payer-transparency-in-coverage-mrfs": "Family entry is not the 10-payer MRF pilot; PR-049 selects those entities later.",
+    "hospital-price-transparency-mrfs": "C-002-3 freezes 25 hospital candidate IDs before any endpoint result; PR-046 consumes those IDs, resolves locators and dispositions, and cannot replace unavailable selections.",
+    "payer-transparency-in-coverage-mrfs": "C-002-3 freezes 10 payer reporting-entity candidate IDs before any endpoint result; PR-049 consumes those IDs, resolves locators and dispositions, and cannot replace unavailable selections.",
     "cdc-atsdr-social-vulnerability-index": "Named exact ATSDR SVI family. Catalog ypqf-r5qs is HHS ASPE SVI and does not satisfy this family.",
+}
+
+MRF_SELECTION_CONTRACT = {
+    "status": "pending_C-002-3",
+    "selection_owner": "C-002-3",
+    "freeze_before_endpoint_results": True,
+    "hospital_candidate_count": 25,
+    "payer_reporting_entity_candidate_count": 10,
+    "hospital_candidate_ids": None,
+    "payer_reporting_entity_candidate_ids": None,
+    "consumer_contract": {
+        "hospital": {
+            "pr": "PR-046",
+            "action": "Consume the frozen hospital IDs, resolve locators and record dispositions.",
+            "replacement_allowed": False,
+        },
+        "payer": {
+            "pr": "PR-049",
+            "action": "Consume the frozen payer reporting-entity IDs, resolve locators and record dispositions.",
+            "replacement_allowed": False,
+        },
+    },
 }
 
 
@@ -57,12 +79,17 @@ def digest(path: Path) -> str:
 
 
 def load_catalog():
-    ns: dict = {}
     path = HERE / "product_catalog.py"
-    exec(compile(path.read_text(encoding="utf-8"), str(path), "exec"), ns)
+    # Check the immutable catalog bytes before compiling or executing them.  A
+    # changed catalog must fail as an integrity error, even if its Python body
+    # would otherwise execute successfully (or contain side effects).
+    catalog_bytes = path.read_bytes()
+    catalog_sha = hashlib.sha256(catalog_bytes).hexdigest()
+    if catalog_sha != EXPECTED_CATALOG:
+        raise SystemExit(f"product_catalog.py hash mismatch: {catalog_sha}")
+    ns: dict = {}
+    exec(compile(catalog_bytes.decode("utf-8"), str(path), "exec"), ns)
     ns["validate_catalog"]()
-    if digest(path) != EXPECTED_CATALOG:
-        raise SystemExit("product_catalog.py hash mismatch")
     return ns["PRODUCTS"], ns["DOMAINS"]
 
 
@@ -83,7 +110,24 @@ def evidence_ids(row: dict) -> list[str]:
     return [item["evidence_id"] for item in items if isinstance(item, dict) and item.get("evidence_id")]
 
 
+def provenance_pointers(row: dict) -> list[dict]:
+    """Return the exact retained provenance identities behind a catalog row."""
+
+    pointers = []
+    for item in row.get("provenance") or []:
+        if not isinstance(item, dict):
+            continue
+        pointers.append({
+            "provenance_id": item.get("provenance_id"),
+            "content_sha256": item.get("content_sha256"),
+            "locator": item.get("locator"),
+            "observed_at": item.get("observed_at"),
+        })
+    return pointers
+
+
 def pointer(row: dict) -> dict:
+    provenance = provenance_pointers(row)
     return {
         "record_id": row["record_id"],
         "source_id": source_id(row),
@@ -91,8 +135,14 @@ def pointer(row: dict) -> dict:
         "title": row["title"],
         "authoritative_url": row.get("authoritative_url"),
         "evidence_ids": evidence_ids(row),
+        "provenance_ids": [item["provenance_id"] for item in provenance if item.get("provenance_id")],
+        "provenance": provenance,
         "shard": row["_shard"],
+        "shard_sha256": row.get("_shard_sha256") or SHARD_HASHES.get(row["_shard"]),
         "line": row["_line"],
+        # This is the SHA-256 of the exact UTF-8 JSON record bytes, excluding
+        # the JSONL line terminator.  It complements the immutable shard hash.
+        "record_sha256": row.get("_record_sha256"),
     }
 
 
@@ -118,7 +168,9 @@ def load_rows(repo: Path):
             if line.strip():
                 rec = json.loads(line)
                 rec["_shard"] = name
+                rec["_shard_sha256"] = expected
                 rec["_line"] = line_no
+                rec["_record_sha256"] = hashlib.sha256(line.encode("utf-8")).hexdigest()
                 rows.append(rec)
     return rows, shard_info, corpus
 
@@ -140,32 +192,109 @@ def census_family(ds: str) -> str:
     return YEAR_SUFFIX.sub("YEAR", ds)
 
 
-def related_census(target_ds, census_ds, representative_id):
+def candidate_relation(
+    row: dict,
+    representative_id: str,
+    representative_source_id: str,
+    inferred_relation: str,
+    inference_basis: dict,
+) -> dict | None:
+    """Build an explicitly unresolved, source-scoped relation candidate."""
+
+    # Naming heuristics cannot cross source boundaries.  Silently excluding a
+    # mismatched row keeps a candidate relation from becoming an identity claim.
+    if source_id(row) != representative_source_id:
+        return None
+    candidate = pointer(row)
+    candidate.update({
+        "representative_record_id": representative_id,
+        "relation": f"candidate_{inferred_relation}",
+        "relation_state": "candidate",
+        "inference_basis": inference_basis,
+        "publisher_relationship_identity": None,
+        "canonical_merge_allowed": False,
+        "release_binding_allowed": False,
+        "scientific_interchangeability": "unresolved",
+    })
+    return candidate
+
+
+def related_census(target_ds, census_ds, representative_id, representative_source_id=None):
     family = census_family(target_ds)
     out = []
+    if representative_source_id is None:
+        representative_source_id = next(
+            (
+                source_id(row)
+                for group in census_ds.values()
+                for row in group
+                if row["record_id"] == representative_id
+            ),
+            None,
+        )
+    if representative_source_id is None:
+        return out
     for ds, group in sorted(census_ds.items()):
         if census_family(ds) != family:
             continue
         for row in sorted(group, key=lambda item: item["record_id"]):
             if row["record_id"] != representative_id:
-                out.append({
-                    "record_id": row["record_id"],
-                    "native_id": native_id(row),
-                    "dataset_id": ds,
-                    "title": row["title"],
-                    "relation": "annual_variant",
-                })
+                candidate = candidate_relation(
+                    row,
+                    representative_id,
+                    representative_source_id,
+                    "annual_variant",
+                    {
+                        "method": "census_dataset_year_suffix",
+                        "rule": "Dataset identifiers share the same value after stripping a terminal four-digit year.",
+                        "target_dataset_id": target_ds,
+                        "candidate_dataset_id": ds,
+                        "normalized_family": family,
+                        "source_identity_rule": "Candidate and representative source_id must match exactly.",
+                    },
+                )
+                if candidate is not None:
+                    candidate["dataset_id"] = ds
+                    out.append(candidate)
     return out
 
 
-def related_by_title_prefix(rows, prefix, representative_id, gis_relation="gis_redistribution", other_relation="annual_or_geography_variant"):
+def related_by_title_prefix(
+    rows,
+    prefix,
+    representative_id,
+    representative_source_id=None,
+    gis_relation="gis_redistribution",
+    other_relation="annual_or_geography_variant",
+):
     out = []
+    if representative_source_id is None:
+        representative_source_id = next(
+            (source_id(row) for row in rows if row["record_id"] == representative_id),
+            None,
+        )
+    if representative_source_id is None:
+        return out
     for row in rows:
         title = row["title"]
         if not title.startswith(prefix) or row["record_id"] == representative_id:
             continue
         relation = gis_relation if "GIS Friendly Format" in title else other_relation
-        out.append({"record_id": row["record_id"], "native_id": native_id(row), "title": title, "relation": relation})
+        candidate = candidate_relation(
+            row,
+            representative_id,
+            representative_source_id,
+            relation,
+            {
+                "method": "title_prefix",
+                "rule": "Candidate title starts with the declared prefix; GIS wording only refines the candidate label.",
+                "title_prefix": prefix,
+                "inferred_relation": relation,
+                "source_identity_rule": "Candidate and representative source_id must match exactly.",
+            },
+        )
+        if candidate is not None:
+            out.append(candidate)
     return sorted(out, key=lambda item: item["record_id"])
 
 
@@ -184,12 +313,15 @@ def resolve_product(product, rows, cms_title, cdc_native, census_ds):
         if not matches:
             failed = {"reason": "cdc_native_not_found", "source_id": spec["source_id"]}
         if product["product_key"] == "cdc-places-local-data-for-better-health" and matches:
-            related = related_by_title_prefix(rows, "PLACES:", representative(matches)["record_id"])
+            rep = representative(matches)
+            related = related_by_title_prefix(rows, "PLACES:", rep["record_id"], source_id(rep))
         if product["product_key"] == "cdc-nonmedical-factor-measures-county-acs" and matches:
+            rep = representative(matches)
             related = related_by_title_prefix(
                 rows,
                 "Non-Medical Factor Measures",
-                representative(matches)["record_id"],
+                rep["record_id"],
+                source_id(rep),
                 other_relation="geography_distribution",
             )
         if product["product_key"] == "hhs-aspe-social-vulnerability-index":
@@ -199,7 +331,8 @@ def resolve_product(product, rows, cms_title, cdc_native, census_ds):
         if not matches:
             failed = {"reason": "census_dataset_not_found", "dataset_id": spec["dataset_id"]}
         elif matches:
-            related = related_census(spec["dataset_id"], census_ds, representative(matches)["record_id"])
+            rep = representative(matches)
+            related = related_census(spec["dataset_id"], census_ds, rep["record_id"], source_id(rep))
     elif kind == "intake":
         intake = {
             "intake_task": spec["intake_task"],
@@ -228,7 +361,7 @@ def resolve_product(product, rows, cms_title, cdc_native, census_ds):
         "match_count": len(matches),
         "representative": None if not matches else pointer(representative(matches)),
         "duplicate_group": None if len(matches) <= 1 else [pointer(row) for row in sorted(matches, key=lambda item: item["record_id"])],
-        "related_releases": related,
+        "related_candidates": related,
         "intake": intake,
         "failed_selector": failed,
         "unresolved_identity_limits": limits,
@@ -290,7 +423,7 @@ def build_payload(repo: Path) -> dict:
         "commit_id": "C-002-1",
         "status": "partial_C1_complete",
         "pending": ["C-002-2", "C-002-3"],
-        "claim_boundary": "C-002-1 freezes product identities, representative catalog anchors or named intake tasks, and the exact 3434-record baseline identity set. It does not freeze tasks, acceptance rows, or MRF 25/10 pilots. Access expectation is not payload proof. R01-R16 are not accepted on this artifact.",
+        "claim_boundary": "C-002-1 freezes product identities, representative catalog anchors or named intake tasks, and the exact 3434-record baseline identity set. It does not select the MRF 25/10 entities; C-002-3 must freeze those candidate IDs before endpoint results, and PR-046/PR-049 consume them without replacement. Access expectation is not payload proof. R01-R16 are not accepted on this artifact.",
         "base": {
             "sha": EXPECTED_BASE,
             "pr001_producer_sha": EXPECTED_PRODUCER,
@@ -314,6 +447,7 @@ def build_payload(repo: Path) -> dict:
             "contribution": "Recovered the retained 100-product declaration without reconstructing product rows. Temporary probes from the failed run are not part of this commit.",
         },
         "domains": list(domains),
+        "mrf_selection": json.loads(json.dumps(MRF_SELECTION_CONTRACT)),
         "products": products,
         "baseline_records": baseline,
         "resolution": {

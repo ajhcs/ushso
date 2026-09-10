@@ -2,9 +2,14 @@
   "format": "ushso.pr-handoff.v1",
   "pr_id": "PR-002",
   "status": "partial_C1_complete",
+  "correction_status": "implemented_pending_independent_review",
   "pending": ["C-002-2", "C-002-3"],
   "owner": "Grok",
   "reviewer": "Astra",
+  "implementation_authorship": {
+    "c0021_producer": "Grok",
+    "c0021_review_correction": "Luna Max"
+  },
   "provider": "grok",
   "actual_model": "grok-4",
   "author_provider_envelope": "grok-4",
@@ -12,8 +17,33 @@
   "assignment_id": "grok-c1-recovery",
   "base_sha": "83f7d1bad39acb6a7eede95a404179c511296efa",
   "base_tree": "691d0a375144bd9d215988d7f70c604af505abf9",
+  "correction_base_sha": "44506be8052e1054641048de68893fc41526b664",
+  "correction_base_tree": "e7b12a01b49ab66c5f5205f3b14407da30804e46",
   "head_sha": null,
-  "head_sha_note": "This C-002-1 packet does not self-identify a final commit hash. Root binds the actual head and tree after the commit lands.",
+  "head_sha_note": "The original Grok producer head is preserved below. This additive correction cannot self-identify its own final commit hash; root binds the corrected head and tree with an external review receipt.",
+  "review_correction": {
+    "kind": "unplanned_additive_review_correction",
+    "reviewed_head_before_correction": "44506be8052e1054641048de68893fc41526b664",
+    "reviewed_tree_before_correction": "e7b12a01b49ab66c5f5205f3b14407da30804e46",
+    "review_context_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-controller-review/review-44506be.json",
+    "review_context_sha256": "af6cb7a54bfb339911825d663b5528477c29e60d40efb0973eeaad03d6b3ecc0",
+    "command_event_extract_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-controller-review/grok-command-events.json",
+    "command_event_extract_sha256": "73ab92009e149cd0ccf6bf793a22d7447ca705b2a0c7802c700a32ce43dff306",
+    "findings_addressed": [
+      "C1-RELATION-EVIDENCE",
+      "C1-MRF-FREEZE-ORDER",
+      "C1-COMMAND-TIMES",
+      "C1-REPLAY-OUTPUT"
+    ],
+    "preserved_original_handoff": {
+      "path": "docs/research-program/handoffs/PR-002.json",
+      "commit": "44506be8052e1054641048de68893fc41526b664",
+      "git_blob_sha": "dc86e1499aa7be997599a8e3de967cb3c80a1798",
+      "sha256": "08140c4cc3af1fb77958554422cebc5400a0aa184a13efbd5beb25753f348d45",
+      "state": "invalid_historical_evidence",
+      "reason": "The original handoff used a rounded source-copy time that preceded the captured recovery dispatch and rounded later command times without identifying them as estimates. Git history preserves those original bytes; this correction records the captured event extract and external replay instead."
+    }
+  },
   "dependency_merge_shas": {
     "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8"
   },
@@ -32,16 +62,33 @@
     "verification/research-program/pr-002/product_catalog.py",
     "verification/research-program/pr-002/verify.py"
   ],
-  "problem": "PR-002 C-002-1 identities were not frozen. Predecessor run ushso-pr002-cohort-freeze-20260910 reached a 100-product declaration then failed with no commit.",
-  "resulting_behavior": "One C-002-1 packet defines the 100-product cohort across ten domains, binds representative catalog anchors or named intake tasks, and seeds all 3434 baseline record IDs. C-002-2/C-002-3, task labels, acceptance.md, and MRF 25/10 selection are not in this commit. R01-R16 are not accepted.",
+  "correction_changed_files": [
+    "docs/research-program/handoffs/PR-002.json",
+    "evaluation/research-program/cohorts.json",
+    "verification/research-program/pr-002/c1-build-receipt.json",
+    "verification/research-program/pr-002/c1-verify-receipt.json",
+    "verification/research-program/pr-002/c1_lib.py",
+    "verification/research-program/pr-002/test_c1_corrections.py",
+    "verification/research-program/pr-002/verify.py"
+  ],
+  "problem": "PR-002 C-002-1 identities were not frozen. Predecessor run ushso-pr002-cohort-freeze-20260910 reached a 100-product declaration then failed with no commit; the recovered producer packet also needed bounded corrections for heuristic relation labels, MRF freeze ordering, command timing evidence, and replay receipt integrity.",
+  "resulting_behavior": "One C-002-1 packet defines the same 100-product cohort across ten domains, binds the same representative catalog anchors or named intake tasks, and seeds the same 3434 baseline record IDs. Naming-based annual/GIS/geography matches are source-scoped candidate relations with exact record/shard/hash/provenance pointers, unresolved publisher relationship identity, and no merge/release/scientific interchangeability permission. The MRF contract requires C-002-3 to freeze 25 hospital and 10 payer candidate IDs before endpoint results; PR-046/PR-049 consume those IDs without replacement, while actual IDs remain pending. Verifier replay is read-only unless --receipt-output is supplied. C-002-2, C-002-3, task labels, acceptance.md, and R01-R16 acceptance remain pending.",
   "commits": [
     {
       "id": "C-002-1",
-      "sha": null,
+      "sha": "44506be8052e1054641048de68893fc41526b664",
       "parent": "83f7d1bad39acb6a7eede95a404179c511296efa",
-      "tree": null,
+      "tree": "e7b12a01b49ab66c5f5205f3b14407da30804e46",
       "subject": "docs(research): define cohort identities (PR-002 C-002-1)",
-      "identity_convention": "Imperative docs(research) subject plus (PR-002 C-002-1), matching PR-001 producer commits. Root records the resulting sha/tree."
+      "identity_convention": "Imperative docs(research) subject plus (PR-002 C-002-1), matching PR-001 producer commits. This is the preserved Grok producer head before the additive review correction."
+    },
+    {
+      "id": "C1-REVIEW-CORRECTION",
+      "sha": null,
+      "parent": "44506be8052e1054641048de68893fc41526b664",
+      "tree": null,
+      "subject": "docs(research): correct C-002-1 evidence boundaries (review correction)",
+      "identity_convention": "One unplanned additive correction; root records the resulting sha/tree and external review receipt after the commit lands. It does not replace C-002-1 or implement C-002-2/C-002-3."
     }
   ],
   "source_identities": [
@@ -57,6 +104,18 @@
     {
       "kind": "pr001_merge",
       "sha": "035465f3f16d15f02467679d96451d4440a36ca8"
+    },
+    {
+      "kind": "c0021_producer_head_before_correction",
+      "sha": "44506be8052e1054641048de68893fc41526b664",
+      "tree": "e7b12a01b49ab66c5f5205f3b14407da30804e46",
+      "authorship": "Grok"
+    },
+    {
+      "kind": "c0021_correction_base",
+      "sha": "44506be8052e1054641048de68893fc41526b664",
+      "tree": "e7b12a01b49ab66c5f5205f3b14407da30804e46",
+      "authorship": "Luna Max"
     },
     {
       "kind": "canonical_corpus",
@@ -94,35 +153,117 @@
   ],
   "commands": [
     {
-      "command": "sha256sum /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-grok-partial/product_catalog.py && cp -a that file to verification/research-program/pr-002/product_catalog.py",
-      "exit_code": 0,
-      "observed_at": "2026-09-10T17:33:00Z",
-      "result": "Retained catalog SHA256 5183f7ac32aeaaa0402965c9658ca1e048ebcbaea18a57cc20a542850e222684, 73829 bytes; copy matched."
+      "command": "python3 -c ...; python3 -c ...; mkdir -p ...; cp -a /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-grok-partial/product_catalog.py verification/research-program/pr-002/product_catalog.py; python3 -c ...",
+      "started_at": "2026-09-10T17:40:08.490Z",
+      "completed_at": "2026-09-10T17:40:08.749Z",
+      "exit_code": null,
+      "completion_status": "provider_completed_numeric_exit_unavailable",
+      "event_source": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-controller-review/grok-command-events.json",
+        "sha256": "73ab92009e149cd0ccf6bf793a22d7447ca705b2a0c7802c700a32ce43dff306",
+        "source_lines": [872, 880]
+      },
+      "result": "The captured command output reports tree 691d0a375144bd9d215988d7f70c604af505abf9, corpus.json SHA256 56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633, and unchanged product_catalog.py SHA256 5183f7ac32aeaaa0402965c9658ca1e048ebcbaea18a57cc20a542850e222684 (73829 bytes)."
     },
     {
       "command": "python3 verification/research-program/pr-002/build.py --repo .",
-      "exit_code": 0,
-      "observed_at": "2026-09-10T17:43:00Z",
-      "result": "Wrote cohorts.json SHA256 3d50afef67780b131d6a2556ada07021510ffe7dd7107d4d539381e5a4e5d1fe; 100 products; 3434 baseline IDs; failed_selectors []; cms_duplicate_title_groups []; selectors 63/13/10/14."
+      "started_at": "2026-09-10T17:43:48.416Z",
+      "completed_at": "2026-09-10T17:43:48.997Z",
+      "exit_code": null,
+      "completion_status": "provider_completed_numeric_exit_unavailable",
+      "event_source": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-controller-review/grok-command-events.json",
+        "sha256": "73ab92009e149cd0ccf6bf793a22d7447ca705b2a0c7802c700a32ce43dff306",
+        "source_lines": [1206, 1214]
+      },
+      "result": "The captured command output reports the producer rebuild: 100 products, 3434 baseline IDs, no failed or unsupported selectors, selector counts 63/13/10/14, and producer cohorts SHA256 3d50afef67780b131d6a2556ada07021510ffe7dd7107d4d539381e5a4e5d1fe. The corrected rebuild later produces the new artifact hash recorded below."
     },
     {
       "command": "python3 verification/research-program/pr-002/verify.py --repo .",
-      "exit_code": 0,
-      "observed_at": "2026-09-10T17:44:56Z",
-      "result": "All C-002-1 identity checks passed against local shards and the rebuilt payload."
+      "started_at": "2026-09-10T17:43:55.883Z",
+      "completed_at": "2026-09-10T17:43:56.995Z",
+      "exit_code": null,
+      "completion_status": "provider_completed_numeric_exit_unavailable",
+      "event_source": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-controller-review/grok-command-events.json",
+        "sha256": "73ab92009e149cd0ccf6bf793a22d7447ca705b2a0c7802c700a32ce43dff306",
+        "source_lines": [1240, 1248]
+      },
+      "result": "The captured provider output reports ok=true and no failed checks for the original C-002-1 verifier. A root replay independently recorded numeric exit 0 below; this correction's explicit-output replay is recorded after the corrected build."
     },
     {
-      "command": "python3 -m py_compile verification/research-program/pr-002/*.py && python3 -m json.tool evaluation/research-program/cohorts.json >/dev/null && python3 -m json.tool verification/research-program/pr-002/c1-build-receipt.json >/dev/null && python3 -m json.tool verification/research-program/pr-002/c1-verify-receipt.json >/dev/null",
+      "command": "python3 -B /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-controller-review/producer-replay/verify.py --repo /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-pr002-c1-recovery--grok-c1-recovery-7c8a9fe5dfc7-d648775d",
+      "started_at": "2026-09-10T17:51:22.227261+00:00",
+      "completed_at": "2026-09-10T17:51:22.998660+00:00",
       "exit_code": 0,
-      "observed_at": "2026-09-10T17:44:56Z",
-      "result": "Python compile and JSON parse succeeded."
+      "completion_status": "independent_root_replay_passed",
+      "event_source": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-controller-review/review-44506be.json",
+        "sha256": "af6cb7a54bfb339911825d663b5528477c29e60d40efb0973eeaad03d6b3ecc0"
+      },
+      "result": "The exact producer verifier/library/catalog/build-receipt replay passed against the unchanged producer head/tree. Its scratch copy avoided overwriting producer receipts; this review correction preserves that behavior by default."
     }
   ],
+  "correction_checks": {
+    "agentctl_task_id": "ushso-pr002-c1-corrections-20260910-luna-max",
+    "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c1-corrections-20260910-luna-max/events.jsonl",
+    "records": [
+      {
+        "command_id": "cmd-0001-9bab24b8",
+        "command": "python3 -B -c <compile c1_lib.py, build.py, verify.py>",
+        "started_at": "2026-09-10T18:13:23.988Z",
+        "completed_at": "2026-09-10T18:13:24.027Z",
+        "exit_code": 0,
+        "result": "syntax_ok"
+      },
+      {
+        "command_id": "cmd-0002-b69a319e",
+        "command": "python3 verification/research-program/pr-002/build.py --repo .",
+        "started_at": "2026-09-10T18:13:24.213Z",
+        "completed_at": "2026-09-10T18:13:24.758Z",
+        "exit_code": 0,
+        "result": "corrected cohort rebuilt"
+      },
+      {
+        "command_id": "cmd-0006-fa1742fd",
+        "command": "python3 -B verification/research-program/pr-002/test_c1_corrections.py",
+        "started_at": "2026-09-10T18:21:33.132Z",
+        "completed_at": "2026-09-10T18:21:33.179Z",
+        "exit_code": 0,
+        "result": "relation/source and catalog hash-before-exec adversarial fixtures passed"
+      },
+      {
+        "command_id": "cmd-0008-5f859eaf",
+        "command": "python3 -c <run verification/research-program/pr-002/verify.py --repo . and compare producer receipt>",
+        "started_at": "2026-09-10T18:23:22.978Z",
+        "completed_at": "2026-09-10T18:23:23.948Z",
+        "exit_code": 0,
+        "result": "read-only replay preserved the producer receipt and created no __pycache__"
+      },
+      {
+        "command_id": "cmd-0009-00febd49",
+        "command": "python3 -B -c <compare corrected cohort identities with 44506be8052e1054641048de68893fc41526b664>",
+        "started_at": "2026-09-10T18:25:42.832Z",
+        "completed_at": "2026-09-10T18:25:42.904Z",
+        "exit_code": 0,
+        "result": "100 selected product identities and 3434 baseline IDs preserved"
+      },
+      {
+        "command_id": "cmd-0010-9e023190",
+        "command": "python3 -B verification/research-program/pr-002/verify.py --repo . --receipt-output verification/research-program/pr-002/c1-verify-receipt.json",
+        "started_at": "2026-09-10T18:27:21.480Z",
+        "completed_at": "2026-09-10T18:27:22.397Z",
+        "exit_code": 0,
+        "result": "explicit corrected producer receipt refreshed"
+      }
+    ]
+  },
   "artifacts": [
     {
       "path": "evaluation/research-program/cohorts.json",
-      "sha256": "3d50afef67780b131d6a2556ada07021510ffe7dd7107d4d539381e5a4e5d1fe",
-      "bytes": 1945622
+      "sha256": "479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4",
+      "bytes": 2336377,
+      "status": "corrected_C1_artifact"
     },
     {
       "path": "verification/research-program/pr-002/product_catalog.py",
@@ -131,7 +272,8 @@
     },
     {
       "path": "verification/research-program/pr-002/c1_lib.py",
-      "sha256": "78686945af30f7dd8295d41b2102e30f8cf5f47578aa887094f32cd59cdf9adb"
+      "sha256": "aa08124fd563fde08d0a0136c526b0c359f0d6233f58da62457ee5557f09910d",
+      "status": "corrected_C1_artifact"
     },
     {
       "path": "verification/research-program/pr-002/build.py",
@@ -139,22 +281,36 @@
     },
     {
       "path": "verification/research-program/pr-002/verify.py",
-      "sha256": "9cba929fd5d973df6475fb02225f3d3f6a879c9b18b7f46e56aadb7688d397e2"
+      "sha256": "5537f1a6071f876149689d484495486ca42a5421715f226dab5c598ece49b6bb",
+      "status": "corrected_C1_artifact"
     },
     {
       "path": "verification/research-program/pr-002/c1-build-receipt.json",
-      "sha256": "2ba397df272e68495111a2fb1a6e93daa7be68136ffbf12a68bd31bb335d2acc"
+      "sha256": "857750c9536aa1f34a8b8b70ce9e463c912b13ca7f386fc6fc2e1e90a7ef8f6d",
+      "status": "corrected_C1_artifact"
     },
     {
       "path": "verification/research-program/pr-002/c1-verify-receipt.json",
-      "sha256": "5c5dbf00063d08f36250b4bd53b82e45ccd15240b672f47b307cc2d312b1a7f9"
+      "sha256": "ec9aad31a65464ac3224a80930d548c2069fd5a4ebf80626e62495eea48a0244",
+      "status": "corrected_C1_artifact",
+      "receipt_mode": "explicit_output"
+    },
+    {
+      "path": "verification/research-program/pr-002/test_c1_corrections.py",
+      "sha256": "abdfcba89e915afa305d3cbc31d97f2e9b6c0afa02aeb1df98864532313ab012",
+      "status": "corrected_C1_adversarial_fixture"
     }
   ],
   "acceptance_results": [
     {
       "id": "C-002-1",
       "status": "producer_checked",
-      "result": "100 unique product keys, ten per domain; 86 catalog anchors resolve; 14 named intake tasks; 3434 unique baseline IDs with source_id and native_id; generation live-2026-09-03-85b50522b420 and catalog manifest 85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e bound; annual/GIS related releases recorded and not counted as extra products."
+      "result": "100 unique product keys, ten per domain; 86 catalog anchors resolve; 14 named intake tasks; 3434 unique baseline IDs with source_id and native_id; generation live-2026-09-03-85b50522b420 and catalog manifest 85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e bound; naming-based annual/GIS/geography matches remain candidate relations and are not counted as extra products."
+    },
+    {
+      "id": "C1-REVIEW-CORRECTION",
+      "status": "producer_checked_pending_independent_review",
+      "result": "185 naming-based relation candidates are source-scoped and carry exact record/shard/hash/evidence/provenance pointers, explicit inference basis, unresolved publisher relationship identity, and false canonical-merge/release-binding permissions. The MRF freeze contract requires 25 hospital and 10 payer candidate IDs before endpoint results and forbids PR-046/PR-049 replacement. Catalog integrity is checked before compile/exec; verifier replay is read-only unless --receipt-output is explicit."
     },
     {
       "id": "R01",
@@ -179,7 +335,7 @@
     {
       "id": "R10",
       "status": "not_accepted_on_C-002-1",
-      "result": "Hospital and payer MRF family entries are not the 25/10 pilot entities."
+      "result": "Hospital and payer MRF family entries are not the 25/10 pilot entities. C-002-3 remains pending and must freeze 25 hospital and 10 payer candidate IDs before endpoint results; PR-046/PR-049 must consume them without replacement."
     },
     {
       "id": "R12",
@@ -207,6 +363,11 @@
       "check": "C-002-2 task freeze, C-002-3 MRF/expansion, acceptance.md, push/PR/merge/deploy",
       "status": "skipped",
       "reason": "Bounded C1 recovery. Root arranges the remaining two planned commits after C1 review."
+    },
+    {
+      "check": "C1-RELATION-EVIDENCE, C1-MRF-FREEZE-ORDER, C1-COMMAND-TIMES, C1-REPLAY-OUTPUT",
+      "status": "corrected_pending_independent_review",
+      "reason": "The additive correction changes only C-002-1 evidence boundaries. Relation candidates are source scoped and unresolved; MRF IDs remain pending C-002-3; the original rounded timing record is retained as invalid historical evidence and replaced by the sanitized controller event extract plus root replay; verifier writes only when --receipt-output is supplied."
     }
   ],
   "unresolved_claims": [
@@ -231,22 +392,34 @@
       "evidence": "Locator strings are not fetched, available, or current."
     },
     {
+      "claim": "Naming-based related annual/GIS/geography records",
+      "state": "candidate_relation_unresolved",
+      "evidence": "The corrected related_candidates entries share source identity and retain record/shard/hash/evidence/provenance pointers, but title or dataset suffix evidence does not establish a publisher relationship, release binding, canonical merge, or scientific interchangeability."
+    },
+    {
+      "claim": "MRF pilot IDs",
+      "state": "pending_C-002-3_freeze",
+      "evidence": "The C-002-1 contract requires 25 hospital and 10 payer reporting-entity candidate IDs to be frozen before endpoint results; the IDs are intentionally absent until C-002-3 and PR-046/PR-049 cannot replace unavailable selections."
+    },
+    {
       "claim": "R01-R16 empirical targets",
       "state": "not_accepted",
       "evidence": "No requirement becomes accepted on this commit."
     }
   ],
-  "next_consumer": "Astra/controller, then C-002-2",
-  "next_action": "C2_C3_pending after C-002-1 independent review. Do not treat this as full PR-002 completion. Do not push, open PR, merge, or deploy from this packet.",
+  "next_consumer": "Astra/controller, then C-002-2 and C-002-3",
+  "next_action": "Root binds the additive correction to its exact commit/tree with an external review receipt, then C-002-2 and C-002-3 may proceed. Do not treat this as full PR-002 completion. Do not push, open PR, merge, or deploy from this packet.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
     "decisive_checks": [
-      "python3 verification/research-program/pr-002/verify.py --repo ."
+      "python3 -B verification/research-program/pr-002/verify.py --repo .",
+      "python3 -B verification/research-program/pr-002/verify.py --repo . --receipt-output /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-corrections/replay-receipt.json"
     ],
     "limitations": [
-      "Producer-checked C-002-1 identities only.",
-      "No task labels, acceptance document, MRF 25/10 selection, source endpoint tests, or payload retrieval."
+      "Producer-checked C-002-1 identities and bounded review correction only.",
+      "No task labels, acceptance document, actual MRF 25/10 IDs, source endpoint tests, or payload retrieval.",
+      "Independent reviewer must verify the corrected head/tree and preserve the historical invalid-handoff hash."
     ]
   }
 }

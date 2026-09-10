@@ -10,6 +10,9 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+# A read-only replay must not leave import bytecode in the candidate.  The
+# documented -B invocation provides a second, process-level guard.
+sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from c1_lib import (
     EXPECTED_BASE,
@@ -45,6 +48,11 @@ def ancestor(repo: Path, sha: str) -> bool:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", type=Path, required=True)
+    parser.add_argument(
+        "--receipt-output",
+        type=Path,
+        help="optional path for a replay receipt; omitted means read-only verification",
+    )
     args = parser.parse_args()
     repo = args.repo.resolve()
     checks: dict[str, bool] = {}
@@ -119,12 +127,52 @@ def main() -> int:
     checks["cms_titles_unique_in_corpus"] = written["resolution"]["cms_unique_titles_in_corpus"] == 159
     reps = [item["anchor"]["representative"]["record_id"] for item in resolved]
     checks["representative_unique"] = len(reps) == len(set(reps))
-    related_ids = {
-        rel["record_id"]
+    related = [
+        (item, item["anchor"]["representative"], candidate)
         for item in written["products"]
-        for rel in item["anchor"]["related_releases"]
-    }
+        for candidate in item["anchor"].get("related_candidates", [])
+    ]
+    related_ids = {candidate["record_id"] for _, _, candidate in related}
     checks["related_not_counted_as_products"] = related_ids.isdisjoint(set(reps))
+    checks["related_candidate_field"] = all(
+        "related_candidates" in item["anchor"] and "related_releases" not in item["anchor"]
+        for item in written["products"]
+    )
+    checks["related_candidate_source_identity"] = all(
+        representative is not None
+        and candidate["source_id"] == representative["source_id"]
+        and candidate["inference_basis"]["source_identity_rule"]
+        == "Candidate and representative source_id must match exactly."
+        for _, representative, candidate in related
+    )
+    checks["related_candidate_evidence_state"] = all(
+        candidate["relation"].startswith("candidate_")
+        and candidate["relation_state"] == "candidate"
+        and candidate["publisher_relationship_identity"] is None
+        and candidate["scientific_interchangeability"] == "unresolved"
+        and candidate["canonical_merge_allowed"] is False
+        and candidate["release_binding_allowed"] is False
+        and candidate["inference_basis"]
+        for _, _, candidate in related
+    )
+    checks["related_candidate_pointers"] = all(
+        candidate["record_id"]
+        and candidate["record_sha256"]
+        and candidate["shard"]
+        and candidate["shard_sha256"]
+        and candidate["line"]
+        and candidate["evidence_ids"]
+        and candidate["provenance_ids"]
+        and candidate["provenance"]
+        and all(
+            item["provenance_id"]
+            and item["content_sha256"]
+            and item["locator"]
+            and item["observed_at"]
+            for item in candidate["provenance"]
+        )
+        for _, _, candidate in related
+    )
     gis_reps = [
         item["product_key"]
         for item in resolved
@@ -135,9 +183,23 @@ def main() -> int:
         item["anchor"]["intake"]["locator_status"] == "unverified_locator" for item in intakes
     )
     checks["mrf_not_pilot"] = all(
-        "not the" in " ".join(item["anchor"]["unresolved_identity_limits"])
+        "candidate IDs before any endpoint result" in " ".join(item["anchor"]["unresolved_identity_limits"])
         for item in written["products"]
         if item["product_key"] in {"hospital-price-transparency-mrfs", "payer-transparency-in-coverage-mrfs"}
+    )
+    mrf_selection = written["mrf_selection"]
+    checks["mrf_freeze_order"] = (
+        mrf_selection["status"] == "pending_C-002-3"
+        and mrf_selection["selection_owner"] == "C-002-3"
+        and mrf_selection["freeze_before_endpoint_results"] is True
+        and mrf_selection["hospital_candidate_count"] == 25
+        and mrf_selection["payer_reporting_entity_candidate_count"] == 10
+        and mrf_selection["hospital_candidate_ids"] is None
+        and mrf_selection["payer_reporting_entity_candidate_ids"] is None
+        and mrf_selection["consumer_contract"]["hospital"]["pr"] == "PR-046"
+        and mrf_selection["consumer_contract"]["payer"]["pr"] == "PR-049"
+        and mrf_selection["consumer_contract"]["hospital"]["replacement_allowed"] is False
+        and mrf_selection["consumer_contract"]["payer"]["replacement_allowed"] is False
     )
     checks["r_not_accepted"] = all(
         value == "not_accepted_on_C-002-1" for value in written["acceptance"].values()
@@ -168,16 +230,29 @@ def main() -> int:
         "cohorts_sha256": out["cohorts_sha256"],
         "product_catalog_sha256": digest(catalog_path),
         "build_receipt_sha256": out["receipt_sha256"],
+        "related_candidate_count": len(related),
         "resolution": written["resolution"],
+        "mrf_selection": mrf_selection,
         "isolated_record_ids": isolated,
         "source_slices": dict(slices),
         "acceptance": written["acceptance"],
         "status": written["status"],
         "pending": written["pending"],
+        "receipt_mode": "explicit_output" if args.receipt_output else "read_only",
+        "receipt_output": str(args.receipt_output.resolve()) if args.receipt_output else None,
     }
-    verify_path = HERE / "c1-verify-receipt.json"
-    verify_path.write_text(json.dumps(verify_receipt, indent=2) + "\n", encoding="utf-8")
-    out["verify_receipt_sha256"] = digest(verify_path)
+    if args.receipt_output:
+        verify_path = args.receipt_output.resolve()
+        verify_path.parent.mkdir(parents=True, exist_ok=True)
+        verify_path.write_text(json.dumps(verify_receipt, indent=2) + "\n", encoding="utf-8")
+        out["verify_receipt_sha256"] = digest(verify_path)
+        out["receipt_output"] = str(verify_path)
+    else:
+        # Independent replay must not rewrite the producer receipt or dirty the
+        # candidate.  Use --receipt-output explicitly when a new receipt is
+        # intended, including when refreshing the producer artifact.
+        out["verify_receipt_sha256"] = None
+        out["receipt_output"] = None
     print(json.dumps({
         "ok": not failed_names,
         "failed_checks": failed_names,
@@ -191,6 +266,7 @@ def main() -> int:
         "source_slices": dict(slices),
         "head": head,
         "base": base,
+        "receipt_output": out["receipt_output"],
     }, indent=2))
     return 0 if not failed_names else 1
 
