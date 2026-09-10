@@ -136,28 +136,22 @@
   ],
   "commands": [
     {
-      "id": "cmd-c003-1-verify-schema-contract",
-      "command": "node verification/research-program/pr-003/verify-schema-contract.mjs",
+      "id": "cmd-c003-r1-provider-unavailable",
+      "command": "node scripts/research-program/check-handoff.mjs verification/research-program/pr-003/fixtures/handoff.valid.json",
       "started_at": "2026-09-10T23:30:00.000Z",
       "completed_at": "2026-09-10T23:30:00.300Z",
-      "exit_code": 0,
-      "completion_status": "observed_exit_0",
-      "expected": "exit 0 with the valid, expected-negative and unavailable fixtures accepted and each negative fixture rejected for its declared reason",
-      "actual": "exit 0 with all declared fixture outcomes and structured outcome checks satisfied",
-      "result": "The schema-contract check exercises explicit expected/observed outcomes, expected-negative nonzero exits, typed unavailability, duplicate IDs, empty evidence, source hashes and outcome mismatch rejection.",
+      "exit_code": null,
+      "completion_status": "unavailable",
+      "expected": "provider unavailable; preserve the typed limitation",
+      "actual": "provider unavailable; no numeric exit was invented",
+      "result": "The command record preserves a typed provider limitation with timestamps and an explicit matching unavailable outcome.",
       "expected_outcome": {
-        "kind": "observed_exit",
-        "exit_code": 0
+        "kind": "unavailable",
+        "detail": "Provider execution was unavailable in this bounded replay; no numeric exit was invented."
       },
       "observed_outcome": {
-        "kind": "observed_exit",
-        "exit_code": 0
-      },
-      "event_source": {
-        "id": "receipt-c003-1-verify-schema-contract",
-        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-1-verify-schema-contract.json",
-        "sha256": "d88316ba05c2b57fdb5d2c4e71a9e14a8350b7f2444440e5281fc5ff59a5daa8",
-        "bytes": 2323
+        "kind": "unavailable",
+        "detail": "Provider execution was unavailable in this bounded replay; no numeric exit was invented."
       }
     }
   ],
@@ -183,7 +177,7 @@
     {
       "id": "artifact-checker",
       "path": "scripts/research-program/check-handoff.mjs",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "babae986f91a1e42c2f22d0cf79b34dda40d6a0f2b0e7b4fca6e9f7c4d969538",
       "bytes": 46846
     },
     {
@@ -213,22 +207,13 @@
   ],
   "acceptance_results": [
     {
-      "id": "C-003-1-R1/C-003-2-R1",
+      "id": "typed-unavailable-correction-check",
       "status": "producer_checked",
-      "result": "Producer-side correction checks exercise complete structured evidence and reject incomplete, contradictory, duplicate, unbound or escaping records.",
+      "result": "A typed unavailable outcome is retained with explicit provider limitation detail.",
       "command_ids": [
-        "cmd-c003-1-verify-schema-contract"
+        "cmd-c003-r1-provider-unavailable"
       ],
-      "artifact_ids": [
-        "artifact-task-schema",
-        "artifact-handoff-schema",
-        "artifact-schema-readme",
-        "artifact-checker",
-        "artifact-focused-test",
-        "artifact-schema-contract-checker",
-        "artifact-task-binding",
-        "artifact-schema-contract-receipt"
-      ]
+      "artifact_ids": []
     }
   ],
   "failures_and_skipped_checks": [],

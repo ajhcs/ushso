@@ -30,6 +30,8 @@ export const SUCCESS_ACCEPTANCE_STATES = new Set([
 
 export const CASES = [
   { id: 'valid', file: 'handoff.valid.json', expectRejected: false },
+  { id: 'valid-expected-negative', file: 'handoff.valid-expected-negative.json', expectRejected: false },
+  { id: 'valid-unavailable', file: 'handoff.valid-unavailable.json', expectRejected: false },
   {
     id: 'reject-claimed-pass-without-command',
     file: 'handoff.reject-claimed-pass-without-command.json',
@@ -47,6 +49,30 @@ export const CASES = [
     file: 'handoff.reject-stale-dependency-sha.json',
     expectRejected: true,
     expectedReason: /stale_dependency_sha/
+  },
+  {
+    id: 'reject-nonzero-success',
+    file: 'handoff.reject-nonzero-success.json',
+    expectRejected: true,
+    expectedReason: /command_outcome_mismatch/
+  },
+  {
+    id: 'reject-duplicate-command',
+    file: 'handoff.reject-duplicate-command.json',
+    expectRejected: true,
+    expectedReason: /duplicate_command_id/
+  },
+  {
+    id: 'reject-empty-evidence',
+    file: 'handoff.reject-empty-evidence.json',
+    expectRejected: true,
+    expectedReason: /minItems/
+  },
+  {
+    id: 'reject-source-hash-omitted',
+    file: 'handoff.reject-source-hash-omitted.json',
+    expectRejected: true,
+    expectedReason: /required/
   }
 ];
 
@@ -79,71 +105,74 @@ function formatAjvErrors(validate) {
  */
 export function crossReferenceErrors(task, handoff) {
   const errors = [];
-
-  if (handoff.pr_id !== task.pr_id) {
-    errors.push(`pr_id_mismatch: handoff ${handoff.pr_id} != task ${task.pr_id}`);
-  }
+  if (handoff.pr_id !== task.pr_id) errors.push(`pr_id_mismatch: handoff ${handoff.pr_id} != task ${task.pr_id}`);
 
   const taskBase = task?.binding?.base_sha;
-  if (handoff.base_sha !== taskBase) {
-    errors.push(`stale_base_sha: handoff ${handoff.base_sha} != task binding ${taskBase}`);
-  }
+  if (handoff.base_sha !== taskBase) errors.push(`stale_base_sha: handoff ${handoff.base_sha} != task binding ${taskBase}`);
 
   const expectedDeps = task?.binding?.dependency_merge_shas ?? {};
   const actualDeps = handoff.dependency_merge_shas ?? {};
   for (const [prId, sha] of Object.entries(actualDeps)) {
-    if (!(prId in expectedDeps)) {
-      errors.push(`unexpected_dependency: ${prId} not declared by the task binding`);
-    } else if (expectedDeps[prId] !== sha) {
-      errors.push(`stale_dependency_sha: ${prId} expected ${expectedDeps[prId]} got ${sha}`);
-    }
+    if (!(prId in expectedDeps)) errors.push(`unexpected_dependency: ${prId} not declared by the task binding`);
+    else if (expectedDeps[prId] !== sha) errors.push(`stale_dependency_sha: ${prId} expected ${expectedDeps[prId]} got ${sha}`);
   }
   for (const prId of Object.keys(expectedDeps)) {
-    if (!(prId in actualDeps)) {
-      errors.push(`missing_dependency_sha: ${prId} missing from the handoff`);
+    if (!(prId in actualDeps)) errors.push(`missing_dependency_sha: ${prId} missing from the handoff`);
+  }
+
+  const commands = new Map();
+  for (const command of handoff.commands ?? []) {
+    if (commands.has(command.id)) errors.push(`duplicate_command_id: ${command.id}`);
+    else commands.set(command.id, command);
+    const expected = command.expected_outcome;
+    const observed = command.observed_outcome;
+    if (!expected || !observed) errors.push(`command_outcome_missing: ${command.id}`);
+    else if (expected.kind !== observed.kind || (expected.kind === 'observed_exit' && expected.exit_code !== observed.exit_code)) {
+      errors.push(`command_outcome_mismatch: ${command.id}`);
     }
   }
 
-  const commands = new Map((handoff.commands ?? []).map(entry => [entry.id, entry]));
-  const artifacts = new Map((handoff.artifacts ?? []).map(entry => [entry.id, entry]));
+  const artifacts = new Map();
+  for (const artifact of handoff.artifacts ?? []) {
+    if (artifacts.has(artifact.id)) errors.push(`duplicate_artifact_id: ${artifact.id}`);
+    else artifacts.set(artifact.id, artifact);
+  }
+  for (const command of handoff.commands ?? []) {
+    const artifact = command.event_source;
+    if (!artifact) continue;
+    if (artifacts.has(artifact.id)) errors.push(`duplicate_artifact_id: ${artifact.id}`);
+    else artifacts.set(artifact.id, artifact);
+  }
 
   for (const result of handoff.acceptance_results ?? []) {
     const commandIds = result.command_ids ?? [];
     if (SUCCESS_ACCEPTANCE_STATES.has(result.status)) {
-      if (commandIds.length === 0) {
-        errors.push(`claimed_pass_without_command_result: ${result.id} has no command_ids`);
-      }
+      if (commandIds.length === 0) errors.push(`claimed_pass_without_command_result: ${result.id} has no command_ids`);
       for (const commandId of commandIds) {
         const command = commands.get(commandId);
         if (!command) {
-          errors.push(
-            `claimed_pass_without_command_result: ${result.id} references unknown command ${commandId}`
-          );
+          errors.push(`claimed_pass_without_command_result: ${result.id} references unknown command ${commandId}`);
           continue;
         }
-        if (typeof command.result !== 'string' || command.result.trim() === '') {
-          errors.push(
-            `claimed_pass_without_command_result: ${result.id} command ${commandId} has no result`
-          );
+        const expected = command.expected_outcome;
+        const observed = command.observed_outcome;
+        if (!expected || !observed) {
+          errors.push(`claimed_pass_without_command_result: ${result.id} command ${commandId} has no complete structured outcome`);
+        } else if (!['observed_exit', 'unavailable'].includes(observed.kind)) {
+          errors.push(`success_claim_backed_by_non_success_outcome: ${result.id} command ${commandId} observed ${observed.kind}`);
+        } else if (expected.kind !== observed.kind || (expected.kind === 'observed_exit' && expected.exit_code !== observed.exit_code)) {
+          errors.push(`command_outcome_mismatch: ${result.id} command ${commandId}`);
         }
       }
     } else {
       for (const commandId of commandIds) {
-        if (!commands.has(commandId)) {
-          errors.push(
-            `unresolved_command_reference: ${result.id} references unknown command ${commandId}`
-          );
-        }
+        if (!commands.has(commandId)) errors.push(`unresolved_command_reference: ${result.id} references unknown command ${commandId}`);
       }
     }
-
     for (const artifactId of result.artifact_ids ?? []) {
-      if (!artifacts.has(artifactId)) {
-        errors.push(`missing_artifact: ${result.id} references unknown artifact ${artifactId}`);
-      }
+      if (!artifacts.has(artifactId)) errors.push(`missing_artifact: ${result.id} references unknown artifact ${artifactId}`);
     }
   }
-
   return errors;
 }
 

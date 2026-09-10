@@ -1,28 +1,42 @@
 #!/usr/bin/env node
-// PR-003 slice C-003-2 — bounded handoff-packet validator.
+// PR-003 slice C-003-2 plus integrity corrections C-003-2-R1 — bounded
+// handoff-packet validator.
 //
 // Usage:
 //   node scripts/research-program/check-handoff.mjs <handoff.json>
 //
 // It accepts exactly one handoff JSON path and then enforces:
-//   * path containment for the handoff, every artifact, every source identity
-//     and every changed file (lexical and symlink-resolved, always inside the
+//   * path containment for the handoff, every artifact (including nested
+//     command event-source records), every local source identity and every
+//     existing changed file (lexical and symlink-resolved, always inside the
 //     repository root);
-//   * file existence for every referenced local artifact and source identity;
-//   * SHA-256 (and byte-length, when declared) binding for every artifact and
-//     every repository-path source identity;
-//   * dependency SHA matching against the committed task binding (a sibling
-//     task-binding.json, when present) and the committed execution ledger;
-//   * local Git commit existence and dependency ancestry for base/dependency
-//     SHAs — never an invented commit;
-//   * the C-003-1 cross-reference rules: a claimed success needs a resolvable
-//     command result, artifact references must resolve, and success is never
-//     inferred from missing, stale, blocked, unavailable or unresolved data.
+//   * file existence and SHA-256 (and byte-length, when declared) binding for
+//     every referenced local artifact, event-source and local source identity;
+//   * explicit local vs external source identity (local requires a content
+//     hash; locality is not inferred from path punctuation);
+//   * unique command and artifact IDs (no silent Map last-write-wins);
+//   * structured expected/observed command outcomes: a success claim needs an
+//     observed outcome or explicit typed unavailability, and that outcome must
+//     match the explicit expected outcome. Expected-negative checks may exit
+//     nonzero. Completed observed_exit records need timestamps;
+//   * dependency SHA matching against a sibling or per-PR task-binding.json
+//     and the committed execution ledger;
+//   * a concrete base SHA from that task binding — a completed packet with
+//     only ledger dependency SHAs is unbound, not accepted;
+//   * local Git commit existence and ancestry for base, dependencies and any
+//     non-null head; head_sha null remains pending-head transport, not a
+//     synthetic commit;
+//   * status-specific evidence (completed packets cannot have empty evidence
+//     arrays or a null owner).
 //
 // Exit codes: 0 accepted, 1 rejected, 2 usage/operational error.
 // The validator is read-only: it writes no files and changes no repository
 // state. `ok:true` means the packet is complete and evidence-bound, not that
-// the work is independently verified.
+// the work is independently verified or scientifically accepted.
+//
+// PR-001.json and PR-002.json predate this contract and are not rewritten.
+// Historical C-003-1/2/3 receipts are preserved byte-for-byte and are not
+// re-presented as runs against this corrected validator.
 
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -35,17 +49,35 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 /** Repository root, derived from this script's location. */
 export const REPO_ROOT = path.resolve(HERE, '..', '..');
 
-export const FORMAT = 'ushso.pr003.c003-2.handoff-check.v1';
+export const FORMAT = 'ushso.pr003.c003-r1.handoff-check.v1';
 
-/** Acceptance states that assert success and therefore require a command result. */
+/** Acceptance states that assert success and therefore require a matching command outcome. */
 export const SUCCESS_ACCEPTANCE_STATES = new Set([
   'passed',
   'producer_checked',
   'independently_verified'
 ]);
 
+/** Handoff statuses that advertise a completed producer packet. */
+export const COMPLETED_PACKET_STATES = new Set([
+  'producer_checked',
+  'draft_pr',
+  'independently_verified',
+  'merged',
+  'integrated',
+  'qualified'
+]);
+
+/** Explicit typed non-execution / non-success command outcome kinds. */
+export const TYPED_COMMAND_OUTCOME_KINDS = new Set([
+  'observed_exit',
+  'unavailable',
+  'blocked',
+  'failed',
+  'unresolved'
+]);
+
 const SCHEMA_DIR = path.join(REPO_ROOT, 'docs', 'research-program', 'handoffs', 'schema');
-const LEDGER_PATH = path.join(REPO_ROOT, 'docs', 'research-program', 'execution-ledger.json');
 
 /** Stable check order for the typed report. */
 const CHECK_ORDER = [
@@ -56,6 +88,8 @@ const CHECK_ORDER = [
   'dependency_sha_binding',
   'base_sha_binding',
   'git_commit_binding',
+  'identifier_uniqueness',
+  'packet_evidence',
   'command_result_resolution',
   'artifact_reference_resolution',
   'artifact_path_containment',
@@ -93,6 +127,10 @@ function reportPath(repoRoot, abs) {
   const relative = path.relative(repoRoot, abs);
   if (relative === '') return '.';
   return isWithin(repoRoot, abs) ? toPosix(relative) : toPosix(abs);
+}
+
+function prSlug(prId) {
+  return String(prId).toLowerCase();
 }
 
 /**
@@ -253,71 +291,217 @@ function createReporter() {
   };
 }
 
+function isOutcomeObject(value) {
+  return value !== null && typeof value === 'object' && TYPED_COMMAND_OUTCOME_KINDS.has(value.kind);
+}
+
+/** Structured observed execution result; narrative fields are never parsed. */
+export function observedCommandOutcome(command) {
+  return isOutcomeObject(command?.observed_outcome) ? command.observed_outcome : null;
+}
+
+/** Structured expected execution result; narrative fields are never parsed. */
+export function expectedCommandOutcome(command) {
+  return isOutcomeObject(command?.expected_outcome) ? command.expected_outcome : null;
+}
+
+export function outcomesMatch(expected, observed) {
+  if (!expected || !observed || expected.kind !== observed.kind) return false;
+  if (expected.kind === 'observed_exit') {
+    return expected.exit_code === observed.exit_code;
+  }
+  return true;
+}
+
+function completionStatusOutcome(value) {
+  if (typeof value !== 'string') return null;
+  if (TYPED_COMMAND_OUTCOME_KINDS.has(value)) return { kind: value };
+  const match = /^observed_exit[_: ](-?\d+)$/.exec(value);
+  if (match) return { kind: 'observed_exit', exit_code: Number(match[1]) };
+  return null;
+}
+
+function hasNonEmptyTiming(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
+function collectDeclaredArtifacts(handoff) {
+  const items = [];
+  for (const artifact of handoff.artifacts ?? []) {
+    items.push({ source: `artifacts[${artifact.id}]`, artifact });
+  }
+  for (const command of handoff.commands ?? []) {
+    if (command?.event_source) {
+      items.push({
+        source: `commands[${command.id}].event_source`,
+        artifact: command.event_source
+      });
+    }
+  }
+  return items;
+}
+
+function perPrBindingCandidates(repoRoot, prId) {
+  const slug = prSlug(prId);
+  return [
+    {
+      source: 'per-pr-task-binding',
+      absolute: path.join(repoRoot, 'verification', 'research-program', slug, 'task-binding.json')
+    },
+    {
+      source: 'per-pr-fixture-task-binding',
+      absolute: path.join(
+        repoRoot,
+        'verification',
+        'research-program',
+        slug,
+        'fixtures',
+        'task-binding.json'
+      )
+    }
+  ];
+}
+
+async function readTaskBinding(filePath, repoRoot, validators, expectedPrId, reporter) {
+  const { fail } = reporter;
+  try {
+    const { value, sha256 } = await loadJsonWithSha(filePath);
+    const record = {
+      sourcePath: reportPath(repoRoot, filePath),
+      sha256,
+      value
+    };
+    if (!validators.validateTask(value)) {
+      fail(
+        'task_binding',
+        'task_binding_invalid',
+        `${record.sourcePath} failed task.schema.json: ${formatAjvErrors(validators.validateTask).join('; ')}`
+      );
+      return { ...record, ok: false };
+    }
+    if (value.pr_id !== expectedPrId) {
+      fail(
+        'task_binding',
+        'task_binding_pr_mismatch',
+        `task binding ${record.sourcePath} is for ${value.pr_id} but the handoff is ${expectedPrId}`
+      );
+      return { ...record, ok: false };
+    }
+    return { ...record, ok: true };
+  } catch (error) {
+    fail('task_binding', 'task_binding_unreadable', `cannot read ${reportPath(repoRoot, filePath)}: ${error.message}`);
+    return { ok: false, sourcePath: reportPath(repoRoot, filePath) };
+  }
+}
+
 /**
  * Resolve the authoritative task/binding records for a handoff.
  *
  * Precedence and cross-checks:
  *   1. a sibling `task-binding.json` next to the handoff (validated against
  *      task.schema.json) supplies the exact base SHA and dependency SHAs;
- *   2. the committed `docs/research-program/execution-ledger.json` supplies the
- *      dependency SHAs for the handoff's PR id (the protocol's dependency
- *      pointer store);
- *   3. when both exist they must agree, otherwise `binding_conflict`.
+ *   2. `verification/research-program/pr-NNN/task-binding.json`, then that
+ *      directory's `fixtures/task-binding.json` (per-PR, not a shared
+ *      docs/research-program/handoffs/task-binding.json);
+ *   3. the committed `docs/research-program/execution-ledger.json` supplies
+ *      dependency SHAs for the handoff's PR id;
+ *   4. when more than one authority exists they must agree, otherwise
+ *      `binding_conflict`. Ledger-only is not a concrete base binding.
  */
 async function resolveAuthorities(handoff, handoffDir, repoRoot, reporter, validators) {
   const { fail, markCheck, note } = reporter;
   const authorities = {
     task_binding: null,
+    task_bindings: [],
     execution_ledger: null
   };
+  const loaded = [];
+  const realRoot = await realpath(repoRoot);
 
-  const siblingCandidate = path.join(handoffDir, 'task-binding.json');
-  let sibling = null;
-  if (await existsAsFile(siblingCandidate)) {
+  async function loadCandidate(source, candidate) {
+    if (!(await existsAsFile(candidate))) return;
+    let candidateReal;
     try {
-      const { value, sha256 } = await loadJsonWithSha(siblingCandidate);
-      authorities.task_binding = {
-        source: 'sibling-task-binding',
-        path: reportPath(repoRoot, siblingCandidate),
-        sha256
-      };
-      if (!validators.validateTask(value)) {
-        fail(
-          'task_binding',
-          'task_binding_invalid',
-          `task-binding.json failed task.schema.json: ${formatAjvErrors(validators.validateTask).join('; ')}`
-        );
-      } else if (value.pr_id !== handoff.pr_id) {
-        fail(
-          'task_binding',
-          'task_binding_pr_mismatch',
-          `task binding is for ${value.pr_id} but the handoff is ${handoff.pr_id}`
-        );
-      } else {
-        sibling = value;
-      }
+      candidateReal = await realpath(candidate);
     } catch (error) {
-      fail('task_binding', 'task_binding_unreadable', `cannot read task-binding.json: ${error.message}`);
+      fail('task_binding', 'task_binding_unreadable', `${source}: ${error.code ?? error.message}`);
+      return;
+    }
+    if (!isWithin(realRoot, candidateReal)) {
+      fail('task_binding', 'task_binding_path_escapes_root_via_symlink', `${source} resolves outside the repository root`);
+      return;
+    }
+    if (loaded.some(entry => entry.realPath === candidateReal)) return;
+    const record = await readTaskBinding(candidate, repoRoot, validators, handoff.pr_id, reporter);
+    if (!record.ok) return;
+    loaded.push({
+      source,
+      binding: record.value.binding,
+      path: record.sourcePath,
+      sha256: record.sha256,
+      realPath: candidateReal
+    });
+  }
+
+  await loadCandidate('sibling-task-binding', path.join(handoffDir, 'task-binding.json'));
+  for (const candidate of perPrBindingCandidates(repoRoot, handoff.pr_id)) {
+    await loadCandidate(candidate.source, candidate.absolute);
+  }
+
+  if (loaded.length > 0) {
+    authorities.task_binding = {
+      source: loaded[0].source,
+      path: loaded[0].path,
+      sha256: loaded[0].sha256
+    };
+    authorities.task_bindings = loaded.map(entry => ({
+      source: entry.source,
+      path: entry.path,
+      sha256: entry.sha256
+    }));
+  }
+
+  for (let i = 1; i < loaded.length; i += 1) {
+    const first = loaded[0];
+    const other = loaded[i];
+    if (first.binding?.base_sha !== other.binding?.base_sha) {
+      fail(
+        'base_sha_binding',
+        'binding_conflict',
+        `${first.path} base_sha ${first.binding?.base_sha} disagrees with ${other.path} ${other.binding?.base_sha}`
+      );
+    }
+    if (
+      JSON.stringify(sortedDependencyEntries(first.binding?.dependency_merge_shas)) !==
+      JSON.stringify(sortedDependencyEntries(other.binding?.dependency_merge_shas))
+    ) {
+      fail(
+        'dependency_sha_binding',
+        'binding_conflict',
+        `${first.path} and ${other.path} disagree on dependency_merge_shas`
+      );
     }
   }
 
   let ledgerTask = null;
-  if (await existsAsFile(LEDGER_PATH)) {
+  const ledgerPath = path.join(repoRoot, 'docs', 'research-program', 'execution-ledger.json');
+  if (await existsAsFile(ledgerPath)) {
     try {
-      const { value, sha256 } = await loadJsonWithSha(LEDGER_PATH);
-      const tasks = Array.isArray(value.tasks) ? value.tasks : [];
-      ledgerTask = tasks.find(task => task.pr_id === handoff.pr_id) ?? null;
-      authorities.execution_ledger = {
-        path: reportPath(repoRoot, LEDGER_PATH),
-        sha256,
-        task_found: ledgerTask !== null
-      };
-      if (!ledgerTask) {
-        fail(
-          'task_binding',
-          'unknown_pr_in_execution_ledger',
-          `execution ledger has no task for ${handoff.pr_id}`
-        );
+      const ledgerReal = await realpath(ledgerPath);
+      if (!isWithin(realRoot, ledgerReal)) {
+        fail('task_binding', 'execution_ledger_path_escapes_root_via_symlink', 'execution ledger resolves outside the repository root');
+      } else {
+        const { value, sha256 } = await loadJsonWithSha(ledgerReal);
+        const tasks = Array.isArray(value.tasks) ? value.tasks : [];
+        ledgerTask = tasks.find(task => task.pr_id === handoff.pr_id) ?? null;
+        authorities.execution_ledger = {
+          path: reportPath(repoRoot, ledgerPath),
+          sha256,
+          task_found: ledgerTask !== null
+        };
+        if (!ledgerTask) {
+          fail('task_binding', 'unknown_pr_in_execution_ledger', `execution ledger has no task for ${handoff.pr_id}`);
+        }
       }
     } catch (error) {
       fail('task_binding', 'execution_ledger_unreadable', `cannot read execution ledger: ${error.message}`);
@@ -330,28 +514,29 @@ async function resolveAuthorities(handoff, handoffDir, repoRoot, reporter, valid
     );
   }
 
-  const siblingDeps = sibling?.binding?.dependency_merge_shas ?? null;
+  const primary = loaded[0] ?? null;
+  const bindingDeps = primary?.binding?.dependency_merge_shas ?? null;
   const ledgerDeps = ledgerTask?.dependency_merge_shas ?? null;
-  if (siblingDeps && ledgerDeps) {
-    if (
-      JSON.stringify(sortedDependencyEntries(siblingDeps)) !==
-      JSON.stringify(sortedDependencyEntries(ledgerDeps))
-    ) {
-      fail(
-        'dependency_sha_binding',
-        'binding_conflict',
-        'sibling task-binding.json and the execution ledger disagree on dependency_merge_shas'
-      );
-    }
+  if (bindingDeps && ledgerDeps && JSON.stringify(sortedDependencyEntries(bindingDeps)) !== JSON.stringify(sortedDependencyEntries(ledgerDeps))) {
+    fail('dependency_sha_binding', 'binding_conflict', 'task-binding.json and the execution ledger disagree on dependency_merge_shas');
+  }
+
+  const bindingBase = primary?.binding?.base_sha ?? null;
+  const ledgerBase = typeof ledgerTask?.base_sha === 'string' ? ledgerTask.base_sha : null;
+  if (bindingBase && ledgerBase && bindingBase !== ledgerBase) {
+    fail('base_sha_binding', 'binding_conflict', `task binding base_sha ${bindingBase} disagrees with execution-ledger base_sha ${ledgerBase}`);
   }
 
   let effective = null;
   let source = null;
-  if (sibling?.binding) {
-    effective = sibling.binding;
-    source = 'sibling-task-binding';
-  } else if (ledgerDeps) {
-    effective = { base_sha: null, dependency_merge_shas: ledgerDeps };
+  if (primary?.binding) {
+    effective = primary.binding;
+    source = primary.source;
+  } else if (ledgerTask) {
+    effective = {
+      base_sha: ledgerBase,
+      dependency_merge_shas: ledgerDeps ?? {}
+    };
     source = 'execution-ledger';
   }
 
@@ -359,8 +544,15 @@ async function resolveAuthorities(handoff, handoffDir, repoRoot, reporter, valid
     fail(
       'task_binding',
       'task_binding_missing',
-      'no sibling task-binding.json and no matching execution-ledger task could bind the handoff'
+      'no sibling or per-PR task-binding.json and no matching execution-ledger task could bind the handoff'
     );
+  } else if (typeof effective.base_sha !== 'string') {
+    fail(
+      'base_sha_binding',
+      'base_sha_unbound',
+      'the resolved authority supplies no exact base_sha; dependency SHAs alone cannot bind a completed handoff to its starting commit'
+    );
+    markCheck('task_binding', 'passed', `dependency authority resolved using ${source}; exact base binding is missing`);
   } else {
     markCheck('task_binding', 'passed', `handoff bound using ${source}`);
   }
@@ -368,20 +560,23 @@ async function resolveAuthorities(handoff, handoffDir, repoRoot, reporter, valid
   return { authorities, effective, source };
 }
 
-async function evaluateArtifacts(handoff, repoRoot, realRoot, reporter) {
+async function evaluateArtifacts(declaredArtifacts, repoRoot, realRoot, reporter) {
   const { fail, markCheck } = reporter;
   let pathOk = true;
   let existenceOk = true;
   let hashOk = true;
 
-  for (const artifact of handoff.artifacts ?? []) {
-    const contained = resolveContainedPath(repoRoot, artifact.path);
+  if (declaredArtifacts.length === 0) {
+    markCheck('artifact_path_containment', 'not_applicable', 'no artifacts or command event-source records declared');
+    markCheck('artifact_file_existence', 'not_applicable', 'no artifacts or command event-source records declared');
+    markCheck('artifact_sha256_binding', 'not_applicable', 'no artifacts or command event-source records declared');
+    return;
+  }
+
+  for (const { source, artifact } of declaredArtifacts) {
+    const contained = resolveContainedPath(repoRoot, artifact?.path);
     if (!contained.ok) {
-      fail(
-        'artifact_path_containment',
-        'artifact_path_not_contained',
-        `${artifact.id} (${artifact.path}): ${contained.detail}`
-      );
+      fail('artifact_path_containment', 'artifact_path_not_contained', `${source} (${artifact?.path}): ${contained.detail}`);
       pathOk = false;
       continue;
     }
@@ -390,119 +585,96 @@ async function evaluateArtifacts(handoff, repoRoot, realRoot, reporter) {
     try {
       real = await realpath(contained.absolute);
     } catch (error) {
-      fail(
-        'artifact_file_existence',
-        'artifact_missing_on_disk',
-        `${artifact.id} (${artifact.path}): ${error.code ?? 'not found'}`
-      );
+      fail('artifact_file_existence', 'artifact_missing_on_disk', `${source} (${artifact.path}): ${error.code ?? 'not found'}`);
       existenceOk = false;
       continue;
     }
-
     if (!isWithin(realRoot, real)) {
-      fail(
-        'artifact_path_containment',
-        'artifact_path_escapes_root_via_symlink',
-        `${artifact.id} (${artifact.path}) resolves outside the repository root`
-      );
+      fail('artifact_path_containment', 'artifact_path_escapes_root_via_symlink', `${source} (${artifact.path}) resolves outside the repository root`);
       pathOk = false;
       continue;
     }
 
-    const info = await stat(real);
-    if (!info.isFile()) {
-      fail(
-        'artifact_file_existence',
-        'artifact_not_regular_file',
-        `${artifact.id} (${artifact.path}) is not a regular file`
-      );
+    let info;
+    let buffer;
+    try {
+      info = await stat(real);
+      if (!info.isFile()) throw new Error('not a regular file');
+      buffer = await readFile(real);
+    } catch (error) {
+      fail('artifact_file_existence', 'artifact_not_regular_file', `${source} (${artifact.path}): ${error.code ?? error.message}`);
       existenceOk = false;
       continue;
     }
 
-    const buffer = await readFile(real);
     const digest = sha256Buffer(buffer);
     if (digest !== artifact.sha256) {
-      fail(
-        'artifact_sha256_binding',
-        'artifact_hash_mismatch',
-        `${artifact.id} (${artifact.path}) expected ${artifact.sha256} got ${digest}`
-      );
+      fail('artifact_sha256_binding', 'artifact_hash_mismatch', `${source} (${artifact.path}) expected ${artifact.sha256} got ${digest}`);
       hashOk = false;
     } else if (typeof artifact.bytes === 'number' && artifact.bytes !== buffer.length) {
-      fail(
-        'artifact_sha256_binding',
-        'artifact_byte_mismatch',
-        `${artifact.id} (${artifact.path}) expected ${artifact.bytes} bytes got ${buffer.length}`
-      );
+      fail('artifact_sha256_binding', 'artifact_byte_mismatch', `${source} (${artifact.path}) expected ${artifact.bytes} bytes got ${buffer.length}`);
       hashOk = false;
     }
   }
 
-  if (pathOk) markCheck('artifact_path_containment', 'passed', 'all artifact paths stay inside the repository root');
-  if (existenceOk) markCheck('artifact_file_existence', 'passed', 'all referenced artifacts exist as regular files');
-  if (hashOk) markCheck('artifact_sha256_binding', 'passed', 'all declared artifact SHA-256 (and byte) bindings match on-disk bytes');
+  if (pathOk) markCheck('artifact_path_containment', 'passed', 'all artifact and event-source paths stay inside the repository root');
+  if (existenceOk) markCheck('artifact_file_existence', 'passed', 'all referenced artifacts and event-source files exist as regular files');
+  if (hashOk) markCheck('artifact_sha256_binding', 'passed', 'all declared artifact and event-source SHA-256 (and byte) bindings match on-disk bytes');
 }
 
-async function evaluateSourceIdentities(handoff, repoRoot, reporter) {
+async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter) {
   const { fail, markCheck, note } = reporter;
   let sourceOk = true;
   let checked = 0;
 
   for (const identity of handoff.source_identities ?? []) {
-    if (typeof identity.sha256 !== 'string') continue;
-    const looksLikeRepositoryPath = identity.id.includes('/') || identity.id.startsWith('.');
-    if (!looksLikeRepositoryPath) {
-      note(
-        'external_source_identity',
-        'external',
-        `source identity ${identity.id} is not a repository path, so its declared SHA-256 is not locally verifiable`
-      );
+    if (identity.location === 'external') {
+      note('external_source_identity', 'external', `source identity ${identity.id} is external; any SHA-256 is recorded but not locally verified`);
+      continue;
+    }
+    if (identity.location !== 'local') {
+      fail('source_identity_binding', 'source_identity_location_missing', `${identity.id}: location must be explicit local or external`);
+      sourceOk = false;
+      continue;
+    }
+    if (typeof identity.sha256 !== 'string') {
+      fail('source_identity_binding', 'source_identity_hash_omitted', `${identity.id}: local source identity requires sha256`);
+      sourceOk = false;
       continue;
     }
     checked += 1;
     const contained = resolveContainedPath(repoRoot, identity.id);
     if (!contained.ok) {
-      fail(
-        'source_identity_binding',
-        'source_identity_path_not_contained',
-        `${identity.id}: ${contained.detail}`
-      );
+      fail('source_identity_binding', 'source_identity_path_not_contained', `${identity.id}: ${contained.detail}`);
       sourceOk = false;
       continue;
     }
+    let real;
+    let info;
     try {
-      const digest = await sha256File(contained.absolute);
-      if (digest !== identity.sha256) {
-        fail(
-          'source_identity_binding',
-          'stale_source_identity_sha',
-          `${identity.id} expected ${identity.sha256} got ${digest}`
-        );
-        sourceOk = false;
-      }
+      real = await realpath(contained.absolute);
+      if (!isWithin(realRoot, real)) throw Object.assign(new Error('resolved outside repository root'), { code: 'OUTSIDE_ROOT' });
+      info = await stat(real);
+      if (!info.isFile()) throw Object.assign(new Error('not a regular file'), { code: 'NOT_FILE' });
     } catch (error) {
-      fail(
-        'source_identity_binding',
-        'source_identity_missing_on_disk',
-        `${identity.id}: ${error.code ?? 'not found'}`
-      );
+      const rule = error.code === 'OUTSIDE_ROOT' ? 'source_identity_path_escapes_root_via_symlink' : error.code === 'NOT_FILE' ? 'source_identity_not_regular_file' : 'source_identity_missing_on_disk';
+      fail('source_identity_binding', rule, `${identity.id}: ${error.code ?? error.message}`);
+      sourceOk = false;
+      continue;
+    }
+    const digest = await sha256File(real);
+    if (digest !== identity.sha256) {
+      fail('source_identity_binding', 'stale_source_identity_sha', `${identity.id} expected ${identity.sha256} got ${digest}`);
       sourceOk = false;
     }
   }
 
   if (sourceOk) {
-    markCheck(
-      'source_identity_binding',
-      checked > 0 ? 'passed' : 'not_applicable',
-      checked > 0
-        ? `${checked} repository-path source identity hash(es) match on-disk bytes`
-        : 'no repository-path source identity with a declared hash'
-    );
+    markCheck('source_identity_binding', checked > 0 ? 'passed' : 'not_applicable', checked > 0 ? `${checked} local source identity hash(es) match on-disk bytes with resolved containment` : 'no local source identity declared');
   }
 }
 
-async function evaluateChangedFiles(handoff, repoRoot, reporter) {
+async function evaluateChangedFiles(handoff, repoRoot, realRoot, reporter) {
   const { fail, markCheck, note } = reporter;
   let ok = true;
 
@@ -513,64 +685,216 @@ async function evaluateChangedFiles(handoff, repoRoot, reporter) {
       ok = false;
       continue;
     }
-    if (!(await existsAsFile(contained.absolute))) {
-      note(
-        'changed_file_not_present',
-        'unresolved',
-        `${changed} is recorded as changed but is not present on disk (a deletion is valid; surface it to the reviewer)`
-      );
+    let real;
+    try {
+      real = await realpath(contained.absolute);
+    } catch {
+      note('changed_file_not_present', 'unresolved', `${changed} is recorded as changed but is not present on disk (a deletion is valid; surface it to the reviewer)`);
+      continue;
+    }
+    if (!isWithin(realRoot, real)) {
+      fail('changed_file_containment', 'changed_file_escapes_root_via_symlink', `${changed} resolves outside the repository root`);
+      ok = false;
     }
   }
 
-  if (ok) markCheck('changed_file_containment', 'passed', 'all changed-file records are repository-contained');
+  if (ok) markCheck('changed_file_containment', 'passed', 'all changed-file records are repository-contained after symlink resolution');
 }
 
-function evaluateCrossReferences(handoff, reporter) {
+function evaluateIdentifierUniqueness(handoff, reporter) {
   const { fail, markCheck } = reporter;
-  const commands = new Map((handoff.commands ?? []).map(entry => [entry.id, entry]));
-  const artifacts = new Map((handoff.artifacts ?? []).map(entry => [entry.id, entry]));
+  let ok = true;
+  const commandIds = new Map();
+  for (const command of handoff.commands ?? []) {
+    if (commandIds.has(command.id)) {
+      fail('identifier_uniqueness', 'duplicate_command_id', `ambiguous command id ${command.id}; duplicate records cannot be resolved safely`);
+      ok = false;
+    } else {
+      commandIds.set(command.id, command);
+    }
+  }
+
+  const artifactIds = new Map();
+  for (const { source, artifact } of collectDeclaredArtifacts(handoff)) {
+    if (artifactIds.has(artifact.id)) {
+      fail('identifier_uniqueness', 'duplicate_artifact_id', `ambiguous artifact id ${artifact.id} (${source} collides with ${artifactIds.get(artifact.id)})`);
+      ok = false;
+    } else {
+      artifactIds.set(artifact.id, source);
+    }
+  }
+
+  const acceptanceIds = new Set();
+  for (const result of handoff.acceptance_results ?? []) {
+    if (acceptanceIds.has(result.id)) {
+      fail('identifier_uniqueness', 'duplicate_acceptance_id', `ambiguous acceptance result id ${result.id}`);
+      ok = false;
+    } else {
+      acceptanceIds.add(result.id);
+    }
+  }
+
+  const sourceIds = new Set();
+  for (const source of handoff.source_identities ?? []) {
+    if (sourceIds.has(source.id)) {
+      fail('identifier_uniqueness', 'duplicate_source_identity_id', `ambiguous source identity id ${source.id}`);
+      ok = false;
+    } else {
+      sourceIds.add(source.id);
+    }
+  }
+
+  if (ok) markCheck('identifier_uniqueness', 'passed', 'command, artifact, acceptance and source-identity ids are unique');
+  return {
+    commands: commandIds,
+    artifacts: new Map((handoff.artifacts ?? []).map(entry => [entry.id, entry]))
+  };
+}
+
+function evaluatePacketEvidence(handoff, reporter) {
+  const { fail, markCheck } = reporter;
+  const status = handoff.status;
+  let ok = true;
+  for (const result of handoff.acceptance_results ?? []) {
+    if (result.status === 'independently_verified' && handoff.head_sha === null) {
+      fail(
+        'packet_evidence',
+        'acceptance_head_sha_required_for_terminal_state',
+        `${result.id} claims independently_verified while head_sha is null; a controller must bind the committed head first`
+      );
+      ok = false;
+    }
+  }
+  if (handoff.independent_review?.status === 'independently_verified' && handoff.independent_review.reviewed_head_sha === null) {
+    fail(
+      'packet_evidence',
+      'independent_review_head_sha_required',
+      'independent_review independently_verified requires a concrete reviewed_head_sha'
+    );
+    ok = false;
+  }
+
+  if (COMPLETED_PACKET_STATES.has(status)) {
+    if (typeof handoff.owner !== 'string' || handoff.owner.trim() === '') {
+      fail('packet_evidence', 'packet_owner_missing', `${status} packets require a non-null owner`);
+      ok = false;
+    }
+    for (const [name, value] of [
+      ['changed_files', handoff.changed_files],
+      ['source_identities', handoff.source_identities],
+      ['commands', handoff.commands],
+      ['artifacts', handoff.artifacts],
+      ['acceptance_results', handoff.acceptance_results]
+    ]) {
+      if (!Array.isArray(value) || value.length === 0) {
+        fail('packet_evidence', 'empty_evidence_array', `${status} packet has empty ${name}`);
+        ok = false;
+      }
+    }
+    if (handoff.head_sha === null) {
+      const pending = (handoff.unresolved_claims ?? []).some(claim =>
+        /head.*sha|sha.*head|commit/i.test(String(claim.id ?? '')) &&
+        ['pending', 'unresolved', 'blocked'].includes(claim.status)
+      );
+      if (!pending) {
+        fail('packet_evidence', 'head_sha_pending_untyped', 'completed packet with null head_sha must carry a typed pending/unresolved head claim');
+        ok = false;
+      }
+      if (['independently_verified', 'merged', 'integrated', 'qualified'].includes(status)) {
+        fail('packet_evidence', 'head_sha_required_for_terminal_state', `${status} cannot be independently accepted with a null head_sha`);
+        ok = false;
+      }
+    }
+  }
+  if (ok) {
+    markCheck('packet_evidence', 'passed', COMPLETED_PACKET_STATES.has(status) ? 'completed packet has attributable owner and non-empty evidence arrays' : `${status} may carry incomplete evidence by protocol state`);
+  }
+}
+
+function evaluateCommandOutcomeConsistency(command, reporter) {
+  const expected = expectedCommandOutcome(command);
+  const observed = observedCommandOutcome(command);
+  let ok = true;
+  if (!expected) {
+    reporter.fail('command_result_resolution', 'command_expected_outcome_missing', `command ${command.id} has no structured expected_outcome`);
+    ok = false;
+  }
+  if (!observed) {
+    reporter.fail('command_result_resolution', 'command_observed_outcome_missing', `command ${command.id} has no structured observed_outcome`);
+    ok = false;
+  }
+  if (!hasNonEmptyTiming(command.started_at) || !hasNonEmptyTiming(command.completed_at)) {
+    reporter.fail('command_result_resolution', 'command_timing_missing', `command ${command.id} requires non-empty started_at and completed_at timestamps`);
+    ok = false;
+  }
+  if (observed?.kind === 'observed_exit') {
+    if (typeof command.exit_code === 'number' && command.exit_code !== observed.exit_code) {
+      reporter.fail('command_result_resolution', 'command_outcome_conflict', `command ${command.id} exit_code ${command.exit_code} disagrees with observed_outcome.exit_code ${observed.exit_code}`);
+      ok = false;
+    }
+  } else if (observed && command.exit_code !== undefined && command.exit_code !== null) {
+    reporter.fail('command_result_resolution', 'command_outcome_conflict', `command ${command.id} records numeric exit_code ${command.exit_code} alongside typed ${observed.kind} outcome`);
+    ok = false;
+  }
+  const completion = completionStatusOutcome(command.completion_status);
+  if (completion && observed && !outcomesMatch(completion, observed)) {
+    reporter.fail('command_result_resolution', 'command_outcome_conflict', `command ${command.id} completion_status conflicts with observed_outcome`);
+    ok = false;
+  }
+  if (observed && observed.kind !== 'observed_exit' && (!observed.detail || observed.detail.trim() === '')) {
+    reporter.fail('command_result_resolution', 'command_provider_limitation_missing', `command ${command.id} typed ${observed.kind} outcome requires detail describing the limitation or failure`);
+    ok = false;
+  }
+  return ok;
+}
+
+function evaluateCrossReferences(handoff, commands, artifacts, reporter) {
+  const { fail, markCheck } = reporter;
   let commandOk = true;
   let artifactOk = true;
+
+  for (const command of handoff.commands ?? []) {
+    if (!evaluateCommandOutcomeConsistency(command, reporter)) commandOk = false;
+    if (typeof command.result !== 'string' || command.result.trim() === '') {
+      fail('command_result_resolution', 'command_result_missing', `command ${command.id} has no non-empty result narrative`);
+      commandOk = false;
+    }
+  }
 
   for (const result of handoff.acceptance_results ?? []) {
     const commandIds = result.command_ids ?? [];
     if (SUCCESS_ACCEPTANCE_STATES.has(result.status)) {
       if (commandIds.length === 0) {
-        fail(
-          'command_result_resolution',
-          'claimed_pass_without_command_result',
-          `${result.id} claims ${result.status} with an empty command_ids list`
-        );
+        fail('command_result_resolution', 'claimed_pass_without_command_result', `${result.id} claims ${result.status} with an empty command_ids list`);
         commandOk = false;
       }
       for (const commandId of commandIds) {
         const command = commands.get(commandId);
         if (!command) {
-          fail(
-            'command_result_resolution',
-            'claimed_pass_without_command_result',
-            `${result.id} references unknown command ${commandId}`
-          );
+          fail('command_result_resolution', 'claimed_pass_without_command_result', `${result.id} references unknown command ${commandId}`);
           commandOk = false;
           continue;
         }
-        if (typeof command.result !== 'string' || command.result.trim() === '') {
-          fail(
-            'command_result_resolution',
-            'claimed_pass_without_command_result',
-            `${result.id} command ${commandId} has no result`
-          );
+        const observed = observedCommandOutcome(command);
+        const expected = expectedCommandOutcome(command);
+        if (!observed || !expected) {
+          fail('command_result_resolution', 'claimed_pass_without_command_result', `${result.id} command ${commandId} has no complete structured expected/observed outcome`);
+          commandOk = false;
+          continue;
+        }
+        if (!['observed_exit', 'unavailable'].includes(observed.kind)) {
+          fail('command_result_resolution', 'success_claim_backed_by_non_success_outcome', `${result.id} command ${commandId} observed typed ${observed.kind}; use an expected-negative observed_exit or preserve the acceptance as failed/blocked/unresolved`);
+          commandOk = false;
+        }
+        if (!outcomesMatch(expected, observed)) {
+          fail('command_result_resolution', 'command_outcome_mismatch', `${result.id} command ${commandId} expected ${expected.kind}${expected.exit_code !== undefined ? ` ${expected.exit_code}` : ''} got ${observed.kind}${observed.exit_code !== undefined ? ` ${observed.exit_code}` : ''}`);
           commandOk = false;
         }
       }
     } else {
       for (const commandId of commandIds) {
         if (!commands.has(commandId)) {
-          fail(
-            'command_result_resolution',
-            'unresolved_command_reference',
-            `${result.id} (${result.status}) references unknown command ${commandId}`
-          );
+          fail('command_result_resolution', 'unresolved_command_reference', `${result.id} (${result.status}) references unknown command ${commandId}`);
           commandOk = false;
         }
       }
@@ -578,18 +902,14 @@ function evaluateCrossReferences(handoff, reporter) {
 
     for (const artifactId of result.artifact_ids ?? []) {
       if (!artifacts.has(artifactId)) {
-        fail(
-          'artifact_reference_resolution',
-          'missing_artifact',
-          `${result.id} references unknown artifact ${artifactId}`
-        );
+        fail('artifact_reference_resolution', 'missing_artifact', `${result.id} references unknown artifact ${artifactId}`);
         artifactOk = false;
       }
     }
   }
 
-  if (commandOk) markCheck('command_result_resolution', 'passed', 'every success claim resolves to a command with a non-empty result');
-  if (artifactOk) markCheck('artifact_reference_resolution', 'passed', 'every referenced artifact id resolves');
+  if (commandOk) markCheck('command_result_resolution', 'passed', 'every command has timestamped structured outcomes and each success claim matches its expected outcome');
+  if (artifactOk) markCheck('artifact_reference_resolution', 'passed', 'every referenced top-level artifact id resolves');
 }
 
 function evaluateDependencyBinding(handoff, effective, reporter) {
@@ -647,15 +967,10 @@ function evaluateDependencyBinding(handoff, effective, reporter) {
       markCheck('base_sha_binding', 'passed', 'handoff base_sha matches the task binding');
     }
   } else {
-    markCheck(
+    fail(
       'base_sha_binding',
-      'not_applicable',
-      'the resolved authority has no base SHA; base is verified only as a local commit'
-    );
-    reporter.note(
-      'base_sha_unbound_to_task_binding',
-      'unresolved',
-      'no task binding supplied an expected base SHA, so exact base matching did not run'
+      'base_sha_unbound',
+      'no sibling or per-PR task-binding supplied an expected base SHA; ledger dependency SHAs alone do not bind the base. Completed packets are not accepted with an unbound base.'
     );
   }
 }
@@ -709,18 +1024,41 @@ function evaluateGitBinding(handoff, repoRoot, reporter) {
     }
   }
 
-  if (ok) {
-    markCheck(
-      'git_commit_binding',
-      'passed',
-      'base is a local commit and every dependency SHA is a local ancestor of it'
-    );
-  }
   if (handoff.head_sha === null) {
     note(
       'head_sha_pending',
       'unresolved',
-      'head_sha is null (one-shot slice); the controller records the committed head later'
+      'head_sha is null (pending-head transport); the controller records the committed head later. A future commit cannot contain its own hash.'
+    );
+  } else if (typeof handoff.head_sha === 'string' && !gitUnavailable) {
+    const headExists = gitCommitExists(handoff.head_sha, repoRoot);
+    if (headExists.unavailable) {
+      markUnavailable();
+    } else if (!headExists.ok) {
+      fail('git_commit_binding', 'head_sha_not_local_commit', headExists.detail);
+      ok = false;
+    } else if (handoff.head_sha !== handoff.base_sha) {
+      const baseAncestorOfHead = gitIsAncestor(handoff.base_sha, handoff.head_sha, repoRoot);
+      if (baseAncestorOfHead.unavailable) {
+        markUnavailable();
+      } else if (!baseAncestorOfHead.ok) {
+        fail(
+          'git_commit_binding',
+          'head_sha_not_descendant_of_base',
+          `base ${handoff.base_sha} is not an ancestor of head ${handoff.head_sha}`
+        );
+        ok = false;
+      }
+    }
+  }
+
+  if (ok) {
+    markCheck(
+      'git_commit_binding',
+      'passed',
+      handoff.head_sha === null
+        ? 'base is a local commit, every dependency SHA is a local ancestor of it, and head_sha is pending'
+        : 'base, head and every dependency SHA are local commits with base ancestry'
     );
   }
 }
@@ -774,7 +1112,7 @@ export async function checkHandoff(handoffPath, options = {}) {
       independent_review: {
         status: 'not_claimed',
         detail:
-          'Producer-side packet validation only. A passing packet is complete and evidence-bound; it is not independent verification.'
+          'Producer-side packet validation only. A passing packet is complete and evidence-bound; it is not independent verification or scientific acceptance.'
       }
     };
   };
@@ -784,7 +1122,9 @@ export async function checkHandoff(handoffPath, options = {}) {
   }
 
   // 1. Input path containment (lexical, then symlink-resolved).
-  const inputAbs = path.resolve(process.cwd(), handoffPath);
+  const inputAbs = path.isAbsolute(handoffPath)
+    ? path.resolve(handoffPath)
+    : path.resolve(repoRoot, handoffPath);
   const lexical = resolveContainedPath(repoRoot, path.relative(repoRoot, inputAbs));
   if (!lexical.ok) {
     reporter.fail(
@@ -864,7 +1204,7 @@ export async function checkHandoff(handoffPath, options = {}) {
   }));
   state.headShaPending = handoff.head_sha === null;
 
-  // 5. Authoritative task binding / ledger.
+  // 5. Authoritative task binding / ledger / per-PR lookup.
   const handoffDir = path.dirname(realInput);
   const { authorities, effective, source } = await resolveAuthorities(
     handoff,
@@ -876,16 +1216,18 @@ export async function checkHandoff(handoffPath, options = {}) {
   state.authorities = authorities;
   state.authoritySource = source;
 
-  // 6. Dependency/base matching and cross-reference rules.
+  // 6. Dependency/base matching, uniqueness, evidence minima and cross-reference rules.
   evaluateDependencyBinding(handoff, effective, reporter);
-  evaluateCrossReferences(handoff, reporter);
+  evaluatePacketEvidence(handoff, reporter);
+  const { commands, artifacts } = evaluateIdentifierUniqueness(handoff, reporter);
+  evaluateCrossReferences(handoff, commands, artifacts, reporter);
 
-  // 7. On-disk existence, containment and SHA-256 binding.
-  await evaluateArtifacts(handoff, repoRoot, realRoot, reporter);
-  await evaluateSourceIdentities(handoff, repoRoot, reporter);
-  await evaluateChangedFiles(handoff, repoRoot, reporter);
+  // 7. On-disk existence, containment and SHA-256 binding (including event-source).
+  await evaluateArtifacts(collectDeclaredArtifacts(handoff), repoRoot, realRoot, reporter);
+  await evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter);
+  await evaluateChangedFiles(handoff, repoRoot, realRoot, reporter);
 
-  // 8. Local Git existence/ancestry for base and dependency SHAs.
+  // 8. Local Git existence/ancestry for base, dependency and non-null head SHAs.
   evaluateGitBinding(handoff, repoRoot, reporter);
 
   return finalize();
@@ -895,7 +1237,8 @@ function printUsage(stream) {
   stream.write(
     'usage: node scripts/research-program/check-handoff.mjs <handoff.json>\n' +
       '  Validates one handoff packet: path containment, file existence, SHA-256\n' +
-      '  binding, dependency SHA matching and command/artifact resolution.\n' +
+      '  binding, dependency/base SHA matching, structured command outcomes,\n' +
+      '  unique IDs, event-source artifacts and Git object binding.\n' +
       '  Exit 0 accepted, 1 rejected, 2 usage/operational error.\n'
   );
 }

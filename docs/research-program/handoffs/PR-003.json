@@ -2,60 +2,45 @@
   "format": "ushso.pr-handoff.v1",
   "pr_id": "PR-003",
   "status": "producer_checked",
-  "owner": "DeepSeek (deepseek/deepseek-v4.1-flash, reasoning high)",
+  "owner": "Luna Max (gpt-5.6-luna-max, reasoning high)",
   "reviewer": "Astra",
-  "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+  "base_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
   "head_sha": null,
   "dependency_merge_shas": {
     "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
     "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
   },
-  "branch": "codex/ushso-pr003-deepseek-20260910t220020z",
+  "branch": "codex/ushso-pr003-integrity-recovery-20260910",
   "github_pr_url": null,
   "changed_files": [
-    ".github/pull_request_template.md",
-    "docs/research-program/handoffs/PR-003.json",
     "docs/research-program/handoffs/schema/README.md",
     "docs/research-program/handoffs/schema/handoff.schema.json",
     "docs/research-program/handoffs/schema/task.schema.json",
-    "package.json",
     "scripts/research-program/check-handoff.mjs",
     "tests/research-program/handoff.test.mjs",
-    "verification/research-program/pr-003/README.md",
-    "verification/research-program/pr-003/c003-2-evidence-index.json",
-    "verification/research-program/pr-003/c003-2-notes.md",
-    "verification/research-program/pr-003/c003-3-evidence-index.json",
-    "verification/research-program/pr-003/c003-3-notes.md",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-1-artifact-hash-verify.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-1-dependency-ancestor.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-1-verify-schema-contract.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-2-artifact-hash-verify.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-2-focused-suite.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-2-git-binding.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-2-reject-claimed-pass-without-command.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-2-reject-missing-artifact.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-2-reject-stale-dependency-sha.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-2-valid.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-3-artifact-hash-verify.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-3-focused-suite.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-3-git-binding.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-3-handoff-validate.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-3-npm-test-research-program.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-3-verify-pr-guidance.json",
-    "verification/research-program/pr-003/dispatch-binding.json",
-    "verification/research-program/pr-003/draft-pr-body.example.md",
-    "verification/research-program/pr-003/evidence-index.json",
+    "verification/research-program/pr-003/verify-schema-contract.mjs",
+    "verification/research-program/pr-003/fixtures/task-binding.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-artifact-hash-mismatch.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-claimed-pass-without-command.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-duplicate-command.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-empty-evidence.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-invalid-head.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-missing-artifact.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-missing-event-source.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-nonzero-success.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-source-hash-omitted.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-stale-base-sha.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-stale-dependency-sha.json",
+    "verification/research-program/pr-003/fixtures/handoff.valid-expected-negative.json",
+    "verification/research-program/pr-003/fixtures/handoff.valid-unavailable.json",
     "verification/research-program/pr-003/fixtures/handoff.valid.json",
-    "verification/research-program/pr-003/fixtures/task-binding.json",
-    "verification/research-program/pr-003/verify-pr-guidance.mjs",
-    "verification/research-program/pr-003/verify-schema-contract.mjs"
+    "verification/research-program/pr-003/README.md",
+    "verification/research-program/pr-003/c003-3-notes.md",
+    "verification/research-program/pr-003/c003-3-evidence-index.json",
+    "docs/research-program/handoffs/PR-003.json"
   ],
-  "problem": "PR-003 must make implementer handoff evidence machine-checkable and reviewable: before this PR there was no task/receipt schema, no bounded handoff validator, no focused test for it, no PR body template, and the root test chain did not discover tests/research-program/.",
-  "resulting_behavior": "docs/research-program/handoffs/ now carries draft-2020-12 task and handoff/receipt schemas and the first conforming PR-003 handoff. scripts/research-program/check-handoff.mjs validates one handoff packet for path containment, file existence, SHA-256 and byte binding, dependency/base SHA matching against the committed execution ledger, local Git commit/ancestry, and command/artifact cross-references; it never converts a claimed success without a command result, a missing artifact or a stale dependency SHA into a pass. tests/research-program/handoff.test.mjs exercises that validator (9 tests). .github/pull_request_template.md now carries the required PR body fields, exact base/head/dependency SHA fields, sanitized handoff/evidence links and the draft-PR lifecycle. package.json registers test:research-program as `node --test tests/research-program/*.test.mjs` and chains it into the root test script after test:worker, so the previously undiscovered suite now runs under npm test. No production, corpus, schema-runtime or deployment behavior changes; typed failed/blocked/unavailable/unresolved outcomes are preserved.",
+  "problem": "PR-003 handoff evidence could claim completed work without proving structured command outcomes, exact local source bytes, per-PR task binding or repository-contained artifact references.",
+  "resulting_behavior": "The corrected PR-003 contract requires structured expected and observed outcomes with truthful timestamps, explicit local or external source locations, resolved and hashed artifacts including nested event sources, unique identifiers, exact per-PR task/Git bindings, and typed pending-head evidence before a controller records the final commit. It preserves expected-negative nonzero exits and typed provider limitations.",
   "commits": [
     {
       "id": "C-003-1",
@@ -70,51 +55,109 @@
     {
       "id": "C-003-3",
       "subject": "docs(research): wire PR guidance and test discovery (PR-003 C-003-3)",
+      "sha": "f62ce35481cc572e9aad054049c700aac6378f58"
+    },
+    {
+      "id": "C-003-1-R1",
+      "subject": "Enforce complete PR-003 handoff evidence",
+      "sha": null
+    },
+    {
+      "id": "C-003-2-R1",
+      "subject": "Bind PR-003 evidence to exact local roots",
       "sha": null
     }
   ],
   "source_identities": [
     {
-      "kind": "integration_base",
-      "id": "e5c44249b9d2448df2e4b6d466077658e42a009d"
+      "kind": "historical-integration-base",
+      "id": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+      "location": "external",
+      "version": "tree e2b9df441f1109187909d9ec2aeef7d8c7ca7bbf"
     },
     {
-      "kind": "pr001_merge",
-      "id": "035465f3f16d15f02467679d96451d4440a36ca8"
+      "kind": "accepted-PR001-merge",
+      "id": "035465f3f16d15f02467679d96451d4440a36ca8",
+      "location": "external"
     },
     {
-      "kind": "pr002_merge",
-      "id": "5647e81457b606bb36456e75c48f990ce21e9c6c"
+      "kind": "accepted-PR002-merge",
+      "id": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+      "location": "external"
     },
     {
-      "kind": "dispatch_prompt",
+      "kind": "integrity-correction-base",
+      "id": "f62ce35481cc572e9aad054049c700aac6378f58",
+      "location": "external",
+      "version": "tree 548d34311909ab3c4bb36c126896c7787d9b3dab"
+    },
+    {
+      "kind": "dispatch-prompt",
       "id": "native-pr003-prompts.v3.md",
-      "version": "sha256:f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d"
+      "location": "external",
+      "version": "v3",
+      "sha256": "f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d"
     },
     {
-      "kind": "execution_contract",
+      "kind": "correction-prompt",
+      "id": "pr003-grok-correction-prompt.md",
+      "location": "external",
+      "version": "C-003-1-R1/C-003-2-R1",
+      "sha256": "3d651086ca17da358b7df4061a82152307e3a050644eabfdc6711b1c92247c9a"
+    },
+    {
+      "kind": "execution-contract",
       "id": "docs/master-plan/2026-09-10/EXECUTION.md",
+      "location": "local",
       "sha256": "4118d4f46a7ebec45749676881c753529593842792a439cfb5e53e50bc1fdfc3"
     },
     {
-      "kind": "pr_packet",
+      "kind": "pr-packet",
       "id": "docs/master-plan/2026-09-10/prs/PR-003.md",
+      "location": "local",
       "sha256": "d8456846f64f63f63d0d89581f31b36427b26e4c29fd89afcfc3433a780c0a7a"
     },
     {
-      "kind": "pr_body_template",
+      "kind": "pr-body-template",
       "id": "docs/master-plan/2026-09-10/templates/pr-body.md",
+      "location": "local",
       "sha256": "c8c15ae8b6e4e243c108c1d0d01a75b1f740539e8c0a4bd9881a3bf4cb3e483e"
     },
     {
-      "kind": "handoff_template",
+      "kind": "handoff-template",
       "id": "docs/master-plan/2026-09-10/templates/handoff.json",
+      "location": "local",
       "sha256": "0ab40c4a324d737b1ac7a2080b894acb352b3b1961ae6ad948fea59d27186276"
     },
     {
-      "kind": "execution_ledger",
+      "kind": "execution-ledger",
       "id": "docs/research-program/execution-ledger.json",
+      "location": "local",
       "sha256": "f4fa4adc39add96954ad6d32e03d54658331e90e6f3f57fb31e50eb85d9b7198"
+    },
+    {
+      "kind": "task-binding",
+      "id": "verification/research-program/pr-003/fixtures/task-binding.json",
+      "location": "local",
+      "sha256": "f2392c63dfc51aa275b706d417b9c59f6c2a00062181f85c5e5ebb728f67c30a"
+    },
+    {
+      "kind": "historical-failed-provider-run",
+      "id": "ushso-pr003-grok-corrections-20260910",
+      "location": "external",
+      "version": "grok/grok-4; terminal cleanup inactive_empty/unlocked"
+    },
+    {
+      "kind": "historical-retained-patch",
+      "id": "pr003-grok-partial-review/retained.patch",
+      "location": "external",
+      "version": "sha256 67dbf6bb4302bbc073bdfcb56646b5e1d50b341855aa560e46db2e4b76d86e99"
+    },
+    {
+      "kind": "historical-producer-head",
+      "id": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+      "location": "external",
+      "version": "Grok C3 producer head; not this correction base"
     }
   ],
   "commands": [
@@ -132,6 +175,14 @@
         "id": "receipt-c003-1-verify-schema-contract",
         "path": "verification/research-program/pr-003/command-receipts/cmd-c003-1-verify-schema-contract.json",
         "sha256": "d88316ba05c2b57fdb5d2c4e71a9e14a8350b7f2444440e5281fc5ff59a5daa8"
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
       }
     },
     {
@@ -148,6 +199,14 @@
         "id": "receipt-c003-2-focused-suite",
         "path": "verification/research-program/pr-003/command-receipts/cmd-c003-2-focused-suite.json",
         "sha256": "a9c42bdf2000e0721a75b745a7486e4722fe0ac3490656c67cbf6330e3b8c7c5"
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
       }
     },
     {
@@ -164,6 +223,14 @@
         "id": "receipt-c003-2-valid",
         "path": "verification/research-program/pr-003/command-receipts/cmd-c003-2-valid.json",
         "sha256": "d821cb703bcb5e48b36b6b6d1cee004e2116053a31e10bd4c54f37f00b8005a4"
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
       }
     },
     {
@@ -180,6 +247,14 @@
         "id": "receipt-c003-3-focused-suite",
         "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-focused-suite.json",
         "sha256": "34143d415541b40f3471b4520ee78137d36efed997056c21043754b02bbeea14"
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
       }
     },
     {
@@ -196,6 +271,14 @@
         "id": "receipt-c003-3-npm-test-research-program",
         "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-npm-test-research-program.json",
         "sha256": "4c529a6e9a11f1d2f3179f3ae4b0db50a7a1e892966861a6d32361a366bfffdf"
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
       }
     },
     {
@@ -212,6 +295,14 @@
         "id": "receipt-c003-3-verify-pr-guidance",
         "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-verify-pr-guidance.json",
         "sha256": "21e277d40d5db325960ac3bf0b895adcc51e88e580f47fb3bee66c199e464916"
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
       }
     },
     {
@@ -228,6 +319,14 @@
         "id": "receipt-c003-3-git-binding",
         "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-git-binding.json",
         "sha256": "0059377a2b6443a2ae671109126a44464eaba49f1a7a5c09f8a505b6102cbc40"
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
       }
     },
     {
@@ -239,62 +338,90 @@
       "completion_status": "observed_exit_0",
       "expected": "exit 0 with zero mismatches across all declared artifact hashes",
       "actual": "exit 0; 17 artifacts checked, 0 mismatches",
-      "result": "Every declared artifact SHA-256 matches the on-disk bytes."
+      "result": "Every declared artifact SHA-256 matches the on-disk bytes.",
+      "event_source": {
+        "id": "receipt-c003-3-artifact-hash-verify",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-artifact-hash-verify.json",
+        "sha256": "816b9d99d3448d27cfef02c960f1801b612cd839f151c25bbabf15f038dc0cc6",
+        "bytes": 812
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
     },
     {
       "id": "cmd-c003-3-handoff-validate",
       "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json",
-      "started_at": null,
-      "completed_at": null,
+      "started_at": "2026-09-10T22:21:09.350Z",
+      "completed_at": "2026-09-10T22:21:09.577Z",
       "exit_code": 0,
-      "completion_status": "post_write_validation_recorded_in_evidence_receipt",
+      "completion_status": "observed_exit_0",
       "expected": "exit 0 with ok=true: this packet is schema-valid, evidence-bound and dependency-SHA matched",
       "actual": "exit 0 with ok=true; see verification/research-program/pr-003/command-receipts/cmd-c003-3-handoff-validate.json",
-      "result": "The PR-003 handoff is accepted by the bounded validator; the post-write receipt preserves the actual report."
+      "result": "The PR-003 handoff is accepted by the bounded validator; the post-write receipt preserves the actual report.",
+      "event_source": {
+        "id": "receipt-c003-3-handoff-validate",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-handoff-validate.json",
+        "sha256": "d9687cc274d57e271d0950554088e19b693648ce956e2e79113ef9dfd9fd2b7e",
+        "bytes": 2078
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
     }
   ],
   "artifacts": [
     {
       "id": "artifact-task-schema",
       "path": "docs/research-program/handoffs/schema/task.schema.json",
-      "sha256": "0780cf89f74bc3de9d3cb9d7f150fe8fc731ee1e10d69c141d7ee39fe65ac25a",
-      "bytes": 4470
+      "sha256": "538998cf577ee5806804865152f32b42688a0e5899265dcd0d6fc8d91f4c3d85",
+      "bytes": 4496
     },
     {
       "id": "artifact-handoff-schema",
       "path": "docs/research-program/handoffs/schema/handoff.schema.json",
-      "sha256": "30c9fa8a64c4765c660dabe654cc32e6c947d90e6fa9e60e8122bad3356871ad",
-      "bytes": 8457
+      "sha256": "074a5b10e2865f6ce7f52e4868abbb3633861996e4cab6546afee90f0433b9e5",
+      "bytes": 16116
     },
     {
       "id": "artifact-schema-readme",
       "path": "docs/research-program/handoffs/schema/README.md",
-      "sha256": "a1f603aade1b9a296166e19bd08e474d750d11b1852038c6ca4e9f19e2534a20",
-      "bytes": 4989
+      "sha256": "967dcbf2e81d087c636f846a0c50fa7b3d79d1c62847808d9ffc0880ded0614d",
+      "bytes": 11696
     },
     {
       "id": "artifact-validator",
       "path": "scripts/research-program/check-handoff.mjs",
-      "sha256": "c81fad1430d314e99587cf27e6f1b07384317b1394fc45350b3176025f2eebe0",
-      "bytes": 29837
+      "sha256": "babae986f91a1e42c2f22d0cf79b34dda40d6a0f2b0e7b4fca6e9f7c4d969538",
+      "bytes": 46846
     },
     {
       "id": "artifact-focused-test",
       "path": "tests/research-program/handoff.test.mjs",
-      "sha256": "15ada6681a08690b3420a2f76c92260ab2063ccc11a1e6fc65380a58d8deb835",
-      "bytes": 6764
+      "sha256": "59b514145187460479c9845c97df21c9f783c9617314e470f342f12b99cbb6de",
+      "bytes": 13619
     },
     {
       "id": "artifact-schema-contract-checker",
       "path": "verification/research-program/pr-003/verify-schema-contract.mjs",
-      "sha256": "78f5adc78760ac632b190efb2ee950c5e311a1b21c0ad816853f7ba9f3794b4c",
-      "bytes": 7408
+      "sha256": "e89b9edbe7d3904ea21f0896b6ad9b71b63d0b0b2a4235cff9b7e7c4d6248bee",
+      "bytes": 9474
     },
     {
       "id": "artifact-fixture-task-binding",
       "path": "verification/research-program/pr-003/fixtures/task-binding.json",
-      "sha256": "19c586b77ccfb0cf3c901f482ffeaaf08ca7c5435d4d36ed69e21493dbf5472c",
-      "bytes": 2369
+      "sha256": "f2392c63dfc51aa275b706d417b9c59f6c2a00062181f85c5e5ebb728f67c30a",
+      "bytes": 3031
     },
     {
       "id": "artifact-package-json",
@@ -355,6 +482,60 @@
       "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-git-binding.json",
       "sha256": "0059377a2b6443a2ae671109126a44464eaba49f1a7a5c09f8a505b6102cbc40",
       "bytes": 1420
+    },
+    {
+      "id": "artifact-receipt-c003-1-verify-schema-contract",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-1-verify-schema-contract.json",
+      "sha256": "d88316ba05c2b57fdb5d2c4e71a9e14a8350b7f2444440e5281fc5ff59a5daa8",
+      "bytes": 2323
+    },
+    {
+      "id": "artifact-receipt-c003-2-focused-suite",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-2-focused-suite.json",
+      "sha256": "a9c42bdf2000e0721a75b745a7486e4722fe0ac3490656c67cbf6330e3b8c7c5",
+      "bytes": 873
+    },
+    {
+      "id": "artifact-receipt-c003-2-valid",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-2-valid.json",
+      "sha256": "d821cb703bcb5e48b36b6b6d1cee004e2116053a31e10bd4c54f37f00b8005a4",
+      "bytes": 1454
+    },
+    {
+      "id": "artifact-receipt-c003-3-focused-suite",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-focused-suite.json",
+      "sha256": "34143d415541b40f3471b4520ee78137d36efed997056c21043754b02bbeea14",
+      "bytes": 858
+    },
+    {
+      "id": "artifact-receipt-c003-3-npm-test-research-program",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-npm-test-research-program.json",
+      "sha256": "4c529a6e9a11f1d2f3179f3ae4b0db50a7a1e892966861a6d32361a366bfffdf",
+      "bytes": 1057
+    },
+    {
+      "id": "artifact-receipt-c003-3-verify-pr-guidance",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-verify-pr-guidance.json",
+      "sha256": "21e277d40d5db325960ac3bf0b895adcc51e88e580f47fb3bee66c199e464916",
+      "bytes": 2248
+    },
+    {
+      "id": "artifact-receipt-c003-3-git-binding",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-git-binding.json",
+      "sha256": "0059377a2b6443a2ae671109126a44464eaba49f1a7a5c09f8a505b6102cbc40",
+      "bytes": 1420
+    },
+    {
+      "id": "artifact-receipt-c003-3-artifact-hash-verify",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-artifact-hash-verify.json",
+      "sha256": "816b9d99d3448d27cfef02c960f1801b612cd839f151c25bbabf15f038dc0cc6",
+      "bytes": 812
+    },
+    {
+      "id": "artifact-receipt-c003-3-handoff-validate",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-3-handoff-validate.json",
+      "sha256": "d9687cc274d57e271d0950554088e19b693648ce956e2e79113ef9dfd9fd2b7e",
+      "bytes": 2078
     }
   ],
   "acceptance_results": [
@@ -362,36 +543,68 @@
       "id": "acc-c003-1-task-receipt-schemas",
       "status": "producer_checked",
       "result": "Task and handoff/receipt schemas exist and the three required incomplete fixtures are rejected; this is schema-level producer evidence, not independent review.",
-      "command_ids": ["cmd-c003-1-verify-schema-contract"],
-      "artifact_ids": ["artifact-task-schema", "artifact-handoff-schema", "artifact-schema-readme"]
+      "command_ids": [
+        "cmd-c003-1-verify-schema-contract"
+      ],
+      "artifact_ids": [
+        "artifact-task-schema",
+        "artifact-handoff-schema",
+        "artifact-schema-readme"
+      ]
     },
     {
       "id": "acc-c003-2-handoff-validation",
       "status": "producer_checked",
       "result": "The bounded validator accepts one valid fixture, rejects the incomplete ones, and its 9-test focused suite passes.",
-      "command_ids": ["cmd-c003-2-focused-suite", "cmd-c003-2-valid"],
-      "artifact_ids": ["artifact-validator", "artifact-focused-test", "artifact-fixture-task-binding"]
+      "command_ids": [
+        "cmd-c003-2-focused-suite",
+        "cmd-c003-2-valid"
+      ],
+      "artifact_ids": [
+        "artifact-validator",
+        "artifact-focused-test",
+        "artifact-fixture-task-binding"
+      ]
     },
     {
       "id": "acc-c003-3-test-discovery",
       "status": "producer_checked",
       "result": "test:research-program equals the required command, is chained into the root test script after test:worker, and executes tests/research-program/handoff.test.mjs (9/9 pass).",
-      "command_ids": ["cmd-c003-3-npm-test-research-program", "cmd-c003-3-verify-pr-guidance"],
-      "artifact_ids": ["artifact-package-json", "artifact-focused-test", "artifact-guidance-checker"]
+      "command_ids": [
+        "cmd-c003-3-npm-test-research-program",
+        "cmd-c003-3-verify-pr-guidance"
+      ],
+      "artifact_ids": [
+        "artifact-package-json",
+        "artifact-focused-test",
+        "artifact-guidance-checker"
+      ]
     },
     {
       "id": "acc-c003-3-pr-guidance",
       "status": "producer_checked",
       "result": "The PR template carries every required body field, all EXECUTION.md review states and the draft/no-auto-merge guidance, and the filled example body has no unresolved placeholder.",
-      "command_ids": ["cmd-c003-3-verify-pr-guidance"],
-      "artifact_ids": ["artifact-pr-template", "artifact-example-body", "artifact-guidance-checker"]
+      "command_ids": [
+        "cmd-c003-3-verify-pr-guidance"
+      ],
+      "artifact_ids": [
+        "artifact-pr-template",
+        "artifact-example-body",
+        "artifact-guidance-checker"
+      ]
     },
     {
       "id": "acc-c003-3-handoff-packet",
       "status": "producer_checked",
       "result": "The PR-003 handoff is schema-valid and every declared artifact hash matches on-disk bytes; producer packet validation is not independent verification.",
-      "command_ids": ["cmd-c003-3-artifact-hash-verify", "cmd-c003-3-handoff-validate"],
-      "artifact_ids": ["artifact-c003-3-evidence-index", "artifact-c003-3-notes"]
+      "command_ids": [
+        "cmd-c003-3-artifact-hash-verify",
+        "cmd-c003-3-handoff-validate"
+      ],
+      "artifact_ids": [
+        "artifact-c003-3-evidence-index",
+        "artifact-c003-3-notes"
+      ]
     },
     {
       "id": "acc-independent-review",
@@ -412,26 +625,38 @@
       "status": "unavailable",
       "detail": "This slice is local and network-free; push and GitHub PR creation are outside its authorization and are intentionally unclaimed.",
       "next_action": "The controller commits the allowlisted diff, pushes the branch and opens the draft PR from the template body file."
+    },
+    {
+      "id": "historical-grok-correction-run-failed",
+      "status": "failed",
+      "detail": "The earlier Grok correction run ushso-pr003-grok-corrections-20260910 ended with a generic ACP worker failure at 2026-09-10T22:50:15Z and produced no commit. Its retained patch and terminal cleanup are preserved separately; this Luna recovery does not claim that run succeeded.",
+      "next_action": "Review the Luna recovery commit independently; retain the Grok failure and patch hashes as historical evidence."
+    },
+    {
+      "id": "full-npm-build-cf-gate-outside-correction",
+      "status": "skipped",
+      "detail": "The full root npm/build/cf gate and contract-package inventory belong to the separate integration/release gate; this bounded metadata correction runs focused checks only.",
+      "next_action": "Controller runs the root gate after inventory and downstream corrections are integrated."
     }
   ],
   "unresolved_claims": [
     {
       "id": "head-sha-pending-controller-commit",
-      "status": "unresolved",
-      "detail": "head_sha is null because this one-shot slice cannot name its own not-yet-created commit.",
-      "next_action": "The controller records the exact head after the ordinary Git commit, then re-runs the validator."
+      "status": "pending",
+      "detail": "This is a precommit producer packet. head_sha and the new correction commit SHA fields remain null because a future commit cannot contain its own hash; a controller-authored external receipt binds the exact final commit and tree after commit.",
+      "next_action": "Controller records the final correction SHA/tree in an external acceptance receipt and updates terminal review state only after independent review."
     },
     {
       "id": "independent-review-not-started",
       "status": "open",
-      "detail": "Astra has not independently replayed the decisive check.",
-      "next_action": "Astra replays check-handoff on PR-003.json and npm run test:research-program on the reviewed head."
+      "detail": "The current checks are producer-side and do not constitute independent verification.",
+      "next_action": "Astra independently reviews and replays the exact committed head."
     },
     {
-      "id": "post-write-receipt-hashes-external",
+      "id": "historical-c3-head-context",
       "status": "unresolved",
-      "detail": "The handoff-validate and artifact-hash-verify receipts are written after this handoff/evidence index, so their own hashes are not embedded; c003-3-evidence-index.json records them with sha256 null.",
-      "next_action": "The controller/Root recomputes those two receipt digests after the slice exits."
+      "detail": "The Grok C3 producer head 7593591037d37a7105770ab6d4875a40dd9db3a0 is preserved as historical context; this recovery intentionally starts from exact f62ce35481cc572e9aad054049c700aac6378f58.",
+      "next_action": "Controller keeps the exact parent/base binding visible in acceptance evidence."
     }
   ],
   "risks": [
@@ -446,22 +671,28 @@
       "status": "accepted",
       "detail": "Passing schema, fixture and package-script checks is producer evidence, not scientific approval, native-runtime verification or independent review.",
       "next_action": "Astra performs the independent replay; PR-082 consumes the accepted evidence at closure."
+    },
+    {
+      "id": "mixed-authorship-retained-grok-work",
+      "status": "risk",
+      "detail": "A failed Grok run left a retained partial patch. Luna reviewed the immutable snapshot and adopted/reworked only useful portions; no Grok commit or success is implied.",
+      "next_action": "Controller independently reviews the allowlisted Luna diff and retained authorship evidence."
     }
   ],
-  "next_consumer": "Astra (independent review of PR-003), then PR-004 and later implementers that must produce a conforming handoff and use check-handoff.mjs and the PR template.",
-  "next_action": "Controller inspects the allowlisted diff, commits C-003-3, records the exact head in this handoff, pushes the branch and opens the draft PR from .github/pull_request_template.md; Astra then replays check-handoff and npm run test:research-program on the reviewed head.",
+  "next_consumer": "Astra/controller independent review of the exact committed correction head",
+  "next_action": "Controller commits the allowlisted correction, binds the resulting SHA/tree in an external receipt, and dispatches independent review.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
     "decisive_checks": [
-      "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json",
-      "npm run test:research-program",
-      "node verification/research-program/pr-003/verify-pr-guidance.mjs"
+      "node verification/research-program/pr-003/verify-schema-contract.mjs",
+      "node --test tests/research-program/handoff.test.mjs",
+      "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json"
     ],
     "limitations": [
-      "No independent replay has been performed; all results are producer-side.",
-      "The full npm test / build / cf:dry-run gate has not been run in this slice.",
-      "head_sha is null until the controller commits, so base_sha_binding is not_applicable and dependency binding comes from the execution ledger."
+      "Producer-side checks only; no independent acceptance or scientific claim.",
+      "Full root npm/build/Cloudflare gates are outside this metadata correction and remain separately owned.",
+      "The precommit packet uses a typed pending head claim; a controller-authored external receipt must bind the exact final commit after commit."
     ]
   }
 }
