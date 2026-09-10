@@ -296,6 +296,7 @@ def hash_check_historical_code() -> None:
 hash_check_historical_code()
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(HERE))
+import c1_lib  # noqa: E402
 import c2_lib  # noqa: E402
 
 
@@ -830,6 +831,35 @@ def render_acceptance_markdown(tasks_sha256: str | None, cohorts_sha256: str) ->
     return "\n".join(lines)
 
 
+def _append_contract_diffs(errors: list[str], actual: object, expected: object, path: str) -> None:
+    """Append deterministic, path-specific differences from a sealed contract."""
+
+    if type(actual) is not type(expected):
+        errors.append(f"{path} type/value diverges from hash-verified sealed reconstruction")
+        return
+    if isinstance(expected, dict):
+        actual_dict = actual
+        expected_dict = expected
+        missing = sorted(set(expected_dict) - set(actual_dict))
+        unexpected = sorted(set(actual_dict) - set(expected_dict))
+        if missing:
+            errors.append(f"{path} missing sealed contract keys: {', '.join(missing)}")
+        if unexpected:
+            errors.append(f"{path} has unexpected contract keys: {', '.join(unexpected)}")
+        for key in expected_dict:
+            if key in actual_dict:
+                _append_contract_diffs(errors, actual_dict[key], expected_dict[key], f"{path}.{key}")
+        return
+    if isinstance(expected, list):
+        if len(actual) != len(expected):
+            errors.append(f"{path} length {len(actual)} != sealed reconstruction length {len(expected)}")
+        for index, (actual_item, expected_item) in enumerate(zip(actual, expected)):
+            _append_contract_diffs(errors, actual_item, expected_item, f"{path}[{index}]")
+        return
+    if actual != expected:
+        errors.append(f"{path} diverges from hash-verified sealed reconstruction")
+
+
 def assert_pilot_identities(payload: dict) -> list[str]:
     errors = []
     selection = payload.get("mrf_selection") or {}
@@ -912,10 +942,11 @@ def assert_pilot_identities(payload: dict) -> list[str]:
         errors.append("R10 frame state is not ids_frozen_locators_not_materialized")
     if selection.get("endpoint_results_seen") is not False:
         errors.append("endpoint results must not have been seen")
+    _append_contract_diffs(errors, selection, build_mrf_selection(), "mrf_selection")
     return errors
 
 
-def assert_expansion_families(payload: dict) -> list[str]:
+def assert_expansion_families(payload: dict, canonical_products: list[dict] | None = None) -> list[str]:
     errors = []
     block = payload.get("expansion_families") or {}
     families = block.get("families") or []
@@ -951,6 +982,14 @@ def assert_expansion_families(payload: dict) -> list[str]:
         errors.append("R09 frame state is not pointers_frozen_intake_not_materialized")
     if block.get("family_count") != 12:
         errors.append("family_count is not 12")
+    if canonical_products is None:
+        canonical_products = c1_lib.build_payload(c2_lib.repository_root())["products"]
+    _append_contract_diffs(
+        errors,
+        block,
+        build_expansion_families(canonical_products),
+        "expansion_families",
+    )
     return errors
 
 
@@ -980,7 +1019,8 @@ def assert_requirement_keyset(payload: dict) -> list[str]:
 def assert_c3_cohorts(payload: dict, rebuilt_c1: dict | None = None) -> list[str]:
     errors = []
     errors.extend(assert_pilot_identities(payload))
-    errors.extend(assert_expansion_families(payload))
+    canonical_products = rebuilt_c1.get("products") if rebuilt_c1 is not None else None
+    errors.extend(assert_expansion_families(payload, canonical_products))
     errors.extend(assert_requirement_keyset(payload))
     if rebuilt_c1 is not None:
         if c2_lib.extract_c1_projection(payload) != c2_lib.extract_c1_projection(rebuilt_c1):
@@ -990,7 +1030,7 @@ def assert_c3_cohorts(payload: dict, rebuilt_c1: dict | None = None) -> list[str
     return errors
 
 
-def assert_c3_acceptance_document(text: str) -> list[str]:
+def assert_c3_acceptance_document(text: str, repo: Path | None = None) -> list[str]:
     errors = c2_lib.assert_acceptance_document(text)
     if R09_FRAME_STATE not in text:
         errors.append("acceptance missing R09 C3 frame state")
@@ -1000,6 +1040,13 @@ def assert_c3_acceptance_document(text: str) -> list[str]:
         errors.append("acceptance missing accepted C2 correction commit")
     if SEAL_SHA256 not in text:
         errors.append("acceptance missing pilot seal hash")
+    root = (repo or c2_lib.repository_root()).resolve()
+    expected = render_acceptance_markdown(
+        digest(root / "evaluation/research-program/tasks.json"),
+        digest(root / "evaluation/research-program/cohorts.json"),
+    )
+    if text != expected:
+        errors.append("acceptance document does not exactly match deterministic C3 rendering for current task/cohort hashes")
     return errors
 
 
@@ -1023,6 +1070,28 @@ def mutate_for_negative(payload: dict, kind: str) -> dict:
     elif kind == "family_substitution":
         clone["expansion_families"]["families"][4]["family_identity"] = "HHS ASPE Social Vulnerability Index"
         clone["expansion_families"]["family_identities"][4] = "HHS ASPE Social Vulnerability Index"
+    elif kind == "family_overlay_field":
+        clone["expansion_families"]["families"][0]["publisher"] = "substituted publisher"
+    elif kind == "hospital_native_identity":
+        selection["hospitals"][0]["native_identity"]["value"] = "999999"
+    elif kind == "hospital_projection_row":
+        selection["hospitals"][0]["selected_row"]["projection_directory_row_index"] += 1
+    elif kind == "hospital_display_name":
+        selection["hospitals"][0]["facility_name"] += " MUTATED"
+    elif kind == "payer_native_identity":
+        selection["payers"][0]["native_identity"]["value"] = "00000"
+    elif kind == "payer_workbook_row":
+        selection["payers"][0]["selected_cell"]["workbook_sheet_row"] += 1
+    elif kind == "payer_stored_cell":
+        selection["payers"][0]["selected_cell"]["raw_workbook_wire_values"]["A"]["stored_value"] = "00000"
+    elif kind == "freeze_before_endpoint_results":
+        selection["freeze_before_endpoint_results"] = False
+    elif kind == "selection_consumed_not_recomputed":
+        selection["selection_consumed_not_recomputed"] = False
+    elif kind == "silent_substitution_allowed":
+        selection["silent_substitution_allowed"] = True
+    elif kind == "denominator_may_not_shrink":
+        selection["denominator_may_not_shrink"] = False
     else:
         raise ValueError(kind)
     return clone

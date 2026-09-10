@@ -44,6 +44,90 @@
       "selector": "Substitute HHS ASPE SVI or another similar baseline title for CDC/ATSDR SVI.",
       "expected": "reject",
       "reason": "The twelve family identities cannot be swapped for similar catalog titles."
+    },
+    {
+      "id": "NEG-C3-FAMILY-OVERLAY-FIELD",
+      "kind": "family_overlay_field",
+      "selector": "Change a frozen family's canonical C1 publisher while retaining its family identity.",
+      "expected": "reject",
+      "reason": "The complete family overlay is reconstructed from canonical C1 products."
+    },
+    {
+      "id": "NEG-C3-HOSPITAL-NATIVE-IDENTITY",
+      "kind": "hospital_native_identity",
+      "selector": "Change a frozen hospital's native facility identity while retaining its candidate position.",
+      "expected": "reject",
+      "reason": "Native identities are part of the sealed hospital record contract."
+    },
+    {
+      "id": "NEG-C3-HOSPITAL-PROJECTION-ROW",
+      "kind": "hospital_projection_row",
+      "selector": "Change a hospital projection directory row index after selection.",
+      "expected": "reject",
+      "reason": "Projection row metadata is part of the sealed hospital record contract."
+    },
+    {
+      "id": "NEG-C3-HOSPITAL-DISPLAY-NAME",
+      "kind": "hospital_display_name",
+      "selector": "Change a frozen hospital display identity while retaining its native ID.",
+      "expected": "reject",
+      "reason": "Displayed identity fields remain bound to the hash-verified selected row."
+    },
+    {
+      "id": "NEG-C3-PAYER-NATIVE-IDENTITY",
+      "kind": "payer_native_identity",
+      "selector": "Change a frozen payer's native HIOS issuer identity while retaining its candidate position.",
+      "expected": "reject",
+      "reason": "Native payer identities are part of the sealed payer record contract."
+    },
+    {
+      "id": "NEG-C3-PAYER-WORKBOOK-ROW",
+      "kind": "payer_workbook_row",
+      "selector": "Change a payer workbook row binding after selection.",
+      "expected": "reject",
+      "reason": "Workbook row metadata is part of the sealed payer cell contract."
+    },
+    {
+      "id": "NEG-C3-PAYER-STORED-CELL",
+      "kind": "payer_stored_cell",
+      "selector": "Change a payer's raw workbook stored cell value while retaining its projection.",
+      "expected": "reject",
+      "reason": "Raw workbook wire values are part of the sealed payer cell contract."
+    },
+    {
+      "id": "NEG-C3-FREEZE-BEFORE-ENDPOINT-RESULTS",
+      "kind": "freeze_before_endpoint_results",
+      "selector": "Allow endpoint results to precede or influence the frozen pilot selection.",
+      "expected": "reject",
+      "reason": "The selection must be frozen before endpoint results are observed."
+    },
+    {
+      "id": "NEG-C3-SELECTION-CONSUMED-NOT-RECOMPUTED",
+      "kind": "selection_consumed_not_recomputed",
+      "selector": "Recompute or replace the selected identities during downstream consumption.",
+      "expected": "reject",
+      "reason": "Consumers must use the frozen selection without recomputation."
+    },
+    {
+      "id": "NEG-C3-SILENT-SUBSTITUTION-ALLOWED",
+      "kind": "silent_substitution_allowed",
+      "selector": "Permit silent substitution of an unavailable selected identity.",
+      "expected": "reject",
+      "reason": "Unavailable or unresolved selections remain typed outcomes without silent substitution."
+    },
+    {
+      "id": "NEG-C3-DENOMINATOR-MAY-NOT-SHRINK",
+      "kind": "denominator_may_not_shrink",
+      "selector": "Allow unavailable or ineligible selected identities to be removed from later denominators.",
+      "expected": "reject",
+      "reason": "All selected opportunities remain in later denominators."
+    },
+    {
+      "id": "NEG-C3-ACCEPTANCE-RENDERING",
+      "kind": "acceptance_rendering",
+      "selector": "Change the generated acceptance text while retaining required C3 substrings.",
+      "expected": "reject",
+      "reason": "The acceptance document must exactly equal the deterministic rendering for current task and cohort hashes."
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
   "format": "ushso.pr-handoff.v1",
   "pr_id": "PR-002",
-  "status": "c3_implemented_pending_whole_pr_acceptance",
-  "correction_status": "c2_correction_accepted_c3_pending_independent_review",
+  "status": "c3_review_correction_implemented_pending_whole_pr_acceptance",
+  "correction_status": "c2_correction_accepted_c3_review_correction_pending_independent_review",
   "pending": [],
   "owner": "Grok",
   "reviewer": "Astra",
@@ -12,7 +12,8 @@
     "c0022_producer": "Grok",
     "c0022_review_correction": "Luna Max",
     "c0023_producer": "Grok",
-    "c0023_recovery": "Grok"
+    "c0023_recovery": "Grok",
+    "c0023_review_correction": "Luna Max"
   },
   "provider": "grok",
   "actual_model": "grok-4",
@@ -24,7 +25,7 @@
   "correction_base_sha": "44506be8052e1054641048de68893fc41526b664",
   "correction_base_tree": "e7b12a01b49ab66c5f5205f3b14407da30804e46",
   "head_sha": null,
-  "head_sha_note": "The C-002-3 commit cannot self-identify its commit hash/tree. Root binds the final C3 head/tree after review. Parent/base is the accepted C2 correction 997070bd94864fabedf73acecd422c6e15a3ed7e / c05b9a74630b715b05304044a24d6e66489a9808.",
+  "head_sha_note": "The reviewed Grok C-002-3 parent is bound at 7593591037d37a7105770ab6d4875a40dd9db3a0 / ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94 and remains changes-requested before this correction. The additive Luna Max review-correction commit cannot self-identify its own SHA/tree; root binds the final correction head/tree from the external receipt after review.",
   "review_correction": {
     "kind": "unplanned_additive_review_correction",
     "reviewed_head_before_correction": "44506be8052e1054641048de68893fc41526b664",
@@ -97,7 +98,7 @@
     "verification/research-program/pr-002/verify.py"
   ],
   "problem": "PR-002 C-002-1 identities were not frozen. Predecessor run ushso-pr002-cohort-freeze-20260910 reached a 100-product declaration then failed with no commit; the recovered producer packet also needed bounded corrections for heuristic relation labels, MRF freeze ordering, command timing evidence, and replay receipt integrity.",
-  "resulting_behavior": "C-002-3 consumes the sealed directory-only 25 hospital and 10 HIOS issuer IDs in sealed order, with selected row/cell/source bindings and typed unresolved PR-046/PR-049 downstream bindings. Twelve exact missing families are pinned to PR-043/044/045 C-*-1..3 intake scopes with unverified locators. The C1 projection (100 products, ten domains, 3,434 baseline IDs, 185 inference-only related candidates) is preserved. R09/R10 identity frames are frozen; all R01-R16 remain unaccepted. No endpoint, payload, parse, TiC-entity, or eligibility result is claimed. This commit recovers the cancelled ushso-pr002-c3-20260910 producer tree, preserves those command receipts as historical events, and records distinct recovery reruns.",
+  "resulting_behavior": "C-002-3 consumes the sealed directory-only 25 hospital and 10 HIOS issuer IDs in sealed order, with selected row/cell/source bindings and typed unresolved PR-046/PR-049 downstream bindings. Twelve exact missing families are pinned to PR-043/044/045 C-*-1..3 intake scopes with unverified locators. The C1 projection (100 products, ten domains, 3,434 baseline IDs, 185 inference-only related candidates) is preserved. R09/R10 identity frames are frozen; all R01-R16 remain unaccepted. No endpoint, payload, parse, TiC-entity, or eligibility result is claimed. This commit recovers the cancelled ushso-pr002-c3-20260910 producer tree, preserves those command receipts as historical events, and records distinct recovery reruns. The additive C3 review correction reconstructs the complete sealed MRF selection and canonical C1 family overlay, requires exact current-hash acceptance rendering, and keeps the reviewed parent and all historical evidence bound separately.",
   "commits": [
     {
       "id": "C-002-1",
@@ -133,12 +134,20 @@
     },
     {
       "id": "C-002-3",
-      "sha": null,
+      "sha": "7593591037d37a7105770ab6d4875a40dd9db3a0",
       "parent": "997070bd94864fabedf73acecd422c6e15a3ed7e",
-      "tree": null,
+      "tree": "ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94",
       "subject": "docs(research): pin MRF and expansion scope (PR-002 C-002-3)",
-      "identity_convention": "Imperative docs(research) subject plus (PR-002 C-002-3). The commit cannot self-identify its hash/tree; root binds the reviewed descendant. This recovery run finishes the cancelled 2026-09-10 C3 producer work.",
+      "identity_convention": "Imperative docs(research) subject plus (PR-002 C-002-3). This is the Grok producer head 7593591037d37a7105770ab6d4875a40dd9db3a0 / ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94; root review marked it changes requested. The additive Luna Max review correction is recorded separately and root binds its reviewed descendant.",
       "authorship": "Grok"
+    },
+    {
+      "id": "C3-REVIEW-CORRECTION",
+      "identity_convention": "Additive review correction authored by Luna Max. Commit/tree are intentionally null until root binds the external final receipt; this row does not replace the Grok C-002-3 producer commit.",
+      "parent": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+      "sha": null,
+      "subject": "docs(research): harden C-002-3 contract replay (review correction)",
+      "tree": null
     }
   ],
   "source_identities": [
@@ -286,6 +295,20 @@
       "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c3-partial-recovery/manifest.json",
       "sha256": "1154f83fde1315b768c7a72849fcddc185012612279d1f7f07959225f21be485",
       "not_copied_into_this_commit": true
+    },
+    {
+      "kind": "c0023_grok_head_before_review_correction",
+      "sha": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+      "tree": "ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94",
+      "authorship": "Grok",
+      "status": "historical_C3_changes_requested_base"
+    },
+    {
+      "kind": "c0023_luna_review_correction_head",
+      "sha": null,
+      "tree": null,
+      "authorship": "Luna Max",
+      "status": "external_head_tree_binding_pending_root_receipt"
     }
   ],
   "commands": [
@@ -413,23 +436,27 @@
     {
       "path": "verification/research-program/pr-002/c1_lib.py",
       "sha256": "aa08124fd563fde08d0a0136c526b0c359f0d6233f58da62457ee5557f09910d",
-      "status": "corrected_C1_artifact"
+      "status": "corrected_C1_artifact",
+      "bytes": 19345
     },
     {
       "path": "verification/research-program/pr-002/c1-build-receipt.json",
       "sha256": "857750c9536aa1f34a8b8b70ce9e463c912b13ca7f386fc6fc2e1e90a7ef8f6d",
-      "status": "corrected_C1_artifact"
+      "status": "corrected_C1_artifact",
+      "bytes": 1033
     },
     {
       "path": "verification/research-program/pr-002/c1-verify-receipt.json",
       "sha256": "ec9aad31a65464ac3224a80930d548c2069fd5a4ebf80626e62495eea48a0244",
       "status": "corrected_C1_artifact",
-      "receipt_mode": "explicit_output"
+      "receipt_mode": "explicit_output",
+      "bytes": 3794
     },
     {
       "path": "verification/research-program/pr-002/test_c1_corrections.py",
       "sha256": "abdfcba89e915afa305d3cbc31d97f2e9b6c0afa02aeb1df98864532313ab012",
-      "status": "corrected_C1_adversarial_fixture"
+      "status": "corrected_C1_adversarial_fixture",
+      "bytes": 4603
     },
     {
       "path": "verification/research-program/pr-002/evaluator-freeze-manifest-sealed-v1.json",
@@ -444,12 +471,14 @@
     {
       "path": "verification/research-program/pr-002/c2-build-receipt.json",
       "sha256": "4eb211c0ee80e3e3ca53627a3b82aeb819110aa0b8da3ba795bca97e2cc1760d",
-      "status": "explicit_output"
+      "status": "explicit_output",
+      "bytes": 1623
     },
     {
       "path": "verification/research-program/pr-002/c2-verify-receipt.json",
       "sha256": "7d9b80974238fe83d284064ce2bc3c91d03afd12dc6b72a665c44af8ac485526",
-      "status": "explicit_output"
+      "status": "explicit_output",
+      "bytes": 4413
     },
     {
       "path": "verification/research-program/pr-002/c2_lib.py",
@@ -545,8 +574,8 @@
     },
     {
       "path": "verification/research-program/pr-002/c3-negative-fixtures.json",
-      "sha256": "d9217b4fd858d9d125de74480e10ad06a197afafc02ed11389bcd9c8c5c8d9b4",
-      "bytes": 2033,
+      "sha256": "1325b9666e7e1099cda91773edf72d795ff2815fcc58b07c40bf53004f5c9d82",
+      "bytes": 5841,
       "status": "current_C3_adversarial_fixture"
     },
     {
@@ -573,8 +602,8 @@
     },
     {
       "path": "verification/research-program/pr-002/c3_lib.py",
-      "sha256": "1e8ac301604673a1bf3bba02b04277997fb1973cb31af00067c973c90613932d",
-      "bytes": 52147,
+      "sha256": "2b5259025831b5a8e5bee91cf2da2a65b6dafc05ac63bd454d44522966b81849",
+      "bytes": 55851,
       "status": "current_C3_artifact"
     },
     {
@@ -591,14 +620,14 @@
     },
     {
       "path": "verification/research-program/pr-002/test_c3.py",
-      "sha256": "c80dd05b35d41f4317e5fcc01c625dae7c9f6e5911299685b56267ddfefe2c36",
-      "bytes": 7813,
+      "sha256": "3752a19f7a414ee61a561237389ced38f3bf1e2e0e9eba299544899dcdc8ab71",
+      "bytes": 10340,
       "status": "current_C3_artifact"
     },
     {
       "path": "verification/research-program/pr-002/verify.py",
-      "sha256": "57ae2f53b0a2a517e43bd4e23153c7c249706ea3a540be007c171036accf2f1e",
-      "bytes": 18123,
+      "sha256": "183e92d3d1df1e5c15a37716cc0714b4e112dac3333430d38117a11b829dc996",
+      "bytes": 18150,
       "status": "current_C3_artifact"
     },
     {
@@ -816,6 +845,72 @@
       "sha256": "a5c4650b1d8f5fb35cb138abff8830d7d06a2058dc646d3b8fa1f66ed424fd98",
       "bytes": 2400,
       "status": "current_C3_portable_wrapper"
+    },
+    {
+      "path": "verification/research-program/pr-002/c3-correction-contract-receipt.json",
+      "sha256": "26b55e6aa0e0bee84fb788e5920c02901428574e5a60f4b36eb0bb9c02945c27",
+      "bytes": 8084,
+      "status": "current_additive_C3_review_correction_evidence"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c3-correction-test-c1.json",
+      "sha256": "a9f4d2af6d501e9fcf6af6ec09ea0b9416677e9602d8f96489d64b4c55902201",
+      "bytes": 759,
+      "status": "current_additive_C3_review_correction_evidence"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c3-correction-test-c2.json",
+      "sha256": "8b133e92847d0d05b73526aaada1676b244926f60a4795b893e026c9a42b858f",
+      "bytes": 748,
+      "status": "current_additive_C3_review_correction_evidence"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c3-correction-test-c3.json",
+      "sha256": "6887a043085532c5c6e262f115f22cf7c30db58aa11d6ac0ebd10cf23417c609",
+      "bytes": 509,
+      "status": "current_additive_C3_review_correction_evidence"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c3-correction-test-c3-final.json",
+      "sha256": "99d99ba13656538608d17189e958f33651287bc4d247c219e7868ee0e43c5ed6",
+      "bytes": 748,
+      "status": "current_additive_C3_review_correction_evidence"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c3-correction-verify-readonly.json",
+      "sha256": "1ffb20140b119324c35c1f6d2d09864db10eef0da9a3767b51de0e8eb7c584a0",
+      "bytes": 531,
+      "status": "current_additive_C3_review_correction_evidence"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c3-correction-verify-readonly-final.json",
+      "sha256": "f9c1443b7ff25f2dff2aaccc41ed0cb84430976c7cfbe5397eb1877ca8f2a78e",
+      "bytes": 770,
+      "status": "current_additive_C3_review_correction_evidence"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c3-correction-portable-replay.json",
+      "sha256": "6be8ff42a03bc90634f88c9c79591a00beba788bc0132efccf9b3f6ff5e83b92",
+      "bytes": 559,
+      "status": "current_additive_C3_review_correction_evidence"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c3-correction-portable-replay-final.json",
+      "sha256": "4f245fdf9aaf3838b2f1b0045cbd6c2e461982d380a7cd6722fa48c8e893db77",
+      "bytes": 798,
+      "status": "current_additive_C3_review_correction_evidence"
+    },
+    {
+      "path": "verification/research-program/pr-002/c3-correction-handoff-audit.json",
+      "sha256": "a0f51e7a154ca3b920d6339f113f70ab1c8746229328407073ba2e35aa3fbae9",
+      "bytes": 2937,
+      "status": "current_additive_C3_review_correction_evidence"
+    },
+    {
+      "path": "verification/research-program/pr-002/c3-correction-handoff-audit-final.json",
+      "sha256": "4f8c9a55a18ff231824a788b5f8c66643d97594f5ca37a155624173890ea6048",
+      "bytes": 1215,
+      "status": "current_additive_C3_review_correction_evidence"
     }
   ],
   "historical_artifact_bindings": [
@@ -980,11 +1075,14 @@
       "verification": "git show <commit>:<path> then SHA-256"
     },
     {
-      "path": "evaluation/research-program/cohorts.json",
-      "sha256": "479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4",
-      "bytes": 2336377,
-      "status": "historical_C1_projection_preserved_inside_current_C3_file",
-      "verification": "extract_c1_projection(current) == extract_c1_projection(c1_lib.build_payload)"
+      "path": "docs/research-program/handoffs/PR-002.json",
+      "sha256": "0898c2b1a670263c73e03d4e814b0c7c8d3ca0e6a8e8ee9795e3dd6442a1a388",
+      "bytes": 88682,
+      "commit": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+      "tree": "ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94",
+      "git_blob_sha": "d11502d3c3867149705426da8218713f1befe478",
+      "status": "historical_C3_reviewed_head_before_correction",
+      "verification": "git show 7593591037d37a7105770ab6d4875a40dd9db3a0:docs/research-program/handoffs/PR-002.json then SHA-256"
     }
   ],
   "acceptance_results": [
@@ -1089,6 +1187,19 @@
       "id": "R10",
       "status": "unaccepted",
       "result": "25/10 IDs frozen. Locators, eligibility, parse, TiC entity, and file binding remain unresolved. Parsed-sample targets stay >=20 hospital and >=8 payer of that denominator."
+    },
+    {
+      "id": "C3-REVIEW-CORRECTION",
+      "status": "implemented_pending_independent_review",
+      "authorship": "Luna Max",
+      "base_sha": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+      "base_tree": "ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94",
+      "findings": [
+        "PR002-C3-001",
+        "PR002-C3-002",
+        "C3-MRF-VERIFIER-GUARD-001"
+      ],
+      "result": "Full deterministic reconstruction now binds all sealed hospital/payer record fields, selection contract flags, canonical twelve-family overlay fields, and exact current task/cohort hash acceptance rendering. The reviewed Grok parent remains historical and changes-requested; no R01-R16 requirement is accepted."
     }
   ],
   "failures_and_skipped_checks": [
@@ -1190,8 +1301,8 @@
       "evidence": "C-002-3 published candidate official locators and intake PR mappings. Publisher access and schema qualification are not claimed."
     }
   ],
-  "next_consumer": "Astra/controller independent review of C-002-3, then root publication of the reviewed descendant on existing draft PR #14",
-  "next_action": "Root independently reviews and replays this C3 commit, binds its final commit/tree, and determines whole-PR acceptance. Do not push, open PR, merge, or deploy from this producer task.",
+  "next_consumer": "Astra/controller independent review of the corrected C-002-3 descendant, then root publication of the reviewed descendant on existing draft PR #14",
+  "next_action": "Root independently replays the exact corrected head, verifies current and Git-bound historical artifact hashes, binds the final correction commit/tree from the external receipt, and determines whole-PR acceptance. Downstream C3 work remains blocked until this review; do not push, open PR, merge, or deploy from this producer task.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
@@ -1674,5 +1785,314 @@
         "run": "recovery_run_ushso-pr002-c3-recovery-20260910"
       }
     ]
+  },
+  "c3_review_correction_base_sha": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+  "c3_review_correction_base_tree": "ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94",
+  "c3_review_correction_changed_files": [
+    "verification/research-program/pr-002/c3_lib.py",
+    "verification/research-program/pr-002/test_c3.py",
+    "verification/research-program/pr-002/c3-negative-fixtures.json",
+    "verification/research-program/pr-002/verify.py",
+    "docs/research-program/handoffs/PR-002.json",
+    "verification/research-program/pr-002/c3-correction-contract-receipt.json",
+    "verification/research-program/pr-002/command-receipts/c3-correction-test-c1.json",
+    "verification/research-program/pr-002/command-receipts/c3-correction-test-c2.json",
+    "verification/research-program/pr-002/command-receipts/c3-correction-test-c3.json",
+    "verification/research-program/pr-002/command-receipts/c3-correction-test-c3-final.json",
+    "verification/research-program/pr-002/command-receipts/c3-correction-verify-readonly.json",
+    "verification/research-program/pr-002/command-receipts/c3-correction-verify-readonly-final.json",
+    "verification/research-program/pr-002/command-receipts/c3-correction-portable-replay.json",
+    "verification/research-program/pr-002/command-receipts/c3-correction-portable-replay-final.json",
+    "verification/research-program/pr-002/c3-correction-handoff-audit.json",
+    "verification/research-program/pr-002/c3-correction-handoff-audit-final.json"
+  ],
+  "c3_review_correction": {
+    "kind": "additive_review_correction",
+    "status": "implemented_pending_independent_review",
+    "authorship": "Luna Max",
+    "reviewed_head_before_correction": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+    "reviewed_tree_before_correction": "ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94",
+    "reviewed_parent_status": "Grok C3 producer head; root review changes requested",
+    "accepted_c2_ancestor": {
+      "sha": "997070bd94864fabedf73acecd422c6e15a3ed7e",
+      "tree": "c05b9a74630b715b05304044a24d6e66489a9808"
+    },
+    "review_context_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c3-controller-review/producer-v2-7593591/review.json",
+    "review_context_sha256": "b6bfd3bca9b5b5cd6f1ba46b5001f24a79336548cc257a90a120eecab00163c7",
+    "family_review_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c3-family-review/review-receipt.json",
+    "family_review_sha256": "1849362491ffa442d6875d9fdc5a62163dff40e32321721411c27b6a359a3a78",
+    "findings_addressed": [
+      "PR002-C3-001",
+      "PR002-C3-002",
+      "C3-MRF-VERIFIER-GUARD-001"
+    ],
+    "changed_paths": [
+      "verification/research-program/pr-002/c3_lib.py",
+      "verification/research-program/pr-002/test_c3.py",
+      "verification/research-program/pr-002/c3-negative-fixtures.json",
+      "verification/research-program/pr-002/verify.py",
+      "docs/research-program/handoffs/PR-002.json",
+      "verification/research-program/pr-002/c3-correction-contract-receipt.json",
+      "verification/research-program/pr-002/command-receipts/c3-correction-test-c1.json",
+      "verification/research-program/pr-002/command-receipts/c3-correction-test-c2.json",
+      "verification/research-program/pr-002/command-receipts/c3-correction-test-c3.json",
+      "verification/research-program/pr-002/command-receipts/c3-correction-test-c3-final.json",
+      "verification/research-program/pr-002/command-receipts/c3-correction-verify-readonly.json",
+      "verification/research-program/pr-002/command-receipts/c3-correction-verify-readonly-final.json",
+      "verification/research-program/pr-002/command-receipts/c3-correction-portable-replay.json",
+      "verification/research-program/pr-002/command-receipts/c3-correction-portable-replay-final.json",
+      "verification/research-program/pr-002/c3-correction-handoff-audit.json",
+      "verification/research-program/pr-002/c3-correction-handoff-audit-final.json"
+    ],
+    "self_identity_convention": "Correction commit/tree remain null in this handoff until root binds the external final receipt, avoiding a self-referential handoff hash.",
+    "historical_parent_handoff_binding": {
+      "path": "docs/research-program/handoffs/PR-002.json",
+      "sha256": "0898c2b1a670263c73e03d4e814b0c7c8d3ca0e6a8e8ee9795e3dd6442a1a388",
+      "bytes": 88682,
+      "commit": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+      "tree": "ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94",
+      "git_blob_sha": "d11502d3c3867149705426da8218713f1befe478",
+      "status": "historical_C3_reviewed_head_before_correction",
+      "verification": "git show 7593591037d37a7105770ab6d4875a40dd9db3a0:docs/research-program/handoffs/PR-002.json then SHA-256"
+    }
+  },
+  "c3_review_correction_checks": {
+    "agentctl_task_id": "ushso-pr002-c3-corrections-20260910-luna-max",
+    "agentctl_event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+    "agentctl_receipt_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/receipt.json",
+    "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr002-c3-corrections-20260910",
+    "branch": "codex/ushso-pr002-c3-corrections-20260910",
+    "writer_lock": "eec4bc4b7bcc4bdc9f673b8312409ac3",
+    "records": [
+      {
+        "agentctl_command_id": "cmd-0001-b6b9b19a",
+        "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+        "event_seq": 5,
+        "check_name": "pinned npm ci in prepared worktree",
+        "command": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm ci",
+        "started_at": "2026-09-10T21:08:32.847Z",
+        "completed_at": "2026-09-10T21:08:37.261Z",
+        "exit_code": 0,
+        "result": "Pinned npm 11.19.1 setup completed: 186 packages added, 257 audited, 0 vulnerabilities. npm reported expected install-script allowlist warnings for esbuild/workerd; lockfile unchanged."
+      },
+      {
+        "agentctl_command_id": "cmd-0003-f93732a9",
+        "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+        "event_seq": 7,
+        "check_name": "focused C1 regression fixtures",
+        "command": "python3 -B verification/research-program/pr-002/test_c1_corrections.py",
+        "started_at": "2026-09-10T21:19:33.041314Z",
+        "completed_at": "2026-09-10T21:19:33.088946Z",
+        "exit_code": 0,
+        "receipt_path": "verification/research-program/pr-002/command-receipts/c3-correction-test-c1.json",
+        "receipt_sha256": "a9f4d2af6d501e9fcf6af6ec09ea0b9416677e9602d8f96489d64b4c55902201",
+        "receipt_bytes": 759,
+        "result": "C1 correction fixtures passed"
+      },
+      {
+        "agentctl_command_id": "cmd-0004-78f2ef3d",
+        "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+        "event_seq": 8,
+        "check_name": "focused C2 regression fixtures",
+        "command": "python3 -B verification/research-program/pr-002/test_c2.py",
+        "started_at": "2026-09-10T21:20:07.372354Z",
+        "completed_at": "2026-09-10T21:20:07.955601Z",
+        "exit_code": 0,
+        "receipt_path": "verification/research-program/pr-002/command-receipts/c3-correction-test-c2.json",
+        "receipt_sha256": "8b133e92847d0d05b73526aaada1676b244926f60a4795b893e026c9a42b858f",
+        "receipt_bytes": 748,
+        "result": "C2 correction fixtures passed, including R06/R12/R14/R11 contracts"
+      },
+      {
+        "agentctl_command_id": "cmd-0008-3f8787e5",
+        "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+        "event_seq": 12,
+        "check_name": "final C3 correction fixtures",
+        "command": "python3 -B verification/research-program/pr-002/test_c3.py",
+        "started_at": "2026-09-10T21:24:49.461515Z",
+        "completed_at": "2026-09-10T21:24:51.960280Z",
+        "exit_code": 0,
+        "receipt_path": "verification/research-program/pr-002/command-receipts/c3-correction-test-c3-final.json",
+        "receipt_sha256": "99d99ba13656538608d17189e958f33651287bc4d247c219e7868ee0e43c5ed6",
+        "receipt_bytes": 748,
+        "result": "C3 fixtures passed, including full record/flag/overlay negatives"
+      },
+      {
+        "agentctl_command_id": "cmd-0009-feb33988",
+        "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+        "event_seq": 13,
+        "check_name": "final read-only C3 correction verifier",
+        "command": "python3 -B verification/research-program/pr-002/verify.py --repo .",
+        "started_at": "2026-09-10T21:25:23.646066Z",
+        "completed_at": "2026-09-10T21:25:24.657480Z",
+        "exit_code": 0,
+        "receipt_path": "verification/research-program/pr-002/command-receipts/c3-correction-verify-readonly-final.json",
+        "receipt_sha256": "f9c1443b7ff25f2dff2aaccc41ed0cb84430976c7cfbe5397eb1877ca8f2a78e",
+        "receipt_bytes": 770,
+        "result": "ok=true; failed_checks=[]; no receipt or __pycache__ writes"
+      },
+      {
+        "agentctl_command_id": "cmd-0010-a975927a",
+        "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+        "event_seq": 14,
+        "check_name": "final portable C3 correction replay",
+        "command": "python3 -B verification/research-program/pr-002/c3-pilot-selection/replay_portable.py --repo .",
+        "started_at": "2026-09-10T21:25:57.664801Z",
+        "completed_at": "2026-09-10T21:25:58.206355Z",
+        "exit_code": 0,
+        "receipt_path": "verification/research-program/pr-002/command-receipts/c3-correction-portable-replay-final.json",
+        "receipt_sha256": "4f245fdf9aaf3838b2f1b0045cbd6c2e461982d380a7cd6722fa48c8e893db77",
+        "receipt_bytes": 798,
+        "result": "ok=true; sealed inputs checked; selection not recomputed"
+      },
+      {
+        "agentctl_command_id": "cmd-0011-b999ed49",
+        "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+        "event_seq": 15,
+        "check_name": "current and historical C3 handoff hash audit (initial)",
+        "command": "python3 -B /mnt/d/tmp/plumbob/ushso-research-program-20260910/audit-c3-correction-handoff.py --repo . --output verification/research-program/pr-002/c3-correction-handoff-audit.json",
+        "started_at": "2026-09-10T21:34:00.737Z",
+        "completed_at": "2026-09-10T21:34:00.903Z",
+        "inner_started_at": "2026-09-10T21:34:00.776081Z",
+        "inner_completed_at": "2026-09-10T21:34:00.896006Z",
+        "exit_code": 1,
+        "receipt_path": "verification/research-program/pr-002/c3-correction-handoff-audit.json",
+        "receipt_sha256": "a0f51e7a154ca3b920d6339f113f70ab1c8746229328407073ba2e35aa3fbae9",
+        "receipt_bytes": 2937,
+        "result": "Checker initially failed on four historical rows whose exact SHA-256 matched but whose legacy bytes field was intentionally absent; no current artifact or scope failure was found."
+      },
+      {
+        "agentctl_command_id": "cmd-0012-e28ef9ee",
+        "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+        "event_seq": 16,
+        "check_name": "final current and historical C3 handoff hash audit",
+        "command": "python3 -B /mnt/d/tmp/plumbob/ushso-research-program-20260910/audit-c3-correction-handoff.py --repo . --output verification/research-program/pr-002/c3-correction-handoff-audit-final.json",
+        "started_at": "2026-09-10T21:35:04.424Z",
+        "completed_at": "2026-09-10T21:35:04.577Z",
+        "inner_started_at": "2026-09-10T21:35:04.460940Z",
+        "inner_completed_at": "2026-09-10T21:35:04.569359Z",
+        "exit_code": 0,
+        "receipt_path": "verification/research-program/pr-002/c3-correction-handoff-audit-final.json",
+        "receipt_sha256": "4f8c9a55a18ff231824a788b5f8c66643d97594f5ca37a155624173890ea6048",
+        "receipt_bytes": 1215,
+        "result": "current_artifacts_match=true for 78 pre-audit entries; historical_commit_bound_artifacts_match=true for 19; parent C3 handoff binding, sealed manifest, scope, and no-pycache checks passed."
+      },
+      {
+        "agentctl_command_id": "cmd-0013-3eb50495",
+        "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+        "event_seq": 17,
+        "check_name": "post-handoff external current and historical hash replay",
+        "command": "python3 -B /mnt/d/tmp/plumbob/ushso-research-program-20260910/audit-c3-correction-handoff.py --repo . --output /mnt/d/tmp/plumbob/ushso-research-program-20260910/c3-correction-handoff-post-final-audit.json",
+        "started_at": "2026-09-10T21:36:57.303Z",
+        "completed_at": "2026-09-10T21:36:57.460Z",
+        "inner_started_at": "2026-09-10T21:36:57.336996Z",
+        "inner_completed_at": "2026-09-10T21:36:57.447383Z",
+        "exit_code": 0,
+        "external_receipt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/c3-correction-handoff-post-final-audit.json",
+        "external_receipt_sha256": "87d3bc1316f3a368320ed2c63dbfd28fc6e19223e76d54d540d9341039f88daa",
+        "external_receipt_bytes": 1215,
+        "result": "current_artifact_count=80; current_artifacts_match=true; historical_commit_bound_count=19; historical_commit_bound_artifacts_match=true; parent C3 binding, sealed manifest, scope, and no-pycache checks passed."
+      }
+    ],
+    "artifact_hashes": {
+      "verification/research-program/pr-002/c3_lib.py": {
+        "sha256": "2b5259025831b5a8e5bee91cf2da2a65b6dafc05ac63bd454d44522966b81849",
+        "bytes": 55851
+      },
+      "verification/research-program/pr-002/test_c3.py": {
+        "sha256": "3752a19f7a414ee61a561237389ced38f3bf1e2e0e9eba299544899dcdc8ab71",
+        "bytes": 10340
+      },
+      "verification/research-program/pr-002/c3-negative-fixtures.json": {
+        "sha256": "1325b9666e7e1099cda91773edf72d795ff2815fcc58b07c40bf53004f5c9d82",
+        "bytes": 5841
+      },
+      "verification/research-program/pr-002/verify.py": {
+        "sha256": "183e92d3d1df1e5c15a37716cc0714b4e112dac3333430d38117a11b829dc996",
+        "bytes": 18150
+      },
+      "verification/research-program/pr-002/c3-correction-contract-receipt.json": {
+        "sha256": "26b55e6aa0e0bee84fb788e5920c02901428574e5a60f4b36eb0bb9c02945c27",
+        "bytes": 8084
+      },
+      "verification/research-program/pr-002/command-receipts/c3-correction-test-c1.json": {
+        "sha256": "a9f4d2af6d501e9fcf6af6ec09ea0b9416677e9602d8f96489d64b4c55902201",
+        "bytes": 759
+      },
+      "verification/research-program/pr-002/command-receipts/c3-correction-test-c2.json": {
+        "sha256": "8b133e92847d0d05b73526aaada1676b244926f60a4795b893e026c9a42b858f",
+        "bytes": 748
+      },
+      "verification/research-program/pr-002/command-receipts/c3-correction-test-c3.json": {
+        "sha256": "6887a043085532c5c6e262f115f22cf7c30db58aa11d6ac0ebd10cf23417c609",
+        "bytes": 509
+      },
+      "verification/research-program/pr-002/command-receipts/c3-correction-test-c3-final.json": {
+        "sha256": "99d99ba13656538608d17189e958f33651287bc4d247c219e7868ee0e43c5ed6",
+        "bytes": 748
+      },
+      "verification/research-program/pr-002/command-receipts/c3-correction-verify-readonly.json": {
+        "sha256": "1ffb20140b119324c35c1f6d2d09864db10eef0da9a3767b51de0e8eb7c584a0",
+        "bytes": 531
+      },
+      "verification/research-program/pr-002/command-receipts/c3-correction-verify-readonly-final.json": {
+        "sha256": "f9c1443b7ff25f2dff2aaccc41ed0cb84430976c7cfbe5397eb1877ca8f2a78e",
+        "bytes": 770
+      },
+      "verification/research-program/pr-002/command-receipts/c3-correction-portable-replay.json": {
+        "sha256": "6be8ff42a03bc90634f88c9c79591a00beba788bc0132efccf9b3f6ff5e83b92",
+        "bytes": 559
+      },
+      "verification/research-program/pr-002/command-receipts/c3-correction-portable-replay-final.json": {
+        "sha256": "4f245fdf9aaf3838b2f1b0045cbd6c2e461982d380a7cd6722fa48c8e893db77",
+        "bytes": 798
+      },
+      "verification/research-program/pr-002/c3-correction-handoff-audit.json": {
+        "sha256": "a0f51e7a154ca3b920d6339f113f70ab1c8746229328407073ba2e35aa3fbae9",
+        "bytes": 2937
+      },
+      "verification/research-program/pr-002/c3-correction-handoff-audit-final.json": {
+        "sha256": "4f8c9a55a18ff231824a788b5f8c66643d97594f5ca37a155624173890ea6048",
+        "bytes": 1215
+      }
+    },
+    "failures_and_skipped_checks": [
+      {
+        "check": "initial bootstrap npm selection",
+        "status": "warning_corrected",
+        "reason": "Bootstrap emitted the known global npm 11.9 EBADENGINE warning. The pinned npm 11.19.1 command above completed successfully; committed lockfile remained unchanged."
+      },
+      {
+        "check": "candidate plan validator",
+        "status": "not_rerun_by_design",
+        "reason": "Root addendum records the exact 101-file scratch replay exit 0 and states the initial candidate failure was caused by validate.py deterministic writes on a read-only candidate, not a producer defect.",
+        "evidence_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c3-controller-review/producer-v2-7593591/plan-replay-addendum.json",
+        "evidence_sha256": "f26e7ea8f413cb657ca3793cd9b72c9fcd3a1b8d8333cb0c0617629fb35f23eb"
+      },
+      {
+        "check": "full npm test, npm run build, npm run cf:dry-run",
+        "status": "skipped_bounded_metadata_correction",
+        "reason": "This correction changes Python metadata validators, fixtures, verifier wiring, and evidence handoff only; integration owns the full release gate."
+      },
+      {
+        "check": "initial current and historical C3 handoff hash audit",
+        "status": "failed_then_corrected",
+        "agentctl_command_id": "cmd-0011-b999ed49",
+        "reason": "The audit checker compared absent legacy bytes fields as if they were stated sizes, while all four historical SHA-256 values matched their Git-bound bytes. The corrected predicate compares size only when a historical row states bytes; the final audit passed.",
+        "preserved_failure_receipt": "verification/research-program/pr-002/c3-correction-handoff-audit.json",
+        "corrective_receipt": "verification/research-program/pr-002/c3-correction-handoff-audit-final.json"
+      }
+    ],
+    "no_network_provider_model_or_private_evaluator_access": true,
+    "self_commit_sha": null,
+    "self_tree": null,
+    "self_binding": "Root binds final correction commit/tree from external receipt after independent review.",
+    "current_artifact_count_after_audit_evidence_rows": 80,
+    "post_handoff_external_audit": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/c3-correction-handoff-post-final-audit.json",
+      "sha256": "87d3bc1316f3a368320ed2c63dbfd28fc6e19223e76d54d540d9341039f88daa",
+      "bytes": 1215,
+      "exit_code": 0
+    }
   }
 }

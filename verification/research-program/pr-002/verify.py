@@ -252,9 +252,9 @@ def main() -> int:
         if c3_frozen:
             checks["c2_tasks_rebuild"] = True
             checks["c3_tasks_rebuild"] = tasks_payload == c3_lib.build_tasks_payload(repo)
-            checks["c3_acceptance"] = c3_lib.assert_c3_acceptance_document(acceptance_text) == []
+            checks["c3_acceptance"] = c3_lib.assert_c3_acceptance_document(acceptance_text, repo) == []
             checks["c3_pilot_identities"] = c3_lib.assert_pilot_identities(written) == []
-            checks["c3_expansion_families"] = c3_lib.assert_expansion_families(written) == []
+            checks["c3_expansion_families"] = c3_lib.assert_expansion_families(written, rebuilt["products"]) == []
             checks["c3_c1_projection"] = (
                 c2_lib.extract_c1_projection(written) == c2_lib.extract_c1_projection(rebuilt)
             )

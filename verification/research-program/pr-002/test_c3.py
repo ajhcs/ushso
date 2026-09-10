@@ -79,7 +79,7 @@ def test_tasks_and_acceptance_bind_c3_frames() -> None:
     assert tasks["c1_identities"]["cohorts_sha256"] == c3_lib.digest(repo / "evaluation/research-program/cohorts.json")
     assert tasks["requirement_status"] == {req: "unaccepted" for req in c2_lib.REQUIREMENT_IDS}
     text = (repo / "docs/research-program/acceptance.md").read_text(encoding="utf-8")
-    assert c3_lib.assert_c3_acceptance_document(text) == []
+    assert c3_lib.assert_c3_acceptance_document(text, repo) == []
     assert c3_lib.R09_FRAME_STATE in text
     assert c3_lib.R10_FRAME_STATE in text
 
@@ -123,6 +123,39 @@ def test_negative_family_substitution() -> None:
     assert any("family identities" in item or "substituted" in item for item in errors)
 
 
+def test_negative_family_overlay_field() -> None:
+    mutated = c3_lib.mutate_for_negative(load_cohorts(), "family_overlay_field")
+    errors = c3_lib.assert_expansion_families(mutated)
+    assert any("expansion_families.families[0].publisher" in item for item in errors)
+
+
+def test_negative_full_frozen_records_and_contract_flags() -> None:
+    written = load_cohorts()
+    cases = {
+        "hospital_native_identity": "mrf_selection.hospitals[0].native_identity.value",
+        "hospital_projection_row": "mrf_selection.hospitals[0].selected_row.projection_directory_row_index",
+        "hospital_display_name": "mrf_selection.hospitals[0].facility_name",
+        "payer_native_identity": "mrf_selection.payers[0].native_identity.value",
+        "payer_workbook_row": "mrf_selection.payers[0].selected_cell.workbook_sheet_row",
+        "payer_stored_cell": "mrf_selection.payers[0].selected_cell.raw_workbook_wire_values.A.stored_value",
+        "freeze_before_endpoint_results": "mrf_selection.freeze_before_endpoint_results",
+        "selection_consumed_not_recomputed": "mrf_selection.selection_consumed_not_recomputed",
+        "silent_substitution_allowed": "mrf_selection.silent_substitution_allowed",
+        "denominator_may_not_shrink": "mrf_selection.denominator_may_not_shrink",
+    }
+    for kind, path in cases.items():
+        errors = c3_lib.assert_pilot_identities(c3_lib.mutate_for_negative(written, kind))
+        assert any(path in item for item in errors), (kind, errors)
+
+
+def test_negative_acceptance_rendering() -> None:
+    repo = repo_root()
+    text = (repo / "docs/research-program/acceptance.md").read_text(encoding="utf-8")
+    mutated = text.replace(c3_lib.R09_FRAME_STATE, "mutated_r09_frame_state", 1)
+    errors = c3_lib.assert_c3_acceptance_document(mutated, repo)
+    assert any("exactly match" in item for item in errors)
+
+
 def test_counts_or_truthy_list_are_insufficient() -> None:
     mutated = copy.deepcopy(load_cohorts())
     mutated["mrf_selection"]["hospital_candidate_ids"][0] = "000000"
@@ -143,6 +176,18 @@ def test_negative_fixture_file_is_decisive() -> None:
         "NEG-C3-EVIDENCE-HASH-MISMATCH",
         "NEG-C3-MISSING-REQUIREMENT-KEYS",
         "NEG-C3-FAMILY-SUBSTITUTION",
+        "NEG-C3-FAMILY-OVERLAY-FIELD",
+        "NEG-C3-HOSPITAL-NATIVE-IDENTITY",
+        "NEG-C3-HOSPITAL-PROJECTION-ROW",
+        "NEG-C3-HOSPITAL-DISPLAY-NAME",
+        "NEG-C3-PAYER-NATIVE-IDENTITY",
+        "NEG-C3-PAYER-WORKBOOK-ROW",
+        "NEG-C3-PAYER-STORED-CELL",
+        "NEG-C3-FREEZE-BEFORE-ENDPOINT-RESULTS",
+        "NEG-C3-SELECTION-CONSUMED-NOT-RECOMPUTED",
+        "NEG-C3-SILENT-SUBSTITUTION-ALLOWED",
+        "NEG-C3-DENOMINATOR-MAY-NOT-SHRINK",
+        "NEG-C3-ACCEPTANCE-RENDERING",
     ]
     assert all(item["expected"] == "reject" for item in fixtures["fixtures"])
 
@@ -172,6 +217,9 @@ if __name__ == "__main__":
         test_negative_evidence_hash_mismatch,
         test_negative_missing_requirement_keys,
         test_negative_family_substitution,
+        test_negative_family_overlay_field,
+        test_negative_full_frozen_records_and_contract_flags,
+        test_negative_acceptance_rendering,
         test_counts_or_truthy_list_are_insufficient,
         test_negative_fixture_file_is_decisive,
         test_receipt_output_refuses_historical_paths,
