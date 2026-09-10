@@ -1,0 +1,89 @@
+{
+  "schema": "ushso.pr002.c3-accounting-review.v1",
+  "reviewer": "Luna Max",
+  "review_kind": "bounded_root_authored_acceptance_publication_accounting",
+  "status": "accounting_review_only_no_acceptance",
+  "reviewed_at": null,
+  "reviewed_at_note": "Exact event timestamp is unavailable for this bounded read-only accounting review; no timestamp is inferred.",
+  "scope": {
+    "integration_worktree": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910",
+    "integration_commit": "45c9effaa9f79e5178d0f6fe2d7429a0a4216989",
+    "integration_tree": "19bc1ca0fdd0f9c9e9ba9645827123bd240ef7d4",
+    "c3_commit": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+    "c3_tree": "ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94",
+    "records_read": [
+      "verification/research-program/bootstrap/pr002-c3-grok-completion.json",
+      "verification/research-program/bootstrap/pr002-c3-review-7593591.json",
+      "verification/research-program/bootstrap/pr002-c3-plan-review-addendum-7593591.json",
+      "verification/research-program/bootstrap/pr002-c3-publication-review-7593591.json",
+      "verification/research-program/bootstrap/pr002-c3-family-precommit-review.json",
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/publication-45c9eff-and-c3.json",
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr12-body-c3-reviewed-45c9eff.md",
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr14-body-c3-reviewed-45c9eff.md"
+    ],
+    "excluded": [
+      "tests and replays",
+      "network and providers",
+      "live C3 correction worktree",
+      "private evaluator inputs",
+      "unlisted task logs and history"
+    ]
+  },
+  "findings": [
+    {
+      "id": "C3-ACCOUNTING-BASE-001",
+      "status": "pass",
+      "finding": "The checkpoint preserves accepted C1/C2 provenance. The Grok C3 completion record and root review both bind C3 to accepted C2 base 997070bd94864fabedf73acecd422c6e15a3ed7e; the PR bodies retain the C1/C2 acceptance evidence and do not rewrite it."
+    },
+    {
+      "id": "C3-ACCOUNTING-STATUS-001",
+      "status": "pass",
+      "finding": "Completion of the Grok run is recorded separately from review disposition: C3 is status completed at 7593591/ded3c2, while review_status is changes_requested with exactly PR002-C3-001 and PR002-C3-002 open."
+    },
+    {
+      "id": "C3-ACCOUNTING-REPLAY-001",
+      "status": "pass_bounded",
+      "finding": "The root review reports 655 assertions with 643 passed and 12 failed: 10 intended validator negatives, one unbound historical whole-file SHA, and one initial read-only plan-validator command. Five code/input replays are recorded successful. The exact 101-file scratch plan replay is separately recorded exit 0; the initial read-only failure remains disclosed as an environment/write-mode issue."
+    },
+    {
+      "id": "C3-ACCOUNTING-PUBLICATION-001",
+      "status": "pass_with_wording_correction",
+      "finding": "The publication disposition contains 1,014 findings: 1,010 exact public Census evidence/provenance references and four known deterministic/public hashes; credential_finding_count is zero and scan_exit_code remains 1. The 1,010 value is a disposition-row/reference count, not 1,010 distinct identifier strings: the record counts 886 unique strings (824 evidence and 62 provenance). Publication summaries should say 1,010 references/matches, or include the distinct count."
+    },
+    {
+      "id": "C3-ACCOUNTING-PROVENANCE-001",
+      "status": "pass",
+      "finding": "Current scan provenance is distinguished from historical identity evidence. The publication record names current C3 head 7593591, while its known-identity calculation is the historical c92465f baseline and its public corpus sources are the historical 45210704 baseline records. The PR bodies describe these as previously public corpus identifiers/known hashes; retain that historical qualifier."
+    },
+    {
+      "id": "C3-ACCOUNTING-FAMILY-BOUNDARY-001",
+      "status": "pass_bounded",
+      "finding": "The family record is explicitly precommit review only. The checkpoint keeps C3 changes requested, retains the two implementation findings, and states that R01-R16 remain unaccepted. No family review or publication disposition is treated as scientific or final C3 acceptance."
+    },
+    {
+      "id": "C3-ACCOUNTING-DRAFT-ID-001",
+      "status": "pass",
+      "finding": "The supplied publication identity record matches the checkpoint: draft PR12 is open at root integration head 45c9eff/tree 19bc1ca, and draft PR14 is open at C3 head 7593591/tree ded3c2. The exact PR12 and PR14 body hashes are recorded below."
+    }
+  ],
+  "required_corrections": [
+    "Use 1,010 exact public Census evidence/provenance references or matches, with 886 distinct identifier strings if a distinct-ID count is presented.",
+    "Preserve publication scan_exit_code 1 and the distinction between current C3 scan head and historical public baseline provenance in any reused summary.",
+    "Keep C3 unaccepted until PR002-C3-001 and PR002-C3-002 are corrected and freshly reviewed; preserve R01-R16 as unaccepted."
+  ],
+  "source_hashes_sha256": {
+    "verification/research-program/bootstrap/pr002-c3-grok-completion.json": "927daa240eca18f525a01083b62c4d263124bde64842801e8265216bda1a01f6",
+    "verification/research-program/bootstrap/pr002-c3-review-7593591.json": "b6bfd3bca9b5b5cd6f1ba46b5001f24a79336548cc257a90a120eecab00163c7",
+    "verification/research-program/bootstrap/pr002-c3-plan-review-addendum-7593591.json": "f26e7ea8f413cb657ca3793cd9b72c9fcd3a1b8d8333cb0c0617629fb35f23eb",
+    "verification/research-program/bootstrap/pr002-c3-publication-review-7593591.json": "a3c2ddbaca7cceaf913f186d5b2583b8e07d23c1f4ead978ccd7933ad152969b",
+    "verification/research-program/bootstrap/pr002-c3-family-precommit-review.json": "1849362491ffa442d6875d9fdc5a62163dff40e32321721411c27b6a359a3a78",
+    "/mnt/d/tmp/plumbob/ushso-research-program-20260910/publication-45c9eff-and-c3.json": "69f013a9ed01de0446bc12c1d4aac2a209c9789de1ee6b1c1beef53c9dbdc582",
+    "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr12-body-c3-reviewed-45c9eff.md": "a8c48b49c31edf4ee7d74f4cd2f232d06d6c7037bc64440722613b1a80cbf3ee",
+    "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr14-body-c3-reviewed-45c9eff.md": "0a64da492da31ab8cbf8a0e49031161b8e7a7aa6458d92814cb37202dcb6e686"
+  },
+  "limitations": [
+    "This is an accounting/publication-boundary review of root-authored records, not independent re-approval of the C3 implementation, scientific outcomes, evaluator results, or release gate.",
+    "No tests, replay commands, network/provider calls, live worktree inspection, or private evaluator access were performed for this receipt. Reported check counts and exits are copied from the named immutable records.",
+    "The publication scan's nonzero exit is preserved; zero credential findings describes disposition classification, not a clean scanner process exit."
+  ]
+}
