@@ -8,3 +8,4 @@ export * from './normalize.mjs';
 export * from './projection.mjs';
 export * from './review-candidates.mjs';
 export * from './store.mjs';
+export * from './field-observation.mjs';
