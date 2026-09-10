@@ -4,7 +4,7 @@
   "title": "USHSO research completeness view",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "artifact_version", "artifact_id", "artifact_digest", "generated_at", "cohort", "generation", "as_of", "membership", "field_definitions", "records", "aggregates", "boundaries"],
+  "required": ["schema_version", "artifact_version", "artifact_id", "artifact_digest", "generated_at", "cohort", "generation", "as_of", "vector_encoding", "evidence_catalog", "access_summary", "membership", "field_definitions", "records", "aggregates", "boundaries"],
   "properties": {
     "schema_version": { "const": "ushso.completeness-view.v1.0.0" },
     "artifact_version": { "const": "ushso.completeness-artifact.v1.0.0" },
@@ -13,6 +13,9 @@
     "generated_at": { "type": "string", "format": "date-time" },
     "cohort": { "type": "string", "minLength": 1, "maxLength": 500 },
     "generation": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "vector_encoding": { "enum": ["full-v1", "compact-v1"] },
+    "evidence_catalog": { "type": "array", "items": { "$ref": "#/$defs/evidenceRef" } },
+    "access_summary": { "oneOf": [{ "$ref": "#/$defs/accessSummary" }, { "type": "null" }] },
     "as_of": { "type": "string", "format": "date-time" },
     "membership": { "$ref": "#/$defs/membership" },
     "field_definitions": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/fieldDefinition" } },
@@ -78,7 +81,65 @@
         "field_role": { "enum": ["identifier", "dimension", "measure_description", "date", "geography", "suppression_flag", "metadata", "unknown"] },
         "unit": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
         "required_for_readiness": { "type": "boolean" },
-        "observation": { "$ref": "https://ushso.org/packages/normalization/v1.0.0/schemas/field-observation.schema.json" }
+        "observation": { "oneOf": [{ "$ref": "https://ushso.org/packages/normalization/v1.0.0/schemas/field-observation.schema.json" }, { "$ref": "#/$defs/compactObservation" }] }
+      }
+    },
+    "evidenceRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["evidence_id", "evidence_state", "observed_at", "source_locator", "claim_paths", "staleness_state"],
+      "properties": {
+        "evidence_id": { "type": "string", "minLength": 3 },
+        "evidence_state": { "enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven", "disputed"] },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "source_locator": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
+        "claim_paths": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "staleness_state": { "enum": ["current", "stale", "unknown", "not_applicable"] }
+      }
+    },
+    "compactObservation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observation_id", "record_id", "source_id", "field_id", "field_role", "unit", "value", "value_state", "evidence_state", "applicability_state", "attempt_state", "endpoint_scope", "evidence_ids", "reason_codes", "source_observed_at", "observed_at", "recorded_at", "attempted_at", "stale_at", "browser_observations", "history"],
+      "properties": {
+        "observation_id": { "type": "string", "minLength": 3 },
+        "record_id": { "type": "string", "minLength": 3 },
+        "source_id": { "type": "string", "minLength": 3 },
+        "field_id": { "type": "string", "minLength": 3 },
+        "field_role": { "type": "string", "minLength": 1 },
+        "unit": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
+        "value": { "type": "object", "required": ["kind", "value"], "properties": { "kind": { "type": "string" }, "value": {} } },
+        "value_state": { "enum": ["known", "unknown"] },
+        "evidence_state": { "enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven", "disputed"] },
+        "applicability_state": { "enum": ["supported", "unsupported", "missing", "not_applicable", "conflicting", "unknown"] },
+        "attempt_state": { "enum": ["not_attempted", "succeeded", "restricted", "failed", "blocked", "unavailable", "stale", "unknown"] },
+        "endpoint_scope": { "$ref": "#/$defs/endpointScope" },
+        "evidence_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 3 } },
+        "reason_codes": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "source_observed_at": { "$ref": "#/$defs/nullableDateTime" },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "recorded_at": { "type": "string", "format": "date-time" },
+        "attempted_at": { "$ref": "#/$defs/nullableDateTime" },
+        "stale_at": { "$ref": "#/$defs/nullableDateTime" },
+        "browser_observations": { "type": "array" },
+        "history": { "type": "array" }
+      }
+    },
+    "endpointScope": {
+      "type": "object", "additionalProperties": false, "required": ["endpoint_id", "resource", "operation"],
+      "properties": {
+        "endpoint_id": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
+        "resource": { "oneOf": [{ "type": "string" }, { "type": "null" }] },
+        "operation": { "enum": ["metadata_read", "payload_read", "schema_read", "browser_read", "other"] }
+      }
+    },
+    "nullableDateTime": { "oneOf": [{ "type": "string", "format": "date-time" }, { "type": "null" }] },
+    "accessSummary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "as_of", "endpoint_scopes", "boundaries"],
+      "properties": {
+        "schema_version": { "const": "ushso.access-summary.v1.0.0" },
+        "as_of": { "type": "string", "format": "date-time" },
+        "endpoint_scopes": { "type": "array", "items": { "type": "object" } },
+        "boundaries": { "type": "object" }
       }
     },
     "partition": {

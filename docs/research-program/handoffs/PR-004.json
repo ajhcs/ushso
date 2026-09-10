@@ -1,0 +1,446 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-004",
+  "status": "producer_checked_pending_independent_review",
+  "owner": "Luna Max (luna-max-pr004)",
+  "reviewer": "Astra",
+  "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+  "head_sha": null,
+  "dependency_merge_shas": {
+    "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
+    "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
+  },
+  "branch": "codex/ushso-pr004-field-states-20260910",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/coverage/index.mjs",
+    "packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json",
+    "packages/coverage/research-program/v1.0.0/src/completeness.mjs",
+    "packages/normalization/manifests/package-manifest.json",
+    "packages/normalization/schemas/field-observation.schema.json",
+    "packages/normalization/src/field-observation.mjs",
+    "packages/normalization/src/index.mjs",
+    "tests/research-program/field-states.test.mjs",
+    "docs/research-program/handoffs/PR-004.json",
+    "verification/research-program/pr-004/build-completeness-view.mjs",
+    "verification/research-program/pr-004/completeness-view.json",
+    "verification/research-program/pr-004/evidence.json",
+    "verification/research-program/pr-004/verify.mjs"
+  ],
+  "problem": "The research program needed versioned field observations and a complete, replayable coverage vector that preserves unknown, failed, blocked, unavailable, stale, and isolated states while keeping access evidence separate from catalog membership.",
+  "resulting_behavior": "PR-004 adds validated field observation and revision-history semantics, deterministic as-of derivation and access summaries, exact cohort membership projection, a signed offline compact completeness artifact, recomputed metrics/evidence bindings, and offline consumer checks. Supplied access summaries are bound to the exact full input or compact vector projections; publisher-native identifiers are kept distinct from stable USHSO record_id values.",
+  "commits": [
+    {
+      "id": "C-004-1",
+      "sha": "dafe6f5ea6d86eb94c47d911e6f601a38cf968c5",
+      "tree": "7bf13af088b220b0aea7861e19002cae7dfab3b1",
+      "parent": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+      "subject": "Add versioned field observation states"
+    },
+    {
+      "id": "C-004-2",
+      "sha": "21b1b12ba3707d89afb967b7b97133277d73044c",
+      "tree": "f55f83f9761698fb4db5087ef8103bc7a8092cb8",
+      "parent": "dafe6f5ea6d86eb94c47d911e6f601a38cf968c5",
+      "subject": "Project exact field coverage from ledger membership"
+    },
+    {
+      "id": "C-004-3",
+      "sha": null,
+      "tree": null,
+      "parent": "21b1b12ba3707d89afb967b7b97133277d73044c",
+      "subject": "Add offline completeness artifact and review-hardened state semantics",
+      "head_binding": "Root binds final immutable commit and tree after producer commit."
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "PR-001 baseline",
+      "path": "docs/research-program/baseline.json",
+      "sha256": "09f8f507697da7d40e1cea452e39c5f07c45a16ffd1ca8a7f723de61c40961dc",
+      "record_count": 3434,
+      "searchable_record_count": 3430,
+      "manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e"
+    },
+    {
+      "kind": "accepted PR-002 cohorts",
+      "path": "evaluation/research-program/cohorts.json",
+      "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+      "selection_status": "accepted frozen membership"
+    },
+    {
+      "kind": "corpus identity",
+      "path": "packages/retrieval/versions/v1.2.0/corpus/",
+      "corpus_id": "ushso-live-catalog-2026-09-03",
+      "generation": "live-2026-09-03-85b50522b420",
+      "manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e",
+      "record_count": 3434,
+      "searchable_record_count": 3430,
+      "source_slices": {
+        "cms-data-catalog": 159,
+        "cdc-socrata": 1472,
+        "census-api": 1803
+      },
+      "isolated_record_ids": [
+        "obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b",
+        "obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250",
+        "obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e",
+        "obs:asset:cdc-socrata:va9e-d8re-c845d9bfb921e339"
+      ]
+    },
+    {
+      "kind": "locked research assets",
+      "path": "config/research-assets.lock.json",
+      "lock_sha256": "75f362a1545f469a74bef00b7d7126fd03ffbfc79e4e6421bafe9fcf62db6c3b",
+      "archive_sha256": "153f7b8c8934095882e46f134334ddb5f6ef29a03aed8358d71878f92ac4a76f",
+      "archive_bytes": 163540588,
+      "archive_url": "https://github.com/ajhcs/ushso/releases/download/research-assets-153f7b8c89340958/research-assets-153f7b8c8934095882e46f134334ddb5f6ef29a03aed8358d71878f92ac4a76f.tar.gz",
+      "dictionary_review_manifest_sha256": "0f10c6b764d054cd15324c4a1d93d6da191d86b792976d9573cdf27feceecb6b",
+      "dictionary_review_tree_sha256": "f06d3190d5fc4a3a36b51dd2c1d722d0e790e6c628213fb7cd9c700f1d3d79e5",
+      "publication_status": "pending owner/scientific review; publication_authorized false"
+    },
+    {
+      "kind": "coverage input binding",
+      "membership_hash": "sha256:0b69f22d8dc2e4010716b871f80ef3a93ee019de4a032e3d37a77422758b266f",
+      "record_count": 3434,
+      "source_membership_count": 3434,
+      "isolated_count": 4,
+      "vector_encoding": "compact-v1"
+    },
+    {
+      "kind": "retained independent input review",
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/bootstrap-review/pr001-input-identity-review.json",
+      "sha256": "8be1879e0c240da91f93a7645c8e07acdcd910b86c1046e8b4d9023464cc8616",
+      "finding": "1483/1483 preserved original manifest entries and locked research archive identities matched."
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-0033-cc48a561",
+      "kind": "test",
+      "argv": [
+        "npm",
+        "test",
+        "--prefix",
+        "packages/normalization"
+      ],
+      "started_at": "2026-09-10T23:16:07.768Z",
+      "ended_at": "2026-09-10T23:16:23.843Z",
+      "exit_code": 0,
+      "duration_ms": 16075,
+      "stdout_sha256": "348258672a074ef8ec586f08a079d931f3b444cebafa5cc5fdba8dd6c6f78a42",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0034-80e45125",
+      "kind": "test",
+      "argv": [
+        "npm",
+        "run",
+        "validate",
+        "--prefix",
+        "packages/normalization"
+      ],
+      "started_at": "2026-09-10T23:16:34.919Z",
+      "ended_at": "2026-09-10T23:16:38.377Z",
+      "exit_code": 0,
+      "duration_ms": 3458,
+      "stdout_sha256": "ad7e86599a0a5ae5ddce2cd5bf38ea635cbcdd4c6614e88bb8c31cb0b42f1907",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0035-f8a93992",
+      "kind": "test",
+      "argv": [
+        "npm",
+        "test",
+        "--prefix",
+        "packages/coverage/accounting/v1.0.0"
+      ],
+      "started_at": "2026-09-10T23:16:49.370Z",
+      "ended_at": "2026-09-10T23:16:50.529Z",
+      "exit_code": 0,
+      "duration_ms": 1159,
+      "stdout_sha256": "c474880d60670a597da617f1e1442766744a4dd9290fbe3f58b90d60d889c185",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0036-32e1635e",
+      "kind": "test",
+      "argv": [
+        "npm",
+        "run",
+        "validate",
+        "--prefix",
+        "packages/coverage/accounting/v1.0.0"
+      ],
+      "started_at": "2026-09-10T23:17:02.148Z",
+      "ended_at": "2026-09-10T23:17:02.587Z",
+      "exit_code": 0,
+      "duration_ms": 438,
+      "stdout_sha256": "6c4a350b96e462394b145ae02bf18c464a323ddef467167769f392bce3d3b218",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0045-5f0fa96c",
+      "kind": "command",
+      "argv": [
+        "npm",
+        "run",
+        "manifest",
+        "--prefix",
+        "packages/normalization"
+      ],
+      "started_at": "2026-09-10T23:28:28.593Z",
+      "ended_at": "2026-09-10T23:28:28.774Z",
+      "exit_code": 0,
+      "duration_ms": 181,
+      "stdout_sha256": "8ea2561d747ad6d97c4db4e2b41523879d5a2cf5e89378b7bea445701af3b491",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0046-9c3ba1d7",
+      "kind": "test",
+      "argv": [
+        "npm",
+        "test",
+        "--prefix",
+        "packages/normalization"
+      ],
+      "started_at": "2026-09-10T23:28:33.053Z",
+      "ended_at": "2026-09-10T23:28:49.969Z",
+      "exit_code": 0,
+      "duration_ms": 16916,
+      "stdout_sha256": "e6c149767bf2ad864db532e4aec10a02ff76fad2489ba380eac85b7aa7cb2818",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0047-f361f242",
+      "kind": "test",
+      "argv": [
+        "npm",
+        "run",
+        "validate",
+        "--prefix",
+        "packages/normalization"
+      ],
+      "started_at": "2026-09-10T23:28:59.662Z",
+      "ended_at": "2026-09-10T23:29:03.556Z",
+      "exit_code": 0,
+      "duration_ms": 3895,
+      "stdout_sha256": "ad7e86599a0a5ae5ddce2cd5bf38ea635cbcdd4c6614e88bb8c31cb0b42f1907",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0048-c03234b1",
+      "kind": "command",
+      "argv": [
+        "node",
+        "verification/research-program/pr-004/build-completeness-view.mjs"
+      ],
+      "started_at": "2026-09-10T23:29:11.461Z",
+      "ended_at": "2026-09-10T23:29:20.289Z",
+      "exit_code": 0,
+      "duration_ms": 8827,
+      "stdout_sha256": "2216ff161cc048c6f99c66a99eacf209d96bc767c356dc61ad59546dd780498f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0049-776ce687",
+      "kind": "test",
+      "argv": [
+        "node",
+        "--test",
+        "tests/research-program/field-states.test.mjs"
+      ],
+      "started_at": "2026-09-10T23:31:40.659Z",
+      "ended_at": "2026-09-10T23:31:47.880Z",
+      "exit_code": 0,
+      "duration_ms": 7221,
+      "stdout_sha256": "926524b2c75e0208bdf020905d1aecad0ecdc74dea7bce2ff2c729ff5584c950",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0050-12bae875",
+      "kind": "command",
+      "argv": [
+        "node",
+        "verification/research-program/pr-004/verify.mjs"
+      ],
+      "started_at": "2026-09-10T23:31:53.136Z",
+      "ended_at": "2026-09-10T23:31:59.514Z",
+      "exit_code": 0,
+      "duration_ms": 6377,
+      "stdout_sha256": "51360fbd13895385476e763aa8e23fabc0fcf74c59bfe3612107fe8aeb8dc60c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0051-7f86289f",
+      "kind": "review",
+      "argv": [
+        "node",
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/additional-cases.mjs",
+        "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910/packages/normalization/src/field-observation.mjs"
+      ],
+      "started_at": "2026-09-10T23:32:08.088Z",
+      "ended_at": "2026-09-10T23:32:08.140Z",
+      "exit_code": 0,
+      "duration_ms": 52,
+      "stdout_sha256": "db11e6f4c0f3833bd013bb48b55fcdd702025f89a78de7611ca02ca6413cdea7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0052-9c25c7e1",
+      "kind": "command",
+      "argv": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import fs from 'node:fs'; JSON.parse(fs.readFileSync('packages/normalization/schemas/field-observation.schema.json','utf8')); JSON.parse(fs.readFileSync('packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json','utf8')); await import('./packages/normalization/src/field-observation.mjs'); await import('./packages/coverage/research-program/v1.0.0/src/completeness.mjs'); console.log('schema-json-and-module-import-pass')"
+      ],
+      "started_at": "2026-09-10T23:32:18.622Z",
+      "ended_at": "2026-09-10T23:32:18.658Z",
+      "exit_code": 0,
+      "duration_ms": 36,
+      "stdout_sha256": "adbff1cd50594502c188f9d9257e6312e4c7252f63e58eb5c9575aafebb0e40a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "cmd-0061-05becffb",
+      "kind": "review",
+      "argv": [
+        "node",
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/access-summary-binding.mjs",
+        "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+      ],
+      "started_at": "2026-09-10T23:42:17.098Z",
+      "ended_at": "2026-09-10T23:42:17.150Z",
+      "exit_code": 0,
+      "duration_ms": 52,
+      "stdout_sha256": "97b17b1df9dc5e905607e034c480ec92fd6c8ed87ccbf6486b069b0fe6efeb6a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "verification/research-program/pr-004/completeness-view.json",
+      "artifact_id": "urn:ushso:completeness-view:7b7c96e61de54453d327e6590eb8bd95100bbe07",
+      "artifact_digest": "sha256:7b7c96e61de54453d327e6590eb8bd95100bbe07def34c08cf5116430cbe92f2",
+      "file_sha256": "7f233cef27c61a56e9cfaaefd28940e9997c4aa8a9287744e76fe915ec3d2207",
+      "bytes": 16027638,
+      "vector_encoding": "compact-v1",
+      "record_count": 3434,
+      "source_membership_count": 3434,
+      "isolated_count": 4,
+      "vector_field_count": 13736,
+      "metric_count": 25,
+      "evidence_catalog_count": 3434
+    },
+    {
+      "path": "verification/research-program/pr-004/evidence.json",
+      "file_sha256": "b976c0b738f7981e4878e1862436c6138f62f913887d8a0462628390d4357b3c",
+      "bytes": 30244,
+      "format": "ushso.pr-evidence.v1",
+      "head_sha_note": "head is intentionally null until root binds post-commit immutable identity"
+    },
+    {
+      "path": "verification/research-program/pr-004/verify.mjs",
+      "file_sha256": "d576e206f5925e2d8da7cdd59d5e719cceaba2c5e4558977cd6b698d69e5ae7d",
+      "purpose": "offline replay checker"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "name": "focused field-state suite",
+      "command_id": "cmd-0049-776ce687",
+      "exit_code": 0,
+      "result": "11 tests passed"
+    },
+    {
+      "name": "normalization package tests",
+      "command_id": "cmd-0046-9c3ba1d7",
+      "exit_code": 0,
+      "result": "32 tests passed"
+    },
+    {
+      "name": "normalization validation",
+      "command_id": "cmd-0047-f361f242",
+      "exit_code": 0,
+      "result": "offline deterministic preflight passed"
+    },
+    {
+      "name": "artifact generation",
+      "command_id": "cmd-0048-c03234b1",
+      "exit_code": 0,
+      "result": "3434 records, 3434 source memberships, 4 isolated"
+    },
+    {
+      "name": "offline artifact replay",
+      "command_id": "cmd-0050-12bae875",
+      "exit_code": 0,
+      "result": "baseline, dictionary, exact arithmetic, native identifier, and artifact bindings passed"
+    },
+    {
+      "name": "review reproducer",
+      "command_id": "cmd-0051-7f86289f",
+      "exit_code": 0,
+      "result": "credential order invariant, attempt clock selected, invalid calendar date rejected"
+    },
+    {
+      "name": "schema and module parse",
+      "command_id": "cmd-0052-9c25c7e1",
+      "exit_code": 0,
+      "result": "schema-json-and-module-import-pass"
+    },
+    {
+      "name": "access-summary binding reproducer",
+      "command_id": "cmd-0061-05becffb",
+      "exit_code": 0,
+      "result": "unbound success summary rejected with access_summary_not_bound; no success exposed"
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "historical": "cmd-0042-c6a500cc",
+      "exit_code": 1,
+      "disposition": "access-summary binding test fixture corrected before cmd-0044 and final cmd-0049"
+    },
+    {
+      "historical": "cmd-0043-40ef57ae",
+      "exit_code": 1,
+      "disposition": "tamper fixture corrected before cmd-0044 and final cmd-0049"
+    },
+    {
+      "skipped": "full integrated npm test/build/cf:dry-run release gate; root-owned and already exercised against integration candidate"
+    },
+    {
+      "skipped": "network, runtime, provider, evaluator, and production deployment checks; outside this offline PR scope"
+    }
+  ],
+  "unresolved_claims": [
+    "R01-R16 scientific requirements are not accepted by this PR.",
+    "Payload access and schema applicability remain unknown/not_attempted; catalog membership and metadata reachability do not prove payload or schema qualification.",
+    "Dictionary review assets are publicly transported as pending proposal assets but are absent from canonical v1.2 promotion; schema applicability and scientific suitability remain unresolved.",
+    "Browser observations are contextual and this artifact makes no browser operation claim.",
+    "Corpus generation and retained safety flags are historical release assertions, not a new freshness or scientific-validity determination.",
+    "Compact vectors intentionally omit full access facts; compact access fact fields are checked against the builder-bound summary while attempt/scope/browser projections are recomputed exactly."
+  ],
+  "next_consumer": {
+    "pr_id": "PR-005",
+    "input": "The exact C-004-3 head, this handoff/evidence, and completeness-view artifact digest; consume normalization exports and offline consumer by artifact digest.",
+    "required_binding": "Root must bind C-004-3 SHA/tree and PR-005 must preserve the artifact's cohort, generation, as_of, membership_hash, vector encoding, and unresolved states."
+  },
+  "next_action": "Root independently replays the exact final head, binds the C-004-3 commit/tree into publication metadata, reviews the corrected access-summary and identifier semantics, then decides integration/publication. PR-005 can dispatch only from the accepted immutable interface.",
+  "independent_review": {
+    "status": "pending",
+    "reviewed_head_sha": null,
+    "decisive_checks": [
+      "c1/c2 independent receipt de247827b50eadba6b5cc1c784acf9b5548f16872b2fc025747a2f1f9016ef07",
+      "additional-cases final cmd-0051-7f86289f",
+      "access-summary binding final cmd-0061-05becffb"
+    ],
+    "limitations": [
+      "This producer handoff does not claim root's independent acceptance or integrated release gate status."
+    ]
+  }
+}

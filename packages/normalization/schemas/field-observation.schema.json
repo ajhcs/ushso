@@ -24,6 +24,7 @@
     "observed_at",
     "recorded_at",
     "attempted_at",
+    "stale_at",
     "access_facts",
     "browser_observations",
     "history",
@@ -49,6 +50,7 @@
     "observed_at": { "type": "string", "format": "date-time" },
     "recorded_at": { "type": "string", "format": "date-time" },
     "attempted_at": { "$ref": "#/$defs/nullableDateTime" },
+    "stale_at": { "$ref": "#/$defs/nullableDateTime" },
     "access_facts": { "$ref": "#/$defs/accessFacts" },
     "browser_observations": { "type": "array", "items": { "$ref": "#/$defs/browserObservation" } },
     "history": { "type": "array", "items": { "$ref": "#/$defs/historyItem" } },
@@ -82,8 +84,24 @@
       "then": { "properties": { "attempted_at": { "type": "null" } } }
     },
     {
-      "if": { "properties": { "attempt_state": { "enum": ["succeeded", "restricted", "failed", "blocked", "unavailable", "stale"] } } },
+      "if": { "properties": { "attempt_state": { "enum": ["succeeded", "restricted", "failed", "blocked", "unavailable", "stale", "unknown"] } } },
       "then": { "required": ["attempted_at"], "properties": { "attempted_at": { "type": "string", "format": "date-time" } } }
+    },
+    {
+      "if": { "properties": { "attempt_state": { "enum": ["succeeded", "restricted", "failed", "blocked", "unavailable", "stale", "unknown"] } } },
+      "then": {
+        "properties": {
+          "endpoint_scope": {
+            "type": "object",
+            "required": ["endpoint_id", "resource"],
+            "properties": {
+              "endpoint_id": { "type": "string", "minLength": 3 },
+              "resource": { "type": "string", "minLength": 1 },
+              "operation": { "enum": ["metadata_read", "payload_read", "schema_read", "browser_read"] }
+            }
+          }
+        }
+      }
     }
   ],
   "$defs": {
@@ -193,23 +211,73 @@
         "observed_at": { "type": "string", "format": "date-time" },
         "evidence_refs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceRef" } },
         "reason_codes": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,119}$" } }
-      }
+      },
+      "allOf": [{
+        "properties": {
+          "endpoint_scope": {
+            "type": "object",
+            "required": ["endpoint_id", "resource"],
+            "properties": {
+              "endpoint_id": { "type": "string", "minLength": 3 },
+              "resource": { "type": "string", "minLength": 1 },
+              "operation": { "const": "browser_read" }
+            }
+          }
+        }
+      }]
     },
+
     "historyItem": {
       "type": "object", "additionalProperties": false,
-      "required": ["revision_id", "value", "value_state", "evidence_state", "applicability_state", "attempt_state", "source_observed_at", "observed_at", "attempted_at", "reason_codes"],
+      "required": ["revision_id", "record_id", "source_id", "field_id", "field_role", "unit", "value", "value_state", "evidence_state", "applicability_state", "attempt_state", "endpoint_scope", "evidence_refs", "reason_codes", "source_observed_at", "observed_at", "recorded_at", "attempted_at", "stale_at", "access_facts", "browser_observations", "core_contracts"],
       "properties": {
         "revision_id": { "type": "string", "minLength": 3, "maxLength": 500 },
+        "record_id": { "type": "string", "minLength": 3, "maxLength": 500 },
+        "source_id": { "type": "string", "minLength": 3, "maxLength": 500 },
+        "field_id": { "type": "string", "pattern": "^[a-z][a-z0-9._-]{1,119}$" },
+        "field_role": { "enum": ["identifier", "dimension", "measure_description", "date", "geography", "suppression_flag", "metadata", "unknown"] },
+        "unit": { "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 200 }, { "type": "null" }] },
         "value": { "$ref": "#/$defs/claimValue" },
         "value_state": { "enum": ["known", "unknown"] },
         "evidence_state": { "enum": ["unknown", "candidate", "ambiguous", "documented", "observed", "executed", "proven", "disputed"] },
         "applicability_state": { "enum": ["supported", "unsupported", "missing", "not_applicable", "conflicting", "unknown"] },
         "attempt_state": { "enum": ["not_attempted", "succeeded", "restricted", "failed", "blocked", "unavailable", "stale", "unknown"] },
+        "endpoint_scope": { "$ref": "#/$defs/endpointScope" },
+        "evidence_refs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/evidenceRef" } },
+        "reason_codes": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,119}$" } },
         "source_observed_at": { "$ref": "#/$defs/nullableDateTime" },
         "observed_at": { "type": "string", "format": "date-time" },
+        "recorded_at": { "type": "string", "format": "date-time" },
         "attempted_at": { "$ref": "#/$defs/nullableDateTime" },
-        "reason_codes": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{1,119}$" } }
-      }
+        "stale_at": { "$ref": "#/$defs/nullableDateTime" },
+        "access_facts": { "$ref": "#/$defs/accessFacts" },
+        "browser_observations": { "type": "array", "items": { "$ref": "#/$defs/browserObservation" } },
+        "core_contracts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "evidence", "applicability", "attempt"],
+          "properties": {
+            "value": { "const": "observatory-core.assertion.claimValue" },
+            "evidence": { "const": "observatory-core.evidenceReference" },
+            "applicability": { "const": "observatory-core.schemaField.field_role" },
+            "attempt": { "const": "observatory-core.accessObservation" }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "value_state": { "const": "unknown" } } },
+          "then": { "properties": { "value": { "type": "object", "properties": { "kind": { "const": "unknown" } } } } }
+        },
+        {
+          "if": { "properties": { "value_state": { "const": "known" } } },
+          "then": { "properties": { "value": { "type": "object", "not": { "properties": { "kind": { "const": "unknown" } } } } } }
+        },
+        {
+          "if": { "properties": { "field_role": { "const": "identifier" } } },
+          "then": { "properties": { "unit": { "type": "null" } } }
+        }
+      ]
     }
   }
 }

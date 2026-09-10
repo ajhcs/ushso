@@ -13,6 +13,7 @@ import {
   validateFieldObservation
 } from '../../packages/normalization/src/index.mjs';
 import { assertCompletenessView, buildCompletenessView, createOfflineCompletenessConsumer } from '../../packages/coverage/index.mjs';
+import { sha256Bytes } from '../../packages/normalization/src/canonical.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const OBSERVED_AT = '2026-09-03T22:22:33.908Z';
@@ -62,6 +63,25 @@ function assertSchema(value) {
   assert.equal(validateSchema(value), true, JSON.stringify(validateSchema.errors));
 }
 
+function digestJson(value) {
+  if (value === null) return 'null';
+  if (typeof value === 'string') return JSON.stringify(value);
+  if (typeof value === 'boolean') return value ? 'true' : 'false';
+  if (typeof value === 'number') return JSON.stringify(value);
+  if (Array.isArray(value)) return '[' + value.map(digestJson).join(',') + ']';
+  return '{' + Object.keys(value).sort((left, right) => left.localeCompare(right)).map(key => JSON.stringify(key) + ':' + digestJson(value[key])).join(',') + '}';
+}
+
+function rehashView(value) {
+  const copy = structuredClone(value);
+  delete copy.artifact_id;
+  delete copy.artifact_digest;
+  const digest = 'sha256:' + sha256Bytes(digestJson(copy));
+  copy.artifact_id = 'urn:ushso:completeness-view:' + digest.slice('sha256:'.length, 'sha256:'.length + 40);
+  copy.artifact_digest = digest;
+  return copy;
+}
+
 test('field observation keeps unknown distinct from false and identifiers unitless', () => {
   const falseValue = field({
     field_id: 'facility.is_active',
@@ -98,8 +118,9 @@ test('field observation keeps unknown distinct from false and identifiers unitle
 test('failed or expired attempts retain the historical successful observation', () => {
   const historical = field({
     observation_id: 'urn:ushso:field-observation:historical-success',
+    evidence_refs: [evidence('evidence:historical-success', '2026-01-01T00:00:00.000Z')],
     observed_at: '2026-01-01T00:00:00.000Z',
-    recorded_at: '2026-01-01T00:00:01.000Z',
+    recorded_at: '2026-01-01T00:00:03.000Z',
     source_observed_at: '2025-12-31T00:00:00.000Z',
     attempted_at: '2026-01-01T00:00:02.000Z',
     reason_codes: ['historical_payload_success']
@@ -121,7 +142,7 @@ test('failed or expired attempts retain the historical successful observation', 
     reason_codes: ['credential_required'],
     source_observed_at: '2026-02-01T00:00:00.000Z',
     observed_at: '2026-02-01T00:00:00.000Z',
-    recorded_at: '2026-02-01T00:00:01.000Z',
+    recorded_at: '2026-02-01T00:00:03.000Z',
     attempted_at: '2026-02-01T00:00:02.000Z'
   });
   assertSchema(failed);
@@ -138,7 +159,79 @@ test('failed or expired attempts retain the historical successful observation', 
   assert.equal(derived.historical_success.value.value, 4);
   assert.equal(derived.historical_success_retained, true);
   assert.equal(failed.history.some(item => item.revision_id === historical.observation_id), true);
+  const expiring = field({
+    observation_id: 'urn:ushso:field-observation:expiring-success',
+    evidence_refs: [evidence('evidence:expiring-success', '2026-01-15T00:00:00.000Z')],
+    observed_at: '2026-01-15T00:00:00.000Z',
+    recorded_at: '2026-01-15T00:00:03.000Z',
+    source_observed_at: '2026-01-14T00:00:00.000Z',
+    attempted_at: '2026-01-15T00:00:02.000Z',
+    stale_at: '2026-02-15T00:00:00.000Z',
+    reason_codes: ['expiring_payload_success']
+  });
+  const expired = deriveFieldObservation({
+    recordId: expiring.record_id,
+    sourceId: expiring.source_id,
+    fieldId: expiring.field_id,
+    observations: [expiring],
+    asOf: '2026-03-01T00:00:00.000Z'
+  });
+  assert.equal(expired.current_state, 'stale');
+  assert.equal(expired.current_observation.stale_at, '2026-02-15T00:00:00.000Z');
+  assert.equal(expired.current_observation.reason_codes.includes('observation_expired'), true);
+  assert.equal(expired.historical_success.observation_id, expiring.observation_id);
+  assert.equal(expired.historical_success_retained, true);
+  const historyOnly = deriveFieldObservation({
+    recordId: failed.record_id,
+    sourceId: failed.source_id,
+    fieldId: failed.field_id,
+    observations: [failed],
+    asOf: '2026-03-01T00:00:00.000Z'
+  });
+  assert.equal(historyOnly.historical_success.observation_id, historical.observation_id);
+  assert.equal(historyOnly.historical_success.evidence_refs[0].evidence_id, historical.evidence_refs[0].evidence_id);
+  assert.deepEqual(historyOnly.historical_success.endpoint_scope, historical.endpoint_scope);
+  assert.equal(historyOnly.historical_success.access_facts.observed_at, historical.access_facts.observed_at);
+  assert.equal(historyOnly.historical_success.recorded_at, historical.recorded_at);
   assert.throws(() => createFieldObservation({ ...failed, attempt_state: 'failed', attempted_at: null }), { code: 'field_observation_invalid' });
+});
+
+test('as-of derivation and endpoint/browser scope reject future or unscoped outcomes', () => {
+  const future = field({
+    evidence_refs: [evidence('evidence:future-observation', '2026-04-01T00:00:00.000Z')],
+    source_observed_at: '2026-04-01T00:00:00.000Z',
+    observed_at: '2026-04-01T00:00:00.000Z',
+    recorded_at: '2026-04-02T00:00:02.000Z',
+    attempted_at: '2026-04-02T00:00:01.000Z'
+  });
+  const derived = deriveFieldObservation({
+    recordId: future.record_id,
+    sourceId: future.source_id,
+    fieldId: future.field_id,
+    observations: [future],
+    asOf: '2026-04-01T12:00:00.000Z'
+  });
+  assert.equal(derived.current_observation, null);
+  assert.equal(buildAccessSummary({ observations: [future], asOf: '2026-04-01T12:00:00.000Z' }).endpoint_scopes.length, 0);
+  assert.throws(() => field({
+    evidence_refs: [evidence('evidence:source-after-observation', '2026-04-01T00:00:00.000Z')],
+    observed_at: '2026-04-01T00:00:00.000Z',
+    recorded_at: '2026-04-01T00:00:00.000Z',
+    attempted_at: '2026-04-01T00:00:00.000Z',
+    source_observed_at: '2026-04-02T00:00:00.000Z'
+  }), { code: 'field_observation_invalid' });
+  assert.throws(() => field({
+    endpoint_scope: { endpoint_id: null, resource: null, operation: 'other' }
+  }), { code: 'field_observation_invalid' });
+  assert.throws(() => field({
+    browser_observations: [{
+      state: 'succeeded',
+      endpoint_scope: { endpoint_id: 'endpoint:wrong', resource: 'resource:payload', operation: 'payload_read' },
+      observed_at: OBSERVED_AT,
+      evidence_refs: [evidence('evidence:browser:wrong-operation')],
+      reason_codes: ['wrong_scope']
+    }]
+  }), { code: 'field_observation_invalid' });
 });
 
 test('documented requirements and access observations remain separate and conservative', () => {
@@ -185,6 +278,139 @@ test('documented requirements and access observations remain separate and conser
   assert.throws(() => createFieldObservation({ ...documented, access_facts: { ...documented.access_facts, credential_requirements: [{ ...documented.access_facts.credential_requirements[0], name: 'api_key=secret-value' }] } }), { code: 'field_observation_invalid' });
 });
 
+test('access history is order invariant, attempts use attempt time, and dates are calendar-valid', () => {
+  const accessObservation = ({ observationId, observedAt, credentialState, attemptedAt = observedAt }) => {
+    const refs = [evidence('evidence:access:' + observationId, observedAt)];
+    return field({
+      observation_id: observationId,
+      observed_at: observedAt,
+      recorded_at: observedAt,
+      attempted_at: attemptedAt,
+      source_observed_at: '2026-09-01T00:00:00.000Z',
+      evidence_refs: refs,
+      access_facts: {
+        credential_requirements: [{
+          requirement_id: 'requirement:api-key',
+          kind: 'credential',
+          name: 'api_key',
+          state: credentialState,
+          evidence_refs: refs,
+          observed_at: observedAt
+        }],
+        cost: { state: 'unknown', amount: null, currency: null, evidence_refs: refs, observed_at: observedAt },
+        usage_limit: { state: 'unknown', limit: null, unit: null, evidence_refs: refs, observed_at: observedAt },
+        evidence_refs: refs,
+        observed_at: observedAt
+      }
+    });
+  };
+  const older = accessObservation({
+    observationId: 'urn:ushso:field-observation:credential-older',
+    observedAt: '2026-09-02T00:00:00.000Z',
+    credentialState: 'required'
+  });
+  const newer = accessObservation({
+    observationId: 'urn:ushso:field-observation:credential-newer',
+    observedAt: '2026-09-04T00:00:00.000Z',
+    credentialState: 'not_required'
+  });
+  const forward = buildAccessSummary({ observations: [older, newer], asOf: '2026-09-10T00:00:00.000Z' });
+  const reverse = buildAccessSummary({ observations: [newer, older], asOf: '2026-09-10T00:00:00.000Z' });
+  assert.equal(forward.endpoint_scopes[0].documented.credential_requirements[0].state, 'conflicting');
+  assert.deepEqual(forward.endpoint_scopes[0].documented.credential_requirements, reverse.endpoint_scopes[0].documented.credential_requirements);
+
+  const recordedLater = accessObservation({
+    observationId: 'urn:ushso:field-observation:attempt-recorded-later',
+    observedAt: '2026-09-05T00:00:00.000Z',
+    credentialState: 'required',
+    attemptedAt: '2026-09-01T00:00:00.000Z'
+  });
+  const attemptedLater = accessObservation({
+    observationId: 'urn:ushso:field-observation:attempt-newer',
+    observedAt: '2026-09-04T00:00:00.000Z',
+    credentialState: 'required',
+    attemptedAt: '2026-09-03T00:00:00.000Z'
+  });
+  const attempts = buildAccessSummary({ observations: [recordedLater, attemptedLater], asOf: '2026-09-10T00:00:00.000Z' }).endpoint_scopes[0];
+  assert.equal(attempts.latest_attempt.observation_id, attemptedLater.observation_id);
+  assert.equal(attempts.latest_successful_check.observation_id, attemptedLater.observation_id);
+
+  assert.throws(() => field({
+    field_id: 'payload.calendar_date',
+    field_role: 'date',
+    value: { kind: 'date', value: '2026-02-31' },
+    value_state: 'known'
+  }), { code: 'field_observation_invalid' });
+});
+
+test('completeness binds access summaries to the vector in full and compact views', () => {
+  const membership = [{
+    record_id: 'record:access-binding',
+    source_id: 'source:access-binding',
+    isolated: false,
+    evidence_ids: ['evidence:access-binding'],
+    source_observed_at: OBSERVED_AT
+  }];
+  const definitions = [{
+    field_id: 'payload.access',
+    field_role: 'metadata',
+    unit: null,
+    required_for_readiness: true,
+    description: 'Access binding fixture.'
+  }];
+  const unattempted = field({
+    record_id: membership[0].record_id,
+    source_id: membership[0].source_id,
+    field_id: 'payload.access',
+    field_role: 'metadata',
+    unit: null,
+    evidence_refs: [evidence('evidence:access-binding-unattempted')],
+    value: { kind: 'unknown', value: null },
+    value_state: 'unknown',
+    applicability_state: 'unknown',
+    attempt_state: 'not_attempted',
+    attempted_at: null,
+    endpoint_scope: { endpoint_id: 'endpoint:access-binding', resource: 'resource:payload', operation: 'payload_read' },
+    reason_codes: ['payload_access_not_tested']
+  });
+  const success = field({
+    record_id: membership[0].record_id,
+    source_id: membership[0].source_id,
+    field_id: 'payload.access',
+    field_role: 'metadata',
+    unit: null,
+    evidence_refs: [evidence('evidence:access-binding-unattempted')],
+    reason_codes: ['payload_access_succeeded']
+  });
+  const fullSuccessSummary = buildAccessSummary({
+    observations: [success],
+    asOf: '2026-09-04T00:00:00.000Z'
+  });
+  const compactSuccessSummary = buildAccessSummary({
+    observations: [success],
+    asOf: '2026-09-04T00:00:00.000Z',
+    compact: true
+  });
+  const input = {
+    membership,
+    observations: [unattempted],
+    fieldDefinitions: definitions,
+    cohort: 'access binding fixture',
+    generation: 'generation-fixture',
+    asOf: '2026-09-04T00:00:00.000Z',
+    generatedAt: '2026-09-04T00:00:00.000Z'
+  };
+  assert.throws(() => buildCompletenessView({ ...input, accessSummary: fullSuccessSummary }), { code: 'access_summary_not_bound' });
+  assert.throws(() => buildCompletenessView({ ...input, vectorEncoding: 'compact-v1', accessSummary: compactSuccessSummary }), { code: 'access_summary_not_bound' });
+  const honest = buildCompletenessView({
+    ...input,
+    accessSummary: buildAccessSummary({ observations: [unattempted], asOf: input.asOf })
+  });
+  assertCompletenessView(honest);
+  const tampered = rehashView({ ...honest, access_summary: fullSuccessSummary });
+  assert.throws(() => assertCompletenessView(tampered), { code: 'completeness_access_summary_mismatch' });
+});
+
 test('coverage is derived from frozen membership and keeps isolated records in every partition', () => {
   const membership = [
     { record_id: 'record:001', source_id: 'source:catalog', isolated: false, evidence_ids: ['evidence:membership:001'], source_observed_at: OBSERVED_AT },
@@ -221,7 +447,13 @@ test('coverage is derived from frozen membership and keeps isolated records in e
   assert.equal(missing.applicability_state, 'missing');
   assert.equal(missing.attempt_state, 'not_attempted');
   assert.equal(missing.value_state, 'unknown');
+  assert.equal(view.records.find(record => record.record_id === 'record:001').readiness_state, 'ready');
   assert.equal(view.records.find(record => record.record_id === 'record:002').readiness_state, 'not_ready');
+  const tampered = structuredClone(view);
+  tampered.aggregates.metrics[0].partitions[0].count += 1;
+  tampered.aggregates.metrics[0].partitions[tampered.aggregates.metrics[0].partitions.length - 1].count -= 1;
+  const rehashed = rehashView(tampered);
+  assert.throws(() => assertCompletenessView(rehashed), { code: 'completeness_metric_recalculation_mismatch' });
   const payloadMetric = view.aggregates.metrics.find(metric => metric.metric_id === 'field.applicability.payload.value');
   assert.equal(payloadMetric.denominator_count, 3);
   assert.equal(payloadMetric.partitions.reduce((sum, item) => sum + item.count, 0), 3);
@@ -230,6 +462,29 @@ test('coverage is derived from frozen membership and keeps isolated records in e
   assert.equal(payloadMetric.rate_context.generation, 'live-2026-09-03-85b50522b420');
   assert.equal(payloadMetric.rate_context.membership_hash, view.membership.membership_hash);
   assert.equal(view.aggregates.metrics.find(metric => metric.metric_id === 'research.readiness').partitions.reduce((sum, item) => sum + item.count, 0), 3);
+});
+
+test('candidate, ambiguous and disputed evidence cannot produce research readiness', () => {
+  const membership = [{ record_id: 'record:evidence-state', source_id: 'source:evidence-state', isolated: false, evidence_ids: ['evidence:evidence-state'], source_observed_at: OBSERVED_AT }];
+  for (const evidenceState of ['candidate', 'ambiguous', 'disputed']) {
+    const observation = field({
+      record_id: membership[0].record_id,
+      source_id: membership[0].source_id,
+      field_id: 'payload.readiness_' + evidenceState,
+      evidence_state: evidenceState,
+      reason_codes: ['unqualified_evidence']
+    });
+    const view = buildCompletenessView({
+      membership,
+      observations: [observation],
+      fieldDefinitions: [{ field_id: observation.field_id, field_role: 'measure_description', unit: 'item', required_for_readiness: true, description: 'Evidence readiness fixture.' }],
+      cohort: 'evidence readiness fixture',
+      generation: 'generation-fixture',
+      asOf: '2026-09-04T00:00:00.000Z',
+      generatedAt: '2026-09-04T00:00:00.000Z'
+    });
+    assert.equal(view.records[0].readiness_state, 'not_ready');
+  }
 });
 
 test('offline coverage consumer is bounded and rejects digest drift or unknown metrics', () => {
@@ -264,4 +519,69 @@ test('offline coverage consumer is bounded and rejects digest drift or unknown m
     denominatorStatus: 'unknown'
   });
   assert.equal(unknownDenominator.aggregates.metrics.every(metric => metric.rate === null), true);
+});
+
+test('one record keeps successful, restricted and failed checks visible in the vector', () => {
+  const membership = [{ record_id: 'record:mixed', source_id: 'source:mixed', isolated: false, evidence_ids: ['evidence:mixed'], source_observed_at: OBSERVED_AT }];
+  const success = field({ record_id: 'record:mixed', source_id: 'source:mixed', field_id: 'payload.success', reason_codes: ['payload_success'] });
+  const restricted = field({
+    record_id: 'record:mixed',
+    source_id: 'source:mixed',
+    field_id: 'payload.restricted',
+    value: { kind: 'unknown', value: null },
+    value_state: 'unknown',
+    applicability_state: 'supported',
+    attempt_state: 'restricted',
+    attempted_at: OBSERVED_AT,
+    reason_codes: ['credential_required']
+  });
+  const failed = field({
+    record_id: 'record:mixed',
+    source_id: 'source:mixed',
+    field_id: 'payload.failed',
+    value: { kind: 'unknown', value: null },
+    value_state: 'unknown',
+    applicability_state: 'supported',
+    attempt_state: 'failed',
+    attempted_at: '2026-09-03T22:22:35.000Z',
+    observed_at: '2026-09-03T22:22:35.000Z',
+    recorded_at: '2026-09-03T22:22:36.000Z',
+    reason_codes: ['malformed_response']
+  });
+  const view = buildCompletenessView({
+    membership,
+    observations: [success, restricted, failed],
+    fieldDefinitions: [
+      { field_id: 'payload.success', field_role: 'measure_description', unit: 'item', description: 'Successful fixture check.' },
+      { field_id: 'payload.restricted', field_role: 'measure_description', unit: 'item', description: 'Restricted fixture check.' },
+      { field_id: 'payload.failed', field_role: 'measure_description', unit: 'item', description: 'Failed fixture check.' }
+    ],
+    cohort: 'mixed fixture',
+    generation: 'generation-fixture',
+    asOf: '2026-09-04T00:00:00.000Z',
+    generatedAt: '2026-09-04T00:00:00.000Z',
+    accessSummary: buildAccessSummary({ observations: [success, restricted, failed], asOf: '2026-09-04T00:00:00.000Z' })
+  });
+  assertCompletenessView(view);
+  const attempts = view.records[0].source_vectors[0].fields.map(item => item.observation.attempt_state);
+  assert.deepEqual(attempts.sort(), ['failed', 'restricted', 'succeeded']);
+  assert.equal(view.records[0].readiness_state, 'not_ready');
+  assert.equal(view.access_summary.endpoint_scopes.length, 1);
+  assert.equal(view.access_summary.endpoint_scopes[0].latest_successful_check.attempt_state, 'succeeded');
+  assert.equal(view.access_summary.endpoint_scopes[0].latest_attempt.attempt_state, 'failed');
+});
+
+test('checked-in completeness artifact validates as an offline compact view', async () => {
+  const artifact = JSON.parse(await fs.readFile(path.join(ROOT, 'verification/research-program/pr-004/completeness-view.json'), 'utf8'));
+  assert.equal(validateCompletenessSchema(artifact), true, JSON.stringify(validateCompletenessSchema.errors));
+  assertCompletenessView(artifact);
+  const consumer = createOfflineCompletenessConsumer(artifact, { expectedDigest: artifact.artifact_digest, maxPageSize: 25 });
+  assert.equal(artifact.vector_encoding, 'compact-v1');
+  assert.equal(artifact.membership.record_count, 3434);
+  assert.equal(artifact.membership.source_membership_count, 3434);
+  assert.equal(artifact.membership.isolated_count, 4);
+  assert.equal(consumer.listRecords({ limit: 25 }).records.length, 25);
+  assert.equal(consumer.getSummary().boundaries.aggregate_metrics_are_supplemental_to_full_vector, true);
+  assert.equal(artifact.access_summary.boundaries.unknown_cost_is_not_free, true);
+  assert.equal(artifact.access_summary.boundaries.unknown_usage_limit_is_not_unlimited, true);
 });
