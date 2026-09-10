@@ -104,7 +104,27 @@ def main() -> int:
             "receipt_output": receipt.get("receipt_output"),
         }, indent=2))
         return 0
-    raise SystemExit("C-002-3 builder is added in the C-002-3 commit")
+    import c3_lib
+
+    receipt = c3_lib.write_c3_artifacts(repo, receipt_output=args.receipt_output)
+    print(json.dumps({
+        "stage": "c3",
+        "cohorts_sha256": receipt["cohorts_sha256"],
+        "tasks_sha256": receipt["tasks_sha256"],
+        "acceptance_sha256": receipt["acceptance_sha256"],
+        "c1_historical_cohorts_sha256": receipt["c1_historical_cohorts_sha256"],
+        "c1_projection_preserved": receipt["c1_projection_preserved"],
+        "pilot_seal_sha256": receipt["pilot_seal_sha256"],
+        "hospital_candidate_count": len(receipt["hospital_candidate_ids"]),
+        "payer_candidate_count": len(receipt["payer_reporting_entity_candidate_ids"]),
+        "expansion_family_count": len(receipt["expansion_family_identities"]),
+        "r09_frame_state": receipt["r09_frame_state"],
+        "r10_frame_state": receipt["r10_frame_state"],
+        "c1_receipts_preserved": receipt["c1_receipts_preserved"],
+        "c2_receipts_preserved": receipt["c2_receipts_preserved"],
+        "receipt_output": receipt.get("receipt_output"),
+    }, indent=2))
+    return 0
 
 
 if __name__ == "__main__":

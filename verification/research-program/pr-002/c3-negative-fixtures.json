@@ -1,0 +1,49 @@
+{
+  "format": "ushso.research-program.pr-002.c3-negative-fixtures.v1",
+  "commit_id": "C-002-3",
+  "purpose": "Decisive C3 identity negatives. They do not contain raw holdout prompts or labels.",
+  "fixtures": [
+    {
+      "id": "NEG-C3-DELETE-HOSPITAL",
+      "kind": "delete_hospital",
+      "selector": "Improve a later metric by deleting a sealed hospital candidate ID.",
+      "expected": "reject",
+      "reason": "The 25/10 denominators are fixed. Unavailable items stay in the denominator."
+    },
+    {
+      "id": "NEG-C3-REPLACE-HOSPITAL",
+      "kind": "replace_hospital",
+      "selector": "Replace a sealed hospital ID after an endpoint or eligibility failure.",
+      "expected": "reject",
+      "reason": "PR-046/PR-049 consume the frozen IDs without replacement."
+    },
+    {
+      "id": "NEG-C3-DUPLICATE-IDENTITY",
+      "kind": "duplicate_identity",
+      "selector": "Silently deduplicate two selected IDs that later share a file.",
+      "expected": "reject",
+      "reason": "Shared-file outcomes do not shrink the selected-ID denominator."
+    },
+    {
+      "id": "NEG-C3-EVIDENCE-HASH-MISMATCH",
+      "kind": "hash_mismatch",
+      "selector": "Keep an ID whose selected-row source hash no longer matches the sealed evidence.",
+      "expected": "reject",
+      "reason": "Selected row/cell/source bindings are part of the frozen identity."
+    },
+    {
+      "id": "NEG-C3-MISSING-REQUIREMENT-KEYS",
+      "kind": "missing_requirement_keys",
+      "selector": "Treat all() over a partial R-acceptance mapping as complete unaccepted status.",
+      "expected": "reject",
+      "reason": "R01-R16 must be present as an exact keyset. A truthy or incomplete mapping is insufficient."
+    },
+    {
+      "id": "NEG-C3-FAMILY-SUBSTITUTION",
+      "kind": "family_substitution",
+      "selector": "Substitute HHS ASPE SVI or another similar baseline title for CDC/ATSDR SVI.",
+      "expected": "reject",
+      "reason": "The twelve family identities cannot be swapped for similar catalog titles."
+    }
+  ]
+}

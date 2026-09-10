@@ -29,7 +29,11 @@ def test_c1_receipts_and_cohorts_preserved() -> None:
     assert c2_lib.digest(c2_lib.HERE / "c1-build-receipt.json") == c2_lib.C1_BUILD_RECEIPT_SHA256
     assert c2_lib.digest(c2_lib.HERE / "c1-verify-receipt.json") == c2_lib.C1_VERIFY_RECEIPT_SHA256
     repo = c2_lib.HERE.parents[2]
-    assert c2_lib.digest(repo / "evaluation/research-program/cohorts.json") == c2_lib.C1_COHORTS_SHA256
+    import c1_lib
+
+    written = c2_lib.load_json(repo / "evaluation/research-program/cohorts.json")
+    rebuilt = c1_lib.build_payload(repo)
+    assert c2_lib.extract_c1_projection(written) == c2_lib.extract_c1_projection(rebuilt)
 
 
 def test_c2_receipts_preserved_and_bound_to_base() -> None:

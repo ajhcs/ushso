@@ -33,6 +33,7 @@ from c1_lib import (
     load_rows,
 )
 import c2_lib
+import c3_lib
 
 
 def git(repo: Path, *args: str) -> str:
@@ -108,7 +109,10 @@ def main() -> int:
     rebuilt = build_payload(repo)
     cohorts_path = repo / "evaluation/research-program/cohorts.json"
     written = json.loads(cohorts_path.read_text(encoding="utf-8"))
-    c3_frozen = bool((written.get("mrf_selection") or {}).get("hospital_candidate_ids"))
+    c3_frozen = written.get("commit_id") == "C-002-3" and isinstance(
+        (written.get("mrf_selection") or {}).get("hospital_candidate_ids"),
+        list,
+    )
     if c3_frozen:
         checks["cohorts_rebuilt"] = c2_lib.extract_c1_projection(written) == c2_lib.extract_c1_projection(rebuilt)
     else:
@@ -206,10 +210,10 @@ def main() -> int:
         checks["mrf_freeze_order"] = (
             checks["mrf_consumer_contract"]
             and mrf_selection["selection_owner"] == "C-002-3"
-            and isinstance(mrf_selection["hospital_candidate_ids"], list)
-            and isinstance(mrf_selection["payer_reporting_entity_candidate_ids"], list)
-            and len(mrf_selection["hospital_candidate_ids"]) == 25
-            and len(mrf_selection["payer_reporting_entity_candidate_ids"]) == 10
+            and mrf_selection["hospital_candidate_ids"] == list(c3_lib.HOSPITAL_CANDIDATE_IDS)
+            and mrf_selection["payer_reporting_entity_candidate_ids"] == list(c3_lib.PAYER_CANDIDATE_IDS)
+            and len(set(mrf_selection["hospital_candidate_ids"])) == 25
+            and len(set(mrf_selection["payer_reporting_entity_candidate_ids"])) == 10
         )
     else:
         checks["mrf_freeze_order"] = (
@@ -220,7 +224,10 @@ def main() -> int:
             and mrf_selection["payer_reporting_entity_candidate_ids"] is None
         )
     accepted_values = {"unaccepted", "not_accepted_on_C-002-1", "not_accepted"}
-    checks["r_not_accepted"] = all(value in accepted_values for value in written["acceptance"].values())
+    if c3_frozen:
+        checks["r_not_accepted"] = c3_lib.assert_requirement_keyset(written) == []
+    else:
+        checks["r_not_accepted"] = all(value in accepted_values for value in written["acceptance"].values())
     tasks_path = repo / "evaluation/research-program/tasks.json"
     acceptance_path = repo / "docs/research-program/acceptance.md"
     if tasks_path.exists() or acceptance_path.exists():
@@ -242,7 +249,19 @@ def main() -> int:
         acceptance_errors = c2_lib.assert_acceptance_document(acceptance_text)
         checks["c2_acceptance_rows"] = acceptance_errors == []
         out["c2_acceptance_errors"] = acceptance_errors
-        checks["c2_tasks_rebuild"] = tasks_payload == c2_lib.build_tasks_payload(repo)
+        if c3_frozen:
+            checks["c2_tasks_rebuild"] = True
+            checks["c3_tasks_rebuild"] = tasks_payload == c3_lib.build_tasks_payload(repo)
+            checks["c3_acceptance"] = c3_lib.assert_c3_acceptance_document(acceptance_text) == []
+            checks["c3_pilot_identities"] = c3_lib.assert_pilot_identities(written) == []
+            checks["c3_expansion_families"] = c3_lib.assert_expansion_families(written) == []
+            checks["c3_c1_projection"] = (
+                c2_lib.extract_c1_projection(written) == c2_lib.extract_c1_projection(rebuilt)
+            )
+            checks["c3_evidence_hashes"] = c3_lib.verify_copied_evidence() == []
+            checks["c3_payer_cells"] = c3_lib.verify_payer_cells() == []
+        else:
+            checks["c2_tasks_rebuild"] = tasks_payload == c2_lib.build_tasks_payload(repo)
         checks["c2_holdout_boundary"] = not c2_lib.contains_private_fields(tasks_payload)
         checks["c2_r14_not_materialized"] = (
             tasks_payload.get("r14", {}).get("materialized") is False
@@ -295,7 +314,9 @@ def main() -> int:
     out["failed_checks"] = failed_names
     verify_receipt = {
         "format": (
-            "ushso.research-program.pr-002.c2-correction-verify-receipt.v1"
+            "ushso.research-program.pr-002.c3-verify-receipt.v1"
+            if args.receipt_output and args.receipt_output.name.startswith("c3-")
+            else "ushso.research-program.pr-002.c2-correction-verify-receipt.v1"
             if args.receipt_output and args.receipt_output.name.startswith("c2-correction-")
             else "ushso.research-program.pr-002.c1-verify-receipt.v1"
         ),
@@ -324,7 +345,7 @@ def main() -> int:
     }
     if args.receipt_output:
         verify_path = args.receipt_output.resolve()
-        if verify_path.parent == HERE and verify_path.name in c2_lib.HISTORICAL_RECEIPT_NAMES:
+        if verify_path.parent == HERE and verify_path.name in c3_lib.HISTORICAL_RECEIPT_NAMES:
             raise SystemExit(f"refusing to overwrite historical C1 receipt {verify_path}")
         verify_path.parent.mkdir(parents=True, exist_ok=True)
         verify_path.write_text(json.dumps(verify_receipt, indent=2) + "\n", encoding="utf-8")

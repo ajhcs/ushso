@@ -2,27 +2,33 @@
 
 Status: **unaccepted** for every requirement R01–R16.
 
-This document is the C-002-2 measurable-row freeze. It preserves master-plan thresholds exactly. It does not accept any requirement, materialize conditional frames, or publish private holdout labels.
+This document is the C-002-3 identity overlay on the C-002-2 measurable-row freeze. It updates current cohort/task hashes and the R09/R10 frozen-identity frame status. It does not accept any requirement, materialize remaining conditional frames, or publish private holdout labels.
 
 ## Identities
 
 - C-002-1 producer: `44506be8052e1054641048de68893fc41526b664`
 - C-002-1 correction: `ef9c2569b78dd26f0436d2ea945a8e1b791b8698`
+- C-002-2 producer: `8fe6e6b2e997e4a3ed59aece64492684f489bec8`
+- C-002-2 correction: `997070bd94864fabedf73acecd422c6e15a3ed7e`
+- C-002-2 correction tree: `c05b9a74630b715b05304044a24d6e66489a9808`
 - Cohorts path: `evaluation/research-program/cohorts.json`
-- Cohorts SHA-256 at this document's C2 write: `479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4`
+- Cohorts SHA-256 at this document's C3 write: `89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543`
 - C1 historical cohorts SHA-256: `479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4`
+- C2 correction tasks SHA-256: `c14c2118dfddab80fd5047dc1912a622721f89a6212d73d2498700fa01305a74`
+- C2 correction acceptance SHA-256: `630c94f9b708271c20b14049413dd116328c1349759fcf604fc1e1336fcd4117`
 - Tasks path: `evaluation/research-program/tasks.json`
-- Tasks SHA-256: `c14c2118dfddab80fd5047dc1912a622721f89a6212d73d2498700fa01305a74`
+- Tasks SHA-256: `4fc5c7fe2a5b51da4bf5ae8e348949a33f26c1758d7a18065e7c5611d1efcedc`
 - Sealed evaluator manifest SHA-256: `142458d686e1cb5e9677b6a5eaa619955c78ef9a4d51735207d4ad19bf26c9ef`
 - R14 protocol SHA-256: `3a35ee6662f939bf53e9f8c5005079ac09982372d80c9b385a9beb9c52e525c7`
+- Pilot selection seal SHA-256: `f74892bbb9bb38619e985cb20e2dd9c6478eba0d7b0bcb02af234f70a1a03060`
 - Generation: `live-2026-09-03-85b50522b420`
 - Catalog manifest SHA-256: `85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e`
 
-Hash scheme: SHA-256 of exact committed file bytes. `cohorts.json` and `tasks.json` do not contain their own digests. This document and the C2 receipt are destinations for those digests.
+Hash scheme: SHA-256 of exact committed file bytes. `cohorts.json` and `tasks.json` do not contain their own digests. This document and the C3 receipt are destinations for those digests. Historical C1/C2 receipts keep their original hashes.
 
 ## Frame rule
 
-A protocol, pointer, or unaccepted row is not a frozen or materialized measurement frame. Conditional frames stay unmaterialized until the named downstream PR writes identities, then independently freezes them before tuning or measurement.
+A protocol, pointer, or unaccepted row is not a frozen or materialized measurement frame. Conditional frames stay unmaterialized until the named downstream PR writes identities, then independently freezes them before tuning or measurement. C-002-3 freezes only the R09 family pointers and R10 25/10 candidate IDs.
 
 ## R01–R16
 
@@ -135,8 +141,8 @@ A protocol, pointer, or unaccepted row is not a frozen or materialized measureme
 - **Master-plan threshold:** Add the twelve named source families with supported identities/access routes and explicit data scope. A restricted source is useful as a verified route, without pretending to have its payload.
 - **Denominator:** The twelve named families frozen by C-002-3 as intake pointers.
 - **Numerator / pass predicate:** Pass iff each family has supported identity/access route evidence and explicit scope. Restricted payload retrieval is not implied.
-- **Frozen identities or conditional frame:** C-002-3 publishes family pointers, candidate locators, and intake PRs. Actual source identities remain unverified locators until PR-043/044/045.
-- **Frame state:** `conditional_until_C3_pointers_then_intake_not_materialized`
+- **Frozen identities or conditional frame:** C-002-3 published the twelve family pointers, candidate locators, and intake PRs. Actual source identities remain unverified locators until PR-043/044/045.
+- **Frame state:** `pointers_frozen_intake_not_materialized`
 - **Source / generation identity:** `{"c1_cohorts_sha256": "479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4", "catalog_manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e", "generation": "live-2026-09-03-85b50522b420", "plan": "docs/master-plan/2026-09-10/MASTER-PLAN.md"}`
 - **Evidence owner:** C-002-3 pointers; PR-043, PR-044, PR-045 intake.
 - **Evidence destination:** evaluation/research-program/cohorts.json expansion families; later intake artifacts.
@@ -148,8 +154,8 @@ A protocol, pointer, or unaccepted row is not a frozen or materialized measureme
 - **Master-plan threshold:** Pilot directory covers 25 hospitals and 10 payer reporting entities from a frozen selection; every item has an evidence-backed locator/disposition. At least 20 hospital and eight payer entries have a successfully parsed bounded sample; no substitution of enforcement datasets for rate files.
 - **Denominator:** 25 hospital candidate IDs and 10 payer candidate IDs frozen by C-002-3, retained even if unavailable, ineligible, or sharing a file. Parsed-sample targets remain >=20 hospital and >=8 payer of that same denominator.
 - **Numerator / pass predicate:** Pass iff all 25/10 have locator/disposition evidence and >=20 / >=8 have successfully parsed bounded samples. Enforcement datasets cannot substitute. No silent replacement or deletion.
-- **Frozen identities or conditional frame:** C-002-3 freezes candidate IDs/order/counts from the sealed directory selection. Locators, eligibility, file binding, and parsed samples are unresolved downstream bindings.
-- **Frame state:** `ids_pending_C3_locators_not_materialized`
+- **Frozen identities or conditional frame:** C-002-3 froze the exact 25 hospital and 10 payer candidate IDs/order/counts from the sealed directory selection. Locators, eligibility, file binding, and parsed samples remain unresolved downstream bindings.
+- **Frame state:** `ids_frozen_locators_not_materialized`
 - **Source / generation identity:** `{"c1_cohorts_sha256": "479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4", "catalog_manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e", "generation": "live-2026-09-03-85b50522b420", "plan": "docs/master-plan/2026-09-10/MASTER-PLAN.md"}`
 - **Evidence owner:** C-002-3 IDs; PR-046/PR-049 locators; PR-047/048/050/051 parse; PR-054 qualification.
 - **Evidence destination:** cohorts.json mrf_selection; later MRF receipts.
