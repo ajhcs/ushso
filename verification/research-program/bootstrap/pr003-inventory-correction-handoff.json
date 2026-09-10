@@ -1,0 +1,81 @@
+{
+  "artifact_hashes": {
+    "diff_base_to_head": {
+      "sha256": "e1e4ec36e4ecd25546690ce680e60a959ff3c09eeb7e27952364001fb288d29f"
+    },
+    "tests/contract-package-inventory.test.mjs": {
+      "git_blob_sha1": "5d471b5345c1a4e4a9e0143a6d74fba39d5a16dc",
+      "sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b"
+    }
+  },
+  "base_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+  "branch": "codex/ushso-pr003-inventory-correction-20260910",
+  "captured_command_evidence": {
+    "agentctl_commands": [
+      "cmd-0001-6c8fc1e2",
+      "cmd-0002-3fd44885"
+    ],
+    "agentctl_event_log": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-inventory-correction/agentctl-state/tasks/ushso-pr003-inventory-correction-20260910/events.jsonl",
+    "agentctl_state_dir": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-inventory-correction/agentctl-state",
+    "agentctl_test_command_duration_ms": 187,
+    "diff_check_duration_ms": 3,
+    "focused_test_child_duration_ms": 152.751266
+  },
+  "change": {
+    "description": "Updated the exact root npm test-chain assertion to insert npm run test:research-program after npm run test:worker, preserving all legacy gates and exactly one verify:research-navigator aggregate.",
+    "kind": "bounded additive correction",
+    "package_json_changed": false,
+    "validator_changed": false
+  },
+  "changed_paths": [
+    "tests/contract-package-inventory.test.mjs"
+  ],
+  "commit": {
+    "parent": "f62ce35481cc572e9aad054049c700aac6378f58",
+    "sha": "3a4ac488710bea48c75ce779b6d3143dce636396",
+    "subject": "test: include research-program in root test chain"
+  },
+  "format": "ushso.pr003-inventory-correction-handoff.v1",
+  "head_sha": "3a4ac488710bea48c75ce779b6d3143dce636396",
+  "head_tree": "5e72b23698e355452d6338d0c3f2e2f78d809d56",
+  "limitations": [
+    "Only tests/contract-package-inventory.test.mjs was edited.",
+    "No full npm test chain was run; the focused test is the decisive check for this one-line assertion correction.",
+    "No private evaluator files, provider calls, network calls, production mutation, push, merge, or deployment."
+  ],
+  "original_producer": {
+    "original_head": "f62ce35481cc572e9aad054049c700aac6378f58",
+    "producer_model": "DeepSeek",
+    "producer_provider": "DeepSeek",
+    "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-deepseek-20260910t220020z"
+  },
+  "owner": {
+    "model": "Luna Max",
+    "provider": "OpenAI Codex"
+  },
+  "ownership_amendment": {
+    "commit": "bc8ff97cb8220dd49c848cdfa0a00889c925dcbc",
+    "plan_sha256": "0895bb9e0a63191282dad9842271051779ca86fd8e3d7376dcd741fe5f625518"
+  },
+  "repository": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/ushso-pr003-inventory-correction-20260910",
+  "review_boundary": "One bounded C-003-3R1 correction; no push, merge, deploy, or self-approval.",
+  "status": "producer_checked_ready_for_independent_review",
+  "task_id": "ushso-pr003-inventory-correction-20260910",
+  "verification": [
+    {
+      "command": "node --test tests/contract-package-inventory.test.mjs",
+      "exit_code": 0,
+      "result": "9 tests passed, 0 failed; focused inventory assertion reads the candidate package.json and matches the required chain."
+    },
+    {
+      "command": "git diff --check -- tests/contract-package-inventory.test.mjs",
+      "exit_code": 0,
+      "result": "clean"
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 0,
+      "result": "clean before commit"
+    }
+  ]
+}

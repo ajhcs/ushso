@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T23:03:14.526171+00:00",
+  "updated_at": "2026-09-10T23:14:50.466072+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "0895bb9e0a63191282dad9842271051779ca86fd8e3d7376dcd741fe5f625518",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -64,10 +64,12 @@
       "latest_run": {
         "run_id": "ushso-pr003-grok-corrections-20260910",
         "assignment_id": "grok-integrity-corrections",
-        "status": "running",
+        "status": "failed_partial_uncommitted",
         "role": "correct_PR003_integrity",
         "actual_model": "grok-4",
-        "evidence": "verification/research-program/bootstrap/pr003-grok-correction-dispatch.json"
+        "evidence": "verification/research-program/bootstrap/pr003-grok-correction-failure.json",
+        "auth_observation": "durable_grant remained approved; no login request in this run",
+        "failure_cause": "generic ACP worker failure; no more specific cause established"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
@@ -432,7 +434,7 @@
     {
       "pr_id": "PR-003",
       "status": "in_progress",
-      "owner": "ce-ushso-pr003-grok-correct-grok-integrity-correctio-ba2a0a0c24e3-71a0bb97",
+      "owner": "ushso-pr003-integrity-recovery-20260910",
       "dependencies": [
         "PR-001",
         "PR-002"
@@ -462,14 +464,14 @@
       "dependency_handoffs": {
         "PR-002": "verification/research-program/pr-002/controller/integration-handoff.json"
       },
-      "branch": "codex/ce-ushso-pr003-grok-correct-grok-integrity-correctio-ba2a0a0c24e3-71a0bb97",
+      "branch": "codex/ushso-pr003-integrity-recovery-20260910",
       "base_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
-      "provider": "Grok Co-Engineer",
-      "selected_model": "grok-4",
+      "provider": "OpenAI Codex",
+      "selected_model": "Luna Max",
       "selected_reasoning": "high",
-      "actual_model": "grok-4",
-      "run_id": "ushso-pr003-grok-corrections-20260910",
-      "dispatch_evidence": "verification/research-program/bootstrap/pr003-grok-correction-dispatch.json",
+      "actual_model": "Luna Max",
+      "run_id": "ushso-pr003-integrity-recovery-20260910",
+      "dispatch_evidence": null,
       "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
       "producer_completion": "verification/research-program/bootstrap/pr003-native-completion-f62ce35.json",
       "independent_review": "verification/research-program/bootstrap/pr003-first-review-f62ce35.json",
@@ -483,18 +485,46 @@
           "head_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
           "status": "producer_completed_changes_requested",
           "evidence": "verification/research-program/bootstrap/pr003-native-completion-f62ce35.json"
+        },
+        {
+          "run_id": "ushso-pr003-grok-corrections-20260910",
+          "provider": "Grok Co-Engineer",
+          "actual_model": "grok-4",
+          "base_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+          "branch": "codex/ce-ushso-pr003-grok-correct-grok-integrity-correctio-ba2a0a0c24e3-71a0bb97",
+          "status": "failed_partial_uncommitted",
+          "terminal_evidence": "verification/research-program/bootstrap/pr003-grok-correction-failure.json",
+          "snapshot_evidence": "verification/research-program/bootstrap/pr003-grok-partial-snapshot.json"
         }
       ],
       "review_state": "changes_requested",
       "original_integration_base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
-      "provider_task_id": "ce-ushso-pr003-grok-correct-grok-integrity-correctio-ba2a0a0c24e3-71a0bb97",
+      "provider_task_id": null,
       "last_producer_head_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
       "publication_branch": "codex/ushso-pr003-deepseek-20260910t220020z",
       "supplemental_review_evidence": "verification/research-program/bootstrap/pr003-independent-review-93793bf.json",
       "ci_failure_evidence": "verification/research-program/bootstrap/pr003-ci-failure-f62ce35.json",
-      "expected_duration_ms": 1800000,
-      "deadline_at": "2026-09-10T23:14:51.788Z",
-      "controller_adjunct": "A disjoint C-003-3 inventory-test correction is authorized separately; it must not change the validator or its evolving evidence."
+      "expected_duration_ms": null,
+      "deadline_at": null,
+      "controller_adjunct": "A disjoint C-003-3 inventory-test correction is authorized separately; it must not change the validator or its evolving evidence.",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-integrity-recovery-20260910",
+      "recovery_scope": "Inspect Grok retained partial patch and finish only schema, validator, fixture and evidence corrections; original Grok run remains failed and was not replayed.",
+      "inventory_correction": {
+        "status": "independently_verified_awaiting_composition",
+        "owner": "ushso-pr003-inventory-correction-20260910",
+        "provider": "OpenAI Codex",
+        "actual_model": "Luna Max",
+        "branch": "codex/ushso-pr003-inventory-correction-20260910",
+        "base_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+        "head_sha": "3a4ac488710bea48c75ce779b6d3143dce636396",
+        "tree_sha": "5e72b23698e355452d6338d0c3f2e2f78d809d56",
+        "owned_paths": [
+          "tests/contract-package-inventory.test.mjs"
+        ],
+        "producer_evidence": "verification/research-program/bootstrap/pr003-inventory-correction-handoff.json",
+        "independent_review": "verification/research-program/bootstrap/pr003-inventory-correction-host-review.json",
+        "named_test_count": 9
+      }
     },
     {
       "pr_id": "PR-004",
@@ -533,7 +563,14 @@
       "dispatch_evidence": "verification/research-program/bootstrap/pr003-pr004-dispatch.json",
       "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
       "preliminary_review": "verification/research-program/bootstrap/pr004-preliminary-review-21b1b12.json",
-      "preliminary_review_scope": "C1/C2 at 21b1b12 only; findings supplied to the active producer for disposition in final work, not a final-head verdict."
+      "preliminary_review_scope": "C1/C2 at 21b1b12 only; findings supplied to the active producer for disposition in final work, not a final-head verdict.",
+      "additional_preliminary_review": "verification/research-program/bootstrap/pr004-additional-preliminary-checks.json",
+      "additional_preliminary_findings": [
+        "Credential summary changes with input order",
+        "Latest access checks selected by observation time instead of attempt time",
+        "Impossible calendar date accepted"
+      ],
+      "additional_preliminary_scope": "Immutable C1/C2 head21b1b12 only; sent to active producer for correction and final-head replay."
     },
     {
       "pr_id": "PR-005",
