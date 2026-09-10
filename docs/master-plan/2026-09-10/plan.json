@@ -3,7 +3,7 @@
   "date": "2026-09-10",
   "status": "proposed_not_implemented",
   "mission": "Help humans and AI find, understand and obtain tested routes to US health-systems data.",
-  "source_sha256": "5fbd0345924eb5094f1689f48ce7f5cc8984bb5e8f3ae3fdc2213f76093a1f89",
+  "source_sha256": "d21cbaff68a5b25dc8f61417aa29f88f7f3b4558be21aeb4f6d646d6c987380f",
   "requirements": [
     {
       "id": "R01",
@@ -698,8 +698,8 @@
         {
           "id": "C-004-1",
           "subject": "Define field observation state",
-          "instructions": "Add versioned value/evidence/applicability/attempt fields using existing contracts. Separate unsupported, missing, not-applicable, conflict, not-attempted and restricted; retain historical values on failure.",
-          "verification": "Validate fixtures where unknown is not false, an identifier has no physical unit, and an expired observation retains its historical success."
+          "instructions": "Add versioned value/evidence/applicability/attempt fields using existing contracts. Separate unsupported, missing, not-applicable, conflict, not-attempted and restricted; retain historical values on failure. Represent documented credential requirements, access costs and usage limits separately from observations, including unknown/conflicting values and evidence timestamps. Credential fields contain names or placeholders only; undocumented cost is unknown, never free by default.",
+          "verification": "Validate fixtures where unknown is not false, an identifier has no physical unit, and an expired observation retains its historical success. A documented key requirement and an unattempted payload check remain distinct; an unknown price or quota cannot become zero or unlimited."
         },
         {
           "id": "C-004-2",
@@ -710,8 +710,8 @@
         {
           "id": "C-004-3",
           "subject": "Publish a machine-readable completeness view",
-          "instructions": "Expose the versioned coverage artifact to offline consumers with field reasons and last-attempt timestamps. Keep aggregate scores supplemental to the full vector.",
-          "verification": "Validate whole-catalog arithmetic and a record with mixed successful, restricted and failed checks."
+          "instructions": "Expose the versioned coverage artifact to offline consumers with field reasons and last-attempt timestamps. Keep aggregate scores supplemental to the full vector. Expose a compact access-summary projection with credential, cost and usage-limit evidence plus the latest successful check and latest attempt, each scoped to its endpoint/resource and operation. Preserve endpoint-specific browser/CORS observations for developer recipes; never infer browser usability from server-side success.",
+          "verification": "Validate whole-catalog arithmetic and a record with mixed successful, restricted and failed checks. Metadata/document reachability cannot populate a successful payload-access badge; stale success remains historical and access-summary fields retain documented-versus-observed provenance."
         }
       ],
       "acceptance": [
@@ -1104,8 +1104,8 @@
         {
           "id": "C-011-1",
           "subject": "Define content-aware response classification",
-          "instructions": "Add MIME, parse-shape, redirect destination and documented login/error-page checks to existing transport handling. Separate authentication-required, unavailable, content-mismatch and transient failures.",
-          "verification": "Use the captured Census Missing Key page with HTTP 200 and show that JSON success is impossible."
+          "instructions": "Add MIME, parse-shape, redirect destination and documented login/error-page checks to existing transport handling. Separate authentication-required, unavailable, content-mismatch and transient failures. Validate the final resource role against the requested documentation/API/data role after redirects; retain requested URL, redirect chain and final destination.",
+          "verification": "Use the captured Census Missing Key page with HTTP 200 and show that JSON success is impossible. Include the public-apis EPA developer link resolving to a Widgets page as a captured, dated destination/resource-role mismatch; reachability alone cannot yield an actionable API recipe."
         },
         {
           "id": "C-011-2",
@@ -1116,8 +1116,8 @@
         {
           "id": "C-011-3",
           "subject": "Persist useful attempt evidence",
-          "instructions": "Store sanitized headers, response hash, expected/actual content and specific next action. Preserve last good values when a check fails.",
-          "verification": "A refresh failure changes attempt/staleness state without deleting the prior successful observation or publishing an error page as data."
+          "instructions": "Store sanitized headers, response hash, expected/actual content and specific next action. Preserve last good values when a check fails. Keep documentation reachability, endpoint payload validation and browser/CORS checks as separate attempt kinds.",
+          "verification": "A refresh failure changes attempt/staleness state without deleting the prior successful observation or publishing an error page as data. A reachable wrong-role redirect invalidates the actionable recipe while retaining the previous qualified observation and the failed attempt."
         }
       ],
       "acceptance": [
@@ -1585,8 +1585,8 @@
         {
           "id": "C-019-3",
           "subject": "Publish example previews safely",
-          "instructions": "Generate a small approved aggregate preview or explicitly synthetic schema example, with capture date and scope. Preserve source pointers even when sample values cannot be retained.",
-          "verification": "A user can distinguish actual sampled values from synthetic examples; no restricted/private value enters a public artifact."
+          "instructions": "Generate a small approved aggregate preview or explicitly synthetic schema example, with capture date and scope. Preserve source pointers even when sample values cannot be retained. Generate copyable cURL and Python examples from the same tested recipe, retaining credential placeholders, exact wire fields, request limits and source/release/distribution identities. Explicitly mark untested or credential-blocked examples.",
+          "verification": "A user can distinguish actual sampled values from synthetic examples; no restricted/private value enters a public artifact. Generated examples round-trip to the bounded recipe and cannot silently drop its limits, context pins or credential placeholders."
         }
       ],
       "acceptance": [
@@ -3699,8 +3699,8 @@
         {
           "id": "C-056-2",
           "subject": "Return tested recipes and precise limits",
-          "instructions": "Include method, endpoint template, parameter meanings, required credentials by name only, pagination, expected schema and latest test receipt.",
-          "verification": "A returned recipe contains no secret or source payload; it does not execute merely because a client inspected it."
+          "instructions": "Include method, endpoint template, parameter meanings, required credentials by name only, pagination, expected schema and latest test receipt. Include scan-friendly documented credential/cost/quota requirements separately from observed checks, with unknowns and latest-success/latest-attempt scopes. Return cURL/Python examples generated from tested recipes with exact wire fields, request bounds and source/release pins. Keep endpoint-specific browser/CORS results in the developer recipe context, with tested origin/method/credential mode or an explicit untested state.",
+          "verification": "A returned recipe contains no secret or source payload; it does not execute merely because a client inspected it. Human and machine access summaries agree, missing cost/quota information stays unknown, and generated example parameters reproduce the validated recipe without embedding a credential."
         },
         {
           "id": "C-056-3",
@@ -4287,8 +4287,8 @@
         {
           "id": "C-066-1",
           "subject": "Put the source decision first",
-          "instructions": "Lead with purpose, exact product/release, observed coverage/grain, access requirements, last test and a clear source action. Consolidate repetitive unresolved sections.",
-          "verification": "The HCRIS page does not claim source-asserted inferred units or hide its supported API example below boilerplate."
+          "instructions": "Lead with purpose, exact product/release, observed coverage/grain, access requirements, last test and a clear source action. Consolidate repetitive unresolved sections. Make credential requirements, access costs, usage limits and the latest successful check easy to scan, distinguishing documented requirements from observed behavior and metadata checks from payload checks. Keep endpoint-specific browser/CORS detail alongside developer recipes.",
+          "verification": "The HCRIS page does not claim source-asserted inferred units or hide its supported API example below boilerplate. Unknown cost/limits remain visible, and a reachable documentation page cannot be presented as proven payload or browser access."
         },
         {
           "id": "C-066-2",
@@ -4522,8 +4522,8 @@
         {
           "id": "C-070-2",
           "subject": "Write access and developer quick starts",
-          "instructions": "Cover public downloads, API keys, applications/DUAs, Python/R/curl examples and MCP setup. Explain which actions happen at the publisher.",
-          "verification": "A new user can follow the documented prerequisites; code examples use exact wire keys and never embed a credential."
+          "instructions": "Cover public downloads, API keys, applications/DUAs, Python/R/curl examples and MCP setup. Explain which actions happen at the publisher. Prefer cURL/Python examples generated from tested canonical recipes, preserving credential placeholders, exact wire names, bounded parameters and source/release identities.",
+          "verification": "A new user can follow the documented prerequisites; code examples use exact wire keys and never embed a credential. Guide examples retain the same request and response bounds as their source recipe; credential-blocked or untested paths state their actual status."
         },
         {
           "id": "C-070-3",
@@ -4897,8 +4897,8 @@
         {
           "id": "C-076-2",
           "subject": "Add actionable operational signals",
-          "instructions": "Track queue age, failed checks, schema drift, coverage loss, budget exhaustion and review backlog. Notify on meaningful changes with affected sources and next action.",
-          "verification": "Repeated unchanged failures do not generate routine notification spam; critical new loss is not hidden by aggregate success."
+          "instructions": "Track queue age, failed checks, schema drift, coverage loss, budget exhaustion and review backlog. Notify on meaningful changes with affected sources and next action. Monitor redirect destination and resource-role drift separately from HTTP reachability, using the PR011 EPA API-link-to-Widgets case as a dated regression fixture.",
+          "verification": "Repeated unchanged failures do not generate routine notification spam; critical new loss is not hidden by aggregate success. A successful HTTP response with the wrong resource role produces a specific changed-destination signal and cannot refresh an actionable API success badge."
         },
         {
           "id": "C-076-3",
