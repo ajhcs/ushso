@@ -1,0 +1,14 @@
+{
+  "format": "ushso.research-program.pr-002.command-receipt.v1",
+  "command": [
+    "python3",
+    "-B",
+    "-c",
+    "import hashlib,json,subprocess; from pathlib import Path; h=json.loads(Path(\"docs/research-program/handoffs/PR-002.json\").read_text()); errors=[]; current=0; historical=0\nfor a in h[\"artifacts\"]:\n p=Path(a[\"path\"]); actual=hashlib.sha256(p.read_bytes()).hexdigest(); current+=1\n if actual!=a[\"sha256\"]: errors.append((\"current\",a[\"path\"],a[\"sha256\"],actual))\n if \"bytes\" in a and p.stat().st_size!=a[\"bytes\"]: errors.append((\"current-bytes\",a[\"path\"],a[\"bytes\"],p.stat().st_size))\nfor a in h[\"historical_artifact_bindings\"]:\n data=subprocess.check_output([\"git\",\"show\",f\"{a[\"commit\"]}:{a[\"path\"]}\"]); actual=hashlib.sha256(data).hexdigest(); historical+=1\n if actual!=a[\"sha256\"]: errors.append((\"historical\",a[\"path\"],a[\"commit\"],a[\"sha256\"],actual))\n if \"bytes\" in a and len(data)!=a[\"bytes\"]: errors.append((\"historical-bytes\",a[\"path\"],a[\"commit\"],a[\"bytes\"],len(data)))\nprint(json.dumps({\"current_checked\":current,\"historical_checked\":historical,\"errors\":errors},sort_keys=True)); raise SystemExit(1 if errors else 0)"
+  ],
+  "started_at": "2026-09-10T19:49:17.416127Z",
+  "completed_at": "2026-09-10T19:49:17.485564Z",
+  "exit_code": 1,
+  "stdout": "{\"current_checked\": 28, \"errors\": [[\"current\", \"verification/research-program/pr-002/command-receipts/c2-correction-test-c2.json\", \"fc594bcdb57a9feae8752e50bb96330d10777880ef0012f8412f9bfd52f1f6e\", \"fc594bcdbb57a9feae8752e50bb96330d10777880ef0012f8412f9bfd52f1f6e\"]], \"historical_checked\": 10}\n",
+  "stderr": ""
+}

@@ -1,0 +1,173 @@
+{
+  "format": "ushso.research-program.pr-002.c3-review-correction-contract-receipt.v1",
+  "recorded_at": "2026-09-10T21:30:41.173126Z",
+  "authorship": "Luna Max",
+  "reviewed_parent": {
+    "commit": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+    "tree": "ded3c2e3a5d497e2dfa4e40f3bf58060e284cd94",
+    "review_sha256": "b6bfd3bca9b5b5cd6f1ba46b5001f24a79336548cc257a90a120eecab00163c7",
+    "family_review_sha256": "1849362491ffa442d6875d9fdc5a62163dff40e32321721411c27b6a359a3a78"
+  },
+  "findings_addressed": [
+    "PR002-C3-001",
+    "PR002-C3-002",
+    "C3-MRF-VERIFIER-GUARD-001"
+  ],
+  "behavior": {
+    "pilot_validation": "Reconstructs the full MRF selection from hash-verified sealed inputs and reports deterministic path-specific differences for every record, identity, row/cell, hash, binding, consumer-contract, and freeze-flag field.",
+    "family_validation": "Reconstructs the twelve-family overlay from canonical C1 products and rejects any field or order substitution.",
+    "acceptance_validation": "Requires acceptance.md to equal the deterministic C3 rendering using the current tasks.json and cohorts.json SHA-256 values.",
+    "historical_scope": "Only additive correction paths were changed; frozen cohorts, tasks, acceptance, C1/C2 libraries, and historical receipts were not rewritten."
+  },
+  "negative_cases": {
+    "pilot_and_contract_kinds": [
+      "hospital_native_identity",
+      "hospital_projection_row",
+      "hospital_display_name",
+      "payer_native_identity",
+      "payer_workbook_row",
+      "payer_stored_cell",
+      "freeze_before_endpoint_results",
+      "selection_consumed_not_recomputed",
+      "silent_substitution_allowed",
+      "denominator_may_not_shrink"
+    ],
+    "family_overlay_kind": "family_overlay_field",
+    "acceptance_kind": "acceptance_rendering"
+  },
+  "implementation_artifacts": [
+    {
+      "path": "verification/research-program/pr-002/c3_lib.py",
+      "sha256": "2b5259025831b5a8e5bee91cf2da2a65b6dafc05ac63bd454d44522966b81849",
+      "bytes": 55851
+    },
+    {
+      "path": "verification/research-program/pr-002/test_c3.py",
+      "sha256": "3752a19f7a414ee61a561237389ced38f3bf1e2e0e9eba299544899dcdc8ab71",
+      "bytes": 10340
+    },
+    {
+      "path": "verification/research-program/pr-002/c3-negative-fixtures.json",
+      "sha256": "1325b9666e7e1099cda91773edf72d795ff2815fcc58b07c40bf53004f5c9d82",
+      "bytes": 5841
+    },
+    {
+      "path": "verification/research-program/pr-002/verify.py",
+      "sha256": "183e92d3d1df1e5c15a37716cc0714b4e112dac3333430d38117a11b829dc996",
+      "bytes": 18150
+    }
+  ],
+  "command_receipts": [
+    {
+      "format": "ushso.research-program.pr-002.c3-correction-command-receipt.v1",
+      "argv": [
+        "python3",
+        "-B",
+        "verification/research-program/pr-002/test_c1_corrections.py"
+      ],
+      "started_at": "2026-09-10T21:19:33.041314Z",
+      "completed_at": "2026-09-10T21:19:33.088946Z",
+      "exit_code": 0,
+      "stdout_sha256": "00990e84dac3be6724dba499e5e183db1268cfb6ee54ba8d460e2c7c13ae56d3",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 26,
+      "stderr_bytes": 0,
+      "agentctl_task_id": "ushso-pr002-c3-corrections-20260910-luna-max",
+      "agentctl_command_id": "cmd-0003-f93732a9",
+      "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+      "receipt_path": "verification/research-program/pr-002/command-receipts/c3-correction-test-c1.json",
+      "receipt_sha256": "a9f4d2af6d501e9fcf6af6ec09ea0b9416677e9602d8f96489d64b4c55902201",
+      "receipt_bytes": 759
+    },
+    {
+      "format": "ushso.research-program.pr-002.c3-correction-command-receipt.v1",
+      "argv": [
+        "python3",
+        "-B",
+        "verification/research-program/pr-002/test_c2.py"
+      ],
+      "started_at": "2026-09-10T21:20:07.372354Z",
+      "completed_at": "2026-09-10T21:20:07.955601Z",
+      "exit_code": 0,
+      "stdout_sha256": "e0cf57eeafd24196507f4573cca924eb090aabfab208fa1b9e2e4a3ce109deae",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 795,
+      "stderr_bytes": 0,
+      "agentctl_task_id": "ushso-pr002-c3-corrections-20260910-luna-max",
+      "agentctl_command_id": "cmd-0004-78f2ef3d",
+      "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+      "receipt_path": "verification/research-program/pr-002/command-receipts/c3-correction-test-c2.json",
+      "receipt_sha256": "8b133e92847d0d05b73526aaada1676b244926f60a4795b893e026c9a42b858f",
+      "receipt_bytes": 748
+    },
+    {
+      "format": "ushso.research-program.pr-002.c3-correction-command-receipt.v1",
+      "argv": [
+        "python3",
+        "-B",
+        "verification/research-program/pr-002/test_c3.py"
+      ],
+      "started_at": "2026-09-10T21:24:49.461515Z",
+      "completed_at": "2026-09-10T21:24:51.960280Z",
+      "exit_code": 0,
+      "stdout_sha256": "58db496245845c668588090c1968bcbf1f2d7fdd10178618c5b13fca9178d275",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 784,
+      "stderr_bytes": 0,
+      "agentctl_task_id": "ushso-pr002-c3-corrections-20260910-luna-max",
+      "agentctl_command_id": "cmd-0008-3f8787e5",
+      "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+      "receipt_path": "verification/research-program/pr-002/command-receipts/c3-correction-test-c3-final.json",
+      "receipt_sha256": "99d99ba13656538608d17189e958f33651287bc4d247c219e7868ee0e43c5ed6",
+      "receipt_bytes": 748
+    },
+    {
+      "format": "ushso.research-program.pr-002.c3-correction-command-receipt.v1",
+      "argv": [
+        "python3",
+        "-B",
+        "verification/research-program/pr-002/verify.py",
+        "--repo",
+        "."
+      ],
+      "started_at": "2026-09-10T21:25:23.646066Z",
+      "completed_at": "2026-09-10T21:25:24.657480Z",
+      "exit_code": 0,
+      "stdout_sha256": "68e148d8c8779543b2809301ad49461ca6932dac3f9a14ba325ace51fc88981c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 840,
+      "stderr_bytes": 0,
+      "agentctl_task_id": "ushso-pr002-c3-corrections-20260910-luna-max",
+      "agentctl_command_id": "cmd-0009-feb33988",
+      "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+      "receipt_path": "verification/research-program/pr-002/command-receipts/c3-correction-verify-readonly-final.json",
+      "receipt_sha256": "f9c1443b7ff25f2dff2aaccc41ed0cb84430976c7cfbe5397eb1877ca8f2a78e",
+      "receipt_bytes": 770
+    },
+    {
+      "format": "ushso.research-program.pr-002.c3-correction-command-receipt.v1",
+      "argv": [
+        "python3",
+        "-B",
+        "verification/research-program/pr-002/c3-pilot-selection/replay_portable.py",
+        "--repo",
+        "."
+      ],
+      "started_at": "2026-09-10T21:25:57.664801Z",
+      "completed_at": "2026-09-10T21:25:58.206355Z",
+      "exit_code": 0,
+      "stdout_sha256": "3cca205036cee578bd695d52e2aa62d0c0833cfa731b470421afc6cbf30b97c9",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_bytes": 410,
+      "stderr_bytes": 0,
+      "agentctl_task_id": "ushso-pr002-c3-corrections-20260910-luna-max",
+      "agentctl_command_id": "cmd-0010-a975927a",
+      "event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c3-corrections-20260910-luna-max/events.jsonl",
+      "receipt_path": "verification/research-program/pr-002/command-receipts/c3-correction-portable-replay-final.json",
+      "receipt_sha256": "4f245fdf9aaf3838b2f1b0045cbd6c2e461982d380a7cd6722fa48c8e893db77",
+      "receipt_bytes": 798
+    }
+  ],
+  "all_command_exits_zero": true,
+  "no_model_calls_or_private_input_reads": true
+}

@@ -1,0 +1,133 @@
+{
+  "format": "ushso.research-program.pr-002.c3-negative-fixtures.v1",
+  "commit_id": "C-002-3",
+  "purpose": "Decisive C3 identity negatives. They do not contain raw holdout prompts or labels.",
+  "fixtures": [
+    {
+      "id": "NEG-C3-DELETE-HOSPITAL",
+      "kind": "delete_hospital",
+      "selector": "Improve a later metric by deleting a sealed hospital candidate ID.",
+      "expected": "reject",
+      "reason": "The 25/10 denominators are fixed. Unavailable items stay in the denominator."
+    },
+    {
+      "id": "NEG-C3-REPLACE-HOSPITAL",
+      "kind": "replace_hospital",
+      "selector": "Replace a sealed hospital ID after an endpoint or eligibility failure.",
+      "expected": "reject",
+      "reason": "PR-046/PR-049 consume the frozen IDs without replacement."
+    },
+    {
+      "id": "NEG-C3-DUPLICATE-IDENTITY",
+      "kind": "duplicate_identity",
+      "selector": "Silently deduplicate two selected IDs that later share a file.",
+      "expected": "reject",
+      "reason": "Shared-file outcomes do not shrink the selected-ID denominator."
+    },
+    {
+      "id": "NEG-C3-EVIDENCE-HASH-MISMATCH",
+      "kind": "hash_mismatch",
+      "selector": "Keep an ID whose selected-row source hash no longer matches the sealed evidence.",
+      "expected": "reject",
+      "reason": "Selected row/cell/source bindings are part of the frozen identity."
+    },
+    {
+      "id": "NEG-C3-MISSING-REQUIREMENT-KEYS",
+      "kind": "missing_requirement_keys",
+      "selector": "Treat all() over a partial R-acceptance mapping as complete unaccepted status.",
+      "expected": "reject",
+      "reason": "R01-R16 must be present as an exact keyset. A truthy or incomplete mapping is insufficient."
+    },
+    {
+      "id": "NEG-C3-FAMILY-SUBSTITUTION",
+      "kind": "family_substitution",
+      "selector": "Substitute HHS ASPE SVI or another similar baseline title for CDC/ATSDR SVI.",
+      "expected": "reject",
+      "reason": "The twelve family identities cannot be swapped for similar catalog titles."
+    },
+    {
+      "id": "NEG-C3-FAMILY-OVERLAY-FIELD",
+      "kind": "family_overlay_field",
+      "selector": "Change a frozen family's canonical C1 publisher while retaining its family identity.",
+      "expected": "reject",
+      "reason": "The complete family overlay is reconstructed from canonical C1 products."
+    },
+    {
+      "id": "NEG-C3-HOSPITAL-NATIVE-IDENTITY",
+      "kind": "hospital_native_identity",
+      "selector": "Change a frozen hospital's native facility identity while retaining its candidate position.",
+      "expected": "reject",
+      "reason": "Native identities are part of the sealed hospital record contract."
+    },
+    {
+      "id": "NEG-C3-HOSPITAL-PROJECTION-ROW",
+      "kind": "hospital_projection_row",
+      "selector": "Change a hospital projection directory row index after selection.",
+      "expected": "reject",
+      "reason": "Projection row metadata is part of the sealed hospital record contract."
+    },
+    {
+      "id": "NEG-C3-HOSPITAL-DISPLAY-NAME",
+      "kind": "hospital_display_name",
+      "selector": "Change a frozen hospital display identity while retaining its native ID.",
+      "expected": "reject",
+      "reason": "Displayed identity fields remain bound to the hash-verified selected row."
+    },
+    {
+      "id": "NEG-C3-PAYER-NATIVE-IDENTITY",
+      "kind": "payer_native_identity",
+      "selector": "Change a frozen payer's native HIOS issuer identity while retaining its candidate position.",
+      "expected": "reject",
+      "reason": "Native payer identities are part of the sealed payer record contract."
+    },
+    {
+      "id": "NEG-C3-PAYER-WORKBOOK-ROW",
+      "kind": "payer_workbook_row",
+      "selector": "Change a payer workbook row binding after selection.",
+      "expected": "reject",
+      "reason": "Workbook row metadata is part of the sealed payer cell contract."
+    },
+    {
+      "id": "NEG-C3-PAYER-STORED-CELL",
+      "kind": "payer_stored_cell",
+      "selector": "Change a payer's raw workbook stored cell value while retaining its projection.",
+      "expected": "reject",
+      "reason": "Raw workbook wire values are part of the sealed payer cell contract."
+    },
+    {
+      "id": "NEG-C3-FREEZE-BEFORE-ENDPOINT-RESULTS",
+      "kind": "freeze_before_endpoint_results",
+      "selector": "Allow endpoint results to precede or influence the frozen pilot selection.",
+      "expected": "reject",
+      "reason": "The selection must be frozen before endpoint results are observed."
+    },
+    {
+      "id": "NEG-C3-SELECTION-CONSUMED-NOT-RECOMPUTED",
+      "kind": "selection_consumed_not_recomputed",
+      "selector": "Recompute or replace the selected identities during downstream consumption.",
+      "expected": "reject",
+      "reason": "Consumers must use the frozen selection without recomputation."
+    },
+    {
+      "id": "NEG-C3-SILENT-SUBSTITUTION-ALLOWED",
+      "kind": "silent_substitution_allowed",
+      "selector": "Permit silent substitution of an unavailable selected identity.",
+      "expected": "reject",
+      "reason": "Unavailable or unresolved selections remain typed outcomes without silent substitution."
+    },
+    {
+      "id": "NEG-C3-DENOMINATOR-MAY-NOT-SHRINK",
+      "kind": "denominator_may_not_shrink",
+      "selector": "Allow unavailable or ineligible selected identities to be removed from later denominators.",
+      "expected": "reject",
+      "reason": "All selected opportunities remain in later denominators."
+    },
+    {
+      "id": "NEG-C3-ACCEPTANCE-RENDERING",
+      "kind": "acceptance_rendering",
+      "selector": "Change the generated acceptance text while retaining required C3 substrings.",
+      "expected": "reject",
+      "reason": "The acceptance document must exactly equal the deterministic rendering for current task and cohort hashes."
+    }
+  ]
+}
