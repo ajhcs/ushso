@@ -32,6 +32,7 @@ from c1_lib import (
     load_catalog,
     load_rows,
 )
+import c2_lib
 
 
 def git(repo: Path, *args: str) -> str:
@@ -107,7 +108,11 @@ def main() -> int:
     rebuilt = build_payload(repo)
     cohorts_path = repo / "evaluation/research-program/cohorts.json"
     written = json.loads(cohorts_path.read_text(encoding="utf-8"))
-    checks["cohorts_rebuilt"] = written == rebuilt
+    c3_frozen = bool((written.get("mrf_selection") or {}).get("hospital_candidate_ids"))
+    if c3_frozen:
+        checks["cohorts_rebuilt"] = c2_lib.extract_c1_projection(written) == c2_lib.extract_c1_projection(rebuilt)
+    else:
+        checks["cohorts_rebuilt"] = written == rebuilt
     baseline_ids = [item["record_id"] for item in written["baseline_records"]]
     checks["baseline_identity_set"] = baseline_ids == record_ids and set(baseline_ids) == set(record_ids)
     checks["baseline_native_and_source"] = all(
@@ -188,22 +193,74 @@ def main() -> int:
         if item["product_key"] in {"hospital-price-transparency-mrfs", "payer-transparency-in-coverage-mrfs"}
     )
     mrf_selection = written["mrf_selection"]
-    checks["mrf_freeze_order"] = (
-        mrf_selection["status"] == "pending_C-002-3"
-        and mrf_selection["selection_owner"] == "C-002-3"
-        and mrf_selection["freeze_before_endpoint_results"] is True
+    checks["mrf_consumer_contract"] = (
+        mrf_selection["freeze_before_endpoint_results"] is True
         and mrf_selection["hospital_candidate_count"] == 25
         and mrf_selection["payer_reporting_entity_candidate_count"] == 10
-        and mrf_selection["hospital_candidate_ids"] is None
-        and mrf_selection["payer_reporting_entity_candidate_ids"] is None
         and mrf_selection["consumer_contract"]["hospital"]["pr"] == "PR-046"
         and mrf_selection["consumer_contract"]["payer"]["pr"] == "PR-049"
         and mrf_selection["consumer_contract"]["hospital"]["replacement_allowed"] is False
         and mrf_selection["consumer_contract"]["payer"]["replacement_allowed"] is False
     )
-    checks["r_not_accepted"] = all(
-        value == "not_accepted_on_C-002-1" for value in written["acceptance"].values()
-    )
+    if c3_frozen:
+        checks["mrf_freeze_order"] = (
+            checks["mrf_consumer_contract"]
+            and mrf_selection["selection_owner"] == "C-002-3"
+            and isinstance(mrf_selection["hospital_candidate_ids"], list)
+            and isinstance(mrf_selection["payer_reporting_entity_candidate_ids"], list)
+            and len(mrf_selection["hospital_candidate_ids"]) == 25
+            and len(mrf_selection["payer_reporting_entity_candidate_ids"]) == 10
+        )
+    else:
+        checks["mrf_freeze_order"] = (
+            checks["mrf_consumer_contract"]
+            and mrf_selection["status"] == "pending_C-002-3"
+            and mrf_selection["selection_owner"] == "C-002-3"
+            and mrf_selection["hospital_candidate_ids"] is None
+            and mrf_selection["payer_reporting_entity_candidate_ids"] is None
+        )
+    accepted_values = {"unaccepted", "not_accepted_on_C-002-1", "not_accepted"}
+    checks["r_not_accepted"] = all(value in accepted_values for value in written["acceptance"].values())
+    tasks_path = repo / "evaluation/research-program/tasks.json"
+    acceptance_path = repo / "docs/research-program/acceptance.md"
+    if tasks_path.exists() or acceptance_path.exists():
+        sealed = c2_lib.load_sealed_manifest()
+        tasks_payload = json.loads(tasks_path.read_text(encoding="utf-8"))
+        schema_errors = c2_lib.assert_task_schema(tasks_payload, sealed)
+        checks["c2_task_schema"] = schema_errors == []
+        out["c2_task_schema_errors"] = schema_errors
+        checks["c2_sealed_manifest_hash"] = (
+            c2_lib.digest(HERE / c2_lib.SEALED_MANIFEST_NAME) == c2_lib.SEALED_MANIFEST_SHA256
+        )
+        checks["c2_r14_protocol_hash"] = (
+            c2_lib.digest(HERE / c2_lib.R14_PROTOCOL_NAME) == c2_lib.R14_PROTOCOL_SHA256
+        )
+        acceptance_text = acceptance_path.read_text(encoding="utf-8")
+        acceptance_errors = c2_lib.assert_acceptance_document(acceptance_text)
+        checks["c2_acceptance_rows"] = acceptance_errors == []
+        out["c2_acceptance_errors"] = acceptance_errors
+        checks["c2_tasks_rebuild"] = tasks_payload == c2_lib.build_tasks_payload(repo)
+        checks["c2_holdout_boundary"] = not c2_lib.contains_private_fields(tasks_payload)
+        checks["c2_r14_not_materialized"] = (
+            tasks_payload.get("r14", {}).get("materialized") is False
+            and tasks_payload.get("r14", {}).get("frozen_sample") is False
+        )
+        checks["c2_cohorts_not_rewritten_before_c3"] = c3_frozen or digest(cohorts_path) == c2_lib.C1_COHORTS_SHA256
+        fixtures = json.loads((HERE / "negative-selector-fixtures.json").read_text(encoding="utf-8"))
+        checks["c2_negative_fixtures"] = (
+            all(item.get("expected") == "reject" for item in fixtures["fixtures"])
+            and {item["id"] for item in fixtures["fixtures"]} >= {
+                "NEG-HOLDOUT-RAW-QUERY",
+                "NEG-DELETE-DIFFICULT-MEMBER",
+                "NEG-TASKS-AS-R14-GOLD",
+                "NEG-PROTOCOL-AS-MATERIALIZED-FRAME",
+                "NEG-CATALOG-AS-RETRIEVAL-DENOMINATOR",
+            }
+        )
+        checks["c2_hash_scheme_non_circular"] = (
+            "own digest" in c2_lib.hash_scheme()["circularity_rule"]
+            and "tasks_sha256" not in tasks_payload
+        )
     checks["predecessor_retained"] = (
         written["predecessor"]["failed_run_id"] == FAILED_RUN
         and written["predecessor"]["retained_manifest_sha256"] == EXPECTED_PARTIAL_MANIFEST
@@ -213,7 +270,14 @@ def main() -> int:
     checks["no_temp_probes"] = probes == []
     receipt_path = HERE / "c1-build-receipt.json"
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
-    checks["receipt_hash"] = receipt["cohorts_sha256"] == digest(cohorts_path)
+    checks["c1_build_receipt_preserved"] = digest(receipt_path) == c2_lib.C1_BUILD_RECEIPT_SHA256
+    checks["c1_verify_receipt_preserved"] = (
+        digest(HERE / "c1-verify-receipt.json") == c2_lib.C1_VERIFY_RECEIPT_SHA256
+    )
+    if digest(cohorts_path) == c2_lib.C1_COHORTS_SHA256:
+        checks["receipt_hash"] = receipt["cohorts_sha256"] == digest(cohorts_path)
+    else:
+        checks["receipt_hash"] = receipt["cohorts_sha256"] == c2_lib.C1_COHORTS_SHA256
     out["resolution"] = written["resolution"]
     out["cohorts_sha256"] = digest(cohorts_path)
     out["receipt_sha256"] = digest(receipt_path)
@@ -240,9 +304,13 @@ def main() -> int:
         "pending": written["pending"],
         "receipt_mode": "explicit_output" if args.receipt_output else "read_only",
         "receipt_output": str(args.receipt_output.resolve()) if args.receipt_output else None,
+        "c1_build_receipt_preserved": checks.get("c1_build_receipt_preserved"),
+        "c1_verify_receipt_preserved": checks.get("c1_verify_receipt_preserved"),
     }
     if args.receipt_output:
         verify_path = args.receipt_output.resolve()
+        if verify_path.parent == HERE and verify_path.name in c2_lib.HISTORICAL_RECEIPT_NAMES:
+            raise SystemExit(f"refusing to overwrite historical C1 receipt {verify_path}")
         verify_path.parent.mkdir(parents=True, exist_ok=True)
         verify_path.write_text(json.dumps(verify_receipt, indent=2) + "\n", encoding="utf-8")
         out["verify_receipt_sha256"] = digest(verify_path)

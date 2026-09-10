@@ -1,26 +1,29 @@
 {
   "format": "ushso.pr-handoff.v1",
   "pr_id": "PR-002",
-  "status": "partial_C1_complete",
+  "status": "partial_C1_C2_complete",
   "correction_status": "implemented_pending_independent_review",
-  "pending": ["C-002-2", "C-002-3"],
+  "pending": [
+    "C-002-3"
+  ],
   "owner": "Grok",
   "reviewer": "Astra",
   "implementation_authorship": {
     "c0021_producer": "Grok",
-    "c0021_review_correction": "Luna Max"
+    "c0021_review_correction": "Luna Max",
+    "c0022_producer": "Grok"
   },
   "provider": "grok",
   "actual_model": "grok-4",
   "author_provider_envelope": "grok-4",
-  "run_id": "ushso-pr002-c1-recovery-20260910",
-  "assignment_id": "grok-c1-recovery",
+  "run_id": "ushso-pr002-c2-c3-20260910",
+  "assignment_id": "grok-c2-c3",
   "base_sha": "83f7d1bad39acb6a7eede95a404179c511296efa",
   "base_tree": "691d0a375144bd9d215988d7f70c604af505abf9",
   "correction_base_sha": "44506be8052e1054641048de68893fc41526b664",
   "correction_base_tree": "e7b12a01b49ab66c5f5205f3b14407da30804e46",
   "head_sha": null,
-  "head_sha_note": "The original Grok producer head is preserved below. This additive correction cannot self-identify its own final commit hash; root binds the corrected head and tree with an external review receipt.",
+  "head_sha_note": "C-002-2 cannot self-identify its commit hash. Root binds the C2 head/tree. C-002-3 remains pending on this commit.",
   "review_correction": {
     "kind": "unplanned_additive_review_correction",
     "reviewed_head_before_correction": "44506be8052e1054641048de68893fc41526b664",
@@ -72,7 +75,7 @@
     "verification/research-program/pr-002/verify.py"
   ],
   "problem": "PR-002 C-002-1 identities were not frozen. Predecessor run ushso-pr002-cohort-freeze-20260910 reached a 100-product declaration then failed with no commit; the recovered producer packet also needed bounded corrections for heuristic relation labels, MRF freeze ordering, command timing evidence, and replay receipt integrity.",
-  "resulting_behavior": "One C-002-1 packet defines the same 100-product cohort across ten domains, binds the same representative catalog anchors or named intake tasks, and seeds the same 3434 baseline record IDs. Naming-based annual/GIS/geography matches are source-scoped candidate relations with exact record/shard/hash/provenance pointers, unresolved publisher relationship identity, and no merge/release/scientific interchangeability permission. The MRF contract requires C-002-3 to freeze 25 hospital and 10 payer candidate IDs before endpoint results; PR-046/PR-049 consume those IDs without replacement, while actual IDs remain pending. Verifier replay is read-only unless --receipt-output is supplied. C-002-2, C-002-3, task labels, acceptance.md, and R01-R16 acceptance remain pending.",
+  "resulting_behavior": "C-002-1 identities remain: 100 products, ten domains, 3,434 baseline IDs, and 185 source-scoped related candidates. C-002-2 freezes the public opaque 40-task index (four/domain; 10 novice/17 advanced/13 machine), hashes cohorts/tasks with SHA-256 of exact file bytes, and gives every R01-R16 an unaccepted measurable row. Holdout labels stay inaccessible. The R14 protocol is published and not materialized. C-002-3 MRF 25/10 IDs remain pending. No R01-R16 acceptance is claimed.",
   "commits": [
     {
       "id": "C-002-1",
@@ -89,6 +92,14 @@
       "tree": null,
       "subject": "docs(research): correct C-002-1 evidence boundaries (review correction)",
       "identity_convention": "One unplanned additive correction; root records the resulting sha/tree and external review receipt after the commit lands. It does not replace C-002-1 or implement C-002-2/C-002-3."
+    },
+    {
+      "id": "C-002-2",
+      "sha": null,
+      "parent": "ef9c2569b78dd26f0436d2ea945a8e1b791b8698",
+      "tree": null,
+      "subject": "docs(research): freeze research tasks and negative cases (PR-002 C-002-2)",
+      "identity_convention": "Imperative docs(research) subject plus (PR-002 C-002-2). This commit cannot self-identify its sha/tree; root binds them after review."
     }
   ],
   "source_identities": [
@@ -149,6 +160,25 @@
       "bytes": 73829,
       "manifest_sha256": "6a764fd4157b4dcf0a8b44a977364d8bccc2c6f88b5e87c05711e1cde39377e6",
       "contribution": "Copied the retained 100-product declaration; did not reconstruct product rows. Predecessor probes were not committed."
+    },
+    {
+      "kind": "c0021_accepted_head",
+      "sha": "ef9c2569b78dd26f0436d2ea945a8e1b791b8698",
+      "tree": "a7db2e54b04891793e6ae9882826d12d7c74b32a",
+      "status": "accepted_c1_only"
+    },
+    {
+      "kind": "evaluator_freeze_manifest_sealed_v1",
+      "path": "verification/research-program/pr-002/evaluator-freeze-manifest-sealed-v1.json",
+      "sha256": "142458d686e1cb5e9677b6a5eaa619955c78ef9a4d51735207d4ad19bf26c9ef",
+      "bytes": 24446,
+      "scientific_gold": false
+    },
+    {
+      "kind": "r14_protocol_v2",
+      "path": "verification/research-program/pr-002/c2-r14-denominator-freeze-protocol-v2.md",
+      "sha256": "3a35ee6662f939bf53e9f8c5005079ac09982372d80c9b385a9beb9c52e525c7",
+      "materialized": false
     }
   ],
   "commands": [
@@ -161,7 +191,10 @@
       "event_source": {
         "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-controller-review/grok-command-events.json",
         "sha256": "73ab92009e149cd0ccf6bf793a22d7447ca705b2a0c7802c700a32ce43dff306",
-        "source_lines": [872, 880]
+        "source_lines": [
+          872,
+          880
+        ]
       },
       "result": "The captured command output reports tree 691d0a375144bd9d215988d7f70c604af505abf9, corpus.json SHA256 56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633, and unchanged product_catalog.py SHA256 5183f7ac32aeaaa0402965c9658ca1e048ebcbaea18a57cc20a542850e222684 (73829 bytes)."
     },
@@ -174,7 +207,10 @@
       "event_source": {
         "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-controller-review/grok-command-events.json",
         "sha256": "73ab92009e149cd0ccf6bf793a22d7447ca705b2a0c7802c700a32ce43dff306",
-        "source_lines": [1206, 1214]
+        "source_lines": [
+          1206,
+          1214
+        ]
       },
       "result": "The captured command output reports the producer rebuild: 100 products, 3434 baseline IDs, no failed or unsupported selectors, selector counts 63/13/10/14, and producer cohorts SHA256 3d50afef67780b131d6a2556ada07021510ffe7dd7107d4d539381e5a4e5d1fe. The corrected rebuild later produces the new artifact hash recorded below."
     },
@@ -187,7 +223,10 @@
       "event_source": {
         "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-controller-review/grok-command-events.json",
         "sha256": "73ab92009e149cd0ccf6bf793a22d7447ca705b2a0c7802c700a32ce43dff306",
-        "source_lines": [1240, 1248]
+        "source_lines": [
+          1240,
+          1248
+        ]
       },
       "result": "The captured provider output reports ok=true and no failed checks for the original C-002-1 verifier. A root replay independently recorded numeric exit 0 below; this correction's explicit-output replay is recorded after the corrected build."
     },
@@ -299,6 +338,54 @@
       "path": "verification/research-program/pr-002/test_c1_corrections.py",
       "sha256": "abdfcba89e915afa305d3cbc31d97f2e9b6c0afa02aeb1df98864532313ab012",
       "status": "corrected_C1_adversarial_fixture"
+    },
+    {
+      "path": "evaluation/research-program/tasks.json",
+      "sha256": "35d9c03693b6575b1ca2743c6d2c38e8d5a4936a76f2e672718d918c5c2d0d58",
+      "bytes": 24026,
+      "status": "c2_artifact"
+    },
+    {
+      "path": "docs/research-program/acceptance.md",
+      "sha256": "abc0b701aa76eeb26c9d19b88b21c80db60ac68c7ceb16930dec7cdb0c3a2f9f",
+      "bytes": 26655,
+      "status": "c2_artifact"
+    },
+    {
+      "path": "evaluation/research-program/cohorts.json",
+      "sha256": "479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4",
+      "bytes": 2336377,
+      "status": "preserved_C1_artifact"
+    },
+    {
+      "path": "verification/research-program/pr-002/c1-build-receipt.json",
+      "sha256": "857750c9536aa1f34a8b8b70ce9e463c912b13ca7f386fc6fc2e1e90a7ef8f6d",
+      "status": "preserved_C1_artifact"
+    },
+    {
+      "path": "verification/research-program/pr-002/c1-verify-receipt.json",
+      "sha256": "ec9aad31a65464ac3224a80930d548c2069fd5a4ebf80626e62495eea48a0244",
+      "status": "preserved_C1_artifact"
+    },
+    {
+      "path": "verification/research-program/pr-002/evaluator-freeze-manifest-sealed-v1.json",
+      "sha256": "142458d686e1cb5e9677b6a5eaa619955c78ef9a4d51735207d4ad19bf26c9ef",
+      "bytes": 24446
+    },
+    {
+      "path": "verification/research-program/pr-002/c2-r14-denominator-freeze-protocol-v2.md",
+      "sha256": "3a35ee6662f939bf53e9f8c5005079ac09982372d80c9b385a9beb9c52e525c7",
+      "bytes": 6619
+    },
+    {
+      "path": "verification/research-program/pr-002/c2-build-receipt.json",
+      "sha256": "4eb211c0ee80e3e3ca53627a3b82aeb819110aa0b8da3ba795bca97e2cc1760d",
+      "status": "explicit_output"
+    },
+    {
+      "path": "verification/research-program/pr-002/c2-verify-receipt.json",
+      "sha256": "7d9b80974238fe83d284064ce2bc3c91d03afd12dc6b72a665c44af8ac485526",
+      "status": "explicit_output"
     }
   ],
   "acceptance_results": [
@@ -341,6 +428,31 @@
       "id": "R12",
       "status": "not_accepted_on_C-002-1",
       "result": "Out of scope for C-002-1."
+    },
+    {
+      "id": "C-002-2",
+      "status": "producer_checked_pending_independent_review",
+      "result": "Public opaque 40-task index frozen and hash-bound. R01-R16 unaccepted measurable rows published. R14 protocol published and not materialized. C1 cohorts/receipts preserved byte-for-byte."
+    },
+    {
+      "id": "R07",
+      "status": "unaccepted",
+      "result": "Task index frozen. Present-source recall@10 task-macro >=0.90, judged precision@5 task-macro >=0.80, zero critical forbidden matches. Full-intention 49-slot recall reported with no numeric threshold."
+    },
+    {
+      "id": "R12",
+      "status": "unaccepted",
+      "result": "Requires eight actual novice and eight actual advanced participants distinct from implementers; assignments not materialized."
+    },
+    {
+      "id": "R14",
+      "status": "unaccepted",
+      "result": "Protocol row published. Residual frame, sample, and model results are later gates. 40 tasks are not claim gold. 149 iid is not adopted."
+    },
+    {
+      "id": "R15",
+      "status": "unaccepted",
+      "result": "Requires two actual scheduled cycles and 14 actual elapsed days. No dates generated."
     }
   ],
   "failures_and_skipped_checks": [
@@ -368,6 +480,11 @@
       "check": "C1-RELATION-EVIDENCE, C1-MRF-FREEZE-ORDER, C1-COMMAND-TIMES, C1-REPLAY-OUTPUT",
       "status": "corrected_pending_independent_review",
       "reason": "The additive correction changes only C-002-1 evidence boundaries. Relation candidates are source scoped and unresolved; MRF IDs remain pending C-002-3; the original rounded timing record is retained as invalid historical evidence and replaced by the sanitized controller event extract plus root replay; verifier writes only when --receipt-output is supplied."
+    },
+    {
+      "check": "C-002-3 MRF/expansion freeze, push/PR/merge/deploy, full npm test/build/cf:dry-run",
+      "status": "skipped",
+      "reason": "Bounded C-002-2 commit. C-002-3 follows separately. Integration/release candidate owns the full gate."
     }
   ],
   "unresolved_claims": [
@@ -405,21 +522,122 @@
       "claim": "R01-R16 empirical targets",
       "state": "not_accepted",
       "evidence": "No requirement becomes accepted on this commit."
+    },
+    {
+      "claim": "R14 residual scientific sample",
+      "state": "protocol_published_not_materialized",
+      "evidence": "C2 published the protocol. PR-020 must produce the residual frame; PR-027 C1 freezes targets before comparison."
     }
   ],
-  "next_consumer": "Astra/controller, then C-002-2 and C-002-3",
-  "next_action": "Root binds the additive correction to its exact commit/tree with an external review receipt, then C-002-2 and C-002-3 may proceed. Do not treat this as full PR-002 completion. Do not push, open PR, merge, or deploy from this packet.",
+  "next_consumer": "C-002-3 owner, then Astra/controller independent review",
+  "next_action": "Implement C-002-3 from the sealed 25/10 directory selection without endpoint tests. Do not push, open PR, merge, or deploy from this packet.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
     "decisive_checks": [
+      "python3 -B verification/research-program/pr-002/test_c2.py",
       "python3 -B verification/research-program/pr-002/verify.py --repo .",
-      "python3 -B verification/research-program/pr-002/verify.py --repo . --receipt-output /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-corrections/replay-receipt.json"
+      "python3 docs/master-plan/2026-09-10/validate.py"
     ],
     "limitations": [
-      "Producer-checked C-002-1 identities and bounded review correction only.",
-      "No task labels, acceptance document, actual MRF 25/10 IDs, source endpoint tests, or payload retrieval.",
-      "Independent reviewer must verify the corrected head/tree and preserve the historical invalid-handoff hash."
+      "Producer-checked C-002-2 public task freeze and unaccepted R01-R16 rows only.",
+      "No raw holdout prompts or labels, no R14 sample, no MRF 25/10 IDs, no payload retrieval, no model calls.",
+      "Independent reviewer must verify the C2 head/tree and preserve historical C1 receipt hashes."
+    ]
+  },
+  "c2_base_sha": "ef9c2569b78dd26f0436d2ea945a8e1b791b8698",
+  "c2_base_tree": "a7db2e54b04891793e6ae9882826d12d7c74b32a",
+  "c2_changed_files": [
+    "docs/research-program/acceptance.md",
+    "docs/research-program/handoffs/PR-002.json",
+    "evaluation/research-program/tasks.json",
+    "verification/research-program/pr-002/build.py",
+    "verification/research-program/pr-002/c2-build-receipt.json",
+    "verification/research-program/pr-002/c2-r14-denominator-freeze-protocol-v2.md",
+    "verification/research-program/pr-002/c2-verify-receipt.json",
+    "verification/research-program/pr-002/c2_lib.py",
+    "verification/research-program/pr-002/command-receipts/c2-build.json",
+    "verification/research-program/pr-002/command-receipts/c2-plan-validate.json",
+    "verification/research-program/pr-002/command-receipts/c2-test-c1-corrections.json",
+    "verification/research-program/pr-002/command-receipts/c2-test-c2.json",
+    "verification/research-program/pr-002/command-receipts/c2-verify-readonly.json",
+    "verification/research-program/pr-002/command-receipts/c2-verify-receipt.json",
+    "verification/research-program/pr-002/evaluator-freeze-manifest-sealed-v1.json",
+    "verification/research-program/pr-002/hash-scheme.json",
+    "verification/research-program/pr-002/log_command.py",
+    "verification/research-program/pr-002/negative-selector-fixtures.json",
+    "verification/research-program/pr-002/pr002-r14-protocol-disposition.json",
+    "verification/research-program/pr-002/test_c2.py",
+    "verification/research-program/pr-002/verify.py"
+  ],
+  "c2_checks": {
+    "records": [
+      {
+        "command": "python3 -B verification/research-program/pr-002/test_c1_corrections.py",
+        "started_at": "2026-09-10T19:07:24.868253Z",
+        "completed_at": "2026-09-10T19:07:24.911938Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": {
+          "path": "verification/research-program/pr-002/command-receipts/c2-test-c1-corrections.json"
+        },
+        "result": "c1_correction_fixtures_ok"
+      },
+      {
+        "command": "python3 -B verification/research-program/pr-002/test_c2.py",
+        "started_at": "2026-09-10T19:07:30.193200Z",
+        "completed_at": "2026-09-10T19:07:30.285103Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": {
+          "path": "verification/research-program/pr-002/command-receipts/c2-test-c2.json"
+        },
+        "result": "c2_fixtures_ok 9c0abe51"
+      },
+      {
+        "command": "python3 -B verification/research-program/pr-002/build.py --repo . --stage c2 --receipt-output verification/research-program/pr-002/c2-build-receipt.json",
+        "started_at": "2026-09-10T19:07:33.424370Z",
+        "completed_at": "2026-09-10T19:07:33.485905Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": {
+          "path": "verification/research-program/pr-002/command-receipts/c2-build.json"
+        },
+        "result": "}"
+      },
+      {
+        "command": "python3 -B verification/research-program/pr-002/verify.py --repo .",
+        "started_at": "2026-09-10T19:07:42.242544Z",
+        "completed_at": "2026-09-10T19:07:43.193940Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": {
+          "path": "verification/research-program/pr-002/command-receipts/c2-verify-readonly.json"
+        },
+        "result": "}"
+      },
+      {
+        "command": "python3 -B verification/research-program/pr-002/verify.py --repo . --receipt-output verification/research-program/pr-002/c2-verify-receipt.json",
+        "started_at": "2026-09-10T19:07:48.900515Z",
+        "completed_at": "2026-09-10T19:07:49.912943Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": {
+          "path": "verification/research-program/pr-002/command-receipts/c2-verify-receipt.json"
+        },
+        "result": "}"
+      },
+      {
+        "command": "python3 docs/master-plan/2026-09-10/validate.py",
+        "started_at": "2026-09-10T19:07:49.947636Z",
+        "completed_at": "2026-09-10T19:07:49.991476Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": {
+          "path": "verification/research-program/pr-002/command-receipts/c2-plan-validate.json"
+        },
+        "result": "{\"format\": \"ushso.plan-structure-validation.v1\", \"status\": \"PASS\", \"scope\": \"Structural hierarchy, graph, traceability and packet synchronization only; not scientific correctness, user acceptance, implementation status or release permission.\", \"counts\": {\"phases\": 8, \"subphases\": 28, \"prs\": 84, \"atomic_commits\": 252, \"requirements\": 16, \"audit_findings\": 33}, \"plan_sha256\": \"80d897a6135e0cbbb27aff2e67139b26d17f51347487ba452335b56914557703\", \"errors\": []}"
+      }
     ]
   }
 }
