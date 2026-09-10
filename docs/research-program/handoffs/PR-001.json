@@ -1,7 +1,7 @@
 {
   "format": "ushso.pr-handoff.v1",
   "pr_id": "PR-001",
-  "status": "producer_checked_after_review_correction",
+  "status": "integrated",
   "review_correction": {
     "reviewed_head_before_correction": "cc7faac838a27a7db525c02acf29cc239737fd02",
     "review_context_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/bootstrap-review/pr001-crosswalk-review.json",
@@ -18,13 +18,13 @@
   "reviewer": "Astra",
   "base_sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
   "base_tree": "35de194e7182a67a0275cc180f2b021da184aacd",
-  "head_sha": null,
-  "head_sha_note": "The final additive correction commit hash is supplied to the controller out of band after commit creation so this handoff does not contain a self-referential hash.",
+  "head_sha": "8fc2fbbbaf1016da4c3951ccd238918ce645f4fe",
+  "head_sha_note": "Exact producer head bound by independent review and the merged GitHub PR; subsequent controller evidence commits do not change this producer identity.",
   "pre_c001_3_head_sha": "1b572930ce010373de2e19dabb5faf27cfef5c69",
   "reviewed_head_before_correction": "cc7faac838a27a7db525c02acf29cc239737fd02",
   "dependency_merge_shas": {},
   "branch": "codex/pr-001-release-baseline",
-  "github_pr_url": null,
+  "github_pr_url": "https://github.com/ajhcs/ushso/pull/13",
   "changed_files": [
     "docs/research-program/baseline.json",
     "docs/research-program/legacy-crosswalk.json",
@@ -54,16 +54,17 @@
     },
     {
       "id": "C-001-3",
-      "sha": null,
+      "sha": "cc7faac838a27a7db525c02acf29cc239737fd02",
       "parent": "1b572930ce010373de2e19dabb5faf27cfef5c69",
-      "sha_note": "Supplied to the controller after the final commit."
+      "tree": "5a98c8b1e505f21589e5df25716ddee3f7906f37",
+      "subject": "docs(research): document isolated integration workflow (PR-001 C-001-3)"
     },
     {
-      "id": "C-001-3R",
-      "sha": null,
+      "id": "PR001-REVIEW-FIX-1",
+      "sha": "8fc2fbbbaf1016da4c3951ccd238918ce645f4fe",
       "parent": "cc7faac838a27a7db525c02acf29cc239737fd02",
-      "subject": "docs(research): correct SEMP custody and control mappings (PR-001 review correction)",
-      "sha_note": "Additive review correction hash is supplied to the controller after commit creation; C-001-1 through C-001-3 remain unchanged."
+      "tree": "b35c8382b0fbecac970a17629759457f9df3fad3",
+      "subject": "docs(research): correct SEMP custody and control mappings (PR-001 review correction)"
     }
   ],
   "source_identities": [
@@ -402,19 +403,22 @@
     }
   ],
   "next_consumer": "Astra/controller, then PR-002",
-  "next_action": "Controller reviews the additive correction head and fills the out-of-band head/hash fields, integrates the three planned commits plus this one correction onto the published research-program integration branch, and asks Astra to replay baseline, SEMP custody, and control-mapping checks before PR-002 consumes the base. Future implementers must preserve unresolved and disabled states.",
+  "next_action": "PR-002 may consume merge 035465f3f16d15f02467679d96451d4440a36ca8 from the current clean published integration head; freeze the product, baseline, MRF, expansion and task denominators before tuning.",
   "independent_review": {
-    "status": "changes_requested_before_correction",
-    "reviewed_head_sha": "cc7faac838a27a7db525c02acf29cc239737fd02",
+    "status": "independently_verified",
+    "reviewer": "codex-root",
+    "reviewed_head_sha": "8fc2fbbbaf1016da4c3951ccd238918ce645f4fe",
     "decisive_checks": [
-      "verification/research-program/pr-001/verify.py with explicit local custody paths",
-      "crosswalk-evidence.json structural, source-hash, authorization-expiry, and SEMP-scope checks",
-      "three-commit parent/tree/scope inspection",
-      "SEMP custody, original-model ID membership, and grouped control-mapping replay"
+      "verification/research-program/pr-001/controller/independent-review-8fc2fbb.json",
+      "verification/research-program/pr-001/controller/verifier-replay-8fc2fbb.json",
+      "verification/research-program/pr-001/controller/review-disposition.json"
     ],
     "limitations": [
-      "Producer evidence does not qualify deployment, science, source payload access, or later program behavior.",
-      "The additive correction hash is supplied out of band after commit creation; the three planned commit hashes remain immutable."
+      "PR-001 baseline acceptance only; R01/R16 and all other research requirements remain unaccepted.",
+      "No new Worker binary identity, publisher freshness, payload access or scientific qualification."
     ]
-  }
+  },
+  "merge_sha": "035465f3f16d15f02467679d96451d4440a36ca8",
+  "merged_at": "2026-09-10T16:51:15Z",
+  "controller_integration_record": "verification/research-program/pr-001/controller/review-disposition.json"
 }

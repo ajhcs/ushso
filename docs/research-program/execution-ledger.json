@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T16:14:27.125848+00:00",
+  "updated_at": "2026-09-10T16:55:10.709118+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "80d897a6135e0cbbb27aff2e67139b26d17f51347487ba452335b56914557703",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -22,6 +22,12 @@
         "reviewed_commit": "428f49e65b6f9aeb2dfa08a0158685db9f59555d",
         "evidence": "verification/research-program/bootstrap/independent-review-428f49e.json"
       }
+    },
+    "latest_integration": {
+      "pr_id": "PR-001",
+      "merge_sha": "035465f3f16d15f02467679d96451d4440a36ca8",
+      "reviewed_producer_head": "8fc2fbbbaf1016da4c3951ccd238918ce645f4fe",
+      "github_pr_url": "https://github.com/ajhcs/ushso/pull/13"
     }
   },
   "providers": [
@@ -171,7 +177,7 @@
   "tasks": [
     {
       "pr_id": "PR-001",
-      "status": "in_progress",
+      "status": "integrated",
       "owner": "gpt-5.6-luna/max",
       "dependencies": [],
       "dependency_merge_shas": {},
@@ -179,12 +185,15 @@
         "docs/research-program/baseline.json",
         "docs/research-program/legacy-crosswalk.json"
       ],
-      "head_sha": null,
-      "merge_sha": null,
+      "head_sha": "8fc2fbbbaf1016da4c3951ccd238918ce645f4fe",
+      "merge_sha": "035465f3f16d15f02467679d96451d4440a36ca8",
       "handoff": "docs/research-program/handoffs/PR-001.json",
       "evidence_directory": "verification/research-program/pr-001/",
-      "github_pr_url": null,
-      "blockers": []
+      "github_pr_url": "https://github.com/ajhcs/ushso/pull/13",
+      "blockers": [],
+      "planned_atomic_commits": 3,
+      "review_correction_commits": 1,
+      "independent_review": "verification/research-program/pr-001/controller/review-disposition.json"
     },
     {
       "pr_id": "PR-002",
@@ -193,7 +202,9 @@
       "dependencies": [
         "PR-001"
       ],
-      "dependency_merge_shas": {},
+      "dependency_merge_shas": {
+        "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8"
+      },
       "owned_paths": [
         "evaluation/research-program/cohorts.json",
         "evaluation/research-program/tasks.json",
@@ -204,7 +215,9 @@
       "handoff": "docs/research-program/handoffs/PR-002.json",
       "evidence_directory": "verification/research-program/pr-002/",
       "github_pr_url": null,
-      "blockers": []
+      "blockers": [],
+      "prerequisites_satisfied": true,
+      "dispatch_preparation": "Evaluator-only held-out task manifest is being prepared; Grok implementation has not been dispatched."
     },
     {
       "pr_id": "PR-003",
