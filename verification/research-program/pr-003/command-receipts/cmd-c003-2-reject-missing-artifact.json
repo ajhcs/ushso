@@ -1,0 +1,26 @@
+{
+  "format": "ushso.pr003.c003-2.command-receipt.v1",
+  "id": "cmd-c003-2-reject-missing-artifact",
+  "kind": "handoff_validator_incomplete_packet",
+  "command": "node scripts/research-program/check-handoff.mjs verification/research-program/pr-003/fixtures/handoff.reject-missing-artifact.json",
+  "cwd": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-deepseek-20260910t220020z",
+  "started_at": "2026-09-10T22:14:21.616Z",
+  "completed_at": "2026-09-10T22:14:21.798Z",
+  "exit_code": 1,
+  "expected": "exit 1 with missing_artifact for an acceptance result that references an artifact id absent from artifacts[]",
+  "actual": "exit 1 with ok=false; artifact_reference_resolution failed with missing_artifact on artifact-not-present",
+  "observed": {
+    "ok": false,
+    "outcome": "rejected",
+    "handoff_sha256": "6cd239292acc49307a4f21c6df4dd1b0d2448cfc31db871968eda5c90fecb221",
+    "failed_checks": ["artifact_reference_resolution"],
+    "findings": [
+      {
+        "rule": "missing_artifact",
+        "detail": "C-003-1 references unknown artifact artifact-not-present"
+      }
+    ]
+  },
+  "sanitized": true,
+  "raw_log_retained_in_git": false
+}

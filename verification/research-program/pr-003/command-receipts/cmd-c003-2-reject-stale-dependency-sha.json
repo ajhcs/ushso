@@ -1,0 +1,26 @@
+{
+  "format": "ushso.pr003.c003-2.command-receipt.v1",
+  "id": "cmd-c003-2-reject-stale-dependency-sha",
+  "kind": "handoff_validator_incomplete_packet",
+  "command": "node scripts/research-program/check-handoff.mjs verification/research-program/pr-003/fixtures/handoff.reject-stale-dependency-sha.json",
+  "cwd": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-deepseek-20260910t220020z",
+  "started_at": "2026-09-10T22:14:21.798Z",
+  "completed_at": "2026-09-10T22:14:21.974Z",
+  "exit_code": 1,
+  "expected": "exit 1 with stale_dependency_sha when the handoff records b142309d for PR-002 instead of the accepted merge 5647e814",
+  "actual": "exit 1 with ok=false; dependency_sha_binding failed: PR-002 expected 5647e814... got b142309d...",
+  "observed": {
+    "ok": false,
+    "outcome": "rejected",
+    "handoff_sha256": "06108132f49a9e75b89874aede2a6a4ae0a335b2288d04062a4c777356ca6104",
+    "failed_checks": ["dependency_sha_binding"],
+    "findings": [
+      {
+        "rule": "stale_dependency_sha",
+        "detail": "PR-002 expected 5647e81457b606bb36456e75c48f990ce21e9c6c got b142309da45d98a9d5e553a05b7a9003a0424854"
+      }
+    ]
+  },
+  "sanitized": true,
+  "raw_log_retained_in_git": false
+}
