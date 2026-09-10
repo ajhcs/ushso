@@ -66,3 +66,10 @@ The numerical targets are acceptance predicates to be measured later. They are n
 - Astra's authored changes are identified as such; independent authorship review cannot be claimed for the same actor's own patch. See the execution protocol.
 
 Result: the decomposition provides a traceable, feasible route to every proposed requirement, with explicit external inputs and empirical gates. It does not claim certainty about unseen publisher formats or pre-authorize a reduced goal when a target proves difficult.
+
+
+## Bounded CI remediation added during execution
+
+PR-085 adds three commits under P1/1A after CI run 34541539731 exposed a stale WP0 approval subject. The initial 84 PRs and 252 planned commits are retained; the current model contains 85 PRs and 255 planned commits across the same eight phases and 28 sub-phases. Initial sub-phase membership remains intact, with PR-085 explicitly added to 1A. PR-082 also depends on PR-085.
+
+The correction must preserve immutable historical approval, run the current technical checks with fresh code/hash identities, and leave current-subject successor approval separate from development CI. It does not lower R01–R16 thresholds, change frozen cohorts, grant scientific approval, or authorize production. See the PR-085 packet and the evidence-backed exception record in docs/research-program/exceptions/PR-085-ci-attestation.md.

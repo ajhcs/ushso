@@ -3,7 +3,7 @@
   "date": "2026-09-10",
   "status": "proposed_not_implemented",
   "mission": "Help humans and AI find, understand and obtain tested routes to US health-systems data.",
-  "source_sha256": "827a6660cf01f11ce729b20da42f353a255f225403dc8ecd981e5afeb05e9088",
+  "source_sha256": "d35a76a28922e3261c454ace101f4eebc1135248be89b0ee873439168427b4dd",
   "requirements": [
     {
       "id": "R01",
@@ -200,7 +200,8 @@
       "prs": [
         "PR-001",
         "PR-002",
-        "PR-003"
+        "PR-003",
+        "PR-085"
       ]
     },
     {
@@ -5354,7 +5355,8 @@
         "PR-078",
         "PR-079",
         "PR-080",
-        "PR-081"
+        "PR-081",
+        "PR-085"
       ],
       "requirements": [
         "R16"
@@ -5517,7 +5519,72 @@
       "evidence_directory": "verification/research-program/pr-084/",
       "verification_scope": "Use the existing affected package tests plus the specific fixtures described below. Add meaningful regression/integration tests for behavior changes; documentation-only commits use link, schema or artifact checks. Full npm test/build/cf:dry-run run at the integration/release gate.",
       "check_commands": []
+    },
+    {
+      "id": "PR-085",
+      "phase": "P1",
+      "subphase": "1A",
+      "title": "Verify current CI work without transferring historical approval",
+      "dependencies": [
+        "PR-001"
+      ],
+      "requirements": [
+        "R16"
+      ],
+      "findings": [
+        "F01",
+        "F32"
+      ],
+      "files": [
+        "scripts/verify-wp0-attestation.mjs",
+        "scripts/run-contract-suites.mjs",
+        "tests/wp0-attestation.test.mjs",
+        "verification/research-program/ci-attestation/",
+        "docs/research-program/ci-attestations.md"
+      ],
+      "outcome": "Current technical checks run on changed candidates while immutable historical approval remains bound to its original subject.",
+      "commits": [
+        {
+          "id": "C-085-1",
+          "subject": "Define historical and current evidence boundaries",
+          "instructions": "Add a read-only verifier and bounded policy that pins the existing WP0 v1.4 approval, evidence and approved receipt. Validate the stored approval against its original subject using existing successor helpers, then build fresh technical evidence and a pending draft for the current code. Preserve exact implementation inventory/hash coverage. Do not issue approval, overwrite a receipt, or label a historical approval as current.",
+          "verification": "The new replay-script addition yields a fresh passing technical draft with a different subject and current approval still pending. Altered historical approval/evidence/receipt bytes, failed current technical checks, and malformed subjects fail."
+        },
+        {
+          "id": "C-085-2",
+          "subject": "Integrate the scoped CI verification path",
+          "instructions": "Route only the reviewed WP0 v1.4 validation path through the new verifier in the existing contract runner, preserving its test execution and every other suite, version selection, error propagation and nonzero-test-count requirement. Keep direct successor validation and issuance strict and unchanged.",
+          "verification": "Exercise actual runner selection and execution. Current verification failure, missing history, future or unknown suite versions and nonzero child exits cannot be swallowed. The original npm test chain and existing WP0 tests still execute."
+        },
+        {
+          "id": "C-085-3",
+          "subject": "Publish reproducible CI evidence and release boundaries",
+          "instructions": "Document historical versus current evidence, exact candidate/source hashes, the failed CI run, the current pending subject and downstream release instructions. Run the focused tests, full npm test and applicable exact-candidate gate. PR-082 still resolves current-subject successor approval and independent release qualification; a green development CI result cannot satisfy that approval.",
+          "verification": "Independent review reproduces the stale-subject trigger and corrected current checks, observes preserved predecessor bytes and no issued approval, and verifies fresh CI on the combined candidate."
+        }
+      ],
+      "acceptance": [
+        "No historical approval is silently repinned or widened.",
+        "A failed current check remains failed, and missing current-subject approval remains explicit for release qualification."
+      ],
+      "owner_role": "Luna Max, Grok or DeepSeek; assign one owner at dispatch",
+      "reviewer_role": "Astra; named human domain/owner decision when required",
+      "status": "planned",
+      "evidence_directory": "verification/research-program/pr-085/",
+      "verification_scope": "Use the existing affected package tests plus the specific fixtures described below. Add meaningful regression/integration tests for behavior changes; documentation-only commits use link, schema or artifact checks. Full npm test/build/cf:dry-run run at the integration/release gate.",
+      "check_commands": [
+        "node --test tests/wp0-attestation.test.mjs"
+      ]
     }
   ],
-  "terminal_pr": "PR-084"
+  "terminal_pr": "PR-084",
+  "scope_extensions": [
+    {
+      "id": "PR-085",
+      "parent_pr": "PR-001",
+      "kind": "bounded_ci_remediation",
+      "trigger": "GitHub CI run 34541539731 on 487f06a756e3c23640dad08fc7f797643c8f186b",
+      "reason": "A new verification replay script changes the repository-wide WP0 subject while all other technical evidence remains identical; each implementation change also needs a current technical check without historical approval transfer."
+    }
+  ]
 }

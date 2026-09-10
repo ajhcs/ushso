@@ -171,3 +171,10 @@ Start at PR-001 and PR-002; assign only nodes whose prerequisites are merged. Us
 Astra is responsible for integration review, independent verification, scientific-consistency review of evidence, and final frontend work. Domain questions requiring a human research/editorial decision are recorded with an exact proposed value and cited source; they are not hidden behind a successful model response. The owner approves real spending, operational changes and final publication as required by the existing repository/host boundaries. This planning task has created no implementation PRs, deployment, recurring service or paid inference job.
 
 Run `python3 docs/master-plan/2026-09-10/validate.py` to validate the plan's graph, hierarchy, traceability, and generated PR files. See [verification status](VALIDATION.md) for the actual result from this task.
+
+
+## Bounded CI remediation added during execution
+
+PR-085 adds three commits under P1/1A after CI run 34541539731 exposed a stale WP0 approval subject. The initial 84 PRs and 252 planned commits are retained; the current model contains 85 PRs and 255 planned commits across the same eight phases and 28 sub-phases. Initial sub-phase membership remains intact, with PR-085 explicitly added to 1A. PR-082 also depends on PR-085.
+
+The correction must preserve immutable historical approval, run the current technical checks with fresh code/hash identities, and leave current-subject successor approval separate from development CI. It does not lower R01–R16 thresholds, change frozen cohorts, grant scientific approval, or authorize production. See the PR-085 packet and the evidence-backed exception record in docs/research-program/exceptions/PR-085-ci-attestation.md.

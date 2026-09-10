@@ -63,7 +63,7 @@ model=dict(format='ushso.research-master-plan.v1',date='2026-09-10',status='prop
  mission='Help humans and AI find, understand and obtain tested routes to US health-systems data.',
  source_sha256=hashlib.sha256((ROOT/'plan-source.py').read_bytes()).hexdigest(),
  requirements=[dict(id=k,outcome=v) for k,v in reqs.items()],finding_ids=[f'F{i:02}' for i in range(1,34)],
- phases=phases,subphases=subs,prs=prs,terminal_pr='PR-084')
+ phases=phases,subphases=subs,prs=prs,terminal_pr='PR-084',scope_extensions=namespace.get('PLAN_EXTENSIONS',[]))
 (ROOT/'plan.json').write_text(json.dumps(model,indent=2)+'\n')
 (ROOT/'prs').mkdir(exist_ok=True)
 index=['# PR index','', 'Generated from `plan-source.py` by `build.py`. The source, index and PR packets describe planned work; none is a claimed implementation.', '',
@@ -73,7 +73,7 @@ for phase in phases:
     for sub in [s for s in subs if s['phase']==phase['id']]:
         index += ['### '+sub['id']+' — '+sub['title'],'',sub['outcome'],'','| PR | Outcome | Dependencies |','|---|---|---|']
         for p in [p for p in prs if p['subphase']==sub['id']]:
-            deps=', '.join(p['dependencies']) if len(p['dependencies'])<12 else 'PR-001 through PR-081 (all work before release)'
+            deps=', '.join(p['dependencies']) if len(p['dependencies'])<12 else 'PR-001 through PR-081'+(' plus '+', '.join(d for d in p['dependencies'] if d not in {f'PR-{i:03}' for i in range(1,82)}) if any(d not in {f'PR-{i:03}' for i in range(1,82)} for d in p['dependencies']) else '')+' (all required work before release)'
             index.append(f"| [{p['id']}: {p['title']}](prs/{p['id']}.md) | {p['outcome']} | {deps or 'None'} |")
         index.append('')
     index+=['Sub-phase closure rule: every listed PR is merged, independently reviewed and its acceptance evidence exists; a sub-phase cannot close from implementation status alone.','']

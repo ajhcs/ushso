@@ -10,7 +10,11 @@ reqs={r['id'] for r in m['requirements']};findings=set(m['finding_ids'])
 check(len(prs)==len(m['prs']),'duplicate PR IDs')
 check(len(subs)==len(m['subphases']),'duplicate sub-phase IDs')
 check(len(phases)==len(m['phases']),'duplicate phase IDs')
-check(set(prs)=={f'PR-{i:03}' for i in range(1,85)},'initial PR sequence must be exactly 001–084; revise validator intentionally when extending scope')
+initial_prs={f'PR-{i:03}' for i in range(1,85)}
+check(set(prs)==initial_prs|{'PR-085'},'declared scope must contain initial PR-001–084 plus bounded remediation PR-085; revise intentionally for later extensions')
+extensions=m.get('scope_extensions',[])
+check(len(extensions)==1 and extensions[0].get('id')=='PR-085' and extensions[0].get('parent_pr')=='PR-001' and extensions[0].get('kind')=='bounded_ci_remediation' and bool(extensions[0].get('trigger')) and bool(extensions[0].get('reason')),'missing exact PR-085 extension provenance')
+check('PR-085' in prs.get('PR-082',{}).get('dependencies',[]),'release qualification must consume the CI remediation')
 check(m['source_sha256']==hashlib.sha256((ROOT/'plan-source.py').read_bytes()).hexdigest(),'source/model drift')
 commit_ids=[];mapped_reqs=set();mapped_findings=set()
 for p in prs.values():
@@ -35,7 +39,8 @@ for p in prs.values():
     check(all(d in text for d in p['dependencies']),p['id']+' packet missing dependencies')
     check(all(c in text for c in p['check_commands']),p['id']+' packet missing planned check command')
 for s in subs.values():
-    check(len(s['prs'])==3,s['id']+' expected three PRs')
+    check(len(set(s['prs'])&initial_prs)==3,s['id']+' must retain its three initial PRs')
+    check(set(s['prs'])-initial_prs==({'PR-085'} if s['id']=='1A' else set()),s['id']+' has an undeclared extension')
     check(sum(s['id'] in p['subphases'] for p in phases.values())==1,s['id']+' must have exactly one phase parent')
     check(bool(s['outcome']),s['id']+' missing outcome')
 check(len(commit_ids)==len(set(commit_ids)),'commit IDs not unique')
