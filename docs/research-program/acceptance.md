@@ -12,7 +12,7 @@ This document is the C-002-2 measurable-row freeze. It preserves master-plan thr
 - Cohorts SHA-256 at this document's C2 write: `479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4`
 - C1 historical cohorts SHA-256: `479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4`
 - Tasks path: `evaluation/research-program/tasks.json`
-- Tasks SHA-256: `35d9c03693b6575b1ca2743c6d2c38e8d5a4936a76f2e672718d918c5c2d0d58`
+- Tasks SHA-256: `c14c2118dfddab80fd5047dc1912a622721f89a6212d73d2498700fa01305a74`
 - Sealed evaluator manifest SHA-256: `142458d686e1cb5e9677b6a5eaa619955c78ef9a4d51735207d4ad19bf26c9ef`
 - R14 protocol SHA-256: `3a35ee6662f939bf53e9f8c5005079ac09982372d80c9b385a9beb9c52e525c7`
 - Generation: `live-2026-09-03-85b50522b420`
@@ -94,8 +94,8 @@ A protocol, pointer, or unaccepted row is not a frozen or materialized measureme
 ### R06 — Broader extraction improves materially.
 
 - **Master-plan threshold:** At least 95% of baseline records with publisher-accessible dictionaries yield a qualified parsed dictionary; the eligible denominator is explicitly evidenced. All other baseline records retain a reason and next action. This does not imply 95% of all fields have documented definitions.
-- **Denominator:** Baseline records with an evidenced publisher-accessible dictionary. Extraction failure cannot be relabeled publisher absence.
-- **Numerator / pass predicate:** Pass iff parsed / evidenced-eligible >= 0.95 and every ineligible/failed record has a reason and next action.
+- **Denominator:** Evidenced eligible baseline denominator: baseline records with an evidenced publisher-accessible dictionary. The denominator is retained, including records that later fail parsing or qualification.
+- **Numerator / pass predicate:** Pass iff records with a QUALIFIED parsed dictionary and retained qualification evidence / evidenced eligible baseline denominator >= 0.95, and every other baseline record (ineligible, parser-failed, or qualification-failed) retains an evidenced reason and next action. Raw parser output alone cannot enter the numerator. Extraction failure cannot be relabeled publisher absence.
 - **Frozen identities or conditional frame:** Conditional eligible-dictionary frame from PR-020/PR-018. Not frozen now.
 - **Frame state:** `conditional_not_materialized`
 - **Source / generation identity:** `{"c1_cohorts_sha256": "479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4", "catalog_manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e", "generation": "live-2026-09-03-85b50522b420", "plan": "docs/master-plan/2026-09-10/MASTER-PLAN.md"}`
@@ -159,21 +159,21 @@ A protocol, pointer, or unaccepted row is not a frozen or materialized measureme
 ### R11 — Machine and human outputs agree.
 
 - **Master-plan threshold:** All eight existing tools have positive and honest negative cases. For each priority example, IDs, release/schema context, field meanings, access state and citations agree across HTTP, MCP, WebMCP, and UI.
-- **Denominator:** Eight existing tools plus later frozen priority examples.
-- **Numerator / pass predicate:** Pass iff each tool has positive and honest negative cases and cross-surface fields agree on each priority example.
-- **Frozen identities or conditional frame:** Conditional tool/example frame. Not materialized on C2.
-- **Frame state:** `conditional_not_materialized`
-- **Source / generation identity:** `{"c1_cohorts_sha256": "479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4", "catalog_manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e", "generation": "live-2026-09-03-85b50522b420", "plan": "docs/master-plan/2026-09-10/MASTER-PLAN.md"}`
+- **Denominator:** The exact eight existing tool identities exported at baseline commit 45210704b8de2d7b1360b6d32657cd17791bdd77 from plugins/ushso-research/assets/tools.json (SHA-256 62b7c514b8dfde6336b42028d1b1578b9aac267e756377cd1018d8827fd61af3): observatory.search_assets, observatory.get_asset, observatory.get_access_plan, observatory.get_retrieval_recipe, observatory.get_variables, observatory.get_join_routes, observatory.compare_assets, observatory.get_coverage_status. Later priority examples are a separate conditional denominator.
+- **Numerator / pass predicate:** Pass iff those exact eight names, with no substitution or deletion, each have positive and honest negative cases and cross-surface fields agree on every independently frozen priority example. Cross-check contracts/machine-toolkit/v1.0.0/contracts/toolkit-manifest.json (SHA-256 6e3a4837d0375ceb1666f1003ed39ba08cd932141c9a395eab24323224a28b8c); observatory.plan_research must remain disabled_pending_gates and outside the eight. Later examples/cases remain conditional until independently frozen before tuning or measurement.
+- **Frozen identities or conditional frame:** The eight tool identities are frozen by the hash-bound export and manifest cross-check. Priority examples and positive/negative cases are not materialized on C2.
+- **Frame state:** `tool_identities_frozen_examples_conditional`
+- **Source / generation identity:** `{"c1_cohorts_sha256": "479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4", "catalog_manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e", "disabled_planner": "observatory.plan_research", "generation": "live-2026-09-03-85b50522b420", "plan": "docs/master-plan/2026-09-10/MASTER-PLAN.md", "tool_export_path": "plugins/ushso-research/assets/tools.json", "tool_export_sha256": "62b7c514b8dfde6336b42028d1b1578b9aac267e756377cd1018d8827fd61af3", "tool_export_source_commit": "45210704b8de2d7b1360b6d32657cd17791bdd77", "tool_names": ["observatory.search_assets", "observatory.get_asset", "observatory.get_access_plan", "observatory.get_retrieval_recipe", "observatory.get_variables", "observatory.get_join_routes", "observatory.compare_assets", "observatory.get_coverage_status"], "toolkit_manifest_path": "contracts/machine-toolkit/v1.0.0/contracts/toolkit-manifest.json", "toolkit_manifest_sha256": "6e3a4837d0375ceb1666f1003ed39ba08cd932141c9a395eab24323224a28b8c"}`
 - **Evidence owner:** PR-061, PR-063, PR-066
 - **Evidence destination:** cross-surface receipts owned by those PRs.
-- **Materialize / freeze before tuning or measurement:** Tool and example identities must be frozen before parity scoring.
+- **Materialize / freeze before tuning or measurement:** Consume only the exact hash-bound eight names. Independently freeze priority examples and positive/negative cases before parity tuning or measurement; do not add the disabled planner.
 - **Status:** `unaccepted`
 
 ### R12 — Beginners and experts can finish tasks.
 
 - **Master-plan threshold:** Eight novice and eight advanced moderated participants, distinct from implementers, attempt a frozen set of tasks; >=85% completion in each group, no critical misinterpretation of access/grain/price semantics. Synthetic agent runs are separate evidence.
-- **Denominator:** Eight actual novice participants and eight actual advanced participants, distinct from implementers, assigned to a frozen task/session map.
-- **Numerator / pass predicate:** Pass iff completion >= 0.85 in each group and critical misinterpretation = 0. Missing sessions and untested tasks remain visible. Simulations and generated participants do not count.
+- **Denominator:** Participant minimum is separate from completion measurement: Eight actual novice and eight actual advanced participants, distinct from implementers, are assigned to a frozen task/session map; each group's completion denominator is ALL assigned frozen task/session opportunities for that group, including assigned opportunities whose session or task evidence is missing or untested.
+- **Numerator / pass predicate:** Pass iff each group has at least eight actual participants distinct from implementers, and completed frozen task/session assignments in that group / ALL assigned frozen task/session opportunities in that group >= 0.85, with missing or untested assigned opportunities retained as non-completions, and critical misinterpretation of access/grain/price semantics = 0. Simulations and generated participants do not count.
 - **Frozen identities or conditional frame:** Task pool is the frozen public opaque index. Participant identities, assignments, and success rules are a conditional frame that must be frozen before the study. Not materialized on C2.
 - **Frame state:** `tasks_frozen_participants_not_materialized`
 - **Source / generation identity:** `{"c1_cohorts_sha256": "479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4", "catalog_manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e", "evaluator_freeze_manifest_sha256": "142458d686e1cb5e9677b6a5eaa619955c78ef9a4d51735207d4ad19bf26c9ef", "generation": "live-2026-09-03-85b50522b420", "plan": "docs/master-plan/2026-09-10/MASTER-PLAN.md"}`
@@ -198,14 +198,14 @@ A protocol, pointer, or unaccepted row is not a frozen or materialized measureme
 ### R14 — AI enrichment is controlled and economical.
 
 - **Master-plan threshold:** No model in public request handling; no private data/credentials sent in enrichment; auditable token/spend ledger; 100% accepted model-derived claims pass citation and schema checks; held-out claim precision >=0.98, with zero critical scientific errors.
-- **Denominator:** A later independently frozen scientific-claim sample drawn from the PR-020 residual frame. Not the 40 retrieval tasks. Sample size/CI design is chosen after that residual frame exists; the illustrative 149 iid count is not adopted.
-- **Numerator / pass predicate:** Protocol row is complete when this protocol, stage order, and unaccepted gate are published. Quality pass later iff held-out claim precision >= 0.98, critical scientific errors = 0 overall and in every predeclared class, 100% accepted-claim citation/schema checks, with actual sample sizes, confidence intervals, and per-source/task-class results. Unjudgeable/uncertain outcomes block acceptance. Model agreement cannot create gold labels.
+- **Denominator:** A later independently frozen scientific-claim sample drawn from the PR-020 residual frame, with predeclared source/task classes and actual sample-size/CI design. Not the 40 retrieval tasks. The illustrative 149 iid count is not adopted as a sample-size or CI threshold.
+- **Numerator / pass predicate:** The full R14 quality pass is conjunctive: (1) no model in public request handling; (2) no private data or credentials transmitted in enrichment; (3) auditable token and spend controls; AND (4) an independently frozen scientific-claim sample from the materialized residual frame; (5) held-out claim precision >= 0.98 for the overall frozen sample; (6) zero critical scientific errors overall and in every predeclared source/task class; (7) 100% of accepted model-derived claims pass citation and schema checks; and (8) actual sample sizes, confidence intervals, and per-source/task-class results are reported. Underpowered classes, unjudgeable outcomes, or unresolved uncertainty block acceptance. Model agreement cannot create gold labels. The protocol row can be ready while this quality gate remains unaccepted.
 - **Frozen identities or conditional frame:** Protocol published. Residual frame, sample, labels, model outputs, spend ledger, and paid budget are not materialized. R14 gates promotion, not creation of the PR-027 comparison.
 - **Frame state:** `protocol_published_not_materialized_not_frozen`
 - **Source / generation identity:** `{"c1_cohorts_sha256": "479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4", "catalog_manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e", "generation": "live-2026-09-03-85b50522b420", "plan": "docs/master-plan/2026-09-10/MASTER-PLAN.md", "r14_protocol_sha256": "3a35ee6662f939bf53e9f8c5005079ac09982372d80c9b385a9beb9c52e525c7"}`
 - **Evidence owner:** C-002-2 protocol; PR-020 residual frame; PR-027 C1 target freeze; PR-022/023/024 controls; PR-027 C2/C3 measurement.
 - **Evidence destination:** verification/research-program/pr-002/c2-r14-denominator-freeze-protocol-v2.md; later PR-020/PR-027 artifacts.
-- **Materialize / freeze before tuning or measurement:** PR-027 C1 must freeze independent targets before comparison calls/results. Do not tune routing from unfrozen model outputs. Paid enrichment requires a selected budget and credentials; this commit does not call product models.
+- **Materialize / freeze before tuning or measurement:** PR-027 C1 must freeze independent targets before PR-027 C2/C3 model comparison calls/results. Do not tune routing from unfrozen model outputs. Paid enrichment requires a selected budget and credentials; this commit does not call product models.
 - **Status:** `unaccepted`
 
 ### R15 — Refresh is sustainable.

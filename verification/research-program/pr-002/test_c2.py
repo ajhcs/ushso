@@ -32,6 +32,13 @@ def test_c1_receipts_and_cohorts_preserved() -> None:
     assert c2_lib.digest(repo / "evaluation/research-program/cohorts.json") == c2_lib.C1_COHORTS_SHA256
 
 
+def test_c2_receipts_preserved_and_bound_to_base() -> None:
+    assert c2_lib.digest(c2_lib.HERE / "c2-build-receipt.json") == c2_lib.C2_BUILD_RECEIPT_SHA256
+    assert c2_lib.digest(c2_lib.HERE / "c2-verify-receipt.json") == c2_lib.C2_VERIFY_RECEIPT_SHA256
+    assert c2_lib.C2_BASE_COMMIT == "8fe6e6b2e997e4a3ed59aece64492684f489bec8"
+    assert c2_lib.C2_BASE_TREE == "7358d73c50e7db7431eb101243f784605ed93a9b"
+
+
 def test_task_schema_matches_sealed_index() -> None:
     repo = c2_lib.HERE.parents[2]
     sealed = c2_lib.load_sealed_manifest()
@@ -82,6 +89,53 @@ def test_r14_protocol_is_not_a_frozen_sample() -> None:
     assert any("R14" in item for item in errors)
 
 
+def test_r06_rejects_unqualified_parser_output() -> None:
+    repo = c2_lib.HERE.parents[2]
+    sealed = c2_lib.load_sealed_manifest()
+    payload = c2_lib.build_tasks_payload(repo)
+    weakened = copy.deepcopy(payload)
+    weakened["correction_contracts"]["R06"]["qualification_required"] = False
+    weakened["correction_contracts"]["R06"]["raw_parser_output_alone_satisfies"] = True
+    weakened["correction_contracts"]["R06"]["numerator"] = "Parser output / eligible denominator >= 0.95."
+    errors = c2_lib.assert_task_schema(weakened, sealed)
+    assert any("R06" in item and "qualified" in item for item in errors)
+
+
+def test_r14_rejects_quality_only_gate() -> None:
+    repo = c2_lib.HERE.parents[2]
+    sealed = c2_lib.load_sealed_manifest()
+    payload = c2_lib.build_tasks_payload(repo)
+    weakened = copy.deepcopy(payload)
+    weakened["correction_contracts"]["R14"]["quality_gate"]["no_models_in_public_request_handling"] = False
+    errors = c2_lib.assert_task_schema(weakened, sealed)
+    assert any("R14" in item for item in errors)
+
+
+def test_r12_keeps_uncompleted_assigned_opportunities() -> None:
+    repo = c2_lib.HERE.parents[2]
+    sealed = c2_lib.load_sealed_manifest()
+    payload = c2_lib.build_tasks_payload(repo)
+    weakened = copy.deepcopy(payload)
+    weakened["correction_contracts"]["R12"]["completion_ratio"]["missing_or_untested_count_as_non_completion"] = False
+    errors = c2_lib.assert_task_schema(weakened, sealed)
+    assert any("R12" in item for item in errors)
+
+
+def test_r11_rejects_tool_substitution_deletion_and_planner_addition() -> None:
+    repo = c2_lib.HERE.parents[2]
+    sealed = c2_lib.load_sealed_manifest()
+    payload = c2_lib.build_tasks_payload(repo)
+    for replacement in (
+        [*c2_lib.FROZEN_TOOL_NAMES[:-1], "observatory.substitute"],
+        list(c2_lib.FROZEN_TOOL_NAMES[:-1]),
+        [*c2_lib.FROZEN_TOOL_NAMES, c2_lib.DISABLED_PLANNER_NAME],
+    ):
+        weakened = copy.deepcopy(payload)
+        weakened["correction_contracts"]["R11"]["tool_export"]["names"] = replacement
+        errors = c2_lib.assert_task_schema(weakened, sealed)
+        assert any("R11" in item for item in errors)
+
+
 def test_acceptance_rows_cover_r01_r16() -> None:
     rows = c2_lib.requirement_rows()
     assert [row["id"] for row in rows] == list(c2_lib.REQUIREMENT_IDS)
@@ -94,9 +148,21 @@ def test_acceptance_rows_cover_r01_r16() -> None:
     r12 = next(row for row in rows if row["id"] == "R12")
     assert "Eight actual novice" in r12["denominator"]
     assert "Simulations" in r12["numerator_or_pass_predicate"]
+    assert "ALL assigned frozen task/session opportunities" in r12["numerator_or_pass_predicate"]
     r14 = next(row for row in rows if row["id"] == "R14")
     assert r14["frame_state"] == "protocol_published_not_materialized_not_frozen"
     assert "149" in r14["denominator"]
+    assert "no model in public request handling" in r14["numerator_or_pass_predicate"]
+    assert "auditable token and spend controls" in r14["numerator_or_pass_predicate"]
+    assert "precision >= 0.98 for the overall frozen sample" in r14["numerator_or_pass_predicate"]
+    assert "precision >= 0.98 overall and in every" not in r14["numerator_or_pass_predicate"]
+    r06 = next(row for row in rows if row["id"] == "R06")
+    assert "QUALIFIED parsed dictionary" in r06["numerator_or_pass_predicate"]
+    r11 = next(row for row in rows if row["id"] == "R11")
+    assert list(c2_lib.FROZEN_TOOL_NAMES) == [
+        name for name in c2_lib.FROZEN_TOOL_NAMES if name in r11["denominator"]
+    ]
+    assert c2_lib.TOOLS_EXPORT_COMMIT in r11["denominator"]
     r15 = next(row for row in rows if row["id"] == "R15")
     assert "Generated dates" in r15["numerator_or_pass_predicate"]
     text = c2_lib.render_acceptance_markdown("deadbeef", c2_lib.C1_COHORTS_SHA256)
@@ -161,11 +227,16 @@ if __name__ == "__main__":
     tests = [
         test_sealed_manifest_and_protocol_bytes,
         test_c1_receipts_and_cohorts_preserved,
+        test_c2_receipts_preserved_and_bound_to_base,
         test_task_schema_matches_sealed_index,
         test_holdout_boundary_rejects_raw_query_field,
         test_holdout_boundary_rejects_gold_labels,
         test_deletion_based_success_fails,
         test_r14_protocol_is_not_a_frozen_sample,
+        test_r06_rejects_unqualified_parser_output,
+        test_r14_rejects_quality_only_gate,
+        test_r12_keeps_uncompleted_assigned_opportunities,
+        test_r11_rejects_tool_substitution_deletion_and_planner_addition,
         test_acceptance_rows_cover_r01_r16,
         test_hash_scheme_is_non_circular,
         test_negative_selector_fixtures_are_decisive,

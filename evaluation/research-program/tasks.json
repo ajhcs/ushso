@@ -47,7 +47,7 @@
     "stage_order": [
       "C2 publishes the protocol and unaccepted R14 row.",
       "PR-020 C-020-3 produces the actual residual frame.",
-      "PR-027 C-027-1 independently freezes scientific claim targets before comparison calls or results.",
+      "PR-027 C-027-1 independently freezes scientific claim targets before PR-027 C-027-2/C-027-3 model comparison calls or results.",
       "PR-027 C-027-2/C-027-3 execute and evaluate model outputs against that freeze.",
       "R14 quality gates promotion, not creation of the comparison itself."
     ],
@@ -55,6 +55,19 @@
       "The 40 retrieval tasks are not R14 claim gold.",
       "The illustrative 149 iid count is not an adopted sample-size or CI threshold."
     ],
+    "quality_gate": {
+      "no_models_in_public_request_handling": true,
+      "no_private_data_or_credentials_transmitted": true,
+      "auditable_token_and_spend_controls": true,
+      "independently_frozen_scientific_sample": true,
+      "held_out_claim_precision_at_least": 0.98,
+      "critical_scientific_errors_overall": 0,
+      "critical_scientific_errors_per_predeclared_source_task_class": 0,
+      "accepted_claim_citation_and_schema_checks": 1.0,
+      "actual_sample_sizes_and_confidence_intervals": true,
+      "per_source_task_class_results": true,
+      "unjudgeable_or_uncertain_outcomes_block": true
+    },
     "thresholds_when_later_measured": {
       "held_out_claim_precision": 0.98,
       "critical_scientific_errors": 0,
@@ -63,6 +76,99 @@
     "paid_enrichment": "Requires an actually selected product budget and credentials. This commit does not call product models.",
     "materialized": false,
     "frozen_sample": false
+  },
+  "correction_contracts": {
+    "R06": {
+      "eligible_denominator": "Baseline records with an evidenced publisher-accessible dictionary.",
+      "numerator": "Baseline records with a QUALIFIED parsed dictionary and retained qualification evidence.",
+      "threshold": 0.95,
+      "qualification_required": true,
+      "raw_parser_output_alone_satisfies": false,
+      "other_records": "Every ineligible or failed baseline record retains an evidenced reason and next action.",
+      "failure_boundary": "Extraction failure cannot be relabeled publisher absence to improve yield.",
+      "status": "unaccepted"
+    },
+    "R11": {
+      "tool_export": {
+        "path": "plugins/ushso-research/assets/tools.json",
+        "source_commit": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+        "sha256": "62b7c514b8dfde6336b42028d1b1578b9aac267e756377cd1018d8827fd61af3",
+        "count": 8,
+        "names": [
+          "observatory.search_assets",
+          "observatory.get_asset",
+          "observatory.get_access_plan",
+          "observatory.get_retrieval_recipe",
+          "observatory.get_variables",
+          "observatory.get_join_routes",
+          "observatory.compare_assets",
+          "observatory.get_coverage_status"
+        ]
+      },
+      "toolkit_manifest": {
+        "path": "contracts/machine-toolkit/v1.0.0/contracts/toolkit-manifest.json",
+        "sha256": "6e3a4837d0375ceb1666f1003ed39ba08cd932141c9a395eab24323224a28b8c",
+        "disabled_planner": "observatory.plan_research",
+        "disabled_planner_registration_state": "disabled_pending_gates"
+      },
+      "later_evidence": "Priority examples and positive/negative cases remain conditional and must be independently frozen before tuning or measurement.",
+      "status": "unaccepted"
+    },
+    "R12": {
+      "participant_minimums": {
+        "novice": 8,
+        "advanced": 8,
+        "actual": true,
+        "distinct_from_implementers": true
+      },
+      "completion_ratio": {
+        "numerator": "Completed frozen task/session assignments in the group.",
+        "denominator": "All assigned task/session opportunities in the group, including missing or untested opportunities.",
+        "threshold": 0.85,
+        "missing_or_untested_count_as_non_completion": true
+      },
+      "critical_misinterpretation_threshold": 0,
+      "assignments_and_success_criteria": "Pending independent freeze before the study; no participant identities, sessions, or dates are materialized here.",
+      "status": "unaccepted"
+    },
+    "R14": {
+      "protocol_path": "verification/research-program/pr-002/c2-r14-denominator-freeze-protocol-v2.md",
+      "protocol_sha256": "3a35ee6662f939bf53e9f8c5005079ac09982372d80c9b385a9beb9c52e525c7",
+      "disposition_path": "verification/research-program/pr-002/pr002-r14-protocol-disposition.json",
+      "status": "protocol_published_not_materialized",
+      "stage_order": [
+        "C2 publishes the protocol and unaccepted R14 row.",
+        "PR-020 C-020-3 produces the actual residual frame.",
+        "PR-027 C-027-1 independently freezes scientific claim targets before PR-027 C-027-2/C-027-3 model comparison calls or results.",
+        "PR-027 C-027-2/C-027-3 execute and evaluate model outputs against that freeze.",
+        "R14 quality gates promotion, not creation of the comparison itself."
+      ],
+      "not_adopted": [
+        "The 40 retrieval tasks are not R14 claim gold.",
+        "The illustrative 149 iid count is not an adopted sample-size or CI threshold."
+      ],
+      "quality_gate": {
+        "no_models_in_public_request_handling": true,
+        "no_private_data_or_credentials_transmitted": true,
+        "auditable_token_and_spend_controls": true,
+        "independently_frozen_scientific_sample": true,
+        "held_out_claim_precision_at_least": 0.98,
+        "critical_scientific_errors_overall": 0,
+        "critical_scientific_errors_per_predeclared_source_task_class": 0,
+        "accepted_claim_citation_and_schema_checks": 1.0,
+        "actual_sample_sizes_and_confidence_intervals": true,
+        "per_source_task_class_results": true,
+        "unjudgeable_or_uncertain_outcomes_block": true
+      },
+      "thresholds_when_later_measured": {
+        "held_out_claim_precision": 0.98,
+        "critical_scientific_errors": 0,
+        "accepted_claim_citation_and_schema_checks": 1.0
+      },
+      "paid_enrichment": "Requires an actually selected product budget and credentials. This commit does not call product models.",
+      "materialized": false,
+      "frozen_sample": false
+    }
   },
   "counts": {
     "tasks": 40,

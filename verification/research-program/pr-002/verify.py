@@ -229,6 +229,9 @@ def main() -> int:
         schema_errors = c2_lib.assert_task_schema(tasks_payload, sealed)
         checks["c2_task_schema"] = schema_errors == []
         out["c2_task_schema_errors"] = schema_errors
+        correction_errors = c2_lib.assert_correction_contracts(tasks_payload, repo)
+        checks["c2_correction_contracts"] = correction_errors == []
+        out["c2_correction_contract_errors"] = correction_errors
         checks["c2_sealed_manifest_hash"] = (
             c2_lib.digest(HERE / c2_lib.SEALED_MANIFEST_NAME) == c2_lib.SEALED_MANIFEST_SHA256
         )
@@ -274,6 +277,12 @@ def main() -> int:
     checks["c1_verify_receipt_preserved"] = (
         digest(HERE / "c1-verify-receipt.json") == c2_lib.C1_VERIFY_RECEIPT_SHA256
     )
+    checks["c2_build_receipt_preserved"] = (
+        digest(HERE / "c2-build-receipt.json") == c2_lib.C2_BUILD_RECEIPT_SHA256
+    )
+    checks["c2_verify_receipt_preserved"] = (
+        digest(HERE / "c2-verify-receipt.json") == c2_lib.C2_VERIFY_RECEIPT_SHA256
+    )
     if digest(cohorts_path) == c2_lib.C1_COHORTS_SHA256:
         checks["receipt_hash"] = receipt["cohorts_sha256"] == digest(cohorts_path)
     else:
@@ -285,7 +294,11 @@ def main() -> int:
     failed_names = [name for name, ok in checks.items() if not ok]
     out["failed_checks"] = failed_names
     verify_receipt = {
-        "format": "ushso.research-program.pr-002.c1-verify-receipt.v1",
+        "format": (
+            "ushso.research-program.pr-002.c2-correction-verify-receipt.v1"
+            if args.receipt_output and args.receipt_output.name.startswith("c2-correction-")
+            else "ushso.research-program.pr-002.c1-verify-receipt.v1"
+        ),
         "ok": not failed_names,
         "failed_checks": failed_names,
         "checks": checks,
@@ -306,6 +319,8 @@ def main() -> int:
         "receipt_output": str(args.receipt_output.resolve()) if args.receipt_output else None,
         "c1_build_receipt_preserved": checks.get("c1_build_receipt_preserved"),
         "c1_verify_receipt_preserved": checks.get("c1_verify_receipt_preserved"),
+        "c2_build_receipt_preserved": checks.get("c2_build_receipt_preserved"),
+        "c2_verify_receipt_preserved": checks.get("c2_verify_receipt_preserved"),
     }
     if args.receipt_output:
         verify_path = args.receipt_output.resolve()

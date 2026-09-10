@@ -11,7 +11,8 @@
   "implementation_authorship": {
     "c0021_producer": "Grok",
     "c0021_review_correction": "Luna Max",
-    "c0022_producer": "Grok"
+    "c0022_producer": "Grok",
+    "c0022_review_correction": "Luna Max"
   },
   "provider": "grok",
   "actual_model": "grok-4",
@@ -23,7 +24,7 @@
   "correction_base_sha": "44506be8052e1054641048de68893fc41526b664",
   "correction_base_tree": "e7b12a01b49ab66c5f5205f3b14407da30804e46",
   "head_sha": null,
-  "head_sha_note": "C-002-2 cannot self-identify its commit hash. Root binds the C2 head/tree. C-002-3 remains pending on this commit.",
+  "head_sha_note": "The additive C2 review-correction commit cannot self-identify its commit hash/tree. Root binds the final correction head/tree after review. Historical C-002-2 is explicitly bound below to 8fe6e6b2e997e4a3ed59aece64492684f489bec8 / 7358d73c50e7db7431eb101243f784605ed93a9b. C-002-3 remains pending and consumes only the reviewed correction head.",
   "review_correction": {
     "kind": "unplanned_additive_review_correction",
     "reviewed_head_before_correction": "44506be8052e1054641048de68893fc41526b664",
@@ -74,8 +75,29 @@
     "verification/research-program/pr-002/test_c1_corrections.py",
     "verification/research-program/pr-002/verify.py"
   ],
+  "c2_review_correction_base_sha": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+  "c2_review_correction_base_tree": "7358d73c50e7db7431eb101243f784605ed93a9b",
+  "c2_review_correction_changed_files": [
+    "docs/research-program/acceptance.md",
+    "docs/research-program/handoffs/PR-002.json",
+    "evaluation/research-program/tasks.json",
+    "verification/research-program/pr-002/c2-correction-build-receipt.json",
+    "verification/research-program/pr-002/c2-correction-verify-receipt.json",
+    "verification/research-program/pr-002/c2_lib.py",
+    "verification/research-program/pr-002/command-receipts/c2-correction-build.json",
+    "verification/research-program/pr-002/command-receipts/c2-correction-artifact-audit-final.json",
+    "verification/research-program/pr-002/command-receipts/c2-correction-artifact-audit.json",
+    "verification/research-program/pr-002/command-receipts/c2-correction-initial-build-wrapper-failure.json",
+    "verification/research-program/pr-002/command-receipts/c2-correction-plan-validate.json",
+    "verification/research-program/pr-002/command-receipts/c2-correction-test-c1.json",
+    "verification/research-program/pr-002/command-receipts/c2-correction-test-c2.json",
+    "verification/research-program/pr-002/command-receipts/c2-correction-verify-readonly.json",
+    "verification/research-program/pr-002/command-receipts/c2-correction-verify.json",
+    "verification/research-program/pr-002/test_c2.py",
+    "verification/research-program/pr-002/verify.py"
+  ],
   "problem": "PR-002 C-002-1 identities were not frozen. Predecessor run ushso-pr002-cohort-freeze-20260910 reached a 100-product declaration then failed with no commit; the recovered producer packet also needed bounded corrections for heuristic relation labels, MRF freeze ordering, command timing evidence, and replay receipt integrity.",
-  "resulting_behavior": "C-002-1 identities remain: 100 products, ten domains, 3,434 baseline IDs, and 185 source-scoped related candidates. C-002-2 freezes the public opaque 40-task index (four/domain; 10 novice/17 advanced/13 machine), hashes cohorts/tasks with SHA-256 of exact file bytes, and gives every R01-R16 an unaccepted measurable row. Holdout labels stay inaccessible. The R14 protocol is published and not materialized. C-002-3 MRF 25/10 IDs remain pending. No R01-R16 acceptance is claimed.",
+  "resulting_behavior": "C-002-1 identities remain: 100 products, ten domains, 3,434 baseline IDs, and 185 source-scoped related candidates. C-002-2 freezes the public opaque 40-task index (four/domain; 10 novice/17 advanced/13 machine), hashes cohorts/tasks with SHA-256 of exact file bytes, and gives every R01-R16 an unaccepted measurable row. This additive correction makes R06 require a QUALIFIED parsed dictionary over the evidenced eligible denominator, R11 bind the exact eight exported tool names plus the disabled planner boundary, R12 separate eight actual participants per group from the all-assigned-opportunity completion ratio, and R14 conjunctively require operational/privacy/spend controls plus every independent scientific quality condition. Holdout labels stay inaccessible. The R14 residual frame and sample remain unmaterialized; PR-020 produces the residual, PR-027 C1 freezes independent targets before C2/C3 comparison, and R14 quality gates promotion. C-002-3 MRF 25/10 IDs remain pending. No R01-R16 acceptance is claimed.",
   "commits": [
     {
       "id": "C-002-1",
@@ -87,19 +109,27 @@
     },
     {
       "id": "C1-REVIEW-CORRECTION",
-      "sha": null,
+      "sha": "ef9c2569b78dd26f0436d2ea945a8e1b791b8698",
       "parent": "44506be8052e1054641048de68893fc41526b664",
-      "tree": null,
+      "tree": "a7db2e54b04891793e6ae9882826d12d7c74b32a",
       "subject": "docs(research): correct C-002-1 evidence boundaries (review correction)",
-      "identity_convention": "One unplanned additive correction; root records the resulting sha/tree and external review receipt after the commit lands. It does not replace C-002-1 or implement C-002-2/C-002-3."
+      "identity_convention": "Accepted additive C1 correction, authored by Luna Max; the immutable commit/tree are filled from the accepted C1 correction head. It does not replace C-002-1 or implement C-002-2/C-002-3."
     },
     {
       "id": "C-002-2",
-      "sha": null,
+      "sha": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
       "parent": "ef9c2569b78dd26f0436d2ea945a8e1b791b8698",
-      "tree": null,
+      "tree": "7358d73c50e7db7431eb101243f784605ed93a9b",
       "subject": "docs(research): freeze research tasks and negative cases (PR-002 C-002-2)",
-      "identity_convention": "Imperative docs(research) subject plus (PR-002 C-002-2). This commit cannot self-identify its sha/tree; root binds them after review."
+      "identity_convention": "Imperative docs(research) subject plus (PR-002 C-002-2), bound to the immutable Grok C2 head/tree before this review correction."
+    },
+    {
+      "id": "C2-REVIEW-CORRECTION",
+      "sha": null,
+      "parent": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "tree": null,
+      "subject": "docs(research): correct C-002-2 acceptance contracts (review correction)",
+      "identity_convention": "One bounded additive correction, authored by Luna Max. Root binds the final commit/tree from the external review receipt; it preserves C-002-2 and does not implement C-002-3."
     }
   ],
   "source_identities": [
@@ -166,6 +196,36 @@
       "sha": "ef9c2569b78dd26f0436d2ea945a8e1b791b8698",
       "tree": "a7db2e54b04891793e6ae9882826d12d7c74b32a",
       "status": "accepted_c1_only"
+    },
+    {
+      "kind": "c0022_changes_requested_head_before_review_correction",
+      "sha": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "tree": "7358d73c50e7db7431eb101243f784605ed93a9b",
+      "authorship": "Grok",
+      "status": "historical_C2_changes_requested_base_receipts_bound_here"
+    },
+    {
+      "kind": "r11_frozen_tool_export",
+      "path": "plugins/ushso-research/assets/tools.json",
+      "source_commit": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+      "sha256": "62b7c514b8dfde6336b42028d1b1578b9aac267e756377cd1018d8827fd61af3",
+      "names": [
+        "observatory.search_assets",
+        "observatory.get_asset",
+        "observatory.get_access_plan",
+        "observatory.get_retrieval_recipe",
+        "observatory.get_variables",
+        "observatory.get_join_routes",
+        "observatory.compare_assets",
+        "observatory.get_coverage_status"
+      ],
+      "disabled_outside_set": "observatory.plan_research",
+      "disabled_registration_state": "disabled_pending_gates"
+    },
+    {
+      "kind": "r11_toolkit_manifest_cross_check",
+      "path": "contracts/machine-toolkit/v1.0.0/contracts/toolkit-manifest.json",
+      "sha256": "6e3a4837d0375ceb1666f1003ed39ba08cd932141c9a395eab24323224a28b8c"
     },
     {
       "kind": "evaluator_freeze_manifest_sealed_v1",
@@ -316,12 +376,13 @@
     },
     {
       "path": "verification/research-program/pr-002/build.py",
-      "sha256": "82ee85101acb0f20df39582abfe8485e945a6bc5d33c9da017be5ea172084836"
+      "sha256": "f7fd6d57d7fbe01d0d61ed02081695f95f34b3563294f3732448c7180f141d25",
+      "status": "historical_C2_base_artifact"
     },
     {
       "path": "verification/research-program/pr-002/verify.py",
-      "sha256": "5537f1a6071f876149689d484495486ca42a5421715f226dab5c598ece49b6bb",
-      "status": "corrected_C1_artifact"
+      "sha256": "5108b1275bad69c7894c37514c4c3f2eae86ff213694ecfe938bfd0b48c7ba6d",
+      "status": "current_C2_review_correction_artifact"
     },
     {
       "path": "verification/research-program/pr-002/c1-build-receipt.json",
@@ -341,15 +402,15 @@
     },
     {
       "path": "evaluation/research-program/tasks.json",
-      "sha256": "35d9c03693b6575b1ca2743c6d2c38e8d5a4936a76f2e672718d918c5c2d0d58",
-      "bytes": 24026,
-      "status": "c2_artifact"
+      "sha256": "c14c2118dfddab80fd5047dc1912a622721f89a6212d73d2498700fa01305a74",
+      "bytes": 29252,
+      "status": "current_C2_review_correction_artifact"
     },
     {
       "path": "docs/research-program/acceptance.md",
-      "sha256": "abc0b701aa76eeb26c9d19b88b21c80db60ac68c7ceb16930dec7cdb0c3a2f9f",
-      "bytes": 26655,
-      "status": "c2_artifact"
+      "sha256": "630c94f9b708271c20b14049413dd116328c1349759fcf604fc1e1336fcd4117",
+      "bytes": 29747,
+      "status": "current_C2_review_correction_artifact"
     },
     {
       "path": "evaluation/research-program/cohorts.json",
@@ -386,6 +447,154 @@
       "path": "verification/research-program/pr-002/c2-verify-receipt.json",
       "sha256": "7d9b80974238fe83d284064ce2bc3c91d03afd12dc6b72a665c44af8ac485526",
       "status": "explicit_output"
+    },
+    {
+      "path": "verification/research-program/pr-002/c2_lib.py",
+      "sha256": "21aec356bf8c4c000f8132ba6c0b9a5a4416090080835bf59b50ac20d682c6d0",
+      "bytes": 60149,
+      "status": "current_C2_review_correction_artifact"
+    },
+    {
+      "path": "verification/research-program/pr-002/test_c2.py",
+      "sha256": "72fb96a84bbb9decf3a097424833749febd0c4d3dad6a9565f739f69fe0fa630",
+      "bytes": 11113,
+      "status": "current_C2_review_correction_artifact"
+    },
+    {
+      "path": "verification/research-program/pr-002/c2-correction-build-receipt.json",
+      "sha256": "288e270b3540f76e50a2fd1117e235fe7ba24c5e86986923ded72d903f97185e",
+      "bytes": 6534,
+      "status": "current_C2_review_correction_receipt"
+    },
+    {
+      "path": "verification/research-program/pr-002/c2-correction-verify-receipt.json",
+      "sha256": "489c7b156adfafc3534f218e45f1c20a2e33fbaff351074a540973ac3f3a8971",
+      "bytes": 4480,
+      "status": "current_C2_review_correction_receipt"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c2-correction-build.json",
+      "sha256": "48c3475d4d5c8336d5178438f0f81b7191636be2ff09dc4af91c628d8b6d7eb6",
+      "bytes": 1353,
+      "status": "current_C2_review_correction_command_receipt"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c2-correction-initial-build-wrapper-failure.json",
+      "sha256": "7a09320dd5e0356930b07418c7c6cb81229a8e9b068893e25cbff6353cd7d7c9",
+      "bytes": 837,
+      "status": "current_C2_review_correction_failure_receipt"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c2-correction-verify.json",
+      "sha256": "f87330862d9b954a7955384eb14c91553fb35cafb2d0f22d8be695512b09b536",
+      "bytes": 1533,
+      "status": "current_C2_review_correction_command_receipt"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c2-correction-test-c1.json",
+      "sha256": "93c9a8b586299080d429f65f98b4c24727b545921e687b8f33f784ea30766468",
+      "bytes": 351,
+      "status": "current_C2_review_correction_command_receipt"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c2-correction-test-c2.json",
+      "sha256": "ac2d0177ce351fa85e3042b24c45889d810405075c5fb5afa5929cc9717b4de3",
+      "bytes": 1125,
+      "status": "current_C2_review_correction_command_receipt"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c2-correction-verify-readonly.json",
+      "sha256": "2e5bd08d90142453d3772bc184ebce398351fc9841cd9d827c8edf7f531f1e5c",
+      "bytes": 1257,
+      "status": "current_C2_review_correction_command_receipt"
+    },
+    {
+      "path": "verification/research-program/pr-002/command-receipts/c2-correction-plan-validate.json",
+      "sha256": "5b58282f4dd0f67f22b142efa3edf06dd6b16b239defdb59d4384564bbc230b9",
+      "bytes": 786,
+      "status": "current_C2_review_correction_command_receipt"
+    }
+  ],
+  "historical_artifact_bindings": [
+    {
+      "path": "verification/research-program/pr-002/build.py",
+      "sha256": "82ee85101acb0f20df39582abfe8485e945a6bc5d33c9da017be5ea172084836",
+      "bytes": 2439,
+      "commit": "ef9c2569b78dd26f0436d2ea945a8e1b791b8698",
+      "tree": "a7db2e54b04891793e6ae9882826d12d7c74b32a",
+      "status": "historical_C1_correction_artifact",
+      "verification": "git show <commit>:<path> then SHA-256"
+    },
+    {
+      "path": "verification/research-program/pr-002/verify.py",
+      "sha256": "5537f1a6071f876149689d484495486ca42a5421715f226dab5c598ece49b6bb",
+      "bytes": 12169,
+      "commit": "ef9c2569b78dd26f0436d2ea945a8e1b791b8698",
+      "tree": "a7db2e54b04891793e6ae9882826d12d7c74b32a",
+      "status": "historical_C1_correction_artifact",
+      "verification": "git show <commit>:<path> then SHA-256"
+    },
+    {
+      "path": "verification/research-program/pr-002/build.py",
+      "sha256": "f7fd6d57d7fbe01d0d61ed02081695f95f34b3563294f3732448c7180f141d25",
+      "bytes": 5087,
+      "commit": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "tree": "7358d73c50e7db7431eb101243f784605ed93a9b",
+      "status": "historical_C2_base_artifact",
+      "verification": "git show <commit>:<path> then SHA-256"
+    },
+    {
+      "path": "verification/research-program/pr-002/verify.py",
+      "sha256": "227ac85ad4fafdbcc28b309a453dab7cdce3d4f98dcbc97ffaa8483b3f6cdf33",
+      "bytes": 16107,
+      "commit": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "tree": "7358d73c50e7db7431eb101243f784605ed93a9b",
+      "status": "historical_C2_base_artifact",
+      "verification": "git show <commit>:<path> then SHA-256"
+    },
+    {
+      "path": "evaluation/research-program/tasks.json",
+      "sha256": "35d9c03693b6575b1ca2743c6d2c38e8d5a4936a76f2e672718d918c5c2d0d58",
+      "bytes": 24026,
+      "commit": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "tree": "7358d73c50e7db7431eb101243f784605ed93a9b",
+      "status": "historical_C2_base_artifact_bound_by_c2_build_receipt"
+    },
+    {
+      "path": "docs/research-program/acceptance.md",
+      "sha256": "abc0b701aa76eeb26c9d19b88b21c80db60ac68c7ceb16930dec7cdb0c3a2f9f",
+      "bytes": 26655,
+      "commit": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "tree": "7358d73c50e7db7431eb101243f784605ed93a9b",
+      "status": "historical_C2_base_artifact_bound_by_c2_build_receipt"
+    },
+    {
+      "path": "verification/research-program/pr-002/c2_lib.py",
+      "sha256": "1cb2076ee09cbf617a9365b10d561acebee92922e12095c5cfe5d7ccded64fc4",
+      "commit": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "tree": "7358d73c50e7db7431eb101243f784605ed93a9b",
+      "status": "historical_C2_base_artifact"
+    },
+    {
+      "path": "verification/research-program/pr-002/test_c2.py",
+      "sha256": "3d0c1a305a24fa31c17585a4a635988fa3f5164c41aa1585a0654c3b980a7e2a",
+      "commit": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "tree": "7358d73c50e7db7431eb101243f784605ed93a9b",
+      "status": "historical_C2_base_artifact"
+    },
+    {
+      "path": "verification/research-program/pr-002/c2-build-receipt.json",
+      "sha256": "4eb211c0ee80e3e3ca53627a3b82aeb819110aa0b8da3ba795bca97e2cc1760d",
+      "commit": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "tree": "7358d73c50e7db7431eb101243f784605ed93a9b",
+      "status": "preserved_historical_C2_receipt"
+    },
+    {
+      "path": "verification/research-program/pr-002/c2-verify-receipt.json",
+      "sha256": "7d9b80974238fe83d284064ce2bc3c91d03afd12dc6b72a665c44af8ac485526",
+      "commit": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "tree": "7358d73c50e7db7431eb101243f784605ed93a9b",
+      "status": "preserved_historical_C2_receipt"
     }
   ],
   "acceptance_results": [
@@ -433,6 +642,21 @@
       "id": "C-002-2",
       "status": "producer_checked_pending_independent_review",
       "result": "Public opaque 40-task index frozen and hash-bound. R01-R16 unaccepted measurable rows published. R14 protocol published and not materialized. C1 cohorts/receipts preserved byte-for-byte."
+    },
+    {
+      "id": "C2-REVIEW-CORRECTION",
+      "status": "implemented_pending_independent_review",
+      "result": "One additive Luna Max correction addresses the five recorded C2 findings. R06 now requires a QUALIFIED parsed dictionary over the evidenced eligible baseline denominator and retains reasons/next actions for every other record. R11 freezes the exact eight names from the hash-bound tools export and cross-checks the disabled_pending_gates planner exclusion. R12 separates eight actual novice/eight actual advanced participants from completed frozen assignments divided by all assigned opportunities at >=0.85, with missing/untested opportunities as non-completions. R14 conjunctively requires no public-handling model, no private data/credential transmission, auditable token/spend controls, an independent residual-derived scientific sample, precision >=0.98 for the overall frozen sample, zero critical errors overall/per source-task class, 100% citation/schema checks, actual sample sizes/CIs, and per-class reporting. R14 remains unaccepted and unmaterialized; the sealed evaluator manifest, 40-task index, 100 products, and 3434 baseline IDs are preserved.",
+      "findings": [
+        "PR002-C2-001",
+        "PR002-C2-002",
+        "PR002-C2-003",
+        "PR002-C2-004",
+        "PR002-C2-005"
+      ],
+      "authorship": "Luna Max",
+      "base_sha": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "base_tree": "7358d73c50e7db7431eb101243f784605ed93a9b"
     },
     {
       "id": "R07",
@@ -529,20 +753,21 @@
       "evidence": "C2 published the protocol. PR-020 must produce the residual frame; PR-027 C1 freezes targets before comparison."
     }
   ],
-  "next_consumer": "C-002-3 owner, then Astra/controller independent review",
-  "next_action": "Implement C-002-3 from the sealed 25/10 directory selection without endpoint tests. Do not push, open PR, merge, or deploy from this packet.",
+  "next_consumer": "Astra/controller independent review of the additive correction, then Grok for the single C-002-3 commit",
+  "next_action": "Root must independently review and replay this correction, bind its final commit/tree and verify current and historical artifact hashes. After that review, assign Grok the single C-002-3 commit from this corrected head using only the sealed 25/10 directory selection, with no endpoint tests. Do not consume or implement C3 in this correction.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
     "decisive_checks": [
+      "python3 -B verification/research-program/pr-002/test_c1_corrections.py",
       "python3 -B verification/research-program/pr-002/test_c2.py",
       "python3 -B verification/research-program/pr-002/verify.py --repo .",
       "python3 docs/master-plan/2026-09-10/validate.py"
     ],
     "limitations": [
-      "Producer-checked C-002-2 public task freeze and unaccepted R01-R16 rows only.",
-      "No raw holdout prompts or labels, no R14 sample, no MRF 25/10 IDs, no payload retrieval, no model calls.",
-      "Independent reviewer must verify the C2 head/tree and preserve historical C1 receipt hashes."
+      "Producer-checked C-002-2 public task freeze and unaccepted R01-R16 rows plus this bounded C2 contract correction only.",
+      "No raw holdout prompts or labels, no R14 residual/sample, no MRF 25/10 IDs, no payload retrieval, no model calls.",
+      "Independent reviewer must verify the correction head/tree, the exact eight tool export and manifest hashes, every current artifact hash, and every historical C1/C2 artifact at its stated commit."
     ]
   },
   "c2_base_sha": "ef9c2569b78dd26f0436d2ea945a8e1b791b8698",
@@ -639,5 +864,125 @@
         "result": "{\"format\": \"ushso.plan-structure-validation.v1\", \"status\": \"PASS\", \"scope\": \"Structural hierarchy, graph, traceability and packet synchronization only; not scientific correctness, user acceptance, implementation status or release permission.\", \"counts\": {\"phases\": 8, \"subphases\": 28, \"prs\": 84, \"atomic_commits\": 252, \"requirements\": 16, \"audit_findings\": 33}, \"plan_sha256\": \"80d897a6135e0cbbb27aff2e67139b26d17f51347487ba452335b56914557703\", \"errors\": []}"
       }
     ]
+  },
+  "c2_review_correction_checks": {
+    "agentctl_task_id": "ushso-pr002-c2-corrections-20260910-luna-max",
+    "agentctl_receipt_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c2-corrections-20260910-luna-max/receipt.json",
+    "agentctl_event_log_path": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c2-corrections-20260910-luna-max/events.jsonl",
+    "records": [
+      {
+        "command": "python3 -B verification/research-program/pr-002/test_c1_corrections.py",
+        "started_at": "2026-09-10T20:03:40.899553Z",
+        "completed_at": "2026-09-10T20:03:40.942627Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": "verification/research-program/pr-002/command-receipts/c2-correction-test-c1.json",
+        "result": "c1_correction_fixtures_ok"
+      },
+      {
+        "command": "python3 -B verification/research-program/pr-002/test_c2.py",
+        "started_at": "2026-09-10T20:03:07.493454Z",
+        "completed_at": "2026-09-10T20:03:07.639970Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": "verification/research-program/pr-002/command-receipts/c2-correction-test-c2.json",
+        "result": "four adversarial C2 finding fixtures plus historical-preservation checks passed"
+      },
+      {
+        "command": "python3 -B verification/research-program/pr-002/build.py --repo . --stage c2 --receipt-output verification/research-program/pr-002/c2-correction-build-receipt.json",
+        "started_at": "2026-09-10T19:35:26.236Z",
+        "completed_at": "2026-09-10T19:35:26.345Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": "/home/plumbob/.local/state/agentctl/tasks/ushso-pr002-c2-corrections-20260910-luna-max/events.jsonl#cmd-0007-c859055c",
+        "result": "agentctl cmd-0007 successful build attempt; child log receipt captured 19:35:26.268184Z-19:35:26.339552Z; cohorts and historical C1 receipts preserved"
+      },
+      {
+        "command": "python3 -B verification/research-program/pr-002/build.py --repo . --stage c2 --receipt-output verification/research-program/pr-002/c2-correction-build-receipt.json",
+        "started_at": "2026-09-10T20:00:41.295370Z",
+        "completed_at": "2026-09-10T20:00:41.376129Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": "verification/research-program/pr-002/command-receipts/c2-correction-build.json",
+        "result": "final direct build rerun after the wrapper failure; tasks and acceptance regenerated with the corrected R14 wording; cohorts and historical C1 receipts preserved"
+      },
+      {
+        "command": "python3 -B verification/research-program/pr-002/verify.py --repo . --receipt-output verification/research-program/pr-002/c2-correction-verify-receipt.json",
+        "started_at": "2026-09-10T20:05:18.248158Z",
+        "completed_at": "2026-09-10T20:05:19.250311Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": "verification/research-program/pr-002/command-receipts/c2-correction-verify.json",
+        "result": "corrected verifier passed; additive receipt written"
+      },
+      {
+        "command": "python3 -B verification/research-program/pr-002/verify.py --repo .",
+        "started_at": "2026-09-10T20:05:51.933407Z",
+        "completed_at": "2026-09-10T20:05:52.929551Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit_read_only",
+        "event_source": "verification/research-program/pr-002/command-receipts/c2-correction-verify-readonly.json",
+        "result": "corrected verifier passed without writing receipts or __pycache__"
+      },
+      {
+        "command": "python3 docs/master-plan/2026-09-10/validate.py",
+        "started_at": "2026-09-10T20:06:26.227579Z",
+        "completed_at": "2026-09-10T20:06:26.274430Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": "verification/research-program/pr-002/command-receipts/c2-correction-plan-validate.json",
+        "result": "plan structure and packet synchronization passed"
+      },
+      {
+        "command": "python3 -B <current and historical artifact hash audit>",
+        "started_at": "2026-09-10T19:49:17.416127Z",
+        "completed_at": "2026-09-10T19:49:17.485564Z",
+        "exit_code": 1,
+        "completion_status": "observed_exit_failure_preserved",
+        "event_source": "verification/research-program/pr-002/command-receipts/c2-correction-artifact-audit.json",
+        "result": "Detected one handoff typo in the c2-correction-test-c2 command-receipt hash; no implementation artifact failed. The failure receipt is retained and the corrected audit follows."
+      },
+      {
+        "command": "python3 -B <current and historical artifact hash audit>",
+        "started_at": "2026-09-10T20:09:13.134438Z",
+        "completed_at": "2026-09-10T20:09:13.234444Z",
+        "exit_code": 0,
+        "completion_status": "observed_exit",
+        "event_source": "verification/research-program/pr-002/command-receipts/c2-correction-artifact-audit-final.json",
+        "result": "All 28 current artifact entries and 10 historical commit-bound entries matched exact SHA-256 bytes and declared sizes where present; final audit receipt hash cc58a6fbf007b307c9386516b1194b55990b1d7f4fc954d263fb8352f8881b5c."
+      },
+      {
+        "command": "agentctl run --kind build ...",
+        "started_at": "2026-09-10T19:46:16.588514Z",
+        "completed_at": "2026-09-10T19:46:16.665206Z",
+        "agentctl_started_at": "2026-09-10T19:46:16.559Z",
+        "agentctl_completed_at": "2026-09-10T19:46:16.670Z",
+        "exit_code": 2,
+        "completion_status": "failed_argument_validation",
+        "event_source": "verification/research-program/pr-002/command-receipts/c2-correction-initial-build-wrapper-failure.json",
+        "result": "agentctl rejected unsupported kind build before the child command ran; this wrapper attempt has no successful retry. The earlier cmd-0007 build and later final direct build are recorded as separate attempts."
+      }
+    ],
+    "artifact_hashes": {
+      "tasks": "c14c2118dfddab80fd5047dc1912a622721f89a6212d73d2498700fa01305a74",
+      "acceptance": "630c94f9b708271c20b14049413dd116328c1349759fcf604fc1e1336fcd4117",
+      "sealed_evaluator_manifest": "142458d686e1cb5e9677b6a5eaa619955c78ef9a4d51735207d4ad19bf26c9ef",
+      "cohorts_preserved": "479a5c33b8b54fa6a2673fdd17219dc52e8f36058fa3170538f1fa6696c156d4",
+      "c1_build_receipt_preserved": "857750c9536aa1f34a8b8b70ce9e463c912b13ca7f386fc6fc2e1e90a7ef8f6d",
+      "c1_verify_receipt_preserved": "ec9aad31a65464ac3224a80930d548c2069fd5a4ebf80626e62495eea48a0244",
+      "c2_build_receipt_preserved": "4eb211c0ee80e3e3ca53627a3b82aeb819110aa0b8da3ba795bca97e2cc1760d",
+      "c2_verify_receipt_preserved": "7d9b80974238fe83d284064ce2bc3c91d03afd12dc6b72a665c44af8ac485526",
+      "correction_build_receipt": "288e270b3540f76e50a2fd1117e235fe7ba24c5e86986923ded72d903f97185e",
+      "correction_verify_receipt": "489c7b156adfafc3534f218e45f1c20a2e33fbaff351074a540973ac3f3a8971",
+      "correction_test_c2_command_receipt": "ac2d0177ce351fa85e3042b24c45889d810405075c5fb5afa5929cc9717b4de3",
+      "correction_test_c1_command_receipt": "93c9a8b586299080d429f65f98b4c24727b545921e687b8f33f784ea30766468",
+      "correction_verify_command_receipt": "f87330862d9b954a7955384eb14c91553fb35cafb2d0f22d8be695512b09b536",
+      "correction_verify_readonly_command_receipt": "2e5bd08d90142453d3772bc184ebce398351fc9841cd9d827c8edf7f531f1e5c",
+      "correction_plan_validate_command_receipt": "5b58282f4dd0f67f22b142efa3edf06dd6b16b239defdb59d4384564bbc230b9",
+      "initial_build_wrapper_failure": "7a09320dd5e0356930b07418c7c6cb81229a8e9b068893e25cbff6353cd7d7c9"
+      ,"artifact_audit_failure": "2c2928c02d7e0946613c91c1ad1b3c4cd38aa6d48b5500a9ef5f8b92fe681315",
+      "artifact_audit_final": "cc58a6fbf007b307c9386516b1194b55990b1d7f4fc954d263fb8352f8881b5c"
+    },
+    "failure_and_recovery": "The earlier successful build is agentctl cmd-0007-c859055c at 19:35:26.236Z-19:35:26.345Z, with its child log receipt at 19:35:26.268184Z-19:35:26.339552Z. A separate wrapper attempt at agentctl cmd-0016-1a412528 ran at 19:46:16.559Z-19:46:16.670Z (outer receipt 19:46:16.588514Z-19:46:16.665206Z), used unsupported --kind build, and exited 2 before the child ran; no successful retry is attributed to that wrapper. Afterward, the final direct build rerun at 20:00:41.295370Z-20:00:41.376129Z exited 0 and refreshed the final generated hashes."
   }
 }

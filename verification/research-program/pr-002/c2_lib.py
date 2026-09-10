@@ -59,6 +59,29 @@ PRIVATE_FIELDS = (
     "holdout_label",
 )
 HISTORICAL_RECEIPT_NAMES = ("c1-build-receipt.json", "c1-verify-receipt.json")
+HISTORICAL_C2_RECEIPT_NAMES = ("c2-build-receipt.json", "c2-verify-receipt.json")
+C2_BASE_COMMIT = "8fe6e6b2e997e4a3ed59aece64492684f489bec8"
+C2_BASE_TREE = "7358d73c50e7db7431eb101243f784605ed93a9b"
+C2_BUILD_RECEIPT_SHA256 = "4eb211c0ee80e3e3ca53627a3b82aeb819110aa0b8da3ba795bca97e2cc1760d"
+C2_VERIFY_RECEIPT_SHA256 = "7d9b80974238fe83d284064ce2bc3c91d03afd12dc6b72a665c44af8ac485526"
+C1_CORRECTION_TREE = "a7db2e54b04891793e6ae9882826d12d7c74b32a"
+
+TOOLS_EXPORT_PATH = "plugins/ushso-research/assets/tools.json"
+TOOLS_EXPORT_COMMIT = "45210704b8de2d7b1360b6d32657cd17791bdd77"
+TOOLS_EXPORT_SHA256 = "62b7c514b8dfde6336b42028d1b1578b9aac267e756377cd1018d8827fd61af3"
+TOOLKIT_MANIFEST_PATH = "contracts/machine-toolkit/v1.0.0/contracts/toolkit-manifest.json"
+TOOLKIT_MANIFEST_SHA256 = "6e3a4837d0375ceb1666f1003ed39ba08cd932141c9a395eab24323224a28b8c"
+FROZEN_TOOL_NAMES = (
+    "observatory.search_assets",
+    "observatory.get_asset",
+    "observatory.get_access_plan",
+    "observatory.get_retrieval_recipe",
+    "observatory.get_variables",
+    "observatory.get_join_routes",
+    "observatory.compare_assets",
+    "observatory.get_coverage_status",
+)
+DISABLED_PLANNER_NAME = "observatory.plan_research"
 
 
 def digest(path: Path) -> str:
@@ -105,6 +128,127 @@ def public_task_index(sealed: dict) -> list[dict]:
 
 def hash_scheme() -> dict:
     return load_json(HERE / "hash-scheme.json")
+
+
+def repository_root() -> Path:
+    """Return the repository root for helper calls that omit an explicit repo."""
+
+    return HERE.parents[2]
+
+
+def load_frozen_tool_export(repo: Path | None = None) -> list[dict]:
+    """Load and hash-check the exact eight-tool public export used by R11."""
+
+    root = repo or repository_root()
+    path = root / TOOLS_EXPORT_PATH
+    actual = digest(path)
+    if actual != TOOLS_EXPORT_SHA256:
+        raise SystemExit(f"frozen tool export hash mismatch: {actual}")
+    payload = load_json(path)
+    if not isinstance(payload, list):
+        raise SystemExit("frozen tool export must be a JSON array")
+    names = [item.get("name") for item in payload if isinstance(item, dict)]
+    if names != list(FROZEN_TOOL_NAMES):
+        raise SystemExit("frozen tool export names diverge from the accepted eight")
+    if len(payload) != len(FROZEN_TOOL_NAMES):
+        raise SystemExit("frozen tool export count diverges from the accepted eight")
+    return payload
+
+
+def load_frozen_toolkit_manifest(repo: Path | None = None) -> dict:
+    """Load and hash-check the machine-toolkit manifest used for the R11 boundary."""
+
+    root = repo or repository_root()
+    path = root / TOOLKIT_MANIFEST_PATH
+    actual = digest(path)
+    if actual != TOOLKIT_MANIFEST_SHA256:
+        raise SystemExit(f"machine-toolkit manifest hash mismatch: {actual}")
+    payload = load_json(path)
+    tools = payload.get("tools") if isinstance(payload, dict) else None
+    if not isinstance(tools, list):
+        raise SystemExit("machine-toolkit manifest tools must be a JSON array")
+    names = [item.get("tool_name") for item in tools if isinstance(item, dict)]
+    expected = [*FROZEN_TOOL_NAMES, DISABLED_PLANNER_NAME]
+    if names != expected:
+        raise SystemExit("machine-toolkit manifest tool order diverges from the frozen contract")
+    planner = tools[-1]
+    if planner.get("tool_name") != DISABLED_PLANNER_NAME:
+        raise SystemExit("machine-toolkit planner identity is not the disabled planner")
+    if planner.get("registration_state") != "disabled_pending_gates":
+        raise SystemExit("observatory.plan_research is not disabled_pending_gates")
+    return payload
+
+
+def r06_public_contract() -> dict:
+    """Return the bounded R06 denominator and qualified-dictionary gate."""
+
+    return {
+        "eligible_denominator": "Baseline records with an evidenced publisher-accessible dictionary.",
+        "numerator": "Baseline records with a QUALIFIED parsed dictionary and retained qualification evidence.",
+        "threshold": 0.95,
+        "qualification_required": True,
+        "raw_parser_output_alone_satisfies": False,
+        "other_records": "Every ineligible or failed baseline record retains an evidenced reason and next action.",
+        "failure_boundary": "Extraction failure cannot be relabeled publisher absence to improve yield.",
+        "status": "unaccepted",
+    }
+
+
+def r12_public_contract() -> dict:
+    """Return the participant minimum and assignment-opportunity completion gate."""
+
+    return {
+        "participant_minimums": {
+            "novice": 8,
+            "advanced": 8,
+            "actual": True,
+            "distinct_from_implementers": True,
+        },
+        "completion_ratio": {
+            "numerator": "Completed frozen task/session assignments in the group.",
+            "denominator": "All assigned task/session opportunities in the group, including missing or untested opportunities.",
+            "threshold": 0.85,
+            "missing_or_untested_count_as_non_completion": True,
+        },
+        "critical_misinterpretation_threshold": 0,
+        "assignments_and_success_criteria": "Pending independent freeze before the study; no participant identities, sessions, or dates are materialized here.",
+        "status": "unaccepted",
+    }
+
+
+def r11_public_contract(repo: Path | None = None) -> dict:
+    """Return the exact tool denominator and disabled-planner boundary."""
+
+    load_frozen_tool_export(repo)
+    load_frozen_toolkit_manifest(repo)
+    return {
+        "tool_export": {
+            "path": TOOLS_EXPORT_PATH,
+            "source_commit": TOOLS_EXPORT_COMMIT,
+            "sha256": TOOLS_EXPORT_SHA256,
+            "count": len(FROZEN_TOOL_NAMES),
+            "names": list(FROZEN_TOOL_NAMES),
+        },
+        "toolkit_manifest": {
+            "path": TOOLKIT_MANIFEST_PATH,
+            "sha256": TOOLKIT_MANIFEST_SHA256,
+            "disabled_planner": DISABLED_PLANNER_NAME,
+            "disabled_planner_registration_state": "disabled_pending_gates",
+        },
+        "later_evidence": "Priority examples and positive/negative cases remain conditional and must be independently frozen before tuning or measurement.",
+        "status": "unaccepted",
+    }
+
+
+def correction_contracts(repo: Path | None = None) -> dict:
+    """Return the four review-correction contracts embedded in public tasks.json."""
+
+    return {
+        "R06": r06_public_contract(),
+        "R11": r11_public_contract(repo),
+        "R12": r12_public_contract(),
+        "R14": r14_public_contract(),
+    }
 
 
 def negative_case_types() -> list[dict]:
@@ -168,7 +312,7 @@ def r14_public_contract() -> dict:
         "stage_order": [
             "C2 publishes the protocol and unaccepted R14 row.",
             "PR-020 C-020-3 produces the actual residual frame.",
-            "PR-027 C-027-1 independently freezes scientific claim targets before comparison calls or results.",
+            "PR-027 C-027-1 independently freezes scientific claim targets before PR-027 C-027-2/C-027-3 model comparison calls or results.",
             "PR-027 C-027-2/C-027-3 execute and evaluate model outputs against that freeze.",
             "R14 quality gates promotion, not creation of the comparison itself.",
         ],
@@ -176,6 +320,19 @@ def r14_public_contract() -> dict:
             "The 40 retrieval tasks are not R14 claim gold.",
             "The illustrative 149 iid count is not an adopted sample-size or CI threshold.",
         ],
+        "quality_gate": {
+            "no_models_in_public_request_handling": True,
+            "no_private_data_or_credentials_transmitted": True,
+            "auditable_token_and_spend_controls": True,
+            "independently_frozen_scientific_sample": True,
+            "held_out_claim_precision_at_least": 0.98,
+            "critical_scientific_errors_overall": 0,
+            "critical_scientific_errors_per_predeclared_source_task_class": 0,
+            "accepted_claim_citation_and_schema_checks": 1.0,
+            "actual_sample_sizes_and_confidence_intervals": True,
+            "per_source_task_class_results": True,
+            "unjudgeable_or_uncertain_outcomes_block": True,
+        },
         "thresholds_when_later_measured": {
             "held_out_claim_precision": 0.98,
             "critical_scientific_errors": 0,
@@ -242,6 +399,7 @@ def build_tasks_payload(repo: Path, here: Path = HERE) -> dict:
             "empirical_acceptance": False,
         },
         "r14": r14_public_contract(),
+        "correction_contracts": correction_contracts(repo),
         "counts": {
             "tasks": counts["tasks"],
             "by_audience": counts["by_audience"],
@@ -350,8 +508,8 @@ def requirement_rows() -> list[dict]:
             "id": "R06",
             "required_outcome": "Broader extraction improves materially.",
             "master_plan_threshold": "At least 95% of baseline records with publisher-accessible dictionaries yield a qualified parsed dictionary; the eligible denominator is explicitly evidenced. All other baseline records retain a reason and next action. This does not imply 95% of all fields have documented definitions.",
-            "denominator": "Baseline records with an evidenced publisher-accessible dictionary. Extraction failure cannot be relabeled publisher absence.",
-            "numerator_or_pass_predicate": "Pass iff parsed / evidenced-eligible >= 0.95 and every ineligible/failed record has a reason and next action.",
+            "denominator": "Evidenced eligible baseline denominator: baseline records with an evidenced publisher-accessible dictionary. The denominator is retained, including records that later fail parsing or qualification.",
+            "numerator_or_pass_predicate": "Pass iff records with a QUALIFIED parsed dictionary and retained qualification evidence / evidenced eligible baseline denominator >= 0.95, and every other baseline record (ineligible, parser-failed, or qualification-failed) retains an evidenced reason and next action. Raw parser output alone cannot enter the numerator. Extraction failure cannot be relabeled publisher absence.",
             "frame": "Conditional eligible-dictionary frame from PR-020/PR-018. Not frozen now.",
             "frame_state": "conditional_not_materialized",
             "source_generation_identity": common_source,
@@ -424,22 +582,31 @@ def requirement_rows() -> list[dict]:
             "id": "R11",
             "required_outcome": "Machine and human outputs agree.",
             "master_plan_threshold": "All eight existing tools have positive and honest negative cases. For each priority example, IDs, release/schema context, field meanings, access state and citations agree across HTTP, MCP, WebMCP, and UI.",
-            "denominator": "Eight existing tools plus later frozen priority examples.",
-            "numerator_or_pass_predicate": "Pass iff each tool has positive and honest negative cases and cross-surface fields agree on each priority example.",
-            "frame": "Conditional tool/example frame. Not materialized on C2.",
-            "frame_state": "conditional_not_materialized",
-            "source_generation_identity": common_source,
+            "denominator": "The exact eight existing tool identities exported at baseline commit 45210704b8de2d7b1360b6d32657cd17791bdd77 from plugins/ushso-research/assets/tools.json (SHA-256 62b7c514b8dfde6336b42028d1b1578b9aac267e756377cd1018d8827fd61af3): observatory.search_assets, observatory.get_asset, observatory.get_access_plan, observatory.get_retrieval_recipe, observatory.get_variables, observatory.get_join_routes, observatory.compare_assets, observatory.get_coverage_status. Later priority examples are a separate conditional denominator.",
+            "numerator_or_pass_predicate": "Pass iff those exact eight names, with no substitution or deletion, each have positive and honest negative cases and cross-surface fields agree on every independently frozen priority example. Cross-check contracts/machine-toolkit/v1.0.0/contracts/toolkit-manifest.json (SHA-256 6e3a4837d0375ceb1666f1003ed39ba08cd932141c9a395eab24323224a28b8c); observatory.plan_research must remain disabled_pending_gates and outside the eight. Later examples/cases remain conditional until independently frozen before tuning or measurement.",
+            "frame": "The eight tool identities are frozen by the hash-bound export and manifest cross-check. Priority examples and positive/negative cases are not materialized on C2.",
+            "frame_state": "tool_identities_frozen_examples_conditional",
+            "source_generation_identity": {
+                **common_source,
+                "tool_export_path": TOOLS_EXPORT_PATH,
+                "tool_export_source_commit": TOOLS_EXPORT_COMMIT,
+                "tool_export_sha256": TOOLS_EXPORT_SHA256,
+                "tool_names": list(FROZEN_TOOL_NAMES),
+                "toolkit_manifest_path": TOOLKIT_MANIFEST_PATH,
+                "toolkit_manifest_sha256": TOOLKIT_MANIFEST_SHA256,
+                "disabled_planner": DISABLED_PLANNER_NAME,
+            },
             "evidence_owner": "PR-061, PR-063, PR-066",
             "evidence_destination": "cross-surface receipts owned by those PRs.",
-            "materialize_before_tuning": "Tool and example identities must be frozen before parity scoring.",
+            "materialize_before_tuning": "Consume only the exact hash-bound eight names. Independently freeze priority examples and positive/negative cases before parity tuning or measurement; do not add the disabled planner.",
             "status": "unaccepted",
         },
         {
             "id": "R12",
             "required_outcome": "Beginners and experts can finish tasks.",
             "master_plan_threshold": "Eight novice and eight advanced moderated participants, distinct from implementers, attempt a frozen set of tasks; >=85% completion in each group, no critical misinterpretation of access/grain/price semantics. Synthetic agent runs are separate evidence.",
-            "denominator": "Eight actual novice participants and eight actual advanced participants, distinct from implementers, assigned to a frozen task/session map.",
-            "numerator_or_pass_predicate": "Pass iff completion >= 0.85 in each group and critical misinterpretation = 0. Missing sessions and untested tasks remain visible. Simulations and generated participants do not count.",
+            "denominator": "Participant minimum is separate from completion measurement: Eight actual novice and eight actual advanced participants, distinct from implementers, are assigned to a frozen task/session map; each group's completion denominator is ALL assigned frozen task/session opportunities for that group, including assigned opportunities whose session or task evidence is missing or untested.",
+            "numerator_or_pass_predicate": "Pass iff each group has at least eight actual participants distinct from implementers, and completed frozen task/session assignments in that group / ALL assigned frozen task/session opportunities in that group >= 0.85, with missing or untested assigned opportunities retained as non-completions, and critical misinterpretation of access/grain/price semantics = 0. Simulations and generated participants do not count.",
             "frame": "Task pool is the frozen public opaque index. Participant identities, assignments, and success rules are a conditional frame that must be frozen before the study. Not materialized on C2.",
             "frame_state": "tasks_frozen_participants_not_materialized",
             "source_generation_identity": {
@@ -469,8 +636,8 @@ def requirement_rows() -> list[dict]:
             "id": "R14",
             "required_outcome": "AI enrichment is controlled and economical.",
             "master_plan_threshold": "No model in public request handling; no private data/credentials sent in enrichment; auditable token/spend ledger; 100% accepted model-derived claims pass citation and schema checks; held-out claim precision >=0.98, with zero critical scientific errors.",
-            "denominator": "A later independently frozen scientific-claim sample drawn from the PR-020 residual frame. Not the 40 retrieval tasks. Sample size/CI design is chosen after that residual frame exists; the illustrative 149 iid count is not adopted.",
-            "numerator_or_pass_predicate": "Protocol row is complete when this protocol, stage order, and unaccepted gate are published. Quality pass later iff held-out claim precision >= 0.98, critical scientific errors = 0 overall and in every predeclared class, 100% accepted-claim citation/schema checks, with actual sample sizes, confidence intervals, and per-source/task-class results. Unjudgeable/uncertain outcomes block acceptance. Model agreement cannot create gold labels.",
+            "denominator": "A later independently frozen scientific-claim sample drawn from the PR-020 residual frame, with predeclared source/task classes and actual sample-size/CI design. Not the 40 retrieval tasks. The illustrative 149 iid count is not adopted as a sample-size or CI threshold.",
+            "numerator_or_pass_predicate": "The full R14 quality pass is conjunctive: (1) no model in public request handling; (2) no private data or credentials transmitted in enrichment; (3) auditable token and spend controls; AND (4) an independently frozen scientific-claim sample from the materialized residual frame; (5) held-out claim precision >= 0.98 for the overall frozen sample; (6) zero critical scientific errors overall and in every predeclared source/task class; (7) 100% of accepted model-derived claims pass citation and schema checks; and (8) actual sample sizes, confidence intervals, and per-source/task-class results are reported. Underpowered classes, unjudgeable outcomes, or unresolved uncertainty block acceptance. Model agreement cannot create gold labels. The protocol row can be ready while this quality gate remains unaccepted.",
             "frame": "Protocol published. Residual frame, sample, labels, model outputs, spend ledger, and paid budget are not materialized. R14 gates promotion, not creation of the PR-027 comparison.",
             "frame_state": "protocol_published_not_materialized_not_frozen",
             "source_generation_identity": {
@@ -479,7 +646,7 @@ def requirement_rows() -> list[dict]:
             },
             "evidence_owner": "C-002-2 protocol; PR-020 residual frame; PR-027 C1 target freeze; PR-022/023/024 controls; PR-027 C2/C3 measurement.",
             "evidence_destination": f"verification/research-program/pr-002/{R14_PROTOCOL_NAME}; later PR-020/PR-027 artifacts.",
-            "materialize_before_tuning": "PR-027 C1 must freeze independent targets before comparison calls/results. Do not tune routing from unfrozen model outputs. Paid enrichment requires a selected budget and credentials; this commit does not call product models.",
+            "materialize_before_tuning": "PR-027 C1 must freeze independent targets before PR-027 C2/C3 model comparison calls/results. Do not tune routing from unfrozen model outputs. Paid enrichment requires a selected budget and credentials; this commit does not call product models.",
             "status": "unaccepted",
         },
         {
@@ -635,9 +802,79 @@ def assert_task_schema(payload: dict, sealed: dict) -> list[str]:
     private_hits = contains_private_fields(payload)
     if private_hits:
         errors.append("private field names present: " + ", ".join(private_hits[:8]))
+    errors.extend(assert_correction_contracts(payload))
     own = json.dumps(payload)
     if "tasks_sha256" in payload or '"sha256": "' + hashlib.sha256(own.encode()).hexdigest() in own:
         errors.append("tasks payload appears to contain a self-hash")
+    return errors
+
+
+def assert_correction_contracts(payload: dict, repo: Path | None = None) -> list[str]:
+    """Reject public task artifacts that weaken any of the four C2 corrections."""
+
+    try:
+        expected = correction_contracts(repo)
+    except SystemExit as error:
+        return [str(error)]
+    actual = payload.get("correction_contracts")
+    errors: list[str] = []
+    if actual != expected:
+        errors.append("tasks.json correction_contracts do not match the hash-bound public contracts")
+    if not isinstance(actual, dict) or any(key not in actual for key in expected):
+        return errors + ["tasks.json correction_contracts is missing one or more R06/R11/R12/R14 rows"]
+    r06 = actual["R06"]
+    if r06.get("qualification_required") is not True or r06.get("raw_parser_output_alone_satisfies") is not False:
+        errors.append("R06 must require qualified evidence beyond raw parser output")
+    if "reason and next action" not in r06.get("other_records", "").lower():
+        errors.append("R06 must retain reasons and next actions for other records")
+    r11 = actual["R11"]
+    export = r11.get("tool_export", {})
+    if export.get("count") != len(FROZEN_TOOL_NAMES) or export.get("names") != list(FROZEN_TOOL_NAMES):
+        errors.append("R11 must bind the exact frozen eight tool names")
+    if export.get("source_commit") != TOOLS_EXPORT_COMMIT or export.get("sha256") != TOOLS_EXPORT_SHA256:
+        errors.append("R11 must bind the frozen tool export commit and hash")
+    manifest = r11.get("toolkit_manifest", {})
+    if manifest.get("sha256") != TOOLKIT_MANIFEST_SHA256 or manifest.get("disabled_planner") != DISABLED_PLANNER_NAME:
+        errors.append("R11 must bind the toolkit manifest and disabled planner")
+    if manifest.get("disabled_planner_registration_state") != "disabled_pending_gates":
+        errors.append("R11 must keep the planner disabled_pending_gates")
+    r12 = actual["R12"]
+    participants = r12.get("participant_minimums", {})
+    completion = r12.get("completion_ratio", {})
+    if participants.get("novice") != 8 or participants.get("advanced") != 8 or not participants.get("actual"):
+        errors.append("R12 must keep eight actual participants per group separate")
+    if completion.get("threshold") != 0.85 or not completion.get("missing_or_untested_count_as_non_completion"):
+        errors.append("R12 must count all assigned missing or untested opportunities")
+    r14 = actual["R14"]
+    quality = r14.get("quality_gate", {})
+    required_quality_flags = (
+        "no_models_in_public_request_handling",
+        "no_private_data_or_credentials_transmitted",
+        "auditable_token_and_spend_controls",
+        "independently_frozen_scientific_sample",
+        "critical_scientific_errors_overall",
+        "critical_scientific_errors_per_predeclared_source_task_class",
+        "accepted_claim_citation_and_schema_checks",
+        "actual_sample_sizes_and_confidence_intervals",
+        "per_source_task_class_results",
+    )
+    if any(key not in quality for key in required_quality_flags):
+        errors.append("R14 quality gate is missing an independent operational or scientific condition")
+    if quality.get("held_out_claim_precision_at_least") != 0.98:
+        errors.append("R14 must retain held-out precision >= 0.98")
+    if quality.get("critical_scientific_errors_overall") != 0 or quality.get("critical_scientific_errors_per_predeclared_source_task_class") != 0:
+        errors.append("R14 must require zero critical errors overall and per class")
+    if quality.get("accepted_claim_citation_and_schema_checks") != 1.0:
+        errors.append("R14 must require 100% citation and schema checks")
+    if any(quality.get(key) is not True for key in (
+        "no_models_in_public_request_handling",
+        "no_private_data_or_credentials_transmitted",
+        "auditable_token_and_spend_controls",
+        "independently_frozen_scientific_sample",
+        "actual_sample_sizes_and_confidence_intervals",
+        "per_source_task_class_results",
+    )):
+        errors.append("R14 full quality acceptance must conjunctively require all control and sample conditions")
     return errors
 
 
@@ -674,6 +911,58 @@ def assert_acceptance_document(text: str) -> list[str]:
     for phrase in forbidden_frozen:
         if phrase in text:
             errors.append(f"conditional frame overclaimed: {phrase}")
+    lowered = text.casefold()
+
+    def row_body(requirement: str) -> str:
+        marker = f"### {requirement} —"
+        start = text.find(marker)
+        if start == -1:
+            return ""
+        end = text.find("\n### ", start + len(marker))
+        return text[start:] if end == -1 else text[start:end]
+
+    required_row_phrases = {
+        "R06": (
+            "qualified parsed dictionary",
+            "evidenced eligible baseline denominator",
+            "raw parser output alone",
+            "reason and next action",
+        ),
+        "R11": (
+            TOOLS_EXPORT_COMMIT,
+            TOOLS_EXPORT_SHA256,
+            TOOLKIT_MANIFEST_SHA256,
+            DISABLED_PLANNER_NAME,
+            "disabled_pending_gates",
+            "independently frozen",
+        ),
+        "R12": (
+            "at least eight actual",
+            "completed frozen task/session assignments",
+            "all assigned frozen task/session opportunities",
+            "missing or untested",
+            "distinct from implementers",
+        ),
+        "R14": (
+            "no model in public request handling",
+            "no private data or credentials",
+            "auditable token and spend controls",
+            "independently frozen scientific-claim sample",
+            "PR-027 C2/C3 model comparison",
+            ">= 0.98",
+            "zero critical scientific errors",
+            "100% of accepted model-derived claims",
+            "actual sample sizes, confidence intervals",
+            "per-source/task-class results",
+        ),
+    }
+    for requirement, phrases in required_row_phrases.items():
+        body = row_body(requirement).casefold()
+        for phrase in phrases:
+            if phrase.casefold() not in body:
+                errors.append(f"{requirement} correction contract missing {phrase}")
+    if lowered.count("observatory.search_assets") < 1:
+        errors.append("R11 exact tool names are missing from the acceptance document")
     return errors
 
 
@@ -715,6 +1004,13 @@ def write_c2_artifacts(repo: Path, here: Path = HERE, receipt_output: Path | Non
         ),
         "task_count": TASK_COUNT,
         "requirement_ids": list(REQUIREMENT_IDS),
+        "correction_contracts": correction_contracts(repo),
+        "historical_c2_receipts": {
+            "commit": C2_BASE_COMMIT,
+            "tree": C2_BASE_TREE,
+            "build_receipt_sha256": C2_BUILD_RECEIPT_SHA256,
+            "verify_receipt_sha256": C2_VERIFY_RECEIPT_SHA256,
+        },
     }
     if receipt_output is not None:
         target = receipt_output.resolve()
