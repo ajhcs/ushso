@@ -1,0 +1,55 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr003-deepseek-20260910t220020z",
+  "slice_id": "C-003-1",
+  "pr_id": "PR-003",
+  "title": "Make implementer handoffs and review evidence enforceable",
+  "owner": "DeepSeek (deepseek/deepseek-v4.1-flash, reasoning high)",
+  "reviewer": "Astra",
+  "branch": "codex/ushso-pr003-deepseek-20260910t220020z",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-deepseek-20260910t220020z",
+  "objective": "Translate the PR-003 and EXECUTION contracts into machine-checkable task and handoff/receipt schema material, and demonstrate rejection of a claimed pass without a command result, a missing artifact, and a stale dependency SHA.",
+  "outcome": "Every implementer PR arrives with enough evidence for independent review.",
+  "dependencies": ["PR-001", "PR-002"],
+  "owned_paths": [
+    "docs/research-program/handoffs/",
+    "verification/research-program/pr-003/"
+  ],
+  "commits": [
+    {
+      "id": "C-003-1",
+      "subject": "Add the task and receipt schemas",
+      "instructions": "Translate EXECUTION.md into machine-checked task/handoff schemas: base/head, owned files, dependencies, changed behavior, commands/exits, fixtures, artifacts, hashes, risks and next consumer.",
+      "verification": "Fixtures reject a claimed pass without a command result, a missing artifact and a stale dependency SHA."
+    }
+  ],
+  "check_commands": [
+    "node verification/research-program/pr-003/verify-schema-contract.mjs"
+  ],
+  "evidence_directory": "verification/research-program/pr-003/",
+  "binding": {
+    "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+    "base_tree": "e2b9df441f1109187909d9ec2aeef7d8c7ca7bbf",
+    "dependency_merge_shas": {
+      "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
+      "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
+    },
+    "prompt_sha256": "f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d",
+    "bootstrap_receipt_sha256": "97cb0072a6270f591d11a02a7c05893f7d5e541974f05db4db99c57fb3efe87c"
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "in_progress"
+}

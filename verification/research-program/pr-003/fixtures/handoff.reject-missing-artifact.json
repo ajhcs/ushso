@@ -1,0 +1,165 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-003",
+  "status": "producer_checked",
+  "owner": "DeepSeek (deepseek/deepseek-v4.1-flash, reasoning high)",
+  "reviewer": "Astra",
+  "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+  "head_sha": null,
+  "dependency_merge_shas": {
+    "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
+    "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
+  },
+  "branch": "codex/ushso-pr003-deepseek-20260910t220020z",
+  "github_pr_url": null,
+  "changed_files": [
+    "docs/research-program/handoffs/schema/task.schema.json",
+    "docs/research-program/handoffs/schema/handoff.schema.json",
+    "docs/research-program/handoffs/schema/README.md",
+    "verification/research-program/pr-003/verify-schema-contract.mjs",
+    "verification/research-program/pr-003/fixtures/task-binding.json",
+    "verification/research-program/pr-003/fixtures/handoff.valid.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-claimed-pass-without-command.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-missing-artifact.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-stale-dependency-sha.json",
+    "verification/research-program/pr-003/evidence-index.json",
+    "verification/research-program/pr-003/README.md"
+  ],
+  "problem": "PR-003 handoff and task packets had no machine-checkable shape, so an independent reviewer could not distinguish a claim from an executed command, a referenced artifact from a missing one, or a current dependency binding from a stale one without reading a chat transcript.",
+  "resulting_behavior": "Two JSON Schema documents (task.schema.json, handoff.schema.json) define the task/dispatch and handoff/receipt contracts, and a bounded local checker demonstrates that a valid packet is accepted while a claimed pass without a command result, a missing artifact reference, and a stale dependency SHA are each rejected.",
+  "commits": [
+    {
+      "id": "C-003-1",
+      "subject": "Add the task and receipt schemas",
+      "sha": null
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "execution-protocol",
+      "id": "docs/master-plan/2026-09-10/EXECUTION.md",
+      "sha256": "4118d4f46a7ebec45749676881c753529593842792a439cfb5e53e50bc1fdfc3"
+    },
+    {
+      "kind": "pr-packet",
+      "id": "docs/master-plan/2026-09-10/prs/PR-003.md",
+      "sha256": "d8456846f64f63f63d0d89581f31b36427b26e4c29fd89afcfc3433a780c0a7a"
+    },
+    {
+      "kind": "handoff-template",
+      "id": "docs/master-plan/2026-09-10/templates/handoff.json",
+      "sha256": "0ab40c4a324d737b1ac7a2080b894acb352b3b1961ae6ad948fea59d27186276"
+    },
+    {
+      "kind": "dependency-handoff",
+      "id": "verification/research-program/pr-002/controller/integration-handoff.json",
+      "sha256": "5380b58c5d69515efb3cbfebdb1dac63492b780cdeae918f3d18c0538ad136a6"
+    },
+    {
+      "kind": "dependency-manifest",
+      "id": "verification/research-program/pr-002/controller/integration-artifact-manifest.json",
+      "sha256": "7b451a76ccc9cd1a8ac402263799aa9174228c1b32a83dfc2c3fc97a571a8567"
+    },
+    {
+      "kind": "dispatch-prompt",
+      "id": "native-pr003-prompts.v3.md",
+      "version": "v3",
+      "sha256": "f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c003-1-verify-schema-contract",
+      "command": "node verification/research-program/pr-003/verify-schema-contract.mjs",
+      "started_at": null,
+      "completed_at": null,
+      "exit_code": 0,
+      "expected": "exit 0 with ok=true: valid fixture accepted and all three rejection fixtures rejected for the declared reason",
+      "actual": "exit 0 with ok=true for the committed fixture set",
+      "result": "Schema-contract check accepted handoff.valid.json and rejected reject-claimed-pass-without-command, reject-missing-artifact and reject-stale-dependency-sha for their declared reasons."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-task-schema",
+      "path": "docs/research-program/handoffs/schema/task.schema.json",
+      "sha256": "0780cf89f74bc3de9d3cb9d7f150fe8fc731ee1e10d69c141d7ee39fe65ac25a",
+      "bytes": 4470
+    },
+    {
+      "id": "artifact-handoff-schema",
+      "path": "docs/research-program/handoffs/schema/handoff.schema.json",
+      "sha256": "30c9fa8a64c4765c660dabe654cc32e6c947d90e6fa9e60e8122bad3356871ad",
+      "bytes": 8457
+    },
+    {
+      "id": "artifact-schema-readme",
+      "path": "docs/research-program/handoffs/schema/README.md",
+      "sha256": "a1f603aade1b9a296166e19bd08e474d750d11b1852038c6ca4e9f19e2534a20",
+      "bytes": 4989
+    },
+    {
+      "id": "artifact-checker",
+      "path": "verification/research-program/pr-003/verify-schema-contract.mjs",
+      "sha256": "78f5adc78760ac632b190efb2ee950c5e311a1b21c0ad816853f7ba9f3794b4c",
+      "bytes": 7408
+    },
+    {
+      "id": "artifact-task-binding",
+      "path": "verification/research-program/pr-003/fixtures/task-binding.json",
+      "sha256": "19c586b77ccfb0cf3c901f482ffeaaf08ca7c5435d4d36ed69e21493dbf5472c",
+      "bytes": 2369
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-003-1",
+      "status": "producer_checked",
+      "result": "References an artifact id that does not resolve in artifacts[].",
+      "command_ids": [
+        "cmd-c003-1-verify-schema-contract"
+      ],
+      "artifact_ids": [
+        "artifact-task-schema",
+        "artifact-not-present"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [],
+  "unresolved_claims": [
+    {
+      "id": "head-sha-pending-controller-commit",
+      "status": "unresolved",
+      "detail": "The one-shot slice does not stage or commit, so head_sha and commits[].sha are intentionally null until the controller performs the ordinary Git commit in a fresh worktree-bootstrap launch.",
+      "next_action": "Controller commits the allowlisted diff and records the resulting head SHA in the PR-003 handoff."
+    },
+    {
+      "id": "independent-review-not-started",
+      "status": "unresolved",
+      "detail": "Producer checks are not independent verification; the schema contract has not been replayed by Astra.",
+      "next_action": "Astra independently inspects the diff and replays the decisive check on the exact reviewed head."
+    }
+  ],
+  "risks": [
+    {
+      "id": "schema-stricter-than-historical-packets",
+      "status": "risk",
+      "detail": "PR-001.json and PR-002.json predate this schema and use narrative-only acceptance results; the schema is intentionally not claimed to validate them.",
+      "next_action": "Keep historical packets unchanged; apply the contract to PR-003 onward."
+    }
+  ],
+  "next_consumer": "PR-003 C-003-2 (handoff packet validation) and C-003-3 (PR guidance and test discovery), then Astra independent review.",
+  "next_action": "Controller inspects the allowlisted diff, verifies the writer lock, commits C-003-1, and dispatches C-003-2 in this worktree.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [
+      "node verification/research-program/pr-003/verify-schema-contract.mjs"
+    ],
+    "limitations": [
+      "Fixture-level contract check only; an implementer statement is not independent verification.",
+      "No commit/head SHA exists in a one-shot slice, so reviewed_head_sha is null.",
+      "The fixture exercises schema semantics, not on-disk artifact hashing, path containment or the C-003-2 CLI."
+    ]
+  }
+}
