@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T15:09:45.866976+00:00",
+  "updated_at": "2026-09-10T15:42:55.948645+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "80d897a6135e0cbbb27aff2e67139b26d17f51347487ba452335b56914557703",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -11,7 +11,14 @@
     "implementation_authorship": [
       "program documentation import and execution ledger"
     ],
-    "independent_review_of_controller_changes": "pending"
+    "independent_review_of_controller_changes": {
+      "bootstrap_commit": "c92465f97df11a1e231983237f27e8c86db792b2",
+      "reviewer": "gpt-5.6-luna/max (separate native review agent)",
+      "verdict": "PASS_WITH_PUBLICATION_NOTES",
+      "evidence": "verification/research-program/bootstrap/independent-review-c92465f.json",
+      "disposition": "verification/research-program/bootstrap/review-disposition.json",
+      "followup_review": "pending"
+    }
   },
   "providers": [
     {
@@ -24,9 +31,18 @@
     {
       "requested": "Grok",
       "actual_interface": "Co-Engineer 3.4.2 grok ACP",
-      "status": "blocked",
-      "reason": "needs_login",
-      "dispatched": false
+      "status": "available",
+      "dispatched": true,
+      "model_recorded_by_interface": "grok-4",
+      "model_reported_by_reviewer": "Grok 4.6",
+      "model_identity_note": "The managed interface records grok-4; the provider report names Grok 4.6. Retain both instead of asserting they are identical.",
+      "latest_run": {
+        "run_id": "ushso-pr001-boundary-review-20260910",
+        "assignment_id": "grok-boundary-inventory",
+        "status": "completed",
+        "role": "read_only_boundary_inventory",
+        "acceptance": "pending_controller_source_review"
+      }
     },
     {
       "requested": "DeepSeek",
@@ -36,7 +52,11 @@
         "meta/muse-spark-1.3-contributor",
         "stealth/ox-alpha"
       ],
-      "dispatched": false
+      "dispatched": false,
+      "native_configuration": "deepseek/deepseek-v4.1-flash",
+      "native_configuration_validation": "isolated startup passed; no provider request made",
+      "native_route_status": "supported-interface validation in progress",
+      "limitation": "Co-Engineer 3.4.2 has a closed DSH model allowlist; the new native DSH configuration does not add MCP dispatch support."
     }
   ],
   "requirements": [
@@ -2168,5 +2188,12 @@
       ],
       "required": "Actual 14-day post-deployment observation and two full scheduled refresh cycles."
     }
-  ]
+  ],
+  "publication": {
+    "github_pr_url": "https://github.com/ajhcs/ushso/pull/12",
+    "draft": true,
+    "authorization": "Owner explicitly approved project-wide publication of code, plans and sanitized evidence.",
+    "qualified_bootstrap_commit": "c92465f97df11a1e231983237f27e8c86db792b2",
+    "gate_summary": "verification/research-program/bootstrap/gate-c92465f.json"
+  }
 }
