@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T19:24:29.357438+00:00",
+  "updated_at": "2026-09-10T19:56:54.987982+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "80d897a6135e0cbbb27aff2e67139b26d17f51347487ba452335b56914557703",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -29,6 +29,13 @@
         "check_count": 9,
         "evidence": "verification/research-program/bootstrap/pr001-integration-closure-review.json",
         "scope": "PR-001 integration documentation/evidence; no product qualification or full release gate."
+      },
+      "pr002_c1_accounting": {
+        "status": "accounting_boundary_passed",
+        "reviewed_integration_head": "5e27efe63f472483eb25f69c44929c6d3ffb869e",
+        "reviewer": "gpt-5.6-luna/max",
+        "evidence": "verification/research-program/bootstrap/pr002-c1-publication-accounting-review.json",
+        "scope": "Accounting/publication-boundary review of root-authored receipts; not an independent re-approval of Luna's C1 implementation or its correction."
       }
     },
     "latest_integration": {
@@ -79,9 +86,10 @@
       "limitation": "Installed Co-Engineer 3.4.2 still cannot dispatch DeepSeek through its closed DSH model allowlist. Native CLI has distinct worktree, lifecycle and token-budget semantics.",
       "model": "deepseek/deepseek-v4.1-flash",
       "reasoning_effort": "high",
-      "native_implementation_writer_status": "not_yet_exercised",
+      "native_implementation_writer_status": "v3_template_independently_reviewed_pending_full_PR002",
       "latest_review_receipt": "verification/research-program/provider-reviews/deepseek-cohort-design-receipt.json",
-      "controller_disposition": "verification/research-program/provider-reviews/deepseek-cohort-design-disposition.json"
+      "controller_disposition": "verification/research-program/provider-reviews/deepseek-cohort-design-disposition.json",
+      "native_implementation_writer_review": "verification/research-program/bootstrap/pr003-native-launcher-v3-review.json"
     }
   ],
   "requirements": [
@@ -2321,7 +2329,7 @@
     {
       "for_pr": "PR-002",
       "kind": "public_directory_metadata",
-      "status": "captured_not_selected",
+      "status": "sealed_selection_inputs",
       "local_index_sha256": "defd18e1fd72671b6c842845eeb2b6ef102526befd9c26cf251fa117dfc39587",
       "hospital_directory_records": 5419,
       "issuer_directory_records": 156,
@@ -2351,6 +2359,27 @@
       "sha256": "3a35ee6662f939bf53e9f8c5005079ac09982372d80c9b385a9beb9c52e525c7",
       "controller_disposition": "verification/research-program/bootstrap/pr002-r14-protocol-disposition.json",
       "quality_result": "not_accepted"
+    },
+    {
+      "for_pr": "PR-003",
+      "kind": "native_deepseek_writer_launcher",
+      "status": "independently_reviewed_template_dependency_gated",
+      "model": "deepseek/deepseek-v4.1-flash",
+      "reasoning": "high",
+      "launcher_sha256": "f0f5687045325e890dabf7e05ca7566502258b475c775362939800f18a185ad4",
+      "review": "verification/research-program/bootstrap/pr003-native-launcher-v3-review.json",
+      "dispatch_allowed": false,
+      "next_action": "After full PR002 is independently accepted and merged, bind exact merge/head, accepted controller handoff and artifact manifest. Launch outside the implementation worktree. DeepSeek edits files; the root checkpoint wrapper commits after provider exit.",
+      "limitation": "Offline mocked launcher behavior only; native implementation writer has not yet been exercised."
+    },
+    {
+      "for_pr": "PR-004",
+      "kind": "field_states_reuse_and_verification_map",
+      "status": "read_only_preparation_dependency_gated",
+      "evidence": "verification/research-program/bootstrap/pr004-reuse-verification-preparation.json",
+      "prepared_from": "5e27efe63f472483eb25f69c44929c6d3ffb869e",
+      "dispatch_allowed": false,
+      "next_action": "Recheck source pins on the accepted full PR002 integration base and assign three atomic field-state, ledger and offline-view commits."
     }
   ]
 }
