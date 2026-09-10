@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T17:37:00.751701+00:00",
+  "updated_at": "2026-09-10T18:05:25.523711+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "80d897a6135e0cbbb27aff2e67139b26d17f51347487ba452335b56914557703",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -206,7 +206,7 @@
     {
       "pr_id": "PR-002",
       "status": "in_progress",
-      "owner": "grok-c1-recovery",
+      "owner": "ushso-pr002-c1-corrections-20260910",
       "dependencies": [
         "PR-001"
       ],
@@ -218,23 +218,19 @@
         "evaluation/research-program/tasks.json",
         "docs/research-program/acceptance.md"
       ],
-      "head_sha": null,
+      "head_sha": "44506be8052e1054641048de68893fc41526b664",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-002.json",
       "evidence_directory": "verification/research-program/pr-002/",
       "github_pr_url": null,
       "blockers": [],
       "prerequisites_satisfied": true,
-      "dispatch_preparation": "C-002-1 only; consume retained 100-product declaration and create exact baseline/cohort builder/verifier/one commit. C-002-2 and C-002-3 remain pending.",
-      "provider": "grok",
-      "actual_model": "grok-4",
-      "base_sha": "83f7d1bad39acb6a7eede95a404179c511296efa",
-      "run_id": "ushso-pr002-c1-recovery-20260910",
-      "provider_task_id": "ce-ushso-pr002-c1-recovery--grok-c1-recovery-7c8a9fe5dfc7-d648775d",
-      "branch": "codex/ce-ushso-pr002-c1-recovery--grok-c1-recovery-7c8a9fe5dfc7-d648775d",
-      "dispatch_evidence": "verification/research-program/bootstrap/pr002-c1-recovery-dispatch.json",
-      "expected_duration_ms": 900000,
-      "deadline_at": "2026-09-10T17:53:17.148Z",
+      "dispatch_preparation": "One additive corrective commit for four recorded C1 findings; preserve Grok commit and all selected product/baseline identities; C2/C3 are not assigned in this correction.",
+      "provider": "native Codex sub-agent",
+      "actual_model": "gpt-5.6-luna",
+      "base_sha": "44506be8052e1054641048de68893fc41526b664",
+      "branch": null,
+      "dispatch_evidence": "verification/research-program/bootstrap/pr002-c1-recovery-completion.json",
       "run_history": [
         {
           "run_id": "ushso-pr002-cohort-freeze-20260910",
@@ -250,12 +246,35 @@
             "boundary": "inactive_empty",
             "lock": "unlocked"
           }
+        },
+        {
+          "run_id": "ushso-pr002-c1-recovery-20260910",
+          "task_id": "ce-ushso-pr002-c1-recovery--grok-c1-recovery-7c8a9fe5dfc7-d648775d",
+          "provider": "grok",
+          "model": "grok-4",
+          "status": "completed_c1_only_changes_requested",
+          "finished_at": "2026-09-10T17:47:36.329Z",
+          "head_sha": "44506be8052e1054641048de68893fc41526b664",
+          "commits": 1,
+          "evidence": "verification/research-program/bootstrap/pr002-c1-recovery-completion.json",
+          "cleanup": {
+            "observed_at": "2026-09-10T17:47:39.176Z",
+            "status": "normal",
+            "boundary": "inactive_empty",
+            "lock": "unlocked"
+          }
         }
       ],
-      "active_atomic_commit": "C-002-1",
+      "active_atomic_commit": "additive C1 review correction",
       "remaining_atomic_commits": [
         "C-002-2",
         "C-002-3"
+      ],
+      "reasoning": "max",
+      "review_evidence": "verification/research-program/bootstrap/pr002-c1-controller-review-44506be.json",
+      "accepted_atomic_commits": [],
+      "implemented_atomic_commits": [
+        "C-002-1"
       ]
     },
     {
@@ -2268,7 +2287,7 @@
       "hospital_directory_records": 5419,
       "issuer_directory_records": 156,
       "mrf_endpoints_requested": 0,
-      "note": "Selection remains pending PR-001 integration. Directory identity does not prove MRF reporting or sample access."
+      "note": "Authoritative directory inputs are captured; C0023 selection remains pending. No MRF endpoint has been requested. Directory identity does not establish a payer reporting-entity/file binding or sample access."
     }
   ]
 }
