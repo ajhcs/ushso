@@ -1,0 +1,148 @@
+{
+  "format": "ushso.pr004-c1-c2-independent-review.v1",
+  "reviewer": "Luna Max",
+  "review_mode": "bounded_read_only_independent_review",
+  "review_boundary": "C1/C2 only; C3 access summary and final handoff were not reviewed.",
+  "basis": {
+    "repository": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+    "base_commit": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+    "base_tree": "e2b9df441f1109187909d9ec2aeef7d8c7ca7bbf",
+    "reviewed_commit": "21b1b12ba3707d89afb967b7b97133277d73044c",
+    "reviewed_tree": "f55f83f9761698fb4db5087ef8103bc7a8092cb8",
+    "packet": "docs/master-plan/2026-09-10/prs/PR-004.md"
+  },
+  "disposition": "changes_requested",
+  "findings": [
+    {
+      "id": "PR004-C1-TIME-001",
+      "severity": "material",
+      "title": "As-of derivation admits future attempt, source, nested access, and browser clocks",
+      "evidence": [
+        "packages/normalization/src/field-observation.mjs:316-330 sorts and filters by observed_at/recorded_at only; attempted_at and source_observed_at are not part of eligibility or ordering.",
+        "packages/normalization/src/field-observation.mjs:408-435 repeats the same parent filter and then selects access facts and browser observations without filtering their own timestamps.",
+        "packages/normalization/src/field-observation.mjs:173-216 and packages/normalization/schemas/field-observation.schema.json:48-51,81-87 validate timestamp shape/presence but no temporal ordering."
+      ],
+      "impact": "A valid observation with observed_at and recorded_at before as_of but attempted_at after as_of can become the historical current state; future nested access or browser outcomes can enter an access summary. PR005 freshness and C004 last-attempt views cannot rely on the as-of boundary.",
+      "required_correction": "Define and enforce ordering/as-of rules for source, observation, recording, attempt, access-fact, and browser clocks; add adversarial future-clock fixtures."
+    },
+    {
+      "id": "PR004-C1-HISTORY-001",
+      "severity": "material",
+      "title": "Revision history is not self-contained or provenance-complete",
+      "evidence": [
+        "packages/normalization/src/field-observation.mjs:288-300 historySnapshot retains value/state/reason/time fields but omits evidence_refs, endpoint_scope, recorded_at, access_facts, and browser observations.",
+        "packages/normalization/src/field-observation.mjs:303-309 appends that reduced snapshot, while :322-346 deriveFieldObservation computes historical_success only from the separate observations array and never traverses history."
+      ],
+      "impact": "If a current failed revision is persisted with its public history only, deriveFieldObservation([current]) cannot recover the earlier success or its evidence and endpoint provenance. The existing test passes both full historical and failed objects (lines 128-140), so it does not prove persisted-history recovery.",
+      "required_correction": "Retain immutable references or a complete historical snapshot (including evidence/endpoint/recording provenance) and make derivation consume that history; validate revision identity and ordering."
+    },
+    {
+      "id": "PR004-C1-SCOPE-001",
+      "severity": "material",
+      "title": "Endpoint and browser scope boundaries are declared but not enforced",
+      "evidence": [
+        "packages/normalization/src/field-observation.mjs:92-99 permits null endpoint/resource and operation other for every observation; :251-284 defaults to that unscoped value.",
+        "packages/normalization/src/field-observation.mjs:187-193 readiness ignores endpoint scope, and :203-211 validates browser shape without requiring browser_read operation.",
+        "packages/normalization/src/field-observation.mjs:408-451 emits latest successful checks and the payload-access boundary without rejecting an unscoped or operation-mismatched attempt."
+      ],
+      "impact": "An unscoped succeeded observation can satisfy the readiness predicate and appear as a successful access summary; a browser observation can carry a non-browser operation. This conflicts with C004-3's endpoint/resource/operation contract and the emitted payload_access_requires_endpoint_scoped_attempt_evidence boundary.",
+      "required_correction": "Require operation-specific endpoint scope for successful payload/browser outcomes, or classify unscoped outcomes as non-success/unknown; add negative fixtures for null scope and wrong browser operation."
+    },
+    {
+      "id": "PR004-C2-READINESS-001",
+      "severity": "material",
+      "title": "Readiness promotes candidate, ambiguous, and disputed evidence",
+      "evidence": [
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:187-193 blocks evidence_state unknown but permits candidate, ambiguous, disputed, and documented when value/applicability/attempt otherwise pass.",
+        "packages/normalization/src/field-observation.mjs:6-9 declares those evidence states; docs/WP11_PUBLIC_UI_FOUNDATION.md:12 says candidate or ambiguous evidence is never promoted."
+      ],
+      "impact": "A known, supported, succeeded field with candidate or ambiguous evidence can make a record ready. This allows the machine readiness projection to promote evidence the project contract keeps unqualified.",
+      "required_correction": "Define the evidence states that are eligible for ready (at minimum exclude candidate/ambiguous/disputed), preserve the other state as not_ready or unknown, and add readiness negatives."
+    },
+    {
+      "id": "PR004-C2-BINDING-001",
+      "severity": "material",
+      "title": "Independent view validation does not rederive exact denominators or generation/clock context",
+      "evidence": [
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:237-291 builds field/source/readiness metrics, but :393-403 checks only partition sum, rate range, internal membership/denominator echoes, and a broad denominator <= membership_count*100 bound.",
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:405-439 does not check numerator_count against the numerator partition, rate against numerator/denominator, partition_states against partitions, metric cohort/generation/as_of/denominator_status against the view, or membership source_counts/isolated counts against vectors.",
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:294-348 copies each field observation's source_observed_at without requiring a relationship to sourceVector.source_observed_at; :368-383 accepts caller-supplied membership/generation and self-hashes it."
+      ],
+      "impact": "The producer calculation is internally plausible for valid input, but an independently rehashed artifact can carry a wrong field/source denominator, numerator/rate, metric generation, or source-vector clock and still pass assertCompletenessView. A consumer has no expected membership/context parameter in the verifier to bind the full vector to the frozen input.",
+      "required_correction": "Recompute expected per-field/per-source/readiness denominators and all metric arithmetic/context from the full vector, validate summary counts and source-clock relations, and accept an externally sealed expected membership/context identity where required."
+    }
+  ],
+  "positive_coverage": [
+    "C1 tests cover known false versus unknown, identifier unit null, required attempted_at, retained historical value when both revisions are supplied, documented access facts, unknown cost/quota null, and credential placeholder rejection.",
+    "C2 tests cover isolated-record retention, missing placeholders, full field vector length for generated views, partition sums for selected metrics, cohort/generation on one rate context, digest mismatch rejection, bounded paging, and null rates for unknown denominator."
+  ],
+  "test_gaps": [
+    "No future attempted_at/source_observed_at/access-fact/browser timestamp fixture.",
+    "No derive-from-current-history-only fixture and no historical evidence/endpoint preservation assertion.",
+    "No unscoped attempted outcome or browser operation mismatch fixture.",
+    "No candidate/ambiguous/disputed readiness negative.",
+    "No mutation/rebinding checks for metric arithmetic, exact field/source denominators, summary source counts/isolated counts, metric context, or source-vector clock binding."
+  ],
+  "exported_interfaces": {
+    "normalization": {
+      "module": "packages/normalization/src/index.mjs",
+      "exports": [
+        "FIELD_OBSERVATION_VERSION",
+        "ACCESS_SUMMARY_VERSION",
+        "VALUE_STATES",
+        "EVIDENCE_STATES",
+        "APPLICABILITY_STATES",
+        "ATTEMPT_STATES",
+        "FIELD_ROLES",
+        "OPERATIONS",
+        "validateFieldObservation",
+        "assertFieldObservation",
+        "createFieldObservation",
+        "appendFieldObservationRevision",
+        "deriveFieldObservation",
+        "buildAccessSummary"
+      ],
+      "PR005_use": "Use deriveFieldObservation for current/historical state and buildAccessSummary for as-of endpoint-scoped latest success/attempt plus browser/access boundaries; preserve each returned evidence/time field until the clock and scope gaps are corrected."
+    },
+    "coverage": {
+      "module": "packages/coverage/index.mjs",
+      "exports": [
+        "COMPLETENESS_VIEW_VERSION",
+        "COMPLETENESS_ARTIFACT_VERSION",
+        "READINESS_STATES",
+        "VALUE_PARTITIONS",
+        "APPLICABILITY_PARTITIONS",
+        "ATTEMPT_PARTITIONS",
+        "membershipHash",
+        "buildCompletenessView",
+        "assertCompletenessView",
+        "createOfflineCompletenessConsumer",
+        "buildCoverageView",
+        "createCompletenessConsumer"
+      ],
+      "PR005_use": "Consume the full records/source_vectors/field observations and metric context through createOfflineCompletenessConsumer; treat aggregates as supplemental until denominator/context binding is strengthened.",
+      "PR007_use": "Carry source_id, field observation evidence_refs/source_locator, source_observed_at, generation/as_of, and membership_hash when binding source-native release/distribution candidates; no release identity binding is supplied by this PR."
+    }
+  },
+  "source_hashes": {
+    "packages/coverage/index.mjs": {"git_blob_sha1": "d6b97d52f66dfafa11f1e2bee7e49053892abc86", "sha256": "5c4459f6b75de6ed518039a290778978b974a1cbd4920e7cb4e9ecdfda672d9a"},
+    "packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json": {"git_blob_sha1": "c6c857b3ead8603dd48fe7592031e4f3fb2eec31", "sha256": "f0560e73ccc44e1cb1d4cfcc83e336d85adf4bf802fef7cbd168695f0fbf76c3"},
+    "packages/coverage/research-program/v1.0.0/src/completeness.mjs": {"git_blob_sha1": "a656fc3e1965a3ec78042f7bb34de5cb833f53e0", "sha256": "7b2bb6c0416dc315be21092e4012aca0c2bb049627e9a77916c1bc48bb438dc4"},
+    "packages/normalization/manifests/package-manifest.json": {"git_blob_sha1": "e3e70602237c3057fd3f6ff18300904ffc089c02", "sha256": "b9b2d26b7dd06e38366bd6aacbca26d729e0f2fa048e5e6303c93f1c5a46bbee"},
+    "packages/normalization/schemas/field-observation.schema.json": {"git_blob_sha1": "a122e5dabbe4389c152f3d8039358f21ee9e9d1a", "sha256": "f60ffb22f7c29a9860925d31ad9c7040cbc908098832612564f2b70a9cd64d50"},
+    "packages/normalization/src/field-observation.mjs": {"git_blob_sha1": "281b2864b7cbd9a721a0ecfd4fc8bdc724e67ce5", "sha256": "6f4b96e6307a42f8c89a5542484b84159f51216991b9b3dc1f3d4fc0e407ea8b"},
+    "packages/normalization/src/index.mjs": {"git_blob_sha1": "f9992b3a19a9af9ea4d9880b81535dbae9727704", "sha256": "7d1b9af8a2c119ce1351a985dbe75ea2f7dd8d3efe773e1d4ef93665be703e5e"},
+    "tests/research-program/field-states.test.mjs": {"git_blob_sha1": "7ccaae8c6fa7d61f04f56c2b46f05262210cd7d0", "sha256": "a44a4f549551613c72a6d85d6ee66be4aa8c05d0889a5ad3d18421ed648240cb"}
+  },
+  "verification": {
+    "source_review": "completed using git show only at reviewed_commit",
+    "tests_run": false,
+    "runtime_or_network": false,
+    "worktree_mutations": false,
+    "limitations": [
+      "The producer worktree was dirty; changing files were not read. All source/test reads came from the immutable reviewed commit.",
+      "No private evaluator inputs, provider calls, network calls, or C3 files were inspected.",
+      "The receipt identifies contract gaps; it is not acceptance of PR004 or of later PR005/PR007 outcomes."
+    ]
+  }
+}

@@ -3,7 +3,7 @@
   "date": "2026-09-10",
   "status": "proposed_not_implemented",
   "mission": "Help humans and AI find, understand and obtain tested routes to US health-systems data.",
-  "source_sha256": "d21cbaff68a5b25dc8f61417aa29f88f7f3b4558be21aeb4f6d646d6c987380f",
+  "source_sha256": "827a6660cf01f11ce729b20da42f353a255f225403dc8ecd981e5afeb05e9088",
   "requirements": [
     {
       "id": "R01",
@@ -630,7 +630,8 @@
         "scripts/research-program/check-handoff.mjs",
         "tests/research-program/handoff.test.mjs",
         "package.json",
-        ".github/pull_request_template.md"
+        ".github/pull_request_template.md",
+        "tests/contract-package-inventory.test.mjs"
       ],
       "outcome": "Every implementer PR arrives with enough evidence for independent review.",
       "commits": [
@@ -649,7 +650,7 @@
         {
           "id": "C-003-3",
           "subject": "Wire PR guidance and test discovery",
-          "instructions": "Add PR body fields and review states from EXECUTION.md. Document GitHub branch/PR commands and evidence links. Register test:research-program using node --test tests/research-program/*.test.mjs and include it in the root npm test chain; the existing tests/*.test.mjs glob does not discover this directory.",
+          "instructions": "Add PR body fields and review states from EXECUTION.md. Document GitHub branch/PR commands and evidence links. Register test:research-program using node --test tests/research-program/*.test.mjs and include it in the root npm test chain; the existing tests/*.test.mjs glob does not discover this directory. Maintain the existing package-inventory assertion for the expanded npm test chain, preserving every legacy gate and exactly one navigator aggregate invocation.",
           "verification": "An intern can submit a draft PR using a body file; the new handoff test is actually executed by npm test, with no automatic merge or deployment."
         }
       ],
@@ -663,7 +664,8 @@
       "evidence_directory": "verification/research-program/pr-003/",
       "verification_scope": "Use the existing affected package tests plus the specific fixtures described below. Add meaningful regression/integration tests for behavior changes; documentation-only commits use link, schema or artifact checks. Full npm test/build/cf:dry-run run at the integration/release gate.",
       "check_commands": [
-        "node --test tests/research-program/handoff.test.mjs"
+        "node --test tests/research-program/handoff.test.mjs",
+        "node --test tests/contract-package-inventory.test.mjs"
       ]
     },
     {
@@ -747,7 +749,18 @@
         "packages/retrieval/tools/retrieval-core-v1.2.mjs",
         "worker/public-query-service.mjs",
         "apps/web/src/lib/researcherGuidance.ts",
-        "tests/research-program/freshness-and-grain.test.mjs"
+        "tests/research-program/freshness-and-grain.test.mjs",
+        "packages/search/static-search-backend.mjs",
+        "apps/web/src/types/discovery.ts",
+        "apps/web/src/types/catalog.ts",
+        "apps/web/src/lib/catalogAdapter.ts",
+        "apps/web/src/components/ResultCard.tsx",
+        "apps/web/src/pages/DatasetDetailsPage.tsx",
+        "tests/wp1-repository-abstraction.test.mjs",
+        "apps/web/src/lib/researcherGuidance.test.tsx",
+        "apps/web/src/lib/catalogAdapter.test.ts",
+        "apps/web/src/components/ResultCard.test.ts",
+        "apps/web/src/pages/DatasetDetailsPage.test.tsx"
       ],
       "outcome": "The live clock and scientific evidence labels agree across cards, detail and APIs.",
       "commits": [
@@ -781,6 +794,7 @@
       "verification_scope": "Use the existing affected package tests plus the specific fixtures described below. Add meaningful regression/integration tests for behavior changes; documentation-only commits use link, schema or artifact checks. Full npm test/build/cf:dry-run run at the integration/release gate.",
       "check_commands": [
         "node --test tests/research-program/freshness-and-grain.test.mjs",
+        "node --test tests/wp1-repository-abstraction.test.mjs",
         "npm run test:web",
         "npm run test:retrieval",
         "npm run test:worker"

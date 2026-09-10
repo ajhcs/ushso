@@ -1,8 +1,8 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T22:30:15.386459+00:00",
+  "updated_at": "2026-09-10T23:03:14.526171+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
-  "plan_sha256": "c33a82b5784796ccca730d8b0c5f499f2971c6b13ffabf5fd71d11a871ebd167",
+  "plan_sha256": "0895bb9e0a63191282dad9842271051779ca86fd8e3d7376dcd741fe5f625518",
   "integration_branch": "codex/research-program-integration-20260910",
   "verified_remote_main_sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
   "controller": {
@@ -62,13 +62,12 @@
       "model_reported_by_reviewer": "Grok 4.6",
       "model_identity_note": "The active managed interface records grok-4. The retained Grok 4.6 self-report belongs only to the earlier read-only boundary review and is not asserted for later implementation runs.",
       "latest_run": {
-        "run_id": "ushso-pr002-c3-recovery-20260910",
-        "assignment_id": "grok-c3-recovery",
-        "status": "completed",
-        "role": "recover_and_complete_C-002-3",
-        "head_sha": "7593591037d37a7105770ab6d4875a40dd9db3a0",
-        "acceptance": "changes_requested",
-        "cleanup": "normal/inactive_empty/unlocked"
+        "run_id": "ushso-pr003-grok-corrections-20260910",
+        "assignment_id": "grok-integrity-corrections",
+        "status": "running",
+        "role": "correct_PR003_integrity",
+        "actual_model": "grok-4",
+        "evidence": "verification/research-program/bootstrap/pr003-grok-correction-dispatch.json"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
@@ -76,7 +75,18 @@
         "evidence": "verification/research-program/bootstrap/grok-deadline-diagnosis.json",
         "conclusion": "An active Grok ACP inner prompt timer is fixed at initial dispatch; an outer audited extension does not demonstrate a longer-running prompt. Choose adequate initial bounded duration. Prior C2 end_turn cause is unresolved. Later C3 cancelled near its unextended deadline; no new login request was observed.",
         "runtime_or_config_modified": false
-      }
+      },
+      "run_history": [
+        {
+          "run_id": "ushso-pr002-c3-recovery-20260910",
+          "assignment_id": "grok-c3-recovery",
+          "status": "completed",
+          "role": "recover_and_complete_C-002-3",
+          "head_sha": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+          "acceptance": "changes_requested",
+          "cleanup": "normal/inactive_empty/unlocked"
+        }
+      ]
     },
     {
       "requested": "DeepSeek",
@@ -421,8 +431,8 @@
     },
     {
       "pr_id": "PR-003",
-      "status": "changes_requested",
-      "owner": "ushso-pr003-deepseek-20260910t220020z",
+      "status": "in_progress",
+      "owner": "ce-ushso-pr003-grok-correct-grok-integrity-correctio-ba2a0a0c24e3-71a0bb97",
       "dependencies": [
         "PR-001",
         "PR-002"
@@ -436,13 +446,14 @@
         "scripts/research-program/check-handoff.mjs",
         "tests/research-program/handoff.test.mjs",
         "package.json",
-        ".github/pull_request_template.md"
+        ".github/pull_request_template.md",
+        "tests/contract-package-inventory.test.mjs"
       ],
-      "head_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+      "head_sha": null,
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-003.json",
       "evidence_directory": "verification/research-program/pr-003/",
-      "github_pr_url": null,
+      "github_pr_url": "https://github.com/ajhcs/ushso/pull/15",
       "blockers": [
         "Validator accepts missing/failed command outcomes, an unknown head commit, a missing nested command receipt and ambiguous duplicate command IDs. Bounded corrections and final-head independent review required."
       ],
@@ -451,17 +462,39 @@
       "dependency_handoffs": {
         "PR-002": "verification/research-program/pr-002/controller/integration-handoff.json"
       },
-      "branch": "codex/ushso-pr003-deepseek-20260910t220020z",
-      "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
-      "provider": "native DSH",
-      "selected_model": "deepseek/deepseek-v4.1-flash",
+      "branch": "codex/ce-ushso-pr003-grok-correct-grok-integrity-correctio-ba2a0a0c24e3-71a0bb97",
+      "base_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+      "provider": "Grok Co-Engineer",
+      "selected_model": "grok-4",
       "selected_reasoning": "high",
-      "actual_model": "deepseek/deepseek-v4.1-flash",
-      "run_id": "ushso-pr003-deepseek-20260910t220020z",
-      "dispatch_evidence": "verification/research-program/bootstrap/pr003-pr004-dispatch.json",
+      "actual_model": "grok-4",
+      "run_id": "ushso-pr003-grok-corrections-20260910",
+      "dispatch_evidence": "verification/research-program/bootstrap/pr003-grok-correction-dispatch.json",
       "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
       "producer_completion": "verification/research-program/bootstrap/pr003-native-completion-f62ce35.json",
-      "independent_review": "verification/research-program/bootstrap/pr003-first-review-f62ce35.json"
+      "independent_review": "verification/research-program/bootstrap/pr003-first-review-f62ce35.json",
+      "run_history": [
+        {
+          "run_id": "ushso-pr003-deepseek-20260910t220020z",
+          "provider": "native DSH",
+          "model": "deepseek/deepseek-v4.1-flash",
+          "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+          "branch": "codex/ushso-pr003-deepseek-20260910t220020z",
+          "head_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+          "status": "producer_completed_changes_requested",
+          "evidence": "verification/research-program/bootstrap/pr003-native-completion-f62ce35.json"
+        }
+      ],
+      "review_state": "changes_requested",
+      "original_integration_base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+      "provider_task_id": "ce-ushso-pr003-grok-correct-grok-integrity-correctio-ba2a0a0c24e3-71a0bb97",
+      "last_producer_head_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+      "publication_branch": "codex/ushso-pr003-deepseek-20260910t220020z",
+      "supplemental_review_evidence": "verification/research-program/bootstrap/pr003-independent-review-93793bf.json",
+      "ci_failure_evidence": "verification/research-program/bootstrap/pr003-ci-failure-f62ce35.json",
+      "expected_duration_ms": 1800000,
+      "deadline_at": "2026-09-10T23:14:51.788Z",
+      "controller_adjunct": "A disjoint C-003-3 inventory-test correction is authorized separately; it must not change the validator or its evolving evidence."
     },
     {
       "pr_id": "PR-004",
@@ -498,7 +531,9 @@
       "actual_model": null,
       "run_id": "ushso-pr004-field-states-20260910",
       "dispatch_evidence": "verification/research-program/bootstrap/pr003-pr004-dispatch.json",
-      "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence."
+      "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
+      "preliminary_review": "verification/research-program/bootstrap/pr004-preliminary-review-21b1b12.json",
+      "preliminary_review_scope": "C1/C2 at 21b1b12 only; findings supplied to the active producer for disposition in final work, not a final-head verdict."
     },
     {
       "pr_id": "PR-005",
@@ -512,7 +547,18 @@
         "packages/retrieval/tools/retrieval-core-v1.2.mjs",
         "worker/public-query-service.mjs",
         "apps/web/src/lib/researcherGuidance.ts",
-        "tests/research-program/freshness-and-grain.test.mjs"
+        "tests/research-program/freshness-and-grain.test.mjs",
+        "packages/search/static-search-backend.mjs",
+        "apps/web/src/types/discovery.ts",
+        "apps/web/src/types/catalog.ts",
+        "apps/web/src/lib/catalogAdapter.ts",
+        "apps/web/src/components/ResultCard.tsx",
+        "apps/web/src/pages/DatasetDetailsPage.tsx",
+        "tests/wp1-repository-abstraction.test.mjs",
+        "apps/web/src/lib/researcherGuidance.test.tsx",
+        "apps/web/src/lib/catalogAdapter.test.ts",
+        "apps/web/src/components/ResultCard.test.ts",
+        "apps/web/src/pages/DatasetDetailsPage.test.tsx"
       ],
       "head_sha": null,
       "merge_sha": null,
@@ -2461,7 +2507,8 @@
     "pr002_integration_gate_summary": "verification/research-program/bootstrap/gate-38e5c5f.json",
     "pr002_url": "https://github.com/ajhcs/ushso/pull/14",
     "pr002_state": "merged",
-    "pr002_merge_sha": "5647e81457b606bb36456e75c48f990ce21e9c6c"
+    "pr002_merge_sha": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+    "pr003_draft_url": "https://github.com/ajhcs/ushso/pull/15"
   },
   "prepared_inputs": [
     {
@@ -2553,6 +2600,19 @@
       "controller_disposition": "verification/research-program/bootstrap/public-directory-controller-review.json",
       "publication_review": "verification/research-program/bootstrap/public-directory-publication-review.json",
       "supplemental_proposal_register": "docs/research-program/supplemental-source-proposals.json"
+    },
+    {
+      "reason": "Resolve observed PR003 CI inventory ownership and PR005 clock/rendering call-path scope",
+      "previous_plan_sha256": "c33a82b5784796ccca730d8b0c5f499f2971c6b13ffabf5fd71d11a871ebd167",
+      "plan_sha256": "0895bb9e0a63191282dad9842271051779ca86fd8e3d7376dcd741fe5f625518",
+      "changed_prs": [
+        "PR-003",
+        "PR-005"
+      ],
+      "dependencies_and_thresholds_unchanged": true,
+      "evidence": "verification/research-program/bootstrap/ownership-plan-amendment-pr003-pr005.json",
+      "independent_review": "verification/research-program/bootstrap/ownership-plan-amendment-independent-review.json",
+      "independent_review_state": "accepted"
     }
   ]
 }
