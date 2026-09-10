@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T20:23:29.716272+00:00",
+  "updated_at": "2026-09-10T20:51:10.469725+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "80d897a6135e0cbbb27aff2e67139b26d17f51347487ba452335b56914557703",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -62,15 +62,20 @@
       "model_reported_by_reviewer": "Grok 4.6",
       "model_identity_note": "The active managed interface records grok-4. The retained Grok 4.6 self-report belongs only to the earlier read-only boundary review and is not asserted for later implementation runs.",
       "latest_run": {
-        "run_id": "ushso-pr002-c3-20260910",
-        "assignment_id": "grok-c3",
+        "run_id": "ushso-pr002-c3-recovery-20260910",
+        "assignment_id": "grok-c3-recovery",
         "status": "running",
-        "role": "implement_C-002-3",
+        "role": "recover_and_complete_C-002-3",
         "base_sha": "997070bd94864fabedf73acecd422c6e15a3ed7e",
-        "acceptance": "C3_pending_independent_review"
+        "acceptance": "C3_pending_final_head_independent_review"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
-      "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json"
+      "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
+      "runtime_diagnosis": {
+        "evidence": "verification/research-program/bootstrap/grok-deadline-diagnosis.json",
+        "conclusion": "An active Grok ACP inner prompt timer is fixed at initial dispatch; an outer audited extension does not demonstrate a longer-running prompt. Choose adequate initial bounded duration. Prior C2 end_turn cause is unresolved. Later C3 cancelled near its unextended deadline; no new login request was observed.",
+        "runtime_or_config_modified": false
+      }
     },
     {
       "requested": "DeepSeek",
@@ -215,7 +220,7 @@
     {
       "pr_id": "PR-002",
       "status": "in_progress",
-      "owner": "ce-ushso-pr002-c3-20260910-grok-c3-ce2e8fd091bf-1d277397",
+      "owner": "ce-ushso-pr002-c3-recovery--grok-c3-recovery-ef22973f85dc-2ed34837",
       "dependencies": [
         "PR-001"
       ],
@@ -234,12 +239,12 @@
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/14",
       "blockers": [],
       "prerequisites_satisfied": true,
-      "dispatch_preparation": "Grok is implementing the single remaining C3 commit from independently accepted C1/C2 at 997070b. Exact pre-endpoint 25/10 selection and twelve families are fixed; no replacement, endpoint tests or R01-R16 acceptance.",
+      "dispatch_preparation": "Grok is finishing a hash-bound snapshot of the cancelled C3 run in a fresh managed worktree on accepted C2. Prior work, timestamps and cleanup are retained. C3 remains pending final commit and independent review; all R01-R16 remain unaccepted.",
       "provider": "grok",
       "actual_model": "grok-4",
       "base_sha": "997070bd94864fabedf73acecd422c6e15a3ed7e",
-      "branch": "codex/ce-ushso-pr002-c3-20260910-grok-c3-ce2e8fd091bf-1d277397",
-      "dispatch_evidence": "verification/research-program/bootstrap/pr002-c3-grok-dispatch.json",
+      "branch": "codex/ce-ushso-pr002-c3-recovery--grok-c3-recovery-ef22973f85dc-2ed34837",
+      "dispatch_evidence": "verification/research-program/bootstrap/pr002-c3-recovery-grok-dispatch.json",
       "run_history": [
         {
           "run_id": "ushso-pr002-cohort-freeze-20260910",
@@ -311,6 +316,23 @@
           "commits": 1,
           "evidence": "verification/research-program/bootstrap/pr002-c2-acceptance-997070b.json",
           "lifecycle_verification": "verification/research-program/bootstrap/pr002-c2-luna-lifecycle-997070b.json"
+        },
+        {
+          "run_id": "ushso-pr002-c3-20260910",
+          "task_id": "ce-ushso-pr002-c3-20260910-grok-c3-ce2e8fd091bf-1d277397",
+          "provider": "grok",
+          "model": "grok-4",
+          "status": "cancelled_c3_uncommitted_partial_preserved",
+          "finished_at": "2026-09-10T20:38:57.862Z",
+          "head_sha": "997070bd94864fabedf73acecd422c6e15a3ed7e",
+          "commits": 0,
+          "cleanup": {
+            "status": "normal",
+            "boundary": "inactive_empty",
+            "lock": "unlocked"
+          },
+          "evidence": "verification/research-program/bootstrap/pr002-c3-partial-terminal.json",
+          "partial_snapshot": "verification/research-program/bootstrap/pr002-c3-partial-snapshot-manifest.json"
         }
       ],
       "active_atomic_commit": "C-002-3",
@@ -329,10 +351,18 @@
       ],
       "supplemental_review_evidence": "verification/research-program/bootstrap/pr002-c2-handoff-review-8fe6e6b.json",
       "open_review_findings": [],
-      "run_id": "ushso-pr002-c3-20260910",
-      "provider_task_id": "ce-ushso-pr002-c3-20260910-grok-c3-ce2e8fd091bf-1d277397",
-      "expected_duration_ms": 900000,
-      "deadline_at": "2026-09-10T20:38:56.483Z"
+      "run_id": "ushso-pr002-c3-recovery-20260910",
+      "provider_task_id": "ce-ushso-pr002-c3-recovery--grok-c3-recovery-ef22973f85dc-2ed34837",
+      "expected_duration_ms": 1800000,
+      "deadline_at": "2026-09-10T21:21:48.474Z",
+      "precommit_observations": {
+        "source": "cancelled_partial_snapshot_not_final_candidate",
+        "evidence": "verification/research-program/bootstrap/pr002-c3-partial-review-observations.json",
+        "finding_ids": [
+          "PR002-C3-PRE-001"
+        ],
+        "final_head_disposition_pending": true
+      }
     },
     {
       "pr_id": "PR-003",
