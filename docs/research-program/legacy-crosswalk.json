@@ -9,7 +9,7 @@
     "integration_tree": "35de194e7182a67a0275cc180f2b021da184aacd",
     "source_candidate": "11b268c17b5b65261041734abca456720b0d9706",
     "dependency_merge_shas": {},
-    "review_basis": "The crosswalk uses checked-in source clauses and bounded historical inventories. Co-Engineer inventory is corroborating review input; source files, hashes, and explicit constraints control the disposition.",
+    "review_basis": "The crosswalk uses committed release source clauses and bounded historical inventories. SEMP clauses are read-only custody references from the preserved original untracked checkout, not checked-in release sources. Co-Engineer inventory is corroborating review input; source files, hashes, custody markers, and explicit constraints control the disposition.",
     "activation_rule": "A mapped legacy work package or branch is a reuse or constraint reference only. It does not authorize deployment, source access, paid provisioning, planner enablement, identity adjudication, scientific promotion, or a production cutover."
   },
   "source_inventory": {
@@ -126,6 +126,64 @@
       }
     ],
     "semp": {
+      "source_custody": {
+        "original_checkout": "/mnt/d/Coding Projects/ushso",
+        "original_checkout_state": "dirty_read_only_preserved",
+        "original_captured_head": "e93ac2b5ad66cc6528182cced7e95fb3929841a9",
+        "original_captured_at": "2026-09-10T15:02:52.581748+00:00",
+        "original_path_status": "docs/semp is present only as an untracked path in the preserved original checkout",
+        "preservation_manifest": {
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/original-workspace-manifest.json",
+          "sha256": "3946fa64ea2803477195f999aca4b58c00be467fb3cdec552f9dd374542decd7",
+          "hashed_dirty_or_untracked_files": 1483
+        },
+        "selected_base": {
+          "sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+          "tree": "35de194e7182a67a0275cc180f2b021da184aacd",
+          "paths_absent": [
+            "docs/semp/model/ushso-system-model.json",
+            "docs/semp/model/ushso-system-model.schema.json",
+            "docs/semp/generated/manifest.json",
+            "docs/semp/tools/generate-views.mjs"
+          ],
+          "absence_verified": true
+        },
+        "original_only_paths": [
+          {
+            "relative_path": "docs/semp/model/ushso-system-model.json",
+            "absolute_path": "/mnt/d/Coding Projects/ushso/docs/semp/model/ushso-system-model.json",
+            "sha256": "08b256f4c8c1f650ad4805d18dede4482b47b6c31cfff1b25802283855dbd875",
+            "availability": "preserved_original_only"
+          },
+          {
+            "relative_path": "docs/semp/model/ushso-system-model.schema.json",
+            "absolute_path": "/mnt/d/Coding Projects/ushso/docs/semp/model/ushso-system-model.schema.json",
+            "sha256": "fc1a2b595e69adc6672f5b8390fbfd3083526ba46836d3064ee1f536b51f0e63",
+            "availability": "preserved_original_only"
+          },
+          {
+            "relative_path": "docs/semp/generated/manifest.json",
+            "absolute_path": "/mnt/d/Coding Projects/ushso/docs/semp/generated/manifest.json",
+            "sha256": "e86feced23f0fbd70fa13c3eaab3ade8ffe20d33bde1a5c47de4ed10f0b0ee70",
+            "availability": "preserved_original_only"
+          },
+          {
+            "relative_path": "docs/semp/tools/generate-views.mjs",
+            "absolute_path": "/mnt/d/Coding Projects/ushso/docs/semp/tools/generate-views.mjs",
+            "sha256": "8052450f8d59eea1dcdc9a9a88aa40d6153249cf2d01e4996038853b2b038046",
+            "availability": "preserved_original_only"
+          }
+        ],
+        "path_resolution_rule": {
+          "current_base": "Treat all four repository-relative SEMP paths as absent and unavailable in the selected base unless a future candidate contains the path and its expected SHA256.",
+          "preserved_original": "Until then, resolve the four paths only beneath original_checkout, require original_captured_head and preservation_manifest.sha256 to match, and verify each listed file SHA256 before reading it.",
+          "reuse_or_promotion": "A future reuse must create an explicitly versioned committed custody or import record and receive independent review. This correction does not copy or import the SEMP tree, activate its generated views, or promote its IDs or claims to production."
+        }
+      },
+      "stable_id_scope": {
+        "status": "map_references_only",
+        "rule": "The stable_ids below refer to local-only IDs in the preserved original SEMP model and evidence. They do not assert selected-base files, generated views, active policy, authorization, scientific approval, or production facts."
+      },
       "canonical_model": {
         "path": "docs/semp/model/ushso-system-model.json",
         "sha256": "08b256f4c8c1f650ad4805d18dede4482b47b6c31cfff1b25802283855dbd875",
@@ -168,6 +226,35 @@
         "gates": ["GATE-00", "GATE-00A", "GATE-01", "GATE-02", "GATE-03", "GATE-04", "GATE-05", "GATE-06", "GATE-07", "GATE-08", "GATE-08A", "GATE-09"],
         "transitions": ["GTR-000A", "GTR-001", "GTR-002", "GTR-003", "GTR-004", "GTR-005", "GTR-006", "GTR-007", "GTR-008", "GTR-008A", "GTR-009", "GTR-010", "GTR-011"],
         "decision_work_packages": ["DWP-001", "DWP-002", "DWP-003", "DWP-004", "DWP-005", "DWP-006", "DWP-007", "DWP-008", "DWP-009", "DWP-010", "DWP-011"],
+        "control_mappings": [
+          {
+            "kind": "review_gates",
+            "ids": ["GATE-00", "GATE-00A", "GATE-01", "GATE-02", "GATE-03", "GATE-04", "GATE-05", "GATE-06", "GATE-07", "GATE-08", "GATE-08A", "GATE-09"],
+            "disposition": "retain_candidate_review_controls",
+            "destination_prs": ["PR-001", "PR-003", "PR-079", "PR-082"],
+            "reason": "Every listed gate is a proposed SEMP review control that can constrain later evidence and release decisions; PR-001 preserves the map, PR-003 consumes executable evidence controls, PR-079 independently reviews them, and PR-082 closes the exact release chain.",
+            "retained_constraints": ["Gate presence or a proposed proceed option does not establish verification, validation, qualification, acceptance, authorization, activation, deployment, or scientific approval.", "A gate may be reused only as a typed control after its exact subject, scope, authority, expiry, evidence, and custody are independently resolved.", "No gate authorizes source payload retrieval, paid provider use, planner enablement, identity adjudication, or production mutation."],
+            "supersession": "none; no selected-base release artifact supersedes these local-only controls"
+          },
+          {
+            "kind": "review_transitions",
+            "ids": ["GTR-000A", "GTR-001", "GTR-002", "GTR-003", "GTR-004", "GTR-005", "GTR-006", "GTR-007", "GTR-008", "GTR-008A", "GTR-009", "GTR-010", "GTR-011"],
+            "disposition": "retain_candidate_lifecycle_transitions",
+            "destination_prs": ["PR-001", "PR-003", "PR-079", "PR-082"],
+            "reason": "Every listed transition expresses a proposed control-state relationship between the retained review gates; the mapping preserves that relationship for downstream traceability without asserting that any transition executed.",
+            "retained_constraints": ["Transition edges are map references only and cannot move a candidate between lifecycle, authorization, activation, or operational states.", "Any reuse must bind the edge to a current exact candidate, decision record, authority, evidence package, and expiry; revise or return edges remain available when a prior baseline is invalid.", "No transition bypasses the selected-base SEMP absence, independent review, or production authorization boundaries."],
+            "supersession": "none; no selected-base release artifact supersedes these local-only transitions"
+          },
+          {
+            "kind": "decision_work_packages",
+            "ids": ["DWP-001", "DWP-002", "DWP-003", "DWP-004", "DWP-005", "DWP-006", "DWP-007", "DWP-008", "DWP-009", "DWP-010", "DWP-011"],
+            "disposition": "retain_historical_planning_and_evidence_controls",
+            "destination_prs": ["PR-001", "PR-003", "PR-079", "PR-082", "PR-083"],
+            "reason": "Every listed DWP is a bounded planning, authority, evidence, claims, or release-control record whose typed state helps downstream consumers understand what was proposed, completed, rejected, or left incomplete.",
+            "retained_constraints": ["DWP state and output IDs remain historical or candidate planning evidence; completed or passed technical steps do not prove scientific approval, acceptance, authorization, deployment, activation, or fitness.", "Reuse requires exact artifact custody, current scope, named authority, independent review, and explicit handling of blocked, unavailable, rejected, expired, and evidence-incomplete states.", "No DWP grants permission for source payload import, paid enrichment, provider mutation, planner execution, identity merge, or production change."],
+            "supersession": "none; no selected-base release artifact supersedes these local-only work-package controls"
+          }
+        ],
         "release_packages": ["PKG-IMPL-20260906-001", "PKG-VER-20260906-001", "PKG-VAL-20260906-001", "PKG-IVV-20260906-001", "PKG-ACC-20260906-001", "PKG-AUTH-20260906-001", "PKG-DEP-20260906-001", "PKG-ACT-20260906-001", "PKG-MON-20260906-001", "PKG-CLAIM-20260906-001"],
         "package_disposition": "Retain the package sequence and typed pending/not_requested states as planning controls. No package state is promoted to a deployment, scientific, acceptance, or operating authorization."
       },
@@ -482,6 +569,13 @@
     "current_worker_entrypoint_verified": "worker/index.mjs",
     "current_static_composition_verified": "worker/static-composition.mjs",
     "generated_semp_views_changed": false,
+    "semp_source_custody_record": "source_inventory.semp.source_custody",
+    "semp_local_ids_are_map_references_only": true,
+    "semp_control_mapping_groups": {
+      "review_gates": 12,
+      "review_transitions": 13,
+      "decision_work_packages": 11
+    },
     "historical_candidate_mixing": false,
     "named_boundary_destination_check": "Every production boundary in production_boundaries has one or more destination_prs and an explicit retained constraint.",
     "review_limit": "This crosswalk is a planning and preservation map. It is not independent review, release qualification, scientific approval, authorization, deployment evidence, or a waiver of an ADR."

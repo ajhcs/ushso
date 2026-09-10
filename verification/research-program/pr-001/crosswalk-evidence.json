@@ -1,10 +1,10 @@
 {
   "format": "ushso.research-program.pr-001.crosswalk-evidence.v1",
   "pr_id": "PR-001",
-  "recorded_at": "2026-09-10T16:12:00Z",
-  "status": "producer_checked",
+  "recorded_at": "2026-09-10T16:43:23.823036Z",
+  "status": "producer_checked_after_review_correction",
   "crosswalk_path": "docs/research-program/legacy-crosswalk.json",
-  "crosswalk_sha256": "cdd61ef5a1d075991596b50d2ba6c769ca4b2e4535a9500bb278ce789bde1a6a",
+  "crosswalk_sha256": "b3475d1ea5f7d48677e2c45005995769a8457cb18405e2e4b5e1cd2a54c810f0",
   "decisive_checks": [
     {
       "id": "crosswalk-json-parse",
@@ -71,6 +71,46 @@
         "changed_paths": [],
         "generated_views_changed": false
       }
+    },
+    {
+      "id": "semp-custody-fields-replay",
+      "agentctl_command_id": "cmd-0002-9e9cf41b",
+      "command": "python3 -c 'import hashlib,json,subprocess; from pathlib import Path; base=Path(\"/mnt/d/worktrees/plumbob/ushso-pr-001-release-baseline\"); original=Path(\"/mnt/d/Coding Projects/ushso\"); manifest=Path(\"/mnt/d/tmp/plumbob/ushso-research-program-20260910/original-workspace-manifest.json\"); paths=[\"docs/semp/model/ushso-system-model.json\",\"docs/semp/model/ushso-system-model.schema.json\",\"docs/semp/generated/manifest.json\",\"docs/semp/tools/generate-views.mjs\"]; expected={paths[0]:\"08b256f4c8c1f650ad4805d18dede4482b47b6c31cfff1b25802283855dbd875\",paths[1]:\"fc1a2b595e69adc6672f5b8390fbfd3083526ba46836d3064ee1f536b51f0e63\",paths[2]:\"e86feced23f0fbd70fa13c3eaab3ade8ffe20d33bde1a5c47de4ed10f0b0ee70\",paths[3]:\"8052450f8d59eea1dcdc9a9a88aa40d6153249cf2d01e4996038853b2b038046\"}; d=json.loads((base/\"docs/research-program/legacy-crosswalk.json\").read_text()); c=d[\"source_inventory\"][\"semp\"]; custody=c[\"source_custody\"]; assert custody[\"original_checkout\"]==str(original) and custody[\"original_captured_head\"]==\"e93ac2b5ad66cc6528182cced7e95fb3929841a9\"; assert custody[\"preservation_manifest\"][\"sha256\"]==\"3946fa64ea2803477195f999aca4b58c00be467fb3cdec552f9dd374542decd7\"; assert custody[\"selected_base\"][\"sha\"]==\"45210704b8de2d7b1360b6d32657cd17791bdd77\" and custody[\"selected_base\"][\"tree\"]==\"35de194e7182a67a0275cc180f2b021da184aacd\" and custody[\"selected_base\"][\"paths_absent\"]==paths and custody[\"selected_base\"][\"absence_verified\"] is True; assert all(not (base/p).exists() for p in paths); assert all(hashlib.sha256((original/p).read_bytes()).hexdigest()==h for p,h in expected.items()); assert all(item[\"absolute_path\"]==str(original/item[\"relative_path\"]) and item[\"sha256\"]==expected[item[\"relative_path\"]] and item[\"availability\"]==\"preserved_original_only\" for item in custody[\"original_only_paths\"]); assert all(x in custody[\"path_resolution_rule\"] for x in (\"current_base\",\"preserved_original\",\"reuse_or_promotion\")); assert c[\"stable_id_scope\"][\"status\"]==\"map_references_only\"; print({\"paths_absent\":len(paths),\"original_hashes_verified\":len(expected),\"stable_id_scope\":c[\"stable_id_scope\"][\"status\"]})'",
+      "exit_code": 0,
+      "expected": "The selected base lacks all four SEMP paths; preserved original checkout head, manifest, and per-file hashes match; local SEMP IDs remain map references only.",
+      "actual": {
+        "selected_base_paths_absent": 4,
+        "original_hashes_verified": 4,
+        "captured_head": "e93ac2b5ad66cc6528182cced7e95fb3929841a9",
+        "manifest_sha256": "3946fa64ea2803477195f999aca4b58c00be467fb3cdec552f9dd374542decd7"
+      }
+    },
+    {
+      "id": "semp-control-mapping-replay",
+      "agentctl_command_id": "cmd-0003-b0a203f7",
+      "command": "python3 -c 'import json; from pathlib import Path; d=json.loads(Path(\"docs/research-program/legacy-crosswalk.json\").read_text()); s=d[\"source_inventory\"][\"semp\"]; expected={\"review_gates\":s[\"stable_ids\"][\"gates\"],\"review_transitions\":s[\"stable_ids\"][\"transitions\"],\"decision_work_packages\":s[\"stable_ids\"][\"decision_work_packages\"]}; mappings={m[\"kind\"]:m for m in s[\"stable_ids\"][\"control_mappings\"]}; assert set(mappings)==set(expected); assert all(mappings[k][\"ids\"]==v and mappings[k][\"destination_prs\"] and mappings[k][\"reason\"] and mappings[k][\"retained_constraints\"] and mappings[k][\"supersession\"] for k,v in expected.items()); assert s[\"stable_id_scope\"][\"status\"]==\"map_references_only\"; assert d[\"verification\"][\"semp_control_mapping_groups\"]=={\"review_gates\":12,\"review_transitions\":13,\"decision_work_packages\":11}; print({k:len(v) for k,v in expected.items()})'",
+      "exit_code": 0,
+      "expected": "All 12 gate, 13 transition, and 11 decision-work-package IDs have explicit grouped dispositions, destinations, reasons, retained constraints, and supersession statements.",
+      "actual": {
+        "review_gates": 12,
+        "review_transitions": 13,
+        "decision_work_packages": 11,
+        "all_mapping_fields_present": true
+      }
+    },
+    {
+      "id": "semp-original-id-membership-and-scope",
+      "agentctl_command_id": "cmd-0004-3f2367a5",
+      "command": "python3 -c 'import json; from pathlib import Path; d=json.loads(Path(\"docs/research-program/legacy-crosswalk.json\").read_text()); m=json.loads(Path(\"/mnt/d/Coding Projects/ushso/docs/semp/model/ushso-system-model.json\").read_text()); s=d[\"source_inventory\"][\"semp\"]; ids={\"review_gates\":{x[\"id\"] for x in m[\"review_gates\"][\"gates\"]},\"review_transitions\":{x[\"id\"] for x in m[\"review_transitions\"]},\"decision_work_packages\":{x[\"id\"] for x in m[\"decision_and_evidence_readiness\"][\"work_packages\"]}}; for_kind={x[\"kind\"]:x for x in s[\"stable_ids\"][\"control_mappings\"]}; assert all(set(for_kind[k][\"ids\"])<=ids[k] for k in ids); assert d[\"scope\"][\"review_basis\"].startswith(\"The crosswalk uses committed release source clauses\") and \"preserved original untracked checkout\" in d[\"scope\"][\"review_basis\"]; print({k:len(for_kind[k][\"ids\"]) for k in ids})'",
+      "exit_code": 0,
+      "expected": "Every grouped mapped ID exists in the preserved original SEMP model and the scope review basis distinguishes committed release sources from original untracked SEMP custody.",
+      "actual": {
+        "review_gates": 12,
+        "review_transitions": 13,
+        "decision_work_packages": 11,
+        "original_model_membership": true,
+        "review_basis_distinguishes_custody": true
+      }
     }
   ],
   "retained_claims": [
@@ -82,8 +122,19 @@
   ],
   "limitations": [
     "The crosswalk does not replace independent review or qualify any work package.",
-    "SEMP generated views remain untracked original artifacts and are intentionally not copied or edited.",
+    "SEMP model, schema, generated manifest, generator, and generated views remain untracked original artifacts under the preserved checkout and are intentionally not copied or edited; model/schema custody and the selected-base absence are explicit in source_inventory.semp.source_custody.",
     "Unmerged branch inspection does not activate, merge, or validate those branches.",
     "Source payloads, provider calls, deployment mutations, and scientific adjudication were not performed."
-  ]
+  ],
+  "review_context": {
+    "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/bootstrap-review/pr001-crosswalk-review.json",
+    "sha256": "c4c9ebe2b980940c4e340ef0cd8d4729d03d3b44b4675586e979b0a66f75350e",
+    "status": "changes_requested_before_additive_correction",
+    "findings": [
+      "SEMP paths were repository-relative without an original-checkout custody marker or selected-base absence statement.",
+      "The 12 GATE, 13 GTR, and 11 DWP IDs lacked explicit dispositions, downstream destinations, reasons, and retained constraints.",
+      "The review basis and companion custody note needed to distinguish committed release sources from original untracked SEMP files and include model/schema custody."
+    ],
+    "resolution": "Addressed in one additive correction commit after cc7faac; the three planned PR-001 commits remain unchanged."
+  }
 }
