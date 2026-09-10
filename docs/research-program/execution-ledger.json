@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T21:47:40.554534+00:00",
+  "updated_at": "2026-09-10T21:57:04.932242+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "80d897a6135e0cbbb27aff2e67139b26d17f51347487ba452335b56914557703",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -220,8 +220,8 @@
     },
     {
       "pr_id": "PR-002",
-      "status": "independently_verified",
-      "owner": "Astra/root integration",
+      "status": "integrated",
+      "owner": null,
       "dependencies": [
         "PR-001"
       ],
@@ -234,13 +234,13 @@
         "docs/research-program/acceptance.md"
       ],
       "head_sha": "2ff1695e9d3dd79deeffa775f78202311874fcf1",
-      "merge_sha": null,
+      "merge_sha": "5647e81457b606bb36456e75c48f990ce21e9c6c",
       "handoff": "docs/research-program/handoffs/PR-002.json",
       "evidence_directory": "verification/research-program/pr-002/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/14",
       "blockers": [],
       "prerequisites_satisfied": true,
-      "dispatch_preparation": "Publish corrected PR14 head, require green CI for that exact head, then merge into the research-program integration branch and bind the actual merge SHA.",
+      "dispatch_preparation": "All three PR002 deliverables independently verified, exact-head CI passed, PR14 merged into the integration branch. Downstream PR003/PR004 are ready.",
       "provider": null,
       "actual_model": null,
       "base_sha": "7593591037d37a7105770ab6d4875a40dd9db3a0",
@@ -409,17 +409,22 @@
           "status": "resolved",
           "evidence": "Every historical whole-file artifact binding resolves to exact original Git commit/tree bytes."
         }
-      ]
+      ],
+      "controller_handoff": "verification/research-program/pr-002/controller/integration-handoff.json",
+      "artifact_manifest": "verification/research-program/pr-002/controller/integration-artifact-manifest.json"
     },
     {
       "pr_id": "PR-003",
-      "status": "planned",
+      "status": "ready",
       "owner": null,
       "dependencies": [
         "PR-001",
         "PR-002"
       ],
-      "dependency_merge_shas": {},
+      "dependency_merge_shas": {
+        "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
+        "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
+      },
       "owned_paths": [
         "docs/research-program/handoffs/",
         "scripts/research-program/check-handoff.mjs",
@@ -433,16 +438,22 @@
       "evidence_directory": "verification/research-program/pr-003/",
       "github_pr_url": null,
       "blockers": [],
-      "dispatch_preparation": "Prepared; dispatch follows verified PR002 merge and committed merge-bound dependency evidence."
+      "dispatch_preparation": "Accepted PR002 integration and actual merge-bound handoff/manifest are available; root can dispatch the prepared bounded assignment.",
+      "prerequisites_satisfied": true,
+      "dependency_handoffs": {
+        "PR-002": "verification/research-program/pr-002/controller/integration-handoff.json"
+      }
     },
     {
       "pr_id": "PR-004",
-      "status": "planned",
+      "status": "ready",
       "owner": null,
       "dependencies": [
         "PR-002"
       ],
-      "dependency_merge_shas": {},
+      "dependency_merge_shas": {
+        "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
+      },
       "owned_paths": [
         "packages/identity/schemas/",
         "packages/normalization/",
@@ -455,7 +466,11 @@
       "evidence_directory": "verification/research-program/pr-004/",
       "github_pr_url": null,
       "blockers": [],
-      "dispatch_preparation": "Prepared; dispatch follows verified PR002 merge and committed merge-bound dependency evidence."
+      "dispatch_preparation": "Accepted PR002 integration and actual merge-bound handoff/manifest are available; root can dispatch the prepared bounded assignment.",
+      "prerequisites_satisfied": true,
+      "dependency_handoffs": {
+        "PR-002": "verification/research-program/pr-002/controller/integration-handoff.json"
+      }
     },
     {
       "pr_id": "PR-005",
