@@ -5,6 +5,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { loadSchemas as loadCoreSchemas } from '../../../contracts/core/v2.0.0/tools/schema.mjs';
 import { semanticErrors } from '../../../contracts/core/v2.0.0/tools/semantics.mjs';
 import { contentFingerprint } from '../src/canonical.mjs';
+import { isRfc3339DateTime } from '../src/field-observation.mjs';
 import { IMPORT_RECEIPT_VERSION, NORMALIZER_VERSION, SOURCE_CONTENT_FINGERPRINT } from '../src/constants.mjs';
 import { reconcileNormalizationDatabaseWorkset, reconcileNormalizationWorkset } from '../src/ingestion-boundary.mjs';
 import { loadLegacyCorpus } from '../src/legacy-loader.mjs';
@@ -13,7 +14,7 @@ import { InMemoryCanonicalImportStore } from '../src/store.mjs';
 import { canonicalEqual, EXCLUDED_MANIFEST_PATHS, fileDescriptor, PACKAGE_ROOT, sha256File, stableJson, walk, writeAtomic } from './common.mjs';
 
 function formats(ajv) {
-  ajv.addFormat('date-time', value => typeof value === 'string' && !Number.isNaN(Date.parse(value)));
+  ajv.addFormat('date-time', isRfc3339DateTime);
 }
 
 async function loadLocalSchemas() {
