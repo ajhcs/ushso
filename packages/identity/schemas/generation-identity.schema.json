@@ -32,6 +32,27 @@
       "type": "array",
       "items": { "type": "string", "minLength": 3 }
     },
+    "cited_generation_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "path"],
+        "properties": {
+          "role": { "enum": ["human_manifest", "machine_generation", "dictionary_source_revision"] },
+          "path": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "value": {
+            "oneOf": [
+              { "type": "string", "minLength": 1, "maxLength": 200 },
+              { "type": "null" }
+            ]
+          },
+          "state": { "enum": ["known", "unresolved"] },
+          "local_retrieval_corpus_manifest_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "detail": { "type": "string", "minLength": 1, "maxLength": 500 }
+        }
+      }
+    },
     "boundaries": {
       "type": "object",
       "additionalProperties": false,
@@ -70,7 +91,8 @@
         "value": { "type": "string", "minLength": 1, "maxLength": 200 },
         "generation": { "type": "string", "minLength": 1, "maxLength": 200 },
         "applicability_state": { "enum": ["unresolved", "documented", "observed", "conflicted", "not_applicable"] },
-        "scientific_approval": { "const": false }
+        "scientific_approval": { "const": false },
+        "unresolved_reason": { "type": "string", "minLength": 1, "maxLength": 500 }
       }
     }
   }

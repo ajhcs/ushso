@@ -70,6 +70,8 @@ const MERGED_DATE_KEYS = Object.freeze([
 
 const OPAQUE_TOKEN = /^[A-Za-z0-9._~-]{1,180}$/;
 const CONTENT_SHA = /^(?:sha256:)?[a-f0-9]{64}$/;
+const STABLE_UNIQUENESS = new Set(["unique", "source_scoped"]);
+
 
 function requireEvidence(ids, label) {
   assert(Array.isArray(ids) && ids.length > 0 && ids.every((id) => typeof id === "string" && id.length >= 3), `${label} requires evidence`, "missing_evidence");
@@ -91,12 +93,55 @@ function hashScopedToken(material) {
   return `hash.${sha256(material).slice(0, 32)}`;
 }
 
-function publisherToken(sourceId, normalizedValue) {
-  const sourceKey = String(sourceId).replace(/^urn:ushso:source:/, "").replace(/[^A-Za-z0-9._~-]+/g, ".").replace(/^\.+|\.+$/g, "");
-  const valueKey = String(normalizedValue).replace(/[^A-Za-z0-9._~-]+/g, ".");
-  const combined = `pub.${sourceKey}.${valueKey}`.slice(0, 180);
-  if (OPAQUE_TOKEN.test(combined) && valueKey.length > 0 && sourceKey.length > 0) return combined;
-  return hashScopedToken({ source_id: sourceId, normalized_value: normalizedValue, rule: "publisher_stable_release_id" });
+function encodeIdentitySegment(value) {
+  let encoded = "";
+  for (const ch of String(value)) {
+    const code = ch.codePointAt(0);
+    if (code < 128 && /[A-Za-z0-9_-]/.test(ch)) encoded += ch;
+    else encoded += `~${code.toString(16).toUpperCase().padStart(4, "0")}`;
+  }
+  return encoded;
+}
+
+function publisherToken({
+  sourceId,
+  namespace,
+  normalizedValue,
+  uniquenessPolicy,
+  entityScope,
+  authority,
+  assetId = null,
+}) {
+  const material = {
+    rule: "publisher_stable_release_id",
+    source_id: sourceId,
+    namespace,
+    normalized_value: normalizedValue,
+    uniqueness_policy: uniquenessPolicy,
+    entity_scope: entityScope,
+    authority,
+    asset_id: uniquenessPolicy === "unique" ? null : assetId,
+  };
+  const sourceKey = encodeIdentitySegment(String(sourceId).replace(/^urn:ushso:source:/, ""));
+  const namespaceKey = encodeIdentitySegment(namespace);
+  const valueKey = encodeIdentitySegment(normalizedValue);
+  const qualified = `pub.${sourceKey}.${namespaceKey}.${valueKey}`;
+  if (OPAQUE_TOKEN.test(qualified) && qualified.length <= 180 && sourceKey && namespaceKey && valueKey) {
+    return qualified;
+  }
+  const hashed = `pub.hash.${sha256(material).slice(0, 32)}`;
+  assert(OPAQUE_TOKEN.test(hashed), "opaque release token is invalid", "invalid_opaque_id");
+  return hashed;
+}
+
+function isStablePublisherIdentifier(identifier, entityScope) {
+  return Boolean(
+    identifier
+    && identifier.entity_scope === entityScope
+    && identifier.authority === "source_native"
+    && STABLE_UNIQUENESS.has(identifier.uniqueness_policy)
+    && identifier.normalized_value,
+  );
 }
 
 export function createPublisherIdentifier(input) {
@@ -148,23 +193,27 @@ export function collectDateRoles(roles = []) {
     requireEvidence(role.evidence_ids, `date role ${role.role}`);
   }
 
-  const byRole = new Map();
   const collected = [];
+  const firstIndexByRole = new Map();
   for (const role of roles) {
     const value = role.value === undefined ? null : role.value;
-    const existing = byRole.get(role.role);
-    if (existing && existing.value !== value) {
-      collected.push(deepFreeze({
+    const existingIndex = firstIndexByRole.get(role.role);
+    if (existingIndex != null) {
+      const existing = collected[existingIndex];
+      if (existing.value === value && existing.value_state !== "conflicted") {
+        existing.evidence_ids = uniqueSorted([...existing.evidence_ids, ...role.evidence_ids]);
+        continue;
+      }
+      existing.value_state = "conflicted";
+      collected.push({
         role: role.role,
-        value: null,
+        value,
         value_state: "conflicted",
         period_basis: role.period_basis ?? existing.period_basis ?? "unknown",
-        evidence_ids: uniqueSorted([...existing.evidence_ids, ...role.evidence_ids]),
-      }));
-      byRole.set(role.role, { ...existing, value: null, value_state: "conflicted" });
+        evidence_ids: uniqueSorted(role.evidence_ids),
+      });
       continue;
     }
-    if (existing) continue;
     const entry = {
       role: role.role,
       value,
@@ -172,21 +221,29 @@ export function collectDateRoles(roles = []) {
       period_basis: role.period_basis ?? "unknown",
       evidence_ids: uniqueSorted(role.evidence_ids),
     };
-    byRole.set(role.role, entry);
-    collected.push(deepFreeze(entry));
+    firstIndexByRole.set(role.role, collected.length);
+    collected.push(entry);
   }
-  return collected;
+  return collected.map((entry) => deepFreeze(entry));
 }
 
 function stableReleaseIdentifier(identifiers) {
-  return identifiers.find((item) => item.entity_scope === "release" && ["unique", "source_scoped"].includes(item.uniqueness_policy) && item.authority === "source_native" && item.normalized_value);
+  return identifiers.find((item) => isStablePublisherIdentifier(item, "release"));
 }
 
 function mintReleaseId({ rule, sourceId, identifier, contentSha256, locator, observedAt, publisherVersion, assetId }) {
   if (rule === "publisher_stable_release_id") {
-    return opaqueId("release", publisherToken(sourceId, identifier.normalized_value));
+    return opaqueId("release", publisherToken({
+      sourceId,
+      namespace: identifier.namespace,
+      normalizedValue: identifier.normalized_value,
+      uniquenessPolicy: identifier.uniqueness_policy,
+      entityScope: identifier.entity_scope,
+      authority: identifier.authority,
+      assetId,
+    }));
   }
-  return opaqueId("release", hashScopedToken({
+  const material = {
     rule: "hash_scoped_content_identity",
     source_id: sourceId,
     asset_id: assetId,
@@ -194,22 +251,28 @@ function mintReleaseId({ rule, sourceId, identifier, contentSha256, locator, obs
     locator: locator.url,
     locator_kind: locator.kind,
     publisher_version: publisherVersion,
-    observed_at: observedAt,
-  }));
+  };
+  if (contentSha256) material.observed_at = observedAt;
+  return opaqueId("release", hashScopedToken(material));
 }
 
 function mintDistributionId({ releaseId, distribution, contentSha256 }) {
-  const publisherDistribution = (distribution.publisher_identifiers ?? []).find((item) => item.entity_scope === "distribution" && item.normalized_value);
+  const publisherDistribution = (distribution.publisher_identifiers ?? []).find((item) => isStablePublisherIdentifier(item, "distribution"));
   if (publisherDistribution && distribution.locator.kind !== "ambiguous") {
     return {
-      distribution_id: opaqueId("distribution", publisherToken(publisherDistribution.source_id, publisherDistribution.normalized_value)),
+      distribution_id: opaqueId("distribution", publisherToken({
+        sourceId: publisherDistribution.source_id,
+        namespace: publisherDistribution.namespace,
+        normalizedValue: publisherDistribution.normalized_value,
+        uniquenessPolicy: publisherDistribution.uniqueness_policy,
+        entityScope: publisherDistribution.entity_scope,
+        authority: publisherDistribution.authority,
+        assetId: releaseId,
+      })),
       identity_rule: "publisher_stable_release_id",
     };
   }
-  if (!contentSha256 && distribution.locator.kind !== "exact_distribution") {
-    return { distribution_id: null, identity_rule: null };
-  }
-  if (!contentSha256 && distribution.locator.kind === "exact_distribution") {
+  if (!contentSha256) {
     return { distribution_id: null, identity_rule: null };
   }
   return {
@@ -329,6 +392,10 @@ export function mintReleaseIdentity(input) {
       identityRule = "hash_scoped_content_identity";
       identityState = dateConflict ? "conflicted" : "exact";
       if (!input.release_kind) releaseKind = publisherVersion ? "vintage" : "snapshot";
+    } else if (publisherVersion && locator.kind !== "unknown") {
+      identityRule = "hash_scoped_content_identity";
+      identityState = dateConflict ? "conflicted" : "exact";
+      if (!input.release_kind) releaseKind = "vintage";
     } else {
       reasons.push("no_stable_release_id_or_content_hash");
       if (locator.kind === "landing_page" || locator.kind === "unknown") reasons.push("url_alone_is_not_exact_release");

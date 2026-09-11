@@ -65,6 +65,23 @@ const stale = lookupProductContext({
   record: captures.cms_record,
 });
 if (!stale.restart_required || stale.code !== "manifest_mismatch") fail("missing_restart", JSON.stringify(stale));
+if (map.dictionary_source_revision.kind !== "unresolved" || map.dictionary_source_revision.value === CURRENT_LIVE_GENERATION) {
+  fail("dictionary_revision_invented", "dictionary/source revision identity cannot be invented from the machine generation label");
+}
+if (map.dictionary_source_revision.scientific_approval !== false) fail("scientific_approval_claimed", "dictionary applicability is not approval");
+
+const otherCatalog = structuredClone(captures.cms_catalog);
+const otherRecord = structuredClone(captures.cms_record);
+otherRecord.record_id = "obs:asset:cms-data-catalog:other-product";
+otherRecord.identity.asset.asset_id = otherRecord.record_id;
+otherRecord.identity.match_fields.source_id = "controller-other-native-id";
+otherCatalog.data.dataset[0].identifier = "controller-other-native-id";
+const otherBinding = bindCapturedCatalogRecord({
+  record: otherRecord,
+  catalogCapture: otherCatalog,
+  observedAt: captures.observed_at,
+});
+if (binding.releases[0] === otherBinding.releases[0]) fail("vintage_global_release", "c_vintage minted the same release ID for two assets");
 
 const report = {
   ok: true,
@@ -77,5 +94,7 @@ const report = {
   product_context_fingerprint: human.product_context_fingerprint,
   stale_restart_code: stale.code,
   scientific_approval: map.dictionary_source_revision.scientific_approval,
+  dictionary_revision_kind: map.dictionary_source_revision.kind,
+  vintage_release_ids_distinct: binding.releases[0] !== otherBinding.releases[0],
 };
 process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);

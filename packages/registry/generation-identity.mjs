@@ -1,5 +1,6 @@
 import {
   assertGenerationPins,
+  assertPublicationGenerationBinding,
   live20260903GenerationMap,
   lookupProductContext,
 } from "../identity/src/generation-identity.mjs";
@@ -28,6 +29,8 @@ export function lookupMappedProductContext({
   pins = null,
 }) {
   assertPublicationReadContext(publication);
+  const publicationCheck = assertPublicationGenerationBinding(map, publication.corpus ?? {});
+  if (publicationCheck.restart_required) return publicationCheck;
   const fingerprint = publication.corpus?.content_fingerprint_sha256;
   const inferredHuman = /^[a-f0-9]{64}$/.test(fingerprint ?? "") ? fingerprint : null;
   const combinedPins = {
@@ -52,4 +55,4 @@ export function lookupMappedProductContext({
   });
 }
 
-export { live20260903GenerationMap, assertGenerationPins, lookupProductContext };
+export { live20260903GenerationMap, assertGenerationPins, assertPublicationGenerationBinding, lookupProductContext };

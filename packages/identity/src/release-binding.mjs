@@ -317,25 +317,41 @@ export function bindCapturedCatalogRecord(input) {
   if (resourcesCapture) {
     const resourcesOk = requireCapture(resourcesCapture, "resources");
     const expectedResourcesUrl = distributionInputs.map((item) => item.resources_url).find(Boolean) ?? null;
+    const observedResourcesUrl = resourcesCapture.data?.links?.self?.href ?? resourcesCapture.url ?? null;
+    const resourcesEvidenceId = resourcesCapture.evidence_id ?? `evidence:resources:${resourcesCapture.sha256.slice(0, 24)}`;
     if (!resourcesOk.ok) {
       reasons.push(resourcesOk.reason);
-    } else if (expectedResourcesUrl && resourcesCapture.data?.links?.self?.href !== expectedResourcesUrl) {
+    } else if (!expectedResourcesUrl) {
+      reasons.push("resources_link_required");
+      alternatives.push({
+        state: "unresolved",
+        release_id: null,
+        distribution_id: null,
+        reason_codes: ["resources_link_required", "unrelated_resources_capture"],
+        evidence_ids: [resourcesEvidenceId],
+        evidence_pointers: [evidencePointer({
+          evidenceId: resourcesEvidenceId,
+          captureSha256: resourcesCapture.sha256,
+          pointer: "/links/self/href",
+          locator: observedResourcesUrl,
+        })],
+      });
+    } else if (observedResourcesUrl !== expectedResourcesUrl) {
       reasons.push("resources_self_identity_mismatch");
       alternatives.push({
         state: "unresolved",
         release_id: null,
         distribution_id: null,
         reason_codes: ["resources_self_identity_mismatch"],
-        evidence_ids: [resourcesCapture.evidence_id ?? `evidence:resources:${resourcesCapture.sha256.slice(0, 24)}`],
+        evidence_ids: [resourcesEvidenceId],
         evidence_pointers: [evidencePointer({
-          evidenceId: resourcesCapture.evidence_id ?? `evidence:resources:${resourcesCapture.sha256.slice(0, 24)}`,
+          evidenceId: resourcesEvidenceId,
           captureSha256: resourcesCapture.sha256,
           pointer: "/links/self/href",
-          locator: resourcesCapture.data?.links?.self?.href ?? resourcesCapture.url ?? null,
+          locator: observedResourcesUrl,
         })],
       });
     } else if (Array.isArray(resourcesCapture.data?.data)) {
-      const resourcesEvidenceId = resourcesCapture.evidence_id ?? `evidence:resources:${resourcesCapture.sha256.slice(0, 24)}`;
       for (const [index, resource] of resourcesCapture.data.data.entries()) {
         const url = resource.downloadURL ?? resource.url ?? null;
         pointers.push(evidencePointer({
@@ -367,21 +383,23 @@ export function bindCapturedCatalogRecord(input) {
     source_id: resolvedSourceId,
     namespace: match.kind === "socrata_view" ? "data.cdc.gov.view" : "publisher.catalog.identifier",
     value: nativeId,
-    entity_scope: rolling ? "asset" : "asset",
+    entity_scope: "asset",
     uniqueness_policy: rolling ? "reusable_over_time" : "source_scoped",
     evidence_ids: [catalogEvidenceId],
   }];
-  const publisherVersion = match.row?.c_vintage ?? match.row?.publisher_version ?? match.row?.version ?? null;
-  if (publisherVersion && !rolling) {
+  const catalogVintage = match.row?.c_vintage ?? match.row?.vintage ?? null;
+  const publisherReleaseId = match.row?.publisher_release_id ?? null;
+  if (publisherReleaseId && !rolling) {
     publisherIdentifiers.push({
       source_id: resolvedSourceId,
       namespace: "publisher.release",
-      value: String(publisherVersion),
+      value: String(publisherReleaseId),
       entity_scope: "release",
       uniqueness_policy: "source_scoped",
       evidence_ids: [catalogEvidenceId],
     });
   }
+  const editionContext = catalogVintage ?? match.row?.publisher_version ?? match.row?.version ?? null;
 
   const landingUrl = record?.authoritative_url ?? record?.identity?.match_fields?.canonical_url ?? catalogCapture.url;
   const releaseIdentity = mintReleaseIdentity({
@@ -395,8 +413,8 @@ export function bindCapturedCatalogRecord(input) {
       evidence_ids: [catalogEvidenceId],
     },
     date_roles: dateRolesFromCatalogRow(match.row, catalogEvidenceId),
-    publisher_version: rolling ? null : publisherVersion,
-    release_kind: rolling ? "rolling_current" : (publisherVersion ? "vintage" : undefined),
+    publisher_version: rolling ? null : editionContext,
+    release_kind: rolling ? "rolling_current" : (editionContext ? "vintage" : undefined),
     content_sha256: match.row?.content_sha256 ?? match.row?.sha256 ?? null,
     distributions: distributionInputs.map((item) => ({
       distribution_kind: item.distribution_kind,

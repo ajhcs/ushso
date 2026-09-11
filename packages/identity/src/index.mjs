@@ -1,6 +1,7 @@
 export * from "./access-aging.mjs";
 export * from "./candidate-generator.mjs";
 export * from "./common.mjs";
+export * from "./core-conformance.mjs";
 export * from "./exact-identifier-policy.mjs";
 export * from "./family-graph.mjs";
 export * from "./generation-identity.mjs";

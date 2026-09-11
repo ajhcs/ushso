@@ -10,10 +10,13 @@ import {
   bindCapturedCatalogRecord,
   compareReplacementIdentities,
   createGenerationIdentityMap,
+  createPublisherIdentifier,
   live20260903GenerationMap,
   lookupProductContext,
   mintDistributionIdentity,
   mintReleaseIdentity,
+  nativeIdentifierConformsToCore,
+  projectCoreReleaseDecision,
 } from "../../packages/identity/src/index.mjs";
 import { createStaticPublicationReadContext } from "../../packages/registry/publication-read-context.mjs";
 import { lookupMappedProductContext } from "../../packages/registry/generation-identity.mjs";
@@ -299,11 +302,14 @@ test("C-007-1 conflicting date roles stay distinct and are not merged", () => {
   });
   assertSchema(identity);
   const byRole = Object.fromEntries(identity.date_roles.map((role) => [role.role, role]));
+  const modified = identity.date_roles.filter((role) => role.role === "catalog_modified");
   assert.equal(byRole.catalog_issued.value, "2023-01-15");
   assert.equal(byRole.vintage.value, "2023");
-  assert.equal(byRole.catalog_modified.value_state, "conflicted");
-  assert.equal(byRole.catalog_modified.value, null);
-  assert.notEqual(byRole.catalog_issued.value, byRole.catalog_modified.value);
+  assert.equal(modified.length, 2);
+  assert.ok(modified.every((role) => role.value_state === "conflicted"));
+  assert.ok(modified.some((role) => role.value === "2024-06-01"));
+  assert.ok(modified.some((role) => role.value === "2025-01-01"));
+  assert.notEqual(byRole.catalog_issued.value, "2024-06-01");
   assert.equal(identity.identity_state, "conflicted");
   assert.ok(identity.reason_codes.includes("date_role_conflict"));
   assert.equal(identity.boundaries.date_roles_merged, false);
@@ -458,6 +464,11 @@ test("C-007-3 human-to-machine source lookup returns the same product context", 
   assert.equal(map.isolated_count, 4);
   assert.equal(map.dictionary_source_revision.scientific_approval, false);
   assert.equal(map.dictionary_source_revision.applicability_state, "unresolved");
+  assert.equal(map.dictionary_source_revision.kind, "unresolved");
+  assert.equal(map.dictionary_source_revision.value, "unresolved");
+  assert.notEqual(map.dictionary_source_revision.value, CURRENT_LIVE_GENERATION);
+  assert.ok(map.cited_generation_evidence.some((item) => item.role === "human_manifest" && item.value === CURRENT_LIVE_MANIFEST_SHA256));
+  assert.ok(map.cited_generation_evidence.some((item) => item.role === "dictionary_source_revision" && item.state === "unresolved"));
   const binding = bindCapturedCatalogRecord({
     record: captures.cms_record,
     catalogCapture: captures.cms_catalog,
@@ -558,4 +569,245 @@ test("C-007-3 stale or mismatched pins yield typed restart guidance", () => {
   });
   assert.equal(mapped.restart_required, true);
   assert.equal(mapped.code, "manifest_mismatch");
+});
+
+function controllerReleaseInput(value, namespace = "publisher.release") {
+  return {
+    asset_id: "obs:asset:controller-example",
+    source_id: "urn:ushso:source:controller",
+    publisher_identifiers: [{
+      source_id: "urn:ushso:source:controller",
+      namespace,
+      value,
+      entity_scope: "release",
+      uniqueness_policy: "source_scoped",
+      evidence_ids: evidence("evidence:controller:identity"),
+    }],
+    locator: {
+      kind: "exact_distribution",
+      url: "https://example.org/data.csv",
+      evidence_ids: evidence("evidence:controller:identity"),
+    },
+    publisher_version: "2026",
+    release_kind: "vintage",
+    evidence_ids: evidence("evidence:controller:identity"),
+    observed_at: OBSERVED_AT,
+  };
+}
+
+test("R007-1 qualified publisher release identifiers keep namespace, punctuation, and long suffixes distinct", () => {
+  const slash = mintReleaseIdentity(controllerReleaseInput("edition/1"));
+  const colon = mintReleaseIdentity(controllerReleaseInput("edition:1"));
+  assert.notEqual(slash.release_id, colon.release_id);
+  assert.equal(slash.publisher_identifiers[0].value, "edition/1");
+  assert.equal(colon.publisher_identifiers[0].value, "edition:1");
+
+  const publisherNs = mintReleaseIdentity(controllerReleaseInput("edition-1", "publisher.release"));
+  const archiveNs = mintReleaseIdentity(controllerReleaseInput("edition-1", "archive.release"));
+  assert.notEqual(publisherNs.release_id, archiveNs.release_id);
+
+  const longA = mintReleaseIdentity(controllerReleaseInput(`${"a".repeat(200)}1`));
+  const longB = mintReleaseIdentity(controllerReleaseInput(`${"a".repeat(200)}2`));
+  assert.notEqual(longA.release_id, longB.release_id);
+  assert.match(longA.release_id, /^urn:ushso:release:/);
+  assert.match(longB.release_id, /^urn:ushso:release:/);
+});
+
+test("R007-1 a reusable-over-time distribution identifier does not bind two releases to one ID", () => {
+  const publisher = createPublisherIdentifier({
+    source_id: "urn:ushso:source:controller",
+    namespace: "publisher.distribution",
+    value: "download",
+    entity_scope: "distribution",
+    uniqueness_policy: "reusable_over_time",
+    evidence_ids: evidence("evidence:controller:identity"),
+  });
+  const base = {
+    format: "CSV",
+    distribution_kind: "download",
+    locator: {
+      kind: "exact_distribution",
+      url: "https://example.org/data.csv",
+      evidence_ids: evidence("evidence:controller:identity"),
+    },
+    publisher_identifiers: [publisher],
+    evidence_ids: evidence("evidence:controller:identity"),
+  };
+  const first = mintDistributionIdentity({ ...base, content_sha256: "a".repeat(64) }, {
+    releaseId: "urn:ushso:release:first",
+    releaseState: "exact",
+  });
+  const second = mintDistributionIdentity({ ...base, content_sha256: "b".repeat(64) }, {
+    releaseId: "urn:ushso:release:second",
+    releaseState: "exact",
+  });
+  assert.notEqual(first.distribution_id, second.distribution_id);
+  assert.equal(first.identity_rule, "hash_scoped_content_identity");
+  assert.equal(second.identity_rule, "hash_scoped_content_identity");
+});
+
+test("C-007-1 reuses core v2 native-identifier contracts without fabricating unresolved core objects", async () => {
+  const coreCommon = JSON.parse(await fs.readFile(path.join(ROOT, "contracts/core/v2.0.0/schemas/common.schema.json"), "utf8"));
+  const coreAjv = new Ajv2020({ strict: false, allErrors: true });
+  coreAjv.addFormat("date-time", (value) => typeof value === "string" && Number.isFinite(Date.parse(value)));
+  coreAjv.addFormat("date", (value) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value));
+  coreAjv.addSchema(coreCommon);
+  const validateNative = coreAjv.compile({
+    $ref: "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/nativeIdentifier",
+  });
+  const bundle = JSON.parse(await fs.readFile(path.join(ROOT, "contracts/core/v2.0.0/bundle/valid-bundle.json"), "utf8"));
+  const coreRelease = bundle.releases[0];
+  const coreNative = coreRelease.native_identifiers[0];
+  assert.equal(validateNative(coreNative), true, JSON.stringify(validateNative.errors, null, 2));
+
+  const accepted = createPublisherIdentifier(coreNative);
+  assert.equal(nativeIdentifierConformsToCore(accepted), true);
+  assert.equal(validateNative(accepted), true, JSON.stringify(validateNative.errors, null, 2));
+
+  const identity = mintReleaseIdentity({
+    asset_id: coreRelease.asset_id,
+    source_id: coreNative.source_id,
+    publisher_identifiers: [coreNative],
+    locator: {
+      kind: "exact_distribution",
+      url: "https://data.cms.gov/example-core-release",
+      evidence_ids: coreNative.evidence_ids,
+    },
+    publisher_version: coreRelease.publisher_version,
+    release_kind: coreRelease.release_kind,
+    evidence_ids: coreNative.evidence_ids,
+    observed_at: OBSERVED_AT,
+  });
+  assertSchema(identity);
+  assert.equal(identity.identity_state, "exact");
+  assert.equal(identity.identity_rule, "publisher_stable_release_id");
+  assert.equal(nativeIdentifierConformsToCore(identity.publisher_identifiers[0]), true);
+
+  const unresolved = mintReleaseIdentity({
+    asset_id: STABLE_ASSET_ID,
+    source_id: "urn:ushso:source:cms-data-catalog",
+    publisher_identifiers: [publisherAsset()],
+    locator: {
+      kind: "landing_page",
+      url: "https://data.cms.gov/dataset/hospital-cost-report",
+      evidence_ids: evidence(),
+    },
+    evidence_ids: evidence(),
+    observed_at: OBSERVED_AT,
+  });
+  const projectedUnresolved = projectCoreReleaseDecision(unresolved);
+  assert.equal(projectedUnresolved.projected, false);
+  assert.equal(projectedUnresolved.core_object, null);
+  assert.ok(projectedUnresolved.reason_codes.includes("unresolved_identity_is_not_a_core_release"));
+
+  const projectedExactWithoutEnvelope = projectCoreReleaseDecision(identity);
+  assert.equal(projectedExactWithoutEnvelope.projected, false);
+  assert.equal(projectedExactWithoutEnvelope.core_object, null);
+  assert.ok(projectedExactWithoutEnvelope.reason_codes.includes("exact_identity_without_core_envelope_is_not_fabricated"));
+
+  const projectedExact = projectCoreReleaseDecision(identity, {
+    envelope: { ...coreRelease, release_id: identity.release_id, entity_id: identity.release_id },
+  });
+  assert.equal(projectedExact.projected, true);
+  assert.equal(projectedExact.core_object.entity_type, "Release");
+  assert.equal(projectedExact.core_object.contract_version, "observatory-core.v2.0.0");
+  assert.equal(projectedExact.core_object.release_id, identity.release_id);
+});
+
+test("R007-2 unsupported pins, foreign bindings, and stale publications restart", () => {
+  const map = live20260903GenerationMap();
+  const record = { record_id: "obs:asset:controller-example", source_id: "urn:ushso:source:controller", source_native_id: "product-1" };
+  const unknownKind = lookupProductContext({
+    map,
+    record,
+    pin: "old-unavailable-generation",
+    pin_kind: "unsupported_kind",
+  });
+  assert.equal(unknownKind.restart_required, true);
+  assert.equal(unknownKind.code, "unsupported_pin_kind");
+
+  const foreign = lookupProductContext({
+    map,
+    record,
+    pin: map.machine_generation.value,
+    binding: {
+      asset_id: "obs:asset:foreign",
+      source_id: "urn:ushso:source:foreign",
+      releases: ["urn:ushso:release:foreign"],
+      distributions: [{ distribution_id: "urn:ushso:distribution:foreign", release_id: "urn:ushso:release:foreign" }],
+    },
+  });
+  assert.equal(foreign.restart_required, true);
+  assert.equal(foreign.code, "binding_ownership_mismatch");
+
+  const publication = createStaticPublicationReadContext({
+    corpus_id: "controller-old-corpus",
+    corpus_version: "0.9.0",
+    manifest_sha256: "b".repeat(64),
+  });
+  const mapped = lookupMappedProductContext({
+    publication,
+    map,
+    record,
+    pin: map.machine_generation.value,
+  });
+  assert.equal(mapped.restart_required, true);
+  assert.equal(mapped.lookup, undefined);
+});
+
+test("R007-3 catalog vintage is not a global release ID and unrelated resources stay unjoined", () => {
+  const first = bindCapturedCatalogRecord({
+    record: captures.cms_record,
+    catalogCapture: captures.cms_catalog,
+  });
+  const catalog = structuredClone(captures.cms_catalog);
+  const otherRecord = structuredClone(captures.cms_record);
+  otherRecord.record_id = "obs:asset:cms-data-catalog:other-product";
+  otherRecord.identity.asset.asset_id = otherRecord.record_id;
+  otherRecord.identity.match_fields.source_id = "controller-other-native-id";
+  catalog.data.dataset[0].identifier = "controller-other-native-id";
+  const second = bindCapturedCatalogRecord({
+    record: otherRecord,
+    catalogCapture: catalog,
+  });
+  assert.notEqual(first.releases[0], second.releases[0]);
+  assert.equal(first.asset_id, captures.cms_record.record_id);
+  assert.equal(second.asset_id, otherRecord.record_id);
+
+  const unlinkedCatalog = structuredClone(captures.cms_catalog);
+  for (const row of unlinkedCatalog.data.dataset) {
+    for (const distribution of row.distribution ?? []) delete distribution.resourcesAPI;
+  }
+  const unrelated = structuredClone(captures.cms_resources);
+  unrelated.data.links.self.href = "https://example.org/unrelated/resources";
+  unrelated.data.data = [{ downloadURL: "https://example.org/unrelated.csv", format: "CSV", sha256: "d".repeat(64) }];
+  const binding = bindCapturedCatalogRecord({
+    record: captures.cms_record,
+    catalogCapture: unlinkedCatalog,
+    resourcesCapture: unrelated,
+  });
+  assert.equal(binding.distributions.some((item) => item.locator.url === "https://example.org/unrelated.csv"), false);
+  assert.ok(binding.reason_codes.includes("resources_link_required"));
+  assert.ok(binding.alternatives.some((item) => item.reason_codes.includes("unrelated_resources_capture")));
+});
+
+test("C-007-2 source-shaped CMS catalog metadata keeps two 2023 products distinct without payload access", async () => {
+  const sourceShaped = JSON.parse(await fs.readFile(path.join(ROOT, "verification/research-program/pr-007/fixtures/cms-source-shaped.captures.json"), "utf8"));
+  const hha = bindCapturedCatalogRecord({
+    record: sourceShaped.hha_record,
+    catalogCapture: sourceShaped.hha_catalog,
+    observedAt: sourceShaped.observed_at,
+  });
+  const hospital = bindCapturedCatalogRecord({
+    record: sourceShaped.hospital_record,
+    catalogCapture: sourceShaped.hospital_catalog,
+    observedAt: sourceShaped.observed_at,
+  });
+  assert.equal(hha.asset_id, sourceShaped.hha_record.record_id);
+  assert.equal(hospital.asset_id, sourceShaped.hospital_record.record_id);
+  assert.notEqual(hha.asset_id, hospital.asset_id);
+  assert.notEqual(hha.releases[0], hospital.releases[0]);
+  assert.equal(hha.boundaries.catalog_membership_is_payload_access, false);
+  assert.equal(hospital.boundaries.catalog_membership_is_payload_access, false);
+  assert.equal(sourceShaped.notes.includes("not payload tests"), true);
 });
