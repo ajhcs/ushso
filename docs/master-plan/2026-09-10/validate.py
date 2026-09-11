@@ -19,6 +19,8 @@ check(extensions[1].get('id')=='PR-086' and extensions[1].get('parent_pr')=='PR-
 check(set(prs.get('PR-086',{}).get('dependencies',[]))=={'PR-003','PR-085'},'PR086 requires accepted protocol and attestation foundations')
 check(all('PR-086' in prs.get(p,{}).get('dependencies',[]) for p in ['PR-005','PR-082']),'PR005 integration and release qualification must consume the current-input remediation')
 check(m['source_sha256']==hashlib.sha256((ROOT/'plan-source.py').read_bytes()).hexdigest(),'source/model drift')
+check({'contracts/machine-toolkit/v1.2.0/schemas/variable-identity.schema.json','packages/identity/manifests/package-manifest.json','packages/identity/validation/validation-receipt.json'}<=set(prs.get('PR-008',{}).get('files',[])),'PR008 must own its additive schema and current identity seal')
+check('contracts/machine-toolkit/' not in prs.get('PR-008',{}).get('files',[]),'PR008 must not own frozen machine contracts through a blanket directory scope')
 commit_ids=[];mapped_reqs=set();mapped_findings=set()
 for p in prs.values():
     check(p['phase'] in phases,p['id']+' missing phase')
