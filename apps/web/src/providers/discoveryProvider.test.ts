@@ -28,6 +28,31 @@ describe('DiscoveryProvider contract', () => {
     })
   })
 
+  it('applies canonical fixture filters with OR within a dimension and AND across dimensions', async () => {
+    const provider = new FixtureDiscoveryProvider(loadAcceptedDiscoveryFixture, 'accepted')
+    const pennsylvania = await provider.browse({ traversal: { filters: ['geography:US-PA'] } })
+    expect(pennsylvania.results.length).toBeGreaterThan(0)
+    expect(pennsylvania.results.every((result) => result.record.geography.jurisdictions.includes('US-PA'))).toBe(true)
+
+    const mixed = await provider.browse({ traversal: { filters: ['geography:US-PA', 'geography:US'] } })
+    expect(mixed.results.length).toBeGreaterThanOrEqual(pennsylvania.results.length)
+    expect(mixed.results.every((result) => ['US-PA', 'US'].some((value) => result.record.geography.jurisdictions.includes(value)))).toBe(true)
+
+    const crossDimension = await provider.browse({ traversal: { filters: ['geography:US-PA', 'access_status:public_direct'] } })
+    expect(crossDimension.results.length).toBeLessThan(pennsylvania.results.length)
+    expect(crossDimension.results.every((result) => result.record.geography.jurisdictions.includes('US-PA'))).toBe(true)
+    expect(crossDimension.results.every((result) => result.record.access.status === 'public_direct')).toBe(true)
+  })
+
+  it('retains a selected filter through a fixture zero-result roundtrip', async () => {
+    const provider = new FixtureDiscoveryProvider(loadAcceptedDiscoveryFixture, 'accepted')
+    const response = await provider.browse({ traversal: { filters: ['geography:unknown'] } })
+    expect(response.results).toHaveLength(0)
+    expect(response.result_count).toBe(0)
+    expect(response.total_matches).toBe(0)
+    expect(response.query.filters.facet_filters).toEqual({ geography: ['unknown'] })
+  })
+
   it('posts the canonical query and validates the API response boundary', async () => {
     const fetchImpl = vi.fn(async () => new Response(JSON.stringify(acceptedResponse), {
       status: 200,

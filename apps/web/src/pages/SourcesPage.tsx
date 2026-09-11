@@ -5,8 +5,10 @@ import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { PageTitle } from '../components/PageTitle'
 import { adaptDiscoveryResponse } from '../lib/catalogAdapter'
-import { normalizeFacetValue } from '../data/facets'
+import { presentFacetOptionLabel } from '../data/facets'
 import { useDiscoveryResult } from '../providers/DiscoveryProviderContext'
+import type { DatasetRecord } from '../types/catalog'
+import type { DiscoveryResult } from '../types/discovery'
 
 interface ReadinessState {
   name: string
@@ -35,6 +37,19 @@ function overlayLabel(state: ReadinessState) {
   return 'Bounded evidence gap; not an absence claim'
 }
 
+export function sourceGroupsFromResponse(response: DiscoveryResult, records: DatasetRecord[]) {
+  const sourceFacet = response.facets?.sections.find((section) => section.id === 'source')
+  if (sourceFacet) return sourceFacet.options.map((option) => ({
+    id: option.value,
+    label: presentFacetOptionLabel('source', option.value, option.label, records),
+    count: option.count,
+    examples: records.filter((record) => record.canonicalResult.record.identity.source.source_id === option.value),
+  }))
+  const groups = new Map<string, DatasetRecord[]>()
+  for (const record of records) groups.set(record.sourceName, [...(groups.get(record.sourceName) ?? []), record])
+  return [...groups.entries()].map(([label, examples]) => ({ id: label, label, count: examples.length, examples }))
+}
+
 export function SourcesPage() {
   const discovery = useDiscoveryResult('')
   const [readiness, setReadiness] = useState<NationalReadiness | null>(null)
@@ -42,16 +57,7 @@ export function SourcesPage() {
   const catalog = useMemo(() => discovery.status === 'ready' ? adaptDiscoveryResponse(discovery.result) : null, [discovery])
   const sourceGroups = useMemo(() => {
     if (discovery.status !== 'ready') return []
-    const sourceFacet = discovery.result.facets?.sections.find((section) => section.id === 'source')
-    if (sourceFacet) return sourceFacet.options.map((option) => ({
-      id: option.value,
-      label: option.label,
-      count: option.count,
-      examples: (catalog?.records ?? []).filter((record) => normalizeFacetValue(record.canonicalResult.record.identity.source.source_id) === normalizeFacetValue(option.value)),
-    }))
-    const groups = new Map<string, NonNullable<typeof catalog>['records']>()
-    for (const record of catalog?.records ?? []) groups.set(record.sourceName, [...(groups.get(record.sourceName) ?? []), record])
-    return [...groups.entries()].map(([label, examples]) => ({ id: label, label, count: examples.length, examples }))
+    return sourceGroupsFromResponse(discovery.result, catalog?.records ?? [])
   }, [catalog, discovery])
 
   useEffect(() => {
