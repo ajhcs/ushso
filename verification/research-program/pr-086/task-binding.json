@@ -1,15 +1,15 @@
 {
   "format": "ushso.research-program.task.v1",
-  "task_id": "pr086-wp11-current-input",
-  "slice_id": "C-086-3",
+  "task_id": "pr086-current-candidate-tests-r2",
+  "slice_id": "C-086-3-R1",
   "pr_id": "PR-086",
-  "title": "Separate original WP11 input proof from current verification",
-  "owner": "Grok (xAI; grok-4; assignment pr086-wp11-current-input)",
+  "title": "Correct PR086 current-candidate WP11 test assumptions",
+  "owner": "Grok (xAI; grok-4; assignment pr086-current-candidate-tests-r2)",
   "reviewer": "Astra",
-  "branch": "codex/ce-ushso-pr086-wp11-grok-20-pr086-wp11-current-input-d5d7f0169e56-ebf15eab",
-  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-pr086-wp11-grok-20-pr086-wp11-current-input-d5d7f0169e56-ebf15eab",
-  "objective": "Implement separately reviewed PR086 portable historical WP11 input proof and distinct unapproved current technical/wrapper verification.",
-  "outcome": "Historical WP11 approval remains bound to its exact original 154-file snapshot while actual current inputs receive separate, unapproved technical and wrapper checks. No current approval, combined acceptance, merge, or deployment is issued.",
+  "branch": "codex/ce-ushso-pr086-grok-r2-2026-pr086-current-candidate--0aee48c9dc8a-51d958ec",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr086-wp11-grok-20-pr086-wp11-current-input-d5d7f0169e56-ebf15eab-worktrees/ce-ushso-pr086-grok-r2-2026-pr086-current-candidate--0aee48c9dc8a-51d958ec",
+  "objective": "Correct independently reproduced PR086 test assumptions that reject the actual PR005/PR086 combined candidate while preserving complete historical/current byte verification.",
+  "outcome": "Named pre-PR005 fixture still asserts the exact two package transitions. Current-candidate checks independently compare every sealed pin path/hash/length against actual current bytes. Current-file mutation uses a task-owned TMPDIR fixture and reads historical hashes from retained proof. No current approval, combined acceptance, merge, or deployment is issued.",
   "dependencies": [
     "PR-003",
     "PR-085"
@@ -39,6 +39,18 @@
       "id": "C-086-3",
       "subject": "Publish current-input evidence and combined acceptance boundary",
       "instructions": "Retain sanitized complete commands, snapshot provenance, all original failed receipts, fresh candidate-specific replays and an evidence index.",
+      "verification": "Run the focused WP11 attestation tests, actual selected WP11 aggregate, current adapter and handoff validation."
+    },
+    {
+      "id": "C-086-2-R1",
+      "subject": "Verify WP11 current diffs against sealed pins",
+      "instructions": "Keep the named pre-PR005 two-change fixture. Independently compare current candidate bytes to every original sealed pin. Mutate current inputs only in a task-owned TMPDIR fixture using the actual builder/validator.",
+      "verification": "Focused tests pass on this tree and do not hardcode the pre-PR005 current tree as every future current tree."
+    },
+    {
+      "id": "C-086-3-R1",
+      "subject": "Record PR086 current-candidate test correction evidence",
+      "instructions": "Add additive r1 receipts and replay. Update current candidate hashes without rewriting prior candidate evidence. Record the actual new task and branch with a typed pending final head.",
       "verification": "Run the focused WP11 attestation tests, actual selected WP11 aggregate, current adapter and handoff validation."
     }
   ],

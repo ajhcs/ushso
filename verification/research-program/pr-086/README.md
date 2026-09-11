@@ -5,4 +5,5 @@ Additive producer evidence for separating original WP11 v1.3 input proof from cu
 - Historical approval remains bound to subject `294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98`.
 - Current technical and wrapper subjects stay `pending_authorized_review` with `approval=null`.
 - Prior PR-085 historical-pins and current-replay records remain byte-identical prior-candidate evidence.
+- The r2 test correction adds `pr086-r1-*` receipts without rewriting `pr086-current-replay.json` or `pr086-command-receipts.json`.
 - This packet is not combined PR005/PR086 acceptance, current-subject approval, or release qualification.
