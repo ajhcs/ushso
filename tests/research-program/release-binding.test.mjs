@@ -5,10 +5,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
 import {
+  bindCapturedCatalogRecord,
   compareReplacementIdentities,
   mintDistributionIdentity,
   mintReleaseIdentity,
 } from "../../packages/identity/src/index.mjs";
+import { createStaticPublicationReadContext } from "../../packages/registry/publication-read-context.mjs";
+import { resolveReleaseDistributions } from "../../packages/registry/release-catalog.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const OBSERVED_AT = "2026-09-03T22:22:33.908Z";
@@ -340,4 +343,99 @@ test("C-007-1 a landing-page URL without content or a stable release ID stays un
   });
   assert.equal(distribution.identity_state, "ambiguous");
   assert.equal(distribution.distribution_id, null);
+});
+
+const captures = JSON.parse(await fs.readFile(path.join(ROOT, "verification/research-program/pr-007/fixtures/catalog-resources.captures.json"), "utf8"));
+
+function fixturePublication() {
+  return createStaticPublicationReadContext({
+    corpus_id: "ushso-pr007-release-binding-fixture",
+    corpus_version: "test",
+    manifest_sha256: "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  });
+}
+
+test("C-007-2 one-to-many publisher distributions remain distinct", () => {
+  const binding = bindCapturedCatalogRecord({
+    record: captures.cms_record,
+    catalogCapture: captures.cms_catalog,
+    resourcesCapture: captures.cms_resources,
+    observedAt: captures.observed_at,
+  });
+  assert.equal(binding.asset_id, captures.cms_record.record_id);
+  assert.equal(binding.binding_state, "one_to_many");
+  assert.equal(binding.fabricated_exact_binding, false);
+  const distributionIds = binding.distributions.map((item) => item.distribution_id).filter(Boolean);
+  assert.ok(distributionIds.length >= 3);
+  assert.equal(new Set(distributionIds).size, distributionIds.length);
+  assert.ok(binding.distributions.some((item) => item.format === "API" || item.distribution_kind === "api"));
+  assert.ok(binding.distributions.some((item) => item.format === "CSV"));
+  assert.ok(binding.distributions.some((item) => item.identity_state === "replaced"));
+  assert.ok(binding.evidence_pointers.some((item) => item.pointer.includes("/distribution/")));
+  assert.ok(binding.evidence_pointers.some((item) => item.pointer.startsWith("/data/")));
+  const resolved = resolveReleaseDistributions({
+    publication: fixturePublication(),
+    record: captures.cms_record,
+    catalogCapture: captures.cms_catalog,
+    resourcesCapture: captures.cms_resources,
+    observedAt: captures.observed_at,
+  });
+  assert.equal(resolved.binding_state, "one_to_many");
+  assert.equal(resolved.asset_id, captures.cms_record.record_id);
+  assert.equal(resolved.publication.corpus.corpus_id, "ushso-pr007-release-binding-fixture");
+});
+
+test("C-007-2 an ambiguous URL never produces a fabricated exact binding", () => {
+  const urlOnly = bindCapturedCatalogRecord({
+    record: captures.cms_record,
+    catalogCapture: null,
+    observedAt: captures.observed_at,
+  });
+  assert.equal(urlOnly.binding_state, "unresolved");
+  assert.deepEqual(urlOnly.releases, []);
+  assert.ok(urlOnly.reason_codes.includes("url_alone_is_not_exact_release"));
+  assert.equal(urlOnly.fabricated_exact_binding, false);
+
+  const shared = bindCapturedCatalogRecord({
+    record: {
+      record_id: "obs:asset:cms-data-catalog:shared-one",
+      identity: {
+        asset: { asset_id: "obs:asset:cms-data-catalog:shared-one", version_state: "edition" },
+        match_fields: { source_id: "asset-one", canonical_url: "https://data.cms.gov/shared-endpoint" },
+        source: { source_id: "cms-data-catalog" },
+      },
+    },
+    catalogCapture: captures.ambiguous_catalog,
+    observedAt: captures.observed_at,
+  });
+  assert.equal(shared.binding_state, "ambiguous");
+  assert.ok(shared.distributions.every((item) => item.distribution_id == null));
+  assert.ok(shared.alternatives.length >= 1);
+  assert.ok(shared.alternatives.every((item) => item.evidence_pointers?.length));
+
+  const duplicateIdentifier = structuredClone(captures.cms_catalog);
+  duplicateIdentifier.data.dataset.push({
+    identifier: captures.cms_record.identity.match_fields.source_id,
+    distribution: [{ accessURL: "https://data.cms.gov/other", format: "API" }],
+  });
+  const ambiguousId = bindCapturedCatalogRecord({
+    record: captures.cms_record,
+    catalogCapture: duplicateIdentifier,
+    observedAt: captures.observed_at,
+  });
+  assert.equal(ambiguousId.binding_state, "ambiguous");
+  assert.deepEqual(ambiguousId.releases, []);
+  assert.ok(ambiguousId.alternatives.length >= 2);
+});
+
+test("C-007-2 rolling catalog resources stay rolling and keep the existing asset ID", () => {
+  const binding = bindCapturedCatalogRecord({
+    record: captures.cdc_record,
+    catalogCapture: captures.cdc_catalog,
+    observedAt: captures.observed_at,
+  });
+  assert.equal(binding.binding_state, "rolling");
+  assert.equal(binding.asset_id, captures.cdc_record.record_id);
+  assert.deepEqual(binding.releases, []);
+  assert.ok(binding.reason_codes.includes("rolling_endpoint_not_exact"));
 });
