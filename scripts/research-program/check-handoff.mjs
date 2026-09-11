@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // PR-003 slice C-003-2 plus integrity corrections C-003-2-R1 / C-003-2-R2
-// and remaining-defect corrections C-003-2-R3 / C-003-3-R3 —
+// and remaining-defect corrections C-003-2-R3 / C-003-3-R3 / C-003-2-R4 —
 // bounded handoff-packet validator.
 //
 // Usage:
@@ -485,15 +485,22 @@ export function ownedPathMatches(ownedPath, candidatePath) {
   const candidate = toPosix(candidatePath);
   if (owned === '' || candidate === '') return false;
   if (owned === candidate) return true;
+  const hasWildcard = owned.includes('*');
   if (owned.endsWith('/')) {
     const prefix = owned.slice(0, -1);
-    return candidate === prefix || candidate.startsWith(`${prefix}/`);
+    if (!hasWildcard) {
+      return candidate === prefix || candidate.startsWith(`${prefix}/`);
+    }
+    return new RegExp(`^${ownedGlobToRegExpSource(prefix)}(?:/.*)?$`).test(candidate);
   }
   if (owned.endsWith('/**')) {
     const prefix = owned.slice(0, -3);
-    return candidate === prefix || candidate.startsWith(`${prefix}/`);
+    if (!prefix.includes('*')) {
+      return candidate === prefix || candidate.startsWith(`${prefix}/`);
+    }
+    return new RegExp(`^${ownedGlobToRegExpSource(prefix)}(?:/.*)?$`).test(candidate);
   }
-  if (!owned.includes('*')) return false;
+  if (!hasWildcard) return false;
   return new RegExp(`^${ownedGlobToRegExpSource(owned)}$`).test(candidate);
 }
 

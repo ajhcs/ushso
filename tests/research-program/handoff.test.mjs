@@ -1,5 +1,5 @@
 // Focused suite for PR-003 C-003-2 and integrity corrections C-003-1-R1/C-003-2-R1
-// plus bounded R2 contract corrections and remaining-defect R3 corrections.
+// plus bounded R2 contract corrections and remaining-defect R3/R4 corrections.
 //
 // The suite exercises the validator on committed fixtures and ephemeral,
 // write-then-remove symlink probes. A passing packet is producer evidence, not
@@ -306,6 +306,16 @@ test('ownedPathMatches documents exact-file and directory/glob ownership', () =>
   assert.equal(ownedPathMatches('foo**bar', 'foobar'), true);
   assert.equal(ownedPathMatches('verification/research-program/pr-003/', 'verification/research-program/pr-003'), true);
   assert.equal(ownedPathMatches('verification/research-program/pr-003/**', 'verification/research-program/pr-003'), true);
+
+  assert.equal(ownedPathMatches('tests/*/**', 'tests/unit/one.mjs'), true);
+  assert.equal(ownedPathMatches('tests/*/**', 'tests/unit'), true);
+  assert.equal(ownedPathMatches('tests/*/**', 'lib/unit/one.mjs'), false);
+  assert.equal(ownedPathMatches('docs/**/fixtures/**', 'docs/pr003/fixtures/nested/one.json'), true);
+  assert.equal(ownedPathMatches('docs/**/fixtures/**', 'docs/fixtures/one.json'), true);
+  assert.equal(ownedPathMatches('docs/**/fixtures/**', 'docs/fixtures'), true);
+  assert.equal(ownedPathMatches('docs/**/fixtures/**', 'docs/pr003/fixture/one.json'), false);
+  assert.equal(ownedPathMatches('tests/*/', 'tests/unit/one.mjs'), true);
+  assert.equal(ownedPathMatches('tests/*/', 'test/unit/one.mjs'), false);
 });
 
 test('base SHA must match the concrete per-PR task binding', async () => {
@@ -639,6 +649,61 @@ test('completed packet scope honors slash-aware wildcards', async () => {
     await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
     const outside = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
     assert.ok(rulesOf(outside).includes('changed_file_outside_owned_paths'));
+  } finally {
+    await rm(runtime.dir, { recursive: true, force: true });
+  }
+});
+
+test('completed packet scope honors composite slash-aware wildcards', async () => {
+  const handoff = await readJson('handoff.valid.json');
+  const binding = JSON.parse(await readFile(fixture('task-binding.json'), 'utf8'));
+  const runtime = await writeRuntimeHandoff('composite-wildcard-scope.json', handoff, {
+    copyFixtureBinding: false
+  });
+  try {
+    const cases = [
+      {
+        pattern: 'tests/*/**',
+        accepted: ['tests/unit/one.mjs', 'tests/unit'],
+        rejected: ['lib/unit/one.mjs']
+      },
+      {
+        pattern: 'docs/**/fixtures/**',
+        accepted: ['docs/pr003/fixtures/nested/one.json', 'docs/fixtures/one.json', 'docs/fixtures'],
+        rejected: ['docs/pr003/fixture/one.json']
+      },
+      {
+        pattern: 'tests/*/',
+        accepted: ['tests/unit/one.mjs'],
+        rejected: ['test/unit/one.mjs']
+      }
+    ];
+
+    for (const { pattern, accepted, rejected } of cases) {
+      binding.owned_paths = [pattern];
+      await writeFile(path.join(runtime.dir, 'task-binding.json'), `${JSON.stringify(binding, null, 2)}\n`);
+
+      for (const changedFile of accepted) {
+        handoff.changed_files = [changedFile];
+        await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+        const report = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+        assert.equal(
+          statusOf(report, 'task_scope_binding'),
+          'passed',
+          `${pattern} should accept ${changedFile}: ${JSON.stringify(report.findings)}`
+        );
+      }
+
+      for (const changedFile of rejected) {
+        handoff.changed_files = [changedFile];
+        await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+        const report = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+        assert.ok(
+          rulesOf(report).includes('changed_file_outside_owned_paths'),
+          `${pattern} should reject ${changedFile}: ${JSON.stringify(report.findings)}`
+        );
+      }
+    }
   } finally {
     await rm(runtime.dir, { recursive: true, force: true });
   }
