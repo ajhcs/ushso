@@ -46,6 +46,12 @@
       "verification": "Rebuild matches the committed gzip bytes; decoding reproduces SHA-256 47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74; field-state tests cover transport/decoded identity plus corrupt, truncated, mismatched-hash and bounded-decoding controls."
     },
     {
+      "id": "C-004-10",
+      "subject": "Reject inconsistent completeness packaging manifests",
+      "instructions": "Reject packaged completeness manifests whose path, encoding, Git snapshot, compressor, loader/verifier, or logical generation/count/source/identity fields contradict the actual gzip transport or decoded view. Preserve existing format validation, bounded decoding, and corruption/truncation/hash controls. Add independent negative tests so one metadata mismatch cannot hide an unchecked second field.",
+      "verification": "Field-state tests reject independently mutated generation, record_count, transport path/encoding, Git snapshot, compressor, and remaining logical metadata; the canonical payload still verifies with the original gzip and decoded identities."
+    },
+    {
       "id": "C-004-9",
       "subject": "Record PR004 lossless packaging evidence and handoff",
       "instructions": "Add a packaging evidence index and update the current handoff and task-binding. Keep evidence.json and evidence/r2/index.json byte-identical. Current owner must match this task-binding owner. Do not alter frozen semantic pins, prior evidence hashes, or the original 85PR/255-commit graph.",
