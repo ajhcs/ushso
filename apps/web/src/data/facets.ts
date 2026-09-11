@@ -475,13 +475,45 @@ export function facetFilterLabel(filter: string, items: DatasetFamily[] = []) {
   return facetOptionLabel(sectionId, filter.slice(separator + 1), items as FacetInput[])
 }
 
+/**
+ * Canonical request values are wire IDs and therefore compare exactly. The
+ * explicit geography/access value aliases and legacy section aliases below
+ * keep old browser tokens usable without normalizing canonical IDs together.
+ */
+function canonicalFacetValuesForSection(record: ObservatoryRecord, sectionId: string) {
+  return canonicalFacetValues(record)[sectionId as CanonicalFacetSectionId] ?? []
+}
+
+/** Canonical request values are compared as exact wire IDs. */
 export function matchesFacetFilter(record: ObservatoryRecord, sectionId: string, value: string) {
+  return canonicalFacetValuesForSection(record, sectionId).includes(value)
+}
+
+/**
+ * Adapts only legacy browser tokens. This boundary keeps old DatasetFamily
+ * aliases usable while canonical request matching remains exact.
+ */
+export function matchesLegacyFacetFilter(record: ObservatoryRecord, sectionId: string, value: string) {
   const canonicalSection = legacySectionAliases[sectionId] ?? sectionId
-  const values = canonicalFacetValues(record)[canonicalSection as CanonicalFacetSectionId] ?? []
+  const values = canonicalFacetValuesForSection(record, canonicalSection)
   if (values.includes(value)) return true
-  if (canonicalSection === 'capability' && values.some((candidate) => normalizeFacetValue(candidate) === normalizeFacetValue(value))) return true
   if (canonicalSection === 'geography' && value === 'pennsylvania') return values.includes('US-PA')
   if (canonicalSection === 'access_status' && value === 'catalog-metadata-only') return values.includes('public_catalog')
-  if (canonicalSection === 'unit_of_analysis' && values.some((candidate) => normalizeFacetValue(candidate) === normalizeFacetValue(value))) return true
+  if (legacySectionAliases[sectionId] && (canonicalSection === 'capability' || canonicalSection === 'unit_of_analysis')) {
+    return values.some((candidate) => normalizeFacetValue(candidate) === normalizeFacetValue(value))
+  }
   return false
+}
+
+function isLegacyFacetToken(sectionId: string, value: string) {
+  return Object.hasOwn(legacySectionAliases, sectionId)
+    || (sectionId === 'geography' && value === 'pennsylvania')
+    || (sectionId === 'access_status' && value === 'catalog-metadata-only')
+}
+
+/** Selects the explicit compatibility boundary for fixture/browser tokens. */
+export function matchesFacetFilterToken(record: ObservatoryRecord, sectionId: string, value: string) {
+  return isLegacyFacetToken(sectionId, value)
+    ? matchesLegacyFacetFilter(record, sectionId, value)
+    : matchesFacetFilter(record, sectionId, value)
 }

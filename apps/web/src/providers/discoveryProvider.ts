@@ -1,5 +1,5 @@
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
-import { matchesFacetFilter } from '../data/facets'
+import { matchesFacetFilterToken } from '../data/facets'
 import { browserRecordErrors } from '../../../../packages/retrieval/tools/catalog-contract.mjs'
 import { safeExternalHttpsUrl } from '../../../../packages/retrieval/tools/external-url-policy.mjs'
 import type { DiscoveryQuery, DiscoveryResult, DiscoverySort } from '../types/discovery'
@@ -256,7 +256,7 @@ function recomputeFixtureFacets(response: DiscoveryResult) {
         options: section.options
           .map((option) => ({
             ...option,
-            count: records.filter((result) => matchesFacetFilter(result.record, section.id, option.value)).length,
+            count: records.filter((result) => matchesFacetFilterToken(result.record, section.id, option.value)).length,
           }))
           .filter((option) => option.count > 0),
       }))
@@ -270,7 +270,7 @@ function applyFixtureFacetFilters(response: DiscoveryResult, filters: Record<str
   const selectedIds = new Set<string>()
   response.results = response.results
     .filter((result) => {
-      const matches = entries.every(([section, values]) => values.some((value) => matchesFacetFilter(result.record, section, value)))
+      const matches = entries.every(([section, values]) => values.some((value) => matchesFacetFilterToken(result.record, section, value)))
       if (matches) selectedIds.add(result.record_id)
       return matches
     })

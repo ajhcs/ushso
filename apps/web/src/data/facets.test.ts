@@ -11,6 +11,8 @@ import {
   facetOptionLabel,
   normalizeFacetValue,
   normalizeDiscoveryFacetSections,
+  matchesFacetFilter,
+  matchesLegacyFacetFilter,
 } from './facets'
 
 const acceptedResponse = await loadAcceptedDiscoveryFixture()
@@ -138,6 +140,30 @@ describe('backend-derived facets', () => {
       'source', 'geography', 'access_status', 'unit_of_analysis', 'capability',
     ])
     expect(sections.some((section) => ['years', 'variables-codebook', 'record-type', 'verification'].includes(section.id))).toBe(false)
+  })
+
+  it('matches canonical wire IDs exactly while retaining explicit legacy aliases', () => {
+    const catalog = adaptDiscoveryResponse(acceptedResponse)
+    const record = structuredClone(catalog.records[0].canonicalResult.record)
+    record.capabilities.topics = [{ ...record.capabilities.topics[0], id: 'topic:claims', label: 'Claims' }]
+    record.capabilities.use_cases = []
+    record.unit_of_analysis = ['facility_period']
+    record.geography.jurisdictions = ['US-PA']
+    record.access.status = 'public_catalog'
+
+    expect(matchesFacetFilter(record, 'capability', 'topic:claims')).toBe(true)
+    expect(matchesFacetFilter(record, 'capability', 'topic-claims')).toBe(false)
+    expect(matchesFacetFilter(record, 'unit_of_analysis', 'facility_period')).toBe(true)
+    expect(matchesFacetFilter(record, 'unit_of_analysis', 'facility-period')).toBe(false)
+    expect(matchesFacetFilter(record, 'geography', 'US-PA')).toBe(true)
+    expect(matchesFacetFilter(record, 'geography', 'pennsylvania')).toBe(false)
+    expect(matchesFacetFilter(record, 'access_status', 'public_catalog')).toBe(true)
+    expect(matchesFacetFilter(record, 'access_status', 'catalog-metadata-only')).toBe(false)
+
+    expect(matchesLegacyFacetFilter(record, 'geography', 'pennsylvania')).toBe(true)
+    expect(matchesLegacyFacetFilter(record, 'access_status', 'catalog-metadata-only')).toBe(true)
+    expect(matchesLegacyFacetFilter(record, 'data-category', 'claims')).toBe(true)
+    expect(matchesLegacyFacetFilter(record, 'reporting-unit', 'facility-period')).toBe(true)
   })
 
   it('uses captured and bounded labels for canonical IDs', () => {
