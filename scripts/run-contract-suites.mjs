@@ -375,12 +375,12 @@ function executePackageScript(descriptor, scriptName) {
   return { script: scriptName, status: 'PASS', parsed_test_count: parsedTestCount }
 }
 
-export function executeWp0CurrentAttestation(descriptor) {
+export function executeWp0CurrentAttestation(descriptor, { verifierPath = resolve(repositoryRoot, 'scripts/verify-wp0-attestation.mjs') } = {}) {
   if (!usesReviewedWp0CurrentAttestation(descriptor, 'validate')) {
     throw new Error(descriptor.path + ': current WP0 attestation route is not reviewed for this suite/version')
   }
   assertSafeScript(descriptor, 'validate')
-  const execution = spawnWithBoundedFileCapture(process.execPath, [resolve(repositoryRoot, 'scripts/verify-wp0-attestation.mjs')], {
+  const execution = spawnWithBoundedFileCapture(process.execPath, [verifierPath], {
     cwd: repositoryRoot,
     env: offlineEnvironment(),
     timeout: CHILD_TIMEOUT_MS,
@@ -421,7 +421,7 @@ function executeMovingTreeAttestation(descriptor) {
   return { script: 'attestation', status: 'PASS' }
 }
 
-export async function runPackageSuites(descriptors) {
+export async function runPackageSuites(descriptors, { currentAttestationVerifierPath } = {}) {
   const results = []
   const failures = []
   for (const descriptor of descriptors) {
@@ -457,7 +457,7 @@ export async function runPackageSuites(descriptors) {
       let executionError
       try {
         executionResult = usesReviewedWp0CurrentAttestation(descriptor, script)
-          ? executeWp0CurrentAttestation(descriptor)
+          ? executeWp0CurrentAttestation(descriptor, { verifierPath: currentAttestationVerifierPath })
           : executePackageScript(descriptor, script)
       } catch (error) {
         executionError = error

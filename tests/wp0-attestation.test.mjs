@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import test from 'node:test'
 
@@ -205,4 +205,95 @@ test('actual WP0 runner keeps the test stage and reports a positive count before
   assert.deepEqual(result.results[0].executions.map(item => item.script), ['test', 'validate'])
   assert.ok(result.results[0].executions[0].parsed_test_count > 0)
   assert.equal(result.results[0].executions[1].verification, 'wp0-current-ci-attestation')
+})
+
+async function createRunnerFixture({ alias, name, version, scripts, files = {} }) {
+  const root = await mkdtemp(path.join(await verificationTempRoot(), 'ushso-pr085-runner-fixture-'))
+  await mkdir(path.join(root, 'tests'), { recursive: true })
+  await writeFile(
+    path.join(root, 'package.json'),
+    JSON.stringify({ name, version, private: true, scripts }, null, 2) + '\n',
+  )
+  for (const [relativePath, contents] of Object.entries(files)) {
+    const filePath = path.join(root, relativePath)
+    await mkdir(path.dirname(filePath), { recursive: true })
+    await writeFile(filePath, contents)
+  }
+  return {
+    root,
+    descriptor: {
+      alias,
+      path: root,
+      version,
+      scripts,
+      required_scripts: Object.keys(scripts),
+      movingTreeAttestation: false,
+    },
+  }
+}
+
+test('actual runner retains future-version failures, child failures, and zero-test failures', async () => {
+  const future = await createRunnerFixture({
+    alias: 'wp0',
+    name: '@ushso/pr085-future-wp0-fixture',
+    version: '1.5.0',
+    scripts: {
+      test: 'node --test tests/pass.test.mjs',
+      validate: 'node -e "process.exit(17)"',
+    },
+    files: {
+      'tests/pass.test.mjs': "import test from 'node:test'\ntest('fixture test', () => {})\n",
+    },
+  })
+  const zero = await createRunnerFixture({
+    alias: 'zero-test',
+    name: '@ushso/pr085-zero-test-fixture',
+    version: '1.0.0',
+    scripts: {
+      test: 'node --test',
+    },
+  })
+  const failingAttestationRoot = await mkdtemp(path.join(await verificationTempRoot(), 'ushso-pr085-attestation-fixture-'))
+  const failingAttestationPath = path.join(failingAttestationRoot, 'failing-attestation.mjs')
+  await writeFile(
+    failingAttestationPath,
+    "process.stderr.write('fixture current attestation failure\\n')\nprocess.exitCode = 23\n",
+  )
+  try {
+    assert.equal(usesReviewedWp0CurrentAttestation(future.descriptor, 'validate'), false)
+    const futureResult = await runPackageSuites([future.descriptor])
+    assert.equal(futureResult.ok, false)
+    assert.equal(futureResult.results[0].executions[0].status, 'PASS')
+    assert.ok(futureResult.results[0].executions[0].parsed_test_count > 0)
+    assert.equal(futureResult.results[0].executions[1].status, 'FAIL')
+    assert.match(futureResult.results[0].executions[1].error, /exit 17/)
+    assert.equal(futureResult.results[0].executions[1].verification, undefined)
+
+    const zeroResult = await runPackageSuites([zero.descriptor])
+    assert.equal(zeroResult.ok, false)
+    assert.equal(zeroResult.results[0].executions[0].status, 'FAIL')
+    assert.equal(zeroResult.results[0].executions[0].parsed_test_count, 0)
+    assert.match(zeroResult.failures[0], /zero parsed tests/)
+
+    const currentDescriptor = {
+      alias: 'wp0',
+      path: 'verification/wp0/v1.4.0',
+      version: '1.4.0',
+      scripts: { validate: 'node tools/verify.mjs --validate' },
+      required_scripts: ['validate'],
+    }
+    const currentResult = await runPackageSuites([currentDescriptor], {
+      currentAttestationVerifierPath: failingAttestationPath,
+    })
+    assert.equal(currentResult.ok, false)
+    assert.equal(currentResult.results[0].executions[0].status, 'FAIL')
+    assert.match(currentResult.results[0].executions[0].error, /exit 23/)
+    assert.equal(currentResult.results[0].executions[0].verification, undefined)
+  } finally {
+    await Promise.all([
+      rm(future.root, { recursive: true, force: true }),
+      rm(zero.root, { recursive: true, force: true }),
+      rm(failingAttestationRoot, { recursive: true, force: true }),
+    ])
+  }
 })
