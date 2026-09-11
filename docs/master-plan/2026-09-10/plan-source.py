@@ -614,3 +614,25 @@ add(85,'1A','Verify current CI work without transferring historical approval',[1
 PLAN_EXTENSIONS=[dict(id='PR-085',parent_pr='PR-001',kind='bounded_ci_remediation',trigger='GitHub CI run 34541539731 on 487f06a756e3c23640dad08fc7f797643c8f186b',reason='A new verification replay script changes the repository-wide WP0 subject while all other technical evidence remains identical; each implementation change also needs a current technical check without historical approval transfer.')]
 for pr in PRS:
     if pr['id']=='PR-082':pr['dependencies'].append('PR-085')
+
+
+# PR-085 full test replay exposed a second immutable subject and the already
+# authorized PR-003 root test-chain transition. Keep the assignment bounded to
+# these two exact versioned CI paths; no approval is transferred or issued.
+for pr in PRS:
+    if pr['id'] != 'PR-085':
+        continue
+    pr['files'].extend([
+        'scripts/verify-ci-attestation.mjs',
+        'verification/testing/ci/v1.4.0/',
+        'tests/ci-attestation.test.mjs',
+        'package-lock.json',
+    ])
+    pr['commits'][0]['instructions'] += ' The full PR-085 replay also exposes a changed CI v1.3 subject from the runner bytes. Pin the complete historical CI v1.3 approval/evidence/receipt and predecessor chain without editing any existing CI version. Add a versioned CI v1.4 structural inventory and a read-only current verifier, reusing workspace-lock/discovery and successor helpers. The new inventory must support the two explicitly reviewed root test sequences: the original sequence, and that sequence with PR-003 test:research-program after test:worker. When test:research-program is declared it must be registered exactly and executed exactly once. Retain every legacy gate, exactly one navigator aggregate, all workflow/lock/child-output/offline invariants and actual input byte hashes. Do not normalize current input bytes into historical ones.'
+    pr['commits'][0]['verification'] += ' Independently reproduce CI v1.3 runner-hash drift and its rejection of the PR-003 test sequence. Historical CI proof tampering, absent predecessor evidence, malformed current evidence and changes outside either reviewed test sequence fail. Current CI v1.4 evidence remains an unapproved draft and explicitly distinguishes structural inventory from actual suite execution.'
+    pr['commits'][1]['instructions'] += ' Extend the scoped runner path only to the explicitly introduced ci-verification v1.4.0 package and its exact validate command; retain WP0 v1.4.0 routing. CI version discovery selects v1.4 by the existing highest-version rule. Preserve all four prior CI integration test behaviors as meaningful updated v1.4 tests, the historical v1.3 package byte-for-byte, and its strict direct validation. Keep new CI direct successor --validate/--issue approval requirements strict; only the reviewed development aggregate uses the read-only verifier. Future/unknown versions retain their normal strict execution. Update only the npm 11.19.1 lock entries needed for the new local workspace package; do not change root package.json or unrelated dependency resolutions.'
+    pr['commits'][1]['verification'] += ' Exercise real subprocess routing and error propagation for CI v1.4, future CI versions, failing current evidence and zero-test children. Both reviewed root chains retain their actual registered tests; deleted/reordered legacy gates and duplicate/missing aggregate invocation fail. Lock consistency must cover the newly discovered workspace.'
+    pr['commits'][2]['instructions'] += ' Retain the full npm-test failure from PR-085 command cmd-0014-9cb38845 and the independently captured CI diagnosis. Report both WP0 and CI current subject identities as pending authorized review. PR-082 must resolve both current-subject approvals and independently qualify the exact release candidate. Additive correction commits are recorded as executed corrections; the initial 84-PR/252-commit baseline and the 85-PR/255-planned-commit model remain unchanged.'
+    pr['commits'][2]['verification'] += ' Final combined PR-003/PR-085 npm test, build, CF dry-run and hosted CI must pass; a producer-only WP0 replay cannot satisfy this condition. No approval may be issued or repinned as a side effect of tests.'
+PLAN_EXTENSIONS[0]['reason'] += ' The PR-085 full test run also proves that CI v1.3 seals the changed runner, and its historical structural inventory rejects the accepted PR-003 test-chain extension. The same bounded assignment adds versioned current CI evidence while retaining both historical proof sets.'
+PLAN_EXTENSIONS[0]['followup_trigger'] = {'candidate_head': '7cfbb96096d5eba46c37fb5b1885f116aa82ab80', 'command_id': 'cmd-0014-9cb38845', 'diagnostic_sha256': 'cb8c54e0d432e3353ed65159a2232030e93124c2c5b5f439a46ee5d93375a80d'}

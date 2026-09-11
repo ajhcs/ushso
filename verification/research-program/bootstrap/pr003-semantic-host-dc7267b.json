@@ -1,0 +1,110 @@
+{
+  "format": "ushso.pr003.integrity-independent-semantic-review.v1",
+  "head_sha": "dc7267bf1c872f1457fa927e2d0403051575f474",
+  "tree_sha": "25fc70a620c2bad2e1c932dcb55c8a16d3464c1c",
+  "reviewer": "root Astra",
+  "started_at": "2026-09-11T00:46:36.718336+00:00",
+  "completed_at": "2026-09-11T00:46:37.254859+00:00",
+  "exit_code": 0,
+  "module_schema_sha256": {
+    "scripts/research-program/check-handoff.mjs": "7588aa8b337496d24ca1cd00205256f03d28d3b290ba382156d3999272bb3e05",
+    "docs/research-program/handoffs/schema/handoff.schema.json": "fcc03794837731594a9172c902637b01b83b87376b198e02c4456e45ff7b2bfc",
+    "docs/research-program/handoffs/schema/task.schema.json": "538998cf577ee5806804865152f32b42688a0e5899265dcd0d6fc8d91f4c3d85"
+  },
+  "case_count": 9,
+  "cases": [
+    {
+      "label": "valid-control",
+      "expected_ok": true,
+      "actual_ok": true,
+      "passed": true,
+      "rules": []
+    },
+    {
+      "label": "missing-command-outcome",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "schema_invalid",
+        "command_observed_outcome_missing",
+        "claimed_pass_without_command_result"
+      ]
+    },
+    {
+      "label": "failed-command-success-claim",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "command_outcome_conflict",
+        "command_outcome_mismatch"
+      ]
+    },
+    {
+      "label": "unknown-head",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "head_sha_not_local_commit"
+      ]
+    },
+    {
+      "label": "missing-nested-receipt",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "artifact_missing_on_disk"
+      ]
+    },
+    {
+      "label": "duplicate-command-id",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "duplicate_command_id",
+        "duplicate_artifact_id"
+      ]
+    },
+    {
+      "label": "contradictory-completion-status",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "command_outcome_conflict"
+      ]
+    },
+    {
+      "label": "invalid-command-clock",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "schema_invalid",
+        "schema_invalid",
+        "command_timestamp_invalid"
+      ]
+    },
+    {
+      "label": "reversed-command-clocks",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "command_timing_order_invalid"
+      ]
+    }
+  ],
+  "script_sha256": "f98bb13833161c4514a676572d82be3399365f565111bc71df94da9a7ec213dc",
+  "stdout_sha256": "a2c791d8a26578d9eda193a104034972689e00343ed9d06f073a4cec68d6d341",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "scope": "Exact committed module/schema and copied referenced fixtures. Local read-only Git queries use existing worktree Git directory; no repository or Git metadata was mutated.",
+  "status": "passed",
+  "limitations": [
+    "Not a final-head or full-suite acceptance. Producer may add subsequent correction commits."
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "format": "ushso.pr085.c2-independent-review.v1",
+  "head_sha": "86b7f7e6c875e877653dc6ff13e3850f7afa2743",
+  "tree_sha": "d317b749e5f769ed97992b5f3333d79fc1b898f9",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-controller-review-20260911",
+  "reviewer": "root Astra",
+  "commands": [
+    {
+      "label": "pinned-locked-reinstall",
+      "started_at": "2026-09-11T00:43:24.156517+00:00",
+      "completed_at": "2026-09-11T00:43:28.013967+00:00",
+      "exit_code": 0,
+      "tool_helper_sha256": "4138a49e42148db9e5c63dfd5386fdac235f19e445453e702f342b1a7002b813",
+      "result": [
+        {
+          "argv": [
+            "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+            "ci",
+            "--ignore-scripts",
+            "--no-audit",
+            "--no-fund"
+          ],
+          "authority": "controller-required-npm-version",
+          "duration_seconds": 3.828,
+          "exit_code": 0
+        }
+      ],
+      "setup_discrepancy": "Initial worktree-bootstrap create ran npm11.9.0 and reported EBADENGINE. This scoped reinstall uses npm11.19.1; original bootstrap result remains retained."
+    },
+    {
+      "label": "focused-tests",
+      "argv": [
+        "node",
+        "--test",
+        "tests/wp0-attestation.test.mjs"
+      ],
+      "started_at": "2026-09-11T00:43:28.114457+00:00",
+      "completed_at": "2026-09-11T00:44:12.113461+00:00",
+      "exit_code": 0,
+      "reported_test_count": 9,
+      "stdout_sha256": "5b7e038507e5a6c437416131ff885e2dd4041414247e230fa87156bcfae71d90",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_exit_code": 0,
+      "passed": true
+    },
+    {
+      "label": "inventory-tests",
+      "argv": [
+        "node",
+        "--test",
+        "tests/contract-package-inventory.test.mjs"
+      ],
+      "started_at": "2026-09-11T00:44:12.113524+00:00",
+      "completed_at": "2026-09-11T00:44:12.290767+00:00",
+      "exit_code": 0,
+      "reported_test_count": 9,
+      "stdout_sha256": "af683cae882a5fe707a01a3bcf7c9bc54543e38b79fc82816c6824620ec20f44",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_exit_code": 0,
+      "passed": true
+    },
+    {
+      "label": "direct-wp0-validate",
+      "argv": [
+        "node",
+        "verification/wp0/v1.4.0/tools/verify.mjs",
+        "--validate"
+      ],
+      "started_at": "2026-09-11T00:44:12.290821+00:00",
+      "completed_at": "2026-09-11T00:44:33.600944+00:00",
+      "exit_code": 1,
+      "reported_test_count": null,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "901566f9591b5da93460c92176fa39384ac2b2721d4847545db6947a39ea43ec",
+      "expected_exit_code": 1,
+      "passed": true
+    }
+  ],
+  "status": "passed_with_coverage_limitations",
+  "limitations": [
+    "C2 tests lacked actual subprocess negative cases for future versions, nonzero attestation child and zero-test output; producer correction requested separately.",
+    "No full npm test/build/CF dry-run/final-head or release acceptance.",
+    "Direct WP0 validate is expected to fail for the current unapproved subject; its nonzero result must not be described as a successful current approval."
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "format": "ushso.pr003.final-contract-review.v1",
+  "candidate": {
+    "head": "dc7267bf1c872f1457fa927e2d0403051575f474",
+    "tree": "25fc70a620c2bad2e1c932dcb55c8a16d3464c1c",
+    "base": "f62ce35481cc572e9aad054049c700aac6378f58",
+    "base_tree": "548d34311909ab3c4bb36c126896c7787d9b3dab",
+    "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-integrity-recovery-20260910",
+    "worktree_clean_at_review": true
+  },
+  "reviewer": {
+    "agent": "/root/pr003_final_contract_review",
+    "model": "Codex session; the native gpt-5.6-luna endpoint requested by the task was not available to this reviewer, and the exact serving model is not independently inspectable from the runtime.",
+    "reasoning": "Bounded independent contract review; configured reasoning level is not exposed, so the requested max setting is not verifiable."
+  },
+  "reviewed_files": {
+    "scripts/research-program/check-handoff.mjs": "7588aa8b337496d24ca1cd00205256f03d28d3b290ba382156d3999272bb3e05",
+    "verification/research-program/pr-003/verify-schema-contract.mjs": "0afb5dd4e150d62c37ccb0f8ea65bdd9eeb615eda5784e0914a3e8b68c541f92",
+    "docs/research-program/handoffs/schema/handoff.schema.json": "fcc03794837731594a9172c902637b01b83b87376b198e02c4456e45ff7b2bfc",
+    "docs/research-program/handoffs/schema/task.schema.json": "538998cf577ee5806804865152f32b42688a0e5899265dcd0d6fc8d91f4c3d85",
+    "docs/research-program/handoffs/schema/README.md": "3454220831129d527a7734829cd8708bd1562bfa3aa50971610cd51527458172",
+    "tests/research-program/handoff.test.mjs": "cfae76bc3ebebaa839e93843378034477be35ab0a4ffe2565041ced586c619e4",
+    "docs/research-program/handoffs/PR-003.json": "34925bd97743b53b34b7c51f4c3f3cc68895cf7437deff48092994aa3b041c85",
+    "verification/research-program/pr-003/fixtures/task-binding.json": "f2392c63dfc51aa275b706d417b9c59f6c2a00062181f85c5e5ebb728f67c30a",
+    "docs/master-plan/2026-09-10/EXECUTION.md": "4118d4f46a7ebec45749676881c753529593842792a439cfb5e53e50bc1fdfc3",
+    "docs/master-plan/2026-09-10/prs/PR-003.md": "d8456846f64f63f63d0d89581f31b36427b26e4c29fd89afcfc3433a780c0a7a"
+  },
+  "checks": [
+    {
+      "check": "candidate and ancestry identity",
+      "outcome": "pass",
+      "detail": "HEAD and tree match the requested pins; base is an ancestor; worktree was clean."
+    },
+    {
+      "check": "node verification/research-program/pr-003/verify-schema-contract.mjs",
+      "outcome": "pass",
+      "detail": "Contract fixtures completed successfully."
+    },
+    {
+      "check": "default check-handoff CLI",
+      "outcome": "limited",
+      "detail": "Sandbox child git show failed with EPERM/status 0 despite available output; host replay reported by root passed the valid control and eight exact negative rules."
+    },
+    {
+      "check": "large immutable Git snapshot reproduction",
+      "outcome": "fail",
+      "detail": "Existing supported blob f62:apps/web/public/corpus-v1.1.0/records.jsonl is 1062135 bytes; execFileSync git show with the checker defaults raised ENOBUFS/SIGTERM after 1062135 stdout bytes."
+    },
+    {
+      "check": "schema-invalid null handoff through checkHandoff API",
+      "outcome": "fail",
+      "detail": "The checker threw Cannot read properties of null (reading acceptance_results) after schema validation instead of returning a rejected report."
+    },
+    {
+      "check": "fractional timestamp ordering reproduction",
+      "outcome": "fail",
+      "detail": "Date.parse gives the same millisecond for .1239Z and .1231Z, so completed_at earlier within the fourth fractional digit is accepted."
+    }
+  ],
+  "findings": [
+    {
+      "id": "PR003-F1",
+      "severity": "P1/P2",
+      "file": "scripts/research-program/check-handoff.mjs:324-343; verification/research-program/pr-003/verify-schema-contract.mjs:24-41; docs/research-program/handoffs/schema/handoff.schema.json:711-715",
+      "trigger": "Use valid RFC3339 UTC timestamps with more than three fractional digits, for example started_at .1239Z and completed_at .1231Z.",
+      "impact": "timestampMillis relies on Date.parse millisecond precision, truncating both values to .123 and allowing completed_at to precede started_at. The schema explicitly permits arbitrary fractional precision, and the verification helper repeats the same comparison bug.",
+      "minimal_fix": "Normalize or compare the full RFC3339 instant at declared precision (or constrain the schema to exactly millisecond precision and reject finer values); keep the helper and checker identical."
+    },
+    {
+      "id": "PR003-F2",
+      "severity": "P1/P2",
+      "file": "scripts/research-program/check-handoff.mjs:703-723",
+      "trigger": "Bind a Git source to an existing repository blob larger than Node child_process execFileSync's default maxBuffer, such as f62:apps/web/public/corpus-v1.1.0/records.jsonl (1062135 bytes).",
+      "impact": "git show raises ENOBUFS/SIGTERM and the broad catch reports source_git_path_missing_at_commit. A real immutable source snapshot is rejected and the diagnostic falsely claims the path is absent; larger supported historical corpus files are affected.",
+      "minimal_fix": "Use a streaming or explicitly sized buffer path for git show (or hash git cat-file --batch output), and classify ENOBUFS/other execution failures separately from a missing Git path."
+    },
+    {
+      "id": "PR003-F3",
+      "severity": "P1/P2",
+      "file": "scripts/research-program/check-handoff.mjs:1290-1310",
+      "trigger": "Call the exported checkHandoff API with schema-invalid JSON such as the valid JSON value null (or malformed top-level collection types).",
+      "impact": "Ajv errors are recorded but execution continues and dereferences acceptance_results, causing an exception. The API contract promises a report object, while the CLI turns this into an error exit rather than a normal rejected packet with diagnostics.",
+      "minimal_fix": "Return the schema-invalid report immediately after validation (or guard all subsequent traversals behind object/array checks), preserving the schema errors in the report."
+    },
+    {
+      "id": "PR003-F4",
+      "severity": "P2",
+      "file": "scripts/research-program/check-handoff.mjs:778-802",
+      "trigger": "List a changed_files path that is an existing symlink whose target has been removed or cannot be resolved.",
+      "impact": "realpath throws and the catch records changed_file_not_present as a deletion while leaving changed-file containment satisfied. This makes a dangling link pass the deletion path, contrary to the README rule that a missing changed path is not a pass through an outside symlink.",
+      "minimal_fix": "lstat the listed path first; only an absent lstat is a typed deletion. For an existing symlink with an unresolved target, reject or classify it explicitly and enforce containment."
+    },
+    {
+      "id": "PR003-F5",
+      "severity": "P1/P2",
+      "file": "scripts/research-program/check-handoff.mjs:438-460,1021-1081; docs/research-program/execution-ledger.json:417-440",
+      "trigger": "Supply a handoff and current per-PR task-binding file whose base/dependency values are mutually consistent, while changing the binding's base to another local ancestor or changing owner/branch/owned paths.",
+      "impact": "The checker records a binding SHA but has no controller-pinned binding digest or immutable binding snapshot, and compares only PR id/base/dependency SHAs. It does not enforce task owner, branch, worktree, or owned_paths against the handoff. A mutable local authority can therefore make an arbitrary base self-consistent and the one-task/one-branch/one-scope contract is not machine-enforced.",
+      "minimal_fix": "Pin the binding by a controller-supplied Git commit/path/hash (or an equivalent signed immutable digest), and compare owner/branch/worktree plus changed paths against the task binding using explicit owned-path matching."
+    }
+  ],
+  "limitations": [
+    "No repository files, Git metadata, producer worktree, or tests that mutate the producer worktree were changed. The malformed-null probe was temporary and is not retained; only this receipt is written under the bounded review directory.",
+    "PR003's five current Git snapshots are small; root's host replay and combined checks covered them and the historical audit. The sandbox Git show limitation is not treated as a PR003 source failure.",
+    "These findings assess packet-contract correctness only. A valid packet is not scientific acceptance, and this receipt does not recommend merge, deployment, or acceptance."
+  ]
+}

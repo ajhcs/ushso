@@ -1,0 +1,137 @@
+{
+  "format": "ushso.pr085.ci-v14-plan-amendment-review.v1",
+  "review_mode": "bounded_read_only_candidate_vs_pinned_base",
+  "reviewer": {
+    "agent": "/root/pr003_final_contract_review",
+    "controller_requested_model": "gpt-5.6-luna",
+    "controller_requested_reasoning": "max",
+    "dispatch_note": "The controller reports a successful spawn_agent request with model gpt-5.6-luna, reasoning_effort max and fork_turns none.",
+    "serving_backend_identity": "not independently inspectable in this reviewer runtime"
+  },
+  "disposition": "pass_with_implementation_conditions",
+  "acceptance_scope": "Plan and accounting review only. PR-085 implementation, CI execution, release qualification, current-subject approval and authorization remain pending.",
+  "candidate": {
+    "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/ci-v14-plan-amendment-candidate",
+    "receipt_sha256": "854ac9fd913ca50fea051c402a32b9145f80db0d79366b843ec6d388e52bf195",
+    "base_head": "61ca92638d1aa87573f4d55be0f5c896f4b0818e",
+    "base_tree": "e537859b6f05a6cb1b3185705eb0aea6472b44d2",
+    "previous_plan_sha256": "cbb1e8f707d7d9a35b1da66d36a217dddd3a1bbd05f80d1fd5a38bf501cdc455",
+    "plan_sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15",
+    "candidate_receipt_hash_verified": true
+  },
+  "changed_file_hashes": {
+    "docs/research-program/exceptions/PR-085-ci-attestation.md": {
+      "bytes": 4679,
+      "sha256": "be0852c73d667c070b92227fc9d194211ca93272f94240af7f22fa8d543656fe"
+    },
+    "docs/master-plan/2026-09-10/plan-source.py": {
+      "bytes": 131364,
+      "sha256": "26498f3b22c0683082ae252d3dd5298d62876f9ea5749d62d2b260b2f5f6be7b"
+    },
+    "docs/master-plan/2026-09-10/validation.json": {
+      "bytes": 1720,
+      "sha256": "e804f0f2ce0116692dd590a2457b73cc3be3e611b51b674c3b330a89f216f073"
+    },
+    "docs/master-plan/2026-09-10/plan.json": {
+      "bytes": 265969,
+      "sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15"
+    },
+    "docs/master-plan/2026-09-10/prs/PR-085.md": {
+      "bytes": 8414,
+      "sha256": "be6a47e2af9c19427db659ee047b6babe9da00721464068947a83a45578cfd37"
+    }
+  },
+  "independent_checks": [
+    {
+      "check": "candidate receipt manifest",
+      "outcome": "PASS",
+      "detail": "All five listed file byte counts and SHA-256 values match receipt.json; receipt.json itself hashes to 854ac9fd..."
+    },
+    {
+      "check": "candidate versus exact base plan",
+      "outcome": "PASS",
+      "detail": "The only changed PR row is PR-085. The other 84 rows, all subphases, phases, requirements and finding IDs are byte/structure equal; both base and candidate remain 85 PRs and 255 commits. The existing PR-082 -> PR-085 edge is retained rather than newly altered by this amendment."
+    },
+    {
+      "check": "source and generated plan identity",
+      "outcome": "PASS",
+      "detail": "plan.json source_sha256 matches plan-source.py, validation.json plan_sha256 matches plan.json, status remains proposed_not_implemented, and the retained generator/validator checks report exit 0/PASS with 8 phases, 28 subphases, 85 PRs, 255 commits, 16 requirements and 33 findings."
+    },
+    {
+      "check": "generated local links",
+      "outcome": "PASS",
+      "detail": "Retained link-validation.json reports 96 Markdown files, 375 local links and no errors."
+    },
+    {
+      "check": "CI v1.3 subject diagnosis",
+      "outcome": "PASS",
+      "detail": "Pinned base runner is 23034 bytes with SHA-256 acfa8900...; diagnostic candidate 7cfbb960... runner is 24729 bytes with SHA-256 854e4e5f...; supplied diagnosis records historical subject 11b8c726... and fresh pending subject 59fcc355... with only that inventory input differing."
+    },
+    {
+      "check": "scope and ownership serialization",
+      "outcome": "PASS_WITH_CONDITION",
+      "detail": "PR-085 adds only scripts/verify-ci-attestation.mjs, verification/testing/ci/v1.4.0/, tests/ci-attestation.test.mjs and package-lock.json. PR-003 remains the sole plan owner of package.json; no path overlap was found. The current ledger owner/branch must remain the same writer when these paths are applied."
+    }
+  ],
+  "technical_assessment": {
+    "historical_boundary": "The plan preserves the existing CI v1.3 package and proof set and requires a fresh versioned v1.4 current inventory. It keeps the CI v1.3 subject distinct from the WP0 v1.4 subject and retains pending/no-approval semantics.",
+    "routing_boundary": "The existing runner selects the latest version under verification/testing/ci; the plan correctly targets ci-verification v1.4.0 while retaining WP0 v1.4.0 routing and strict future/unknown handling.",
+    "root_chain_boundary": "The plan names exactly the original root npm-test chain and the PR-003 chain with test:research-program after test:worker, while retaining legacy gates and one navigator aggregate.",
+    "workspace_boundary": "The pinned base already declares verification/testing/*/v* as a workspace pattern, so a v1.4 package can be added through package-lock workspace/link entries without changing root package.json."
+  },
+  "implementation_conditions": [
+    {
+      "id": "PR085-V14-IMPL-001",
+      "severity": "required",
+      "source_locations": [
+        "docs/master-plan/2026-09-10/prs/PR-085.md:33-43",
+        "docs/master-plan/2026-09-10/plan-source.py:619-634",
+        "scripts/run-contract-suites.mjs:253-275,347-361,393-447,471-507"
+      ],
+      "condition": "Special-case only the ci-verification v1.4.0 development aggregate for the read-only current verifier. Run the v1.4 package tests, preserve positive parsed-test counts, child nonzero/timeout/error propagation, output bounds, offline and sealed-artifact invariants, and leave WP0 routing and future/unknown versions strict. Direct v1.4 --validate and --issue must retain strict successor semantics and may not issue or repin approval."
+    },
+    {
+      "id": "PR085-V14-IMPL-002",
+      "severity": "required",
+      "source_locations": [
+        "docs/master-plan/2026-09-10/prs/PR-085.md:33-37",
+        "verification/testing/ci/v1.3.0/tools/validate-package.mjs:8-55",
+        "verification/successor-support.mjs:22-36,66-112"
+      ],
+      "condition": "Pin the complete historical CI v1.3 approval/evidence/approved receipt, its v1.0 predecessor, v1.2 successor receipt and the approved implementation/input file hashes. Tampered, missing or stale historical bytes must fail; the 11b8c726... approval cannot be transferred to current v1.3 or v1.4 bytes. Retain the supplied full-test failure and v1.3 diagnosis as durable hashed evidence."
+    },
+    {
+      "id": "PR085-V14-IMPL-003",
+      "severity": "required",
+      "source_locations": [
+        "docs/master-plan/2026-09-10/prs/PR-085.md:33-43",
+        "tests/contract-package-inventory.test.mjs:133-149"
+      ],
+      "condition": "Test both reviewed root sequences as exact contracts: the original chain and the PR-003 chain with test:research-program immediately after test:worker. Keep all legacy gates, execute test:research-program exactly once when declared, and invoke verify:research-navigator exactly once; deleted, reordered, duplicated or missing steps must fail. The root test and lock changes remain PR-003-owned/package-lock-only as declared."
+    },
+    {
+      "id": "PR085-V14-IMPL-004",
+      "severity": "required",
+      "source_locations": [
+        "docs/master-plan/2026-09-10/prs/PR-085.md:17-29",
+        "docs/research-program/execution-ledger.json:2560-2597"
+      ],
+      "condition": "Before implementation, serialize the same PR-085 owner/branch/worktree and extend its ledger owned_paths to the four new paths. Keep docs/research-program/exceptions/PR-085-ci-attestation.md as the controller's planning artifact unless its ownership is explicitly updated; the PR-085 implementation must not edit PR-003's package.json. Update only the npm 11.19.1 lock entries needed for the v1.4 workspace/link and verify npm ci plus workspace-lock consistency."
+    },
+    {
+      "id": "PR085-V14-IMPL-005",
+      "severity": "required",
+      "source_locations": [
+        "docs/master-plan/2026-09-10/prs/PR-085.md:45-49",
+        "docs/master-plan/2026-09-10/EXECUTION.md:78-96"
+      ],
+      "condition": "On the composed PR-003/PR-085 candidate, run the focused CI tests, full npm test, build, cf:dry-run and hosted CI. Preserve any failure, keep current CI v1.4 evidence pending_authorized_review with release_gate_pass=false, and distinguish structural inventory from actual suite execution. PR-082 must still resolve exact current-subject approvals and release qualification."
+    }
+  ],
+  "limitations": [
+    "This was a scratch plan review; no repository files, Git metadata, CI package, lockfile or producer worktree were changed, and no implementation/release tests were run.",
+    "The candidate receipt's retained generator/validator results are accepted as plan evidence; rerunning generators would rewrite candidate outputs and was intentionally avoided.",
+    "The disposition is conditional and does not call the plan accepted, the CI current subject approved, or the product ready for merge, release or deployment."
+  ],
+  "final_assessment": "The v1.4 amendment is bounded and technically adequate as a plan: it changes only PR-085's generated row and exception narrative, keeps 85 PRs/255 commits and all existing requirements/graph structure, adds no PR-003 package.json ownership conflict, and preserves the historical/current approval boundary. Implementation may proceed only with the five conditions above, especially exact ci-verification v1.4 read-only routing, complete v1.3 byte pins, exact dual root-chain tests, same-writer ledger serialization and full combined CI evidence."
+}

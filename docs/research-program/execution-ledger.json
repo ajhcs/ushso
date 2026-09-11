@@ -1,8 +1,8 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-10T23:58:23.646463+00:00",
+  "updated_at": "2026-09-11T01:22:04.009550+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
-  "plan_sha256": "cbb1e8f707d7d9a35b1da66d36a217dddd3a1bbd05f80d1fd5a38bf501cdc455",
+  "plan_sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15",
   "integration_branch": "codex/research-program-integration-20260910",
   "verified_remote_main_sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
   "controller": {
@@ -46,11 +46,11 @@
       "evidence": "verification/research-program/bootstrap/pr002-acceptance-2ff1695.json"
     },
     "latest_ci": {
-      "candidate_head": "487f06a756e3c23640dad08fc7f797643c8f186b",
+      "candidate_head": "61ca92638d1aa87573f4d55be0f5c896f4b0818e",
       "status": "failed",
-      "evidence": "verification/research-program/bootstrap/ci-failure-487f06a.json",
+      "evidence": "verification/research-program/bootstrap/ci-failure-61ca926.json",
       "required_correction": "PR-085",
-      "release_approval": "Current technical draft is pending authorized review; no historical approval transfers."
+      "release_approval": "Both current WP0 and CI subjects require their own approval; technical checks never transfer historical approval."
     },
     "ledger_fact_corrections": "verification/research-program/bootstrap/ledger-fact-corrections-487f06a.json"
   },
@@ -71,14 +71,13 @@
       "model_reported_by_reviewer": "Grok 4.6",
       "model_identity_note": "The active managed interface records grok-4. The retained Grok 4.6 self-report belongs only to the earlier read-only boundary review and is not asserted for later implementation runs.",
       "latest_run": {
-        "run_id": "ushso-pr003-grok-corrections-20260910",
-        "assignment_id": "grok-integrity-corrections",
-        "status": "failed_partial_uncommitted",
-        "role": "correct_PR003_integrity",
+        "run_id": "ushso-pr003-grok-final-contract-20260911",
+        "assignment_id": "grok-final-contract",
+        "status": "running",
+        "role": "correct_final_PR003_contract",
         "actual_model": "grok-4",
-        "evidence": "verification/research-program/bootstrap/pr003-grok-correction-failure.json",
-        "auth_observation": "durable_grant remained approved; no login request in this run",
-        "failure_cause": "generic ACP worker failure; no more specific cause established"
+        "evidence": "verification/research-program/bootstrap/pr003-grok-final-contract-dispatch.json",
+        "auth_observation": "Approved durable grant reused; no new login or consent request."
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
@@ -491,7 +490,7 @@
     {
       "pr_id": "PR-003",
       "status": "in_progress",
-      "owner": "ushso-pr003-integrity-recovery-20260910",
+      "owner": "ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
       "dependencies": [
         "PR-001",
         "PR-002"
@@ -514,24 +513,24 @@
       "evidence_directory": "verification/research-program/pr-003/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/15",
       "blockers": [
-        "Validator accepts missing/failed command outcomes, an unknown head commit, a missing nested command receipt and ambiguous duplicate command IDs. Bounded corrections and final-head independent review required."
+        "Final contract review requires bounded precision, large Git snapshot, malformed packet, changed-file and local task-binding consistency corrections; Grok is dispatched on the composed candidate."
       ],
       "dispatch_preparation": "Three native DeepSeek slices completed; clean terminal lifecycle and producer final head are recorded.",
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-002": "verification/research-program/pr-002/controller/integration-handoff.json"
       },
-      "branch": "codex/ushso-pr003-integrity-recovery-20260910",
-      "base_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
-      "provider": "OpenAI Codex",
-      "selected_model": "Luna Max",
-      "selected_reasoning": "max",
-      "actual_model": "Luna Max",
-      "run_id": "ushso-pr003-integrity-recovery-20260910",
-      "dispatch_evidence": null,
+      "branch": "codex/ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
+      "base_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "provider": "Grok Co-Engineer",
+      "selected_model": "grok-4",
+      "selected_reasoning": null,
+      "actual_model": "grok-4",
+      "run_id": "ushso-pr003-grok-final-contract-20260911",
+      "dispatch_evidence": "verification/research-program/bootstrap/pr003-grok-final-contract-dispatch.json",
       "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
       "producer_completion": "verification/research-program/bootstrap/pr003-native-completion-f62ce35.json",
-      "independent_review": "verification/research-program/bootstrap/pr003-first-review-f62ce35.json",
+      "independent_review": "verification/research-program/bootstrap/pr003-final-contract-review-dc7267b.json",
       "run_history": [
         {
           "run_id": "ushso-pr003-deepseek-20260910t220020z",
@@ -552,22 +551,33 @@
           "status": "failed_partial_uncommitted",
           "terminal_evidence": "verification/research-program/bootstrap/pr003-grok-correction-failure.json",
           "snapshot_evidence": "verification/research-program/bootstrap/pr003-grok-partial-snapshot.json"
+        },
+        {
+          "run_id": "ushso-pr003-integrity-recovery-20260910",
+          "provider": "OpenAI Codex",
+          "controller_requested_model": "gpt-5.6-luna",
+          "controller_requested_reasoning": "max",
+          "head_sha": "dc7267bf1c872f1457fa927e2d0403051575f474",
+          "composed_head_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+          "status": "completed_changes_requested",
+          "evidence": "verification/research-program/bootstrap/pr003-composed-checks-bf46d92.json",
+          "independent_review": "verification/research-program/bootstrap/pr003-final-contract-review-dc7267b.json"
         }
       ],
       "review_state": "changes_requested",
       "original_integration_base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
-      "provider_task_id": null,
-      "last_producer_head_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+      "provider_task_id": "ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
+      "last_producer_head_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
       "publication_branch": "codex/ushso-pr003-deepseek-20260910t220020z",
       "supplemental_review_evidence": "verification/research-program/bootstrap/pr003-independent-review-93793bf.json",
       "ci_failure_evidence": "verification/research-program/bootstrap/pr003-ci-failure-f62ce35.json",
       "expected_duration_ms": null,
       "deadline_at": null,
       "controller_adjunct": "A disjoint C-003-3 inventory-test correction is authorized separately; it must not change the validator or its evolving evidence.",
-      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-integrity-recovery-20260910",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
       "recovery_scope": "Inspect Grok retained partial patch and finish only schema, validator, fixture and evidence corrections; original Grok run remains failed and was not replayed.",
       "inventory_correction": {
-        "status": "independently_verified_awaiting_composition",
+        "status": "composed_independently_checked",
         "owner": "ushso-pr003-inventory-correction-20260910",
         "provider": "OpenAI Codex",
         "actual_model": "Luna Max",
@@ -580,12 +590,15 @@
         ],
         "producer_evidence": "verification/research-program/bootstrap/pr003-inventory-correction-handoff.json",
         "independent_review": "verification/research-program/bootstrap/pr003-inventory-correction-host-review.json",
-        "named_test_count": 9
-      }
+        "named_test_count": 9,
+        "composed_head_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+        "independent_combined_review": "verification/research-program/bootstrap/pr003-composed-checks-bf46d92.json"
+      },
+      "reviewer_identity_note": "The native review was controller-dispatched with gpt-5.6-luna/max. Its retained inability to inspect a serving backend is not evidence that the endpoint was unavailable; the historical raw receipt is preserved without modification."
     },
     {
       "pr_id": "PR-004",
-      "status": "in_progress",
+      "status": "independent_review",
       "owner": "ushso-pr004-field-states-20260910",
       "dependencies": [
         "PR-002"
@@ -604,7 +617,9 @@
       "handoff": "docs/research-program/handoffs/PR-004.json",
       "evidence_directory": "verification/research-program/pr-004/",
       "github_pr_url": null,
-      "blockers": [],
+      "blockers": [
+        "Final semantic review and concrete per-PR task-binding reconciliation remain pending. Generated artifact reproduced byte-identically; 12 field-state and 32 normalization tests passed."
+      ],
       "dispatch_preparation": "Workspace ready and dispatch initiated; actual model/preflight and execution receipts will establish provider usage.",
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
@@ -627,7 +642,12 @@
         "Latest access checks selected by observation time instead of attempt time",
         "Impossible calendar date accepted"
       ],
-      "additional_preliminary_scope": "Immutable C1/C2 head21b1b12 only; sent to active producer for correction and final-head replay."
+      "additional_preliminary_scope": "Immutable C1/C2 head21b1b12 only; sent to active producer for correction and final-head replay.",
+      "review_state": "changes_requested",
+      "last_producer_head_sha": "cd4076792ecf6b262ae13f0e092baa9123fc2c14",
+      "last_producer_tree_sha": "ce01ea2bc7029633116599394ca83ee3b575221c",
+      "independent_component_checks": "verification/research-program/bootstrap/pr004-final-checks-cd40767.json",
+      "handoff_contract_rejection": "verification/research-program/bootstrap/pr004-handoff-rejection-cd40767.json"
     },
     {
       "pr_id": "PR-005",
@@ -2558,8 +2578,8 @@
     },
     {
       "pr_id": "PR-085",
-      "status": "ready",
-      "owner": null,
+      "status": "changes_requested",
+      "owner": "ushso-pr085-ci-attestation-20260910",
       "dependencies": [
         "PR-001"
       ],
@@ -2571,20 +2591,54 @@
         "scripts/run-contract-suites.mjs",
         "tests/wp0-attestation.test.mjs",
         "verification/research-program/ci-attestation/",
-        "docs/research-program/ci-attestations.md"
+        "docs/research-program/ci-attestations.md",
+        "scripts/verify-ci-attestation.mjs",
+        "verification/testing/ci/v1.4.0/",
+        "tests/ci-attestation.test.mjs",
+        "package-lock.json"
       ],
       "head_sha": null,
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-085.json",
       "evidence_directory": "verification/research-program/pr-085/",
       "github_pr_url": null,
-      "blockers": [],
+      "blockers": [
+        "Full npm test retained CI v1.3 stale subject; reviewed CI v1.4 continuation must implement exact historical/current boundaries and pass the combined gate."
+      ],
       "planned_atomic_commits": 3,
       "prerequisites_satisfied": true,
       "parent_pr": "PR-001",
       "exception": "docs/research-program/exceptions/PR-085-ci-attestation.md",
       "independent_plan_review": "verification/research-program/bootstrap/ci-attestation-plan-independent-review.json",
-      "dispatch_preparation": "Await exact post-amendment integration head and bounded implementer dispatch; no implementation or authorization issued by this amendment."
+      "dispatch_preparation": "Started in a verified fresh local-exact-SHA worktree; final implementation and independent acceptance are pending.",
+      "provider": "OpenAI Codex",
+      "selected_model": "Luna Max",
+      "actual_model": "Luna Max",
+      "selected_reasoning": "max",
+      "run_id": "ushso-pr085-ci-attestation-20260910",
+      "base_sha": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "base_tree": "8707c8fc92f35742f58508a83a57a3c4d9b7baf4",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "branch": "codex/ushso-pr085-ci-attestation-20260910",
+      "dispatch_evidence": "verification/research-program/bootstrap/pr085-native-dispatch.json",
+      "last_producer_head_sha": "620ed231bd9565e13af76c6647e85f3eae067126",
+      "last_producer_tree_sha": "cfc34edf071e35d8709620c72d0436b9ba943c15",
+      "review_state": "changes_requested",
+      "continuation": {
+        "scope": "Reviewed CI v1.4 inventory/attestation correction under the same PR085 task branch/worktree with serialized writer ownership.",
+        "plan_evidence": "verification/research-program/bootstrap/ci-v14-plan-amendment.json",
+        "independent_review": "verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
+        "prior_component_head": "620ed231bd9565e13af76c6647e85f3eae067126",
+        "status": "authorized_pending_same_task_resume",
+        "prohibited_changes": [
+          "root package.json",
+          "all prior CI versions and approvals",
+          "scientific thresholds",
+          "frozen inputs"
+        ]
+      },
+      "ci_diagnostic": "verification/research-program/bootstrap/ci-v13-diagnosis-7cfbb96.json",
+      "independent_component_checks": "verification/research-program/bootstrap/pr085-c2-independent-checks-86b7f7e.json"
     }
   ],
   "external_inputs": [
@@ -2758,6 +2812,26 @@
       "requirements_and_frozen_inputs_unchanged": true,
       "evidence": "verification/research-program/bootstrap/ci-attestation-plan-amendment.json",
       "independent_review": "verification/research-program/bootstrap/ci-attestation-plan-independent-review.json",
+      "independent_review_state": "accepted"
+    },
+    {
+      "reason": "Full PR085 replay exposes immutable CI v1.3 runner hash drift and the historical root-chain assertion conflicts with PR003 test registration.",
+      "previous_plan_sha256": "cbb1e8f707d7d9a35b1da66d36a217dddd3a1bbd05f80d1fd5a38bf501cdc455",
+      "plan_sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15",
+      "changed_prs": [
+        "PR-085"
+      ],
+      "initial_scope": {
+        "prs": 84,
+        "commits": 252
+      },
+      "current_scope": {
+        "prs": 85,
+        "commits": 255
+      },
+      "requirements_and_frozen_inputs_unchanged": true,
+      "evidence": "verification/research-program/bootstrap/ci-v14-plan-amendment.json",
+      "independent_review": "verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
       "independent_review_state": "accepted"
     }
   ]
