@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T01:22:04.009550+00:00",
+  "updated_at": "2026-09-11T01:52:29.711642+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -9,7 +9,8 @@
     "actor": "codex-root",
     "role_requested": "Astra Max",
     "implementation_authorship": [
-      "program documentation import and execution ledger"
+      "program documentation import and execution ledger",
+      "PR004 historical task-binding and direct-dependency handoff metadata reconstruction, separately reviewed before application"
     ],
     "independent_review_of_controller_changes": {
       "bootstrap_commit": "c92465f97df11a1e231983237f27e8c86db792b2",
@@ -36,6 +37,15 @@
         "reviewer": "gpt-5.6-luna/max",
         "evidence": "verification/research-program/bootstrap/pr002-c1-publication-accounting-review.json",
         "scope": "Accounting/publication-boundary review of root-authored receipts; not an independent re-approval of Luna's C1 implementation or its correction."
+      },
+      "pr004_binding_reconstruction": {
+        "parent_head": "cd4076792ecf6b262ae13f0e092baa9123fc2c14",
+        "applied_head": "cb74c3e7ffebd29341c2fca4f435cf36ef9e0485",
+        "reviewer": "separate native review agent, controller-requested gpt-5.6-luna/max",
+        "verdict": "metadata_candidate_passed_21_checks",
+        "review_evidence": "verification/research-program/bootstrap/pr004-final-semantic-review-cd40767.json",
+        "applied_evidence": "verification/research-program/bootstrap/pr004-binding-applied-cb74c3e.json",
+        "scope": "Metadata only; four semantic corrections remain unaccepted."
       }
     },
     "latest_integration": {
@@ -73,11 +83,12 @@
       "latest_run": {
         "run_id": "ushso-pr003-grok-final-contract-20260911",
         "assignment_id": "grok-final-contract",
-        "status": "running",
+        "status": "completed_changes_requested",
         "role": "correct_final_PR003_contract",
         "actual_model": "grok-4",
         "evidence": "verification/research-program/bootstrap/pr003-grok-final-contract-dispatch.json",
-        "auth_observation": "Approved durable grant reused; no new login or consent request."
+        "auth_observation": "Approved durable grant reused; no new login or consent request.",
+        "completion_evidence": "verification/research-program/bootstrap/pr003-grok-r2-completion-5115170.json"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
@@ -489,7 +500,7 @@
     },
     {
       "pr_id": "PR-003",
-      "status": "in_progress",
+      "status": "independent_review",
       "owner": "ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
       "dependencies": [
         "PR-001",
@@ -513,7 +524,7 @@
       "evidence_directory": "verification/research-program/pr-003/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/15",
       "blockers": [
-        "Final contract review requires bounded precision, large Git snapshot, malformed packet, changed-file and local task-binding consistency corrections; Grok is dispatched on the composed candidate."
+        "Root reproduced remaining malformed null collection-item throws and wildcard ownership matcher failures after Grok R2. Separate review is consolidating the bounded final correction. PR085 remains required for the combined gate."
       ],
       "dispatch_preparation": "Three native DeepSeek slices completed; clean terminal lifecycle and producer final head are recorded.",
       "prerequisites_satisfied": true,
@@ -567,7 +578,7 @@
       "review_state": "changes_requested",
       "original_integration_base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
       "provider_task_id": "ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
-      "last_producer_head_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "last_producer_head_sha": "5115170093512b06b21c01725bb982e457797efe",
       "publication_branch": "codex/ushso-pr003-deepseek-20260910t220020z",
       "supplemental_review_evidence": "verification/research-program/bootstrap/pr003-independent-review-93793bf.json",
       "ci_failure_evidence": "verification/research-program/bootstrap/pr003-ci-failure-f62ce35.json",
@@ -594,11 +605,24 @@
         "composed_head_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
         "independent_combined_review": "verification/research-program/bootstrap/pr003-composed-checks-bf46d92.json"
       },
-      "reviewer_identity_note": "The native review was controller-dispatched with gpt-5.6-luna/max. Its retained inability to inspect a serving backend is not evidence that the endpoint was unavailable; the historical raw receipt is preserved without modification."
+      "reviewer_identity_note": "The native review was controller-dispatched with gpt-5.6-luna/max. Its retained inability to inspect a serving backend is not evidence that the endpoint was unavailable; the historical raw receipt is preserved without modification.",
+      "last_producer_tree_sha": "24fe636b0370e2e7b9c166d6f1c6bed520ed033e",
+      "latest_completion": "verification/research-program/bootstrap/pr003-grok-r2-completion-5115170.json",
+      "independent_registered_checks": "verification/research-program/bootstrap/pr003-grok-r2-registered-checks-5115170.json",
+      "remaining_semantic_checks": [
+        "verification/research-program/bootstrap/pr003-grok-r2-semantic-checks-5115170.json",
+        "verification/research-program/bootstrap/pr003-grok-r2-owned-path-checks-5115170.json"
+      ],
+      "separate_final_review": {
+        "status": "running",
+        "agent": "/root/pr003_final_contract_review",
+        "candidate_head": "5115170093512b06b21c01725bb982e457797efe",
+        "candidate_tree": "24fe636b0370e2e7b9c166d6f1c6bed520ed033e"
+      }
     },
     {
       "pr_id": "PR-004",
-      "status": "independent_review",
+      "status": "in_progress",
       "owner": "ushso-pr004-field-states-20260910",
       "dependencies": [
         "PR-002"
@@ -618,7 +642,7 @@
       "evidence_directory": "verification/research-program/pr-004/",
       "github_pr_url": null,
       "blockers": [
-        "Final semantic review and concrete per-PR task-binding reconciliation remain pending. Generated artifact reproduced byte-identically; 12 field-state and 32 normalization tests passed."
+        "Retain unlinked prior observations; prevent cross-record revision ID first-wins; compare all documented access facts and boundaries; strictly validate nested timestamps. The original implementer has resumed these four bounded corrections."
       ],
       "dispatch_preparation": "Workspace ready and dispatch initiated; actual model/preflight and execution receipts will establish provider usage.",
       "prerequisites_satisfied": true,
@@ -647,7 +671,32 @@
       "last_producer_head_sha": "cd4076792ecf6b262ae13f0e092baa9123fc2c14",
       "last_producer_tree_sha": "ce01ea2bc7029633116599394ca83ee3b575221c",
       "independent_component_checks": "verification/research-program/bootstrap/pr004-final-checks-cd40767.json",
-      "handoff_contract_rejection": "verification/research-program/bootstrap/pr004-handoff-rejection-cd40767.json"
+      "handoff_contract_rejection": "verification/research-program/bootstrap/pr004-handoff-rejection-cd40767.json",
+      "independent_review": "verification/research-program/bootstrap/pr004-final-semantic-review-cd40767.json",
+      "binding_correction": {
+        "head_sha": "cb74c3e7ffebd29341c2fca4f435cf36ef9e0485",
+        "tree_sha": "e81d8c9ba6882e71a6a858e3320d630f5d8e117e",
+        "root_authored": true,
+        "separate_review": "passed",
+        "actual_pinned_pr003_checker": "passed",
+        "evidence": "verification/research-program/bootstrap/pr004-binding-applied-cb74c3e.json"
+      },
+      "continuation": {
+        "status": "dispatched_same_native_agent",
+        "agent": "/root/pr_001_release_baseline",
+        "interface": "collaboration.followup_task",
+        "task_id": "ushso-pr004-field-states-20260910",
+        "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+        "branch": "codex/ushso-pr004-field-states-20260910",
+        "base_sha": "cb74c3e7ffebd29341c2fca4f435cf36ef9e0485",
+        "base_tree": "e81d8c9ba6882e71a6a858e3320d630f5d8e117e",
+        "prompt": "verification/research-program/bootstrap/pr004-final-semantic-correction-dispatch.md",
+        "prompt_sha256": "3dacae053e7832c73d63798e717d816d5187e0fce2fa571d3b431993ca1433c6",
+        "controller_requested_model": "gpt-5.6-luna",
+        "controller_requested_reasoning": "max",
+        "backend_serving_identity": null,
+        "dispatch_observation": "The existing-agent followup call returned successfully; this receipt records that observation without inventing a tool-supplied start timestamp."
+      }
     },
     {
       "pr_id": "PR-005",
@@ -2578,7 +2627,7 @@
     },
     {
       "pr_id": "PR-085",
-      "status": "changes_requested",
+      "status": "in_progress",
       "owner": "ushso-pr085-ci-attestation-20260910",
       "dependencies": [
         "PR-001"
@@ -2612,8 +2661,8 @@
       "independent_plan_review": "verification/research-program/bootstrap/ci-attestation-plan-independent-review.json",
       "dispatch_preparation": "Started in a verified fresh local-exact-SHA worktree; final implementation and independent acceptance are pending.",
       "provider": "OpenAI Codex",
-      "selected_model": "Luna Max",
-      "actual_model": "Luna Max",
+      "selected_model": "gpt-5.6-luna",
+      "actual_model": null,
       "selected_reasoning": "max",
       "run_id": "ushso-pr085-ci-attestation-20260910",
       "base_sha": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
@@ -2629,16 +2678,23 @@
         "plan_evidence": "verification/research-program/bootstrap/ci-v14-plan-amendment.json",
         "independent_review": "verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
         "prior_component_head": "620ed231bd9565e13af76c6647e85f3eae067126",
-        "status": "authorized_pending_same_task_resume",
+        "status": "dispatched_same_native_agent",
         "prohibited_changes": [
           "root package.json",
           "all prior CI versions and approvals",
           "scientific thresholds",
           "frozen inputs"
-        ]
+        ],
+        "agent": "/root/pr002_c1_corrections",
+        "interface": "collaboration.followup_task",
+        "head_sha": "4ad67220df54334f70d891fd26d1778f83328d54",
+        "tree_sha": "02544973bf065b3825c8b189f186a598da99a223",
+        "evidence": "verification/research-program/bootstrap/pr085-ci-v14-continuation-4ad6722.json",
+        "writer_scope": "Same bootstrap task, branch and worktree; root merge lease released before implementer resume."
       },
       "ci_diagnostic": "verification/research-program/bootstrap/ci-v13-diagnosis-7cfbb96.json",
-      "independent_component_checks": "verification/research-program/bootstrap/pr085-c2-independent-checks-86b7f7e.json"
+      "independent_component_checks": "verification/research-program/bootstrap/pr085-c3-independent-checks-620ed23.json",
+      "model_identity_note": "Luna Max is the requested role; native controller dispatch selects gpt-5.6-luna/max, while this interface does not independently attest the serving backend. Historical producer labels are retained in their receipts."
     }
   ],
   "external_inputs": [
