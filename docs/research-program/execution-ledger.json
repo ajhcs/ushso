@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T02:51:52.106089+00:00",
+  "updated_at": "2026-09-11T03:28:45.918824+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -501,7 +501,7 @@
     },
     {
       "pr_id": "PR-003",
-      "status": "in_progress",
+      "status": "independent_review",
       "owner": "ushso-pr003-composite-glob-20260911",
       "dependencies": [
         "PR-001",
@@ -525,7 +525,7 @@
       "evidence_directory": "verification/research-program/pr-003/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/15",
       "blockers": [
-        "Native Luna R4 corrects only composite wildcard paths ending in / or /**. Grok R3 registered and malformed-packet checks pass. Final handoff and combined candidate gate remain required."
+        "Final component checks pass. The combined PR003/PR004/PR085 gate remains pending a bounded resolution of historical-versus-current successor input validation. Publication branch is fast-forwarded to d1c42ea; existing PR15 update is pending."
       ],
       "dispatch_preparation": "Three native DeepSeek slices completed; clean terminal lifecycle and producer final head are recorded.",
       "prerequisites_satisfied": true,
@@ -542,7 +542,7 @@
       "dispatch_evidence": "verification/research-program/bootstrap/pr003-r4-composite-glob-dispatch.json",
       "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
       "producer_completion": "verification/research-program/bootstrap/pr003-native-completion-f62ce35.json",
-      "independent_review": "verification/research-program/bootstrap/pr003-grok-r3-owned-path-checks-0b28d03.json",
+      "independent_review": "verification/research-program/bootstrap/pr003-r4-owned-path-checks-b41c27d.json",
       "run_history": [
         {
           "run_id": "ushso-pr003-deepseek-20260910t220020z",
@@ -595,12 +595,23 @@
           "evidence": "verification/research-program/bootstrap/pr003-grok-r3-completion-0b28d03.json",
           "independent_semantic_review": "verification/research-program/bootstrap/pr003-grok-r3-semantic-checks-0b28d03.json",
           "remaining_finding": "verification/research-program/bootstrap/pr003-grok-r3-owned-path-checks-0b28d03.json"
+        },
+        {
+          "run_id": "ushso-pr003-composite-glob-20260911",
+          "interface": "OpenAI Codex native collaboration followup",
+          "requested_model": "gpt-5.6-luna",
+          "requested_reasoning": "max",
+          "actual_serving_model": null,
+          "status": "completed_component_verified",
+          "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
+          "tree_sha": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
+          "evidence": "verification/research-program/bootstrap/pr003-r4-final-checks-d1c42ea.json"
         }
       ],
-      "review_state": "changes_requested",
+      "review_state": "final_component_verified_integrated_gate_pending",
       "original_integration_base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
       "provider_task_id": "ushso-pr003-composite-glob-20260911",
-      "last_producer_head_sha": "0b28d036f1df4b5248732bc62f68edd79f14d06f",
+      "last_producer_head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
       "publication_branch": "codex/ushso-pr003-deepseek-20260910t220020z",
       "supplemental_review_evidence": "verification/research-program/bootstrap/pr003-independent-review-93793bf.json",
       "ci_failure_evidence": "verification/research-program/bootstrap/pr003-ci-failure-f62ce35.json",
@@ -628,12 +639,10 @@
         "independent_combined_review": "verification/research-program/bootstrap/pr003-composed-checks-bf46d92.json"
       },
       "reviewer_identity_note": "The native review was controller-dispatched with gpt-5.6-luna/max. Its retained inability to inspect a serving backend is not evidence that the endpoint was unavailable; the historical raw receipt is preserved without modification.",
-      "last_producer_tree_sha": "6e2de2232e2aa0f19055751d70e5a904a38216f9",
+      "last_producer_tree_sha": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
       "latest_completion": "verification/research-program/bootstrap/pr003-grok-r3-completion-0b28d03.json",
-      "independent_registered_checks": "verification/research-program/bootstrap/pr003-grok-r3-registered-checks-0b28d03.json",
-      "remaining_semantic_checks": [
-        "verification/research-program/bootstrap/pr003-grok-r3-owned-path-checks-0b28d03.json"
-      ],
+      "independent_registered_checks": "verification/research-program/bootstrap/pr003-r4-final-checks-d1c42ea.json",
+      "remaining_semantic_checks": [],
       "separate_final_review": {
         "status": "completed_changes_requested",
         "agent": "/root/pr003_final_contract_review",
@@ -643,11 +652,24 @@
       },
       "base_tree": "6e2de2232e2aa0f19055751d70e5a904a38216f9",
       "published_head_sha": "5115170093512b06b21c01725bb982e457797efe",
-      "model_identity_note": "Native continuation requests gpt-5.6-luna/max; serving backend is not independently inspectable. Prior Grok R3 actual interface model remains grok-4."
+      "model_identity_note": "Native continuation requests gpt-5.6-luna/max; serving backend is not independently inspectable. Prior Grok R3 actual interface model remains grok-4.",
+      "current_component": {
+        "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
+        "tree_sha": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
+        "status": "passed_independent_component_review",
+        "functional_head": "b41c27db36b58b4bda16ded02bde3211ca02fb9d",
+        "registered_handoff_tests": 42,
+        "inventory_tests": 9,
+        "independent_composite_path_cases": 15,
+        "current_handoff_artifacts": 66,
+        "current_index_artifacts": 19,
+        "preserved_prior_receipts_indexes": 44,
+        "transport_receipt": "verification/research-program/bootstrap/pr003-r4-composition-d1c42ea.json"
+      }
     },
     {
       "pr_id": "PR-004",
-      "status": "in_progress",
+      "status": "independent_review",
       "owner": "ushso-pr004-field-states-20260910",
       "dependencies": [
         "PR-002"
@@ -667,7 +689,7 @@
       "evidence_directory": "verification/research-program/pr-004/",
       "github_pr_url": null,
       "blockers": [
-        "Final index contains a copied 62-character review digest; same producer is correcting only that reference and its handoff hash. Functional checks pass; combined gate remains required."
+        "Final component and metadata checks pass; exact reviewed323dfe5 is published as draftPR16. The combined release gate remains pending."
       ],
       "dispatch_preparation": "Workspace ready and dispatch initiated; actual model/preflight and execution receipts will establish provider usage.",
       "prerequisites_satisfied": true,
@@ -692,9 +714,9 @@
         "Impossible calendar date accepted"
       ],
       "additional_preliminary_scope": "Immutable C1/C2 head21b1b12 only; sent to active producer for correction and final-head replay.",
-      "review_state": "changes_requested",
-      "last_producer_head_sha": "86cf1b04f51089793086c6dfeab9498cd3faf5a7",
-      "last_producer_tree_sha": "2b436885f02bee906b0511c7b6623a3304604607",
+      "review_state": "final_component_verified_integrated_gate_pending",
+      "last_producer_head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
+      "last_producer_tree_sha": "abfa7c2fd860e35c01ee11902696b015d02f6981",
       "independent_component_checks": "verification/research-program/bootstrap/pr004-r2-final-checks-86cf1b0.json",
       "handoff_contract_rejection": "verification/research-program/bootstrap/pr004-handoff-rejection-cd40767.json",
       "independent_review": "verification/research-program/bootstrap/pr004-r2-semantic-checks-6980897.json",
@@ -707,7 +729,7 @@
         "evidence": "verification/research-program/bootstrap/pr004-binding-applied-cb74c3e.json"
       },
       "continuation": {
-        "status": "functional_and_final_checks_passed_evidence_reference_correction_active",
+        "status": "completed_component_verified",
         "agent": "/root/pr_001_release_baseline",
         "interface": "collaboration.followup_task",
         "task_id": "ushso-pr004-field-states-20260910",
@@ -729,7 +751,19 @@
         "field_tests": 15,
         "normalization_tests": 32,
         "artifact_reproduced_exactly": true,
-        "evidence_audit": "verification/research-program/bootstrap/pr004-r2-evidence-audit-86cf1b0.json"
+        "evidence_audit": "verification/research-program/bootstrap/pr004-r2-evidence-audit-86cf1b0.json",
+        "final_head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
+        "final_tree_sha": "abfa7c2fd860e35c01ee11902696b015d02f6981",
+        "final_packet_evidence": "verification/research-program/bootstrap/pr004-final-packet-review-323dfe5.json",
+        "reference_count": 36
+      },
+      "independent_final_packet_review": "verification/research-program/bootstrap/pr004-final-packet-review-323dfe5.json",
+      "publication": {
+        "url": "https://github.com/ajhcs/ushso/pull/16",
+        "draft": true,
+        "head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
+        "identity_and_body_readback_verified": true,
+        "evidence": "verification/research-program/bootstrap/pr004-draft-publication-323dfe5.json"
       }
     },
     {
@@ -2661,7 +2695,7 @@
     },
     {
       "pr_id": "PR-085",
-      "status": "in_progress",
+      "status": "independent_review",
       "owner": "ushso-pr085-ci-attestation-20260910",
       "dependencies": [
         "PR-001"
@@ -2686,7 +2720,7 @@
       "evidence_directory": "verification/research-program/pr-085/",
       "github_pr_url": null,
       "blockers": [
-        "Current CI v1.4 component independently passes. Producer is sealing additive final evidence and handoff before combined PR003/PR004/PR085 gate."
+        "Root independently reproduced WP11 v1.3 SUCCESSOR_APPROVAL_STALE_SUBJECT on final4f90157. Current technical draft passes but prior approval binds a different subject; only package-lock.json differs across154 approved inputs. A read-only all-selected-package audit is active to establish the bounded follow-up scope. No historical approval is changed or transferred. The exact combined release gate and hosted CI remain required."
       ],
       "planned_atomic_commits": 3,
       "prerequisites_satisfied": true,
@@ -2704,15 +2738,15 @@
       "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
       "branch": "codex/ushso-pr085-ci-attestation-20260910",
       "dispatch_evidence": "verification/research-program/bootstrap/pr085-native-dispatch.json",
-      "last_producer_head_sha": "6ed7fb4cb24199977034cf86bb3f0b4a928513be",
-      "last_producer_tree_sha": "959cdb237f1b733af839bd72747761d837e8ba04",
-      "review_state": "independent_review",
+      "last_producer_head_sha": "4f90157108a92ce9541c340d5536eac31f24a1d8",
+      "last_producer_tree_sha": "ba468220ab24bb560d2f8fb6bac83aa94ee61070",
+      "review_state": "final_component_verified_integrated_gate_blocked",
       "continuation": {
         "scope": "Reviewed CI v1.4 inventory/attestation correction under the same PR085 task branch/worktree with serialized writer ownership.",
         "plan_evidence": "verification/research-program/bootstrap/ci-v14-plan-amendment.json",
         "independent_review": "verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
         "prior_component_head": "620ed231bd9565e13af76c6647e85f3eae067126",
-        "status": "functional_component_passed_final_evidence_active",
+        "status": "completed_component_verified_followup_scope_diagnosis",
         "prohibited_changes": [
           "root package.json",
           "all prior CI versions and approvals",
@@ -2739,7 +2773,25 @@
         "focused_tests": 10,
         "current_approval": null,
         "release_gate_pass": false,
-        "disposition": "Complete original and reviewed input pairs pass; either partial transition rejects. Direct pending CLI exit 2 preserved. Final handoff/evidence and combined gate pending."
+        "disposition": "Complete original and reviewed input pairs pass; either partial transition rejects. Direct pending CLI exit 2 preserved. Final handoff/evidence and combined gate pending.",
+        "final_head_sha": "4f90157108a92ce9541c340d5536eac31f24a1d8",
+        "final_tree_sha": "ba468220ab24bb560d2f8fb6bac83aa94ee61070",
+        "final_packet_evidence": "verification/research-program/bootstrap/pr085-final-packet-review-4f90157.json",
+        "reference_count": 41
+      },
+      "independent_final_packet_review": "verification/research-program/bootstrap/pr085-final-packet-review-4f90157.json",
+      "wp11_diagnosis": {
+        "producer_evidence": "verification/research-program/bootstrap/pr085-wp11-producer-diagnosis-9c8cba9.json",
+        "independent_evidence": "verification/research-program/bootstrap/wp11-current-subject-independent-diagnosis-4f90157.json",
+        "approved_subject_sha256": "294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98",
+        "current_subject_sha256": "8d3409bc360d9b295c5c21f9b1a2d6ad91f42ff5c946a14aff92cd4b7d97c259",
+        "current_approval": null,
+        "release_gate_pass": false,
+        "all_selected_package_audit": {
+          "status": "in_progress",
+          "agent": "/root/pr_001_release_baseline",
+          "scope": "Read-only20selected-package inventory and prospective PR003/PR004 input overlay; no implementation, approval or fullgate."
+        }
       }
     }
   ],
