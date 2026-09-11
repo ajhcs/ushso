@@ -27,7 +27,7 @@ const requiredContracts = [
   'contracts/tooling/v1.0.0',
 ]
 
-const rootScriptContract = Object.freeze({
+export const ROOT_SCRIPT_CONTRACT = Object.freeze({
   'test:contracts': 'node scripts/run-contract-suites.mjs --contracts',
   'test:evaluator-v2': 'node scripts/run-contract-suites.mjs --suite evaluator-v2',
   'test:evaluator-bridge': 'node scripts/run-contract-suites.mjs --suite evaluator-bridge',
@@ -242,7 +242,7 @@ export async function buildCiIntegrationReceipt() {
 
   for (const path of requiredContracts) requireCondition(contracts.some((item) => item.path === path), `required contract not discovered: ${path}`)
   for (const workspace of requiredWorkspacePatterns) requireCondition(rootPackage.workspaces?.includes(workspace), `workspace pattern missing: ${workspace}`)
-  for (const [name, command] of Object.entries(rootScriptContract)) requireCondition(rootPackage.scripts?.[name] === command, `root script changed: ${name}`)
+  for (const [name, command] of Object.entries(ROOT_SCRIPT_CONTRACT)) requireCondition(rootPackage.scripts?.[name] === command, `root script changed: ${name}`)
   const rootTestContract = validateRootTestSequence(rootPackage)
 
   requireCondition(/^permissions:\n  contents: read$/mu.test(workflow), 'CI permissions are not least privilege')

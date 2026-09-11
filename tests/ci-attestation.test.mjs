@@ -1,9 +1,13 @@
 import assert from 'node:assert/strict'
+import { execFile as execFileCallback } from 'node:child_process'
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import test from 'node:test'
+import { promisify } from 'node:util'
 
 import { verificationTempRoot } from '../scripts/verification-temp-root.mjs'
+
+const execFile = promisify(execFileCallback)
 import {
   assertSuccessfulChildExecution,
   discoverVerificationSuites,
@@ -13,12 +17,14 @@ import {
 } from '../scripts/run-contract-suites.mjs'
 import {
   HISTORICAL_CI_V1_3,
+  REVIEWED_PR003_CURRENT_INPUTS,
   buildCurrentDraft,
   validateHistoricalCiProof,
   verifyCiAttestation,
 } from '../scripts/verify-ci-attestation.mjs'
 import { runSuccessorCli } from '../verification/successor-support.mjs'
 import { packageId } from '../verification/testing/ci/v1.4.0/tools/validate-package.mjs'
+import { repositoryRoot } from '../verification/testing/ci/v1.4.0/tools/ci-inventory.mjs'
 
 async function historicalBytes() {
   const names = HISTORICAL_CI_V1_3.files
@@ -59,6 +65,45 @@ test('historical v1.3 proof fails closed for missing and altered immutable bytes
     const altered = { ...fixture, [name + 'Bytes']: Buffer.concat([fixture[name + 'Bytes'], Buffer.from('tamper')]) }
     await assert.rejects(validateHistoricalCiProof(altered), new RegExp(`CI_HISTORICAL_${labels[name]}_CHANGED`))
   }
+})
+
+async function readGitBytes(commit, relativePath) {
+  const { stdout } = await execFile('git', ['show', `${commit}:${relativePath}`], {
+    cwd: repositoryRoot,
+    encoding: 'buffer',
+    maxBuffer: 2_000_000,
+  })
+  return stdout
+}
+
+test('historical proof accepts only the reviewed PR-003 input transition', async () => {
+  const fixture = await historicalBytes()
+  const legacy = await validateHistoricalCiProof(fixture)
+  assert.equal(legacy.input_bindings.status, 'PASS')
+  assert.equal(legacy.input_bindings.checked.filter((item) => item.reviewed_current_transition).length, 0)
+
+  const reviewedBytes = new Map(await Promise.all(REVIEWED_PR003_CURRENT_INPUTS.map(async (item) => [
+    item.path,
+    await readGitBytes(item.source_commit, item.path),
+  ])))
+  const readReviewedCurrentFile = async (root, relativePath) => reviewedBytes.get(relativePath) ?? readFile(path.resolve(root, relativePath))
+  const transition = await validateHistoricalCiProof({ ...fixture, readCurrentFile: readReviewedCurrentFile })
+  const transitioned = transition.input_bindings.checked.filter((item) => item.reviewed_current_transition)
+  assert.deepEqual(transitioned.map((item) => item.path).sort(), REVIEWED_PR003_CURRENT_INPUTS.map((item) => item.path).sort())
+  for (const item of transitioned) {
+    assert.equal(item.source_commit, REVIEWED_PR003_CURRENT_INPUTS.find((review) => review.path === item.path).source_commit)
+    assert.equal(item.current_drift_allowed, true)
+    assert.notEqual(item.current_sha256, item.historical_sha256)
+  }
+  assert.equal(transition.input_bindings.reviewed_current_inputs.length, 2)
+
+  const tamperedPackage = Buffer.from(reviewedBytes.get('package.json'))
+  tamperedPackage[tamperedPackage.length - 1] ^= 1
+  const readTampered = async (root, relativePath) => relativePath === 'package.json' ? tamperedPackage : readReviewedCurrentFile(root, relativePath)
+  await assert.rejects(
+    validateHistoricalCiProof({ ...fixture, readCurrentFile: readTampered }),
+    /CI_CURRENT_REVIEWED_PR003_ROOT-PACKAGE_CHANGED/u,
+  )
 })
 
 test('current technical failure cannot be represented as a pending draft', async () => {

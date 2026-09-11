@@ -4,7 +4,14 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { buildTechnicalEvidence, packageId } from '../verification/testing/ci/v1.4.0/tools/validate-package.mjs'
-import { repositoryRoot } from '../verification/testing/ci/v1.4.0/tools/ci-inventory.mjs'
+import {
+  EXTENDED_ROOT_TEST_SEQUENCE,
+  ORIGINAL_ROOT_TEST_SEQUENCE,
+  RESEARCH_PROGRAM_SCRIPT,
+  ROOT_SCRIPT_CONTRACT,
+  repositoryRoot,
+  validateRootTestSequence,
+} from '../verification/testing/ci/v1.4.0/tools/ci-inventory.mjs'
 import {
   createDraft,
   sha256,
@@ -14,6 +21,33 @@ import {
 const SHA256 = /^[a-f0-9]{64}$/u
 const HISTORICAL_BASE_COMMIT = '30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0'
 const HISTORICAL_V1_3_PACKAGE_ID = '@ushso/ci-verification-successor-v1-3@1.3.0'
+const REVIEWED_PR003_SOURCE_COMMIT = 'bf46d92b0e4fc91457bd3eb78aa1742ae84038f2'
+
+/**
+ * These are the two current inputs reviewed with PR-003. Their historical
+ * pins remain immutable; the current bytes are separately pinned to the
+ * exact reviewed PR-003 commit and validated against the bounded transition.
+ */
+export const REVIEWED_PR003_CURRENT_INPUTS = Object.freeze([
+  Object.freeze({
+    path: 'package.json',
+    role: 'root-package',
+    source_commit: REVIEWED_PR003_SOURCE_COMMIT,
+    historical_bytes: 3555,
+    historical_sha256: '25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c',
+    current_bytes: 3666,
+    current_sha256: 'b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e',
+  }),
+  Object.freeze({
+    path: 'tests/contract-package-inventory.test.mjs',
+    role: 'root-inventory-test',
+    source_commit: REVIEWED_PR003_SOURCE_COMMIT,
+    historical_bytes: 7809,
+    historical_sha256: '2bdf766d6c69875160330d8bdf44fbd8d21bbfec43a9b7671c9d233e3ddc4bfa',
+    current_bytes: 7842,
+    current_sha256: '5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b',
+  }),
+])
 
 export const HISTORICAL_CI_V1_3 = Object.freeze({
   package_id: HISTORICAL_V1_3_PACKAGE_ID,
@@ -85,6 +119,83 @@ function expectedDriftPaths(expected = HISTORICAL_CI_V1_3) {
   return new Set((expected?.allowed_current_drift ?? HISTORICAL_CI_V1_3.allowed_current_drift).map((item) => item.path))
 }
 
+const reviewedPr003InputsByPath = new Map(REVIEWED_PR003_CURRENT_INPUTS.map((item) => [item.path, item]))
+
+function parseJsonValue(bytes, label) {
+  try {
+    return JSON.parse(Buffer.from(bytes).toString('utf8'))
+  } catch (error) {
+    throw new Error(`CI_CURRENT_${label}_MALFORMED: ${error.message}`, { cause: error })
+  }
+}
+
+function validateRootPackageTransition(bytes) {
+  const rootPackage = parseJsonValue(bytes, 'PR003_PACKAGE')
+  assert.equal(rootPackage.name, 'ushso', 'CI_CURRENT_PR003_PACKAGE_NAME')
+  assert.equal(rootPackage.version, '0.1.0', 'CI_CURRENT_PR003_PACKAGE_VERSION')
+  assert.equal(rootPackage.private, true, 'CI_CURRENT_PR003_PACKAGE_PRIVATE')
+  assert.equal(rootPackage.license, 'Apache-2.0', 'CI_CURRENT_PR003_PACKAGE_LICENSE')
+  assert.equal(rootPackage.type, 'module', 'CI_CURRENT_PR003_PACKAGE_TYPE')
+  assert.equal(rootPackage.packageManager, 'npm@11.19.1', 'CI_CURRENT_PR003_PACKAGE_MANAGER')
+  assert.deepEqual(rootPackage.engines, { node: '>=22.15.0', npm: '>=11.19.1 <12' }, 'CI_CURRENT_PR003_PACKAGE_ENGINES')
+  assert.deepEqual(rootPackage.workspaces, [
+    'apps/web',
+    'packages/*',
+    'packages/*/*/v*',
+    'contracts/*/v*',
+    'docs/feedback/v*',
+    'evaluation/*/v*',
+    'verification/*/v*',
+    'verification/testing/*/v*',
+  ], 'CI_CURRENT_PR003_PACKAGE_WORKSPACES')
+  for (const [name, command] of Object.entries(ROOT_SCRIPT_CONTRACT)) {
+    assert.equal(rootPackage.scripts?.[name], command, `CI_CURRENT_PR003_PACKAGE_SCRIPT_${name}`)
+  }
+  assert.equal(rootPackage.scripts?.['test:research-program'], RESEARCH_PROGRAM_SCRIPT, 'CI_CURRENT_PR003_RESEARCH_SCRIPT')
+  const rootTest = validateRootTestSequence(rootPackage)
+  assert.equal(rootTest.chain, 'pr003-root-chain', 'CI_CURRENT_PR003_ROOT_CHAIN')
+  assert.deepEqual(rootTest.sequence, EXTENDED_ROOT_TEST_SEQUENCE, 'CI_CURRENT_PR003_ROOT_SEQUENCE')
+  assert.equal(rootTest.research_program.stage_count, 1, 'CI_CURRENT_PR003_RESEARCH_STAGE_COUNT')
+  return {
+    chain: rootTest.chain,
+    sequence: rootTest.sequence,
+    registered_research_program: rootPackage.scripts['test:research-program'],
+  }
+}
+
+function validateRootInventoryTestTransition(bytes) {
+  const source = Buffer.from(bytes).toString('utf8')
+  const expectedAssertion = `assert.equal(rootPackage.scripts.test, '${EXTENDED_ROOT_TEST_SEQUENCE.join(' && ')}')`
+  assert.equal(source.includes(expectedAssertion), true, 'CI_CURRENT_PR003_INVENTORY_TEST_SEQUENCE_ASSERTION')
+  assert.equal((source.match(/rootPackage\.scripts\.test, 'npm run test:retrieval && npm run test:web && npm run test:worker && npm run test:research-program && npm run test:evaluation && npm run validate:evaluation && npm run verify:research-navigator'/gu) ?? []).length, 1, 'CI_CURRENT_PR003_INVENTORY_TEST_SEQUENCE_ASSERTION_COUNT')
+  assert.match(source, /rootPackage\.scripts\.test\.match\(\/npm run verify:research-navigator\/gu\)/u, 'CI_CURRENT_PR003_INVENTORY_TEST_AGGREGATE_ASSERTION')
+  assert.match(source, /for \(const name of \['test:retrieval', 'test:web', 'test:worker', 'test:evaluation', 'validate:evaluation'\]/u, 'CI_CURRENT_PR003_INVENTORY_TEST_LEGACY_ASSERTIONS')
+  return {
+    sequence_assertion: expectedAssertion,
+    aggregate_assertion: 'navigator aggregate count assertion',
+    legacy_assertions: true,
+  }
+}
+
+function validateReviewedPr003CurrentInput(review, bytes) {
+  assertHash(review.current_sha256, `REVIEWED_PR003_${review.role.toUpperCase()}_HASH`)
+  assert.equal(sha256(bytes), review.current_sha256, `CI_CURRENT_REVIEWED_PR003_${review.role.toUpperCase()}_CHANGED`)
+  assert.equal(bytes.length, review.current_bytes, `CI_CURRENT_REVIEWED_PR003_${review.role.toUpperCase()}_BYTES`)
+  const semantic = review.role === 'root-package'
+    ? validateRootPackageTransition(bytes)
+    : validateRootInventoryTestTransition(bytes)
+  return {
+    path: review.path,
+    role: review.role,
+    source_commit: review.source_commit,
+    bytes: review.current_bytes,
+    sha256: review.current_sha256,
+    historical_bytes: review.historical_bytes,
+    historical_sha256: review.historical_sha256,
+    semantic,
+  }
+}
+
 async function readCurrent(root, relativePath) {
   return readFile(path.resolve(root, relativePath))
 }
@@ -117,7 +228,19 @@ export async function validateHistoricalInputBindings({ root = repositoryRoot, r
     assert.ok(!seen.has(key), `CI_HISTORICAL_DUPLICATE_${pin.source.toUpperCase()}_PIN`)
     seen.add(key)
     const bytes = await readCurrentFile(root, relativePath)
-    if (drift.has(relativePath)) {
+    const reviewed = reviewedPr003InputsByPath.get(relativePath)
+    if (reviewed) {
+      assert.equal(pin.sha256, reviewed.historical_sha256, `CI_HISTORICAL_${relativePath}_PIN_MISMATCH`)
+      if (sha256(bytes) === pin.sha256) {
+        if (relativePath === 'package.json') {
+          const rootPackage = parseJsonValue(bytes, 'HISTORICAL_PACKAGE')
+          validateRootTestSequence(rootPackage)
+        }
+        checked.push({ path: relativePath, source: pin.source, historical_bytes: pin.bytes, historical_sha256: pin.sha256, current_bytes: bytes.length, current_sha256: sha256(bytes), current_drift_allowed: false, reviewed_current_transition: false })
+      } else {
+        checked.push({ ...validateReviewedPr003CurrentInput(reviewed, bytes), source: pin.source, current_drift_allowed: true, reviewed_current_transition: true })
+      }
+    } else if (drift.has(relativePath)) {
       assertHash(pin.sha256, `${relativePath}_HISTORICAL_HASH`)
       assert.equal(bytes.length > 0, true, `CI_CURRENT_${relativePath}_EMPTY`)
       checked.push({ path: relativePath, source: pin.source, historical_bytes: pin.bytes, historical_sha256: pin.sha256, current_bytes: bytes.length, current_sha256: sha256(bytes), current_drift_allowed: true })
@@ -126,7 +249,13 @@ export async function validateHistoricalInputBindings({ root = repositoryRoot, r
       checked.push({ path: relativePath, source: pin.source, historical_bytes: pin.bytes, historical_sha256: pin.sha256, current_bytes: bytes.length, current_sha256: sha256(bytes), current_drift_allowed: false })
     }
   }
-  return { status: 'PASS', source_commit: HISTORICAL_BASE_COMMIT, allowed_current_drift: [...drift].sort(), checked }
+  return {
+    status: 'PASS',
+    source_commit: HISTORICAL_BASE_COMMIT,
+    allowed_current_drift: [...drift].sort(),
+    reviewed_current_inputs: REVIEWED_PR003_CURRENT_INPUTS.map((item) => ({ ...item })),
+    checked,
+  }
 }
 
 /**
