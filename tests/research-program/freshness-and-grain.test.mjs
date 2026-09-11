@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { createRetrievalEngine } from '../../packages/retrieval/tools/retrieval-core-v1.2.mjs';
+import { createRetrievalEngine, projectFreshness } from '../../packages/retrieval/tools/retrieval-core-v1.2.mjs';
 import { StaticCoverageRepository } from '../../packages/coverage/static-coverage-repository.mjs';
 import { StaticPlannerRepository } from '../../packages/planner/static-planner-repository.mjs';
 import { StaticAssetCatalogRepository } from '../../packages/registry/static-asset-catalog-repository.mjs';
@@ -68,10 +68,11 @@ test('C-005-1: September 10 evaluation of a September 5 deadline is overdue', ()
   const record = clockRecord();
   const beforeHash = sha256(record);
   const retrieval = engineFor([record]);
-  const overdue = retrieval.retrieve({ question: 'hospital financials', page_size: 10 }, { now: '2026-09-10T12:00:00.000Z' }).results[0].metadata.freshness;
+  const overdueResult = retrieval.retrieve({ question: 'hospital financials', page_size: 10 }, { now: '2026-09-10T12:00:00.000Z' });
+  const overdue = overdueResult.results[0].metadata.freshness;
   assert.equal(overdue.freshness_state, 'overdue');
   assert.match(overdue.note, /overdue/);
-  assert.equal(overdue.evaluated_at, '2026-09-10T12:00:00.000Z');
+  assert.equal(overdueResult.receipt.generated_at, '2026-09-10T12:00:00.000Z');
   assert.equal(overdue.last_checked, record.freshness_verification.metadata_observed_at);
   assert.equal(sha256(retrieval.retrieve({ question: 'hospital financials', page_size: 10 }, { now: '2026-09-10T12:00:00.000Z' }).results[0].record), beforeHash);
 });
@@ -102,7 +103,7 @@ test('C-005-1: frozen default clock stays deterministic and does not rewrite sou
   assert.equal(first.receipt.generated_at, '1970-01-01T00:00:00.000Z');
   assert.equal(second.receipt.generated_at, first.receipt.generated_at);
   assert.equal(first.results[0].metadata.freshness.freshness_state, 'within_review_window');
-  assert.equal(first.results[0].metadata.freshness.evaluated_at, '1970-01-01T00:00:00.000Z');
+  assert.equal(first.receipt.generated_at, '1970-01-01T00:00:00.000Z');
   assert.equal(JSON.stringify(first.ranking.ordered_ids), JSON.stringify(second.ranking.ordered_ids));
   assert.equal(sha256(first.results[0].record), sha256(record));
   assert.equal(sha256(first.results[0].record.evidence), sha256(record.evidence));
@@ -125,7 +126,6 @@ test('C-005-1: public request evaluation time reaches freshness projection', asy
   assert.equal(session.evaluatedAt, '2026-09-10T12:00:00.000Z');
   const result = await service.discover(session, { question: 'hospital financials', page_size: 10 });
   assert.equal(result.results[0].metadata.freshness.freshness_state, 'overdue');
-  assert.equal(result.results[0].metadata.freshness.evaluated_at, '2026-09-10T12:00:00.000Z');
   assert.equal(result.receipt.generated_at, '2026-09-10T12:00:00.000Z');
   assert.equal(sha256(result.results[0].record), sha256(record));
 
@@ -136,6 +136,56 @@ test('C-005-1: public request evaluation time reaches freshness projection', asy
   const before = await service.discover(headerSession, { question: 'hospital financials', page_size: 10 });
   assert.equal(before.results[0].metadata.freshness.freshness_state, 'within_review_window');
   assert.equal(before.receipt.generated_at, headerSession.evaluatedAt);
+});
+
+test('C-005-3: advancing the evaluation clock changes status without rebuilding corpus evidence', async () => {
+  const record = clockRecord();
+  const evidenceHash = sha256(record.evidence);
+  const recordHash = sha256(record);
+  const corpus = { corpus_id: 'pr005-clock', corpus_version: 'test', manifest_sha256: 'a'.repeat(64) };
+  const engine = engineFor([record], corpus);
+  const service = publicService(engine, [record], corpus);
+  const beforeSession = await service.openRequest({
+    request: new Request('https://ushso.org/api/discover'),
+    env: {},
+    now: '2026-09-04T12:00:00.000Z'
+  });
+  const afterSession = await service.openRequest({
+    request: new Request('https://ushso.org/api/discover'),
+    env: {},
+    now: '2026-09-10T12:00:00.000Z'
+  });
+  const before = await service.discover(beforeSession, { question: 'hospital financials', page_size: 10 });
+  const after = await service.discover(afterSession, { question: 'hospital financials', page_size: 10 });
+  const dataset = await service.dataset(afterSession, record.record_id);
+  assert.equal(before.results[0].metadata.freshness.freshness_state, 'within_review_window');
+  assert.equal(after.results[0].metadata.freshness.freshness_state, 'overdue');
+  const scoped = projectFreshness(after.results[0].record, afterSession.evaluatedAt);
+  assert.equal(scoped.stale_status, 'review_overdue');
+  assert.equal(scoped.payload_check.state, 'not_attempted');
+  assert.equal(scoped.last_successful_metadata_check, record.freshness_verification.metadata_observed_at);
+  assert.equal(dataset.results[0].metadata.freshness.freshness_state, 'overdue');
+  assert.equal(dataset.results[0].metadata.freshness.payload_check.scope, 'payload');
+  assert.equal(sha256(before.results[0].record), recordHash);
+  assert.equal(sha256(after.results[0].record), recordHash);
+  assert.equal(sha256(dataset.results[0].record.evidence), evidenceHash);
+});
+
+test('C-005-3: stale historical metadata success stays distinct from payload checks and later failed attempts', () => {
+  const stale = projectFreshness({
+    freshness_verification: {
+      metadata_observed_at: '2026-08-01T00:00:00.000Z',
+      next_review_due: '2026-09-05T00:00:00.000Z',
+      verification_status: 'stale',
+      failed_refresh_state: 'failed'
+    }
+  }, '2026-09-10T12:00:00.000Z');
+  assert.equal(stale.last_successful_metadata_check, '2026-08-01T00:00:00.000Z');
+  assert.equal(stale.latest_attempt.outcome, 'failed');
+  assert.equal(stale.latest_attempt.at, null);
+  assert.equal(stale.stale_status, 'stale_historical_success');
+  assert.equal(stale.payload_check.state, 'not_attempted');
+  assert.match(stale.payload_check.note, /not a payload-access check/);
 });
 
 test('C-005-2: HCRIS-style inferred unit tags do not become observation grain', () => {

@@ -1,0 +1,425 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-005",
+  "status": "producer_checked",
+  "owner": "Grok",
+  "reviewer": "Astra",
+  "base_sha": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+  "head_sha": null,
+  "dependency_merge_shas": {
+    "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce"
+  },
+  "branch": "codex/ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+    "worker/public-query-service.mjs",
+    "packages/search/static-search-backend.mjs",
+    "apps/web/src/lib/researcherGuidance.ts",
+    "apps/web/src/lib/researcherGuidance.test.tsx",
+    "apps/web/src/lib/catalogAdapter.ts",
+    "apps/web/src/lib/catalogAdapter.test.ts",
+    "apps/web/src/components/ResultCard.tsx",
+    "apps/web/src/components/ResultCard.test.ts",
+    "apps/web/src/pages/DatasetDetailsPage.tsx",
+    "apps/web/src/pages/DatasetDetailsPage.test.tsx",
+    "apps/web/src/types/discovery.ts",
+    "apps/web/src/types/catalog.ts",
+    "tests/research-program/freshness-and-grain.test.mjs",
+    "tests/wp1-repository-abstraction.test.mjs",
+    "docs/research-program/handoffs/PR-005.json",
+    "verification/research-program/pr-005/task-binding.json",
+    "verification/research-program/pr-005/README.md",
+    "verification/research-program/pr-005/observe-freshness-and-grain.mjs",
+    "verification/research-program/pr-005/record-commands.mjs",
+    "verification/research-program/pr-005/evidence/index.json",
+    "verification/research-program/pr-005/evidence/c-005-1/before-f07.json",
+    "verification/research-program/pr-005/evidence/c-005-1/after-f07.json",
+    "verification/research-program/pr-005/evidence/c-005-1/commands.json",
+    "verification/research-program/pr-005/evidence/c-005-2/before-f06.json",
+    "verification/research-program/pr-005/evidence/c-005-2/after-f06.json",
+    "verification/research-program/pr-005/evidence/c-005-2/commands.json",
+    "verification/research-program/pr-005/evidence/c-005-3/commands.json",
+    "verification/research-program/pr-005/evidence/c-005-3/proposed-wp11-resultcard-test-pin.json",
+    "verification/research-program/pr-005/evidence/c-005-3-worker/commands.json"
+  ],
+  "problem": "Live freshness used a frozen/default clock, so a September 10 evaluation of a September 5 review deadline still said the deadline had not passed. Researcher guidance also labeled inferred unit_of_analysis tags as source-asserted typical units while observation grain remained unresolved. Cards, detail and APIs did not jointly show last successful metadata check, latest attempt, stale historical success and payload-check absence.",
+  "resulting_behavior": "PublicQueryService captures request evaluation time and StaticSearchBackend forwards it into retrieve/browse. Direct engine calls without now remain frozen at corpus published_at/built_at or 1970, so lexical/direct-base byte-parity stays deterministic. Typical unit now follows the explicit observation-grain claim; inferred unit tags are labeled search aids only. Dataset dereference and UI render last successful catalog-metadata check, latest catalog-metadata attempt and payload-check not-attempted together. Retrieve() freshness shape remains catalog-contract freshnessState. Extra scope fields are projected by projectFreshness() for dataset() and UI adapters. F06 and F07 reproduce on the accepted base and fail to reproduce after the owned changes. npm run test:worker fails closed on the out-of-scope WP11 historical pin for ResultCard.test.ts.",
+  "commits": [
+    {
+      "id": "C-005-1",
+      "subject": "Use an explicit observation clock",
+      "sha": "47c739b1d370f3d61c093fe2f11d9d97958e6a9f"
+    },
+    {
+      "id": "C-005-2",
+      "subject": "Stop promoting inferred unit tags as typical units",
+      "sha": "5e51fea2033eb775c74f5425260b5cd21508e5e9"
+    },
+    {
+      "id": "C-005-3",
+      "subject": "Explain freshness scope in the UI",
+      "sha": null
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "accepted PR-001 baseline",
+      "id": "docs/research-program/baseline.json",
+      "location": "local",
+      "sha256": "09f8f507697da7d40e1cea452e39c5f07c45a16ffd1ca8a7f723de61c40961dc"
+    },
+    {
+      "kind": "accepted PR-002 frozen cohort input",
+      "id": "evaluation/research-program/cohorts.json",
+      "location": "local",
+      "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543"
+    },
+    {
+      "kind": "published corpus manifest",
+      "id": "packages/retrieval/versions/v1.2.0/corpus/corpus.json",
+      "location": "local",
+      "sha256": "56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633"
+    },
+    {
+      "kind": "research asset lock",
+      "id": "config/research-assets.lock.json",
+      "location": "local",
+      "sha256": "75f362a1545f469a74bef00b7d7126fd03ffbfc79e4e6421bafe9fcf62db6c3b"
+    },
+    {
+      "kind": "accepted PR-004 integration handoff",
+      "id": "verification/research-program/bootstrap/components-463f092/pr-004-integration-handoff.json",
+      "location": "local",
+      "sha256": "cd45618d9b533f76b987e6ced3466fbff427db43b4de4502f3d99347f884590b"
+    },
+    {
+      "kind": "accepted dependency merge",
+      "id": "PR-004:463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+      "location": "external"
+    },
+    {
+      "kind": "accepted PR-004 producer head, not the dependency merge",
+      "id": "PR-004-producer:78d164e816049c45193b17c2267f64c8fb783399",
+      "location": "external"
+    },
+    {
+      "kind": "source generation identity",
+      "id": "live-2026-09-03-85b50522b420",
+      "location": "external",
+      "version": "live-2026-09-03-85b50522b420"
+    },
+    {
+      "kind": "current task binding",
+      "id": "verification/research-program/pr-005/task-binding.json",
+      "location": "local",
+      "sha256": "876fb17cf0f024e5a4f1634264f084ae4ab189c73d5d4ab9f07c1c77accf39e6"
+    },
+    {
+      "kind": "tracked PR-005 source",
+      "id": "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+      "location": "local",
+      "sha256": "0541f373a44cffce76037666aab5d91b1213879da79a4d5a49762ce5484c43ac"
+    },
+    {
+      "kind": "tracked PR-005 source",
+      "id": "worker/public-query-service.mjs",
+      "location": "local",
+      "sha256": "3c54d0c438fa81faf3cfffd9d91fdd0bfd6b41ff8671fa9d6b737a160175e6ce"
+    },
+    {
+      "kind": "tracked PR-005 source",
+      "id": "packages/search/static-search-backend.mjs",
+      "location": "local",
+      "sha256": "8d12b959f477c0c8d4ac6d3b263327b683fe0fa5a576faac80e96cc172e6de6f"
+    },
+    {
+      "kind": "tracked PR-005 source",
+      "id": "apps/web/src/lib/researcherGuidance.ts",
+      "location": "local",
+      "sha256": "d3788287f2aa62cdbad49e04a2514a94a98d2280ffeb0b9c9a0f5cf2661e974c"
+    },
+    {
+      "kind": "tracked PR-005 source",
+      "id": "apps/web/src/lib/catalogAdapter.ts",
+      "location": "local",
+      "sha256": "7d4fcb71c457f8244b5b9c4fd18dfd1f6e77cc1f508f08c5cb8cb5fc96fb8977"
+    },
+    {
+      "kind": "tracked PR-005 source",
+      "id": "apps/web/src/components/ResultCard.tsx",
+      "location": "local",
+      "sha256": "7076cda6e97380a47cdc4fdaf592de69602a6ebbf23b035ed44a633d68050c2f"
+    },
+    {
+      "kind": "tracked PR-005 source",
+      "id": "apps/web/src/pages/DatasetDetailsPage.tsx",
+      "location": "local",
+      "sha256": "1a5e4d65c1b410b9936a90497675da4a7ff69b5219664b99283182d5eb76cc06"
+    },
+    {
+      "kind": "execution provider identity from this interface",
+      "id": "grok-4.6-interface/assignment-model-grok-4",
+      "location": "external",
+      "version": "grok-4"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c005-1-tests",
+      "command": "node --test tests/research-program/freshness-and-grain.test.mjs tests/wp1-repository-abstraction.test.mjs",
+      "started_at": "2026-09-11T13:27:29.239Z",
+      "completed_at": "2026-09-11T13:27:31.242Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "C-005-1 clock tests and wp1 clock-forwarding tests passed.",
+      "expected": "exit 0",
+      "actual": "11 tests passed",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 }
+    },
+    {
+      "id": "cmd-c005-2-web",
+      "command": "npm run test:web -- src/lib/researcherGuidance.test.tsx src/lib/catalogAdapter.test.ts src/components/ResultCard.test.ts src/pages/DatasetDetailsPage.test.tsx",
+      "started_at": "2026-09-11T13:30:30.000Z",
+      "completed_at": "2026-09-11T13:30:31.000Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "C-005-2 grain UI tests passed.",
+      "expected": "exit 0",
+      "actual": "22 tests passed",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 }
+    },
+    {
+      "id": "cmd-c005-3-freshness",
+      "command": "node --test tests/research-program/freshness-and-grain.test.mjs",
+      "started_at": "2026-09-11T13:37:53.750Z",
+      "completed_at": "2026-09-11T13:37:53.922Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Freshness and grain suite passed after C-005-3.",
+      "expected": "exit 0",
+      "actual": "7 tests passed",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 }
+    },
+    {
+      "id": "cmd-c005-3-wp1",
+      "command": "node --test tests/wp1-repository-abstraction.test.mjs",
+      "started_at": "2026-09-11T13:37:53.922Z",
+      "completed_at": "2026-09-11T13:37:55.951Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "WP1 public-service tests passed, including clock forwarding and dataset freshness metadata.",
+      "expected": "exit 0",
+      "actual": "7 tests passed",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 }
+    },
+    {
+      "id": "cmd-c005-3-web",
+      "command": "npm run test:web",
+      "started_at": "2026-09-11T13:37:55.951Z",
+      "completed_at": "2026-09-11T13:37:59.023Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Full web package tests passed.",
+      "expected": "exit 0",
+      "actual": "29 files, 153 tests passed",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 }
+    },
+    {
+      "id": "cmd-c005-3-retrieval",
+      "command": "npm run test:retrieval",
+      "started_at": "2026-09-11T13:37:59.023Z",
+      "completed_at": "2026-09-11T13:38:03.244Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Retrieval package tests passed, including frozen lexical byte-parity at the 1970 fallback clock.",
+      "expected": "exit 0",
+      "actual": "105 tests passed",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 }
+    },
+    {
+      "id": "cmd-c005-3-worker-functional",
+      "command": "node --test tests/access-dimensions-cache.test.mjs tests/advertised-schemas.test.mjs tests/bounded-request-body.test.mjs tests/ci-attestation.test.mjs tests/direct-base-regression.test.mjs tests/subject-shortcircuit.test.mjs tests/worker-contract.test.mjs tests/wp0-attestation.test.mjs tests/wp1-repository-abstraction.test.mjs",
+      "started_at": "2026-09-11T13:38:09.712Z",
+      "completed_at": "2026-09-11T13:38:53.792Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Owned worker/direct-base/subject-shortcircuit/wp1 functional tests passed.",
+      "expected": "exit 0",
+      "actual": "exit 0",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 }
+    },
+    {
+      "id": "cmd-c005-3-worker",
+      "command": "npm run test:worker",
+      "started_at": "2026-09-11T13:38:53.792Z",
+      "completed_at": "2026-09-11T13:39:41.415Z",
+      "exit_code": 1,
+      "completion_status": "completed",
+      "result": "Full worker glob failed closed on WP11 historical ResultCard.test.ts pin. 342 passed, 4 failed, all four in tests/wp11-attestation.test.mjs.",
+      "expected": "exit 0 if WP11 historical pins are updated for the owned ResultCard.test.ts change",
+      "actual": "exit 1; WP11_HISTORICAL_INPUT_apps/web/src/components/ResultCard.test.ts_CHANGED actual a9415f9c66580fafb9f5ba2572d829b86344c1990044ebcd48d109739c18ea9d expected 16226fad7dbbb87f6ca90541fcb33366b4104d8f7324e1f2373cff8446afe06d",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 1 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 1 }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "task-binding",
+      "path": "verification/research-program/pr-005/task-binding.json",
+      "sha256": "876fb17cf0f024e5a4f1634264f084ae4ab189c73d5d4ab9f07c1c77accf39e6",
+      "bytes": 3745
+    },
+    {
+      "id": "evidence-index",
+      "path": "verification/research-program/pr-005/evidence/index.json",
+      "sha256": "07cf57336011ebec89a2c2681a25b9873a949081492ff9e9d56860504d9e2790",
+      "bytes": 2388
+    },
+    {
+      "id": "f07-before",
+      "path": "verification/research-program/pr-005/evidence/c-005-1/before-f07.json",
+      "sha256": "bcc441ee0851cba67fb48c3bf4b6c558292066d5a707efe7f58b1684f97f4239",
+      "bytes": 1598
+    },
+    {
+      "id": "f07-after",
+      "path": "verification/research-program/pr-005/evidence/c-005-1/after-f07.json",
+      "sha256": "ef15eaaf27a07d61889362ac1d7526d8b71a864f0f8de86fccf835b50edc8cc9",
+      "bytes": 1624
+    },
+    {
+      "id": "f06-before",
+      "path": "verification/research-program/pr-005/evidence/c-005-2/before-f06.json",
+      "sha256": "db885346007a5482276820277d9bc392457391ce597f87b9ba62ad48f81f0e75",
+      "bytes": 751
+    },
+    {
+      "id": "f06-after",
+      "path": "verification/research-program/pr-005/evidence/c-005-2/after-f06.json",
+      "sha256": "8f49c9c1eff0a1cc08f4a010e4e482fdd86ed1128baaca11abb8fa2ffae3bcab",
+      "bytes": 776
+    },
+    {
+      "id": "c005-3-commands",
+      "path": "verification/research-program/pr-005/evidence/c-005-3/commands.json",
+      "sha256": "7ad968dd73ecfc02122909b37cd606fd1a360c549587b9145f5a190e626e8d0d",
+      "bytes": 1805
+    },
+    {
+      "id": "c005-3-worker-commands",
+      "path": "verification/research-program/pr-005/evidence/c-005-3-worker/commands.json",
+      "sha256": "0fc7b24e74a19a5e8f47c419516d611b71d8a93c291a7ba8b0f58ec69ea264c4",
+      "bytes": 1235
+    },
+    {
+      "id": "proposed-wp11-pin",
+      "path": "verification/research-program/pr-005/evidence/c-005-3/proposed-wp11-resultcard-test-pin.json",
+      "sha256": "49d0761a93be20c4cc618cd83e2ec61a39f210fc842c55151d7c5c3a9d0d9dd4",
+      "bytes": 872
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-005-1-F07",
+      "status": "passed",
+      "result": "September 10 evaluation of a September 5 deadline is overdue through the public path; missing/invalid due dates remain deadline_unknown; frozen retrieve without now stays at 1970.",
+      "command_ids": ["cmd-c005-1-tests", "cmd-c005-3-freshness"],
+      "artifact_ids": ["f07-before", "f07-after"]
+    },
+    {
+      "id": "C-005-2-F06",
+      "status": "passed",
+      "result": "HCRIS-style typical unit is unresolved; inferred unit tags are search aids; card/detail/machine grain states match.",
+      "command_ids": ["cmd-c005-2-web", "cmd-c005-3-web"],
+      "artifact_ids": ["f06-before", "f06-after"]
+    },
+    {
+      "id": "C-005-3-freshness-scope",
+      "status": "passed",
+      "result": "Clock advancement without corpus rebuild changes overdue status while record/evidence hashes stay stable. Dataset API and UI distinguish last successful catalog-metadata check from payload-check not-attempted.",
+      "command_ids": ["cmd-c005-3-freshness", "cmd-c005-3-wp1", "cmd-c005-3-web"],
+      "artifact_ids": ["c005-3-commands"]
+    },
+    {
+      "id": "frozen-retrieve-bytes",
+      "status": "passed",
+      "result": "Frozen retrieve() freshness shape remains catalog-contract freshnessState; lexical-index and direct-base byte-parity pass.",
+      "command_ids": ["cmd-c005-3-retrieval", "cmd-c005-3-worker-functional"],
+      "artifact_ids": ["c005-3-commands"]
+    },
+    {
+      "id": "packet-worker-glob",
+      "status": "failed",
+      "result": "npm run test:worker exits 1 solely on WP11 historical ResultCard.test.ts pin. Functional worker/direct-base tests passed.",
+      "command_ids": ["cmd-c005-3-worker"],
+      "artifact_ids": ["proposed-wp11-pin", "c005-3-worker-commands"]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "npm-run-test-worker-wp11-pin",
+      "status": "failed",
+      "detail": "npm run test:worker failed closed because WP11 v1.3 historical input pins apps/web/src/components/ResultCard.test.ts. PR-005 owns that test file and added grain/freshness coverage. WP11 pin update is outside this PR.",
+      "next_action": "PR-085/WP11 owner may rebind the historical ResultCard.test.ts pin to SHA-256 a9415f9c66580fafb9f5ba2572d829b86344c1990044ebcd48d109739c18ea9d after independent review of this PR, or reject the test-file change."
+    },
+    {
+      "id": "full-release-gate",
+      "status": "skipped",
+      "detail": "Full npm test/build/cf:dry-run was not run. Packet scoped checks were executed instead.",
+      "next_action": "Integration/release gate remains the controller's combined run."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "pending_head_sha",
+      "status": "pending",
+      "detail": "head_sha is null pending-head transport. A future commit cannot contain its own hash. The controller binds the actual C-005-3 / final head after this packet is committed.",
+      "next_action": "Controller records the committed head in an external receipt."
+    },
+    {
+      "id": "hcris-observation-grain",
+      "status": "unresolved",
+      "detail": "HCRIS grain remains unresolved. Inferred hospital/facility/provider/state unit_of_analysis tags are search aids only and are not source-asserted typical units.",
+      "next_action": "A later evidence-backed observation-grain claim may populate typical unit without promoting inferred tags."
+    },
+    {
+      "id": "payload-access",
+      "status": "unresolved",
+      "detail": "No payload check is attempted. Catalog metadata success is not payload access.",
+      "next_action": "Endpoint-scoped payload observations remain a later PR-004 consumer concern, not established here."
+    }
+  ],
+  "risks": [
+    {
+      "id": "wp11-historical-pin",
+      "status": "risk",
+      "detail": "Changing ResultCard.test.ts is required by the PR-005 packet and breaks the WP11 historical input pin until that out-of-scope inventory is updated.",
+      "next_action": "Do not treat npm run test:worker failure as a freshness-logic regression."
+    },
+    {
+      "id": "retrieve-freshness-shape",
+      "status": "accepted",
+      "detail": "Retrieve() does not emit the extra freshness-scope fields so frozen engine byte-parity remains intact. Dataset() and UI adapters project those fields separately.",
+      "next_action": "Reviewers should compare search retrieve freshness against dataset() projectFreshness for the same record."
+    }
+  ],
+  "next_consumer": "Astra independent review. Downstream consumers include PR-006 (facets/grain labels) and PR-076/PR-079 freshness operations.",
+  "next_action": "Astra inspects the diff, replays node --test tests/research-program/freshness-and-grain.test.mjs and the F06/F07 fixtures, and decides whether to publish a draft PR. Do not merge or deploy from this producer packet. Bind the actual head after C-005-3 is committed.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer logs and packet validity are not independent approval.",
+      "No live collection, paid enrichment, or production deploy was performed."
+    ]
+  }
+}

@@ -34,9 +34,42 @@ export function resolveObservationClock(now, corpus = {}) {
 
 export function projectFreshness(record, now) {
   const clock = now instanceof Date ? now : resolveObservationClock(now);
+  const historical = record?.freshness_verification ?? {};
+  const base = freshnessState(record, clock);
+  const lastSuccessful = historical.metadata_observed_at ?? null;
+  const failedRefresh = historical.failed_refresh_state ?? 'none_recorded';
+  const latestAttemptAt = failedRefresh === 'none_recorded' ? lastSuccessful : (historical.latest_attempt_at ?? null);
+  const latestAttemptOutcome = failedRefresh !== 'none_recorded'
+    ? failedRefresh
+    : historical.verification_status === 'current_verified'
+      ? 'succeeded'
+      : historical.verification_status ?? 'unknown';
+  const staleStatus = historical.verification_status === 'stale'
+    ? 'stale_historical_success'
+    : base.freshness_state === 'overdue'
+      ? 'review_overdue'
+      : 'not_stale';
   return {
-    ...freshnessState(record, clock),
-    evaluated_at: clock.toISOString()
+    ...base,
+    evaluated_at: clock.toISOString(),
+    last_successful_metadata_check: lastSuccessful,
+    latest_attempt: {
+      at: latestAttemptAt,
+      outcome: latestAttemptOutcome,
+      scope: 'catalog_metadata'
+    },
+    catalog_metadata_check: {
+      state: historical.verification_status ?? 'unknown',
+      at: lastSuccessful,
+      scope: 'catalog_metadata'
+    },
+    payload_check: {
+      state: 'not_attempted',
+      at: null,
+      scope: 'payload',
+      note: 'Catalog metadata observation is not a payload-access check.'
+    },
+    stale_status: staleStatus
   };
 }
 
@@ -636,7 +669,7 @@ export function createRetrievalEngine({ lexicalArtifact = null, diagnostic = nul
           dimensions: metadataDimensions(item.record),
           dates: dateDimensions(item.record),
           access: { ...(cachedAccessDimensions(item.record, recordScoring.get(item.record.record_id))) },
-          freshness: projectFreshness(item.record, effectiveNow),
+          freshness: freshnessState(item.record, effectiveNow),
           description_quality: descriptionQuality(item.record),
           claim_evidence: auditEvidence(item.record),
           retrieval_plan: retrievalPlan(item.record),

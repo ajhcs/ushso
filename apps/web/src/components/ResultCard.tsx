@@ -12,20 +12,23 @@ interface ResultCardProps {
   uncertaintyReasons?: string[]
 }
 
-function checkedLabel(result: DatasetFamily) {
-  const metadataFreshness = result.canonicalResult.metadata?.freshness
-  if (metadataFreshness) {
-    const checked = metadataFreshness.last_checked ? new Date(metadataFreshness.last_checked) : null
-    return {
-      checkedText: !checked || Number.isNaN(checked.getTime()) ? metadataFreshness.last_checked ?? 'unknown' : new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(checked),
-      overdue: metadataFreshness.freshness_state === 'overdue',
-    }
+function formatChecked(value: string | null | undefined) {
+  if (!value) return 'unknown'
+  const checked = new Date(value)
+  return Number.isNaN(checked.getTime()) ? value : new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(checked)
+}
+
+function freshnessPresentation(result: DatasetFamily) {
+  const projected = result.canonicalResult.metadata?.freshness
+  const verification = result.verification
+  return {
+    lastSuccessfulText: formatChecked(verification.lastSuccessfulMetadataCheck ?? projected?.last_successful_metadata_check ?? verification.metadataObservedAt),
+    latestAttemptText: formatChecked(verification.latestAttemptAt ?? projected?.latest_attempt?.at ?? verification.metadataObservedAt),
+    latestAttemptOutcome: (verification.latestAttemptOutcome ?? projected?.latest_attempt?.outcome ?? verification.status).replaceAll('_', ' '),
+    payloadCheck: verification.payloadCheckNote ?? projected?.payload_check?.note ?? 'Catalog metadata observation is not a payload-access check.',
+    stale: verification.staleStatus === 'stale_historical_success' || verification.status === 'stale' || projected?.stale_status === 'stale_historical_success',
+    overdue: projected?.freshness_state === 'overdue' || verification.freshnessState === 'overdue',
   }
-  const checked = new Date(result.verification.metadataObservedAt)
-  const checkedText = Number.isNaN(checked.getTime()) ? result.verification.metadataObservedAt : new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(checked)
-  const due = result.verification.nextReviewDue ? new Date(result.verification.nextReviewDue).getTime() : null
-  const overdue = due !== null && Number.isFinite(due) && Date.now() > due
-  return { checkedText, overdue }
 }
 
 function hasEncodingDamage(value: string) {
@@ -43,12 +46,12 @@ function matchStatus(result: DatasetFamily) {
 
 export function ResultCard({ result, id, displayRank, detailsHref = result.detailsUrl, onDetailsClick, uncertaintyReasons = [] }: ResultCardProps) {
   const categoryDetails = result.canonicalResult.record.capabilities.topics.filter((topic) => topic.label).slice(0, 3)
-  const freshness = checkedLabel(result)
+  const freshness = freshnessPresentation(result)
   const metadata = result.canonicalResult.metadata
-  const description = metadata?.description_quality.display_description ?? result.description
-  const corrupted = metadata ? metadata.description_quality.state === 'suspected_encoding_corruption' : hasEncodingDamage(result.description)
+  const description = metadata?.description_quality?.display_description ?? result.description
+  const corrupted = metadata?.description_quality?.state === 'suspected_encoding_corruption' || (!metadata?.description_quality && hasEncodingDamage(result.description))
   const observationGrain = result.grain
-  const observationPeriod = metadata?.dates.observation_period
+  const observationPeriod = metadata?.dates?.observation_period
   const observationTime = observationPeriod ? [observationPeriod.start, observationPeriod.end].filter(Boolean).join('–') || observationPeriod.state : result.availableYears
   const whyMatched = result.relevance === 'Browse'
     ? 'Published catalog browse; no research objective was inferred.'
@@ -86,7 +89,7 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
             <dt>Time</dt>
             <dd>{observationTime}</dd>
           </div>
-          {metadata?.dates.publisher_release_date && <div><dt>Publisher release</dt><dd>{metadata.dates.publisher_release_date}</dd></div>}
+          {metadata?.dates?.publisher_release_date && <div><dt>Publisher release</dt><dd>{metadata.dates.publisher_release_date}</dd></div>}
         </dl>
       </div>
       <aside className="result-card__summary" aria-label="Verification and access status">
@@ -98,7 +101,10 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
               <small>Verification target</small>
               <strong>{verificationTarget}</strong>
               {freshness.overdue && <em>Review overdue</em>}
-              <small>Last checked {freshness.checkedText}</small>
+              {freshness.stale && <em>Historical metadata success is stale</em>}
+              <small>Last successful metadata check {freshness.lastSuccessfulText}</small>
+              <small>Latest catalog-metadata attempt {freshness.latestAttemptText} ({freshness.latestAttemptOutcome})</small>
+              <small>Payload check not attempted. {freshness.payloadCheck}</small>
             </span>
           </p>
           <p className="result-status"><span><small>Access</small><strong>{result.accessStatusLabel}</strong></span></p>

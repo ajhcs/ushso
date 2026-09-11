@@ -11,6 +11,7 @@ import { safeExternalHttpsUrl } from '../lib/externalUrls'
 import { parseReturnContext, resultAnchorId, safeReturnDestination } from '../lib/returnContext'
 import { assessmentGeneration, readSearchAssessment } from '../lib/searchAssessment'
 import { useDatasetResult } from '../providers/DiscoveryProviderContext'
+import type { DatasetFamily } from '../types/catalog'
 import type { ObservatoryRecord } from '../types/discovery'
 const ScientificReviewPanel = lazy(() => import('../components/ScientificReviewPanel'))
 
@@ -37,13 +38,25 @@ function descriptionHasEncodingDamage(value: string) {
   return /\uFFFD|(?:Ã.|Â.|â€|â€™|â€œ|â€)/u.test(value)
 }
 
-function freshnessState(record: ObservatoryRecord) {
-  const due = record.freshness_verification.next_review_due
-  if (!due) return { label: 'Review schedule not published', overdue: false }
-  const dueAt = new Date(due).getTime()
-  if (Number.isNaN(dueAt)) return { label: `Review deadline: ${due}`, overdue: false }
-  if (Date.now() > dueAt) return { label: `Review overdue since ${formatDate(due)}`, overdue: true }
-  return { label: `Next review due ${formatDate(due)}`, overdue: false }
+export function freshnessPresentation(dataset: DatasetFamily) {
+  const projected = dataset.canonicalResult.metadata?.freshness
+  const overdue = projected?.freshness_state === 'overdue' || dataset.verification.freshnessState === 'overdue'
+  const due = projected?.next_review_due ?? dataset.verification.nextReviewDue
+  const label = overdue
+    ? `Review overdue${due ? ` since ${formatDate(due)}` : ''}`
+    : projected?.freshness_state === 'within_review_window' && due
+      ? `Next review due ${formatDate(due)}`
+      : 'Review schedule not published'
+  return {
+    label,
+    overdue,
+    note: projected?.note,
+    lastSuccessful: dataset.verification.lastSuccessfulMetadataCheck ?? projected?.last_successful_metadata_check ?? dataset.verification.metadataObservedAt,
+    latestAttempt: dataset.verification.latestAttemptAt ?? projected?.latest_attempt?.at ?? dataset.verification.metadataObservedAt,
+    latestAttemptOutcome: dataset.verification.latestAttemptOutcome ?? projected?.latest_attempt?.outcome ?? 'unknown',
+    payloadNote: dataset.verification.payloadCheckNote ?? projected?.payload_check?.note ?? 'Catalog metadata observation is not a payload-access check.',
+    stale: dataset.verification.staleStatus === 'stale_historical_success' || dataset.verification.status === 'stale' || projected?.stale_status === 'stale_historical_success',
+  }
 }
 
 function relationshipSummary(record: ObservatoryRecord, siblingCount: number) {
@@ -107,20 +120,18 @@ export function DatasetDetailsPage() {
 
   const record = dataset.canonicalResult.record
   const metadata = dataset.canonicalResult.metadata
-  const freshness = metadata?.freshness
-    ? { label: metadata.freshness.freshness_state === 'overdue' ? `Review overdue${metadata.freshness.next_review_due ? ` since ${formatDate(metadata.freshness.next_review_due)}` : ''}` : metadata.freshness.freshness_state === 'within_review_window' && metadata.freshness.next_review_due ? `Next review due ${formatDate(metadata.freshness.next_review_due)}` : 'Review schedule not published', overdue: metadata.freshness.freshness_state === 'overdue' }
-    : freshnessState(record)
+  const freshness = freshnessPresentation(dataset)
   const guidance = sourceGuidance(record)
-  const rawAccessRoutes = metadata?.retrieval_plan.access_routes ?? record.retrieval.instructions.filter((step) => step.action !== 'stop_and_report' && step.url)
+  const rawAccessRoutes = metadata?.retrieval_plan?.access_routes ?? record.retrieval.instructions.filter((step) => step.action !== 'stop_and_report' && step.url)
   const accessRoutes = rawAccessRoutes.flatMap((step) => {
     const url = safeExternalHttpsUrl(step.url)
     return url ? [{ ...step, url }] : []
   })
   const unresolvedRoutes = [
-    ...(metadata?.retrieval_plan.unresolved_routes ?? record.retrieval.instructions.filter((step) => step.action !== 'stop_and_report' && !step.url)),
+    ...(metadata?.retrieval_plan?.unresolved_routes ?? record.retrieval.instructions.filter((step) => step.action !== 'stop_and_report' && !step.url)),
     ...rawAccessRoutes.filter((step) => safeExternalHttpsUrl(step.url) === null).map((step) => ({ ...step, original_url: step.url, url: null })),
   ]
-  const stopConditions = metadata?.retrieval_plan.stop_conditions ?? record.retrieval.instructions.filter((step) => step.action === 'stop_and_report')
+  const stopConditions = metadata?.retrieval_plan?.stop_conditions ?? record.retrieval.instructions.filter((step) => step.action === 'stop_and_report')
   const routeParams = new URLSearchParams(location.search)
   const returnContext = parseReturnContext(routeParams.get('return'))
   const contextualQuestion = returnContext?.selected_record_id.replace(/^obs:asset:/, '') === record.record_id.replace(/^obs:asset:/, '') ? new URLSearchParams(returnContext.search).get('q') : null
@@ -137,8 +148,8 @@ export function DatasetDetailsPage() {
   const pageUrl = typeof window === 'undefined' ? `/datasets/${encodeURIComponent(datasetId)}` : window.location.href.split('?')[0]
   const correctionBody = [`Record ID: ${record.record_id}`, `Catalog generation: ${discovery.result.corpus.corpus_id} ${discovery.result.corpus.corpus_version}`, `Page URL: ${pageUrl}`, 'Affected field: ', '', 'Authoritative supporting link: ', '', 'Correction description: ', '', 'Do not include protected health information.'].join('\n')
   const correctionHref = `mailto:info@ushso.org?subject=${encodeURIComponent(`Metadata correction: ${record.record_id}`)}&body=${encodeURIComponent(correctionBody)}`
-  const displayedDescription = metadata?.description_quality.display_description ?? record.description
-  const corrupted = metadata ? metadata.description_quality.state === 'suspected_encoding_corruption' : descriptionHasEncodingDamage(record.description)
+  const displayedDescription = metadata?.description_quality?.display_description ?? record.description
+  const corrupted = metadata?.description_quality?.state === 'suspected_encoding_corruption' || (!metadata?.description_quality && descriptionHasEncodingDamage(record.description))
   const dimensions = metadata?.dimensions
 
   return (
@@ -150,7 +161,7 @@ export function DatasetDetailsPage() {
           <p>{record.identity.source.name} · {sentenceCase(record.identity.asset.asset_type)}</p>
           <h1>{dataset.title}</h1>
           <p>{displayedDescription}</p>
-          {corrupted && <div className="text-quality-notice" role="note"><AlertTriangle aria-hidden="true" /><p><strong>Source text may contain encoding damage.</strong> The captured wording is preserved without guessing at missing symbols. {metadata?.description_quality.authoritative_url && <a href={metadata.description_quality.authoritative_url} target="_blank" rel="noreferrer">Check the publisher’s current page <ExternalLink aria-hidden="true" /></a>}</p></div>}
+          {corrupted && <div className="text-quality-notice" role="note"><AlertTriangle aria-hidden="true" /><p><strong>Source text may contain encoding damage.</strong> The captured wording is preserved without guessing at missing symbols. {metadata?.description_quality?.authoritative_url && <a href={metadata.description_quality.authoritative_url} target="_blank" rel="noreferrer">Check the publisher’s current page <ExternalLink aria-hidden="true" /></a>}</p></div>}
         </header>
 
          {contextualQuestion && <section className="context-relevance" aria-label="Search relevance context"><strong>{searchAssessment ? `${searchAssessment.relevance} relevance in the originating search` : 'Originating search context'}</strong><p>Question: “{contextualQuestion}”</p>{searchAssessment ? <><p>Ranking version: {searchAssessment.ranking_version}. Catalog generation: {searchAssessment.generation}.</p><ul>{searchAssessment.reasons.map((reason, index) => <li key={index}>{reason}</li>)}</ul><p>This is the assessment saved from the originating search, not a scientific-quality or fitness rating.</p></> : <p>No matching search assessment is available on this record lookup. Return to the search results to inspect relevance; no relevance rating is inferred.</p>}</section>}
@@ -169,9 +180,9 @@ export function DatasetDetailsPage() {
               <div><dt>Reporting organization</dt><dd><ClaimValue>{dimensions?.reporting_organization.values.join(', ') || 'Unknown'}</ClaimValue></dd></div>
               <div><dt>Geography</dt><dd><ClaimValue evidenceIds={record.geography.evidence_ids}>{dataset.geographicApplicability}</ClaimValue></dd></div>
               <div><dt>Observation period</dt><dd><ClaimValue evidenceIds={record.time_coverage.evidence_ids}>{dataset.availableYears}</ClaimValue></dd></div>
-              <div><dt>Publisher release</dt><dd>{metadata?.dates.publisher_release_date ?? 'Unknown'}</dd></div>
-              <div><dt>Publisher revision</dt><dd>{metadata?.dates.publisher_revision_date ?? 'Unknown'}</dd></div>
-              <div><dt>Projection horizon</dt><dd>{metadata?.dates.projection_horizon ?? 'Not documented'}</dd></div>
+              <div><dt>Publisher release</dt><dd>{metadata?.dates?.publisher_release_date ?? 'Unknown'}</dd></div>
+              <div><dt>Publisher revision</dt><dd>{metadata?.dates?.publisher_revision_date ?? 'Unknown'}</dd></div>
+              <div><dt>Projection horizon</dt><dd>{metadata?.dates?.projection_horizon ?? 'Not documented'}</dd></div>
               <div><dt>Access</dt><dd><ClaimValue evidenceIds={record.access.evidence_ids}>{dataset.accessStatusLabel}</ClaimValue></dd></div>
               <div><dt>Relationship</dt><dd>{relationshipSummary(record, dataset.familySiblingCount)}</dd></div>
             </dl>
@@ -202,9 +213,16 @@ export function DatasetDetailsPage() {
 
           <section className={`details-panel freshness-panel${freshness.overdue ? ' freshness-panel--overdue' : ''}`} aria-labelledby="verification-heading">
             <div className="details-panel__heading"><Clock3 aria-hidden="true" /><div><p className="details-panel__eyebrow">Freshness is separate from historical evidence</p><h2 id="verification-heading">Verification and review</h2></div></div>
-            <p className="freshness-state"><strong>{freshness.label}</strong>{metadata?.freshness.note && <span>{metadata.freshness.note}</span>}</p>
-            <dl className="details-list"><div><dt>Last checked</dt><dd>{(metadata?.freshness.last_checked ?? record.freshness_verification.metadata_observed_at) ? <time dateTime={metadata?.freshness.last_checked ?? record.freshness_verification.metadata_observed_at}>{formatDate(metadata?.freshness.last_checked ?? record.freshness_verification.metadata_observed_at)}</time> : 'Unknown'}</dd></div><div><dt>Historical status</dt><dd>{sentenceCase(metadata?.freshness.verification_status ?? record.freshness_verification.verification_status)}</dd></div><div><dt>Failed refresh</dt><dd>{sentenceCase(metadata?.freshness.failed_refresh_state ?? 'None recorded')}</dd></div><div><dt>Data through</dt><dd>{record.freshness_verification.data_through ?? 'Unknown'}</dd></div></dl>
-            <p className="freshness-boundary">An overdue review does not imply that the captured metadata is false. A failed refresh, when recorded, must remain distinct from the earlier successful observation.</p>
+            <p className="freshness-state"><strong>{freshness.label}</strong>{freshness.note && <span>{freshness.note}</span>}{freshness.stale && <span> Historical metadata success is stale.</span>}</p>
+            <dl className="details-list">
+              <div><dt>Last successful metadata check</dt><dd>{freshness.lastSuccessful ? <time dateTime={freshness.lastSuccessful}>{formatDate(freshness.lastSuccessful)}</time> : 'Unknown'}</dd></div>
+              <div><dt>Latest catalog-metadata attempt</dt><dd>{freshness.latestAttempt ? <time dateTime={freshness.latestAttempt}>{formatDate(freshness.latestAttempt)}</time> : 'Unknown'} · {sentenceCase(freshness.latestAttemptOutcome)}</dd></div>
+              <div><dt>Historical status</dt><dd>{sentenceCase(metadata?.freshness?.verification_status ?? record.freshness_verification.verification_status)}</dd></div>
+              <div><dt>Failed refresh</dt><dd>{sentenceCase(metadata?.freshness?.failed_refresh_state ?? 'None recorded')}</dd></div>
+              <div><dt>Payload check</dt><dd>Not attempted. {freshness.payloadNote}</dd></div>
+              <div><dt>Data through</dt><dd>{record.freshness_verification.data_through ?? 'Unknown'}</dd></div>
+            </dl>
+            <p className="freshness-boundary">An overdue review does not imply that the captured metadata is false. Catalog metadata success is not payload access. A failed refresh, when recorded, must remain distinct from the earlier successful observation.</p>
           </section>
         </div>
 

@@ -2,6 +2,15 @@ import { assertCoverageRepository } from '../packages/coverage/coverage-reposito
 import { assertPlannerRepository } from '../packages/planner/planner-repository.mjs';
 import { assertCatalogRepository } from '../packages/registry/catalog-repository.mjs';
 import { assertPublicationReadContext } from '../packages/registry/publication-read-context.mjs';
+import {
+  accessDimensions,
+  auditEvidence,
+  dateDimensions,
+  descriptionQuality,
+  metadataDimensions,
+  retrievalPlan
+} from '../packages/retrieval/tools/catalog-contract.mjs';
+import { projectFreshness } from '../packages/retrieval/tools/retrieval-core-v1.2.mjs';
 import { assertSearchBackend } from '../packages/search/search-backend.mjs';
 
 function retrievalId(value) {
@@ -27,8 +36,8 @@ function queryFromIntent(intent, filters = {}) {
   };
 }
 
-function directResult(record, whyRelevant) {
-  return {
+function directResult(record, whyRelevant, evaluatedAt = null) {
+  const result = {
     rank: 1,
     score: 1,
     record_id: record.record_id,
@@ -46,6 +55,23 @@ function directResult(record, whyRelevant) {
       why_relevant: [whyRelevant]
     },
     record: structuredClone(record)
+  };
+  if (!evaluatedAt) return result;
+  return {
+    ...result,
+    metadata: {
+      dimensions: metadataDimensions(record),
+      dates: dateDimensions(record),
+      access: accessDimensions(record),
+      freshness: projectFreshness(record, evaluatedAt),
+      description_quality: descriptionQuality(record),
+      claim_evidence: auditEvidence(record),
+      retrieval_plan: retrievalPlan(record),
+      named_source_role: 'not_applicable',
+      geographic_compatibility: 'not_requested',
+      observation_time_compatibility: 'not_requested',
+      access_compatibility: 'not_requested'
+    }
   };
 }
 
@@ -180,7 +206,7 @@ export class PublicQueryService {
         family_sibling_count: Math.max(0, familySize - 1)
       }),
       ...resultBounds(1, 1),
-      results: [directResult(record, 'Opened by its stable published record identifier.')],
+      results: [directResult(record, 'Opened by its stable published record identifier.', session.evaluatedAt)],
       join_routes: joinRoutes,
       warnings: ['This page describes indexed metadata and retrieval routes; it does not prove current endpoint availability or authorize access.']
     };

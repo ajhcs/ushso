@@ -86,6 +86,14 @@ describe('canonical discovery response adapter', () => {
     }))
   })
 
+  it('projects last successful metadata check separately from payload access', () => {
+    const first = adaptDiscoveryResponse(acceptedResponse).records[0]
+    expect(first.verification.lastSuccessfulMetadataCheck).toBe(first.verification.metadataObservedAt)
+    expect(first.verification.payloadCheckState).toBe('not_attempted')
+    expect(first.verification.payloadCheckNote).toMatch(/not a payload-access check/)
+    expect(first.verification.latestAttemptScope).toBe('catalog_metadata')
+  })
+
   it('does not reinterpret public catalog visibility as public payload access', () => {
     const catalogOnly = structuredClone(acceptedResponse)
     catalogOnly.results[0].record.access.status = 'public_catalog'

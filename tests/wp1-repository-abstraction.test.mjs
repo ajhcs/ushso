@@ -161,8 +161,12 @@ test('static adapters reproduce exact legacy browse, dataset, and discovery stru
 
   const target = records.find(record => record.record_id.startsWith('obs:asset:')) ?? records[0];
   const dataset = await service.dataset(session, target.record_id.replace(/^obs:asset:/, ''));
-  assert.deepEqual(dataset, legacyDataset(target));
-  assert.equal(JSON.stringify(dataset), JSON.stringify(legacyDataset(target)));
+  const expectedDataset = legacyDataset(target);
+  const { metadata: datasetMetadata, ...datasetRow } = dataset.results[0];
+  assert.deepEqual({ ...dataset, results: [datasetRow] }, expectedDataset);
+  assert.equal(datasetMetadata.freshness.evaluated_at, session.evaluatedAt);
+  assert.equal(datasetMetadata.freshness.payload_check.state, 'not_attempted');
+  assert.equal(datasetMetadata.freshness.last_successful_metadata_check, target.freshness_verification.metadata_observed_at);
 
   const query = { question: 'hospital financial and utilization data for Pennsylvania', limit: 15 };
   assert.deepEqual(await service.discover(session, query), engine.retrieve(query));
