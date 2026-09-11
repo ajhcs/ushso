@@ -74,6 +74,31 @@ export const WP11_WRAPPER_IMPLEMENTATION_FILES = Object.freeze([
   'verification/research-program/ci-attestation/wp11-v1.3.0/policy.json',
 ])
 
+export const WP11_POLICY_PATH = 'verification/research-program/ci-attestation/wp11-v1.3.0/policy.json'
+
+export const WP11_BUILDER_UNPINNED_READS = Object.freeze([
+  'worker/index.mjs',
+  'packages/coverage/accounting/v1.0.0/artifacts/public-coverage-view.json',
+  'verification/external-authorization/v1.0.0/register.json',
+  'packages/retrieval/corpus/records.jsonl',
+])
+
+export const PR005_941C9CD_CHANGED_INPUTS = Object.freeze([
+  'apps/web/src/components/ResultCard.test.ts',
+  'apps/web/src/components/ResultCard.tsx',
+  'apps/web/src/lib/catalogAdapter.test.ts',
+  'apps/web/src/lib/catalogAdapter.ts',
+  'apps/web/src/lib/researcherGuidance.test.tsx',
+  'apps/web/src/lib/researcherGuidance.ts',
+  'apps/web/src/pages/DatasetDetailsPage.test.tsx',
+  'apps/web/src/pages/DatasetDetailsPage.tsx',
+  'apps/web/src/types/catalog.ts',
+  'apps/web/src/types/discovery.ts',
+  'package-lock.json',
+  'package.json',
+  'packages/retrieval/tools/retrieval-core-v1.2.mjs',
+])
+
 export const HISTORICAL_WP11_V1_3 = Object.freeze({
   package_id: WP11_PACKAGE_ID,
   subject_sha256: '294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98',
@@ -265,6 +290,129 @@ export async function validateHistoricalInputBindings({
   }
 }
 
+function currentInputRole(relativePath, bytes) {
+  if (relativePath === 'package.json') {
+    try {
+      const provenance = packageProvenanceFor(bytes)
+      return provenance.reviewed_pr003_transition ? 'reviewed_pr003_package_transition' : 'original_pr085_git_snapshot'
+    } catch {
+      return 'unreviewed_package_json'
+    }
+  }
+  if (relativePath === 'package-lock.json') {
+    try {
+      const lockState = lockStateFor(bytes)
+      return lockState === 'pr085_ci_v14' ? 'pr085_ci_v14_workspace_lock' : 'historical_package_lock'
+    } catch {
+      return 'unreviewed_package_lock'
+    }
+  }
+  return 'current_unapproved_input_change'
+}
+
+/**
+ * Compare every sealed historical input against current candidate bytes and
+ * report the complete changed set. This is not historical approval, current
+ * approval, or combined-candidate acceptance.
+ */
+export async function reportCurrentVersusHistoricalInputs({
+  root = repoRoot,
+  snapshot,
+  readCurrentFile = readCurrent,
+  currentSource = 'current_tree',
+} = {}) {
+  const retained = snapshot ?? await readHistoricalPreimageSnapshot({ root })
+  assert.equal(retained.file_count, SEALED_WP11_FILE_COUNT, 'WP11_SNAPSHOT_FILE_COUNT')
+  const changed = []
+  let unchangedCount = 0
+  for (const pin of retained.files) {
+    const relativePath = safeRelativePath(pin.path, 'CURRENT_INPUT')
+    const bytes = await readCurrentFile(root, relativePath)
+    assert.ok(bytes && bytes.length > 0, `WP11_CURRENT_${relativePath}_EMPTY`)
+    const currentSha256 = sha256(bytes)
+    if (currentSha256 === pin.sha256 && bytes.length === pin.bytes) {
+      unchangedCount += 1
+      continue
+    }
+    changed.push({
+      path: relativePath,
+      historical_bytes: pin.bytes,
+      historical_sha256: pin.sha256,
+      historical_source: 'retained_historical_preimage_snapshot',
+      current_bytes: bytes.length,
+      current_sha256: currentSha256,
+      current_source: currentSource,
+      role: currentInputRole(relativePath, bytes),
+    })
+  }
+  changed.sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0))
+  assert.equal(unchangedCount + changed.length, SEALED_WP11_FILE_COUNT, 'WP11_CURRENT_DIFF_COUNT')
+  const unreviewed = changed.filter((item) => item.role === 'unreviewed_package_json' || item.role === 'unreviewed_package_lock')
+  if (unreviewed.length > 0) {
+    const error = new Error(`WP11_CURRENT_INPUT_UNREVIEWED_DRIFT:${unreviewed.map((item) => item.path).join(',')}`)
+    error.changed = changed
+    throw error
+  }
+  return {
+    status: 'PASS',
+    compared_file_count: SEALED_WP11_FILE_COUNT,
+    changed_count: changed.length,
+    unchanged_count: unchangedCount,
+    changed,
+    approval: null,
+    current_approval_issued: false,
+    historical_approval_transferred: false,
+    combined_acceptance: false,
+    release_qualified: false,
+  }
+}
+
+export function builderCoverageLimits() {
+  return {
+    historical_inventory_file_count: SEALED_WP11_FILE_COUNT,
+    unpinned_legacy_builder_reads: WP11_BUILDER_UNPINNED_READS.map((path) => ({
+      path,
+      in_sealed_inventory: false,
+    })),
+    note: 'The existing WP11 v1.3 technical builder reads these paths without listing them in technical_evidence.files. This assignment does not expand historical package scope, does not treat those reads as sealed historical pins, and does not imply full release qualification.',
+  }
+}
+
+export async function assertCurrentWrapperPolicy({
+  root = repoRoot,
+  implementationFiles,
+  policy,
+} = {}) {
+  const policyBytes = policy
+    ? Buffer.from(JSON.stringify(policy))
+    : await readFile(path.resolve(root, WP11_POLICY_PATH))
+  const parsed = policy ?? parseJson(policyBytes, 'POLICY')
+  const snapshotPin = parsed.historical_preimage_snapshot
+  const readerPin = parsed.historical_preimage_reader
+  assert.ok(snapshotPin && typeof snapshotPin === 'object', 'WP11_WRAPPER_SNAPSHOT_BINDING_MISSING')
+  assert.ok(readerPin && typeof readerPin === 'object', 'WP11_WRAPPER_READER_BINDING_MISSING')
+  const inventory = implementationFiles.find((file) => file.path === HISTORICAL_PREIMAGE_INVENTORY_PATH)
+  const reader = implementationFiles.find((file) => file.path === HISTORICAL_PREIMAGE_READER_PATH)
+  assert.ok(inventory, 'WP11_WRAPPER_SNAPSHOT_BINDING_MISSING')
+  assert.ok(reader, 'WP11_WRAPPER_READER_BINDING_MISSING')
+  assert.equal(snapshotPin.path, HISTORICAL_PREIMAGE_INVENTORY_PATH, 'WP11_WRAPPER_POLICY_STALE_SNAPSHOT')
+  assert.equal(snapshotPin.sha256, inventory.sha256, 'WP11_WRAPPER_POLICY_STALE_SNAPSHOT')
+  assert.equal(snapshotPin.bytes, inventory.bytes, 'WP11_WRAPPER_POLICY_STALE_SNAPSHOT')
+  assert.equal(snapshotPin.file_count, SEALED_WP11_FILE_COUNT, 'WP11_WRAPPER_POLICY_STALE_SNAPSHOT')
+  assert.equal(snapshotPin.total_bytes, SEALED_WP11_TOTAL_BYTES, 'WP11_WRAPPER_POLICY_STALE_SNAPSHOT')
+  assert.equal(snapshotPin.execute_retained_sources, false, 'WP11_WRAPPER_POLICY_EXECUTE_RETAINED_SOURCES')
+  assert.equal(readerPin.path, HISTORICAL_PREIMAGE_READER_PATH, 'WP11_WRAPPER_POLICY_STALE_READER')
+  assert.equal(readerPin.sha256, reader.sha256, 'WP11_WRAPPER_POLICY_STALE_READER')
+  assert.equal(readerPin.bytes, reader.bytes, 'WP11_WRAPPER_POLICY_STALE_READER')
+  const declared = parsed.wrapper_implementation_files
+  assert.ok(Array.isArray(declared), 'WP11_WRAPPER_POLICY_BINDINGS_MISSING')
+  for (const name of WP11_WRAPPER_IMPLEMENTATION_FILES) {
+    assert.ok(declared.includes(name), 'WP11_WRAPPER_POLICY_STALE_BINDINGS')
+    assert.ok(implementationFiles.some((file) => file.path === name), 'WP11_WRAPPER_FILE_MISSING')
+  }
+  return parsed
+}
+
 /**
  * Validate immutable WP11 v1.3 approval, evidence, approved receipt and
  * required predecessor proof from supplied bytes. Never writes a receipt and
@@ -404,13 +552,18 @@ export async function buildCurrentWp11Draft({
   return draft
 }
 
-export async function bindWrapperImplementation({ root = repoRoot } = {}) {
-  const implementationFiles = await pinFiles(root, WP11_WRAPPER_IMPLEMENTATION_FILES)
-  assert.equal(implementationFiles.length, WP11_WRAPPER_IMPLEMENTATION_FILES.length, 'WP11_WRAPPER_FILE_COUNT')
+export async function bindWrapperImplementation({
+  root = repoRoot,
+  implementationFileNames = WP11_WRAPPER_IMPLEMENTATION_FILES,
+  policy,
+} = {}) {
+  const implementationFiles = await pinFiles(root, implementationFileNames)
+  assert.equal(implementationFiles.length, new Set(implementationFileNames).size, 'WP11_WRAPPER_FILE_COUNT')
   for (const file of implementationFiles) {
     assert.ok(file.bytes > 0, `WP11_WRAPPER_${file.path}_EMPTY`)
     assertHash(file.sha256, `WRAPPER_${file.path}`)
   }
+  await assertCurrentWrapperPolicy({ root, implementationFiles, policy })
   const technicalEvidence = {
     status: 'PASS',
     schema_version: 'ushso.wp11-current-attestation-adapter.v1.3.0',
@@ -457,11 +610,17 @@ export async function verifyWp11Attestation({
   root = repoRoot,
   technicalEvidenceBuilder = buildTechnicalEvidence,
   validateCurrent = validateCandidateEvidence,
+  readCurrentFile = readCurrent,
 } = {}) {
   const historical = await readHistoricalWp11Proof(root)
   const currentDraft = await buildCurrentWp11Draft({ technicalEvidenceBuilder, validateCurrent, root })
   const wrapperDraft = await bindWrapperImplementation({ root })
   assert.notEqual(wrapperDraft.subject_sha256, currentDraft.subject_sha256, 'WP11_WRAPPER_REUSED_TECHNICAL_SUBJECT')
+  const currentVersusHistorical = await reportCurrentVersusHistoricalInputs({
+    root,
+    readCurrentFile,
+    currentSource: 'current_tree',
+  })
 
   const approvalBytes = await readFile(path.resolve(root, HISTORICAL_WP11_V1_3.files.approval.path))
   const evidenceBytes = await readFile(path.resolve(root, HISTORICAL_WP11_V1_3.files.evidence.path))
@@ -501,7 +660,11 @@ export async function verifyWp11Attestation({
       release_ready: false,
       production_eligibility: false,
       implementation_files: wrapperDraft.technical_evidence.implementation_files,
+      historical_preimage_snapshot: wrapperDraft.technical_evidence.historical_preimage_snapshot,
+      historical_preimage_reader: wrapperDraft.technical_evidence.historical_preimage_reader,
     },
+    current_versus_historical: currentVersusHistorical,
+    builder_coverage_limits: builderCoverageLimits(),
     boundaries: {
       historical_approval_reused: false,
       historical_receipt_overwritten: false,
@@ -511,6 +674,7 @@ export async function verifyWp11Attestation({
       current_release_qualified: false,
       production_authorized: false,
       writes_approval_artifacts: false,
+      combined_acceptance: false,
     },
   }
 }

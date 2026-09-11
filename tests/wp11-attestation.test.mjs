@@ -16,16 +16,23 @@ import {
 import {
   HISTORICAL_WP11_V1_3,
   ORIGINAL_PR085_PACKAGE_SNAPSHOT,
+  PR005_941C9CD_CHANGED_INPUTS,
   REVIEWED_PR003_PACKAGE_SNAPSHOT,
   REVIEWED_WP11_ROUTE,
+  WP11_BUILDER_UNPINNED_READS,
   WP11_PACKAGE_ID,
+  WP11_WRAPPER_IMPLEMENTATION_FILES,
   WP11_WRAPPER_PACKAGE_ID,
+  bindWrapperImplementation,
   buildCurrentWp11Draft,
+  reportCurrentVersusHistoricalInputs,
   repoRoot,
   validateHistoricalWp11Proof,
   verifyWp11Attestation,
 } from '../scripts/verify-wp11-attestation.mjs'
 import {
+  HISTORICAL_PREIMAGE_INVENTORY_PATH,
+  HISTORICAL_PREIMAGE_READER_PATH,
   HISTORICAL_PREIMAGE_SNAPSHOT_DIR,
   HISTORICAL_WP11_SUBJECT_SHA256,
   SEALED_WP11_FILE_COUNT,
@@ -119,6 +126,14 @@ test('current WP11 verifier keeps historical proof, technical draft and wrapper 
   assert.equal(result.historical.input_bindings.git_required, false)
   assert.equal(result.historical.input_bindings.execute_retained_sources, false)
   assert.equal(result.historical.input_bindings.subject_sha256, HISTORICAL_WP11_SUBJECT_SHA256)
+  assert.equal(result.current_versus_historical.changed_count, 2)
+  assert.equal(result.current_versus_historical.approval, null)
+  assert.equal(result.current_versus_historical.combined_acceptance, false)
+  assert.deepEqual(
+    result.current_versus_historical.changed.map((item) => item.path).sort(),
+    ['package-lock.json', 'package.json'],
+  )
+  assert.equal(result.builder_coverage_limits.unpinned_legacy_builder_reads.length, WP11_BUILDER_UNPINNED_READS.length)
   const actualPackage = await hashPinned('package.json')
   const reviewedTransition = actualPackage.sha256 === REVIEWED_PR003_PACKAGE_SNAPSHOT.sha256
   const expectedPackage = reviewedTransition ? REVIEWED_PR003_PACKAGE_SNAPSHOT : ORIGINAL_PR085_PACKAGE_SNAPSHOT
@@ -253,6 +268,115 @@ if (retained.git_required !== false) process.exit(3)
   } finally {
     await rm(script, { force: true })
   }
+})
+
+test('current technical builder hashes actual current files and remains unapproved', async () => {
+  const draft = await buildCurrentWp11Draft()
+  assert.equal(draft.approval, null)
+  assert.equal(draft.status, 'pending_authorized_review')
+  assert.equal(draft.release_gate_pass, false)
+  assert.equal(draft.technical_evidence.files.length, SEALED_WP11_FILE_COUNT)
+  assert.notEqual(draft.subject_sha256, HISTORICAL_WP11_V1_3.subject_sha256)
+  const resultCard = draft.technical_evidence.files.find((file) => file.path === 'apps/web/src/components/ResultCard.test.ts')
+  assert.deepEqual(
+    { bytes: resultCard.bytes, sha256: resultCard.sha256 },
+    await hashPinned('apps/web/src/components/ResultCard.test.ts'),
+  )
+})
+
+test('actual current-file change updates the pending technical subject while snapshot proof still passes', async () => {
+  const relativePath = 'apps/web/src/components/ResultCard.test.ts'
+  const filePath = path.join(repoRoot, relativePath)
+  const original = await readFile(filePath)
+  const mutated = Buffer.from(original)
+  mutated[mutated.length - 1] ^= 1
+  const before = await buildCurrentWp11Draft()
+  const historicalBefore = await validateHistoricalWp11Proof(await historicalBytes())
+  try {
+    await writeFile(filePath, mutated)
+    const after = await buildCurrentWp11Draft()
+    assert.notEqual(after.subject_sha256, before.subject_sha256)
+    assert.equal(after.approval, null)
+    assert.equal(after.status, 'pending_authorized_review')
+    const historicalAfter = await validateHistoricalWp11Proof(await historicalBytes())
+    assert.equal(historicalAfter.subject_sha256, historicalBefore.subject_sha256)
+    const report = await reportCurrentVersusHistoricalInputs()
+    const changed = report.changed.find((item) => item.path === relativePath)
+    assert.ok(changed)
+    assert.equal(changed.current_sha256, sha256(mutated))
+    assert.equal(changed.historical_sha256, sha256(original))
+    assert.equal(changed.role, 'current_unapproved_input_change')
+    assert.equal(report.approval, null)
+  } finally {
+    await writeFile(filePath, original)
+  }
+})
+
+test('missing snapshot or reader bindings and stale policy pins fail closed', async () => {
+  const policy = JSON.parse(await readFile(path.join(repoRoot, 'verification/research-program/ci-attestation/wp11-v1.3.0/policy.json'), 'utf8'))
+  await assert.rejects(
+    bindWrapperImplementation({
+      implementationFileNames: WP11_WRAPPER_IMPLEMENTATION_FILES.filter((name) => name !== HISTORICAL_PREIMAGE_READER_PATH),
+    }),
+    /WP11_WRAPPER_READER_BINDING_MISSING/u,
+  )
+  await assert.rejects(
+    bindWrapperImplementation({
+      implementationFileNames: WP11_WRAPPER_IMPLEMENTATION_FILES.filter((name) => name !== HISTORICAL_PREIMAGE_INVENTORY_PATH),
+    }),
+    /WP11_WRAPPER_SNAPSHOT_BINDING_MISSING/u,
+  )
+  const staleSnapshot = structuredClone(policy)
+  staleSnapshot.historical_preimage_snapshot.sha256 = '00'.repeat(32)
+  await assert.rejects(bindWrapperImplementation({ policy: staleSnapshot }), /WP11_WRAPPER_POLICY_STALE_SNAPSHOT/u)
+  const staleReader = structuredClone(policy)
+  staleReader.historical_preimage_reader.sha256 = '11'.repeat(32)
+  await assert.rejects(bindWrapperImplementation({ policy: staleReader }), /WP11_WRAPPER_POLICY_STALE_READER/u)
+})
+
+test('PR005-941c9cd comparison reports all 13 changed inputs and is not combined acceptance', async () => {
+  const report = await reportCurrentVersusHistoricalInputs({
+    readCurrentFile: async (_root, relativePath) => readGitBytes('941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9', relativePath),
+    currentSource: 'pr005_941c9cd_git_snapshot',
+  })
+  assert.equal(report.changed_count, 13)
+  assert.equal(report.unchanged_count, SEALED_WP11_FILE_COUNT - 13)
+  assert.deepEqual(report.changed.map((item) => item.path), [...PR005_941C9CD_CHANGED_INPUTS].sort())
+  assert.equal(report.approval, null)
+  assert.equal(report.combined_acceptance, false)
+  assert.equal(report.current_approval_issued, false)
+  const roles = Object.fromEntries(report.changed.map((item) => [item.path, item.role]))
+  assert.equal(roles['package.json'], 'reviewed_pr003_package_transition')
+  assert.equal(roles['package-lock.json'], 'pr085_ci_v14_workspace_lock')
+  assert.equal(roles['apps/web/src/components/ResultCard.test.ts'], 'current_unapproved_input_change')
+  for (const item of report.changed) {
+    assert.notEqual(item.historical_sha256, item.current_sha256)
+    assert.equal(item.historical_source, 'retained_historical_preimage_snapshot')
+    assert.equal(item.current_source, 'pr005_941c9cd_git_snapshot')
+    assert.ok(item.historical_bytes > 0 && item.current_bytes > 0)
+  }
+})
+
+test('current integration comparison reports only the two package transitions', async () => {
+  const report = await reportCurrentVersusHistoricalInputs()
+  assert.equal(report.changed_count, 2)
+  assert.deepEqual(report.changed.map((item) => item.path).sort(), ['package-lock.json', 'package.json'])
+  assert.equal(report.changed.find((item) => item.path === 'package.json').role, 'reviewed_pr003_package_transition')
+  assert.equal(report.changed.find((item) => item.path === 'package-lock.json').role, 'pr085_ci_v14_workspace_lock')
+  assert.equal(report.approval, null)
+  assert.equal(report.combined_acceptance, false)
+})
+
+test('corrected PR005 afb9056 comparison is a complete unapproved report, not combined acceptance', async () => {
+  const report = await reportCurrentVersusHistoricalInputs({
+    readCurrentFile: async (_root, relativePath) => readGitBytes('afb90565456a429e73527f2bb99daf9cf174aa3c', relativePath),
+    currentSource: 'pr005_afb9056_git_snapshot',
+  })
+  assert.ok(report.changed_count >= 2)
+  assert.equal(report.changed_count + report.unchanged_count, SEALED_WP11_FILE_COUNT)
+  assert.equal(report.approval, null)
+  assert.equal(report.combined_acceptance, false)
+  assert.equal(report.changed.some((item) => item.path === 'apps/web/src/components/ResultCard.test.ts'), true)
 })
 
 test('current technical failure and approval overclaim cannot be represented as a pending draft', async () => {
