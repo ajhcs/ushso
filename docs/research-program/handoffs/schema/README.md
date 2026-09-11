@@ -4,7 +4,8 @@ Machine-checkable contract material for PR-003 (`C-003-1` plus integrity
 corrections `C-003-1-R1` / `C-003-2-R1`, bounded contract corrections
 `C-003-2-R2` / `C-003-3-R2`, and remaining-defect corrections
 `C-003-2-R3` / `C-003-3-R3`, and the composite-wildcard correction
-`C-003-2-R4` / `C-003-3-R4`). It translates
+`C-003-2-R4` / `C-003-3-R4`, and the fixture-context isolation
+`C-003-2-R5` / `C-003-3-R5`). It translates
 [`docs/master-plan/2026-09-10/EXECUTION.md`](../../../master-plan/2026-09-10/EXECUTION.md)
 and the [PR-003 packet](../../../master-plan/2026-09-10/prs/PR-003.md) into
 two JSON Schema documents that preserve the evidence an independent reviewer
@@ -194,22 +195,36 @@ file established the packet's task binding; that file is not a signature.
 
 ## Validator roots and schema authority
 
-`checkHandoff(handoffPath, { repoRoot })` treats `repoRoot` as the repository
-root for the handoff input, task-binding and execution-ledger lookup, Git
-commands, artifact/event-source files, local source identities, and
-`changed_files[]` containment. Relative input paths are resolved against that
-root; absolute inputs are accepted only when they resolve inside it. Sibling
-and per-PR task-binding files are realpath-checked before their JSON is read,
-and the execution ledger is read only from that same root. This prevents a
-fixture or copied repository from silently using a sibling repository's ledger
-or binding.
+`checkHandoff(handoffPath, { repoRoot, contextRoot })` treats `repoRoot` as the
+repository root for the handoff input, task-binding lookup, artifact/event-source
+files, local source identities, and `changed_files[]` containment. Relative
+input paths are resolved against that root; absolute inputs are accepted only
+when they resolve inside it. Sibling and per-PR task-binding files are
+realpath-checked before their JSON is read.
+
+By default, with no `contextRoot` / `--context`, the execution ledger is read
+only from that same `repoRoot` and Git commands use `repoRoot` as cwd. That
+default remains the strict production path: a completed packet whose task
+binding disagrees with the live ledger still fails `binding_conflict`.
+
+An explicit `contextRoot` (CLI `--context <dir>`) must resolve inside
+`repoRoot`. It supplies only `docs/research-program/execution-ledger.json` and
+the Git cwd. Packet, artifact, source, changed-file and task-binding paths stay
+bound to `repoRoot`. Git commands issued from a nested in-repo context still
+resolve the containing repository; no copied `node_modules`, Git-metadata
+workaround or extra checkout is required. A small ignored fixture root can
+therefore carry a controlled ledger that cannot inherit the controller's
+changing PR task base, while production current-handoff checks omit `--context`
+and keep live-ledger validation.
 
 The JSON Schemas remain pinned to the validator module's authoritative
 `docs/research-program/handoffs/schema/` directory. `repoRoot` does not select
 an arbitrary replacement schema directory. A caller using another repository
 root therefore gets the same contract definitions while all packet, evidence,
 task, ledger and Git paths are resolved within the supplied root; the caller
-must provide the expected per-PR binding and ledger there.
+must provide the expected per-PR binding and ledger there. Historical fixture
+packets additionally provide a controlled ledger through `contextRoot` instead
+of being rewritten onto the latest live base.
 
 A precommit producer packet may use `head_sha: null` only with a typed pending
 or unresolved head claim. That transport state is accepted for
@@ -238,15 +253,15 @@ retroactively rewritten, and this schema intentionally does not claim to
 validate them (they carry extra fields and a different evidence shape). Handoffs
 produced from PR-003 onward are expected to satisfy the contract, including the
 R1 integrity corrections, the R2 contract corrections, the R3
-null-item/wildcard-ownership corrections and the R4 composite-wildcard
-correction. A handoff is a
+null-item/wildcard-ownership corrections, the R4 composite-wildcard
+correction and the R5 fixture-context isolation. A handoff is a
 producer artifact: passing this schema is not independent verification and not
 scientific approval.
 
 Historical C-003-1 / C-003-2 / C-003-3, R1 and R2 command receipts and evidence
 indexes under `verification/research-program/pr-003/` are preserved
 byte-for-byte. They record runs against earlier validators and remain
-explicitly historical; they are not re-presented as fresh checks. R3 and R4
+explicitly historical; they are not re-presented as fresh checks. R3, R4 and R5
 correction evidence each have separate additive indexes that bind their current
 files and cite historical bytes through immutable Git commit/path/hash triples.
 
@@ -255,6 +270,7 @@ files and cite historical bytes through immutable Git commit/path/hash triples.
 ```bash
 node verification/research-program/pr-003/verify-schema-contract.mjs
 node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json
+node scripts/research-program/check-handoff.mjs --context verification/research-program/pr-003/fixtures/.context/matching verification/research-program/pr-003/fixtures/handoff.valid.json
 ```
 
 The C-003-1 checker reads the two schemas, validates the fixtures under
@@ -276,6 +292,9 @@ hashing, Git object binding and per-PR base lookup.
   (tree `24fe636b0370e2e7b9c166d6f1c6bed520ed033e`).
 - Composite-wildcard correction base (R4): `0b28d036f1df4b5248732bc62f68edd79f14d06f`
   (tree `6e2de2232e2aa0f19055751d70e5a904a38216f9`), the exact reviewed R3
+  candidate.
+- Fixture-context isolation base (R5): `d1c42eab33e1c21edf805036464f2b64667a489a`
+  (tree `d765aa66a6bc360a3c03a86eaf54b6366ccb2be1`), the exact reviewed R4
   candidate.
 - Accepted PR-002 merge (dependency): `5647e81457b606bb36456e75c48f990ce21e9c6c`.
 - PR-001 merge (dependency): `035465f3f16d15f02467679d96451d4440a36ca8`.
@@ -311,6 +330,12 @@ Authorship is layered and must not be collapsed:
   result. The serving backend identity is not independently inspectable through
   this interface; the R3 Grok implementation remains historical evidence and
   is not credited with the R4 patch.
+- This separately scoped R5 correction is Grok Co-Engineer work
+  (`execution.provider: grok`, `execution.model: grok-4`; this interface
+  identifies as Grok 4.6) on the reviewed R4 result. It isolates historical
+  fixture packets from the moving live execution ledger without weakening
+  default production conflict checks. It is not a replay of R1–R4 or of the
+  failed 2026-09-10 Grok task.
 
 Reviewer Astra. `head_sha` stays null until the controller records the actual
 final commit; a future commit cannot contain its own hash. Root owns

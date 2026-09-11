@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // PR-003 slice C-003-2 plus integrity corrections C-003-2-R1 / C-003-2-R2
-// and remaining-defect corrections C-003-2-R3 / C-003-3-R3 / C-003-2-R4 —
-// bounded handoff-packet validator.
+// and remaining-defect corrections C-003-2-R3 / C-003-3-R3 / C-003-2-R4 /
+// C-003-2-R5 — bounded handoff-packet validator.
 //
 // Usage:
-//   node scripts/research-program/check-handoff.mjs <handoff.json>
+//   node scripts/research-program/check-handoff.mjs [--context <dir>] <handoff.json>
 //
 // It accepts exactly one handoff JSON path and then enforces:
 //   * path containment for the handoff, every artifact (including nested
@@ -22,7 +22,9 @@
 //     nonzero. Completed observed_exit records need RFC3339 UTC timestamps
 //     compared at full fractional precision;
 //   * dependency SHA matching against a sibling or per-PR task-binding.json
-//     and the committed execution ledger;
+//     and the execution ledger from the validation context (default: the
+//     live committed ledger under repoRoot); an explicit --context/contextRoot
+//     isolates ledger lookup for fixtures without weakening default checks;
 //   * a concrete base SHA from that task binding — a completed packet with
 //     only ledger dependency SHAs is unbound, not accepted;
 //   * completed-packet owner/branch and changed-file scope against that
@@ -134,6 +136,10 @@ function isWithin(rootAbs, abs) {
     !relative.startsWith(`..${path.sep}`) &&
     !path.isAbsolute(relative)
   );
+}
+
+function isWithinOrEqual(rootAbs, abs) {
+  return path.resolve(rootAbs) === path.resolve(abs) || isWithin(rootAbs, abs);
 }
 
 function reportPath(repoRoot, abs) {
@@ -683,12 +689,13 @@ async function readTaskBinding(filePath, repoRoot, validators, expectedPrId, rep
  *   2. `verification/research-program/pr-NNN/task-binding.json`, then that
  *      directory's `fixtures/task-binding.json` (per-PR, not a shared
  *      docs/research-program/handoffs/task-binding.json);
- *   3. the committed `docs/research-program/execution-ledger.json` supplies
- *      dependency SHAs for the handoff's PR id;
+ *   3. `docs/research-program/execution-ledger.json` under the validation
+ *      context (default: repoRoot) supplies dependency/base SHAs for the
+ *      handoff's PR id. An explicit contextRoot does not skip this comparison;
  *   4. when more than one authority exists they must agree, otherwise
  *      `binding_conflict`. Ledger-only is not a concrete base binding.
  */
-async function resolveAuthorities(handoff, handoffDir, repoRoot, reporter, validators) {
+async function resolveAuthorities(handoff, handoffDir, repoRoot, reporter, validators, ledgerRoot) {
   const { fail, markCheck, note } = reporter;
   const authorities = {
     task_binding: null,
@@ -772,12 +779,16 @@ async function resolveAuthorities(handoff, handoffDir, repoRoot, reporter, valid
   }
 
   let ledgerTask = null;
-  const ledgerPath = path.join(repoRoot, 'docs', 'research-program', 'execution-ledger.json');
-  if (await existsAsFile(ledgerPath)) {
+  const ledgerLookupRoot = ledgerRoot === null ? null : (ledgerRoot ?? repoRoot);
+  const ledgerPath = ledgerLookupRoot
+    ? path.join(ledgerLookupRoot, 'docs', 'research-program', 'execution-ledger.json')
+    : null;
+  if (ledgerPath && (await existsAsFile(ledgerPath))) {
     try {
       const ledgerReal = await realpath(ledgerPath);
-      if (!isWithin(realRoot, ledgerReal)) {
-        fail('task_binding', 'execution_ledger_path_escapes_root_via_symlink', 'execution ledger resolves outside the repository root');
+      const realLedgerRoot = await realpath(ledgerLookupRoot);
+      if (!isWithin(realLedgerRoot, ledgerReal)) {
+        fail('task_binding', 'execution_ledger_path_escapes_root_via_symlink', 'execution ledger resolves outside the validation context root');
       } else {
         const { value, sha256 } = await loadJsonWithSha(ledgerReal);
         const tasks = Array.isArray(value.tasks) ? value.tasks : [];
@@ -910,7 +921,7 @@ async function evaluateArtifacts(declaredArtifacts, repoRoot, realRoot, reporter
   if (hashOk) markCheck('artifact_sha256_binding', 'passed', 'all declared artifact and event-source SHA-256 (and byte) bindings match on-disk bytes');
 }
 
-async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter) {
+async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter, gitCwd = repoRoot) {
   const { fail, markCheck, note } = reporter;
   let sourceOk = true;
   let localChecked = 0;
@@ -951,7 +962,7 @@ async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter) {
         sourceOk = false;
         continue;
       }
-      const commit = gitCommitExists(identity.git_commit, repoRoot);
+      const commit = gitCommitExists(identity.git_commit, gitCwd);
       if (commit.unavailable) {
         fail(
           'source_identity_binding',
@@ -970,7 +981,7 @@ async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter) {
         sourceOk = false;
         continue;
       }
-      const pathExists = gitPathExistsAtCommit(identity.git_commit, identity.git_path, repoRoot);
+      const pathExists = gitPathExistsAtCommit(identity.git_commit, identity.git_path, gitCwd);
       if (pathExists.unavailable) {
         fail(
           'source_identity_binding',
@@ -989,7 +1000,7 @@ async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter) {
         sourceOk = false;
         continue;
       }
-      const sizeInfo = gitBlobSizeAtCommit(identity.git_commit, identity.git_path, repoRoot);
+      const sizeInfo = gitBlobSizeAtCommit(identity.git_commit, identity.git_path, gitCwd);
       if (sizeInfo.unavailable) {
         fail(
           'source_identity_binding',
@@ -1020,7 +1031,7 @@ async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter) {
       const hashed = await hashGitShowStream(
         identity.git_commit,
         identity.git_path,
-        repoRoot,
+        gitCwd,
         GIT_SNAPSHOT_MAX_BYTES
       );
       if (!hashed.ok) {
@@ -1485,7 +1496,7 @@ function evaluateDependencyBinding(handoff, effective, reporter) {
   }
 }
 
-function evaluateGitBinding(handoff, repoRoot, reporter) {
+function evaluateGitBinding(handoff, gitCwd, reporter) {
   const { fail, markCheck, note } = reporter;
   if (typeof handoff.base_sha !== 'string') {
     markCheck('git_commit_binding', 'not_applicable', 'no base SHA to bind to the local repository');
@@ -1502,7 +1513,7 @@ function evaluateGitBinding(handoff, repoRoot, reporter) {
     ok = false;
   };
 
-  const baseExists = gitCommitExists(handoff.base_sha, repoRoot);
+  const baseExists = gitCommitExists(handoff.base_sha, gitCwd);
   if (baseExists.unavailable) {
     markUnavailable();
   } else if (!baseExists.ok) {
@@ -1512,7 +1523,7 @@ function evaluateGitBinding(handoff, repoRoot, reporter) {
 
   if (!gitUnavailable) {
     for (const [prId, sha] of Object.entries(handoff.dependency_merge_shas ?? {})) {
-      const exists = gitCommitExists(sha, repoRoot);
+      const exists = gitCommitExists(sha, gitCwd);
       if (exists.unavailable) {
         markUnavailable();
         break;
@@ -1522,7 +1533,7 @@ function evaluateGitBinding(handoff, repoRoot, reporter) {
         ok = false;
         continue;
       }
-      const ancestor = gitIsAncestor(sha, handoff.base_sha, repoRoot);
+      const ancestor = gitIsAncestor(sha, handoff.base_sha, gitCwd);
       if (ancestor.unavailable) {
         markUnavailable();
         break;
@@ -1541,14 +1552,14 @@ function evaluateGitBinding(handoff, repoRoot, reporter) {
       'head_sha is null (pending-head transport); the controller records the committed head later. A future commit cannot contain its own hash.'
     );
   } else if (typeof handoff.head_sha === 'string' && !gitUnavailable) {
-    const headExists = gitCommitExists(handoff.head_sha, repoRoot);
+    const headExists = gitCommitExists(handoff.head_sha, gitCwd);
     if (headExists.unavailable) {
       markUnavailable();
     } else if (!headExists.ok) {
       fail('git_commit_binding', 'head_sha_not_local_commit', headExists.detail);
       ok = false;
     } else if (handoff.head_sha !== handoff.base_sha) {
-      const baseAncestorOfHead = gitIsAncestor(handoff.base_sha, handoff.head_sha, repoRoot);
+      const baseAncestorOfHead = gitIsAncestor(handoff.base_sha, handoff.head_sha, gitCwd);
       if (baseAncestorOfHead.unavailable) {
         markUnavailable();
       } else if (!baseAncestorOfHead.ok) {
@@ -1574,10 +1585,102 @@ function evaluateGitBinding(handoff, repoRoot, reporter) {
 }
 
 /**
+ * Resolve an optional explicit validation context used only for execution-ledger
+ * lookup and Git cwd. Packet, artifact, source, changed-file and task-binding
+ * paths stay bound to repoRoot. Default (no contextRoot) keeps live-ledger
+ * validation strict. Git commands issued from a nested in-repo context still
+ * resolve the containing repository; no copied checkout is required.
+ */
+async function resolveValidationContext(repoRoot, requestedContextRoot, reporter) {
+  const rootAbs = path.resolve(repoRoot);
+  if (requestedContextRoot === undefined || requestedContextRoot === null) {
+    return { ok: true, explicit: false, contextRoot: rootAbs, gitCwd: rootAbs };
+  }
+  if (typeof requestedContextRoot !== 'string' || requestedContextRoot.trim() === '') {
+    reporter.fail(
+      'task_binding',
+      'validation_context_invalid',
+      'contextRoot must be a non-empty path when provided'
+    );
+    return { ok: false, explicit: true, contextRoot: rootAbs, gitCwd: rootAbs };
+  }
+
+  const absolute = path.isAbsolute(requestedContextRoot)
+    ? path.resolve(requestedContextRoot)
+    : path.resolve(rootAbs, requestedContextRoot);
+  const relative = path.relative(rootAbs, absolute);
+  if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    reporter.fail(
+      'task_binding',
+      'validation_context_escapes_root',
+      `contextRoot escapes the repository root: ${requestedContextRoot}`
+    );
+    return { ok: false, explicit: true, contextRoot: rootAbs, gitCwd: rootAbs };
+  }
+
+  try {
+    const info = await stat(absolute);
+    if (!info.isDirectory()) {
+      reporter.fail(
+        'task_binding',
+        'validation_context_unreadable',
+        `contextRoot is not a directory: ${reportPath(rootAbs, absolute)}`
+      );
+      return { ok: false, explicit: true, contextRoot: rootAbs, gitCwd: rootAbs };
+    }
+    const realRoot = await realpath(rootAbs);
+    const real = await realpath(absolute);
+    if (!isWithinOrEqual(realRoot, real)) {
+      reporter.fail(
+        'task_binding',
+        'validation_context_escapes_root_via_symlink',
+        `contextRoot resolves outside the repository root: ${requestedContextRoot}`
+      );
+      return { ok: false, explicit: true, contextRoot: rootAbs, gitCwd: rootAbs };
+    }
+    return { ok: true, explicit: true, contextRoot: absolute, gitCwd: absolute };
+  } catch (error) {
+    reporter.fail(
+      'task_binding',
+      'validation_context_unreadable',
+      `cannot resolve contextRoot ${requestedContextRoot}: ${error.code ?? error.message}`
+    );
+    return { ok: false, explicit: true, contextRoot: rootAbs, gitCwd: rootAbs };
+  }
+}
+
+function parseCliArgs(argv) {
+  let contextRoot;
+  const positional = [];
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === '--help' || arg === '-h') {
+      return { help: true };
+    }
+    if (arg === '--context') {
+      if (contextRoot !== undefined || i + 1 >= argv.length || String(argv[i + 1]).startsWith('-')) {
+        return { usageError: true };
+      }
+      contextRoot = argv[i + 1];
+      i += 1;
+      continue;
+    }
+    if (String(arg).startsWith('-')) {
+      return { usageError: true };
+    }
+    positional.push(arg);
+  }
+  if (positional.length !== 1) {
+    return { usageError: true };
+  }
+  return { handoffPath: positional[0], contextRoot };
+}
+
+/**
  * Validate one handoff packet.
  *
  * @param {string} handoffPath path to the handoff JSON (repository-relative or absolute inside the repo)
- * @param {{repoRoot?: string}} [options]
+ * @param {{repoRoot?: string, contextRoot?: string}} [options]
  * @returns {Promise<object>} typed, actionable report
  */
 export async function checkHandoff(handoffPath, options = {}) {
@@ -1725,14 +1828,27 @@ export async function checkHandoff(handoffPath, options = {}) {
   }));
   state.headShaPending = handoff.head_sha === null;
 
-  // 5. Authoritative task binding / ledger / per-PR lookup.
+  // 5. Optional explicit validation context (ledger + Git cwd only).
+  const context = await resolveValidationContext(repoRoot, options.contextRoot, reporter);
+  const gitCwd = context.gitCwd;
+  const ledgerRoot = context.explicit ? (context.ok ? context.contextRoot : null) : undefined;
+  if (context.explicit && context.ok) {
+    reporter.note(
+      'validation_context',
+      'bound',
+      `execution ledger and Git lookup use context root ${reportPath(repoRoot, context.contextRoot)}; packet, artifact, source, changed-file and task-binding paths remain bound to repoRoot`
+    );
+  }
+
+  // 6. Authoritative task binding / ledger / per-PR lookup.
   const handoffDir = path.dirname(realInput);
   const { authorities, effective, source, taskRecord } = await resolveAuthorities(
     handoff,
     handoffDir,
     repoRoot,
     reporter,
-    validators
+    validators,
+    ledgerRoot
   );
   state.authorities = authorities;
   state.authoritySource = source;
@@ -1744,47 +1860,51 @@ export async function checkHandoff(handoffPath, options = {}) {
     );
   }
 
-  // 6. Dependency/base matching, uniqueness, evidence minima and cross-reference rules.
+  // 7. Dependency/base matching, uniqueness, evidence minima and cross-reference rules.
   evaluateDependencyBinding(handoff, effective, reporter);
   evaluateTaskScope(handoff, taskRecord, reporter);
   evaluatePacketEvidence(handoff, reporter);
   const { commands, artifacts } = evaluateIdentifierUniqueness(handoff, reporter);
   evaluateCrossReferences(handoff, commands, artifacts, reporter);
 
-  // 7. On-disk existence, containment and SHA-256 binding (including event-source).
+  // 8. On-disk existence, containment and SHA-256 binding (including event-source).
   await evaluateArtifacts(collectDeclaredArtifacts(handoff), repoRoot, realRoot, reporter);
-  await evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter);
+  await evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter, gitCwd);
   await evaluateChangedFiles(handoff, repoRoot, realRoot, reporter);
 
-  // 8. Local Git existence/ancestry for base, dependency and non-null head SHAs.
-  evaluateGitBinding(handoff, repoRoot, reporter);
+  // 9. Local Git existence/ancestry for base, dependency and non-null head SHAs.
+  evaluateGitBinding(handoff, gitCwd, reporter);
 
   return finalize();
 }
 
 function printUsage(stream) {
   stream.write(
-    'usage: node scripts/research-program/check-handoff.mjs <handoff.json>\n' +
+    'usage: node scripts/research-program/check-handoff.mjs [--context <dir>] <handoff.json>\n' +
       '  Validates one handoff packet: path containment, file existence, SHA-256\n' +
       '  binding, dependency/base SHA matching, owner/branch/owned-path scope,\n' +
       '  structured command outcomes, unique IDs, event-source artifacts and Git\n' +
-      '  object binding. Exit 0 accepted, 1 rejected, 2 usage/operational error.\n'
+      '  object binding. Optional --context selects an in-repo ledger/Git context\n' +
+      '  for fixture isolation; omitting it keeps live execution-ledger checks.\n' +
+      '  Exit 0 accepted, 1 rejected, 2 usage/operational error.\n'
   );
 }
 
 async function main() {
-  const args = process.argv.slice(2);
-  if (args.length === 1 && (args[0] === '--help' || args[0] === '-h')) {
+  const parsed = parseCliArgs(process.argv.slice(2));
+  if (parsed.help) {
     printUsage(process.stdout);
     process.exit(0);
   }
-  if (args.length !== 1) {
+  if (parsed.usageError) {
     printUsage(process.stderr);
     process.exit(2);
   }
 
   try {
-    const report = await checkHandoff(args[0]);
+    const report = await checkHandoff(parsed.handoffPath, {
+      contextRoot: parsed.contextRoot
+    });
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
     process.exit(report.ok ? 0 : 1);
   } catch (error) {

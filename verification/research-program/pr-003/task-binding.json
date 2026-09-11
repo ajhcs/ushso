@@ -1,15 +1,15 @@
 {
   "format": "ushso.research-program.task.v1",
-  "task_id": "ushso-pr003-composite-glob-20260911",
-  "slice_id": "C-003-2-R4",
+  "task_id": "ushso-pr003-grok-r5-20260911",
+  "slice_id": "C-003-2-R5",
   "pr_id": "PR-003",
-  "title": "Finish PR-003 composite wildcard ownership",
-  "owner": "Luna Max (controller-requested gpt-5.6-luna, reasoning max)",
+  "title": "Isolate PR-003 handoff fixtures from the moving execution ledger",
+  "owner": "Grok Co-Engineer (execution.provider grok, dispatch model grok-4; this interface Grok 4.6)",
   "reviewer": "Astra",
-  "branch": "codex/ushso-pr003-composite-glob-20260911",
-  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/.ce-ushso-pr003-grok-r3-2026-grok-r3-contract-aa54f33d148b-f9711d5b-worktrees/ushso-pr003-composite-glob-20260911",
-  "objective": "Correct the remaining composite wildcard ownership defect while preserving documented slash-aware *, **, exact-file, literal directory and typed handoff semantics.",
-  "outcome": "Composite wildcard prefixes are matched as globs when followed by suffix /** or a trailing slash, while literal directory prefixes, exact files, malformed-packet reports, and boundary rejection remain unchanged.",
+  "branch": "codex/ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
+  "objective": "Isolate historical PR-003 fixture packets from the moving controller execution ledger while preserving strict production binding_conflict checks.",
+  "outcome": "Fixture packets validate against an explicit controlled in-repo ledger/context; default live-ledger validation remains strict; observed and other plausible ledger-base mismatches still reject with binding_conflict.",
   "dependencies": [
     "PR-001",
     "PR-002"
@@ -23,16 +23,16 @@
   ],
   "commits": [
     {
-      "id": "C-003-2-R4",
-      "subject": "Honor composite wildcard ownership",
-      "instructions": "Make wildcard-bearing prefixes in suffix /** and trailing-slash ownership patterns use the existing slash-aware glob translation, preserving literal suffix and directory behavior.",
-      "verification": "Direct matcher controls and completed-packet scope regressions accept the five demonstrated composite cases and reject outside or malformed boundaries; the focused handoff suite passes."
+      "id": "C-003-2-R5",
+      "subject": "Isolate PR003 fixtures from live ledger",
+      "instructions": "Make historical fixture checks use an explicit controlled in-repo ledger/context so they cannot inherit the controller's changing PR task base, without weakening default live-ledger conflict detection.",
+      "verification": "Positive/negative/CLI fixture checks pass against the controlled ledger; the observed 0c29fdb mismatch and another plausible ledger base reject with binding_conflict; default current-handoff validation still uses the live ledger."
     },
     {
-      "id": "C-003-3-R4",
-      "subject": "Record PR003 R4 composite wildcard evidence",
-      "instructions": "Preserve all historical command-receipt/evidence-index bytes, add R4 command receipts and an evidence index, and update the current handoff/task binding with exact base, branch, owner and provenance.",
-      "verification": "Schema, focused, registered, default-handoff and guidance checks pass; historical 44-file hashes remain unchanged and the current packet remains pending-head and non-acceptance evidence."
+      "id": "C-003-3-R5",
+      "subject": "Record PR003 R5 fixture isolation evidence",
+      "instructions": "Preserve all 53 historical command-receipt/evidence-index bytes, add R5 command receipts and an evidence index, and update the current handoff/task binding with exact base, branch, owner and provenance.",
+      "verification": "Schema, focused, registered, default-handoff and guidance checks pass; historical 53-file hashes remain unchanged and the current packet remains pending-head and non-acceptance evidence."
     }
   ],
   "check_commands": [
@@ -44,13 +44,12 @@
   ],
   "evidence_directory": "verification/research-program/pr-003/",
   "binding": {
-    "base_sha": "0b28d036f1df4b5248732bc62f68edd79f14d06f",
-    "base_tree": "6e2de2232e2aa0f19055751d70e5a904a38216f9",
+    "base_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
+    "base_tree": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
     "dependency_merge_shas": {
       "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
       "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
-    },
-    "prompt_sha256": "b1a0895101086a2843c96a4089763717091e16b4c073ab2cd9045dea8d259edc"
+    }
   },
   "review_states": [
     "planned",
