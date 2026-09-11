@@ -1,15 +1,15 @@
 {
   "format": "ushso.research-program.task.v1",
-  "task_id": "ushso-pr003-grok-final-contract-20260911",
-  "slice_id": "C-003-2-R2",
+  "task_id": "ushso-pr003-grok-r3-20260911",
+  "slice_id": "C-003-2-R3",
   "pr_id": "PR-003",
-  "title": "Correct remaining PR-003 final-contract gaps",
+  "title": "Correct remaining PR-003 null-item and wildcard-ownership defects",
   "owner": "Grok (grok-4)",
   "reviewer": "Astra",
-  "branch": "codex/ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
-  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
-  "objective": "Resolve bounded final PR003 timestamp, large Git snapshot, malformed packet and task-evidence accounting gaps while preserving historical receipts.",
-  "outcome": "The PR-003 checker compares full RFC3339 fractional instants, hashes large immutable Git snapshots without missing-path misdiagnosis, returns schema-invalid packets as rejected reports, distinguishes unresolved symlinks from deletions, and compares completed owner/branch/changed-file scope with the concrete per-PR task binding.",
+  "branch": "codex/ce-ushso-pr003-grok-r3-2026-grok-r3-contract-aa54f33d148b-f9711d5b",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/ce-ushso-pr003-grok-r3-2026-grok-r3-contract-aa54f33d148b-f9711d5b",
+  "objective": "Finish the two independently reproduced PR003 null-item rejection and wildcard ownership defects with additive evidence.",
+  "outcome": "The PR-003 checker returns schema-invalid rejected reports for null or non-object collection items without throwing, and honors documented slash-aware * / ** owned-path globs including an interior globstar with no intervening directory.",
   "dependencies": [
     "PR-001",
     "PR-002"
@@ -23,16 +23,16 @@
   ],
   "commits": [
     {
-      "id": "C-003-2-R2",
-      "subject": "Correct PR003 timestamp, snapshot, packet and scope checks",
-      "instructions": "Preserve full RFC3339 fractional timestamp order, stream large Git snapshots, return schema-invalid packets without throwing, distinguish unresolved symlinks from deletions, and compare completed owner/branch/changed-file scope with the concrete task binding.",
-      "verification": "Focused tests reject same-millisecond reversed fractions, hash evaluation/research-program/cohorts.json from Git, return rejected reports for null/noniterable packets, reject unresolved changed-file symlinks, and reject owner/branch/owned-path mismatches."
+      "id": "C-003-2-R3",
+      "subject": "Reject null packet items and honor documented globs",
+      "instructions": "Guard semantically traversed collection item shapes so null or non-object items return schema_invalid rejected reports with CLI exit 1, and translate wildcard tokens independently of regex metacharacter escaping while preserving exact-file, dir/ and suffix dir/** ownership.",
+      "verification": "Focused tests cover the six failing collections, malformed non-object elements, a valid-packet control, direct matcher cases, and completed-packet wildcard scope; named semantic diagnostics for structurally safe incomplete packets remain."
     },
     {
-      "id": "C-003-3-R2",
-      "subject": "Record PR003 R2 evidence and provenance",
-      "instructions": "Keep historical receipts and R1 indexes byte-identical, add an additive R2 index and actual command receipts, bind historical inputs by Git commit/path/hash, and label this correction as Grok work without attributing Luna's R1 recovery to Grok.",
-      "verification": "Current PR-003.json validates, historical command receipts remain unchanged, and the R2 index cites historical R1 bytes as historical rather than as fresh checks."
+      "id": "C-003-3-R3",
+      "subject": "Record PR003 R3 evidence and provenance",
+      "instructions": "Keep all 38 existing command-receipt and evidence-index files byte-identical, add an additive R3 index and actual command receipts, preserve the R2 index as historical, and bind the managed branch/owner, exact starting head/tree and controller review/dispatch input.",
+      "verification": "Current PR-003.json validates, historical receipts remain unchanged, and the R3 index cites historical R2 bytes as historical rather than as fresh checks."
     }
   ],
   "check_commands": [
@@ -43,8 +43,8 @@
   ],
   "evidence_directory": "verification/research-program/pr-003/",
   "binding": {
-    "base_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
-    "base_tree": "98e04d100daa94cdf9da5905c15d58a0aae6778d",
+    "base_sha": "5115170093512b06b21c01725bb982e457797efe",
+    "base_tree": "24fe636b0370e2e7b9c166d6f1c6bed520ed033e",
     "dependency_merge_shas": {
       "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
       "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"

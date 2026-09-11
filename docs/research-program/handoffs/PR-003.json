@@ -4,21 +4,18 @@
   "status": "producer_checked",
   "owner": "Grok (grok-4)",
   "reviewer": "Astra",
-  "base_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+  "base_sha": "5115170093512b06b21c01725bb982e457797efe",
   "head_sha": null,
   "dependency_merge_shas": {
     "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
     "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
   },
-  "branch": "codex/ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
+  "branch": "codex/ce-ushso-pr003-grok-r3-2026-grok-r3-contract-aa54f33d148b-f9711d5b",
   "github_pr_url": null,
   "changed_files": [
     "docs/research-program/handoffs/schema/README.md",
-    "docs/research-program/handoffs/schema/handoff.schema.json",
     "scripts/research-program/check-handoff.mjs",
     "tests/research-program/handoff.test.mjs",
-    "verification/research-program/pr-003/verify-schema-contract.mjs",
-    "verification/research-program/pr-003/task-binding.json",
     "verification/research-program/pr-003/fixtures/handoff.valid.json",
     "verification/research-program/pr-003/fixtures/handoff.valid-expected-negative.json",
     "verification/research-program/pr-003/fixtures/handoff.valid-unavailable.json",
@@ -35,16 +32,17 @@
     "verification/research-program/pr-003/fixtures/handoff.reject-stale-base-sha.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-stale-dependency-sha.json",
     "docs/research-program/handoffs/PR-003.json",
-    "verification/research-program/pr-003/c003-r2-notes.md",
-    "verification/research-program/pr-003/c003-r2-evidence-index.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r2-schema.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r2-focused.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r2-npm-test-research-program.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r2-default-handoff.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r2-sealed-final-default-handoff.json"
+    "verification/research-program/pr-003/task-binding.json",
+    "verification/research-program/pr-003/c003-r3-notes.md",
+    "verification/research-program/pr-003/c003-r3-evidence-index.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r3-schema.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r3-focused.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r3-npm-test-research-program.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r3-default-handoff.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r3-sealed-final-default-handoff.json"
   ],
-  "problem": "The independently reviewed PR-003 candidate still truncated RFC3339 fractional timestamps, misdiagnosed large Git snapshots as missing paths, threw on schema-invalid null/noniterable packets, counted unresolved changed-file symlinks as deletions, and did not compare completed owner/branch/changed-file scope with the concrete per-PR task binding.",
-  "resulting_behavior": "The R2 checker compares full RFC3339 fractional instants, streams immutable Git snapshot bytes with typed missing versus unreadable/size-limit diagnostics, returns schema-invalid packets as rejected reports, uses lstat so only true absence is a typed deletion, and compares completed owner/branch/owned-path scope with the exclusive first-match per-PR task binding. Historical receipts remain byte-identical and explicitly historical.",
+  "problem": "The independently reviewed PR-003 R2 checker still threw TypeError on null items in semantically traversed collections and did not honor documented slash-aware * / ** owned-path globs.",
+  "resulting_behavior": "The R3 checker returns schema-invalid rejected reports (CLI exit 1) for null or non-object items in commands, artifacts, source_identities, acceptance_results, failures_and_skipped_checks and unresolved_claims, and translates wildcard tokens independently of regex escaping so tests/*.mjs, tests/**/*.mjs and *.mjs match documented one-segment and globstar rules. Historical receipts remain byte-identical and explicitly historical.",
   "commits": [
     {
       "id": "C-003-1",
@@ -79,6 +77,16 @@
     {
       "id": "C-003-3-R2",
       "subject": "docs(research): record PR003 R2 evidence and provenance",
+      "sha": "5115170093512b06b21c01725bb982e457797efe"
+    },
+    {
+      "id": "C-003-2-R3",
+      "subject": "fix(research): reject null packet items and honor globs",
+      "sha": "56ec38e3bb4c1af0e558a76c996816a7a604132f"
+    },
+    {
+      "id": "C-003-3-R3",
+      "subject": "docs(research): record PR003 R3 evidence and provenance",
       "sha": null
     }
   ],
@@ -162,8 +170,8 @@
       "kind": "controller-task-binding",
       "id": "verification/research-program/pr-003/task-binding.json",
       "location": "local",
-      "sha256": "0dea1407c432c620a7650811cd8c77f48956bb2f563361f2e1082a110cf00a7d",
-      "version": "Concrete per-PR task binding established by Co-Engineer dispatch ushso-pr003-grok-final-contract-20260911 / assignment grok-final-contract. Not a self-authenticating signature."
+      "sha256": "25785027c1a4b80bcb71194c39c5a2bf9c062071df52fa4e7beeb8f73c80d93c",
+      "version": "Concrete per-PR task binding established by Co-Engineer dispatch ushso-pr003-grok-r3-20260911 / assignment grok-r3-contract. Not a self-authenticating signature. Local task-binding consistency does not authenticate the producer or replace controller dispatch review."
     },
     {
       "kind": "independent-final-contract-review",
@@ -198,6 +206,33 @@
       "id": "dc7267bf1c872f1457fa927e2d0403051575f474",
       "location": "external",
       "version": "Luna R1 sealed head; not this R2 correction and not completed Grok work"
+    },
+    {
+      "kind": "remaining-defect-correction-base",
+      "id": "5115170093512b06b21c01725bb982e457797efe",
+      "location": "external",
+      "version": "tree 24fe636b0370e2e7b9c166d6f1c6bed520ed033e; independently reviewed R2 result"
+    },
+    {
+      "kind": "independent-r2-review",
+      "id": "pr003-grok-r2-independent-review/receipt.json",
+      "location": "external",
+      "sha256": "91924040dd21957d55eab626d19abbfb86b9243b56b6c4caa12635314aae4681",
+      "version": "Independent final review of R2; findings PR003-R2-F6 and PR003-R2-F7"
+    },
+    {
+      "kind": "controller-null-item-reproduction",
+      "id": "pr003-controller-review/5115170-semantic-host/receipt.json",
+      "location": "external",
+      "sha256": "c6503896a31cc45732c19003b87f84965ed3af661702a9f9ea18b6ce7a671a2e",
+      "version": "Root reproduction of null collection-item TypeError at 5115170"
+    },
+    {
+      "kind": "controller-owned-path-reproduction",
+      "id": "pr003-controller-review/5115170-owned-path.json",
+      "location": "external",
+      "sha256": "d5be04adbdb2c2cea16b05bea232bd21115a60d9cf2eccdd99e490804ff279b8",
+      "version": "Root reproduction of documented wildcard ownership failures at 5115170"
     }
   ],
   "commands": [
@@ -850,6 +885,131 @@
         "sha256": "a822d446aab5d730198c748a0e4b057d7824d636b8cf9c7fd10ef835fc41dad8",
         "bytes": 1203
       }
+    },
+    {
+      "id": "cmd-c003-r3-schema",
+      "command": "node verification/research-program/pr-003/verify-schema-contract.mjs",
+      "started_at": "2026-09-11T02:19:15.418Z",
+      "completed_at": "2026-09-11T02:19:15.598Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the schema contract check passing, including fractional-timing rejection",
+      "actual": "exit 0; task schema and 12 handoff fixture cases passed; expected-negative and unavailable fixtures accepted; fractional same-millisecond reversal rejected; declared negative cases rejected.",
+      "result": "Schema-contract fixture replay passed, including full-precision fractional timestamp ordering.",
+      "event_source": {
+        "id": "receipt-cmd-c003-r3-schema",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r3-schema.json",
+        "sha256": "e64b0611d60249af999a3d75bed5095c9dff54f39d1ff5ad02ad4ca3a4063455",
+        "bytes": 1211
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c003-r3-focused",
+      "command": "node --test tests/research-program/handoff.test.mjs",
+      "started_at": "2026-09-11T02:19:15.600Z",
+      "completed_at": "2026-09-11T02:19:23.650Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the focused PR-003 handoff suite passing",
+      "actual": "exit 0; 41 tests passed, 0 failed, 0 skipped, including null collection items, non-object elements, slash-aware wildcards, completed-packet glob scope, and typed file/Git operational failures.",
+      "result": "Focused handoff suite passed: 41 tests passed, 0 failed, 0 skipped.",
+      "event_source": {
+        "id": "receipt-cmd-c003-r3-focused",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r3-focused.json",
+        "sha256": "c4be9c058365746f9a6f4ad930653904510a7e3ffd0722a68fe8ddd83a60d403",
+        "bytes": 1164
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c003-r3-npm-test-research-program",
+      "command": "npm run test:research-program",
+      "started_at": "2026-09-11T02:19:23.651Z",
+      "completed_at": "2026-09-11T02:19:31.862Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0; registered script executes tests/research-program/handoff.test.mjs",
+      "actual": "exit 0; tests 41, pass 41, fail 0 using pinned npm 11.19.1 and Node 24.14.",
+      "result": "Registered npm run test:research-program executed the handoff suite (41/41).",
+      "event_source": {
+        "id": "receipt-cmd-c003-r3-npm-test-research-program",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r3-npm-test-research-program.json",
+        "sha256": "0e8054a19c886d4f956682270fbc8a0cced360edf86f45217e433cbee9c98009",
+        "bytes": 1065
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c003-r3-default-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json",
+      "started_at": "2026-09-11T02:22:11.072Z",
+      "completed_at": "2026-09-11T02:22:11.362Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the current PR-003 handoff accepted",
+      "actual": "exit 0; current R3 producer handoff accepted with zero findings; historical Git snapshots including 2.45MB cohorts.json verified; typed pending head preserved.",
+      "result": "Current PR-003 producer handoff accepted with zero findings after R3 contract corrections.",
+      "event_source": {
+        "id": "receipt-cmd-c003-r3-default-handoff",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r3-default-handoff.json",
+        "sha256": "b8620831b111260ae9b541194679d81f01859b03897bc3752b9abc87a62b37ed",
+        "bytes": 1183
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c003-r3-sealed-final-default-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json",
+      "started_at": "2026-09-11T02:22:45.956Z",
+      "completed_at": "2026-09-11T02:22:46.266Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the fully sealed current PR-003 handoff accepted",
+      "actual": "exit 0; fully sealed current R3 handoff accepted with zero findings; historical Git snapshots including 2.45MB cohorts.json verified; typed pending head preserved.",
+      "result": "Fully sealed current PR-003 handoff accepted with zero findings after receipt/index binding.",
+      "event_source": {
+        "id": "receipt-cmd-c003-r3-sealed-final-default-handoff",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r3-sealed-final-default-handoff.json",
+        "sha256": "d82499b5cc642ca8a573ed1b21069c67c5d1700991505dda23ff7d80f61c527e",
+        "bytes": 1213
+      },
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
     }
   ],
   "artifacts": [
@@ -868,20 +1028,20 @@
     {
       "id": "artifact-schema-readme",
       "path": "docs/research-program/handoffs/schema/README.md",
-      "sha256": "25422753c5905e2dc60850048d51e28402659a0599ec68c237287be355b8a2bf",
-      "bytes": 17032
+      "sha256": "ca37e377cc6abf9d0882e174c7751a21960e6a9d425d5b9d08ec5f7bffb8d2c6",
+      "bytes": 18249
     },
     {
       "id": "artifact-validator",
       "path": "scripts/research-program/check-handoff.mjs",
-      "sha256": "c403bd1c9a064039f1591c6e5843b62d42bf143dc37ffc4765740fc7e438001d",
-      "bytes": 62926
+      "sha256": "a39643834961a69940efb11ff16e732868dd6c86fe3532af5843046d25023aae",
+      "bytes": 64333
     },
     {
       "id": "artifact-focused-test",
       "path": "tests/research-program/handoff.test.mjs",
-      "sha256": "02c66333186c01646b26f7fa97d8f36490112eb31f2551d064439f9978ff47fe",
-      "bytes": 23940
+      "sha256": "ca878a03ca313ca1cf32b017e9455effb96870c6054348b9aa7af764774ee401",
+      "bytes": 31417
     },
     {
       "id": "artifact-schema-contract-checker",
@@ -1096,13 +1256,13 @@
     {
       "id": "artifact-current-task-binding",
       "path": "verification/research-program/pr-003/task-binding.json",
-      "sha256": "0dea1407c432c620a7650811cd8c77f48956bb2f563361f2e1082a110cf00a7d",
-      "bytes": 3589
+      "sha256": "25785027c1a4b80bcb71194c39c5a2bf9c062071df52fa4e7beeb8f73c80d93c",
+      "bytes": 3477
     },
     {
       "id": "artifact-fixture-fractional-timing",
       "path": "verification/research-program/pr-003/fixtures/handoff.reject-fractional-timing.json",
-      "sha256": "30663a247b3b0f386306f73d9ff971c0668aa971332186fba012d8bc1623f884",
+      "sha256": "d9cb7dc2d295d0e12fcd373e4d7c78b7bb8d0a2686ceac3508e56d7dbea1116f",
       "bytes": 12265
     },
     {
@@ -1146,6 +1306,48 @@
       "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r2-sealed-final-default-handoff.json",
       "sha256": "a822d446aab5d730198c748a0e4b057d7824d636b8cf9c7fd10ef835fc41dad8",
       "bytes": 1203
+    },
+    {
+      "id": "artifact-c003-r3-notes",
+      "path": "verification/research-program/pr-003/c003-r3-notes.md",
+      "sha256": "fb2a05642cbf90929fb6d0683200d01a24e1d76c15ae44593c61123cd70cfe6c",
+      "bytes": 2709
+    },
+    {
+      "id": "artifact-cmd-c003-r3-schema",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r3-schema.json",
+      "sha256": "e64b0611d60249af999a3d75bed5095c9dff54f39d1ff5ad02ad4ca3a4063455",
+      "bytes": 1211
+    },
+    {
+      "id": "artifact-cmd-c003-r3-focused",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r3-focused.json",
+      "sha256": "c4be9c058365746f9a6f4ad930653904510a7e3ffd0722a68fe8ddd83a60d403",
+      "bytes": 1164
+    },
+    {
+      "id": "artifact-cmd-c003-r3-npm-test-research-program",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r3-npm-test-research-program.json",
+      "sha256": "0e8054a19c886d4f956682270fbc8a0cced360edf86f45217e433cbee9c98009",
+      "bytes": 1065
+    },
+    {
+      "id": "artifact-c003-r3-evidence-index",
+      "path": "verification/research-program/pr-003/c003-r3-evidence-index.json",
+      "sha256": "0215d007728fa1f44c8e26df11aa1da13174f8e808a0fa39b261560d1085b1dd",
+      "bytes": 6540
+    },
+    {
+      "id": "artifact-cmd-c003-r3-default-handoff",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r3-default-handoff.json",
+      "sha256": "b8620831b111260ae9b541194679d81f01859b03897bc3752b9abc87a62b37ed",
+      "bytes": 1183
+    },
+    {
+      "id": "artifact-cmd-c003-r3-sealed-final-default-handoff",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r3-sealed-final-default-handoff.json",
+      "sha256": "d82499b5cc642ca8a573ed1b21069c67c5d1700991505dda23ff7d80f61c527e",
+      "bytes": 1213
     }
   ],
   "acceptance_results": [
@@ -1331,6 +1533,49 @@
       "artifact_ids": [
         "artifact-cmd-c003-r2-sealed-final-default-handoff"
       ]
+    },
+    {
+      "id": "acc-c003-2-r3-contract",
+      "status": "producer_checked",
+      "result": "R3 contract corrections passed: null/non-object collection items return schema_invalid rejected reports with CLI exit 1, slash-aware wildcards match documented ownership, and file/Git operational failures remain typed. Producer evidence only.",
+      "command_ids": [
+        "cmd-c003-r3-schema",
+        "cmd-c003-r3-focused",
+        "cmd-c003-r3-npm-test-research-program"
+      ],
+      "artifact_ids": [
+        "artifact-validator",
+        "artifact-focused-test",
+        "artifact-schema-readme",
+        "artifact-current-task-binding",
+        "artifact-cmd-c003-r3-schema",
+        "artifact-cmd-c003-r3-focused",
+        "artifact-cmd-c003-r3-npm-test-research-program",
+        "artifact-c003-r3-notes"
+      ]
+    },
+    {
+      "id": "acc-c003-r3-default-handoff",
+      "status": "producer_checked",
+      "result": "The current R3 PR-003 handoff was accepted with zero findings, including streamed large Git snapshot verification and a typed pending head.",
+      "command_ids": [
+        "cmd-c003-r3-default-handoff"
+      ],
+      "artifact_ids": [
+        "artifact-cmd-c003-r3-default-handoff",
+        "artifact-c003-r3-evidence-index"
+      ]
+    },
+    {
+      "id": "acc-c003-r3-final-default-handoff",
+      "status": "producer_checked",
+      "result": "The fully sealed current PR-003 R3 handoff was rechecked after receipt binding and accepted with zero findings.",
+      "command_ids": [
+        "cmd-c003-r3-sealed-final-default-handoff"
+      ],
+      "artifact_ids": [
+        "artifact-cmd-c003-r3-sealed-final-default-handoff"
+      ]
     }
   ],
   "failures_and_skipped_checks": [
@@ -1381,7 +1626,7 @@
     {
       "id": "head-sha-pending-controller-commit",
       "status": "pending",
-      "detail": "This is a precommit producer packet for C-003-3-R2 evidence. head_sha and the C-003-3-R2 commit SHA remain null because a future commit cannot contain its own hash; a controller-authored external receipt binds the exact final commit and tree after commit. C-003-2-R2 is already 57e990e3bcbb8b7a731f4910c5adff451557ffa9.",
+      "detail": "This is a precommit producer packet for C-003-3-R3 evidence. head_sha and the C-003-3-R3 commit SHA remain null because a future commit cannot contain its own hash; a controller-authored external receipt binds the exact final commit and tree after commit. C-003-2-R3 is already 56ec38e3bb4c1af0e558a76c996816a7a604132f.",
       "next_action": "Controller records the final correction SHA/tree in an external acceptance receipt and updates terminal review state only after independent review."
     },
     {
@@ -1413,12 +1658,12 @@
     {
       "id": "layered-authorship-must-not-collapse",
       "status": "accepted",
-      "detail": "Luna R1 work remains Luna work. The failed 2026-09-10 Grok partial remains failed historical evidence. This R2 packet is Grok Co-Engineer work only for the files it actually produced.",
+      "detail": "Luna R1 work remains Luna work. The failed 2026-09-10 Grok partial remains failed historical evidence. R2 Grok work remains R2. This R3 packet is Grok Co-Engineer work only for the files it actually produced.",
       "next_action": "Keep historical receipts byte-identical and label current authored corrections accurately."
     }
   ],
-  "next_consumer": "Astra/controller independent review of the exact committed R2 correction head",
-  "next_action": "Controller commits the allowlisted C-003-3-R2 evidence, binds the resulting SHA/tree in an external receipt, and dispatches independent review. Do not treat historical R1 indexes as fresh checks. Full npm test/build/CF remains a PR-085-dependent root gate.",
+  "next_consumer": "Astra/controller independent review of the exact committed R3 correction head",
+  "next_action": "Controller commits the allowlisted C-003-3-R3 evidence, binds the resulting SHA/tree in an external receipt, and dispatches independent review. Do not treat historical R2 indexes as fresh checks. Full npm test/build/CF remains a PR-085-dependent root gate.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
@@ -1430,7 +1675,8 @@
     "limitations": [
       "Producer-side checks only; no independent acceptance or scientific claim.",
       "Full root npm/build/Cloudflare gates currently need a separate PR-085 CI inventory correction and remain separately owned.",
-      "The precommit packet uses a typed pending head claim; a controller-authored external receipt must bind the exact final commit after commit."
+      "The precommit packet uses a typed pending head claim; a controller-authored external receipt must bind the exact final commit after commit.",
+      "Local task-binding consistency does not authenticate the producer or replace controller dispatch review."
     ]
   }
 }
