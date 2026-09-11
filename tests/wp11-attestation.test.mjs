@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { execFile as execFileCallback, spawnSync } from 'node:child_process'
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import test from 'node:test'
 import { promisify } from 'node:util'
@@ -25,6 +25,14 @@ import {
   validateHistoricalWp11Proof,
   verifyWp11Attestation,
 } from '../scripts/verify-wp11-attestation.mjs'
+import {
+  HISTORICAL_PREIMAGE_SNAPSHOT_DIR,
+  HISTORICAL_WP11_SUBJECT_SHA256,
+  SEALED_WP11_FILE_COUNT,
+  SEALED_WP11_RECEIPT_PATH,
+  SEALED_WP11_TOTAL_BYTES,
+  readHistoricalPreimageSnapshot,
+} from '../verification/research-program/ci-attestation/wp11-v1.3.0/historical-preimage-reader.mjs'
 import { sha256 } from '../verification/successor-support.mjs'
 import { packageId } from '../verification/wp11/v1.3.0/tools/verify.mjs'
 const execFile = promisify(execFileCallback)
@@ -55,6 +63,28 @@ async function hashPinned(relativePath) {
   return { bytes: bytes.length, sha256: sha256(bytes) }
 }
 
+async function copySnapshotRoot() {
+  const root = await mkdtemp(path.join(await verificationTempRoot(), 'ushso-pr086-wp11-snapshot-'))
+  const snapshotDest = path.join(root, HISTORICAL_PREIMAGE_SNAPSHOT_DIR)
+  const receiptDest = path.join(root, SEALED_WP11_RECEIPT_PATH)
+  await mkdir(path.dirname(snapshotDest), { recursive: true })
+  await mkdir(path.dirname(receiptDest), { recursive: true })
+  await cp(path.join(repoRoot, HISTORICAL_PREIMAGE_SNAPSHOT_DIR), snapshotDest, { recursive: true })
+  await cp(path.join(repoRoot, SEALED_WP11_RECEIPT_PATH), receiptDest)
+  return root
+}
+
+async function readSnapshotInventory(root) {
+  return JSON.parse(await readFile(path.join(root, HISTORICAL_PREIMAGE_SNAPSHOT_DIR, 'inventory.json'), 'utf8'))
+}
+
+async function writeSnapshotInventory(root, inventory) {
+  await writeFile(
+    path.join(root, HISTORICAL_PREIMAGE_SNAPSHOT_DIR, 'inventory.json'),
+    JSON.stringify(inventory, null, 2) + '\n',
+  )
+}
+
 test('current WP11 verifier keeps historical proof, technical draft and wrapper subject separate', async () => {
   const result = await verifyWp11Attestation()
   assert.equal(result.status, 'PASS')
@@ -82,20 +112,18 @@ test('current WP11 verifier keeps historical proof, technical draft and wrapper 
   assert.equal(result.boundaries.historical_approval_applied_to_wrapper_subject, false)
   assert.equal(result.boundaries.current_approval_issued, false)
   assert.equal(result.boundaries.writes_approval_artifacts, false)
+  assert.equal(result.historical.input_bindings.source, 'retained_historical_preimage_snapshot')
+  assert.equal(result.historical.input_bindings.historical_file_count, SEALED_WP11_FILE_COUNT)
+  assert.equal(result.historical.input_bindings.total_bytes, SEALED_WP11_TOTAL_BYTES)
+  assert.equal(result.historical.input_bindings.unchanged_count, SEALED_WP11_FILE_COUNT)
+  assert.equal(result.historical.input_bindings.git_required, false)
+  assert.equal(result.historical.input_bindings.execute_retained_sources, false)
+  assert.equal(result.historical.input_bindings.subject_sha256, HISTORICAL_WP11_SUBJECT_SHA256)
   const actualPackage = await hashPinned('package.json')
   const reviewedTransition = actualPackage.sha256 === REVIEWED_PR003_PACKAGE_SNAPSHOT.sha256
   const expectedPackage = reviewedTransition ? REVIEWED_PR003_PACKAGE_SNAPSHOT : ORIGINAL_PR085_PACKAGE_SNAPSHOT
   assert.deepEqual(actualPackage, { bytes: expectedPackage.bytes, sha256: expectedPackage.sha256 })
-  const provenance = result.historical.input_bindings.package_provenance
-  assert.equal(provenance.state, reviewedTransition ? 'reviewed_pr003_current' : 'original_pr085_git_snapshot')
-  assert.equal(provenance.location, 'external')
-  assert.equal(provenance.git_commit, expectedPackage.git_commit)
-  assert.equal(provenance.git_path, expectedPackage.git_path)
-  assert.equal(provenance.sha256, actualPackage.sha256)
-  assert.equal(provenance.bytes, actualPackage.bytes)
-  assert.equal(result.historical.input_bindings.lock_state, 'pr085_ci_v14')
-  assert.equal(provenance.reviewed_pr003_transition, reviewedTransition)
-  if (reviewedTransition) assert.deepEqual(provenance.original_pr085_snapshot, ORIGINAL_PR085_PACKAGE_SNAPSHOT)
+  assert.notEqual(actualPackage.sha256, HISTORICAL_WP11_V1_3.files.receipt.sha256)
 })
 
 test('historical WP11 proof fails closed for missing and altered immutable bytes', async () => {
@@ -117,41 +145,114 @@ test('historical WP11 proof fails closed for missing and altered immutable bytes
   }
 })
 
-test('package provenance keeps the original PR085 Git snapshot and names the PR003 transition separately', async () => {
+test('retained snapshot reconstitutes 154 sealed preimages without Git', async () => {
+  const retained = await readHistoricalPreimageSnapshot()
+  assert.equal(retained.status, 'PASS')
+  assert.equal(retained.file_count, SEALED_WP11_FILE_COUNT)
+  assert.equal(retained.total_bytes, SEALED_WP11_TOTAL_BYTES)
+  assert.equal(retained.subject_sha256, HISTORICAL_WP11_SUBJECT_SHA256)
+  assert.equal(retained.git_required, false)
+  assert.equal(retained.execute_retained_sources, false)
+  assert.equal(retained.files.length, SEALED_WP11_FILE_COUNT)
+  let total = 0
+  for (const pin of retained.files) {
+    const bytes = retained.bytesByPath.get(pin.path)
+    assert.equal(bytes.length, pin.bytes)
+    assert.equal(sha256(bytes), pin.sha256)
+    total += bytes.length
+  }
+  assert.equal(total, SEALED_WP11_TOTAL_BYTES)
   const fixture = await historicalBytes()
-  const originalBytes = await readGitBytes(ORIGINAL_PR085_PACKAGE_SNAPSHOT.git_commit, ORIGINAL_PR085_PACKAGE_SNAPSHOT.git_path)
-  assert.equal(originalBytes.length, ORIGINAL_PR085_PACKAGE_SNAPSHOT.bytes)
-  assert.equal(sha256(originalBytes), ORIGINAL_PR085_PACKAGE_SNAPSHOT.sha256)
+  const proof = await validateHistoricalWp11Proof({ ...fixture, snapshot: retained })
+  assert.equal(proof.subject_sha256, HISTORICAL_WP11_SUBJECT_SHA256)
+  assert.equal(proof.input_bindings.historical_file_count, SEALED_WP11_FILE_COUNT)
+})
 
-  const readOriginalPackage = async (root, relativePath) => relativePath === 'package.json'
-    ? originalBytes
-    : readFile(path.resolve(root, relativePath))
-  const legacy = await validateHistoricalWp11Proof({ ...fixture, readCurrentFile: readOriginalPackage })
-  assert.equal(legacy.input_bindings.package_provenance.state, 'original_pr085_git_snapshot')
-  assert.equal(legacy.input_bindings.package_provenance.git_commit, ORIGINAL_PR085_PACKAGE_SNAPSHOT.git_commit)
+test('snapshot reader rejects missing, extra, tampered, substituted, incomplete, duplicate and unsafe inventory bytes', async () => {
+  const targetPath = 'apps/web/src/components/ResultCard.test.ts'
+  const substituted = await readGitBytes('941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9', targetPath)
+  assert.notEqual(sha256(substituted), '16226fad7dbbb87f6ca90541fcb33366b4104d8f7324e1f2373cff8446afe06d')
 
-  const reviewedBytes = await readGitBytes(REVIEWED_PR003_PACKAGE_SNAPSHOT.git_commit, REVIEWED_PR003_PACKAGE_SNAPSHOT.git_path)
-  assert.equal(reviewedBytes.length, REVIEWED_PR003_PACKAGE_SNAPSHOT.bytes)
-  assert.equal(sha256(reviewedBytes), REVIEWED_PR003_PACKAGE_SNAPSHOT.sha256)
-  const readReviewedPackage = async (root, relativePath) => relativePath === 'package.json'
-    ? reviewedBytes
-    : readFile(path.resolve(root, relativePath))
-  const transition = await validateHistoricalWp11Proof({ ...fixture, readCurrentFile: readReviewedPackage })
-  assert.equal(transition.input_bindings.package_provenance.state, 'reviewed_pr003_current')
-  assert.equal(transition.input_bindings.package_provenance.git_commit, REVIEWED_PR003_PACKAGE_SNAPSHOT.git_commit)
-  assert.equal(transition.input_bindings.package_provenance.original_pr085_snapshot.sha256, ORIGINAL_PR085_PACKAGE_SNAPSHOT.sha256)
-  assert.equal(transition.input_bindings.package_provenance.reviewed_pr003_transition, true)
-  assert.equal(transition.input_bindings.drifted.some((item) => item.path === 'package.json' && item.reason === 'reviewed_pr003_package_transition'), true)
+  const cases = []
 
-  const tampered = Buffer.from(reviewedBytes)
-  tampered[tampered.length - 1] ^= 1
-  const readTampered = async (root, relativePath) => relativePath === 'package.json'
-    ? tampered
-    : readFile(path.resolve(root, relativePath))
-  await assert.rejects(
-    validateHistoricalWp11Proof({ ...fixture, readCurrentFile: readTampered }),
-    /WP11_CURRENT_PACKAGE_UNREVIEWED_DRIFT/u,
-  )
+  const missingRoot = await copySnapshotRoot()
+  const missingInventory = await readSnapshotInventory(missingRoot)
+  const missingEntry = missingInventory.files.find((item) => item.path === targetPath)
+  await rm(path.join(missingRoot, HISTORICAL_PREIMAGE_SNAPSHOT_DIR, 'blobs', missingEntry.sha256))
+  cases.push({ root: missingRoot, pattern: /WP11_SNAPSHOT_BLOB_MISSING/u })
+
+  const extraRoot = await copySnapshotRoot()
+  await writeFile(path.join(extraRoot, HISTORICAL_PREIMAGE_SNAPSHOT_DIR, 'blobs', 'ab'.repeat(32)), Buffer.from('extra-blob'))
+  cases.push({ root: extraRoot, pattern: /WP11_SNAPSHOT_BLOB_EXTRA|WP11_SNAPSHOT_BLOB_NAME/u })
+
+  const tamperRoot = await copySnapshotRoot()
+  const tamperInventory = await readSnapshotInventory(tamperRoot)
+  const tamperEntry = tamperInventory.files.find((item) => item.path === targetPath)
+  const tamperPath = path.join(tamperRoot, HISTORICAL_PREIMAGE_SNAPSHOT_DIR, 'blobs', tamperEntry.sha256)
+  const tamperBytes = Buffer.from(await readFile(tamperPath))
+  tamperBytes[tamperBytes.length - 1] ^= 1
+  await writeFile(tamperPath, tamperBytes)
+  cases.push({ root: tamperRoot, pattern: /WP11_SNAPSHOT_BLOB_SUBSTITUTED|WP11_SNAPSHOT_BLOB_BYTES/u })
+
+  const substitutedRoot = await copySnapshotRoot()
+  const substitutedInventory = await readSnapshotInventory(substitutedRoot)
+  const substitutedEntry = substitutedInventory.files.find((item) => item.path === targetPath)
+  await writeFile(path.join(substitutedRoot, HISTORICAL_PREIMAGE_SNAPSHOT_DIR, 'blobs', substitutedEntry.sha256), substituted)
+  cases.push({ root: substitutedRoot, pattern: /WP11_SNAPSHOT_BLOB_SUBSTITUTED|WP11_SNAPSHOT_BLOB_BYTES/u })
+
+  const incompleteRoot = await copySnapshotRoot()
+  const incompleteInventory = await readSnapshotInventory(incompleteRoot)
+  incompleteInventory.files = incompleteInventory.files.filter((item) => item.path !== targetPath)
+  incompleteInventory.file_count = incompleteInventory.files.length
+  await writeSnapshotInventory(incompleteRoot, incompleteInventory)
+  cases.push({ root: incompleteRoot, pattern: /WP11_SNAPSHOT_INVENTORY_INCOMPLETE|WP11_SNAPSHOT_INVENTORY_FILE_COUNT|WP11_SNAPSHOT_INVENTORY_MISSING_PATH/u })
+
+  const duplicateRoot = await copySnapshotRoot()
+  const duplicateInventory = await readSnapshotInventory(duplicateRoot)
+  duplicateInventory.files[1] = { ...duplicateInventory.files[0] }
+  await writeSnapshotInventory(duplicateRoot, duplicateInventory)
+  cases.push({ root: duplicateRoot, pattern: /WP11_SNAPSHOT_DUPLICATE_PATH/u })
+
+  const unsafeRoot = await copySnapshotRoot()
+  const unsafeInventory = await readSnapshotInventory(unsafeRoot)
+  unsafeInventory.files[0] = { ...unsafeInventory.files[0], path: '../etc/passwd' }
+  await writeSnapshotInventory(unsafeRoot, unsafeInventory)
+  cases.push({ root: unsafeRoot, pattern: /WP11_SNAPSHOT_INVENTORY_PATH_UNSAFE/u })
+
+  try {
+    for (const item of cases) {
+      await assert.rejects(readHistoricalPreimageSnapshot({ root: item.root }), item.pattern)
+      const fixture = await historicalBytes()
+      await assert.rejects(validateHistoricalWp11Proof({ ...fixture, root: item.root }), item.pattern)
+    }
+  } finally {
+    await Promise.all(cases.map((item) => rm(item.root, { recursive: true, force: true })))
+  }
+})
+
+test('historical snapshot proof still passes when Git is unavailable', async () => {
+  const script = path.join(await verificationTempRoot(), `ushso-pr086-wp11-offline-${process.pid}.mjs`)
+  await writeFile(script, `import { readHistoricalPreimageSnapshot } from ${JSON.stringify(path.join(repoRoot, 'verification/research-program/ci-attestation/wp11-v1.3.0/historical-preimage-reader.mjs'))}
+const retained = await readHistoricalPreimageSnapshot(${JSON.stringify({ root: repoRoot })})
+if (retained.file_count !== ${SEALED_WP11_FILE_COUNT} || retained.total_bytes !== ${SEALED_WP11_TOTAL_BYTES} || retained.subject_sha256 !== '${HISTORICAL_WP11_SUBJECT_SHA256}') process.exit(2)
+if (retained.git_required !== false) process.exit(3)
+`)
+  try {
+    const result = spawnSync(process.execPath, [script], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        PATH: '/usr/bin:/bin',
+        GIT_DIR: '/nonexistent',
+        GIT_EXEC_PATH: '/nonexistent',
+        GIT_CEILING_DIRECTORIES: '/',
+      },
+    })
+    assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`)
+  } finally {
+    await rm(script, { force: true })
+  }
 })
 
 test('current technical failure and approval overclaim cannot be represented as a pending draft', async () => {

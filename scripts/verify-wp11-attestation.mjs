@@ -10,6 +10,16 @@ import {
   validateApproval,
 } from '../verification/successor-support.mjs'
 import {
+  HISTORICAL_PREIMAGE_INVENTORY_PATH,
+  HISTORICAL_PREIMAGE_READER_PATH,
+  HISTORICAL_WP11_SOURCE_COMMIT,
+  HISTORICAL_WP11_SUBJECT_SHA256,
+  SEALED_WP11_FILE_COUNT,
+  SEALED_WP11_RECEIPT_SHA256,
+  SEALED_WP11_TOTAL_BYTES,
+  readHistoricalPreimageSnapshot,
+} from '../verification/research-program/ci-attestation/wp11-v1.3.0/historical-preimage-reader.mjs'
+import {
   buildTechnicalEvidence,
   validateCandidateEvidence,
 } from '../verification/wp11/v1.3.0/tools/technical-evidence.mjs'
@@ -59,6 +69,8 @@ export const WP11_WRAPPER_IMPLEMENTATION_FILES = Object.freeze([
   'scripts/verify-wp11-attestation.mjs',
   'scripts/run-contract-suites.mjs',
   'tests/wp11-attestation.test.mjs',
+  HISTORICAL_PREIMAGE_READER_PATH,
+  HISTORICAL_PREIMAGE_INVENTORY_PATH,
   'verification/research-program/ci-attestation/wp11-v1.3.0/policy.json',
 ])
 
@@ -188,72 +200,68 @@ function assertDisabledCurrentFeatures(evidence) {
 }
 
 /**
- * Compare current bytes against the historical WP11 file inventory. Only the
- * demonstrated package-lock drift and the separately named PR003 package.json
- * snapshot are accepted as current drift.
+ * Prove the sealed 154 historical input pins from retained snapshot bytes.
+ * Current tree bytes are never substituted into this proof.
  */
 export async function validateHistoricalInputBindings({
   root = repoRoot,
   receipt,
   expected = HISTORICAL_WP11_V1_3,
-  readCurrentFile = readCurrent,
+  snapshot,
 } = {}) {
   const files = receipt?.technical_evidence?.files
   assert.ok(Array.isArray(files) && files.length > 0, 'WP11_HISTORICAL_INPUT_PINS_MISSING')
+  assert.equal(files.length, SEALED_WP11_FILE_COUNT, 'WP11_HISTORICAL_INPUT_COUNT')
+  const retained = snapshot ?? await readHistoricalPreimageSnapshot({ root })
+  assert.equal(retained.status, 'PASS', 'WP11_SNAPSHOT_STATUS')
+  assert.equal(retained.subject_sha256, expected.subject_sha256, 'WP11_SNAPSHOT_SUBJECT')
+  assert.equal(retained.subject_sha256, HISTORICAL_WP11_SUBJECT_SHA256, 'WP11_SNAPSHOT_SUBJECT')
+  assert.equal(retained.source_commit, expected.source_commit, 'WP11_SNAPSHOT_SOURCE_COMMIT')
+  assert.equal(retained.source_commit, HISTORICAL_WP11_SOURCE_COMMIT, 'WP11_SNAPSHOT_SOURCE_COMMIT')
+  assert.equal(retained.receipt_sha256, SEALED_WP11_RECEIPT_SHA256, 'WP11_SNAPSHOT_RECEIPT_HASH')
+  assert.equal(retained.file_count, SEALED_WP11_FILE_COUNT, 'WP11_SNAPSHOT_FILE_COUNT')
+  assert.equal(retained.total_bytes, SEALED_WP11_TOTAL_BYTES, 'WP11_SNAPSHOT_TOTAL_BYTES')
+  assert.equal(retained.git_required, false, 'WP11_SNAPSHOT_GIT_REQUIRED')
+  assert.equal(retained.execute_retained_sources, false, 'WP11_SNAPSHOT_EXECUTE_RETAINED_SOURCES')
+
+  const snapshotByPath = new Map(retained.files.map((pin) => [pin.path, pin]))
   const seen = new Set()
-  const drifted = []
-  let packageProvenance = null
-  let lockState = null
-  let unchangedCount = 0
+  let totalBytes = 0
   for (const pin of files) {
     const relativePath = safeRelativePath(pin.path, 'INPUT')
     assert.ok(!seen.has(relativePath), 'WP11_HISTORICAL_DUPLICATE_INPUT_PIN')
     seen.add(relativePath)
-    const bytes = await readCurrentFile(root, relativePath)
-    assert.ok(bytes && bytes.length > 0, `WP11_CURRENT_${relativePath}_EMPTY`)
+    const retainedPin = snapshotByPath.get(relativePath)
+    assert.ok(retainedPin, 'WP11_SNAPSHOT_INPUT_MISSING')
     assertHash(pin.sha256, `${relativePath}_HISTORICAL_HASH`)
-    const currentSha256 = sha256(bytes)
-    if (relativePath === 'package.json') {
-      packageProvenance = packageProvenanceFor(bytes)
-      if (currentSha256 !== pin.sha256) {
-        drifted.push({
-          path: relativePath,
-          historical_bytes: pin.bytes,
-          historical_sha256: pin.sha256,
-          current_bytes: bytes.length,
-          current_sha256: currentSha256,
-          reason: 'reviewed_pr003_package_transition',
-        })
-      } else unchangedCount += 1
-    } else if (relativePath === 'package-lock.json') {
-      lockState = lockStateFor(bytes)
-      if (currentSha256 !== pin.sha256) {
-        drifted.push({
-          path: relativePath,
-          historical_bytes: pin.bytes,
-          historical_sha256: pin.sha256,
-          current_bytes: bytes.length,
-          current_sha256: currentSha256,
-          reason: 'pr085_ci_v14_workspace_lock',
-        })
-      } else unchangedCount += 1
-    } else {
-      verifyPin(pin, bytes, `INPUT_${relativePath}`)
-      unchangedCount += 1
-    }
+    assert.equal(Number.isInteger(pin.bytes), true, `WP11_HISTORICAL_INPUT_${relativePath}_BYTES_TYPE`)
+    assert.equal(retainedPin.sha256, pin.sha256, `WP11_HISTORICAL_INPUT_${relativePath}_CHANGED`)
+    assert.equal(retainedPin.bytes, pin.bytes, `WP11_HISTORICAL_INPUT_${relativePath}_BYTES`)
+    const bytes = retained.bytesByPath.get(relativePath)
+    assert.ok(bytes && bytes.length === pin.bytes, `WP11_SNAPSHOT_${relativePath}_EMPTY`)
+    assert.equal(sha256(bytes), pin.sha256, `WP11_SNAPSHOT_${relativePath}_SUBSTITUTED`)
+    totalBytes += bytes.length
   }
-  assert.ok(packageProvenance, 'WP11_HISTORICAL_PACKAGE_PIN_MISSING')
-  assert.ok(lockState, 'WP11_HISTORICAL_LOCK_PIN_MISSING')
+  assert.equal(seen.size, SEALED_WP11_FILE_COUNT, 'WP11_HISTORICAL_INPUT_COUNT')
+  assert.equal(snapshotByPath.size, SEALED_WP11_FILE_COUNT, 'WP11_SNAPSHOT_EXTRA_INPUT')
+  for (const relativePath of snapshotByPath.keys()) {
+    assert.ok(seen.has(relativePath), 'WP11_SNAPSHOT_UNSEALED_PATH')
+  }
+  assert.equal(totalBytes, SEALED_WP11_TOTAL_BYTES, 'WP11_SNAPSHOT_TOTAL_BYTES')
   return {
     status: 'PASS',
-    source_commit: expected.source_commit,
-    historical_file_count: files.length,
-    unchanged_count: unchangedCount,
-    drifted,
-    package_provenance: packageProvenance,
-    lock_state: lockState,
-    original_pr085_package: { ...ORIGINAL_PR085_PACKAGE_SNAPSHOT },
-    reviewed_pr003_package: { ...REVIEWED_PR003_PACKAGE_SNAPSHOT },
+    source: retained.source,
+    source_commit: retained.source_commit,
+    historical_file_count: SEALED_WP11_FILE_COUNT,
+    total_bytes: SEALED_WP11_TOTAL_BYTES,
+    unchanged_count: SEALED_WP11_FILE_COUNT,
+    unique_blob_count: retained.unique_blob_count,
+    git_required: false,
+    execute_retained_sources: false,
+    receipt_sha256: retained.receipt_sha256,
+    subject_sha256: retained.subject_sha256,
+    snapshot_dir: retained.snapshot_dir,
+    inventory_path: retained.inventory_path,
   }
 }
 
@@ -271,7 +279,7 @@ export async function validateHistoricalWp11Proof({
   previousSuccessorBytes,
   expected = HISTORICAL_WP11_V1_3,
   root = repoRoot,
-  readCurrentFile = readCurrent,
+  snapshot,
 } = {}) {
   const files = expected.files ?? HISTORICAL_WP11_V1_3.files
   const bytesByName = { approval: approvalBytes, evidence: evidenceBytes, receipt: receiptBytes }
@@ -334,7 +342,7 @@ export async function validateHistoricalWp11Proof({
   assert.equal(receipt.technical_evidence.previous_successor_receipt?.path, expected.previous_successor.path, 'WP11_HISTORICAL_RECEIPT_PREVIOUS_PATH')
   assert.equal(receipt.technical_evidence.previous_successor_receipt?.sha256, expected.previous_successor.sha256, 'WP11_HISTORICAL_RECEIPT_PREVIOUS_HASH')
 
-  const inputBindings = await validateHistoricalInputBindings({ root, receipt, expected, readCurrentFile })
+  const inputBindings = await validateHistoricalInputBindings({ root, receipt, expected, snapshot })
   return {
     package_id: expected.package_id,
     subject_sha256: expected.subject_sha256,
@@ -411,6 +419,17 @@ export async function bindWrapperImplementation({ root = repoRoot } = {}) {
     historical_package_id: WP11_PACKAGE_ID,
     historical_subject_sha256: HISTORICAL_WP11_V1_3.subject_sha256,
     implementation_files: implementationFiles,
+    historical_preimage_snapshot: {
+      path: HISTORICAL_PREIMAGE_INVENTORY_PATH,
+      file_count: SEALED_WP11_FILE_COUNT,
+      total_bytes: SEALED_WP11_TOTAL_BYTES,
+      source_commit: HISTORICAL_WP11_SOURCE_COMMIT,
+      receipt_sha256: SEALED_WP11_RECEIPT_SHA256,
+      execute_retained_sources: false,
+    },
+    historical_preimage_reader: {
+      path: HISTORICAL_PREIMAGE_READER_PATH,
+    },
     writes_approval_artifacts: false,
     accepts_issue_option: false,
     historical_approval_applied: false,
