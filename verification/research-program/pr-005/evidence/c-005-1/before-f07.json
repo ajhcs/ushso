@@ -1,0 +1,37 @@
+{
+  "artifact_kind": "pr005_before_change_f07_observation",
+  "status": "defect_reproduced",
+  "observed_at": "2026-09-11T13:23:56.870Z",
+  "base_sha": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+  "command": "node verification/research-program/pr-005/observe-freshness-and-grain.mjs",
+  "exit_code": 0,
+  "finding": "F07",
+  "expected_live_behavior": "A 2026-09-10 evaluation of a record whose next_review_due is 2026-09-05T00:00:00.000Z is overdue.",
+  "observed": {
+    "direct_engine_without_now": {
+      "freshness_state": "within_review_window",
+      "note": "Review deadline has not passed.",
+      "receipt_generated_at": "1970-01-01T00:00:00.000Z"
+    },
+    "direct_engine_now_2026_09_10": {
+      "freshness_state": "overdue"
+    },
+    "direct_engine_now_2026_09_04": {
+      "freshness_state": "within_review_window"
+    },
+    "public_path_with_date_header_and_now_option": {
+      "evaluated_at": null,
+      "freshness_state": "within_review_window",
+      "note": "Review deadline has not passed.",
+      "receipt_generated_at": "1970-01-01T00:00:00.000Z"
+    },
+    "record_sha256_stable": "551d4f712eea2f8a33fb27755e931822f7af31d4f5605f5bc2024dcd348d7766"
+  },
+  "defect_reproduced": true,
+  "notes": [
+    "Direct retrieve({ now }) already classifies before/after correctly.",
+    "PublicQueryService.openRequest does not capture evaluation time.",
+    "StaticSearchBackend.retrieve/browse drop any clock, so the v1.2 engine falls back to corpus published_at/built_at or 1970.",
+    "The immutable source record hash is unchanged by the frozen-clock misclassification."
+  ]
+}

@@ -285,6 +285,7 @@ export interface DiscoveryResultMetadata {
     freshness_state: 'deadline_unknown' | 'overdue' | 'within_review_window'
     failed_refresh_state: string
     note: string
+    evaluated_at?: string
   }
   description_quality: {
     raw_description: string

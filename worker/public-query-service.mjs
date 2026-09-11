@@ -49,6 +49,30 @@ function directResult(record, whyRelevant) {
   };
 }
 
+export function resolveRequestEvaluationTime({ now, request } = {}) {
+  if (now != null && now !== '') {
+    const date = now instanceof Date ? new Date(now.getTime()) : new Date(now);
+    if (Number.isNaN(date.valueOf())) throw new TypeError('evaluation time is invalid');
+    return date.toISOString();
+  }
+  const header = typeof request?.headers?.get === 'function' ? request.headers.get('date') : null;
+  if (header) {
+    const parsed = new Date(header);
+    if (!Number.isNaN(parsed.valueOf())) return parsed.toISOString();
+  }
+  return new Date().toISOString();
+}
+
+function searchInvocation(session) {
+  return {
+    publication: session.publication,
+    request: session.request,
+    env: session.env,
+    signal: session.signal,
+    now: session.evaluatedAt ?? null
+  };
+}
+
 function resultBounds(totalMatches, returnedCount) {
   return {
     result_count: returnedCount,
@@ -68,9 +92,15 @@ export class PublicQueryService {
     this.plannerRepository = assertPlannerRepository(plannerRepository);
   }
 
-  async openRequest({ request, env }) {
+  async openRequest({ request, env, now } = {}) {
     const publication = assertPublicationReadContext(await this.publicationResolver.resolve({ request, env, signal: request.signal }));
-    return Object.freeze({ publication, request, env, signal: request.signal });
+    return Object.freeze({
+      publication,
+      request,
+      env,
+      signal: request.signal,
+      evaluatedAt: resolveRequestEvaluationTime({ now, request })
+    });
   }
 
   async health(session) {
@@ -89,10 +119,7 @@ export class PublicQueryService {
     const question = 'Browse published health systems data';
     if (typeof options !== 'number' && typeof this.searchBackend.browseAssets === 'function') {
       const result = await this.searchBackend.browseAssets({
-        publication: session.publication,
-        request: session.request,
-        env: session.env,
-        signal: session.signal,
+        ...searchInvocation(session),
         query: { question, ...traversal }
       });
       if (result) {
@@ -102,10 +129,7 @@ export class PublicQueryService {
     }
     const limit = traversal.page_size ?? 20;
     const intent = await this.searchBackend.interpret({
-      publication: session.publication,
-      request: session.request,
-      env: session.env,
-      signal: session.signal,
+      ...searchInvocation(session),
       query: { question, limit: Math.min(limit, 50) }
     });
     const [records, corpus, joinRoutes] = await Promise.all([
@@ -138,10 +162,7 @@ export class PublicQueryService {
     const question = `Open dataset ${record.record_id}`;
     const [intent, familySize, corpus, joinRoutes] = await Promise.all([
       this.searchBackend.interpret({
-        publication: session.publication,
-        request: session.request,
-        env: session.env,
-        signal: session.signal,
+        ...searchInvocation(session),
         query: { question }
       }),
       this.catalogRepository.getFamilySize({ ...session, familyId: record.identity?.family?.family_id }),
@@ -167,10 +188,7 @@ export class PublicQueryService {
 
   async discover(session, query) {
     return this.searchBackend.searchAssets({
-      publication: session.publication,
-      request: session.request,
-      env: session.env,
-      signal: session.signal,
+      ...searchInvocation(session),
       query
     });
   }

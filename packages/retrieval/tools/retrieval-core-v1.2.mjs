@@ -15,12 +15,30 @@ import {
   validateCatalogRecords
 } from './catalog-contract.mjs';
 
+const FROZEN_OBSERVATION_CLOCK = '1970-01-01T00:00:00.000Z';
 const RESTRICTED = new Set(['registration_required', 'application_required', 'dua_required', 'licensed_paid', 'controlled']);
 const FITNESS_WEIGHT = { primary: 52, supporting: 32, context_only: 12, unknown: 4 };
 const EVIDENCE_WEIGHT = { verified_first_party: 8, source_asserted: 5, inferred: 2, unresolved: 0, unavailable: 0 };
 const STOPWORDS = new Set(['a', 'about', 'an', 'and', 'are', 'by', 'can', 'data', 'dataset', 'datasets', 'describe', 'excluding', 'exclude', 'except', 'find', 'for', 'from', 'i', 'in', 'is', 'me', 'need', 'no', 'not', 'of', 'on', 'only', 'public', 'show', 'source', 'sources', 'study', 'the', 'to', 'use', 'what', 'which', 'with', 'without']);
 const RANKING_VERSION = 'observatory-canonical-ranking.v1.2.0';
 const SORTS = new Set(['canonical_relevance', 'title_asc', 'release_newest', 'observation_latest']);
+
+export function resolveObservationClock(now, corpus = {}) {
+  if (now == null || now === '') {
+    return new Date(corpus.published_at ?? corpus.built_at ?? FROZEN_OBSERVATION_CLOCK);
+  }
+  const date = now instanceof Date ? new Date(now.getTime()) : new Date(now);
+  if (Number.isNaN(date.valueOf())) throw new TypeError('observation clock is invalid');
+  return date;
+}
+
+export function projectFreshness(record, now) {
+  const clock = now instanceof Date ? now : resolveObservationClock(now);
+  return {
+    ...freshnessState(record, clock),
+    evaluated_at: clock.toISOString()
+  };
+}
 
 function stableHash(value) {
   let first = 0x811c9dc5;
@@ -530,7 +548,7 @@ export function createRetrievalEngine({ lexicalArtifact = null, diagnostic = nul
       const intent = compileDiscoveryIntent(rawQuery, frozenVocabulary, frozenNamedSources);
       const parsed = { ...intent, raw: intent.filters };
       const preparedScoring = prepareScoring(parsed, frozenVocabulary);
-      const effectiveNow = now ? new Date(now) : new Date(frozenCorpus.published_at ?? frozenCorpus.built_at ?? '1970-01-01T00:00:00.000Z');
+      const effectiveNow = resolveObservationClock(now, frozenCorpus);
       if (!SORTS.has(parsed.raw.sort)) cursorError('unsupported_sort', 'The requested sort is not supported by this ranking release.');
       if (parsed.raw.generation && parsed.raw.generation !== generation) cursorError('generation_unavailable', 'The requested catalog generation is unavailable; restart against the published generation.');
       const cursorSignature = stableHash(JSON.stringify({
@@ -618,7 +636,7 @@ export function createRetrievalEngine({ lexicalArtifact = null, diagnostic = nul
           dimensions: metadataDimensions(item.record),
           dates: dateDimensions(item.record),
           access: { ...(cachedAccessDimensions(item.record, recordScoring.get(item.record.record_id))) },
-          freshness: freshnessState(item.record, effectiveNow),
+          freshness: projectFreshness(item.record, effectiveNow),
           description_quality: descriptionQuality(item.record),
           claim_evidence: auditEvidence(item.record),
           retrieval_plan: retrievalPlan(item.record),

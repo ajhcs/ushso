@@ -168,6 +168,28 @@ test('static adapters reproduce exact legacy browse, dataset, and discovery stru
   assert.deepEqual(await service.discover(session, query), engine.retrieve(query));
 });
 
+test('public search forwards the request evaluation clock into retrieve without changing v1.1 bytes', async () => {
+  const seen = [];
+  const wrappedEngine = {
+    interpret: query => engine.interpret(query),
+    retrieve: (query, options) => {
+      seen.push(options);
+      return engine.retrieve(query, options);
+    }
+  };
+  const service = createStaticPublicQueryService({ loadCatalog, loadEngine: async () => wrappedEngine });
+  const session = await service.openRequest({
+    request: request('https://ushso.org/api/discover'),
+    env: {},
+    now: '2026-09-10T12:00:00.000Z'
+  });
+  assert.equal(session.evaluatedAt, '2026-09-10T12:00:00.000Z');
+  const query = { question: 'hospital financial and utilization data for Pennsylvania', limit: 15 };
+  const discovered = await service.discover(session, query);
+  assert.equal(seen.at(-1)?.now, '2026-09-10T12:00:00.000Z');
+  assert.deepEqual(discovered, engine.retrieve(query));
+});
+
 test('Worker dependency injection preserves exact response bytes, fields, ordering, and cache headers', async () => {
   const service = createStaticPublicQueryService({ loadCatalog, loadEngine });
   const worker = createWorker({ publicQueryService: service });
