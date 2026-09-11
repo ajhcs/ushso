@@ -1,15 +1,15 @@
 {
   "format": "ushso.research-program.task.v1",
-  "task_id": "ushso-pr003-grok-r6-20260911",
-  "slice_id": "C-003-2-R6",
+  "task_id": "ushso-pr003-grok-r7-20260911",
+  "slice_id": "C-003-2-R7",
   "pr_id": "PR-003",
-  "title": "Make PR-003 fixture temporary storage portable and captured ledger data self-contained",
+  "title": "Allocate a unique PR-003 cleanup control and finish retained R6 evidence",
   "owner": "Grok Co-Engineer (execution.provider grok, dispatch model grok-4; this interface Grok 4.6)",
   "reviewer": "Astra",
-  "branch": "codex/ce-ushso-pr003-grok-r6-2026-grok-r6-portability-90a932fb735a-90573407",
-  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/.ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323-worktrees/ce-ushso-pr003-grok-r6-2026-grok-r6-portability-90a932fb735a-90573407",
-  "objective": "Make PR003 fixture storage portable and captured ledger regression data self-contained.",
-  "outcome": "Fixture temps honor TMPDIR, then RUNNER_TEMP, then an ignored in-repo scratch root; owned children are cleaned without recursively removing unrelated directories; the observed f62ce354 vs 0b28d036 binding_conflict uses a committed 0c29fdb task-row extraction instead of git show of a non-ancestor object.",
+  "branch": "codex/ce-ushso-pr003-grok-r7-2026-grok-r7-finalize-606127415ace-2aec4b10",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/.ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323-worktrees/.ce-ushso-pr003-grok-r6-2026-grok-r6-portability-90a932fb735a-90573407-worktrees/ce-ushso-pr003-grok-r7-2026-grok-r7-finalize-606127415ace-2aec4b10",
+  "objective": "Finish retained PR003 R6 evidence and correct the fixed-name cleanup control.",
+  "outcome": "The cleanup-control test allocates its unrelated sentinel with mkdtemp and removes only that unique directory; a pre-existing controller-style sentinel is preserved. Retained R6 receipts, index and interruption note stay historical. Current task-binding and handoff identify this R7 assignment, branch, worktree and base a8cec211. R6 base 243a125 and prior R5 history remain separately named provenance.",
   "dependencies": [
     "PR-001",
     "PR-002"
@@ -23,16 +23,16 @@
   ],
   "commits": [
     {
-      "id": "C-003-2-R6",
-      "subject": "Make PR003 fixture storage portable",
-      "instructions": "Honor valid TMPDIR, then RUNNER_TEMP, then a small ignored in-repository scratch root. Replace runtime dependence on git object 0c29fdb with a committed task-row extraction that keeps the observed f62ce354 vs 0b28d036 binding_conflict meaningful.",
-      "verification": "Registered suite passes with configured TMPDIR and with TMPDIR absent plus RUNNER_TEMP present; the observed combined-head command passes with both absent using the local fallback; second plausible base and deliberate dependency-conflict checks remain."
+      "id": "C-003-2-R7",
+      "subject": "Allocate unique PR003 cleanup control",
+      "instructions": "Replace the fixed-name unrelated cleanup directory with mkdtemp. Use try/finally and remove only the newly created control. Keep the untracked-path refusal and sentinel-preservation assertions.",
+      "verification": "Registered suite passes with configured TMPDIR and with TMPDIR absent plus RUNNER_TEMP present; the observed combined-head command passes with both absent; the cleanup test preserves a separately pre-existing controller-style sentinel."
     },
     {
-      "id": "C-003-3-R6",
-      "subject": "Record PR003 R6 portability evidence",
-      "instructions": "Preserve all 62 historical command-receipt/evidence-index bytes from 243a125, add a separate R6 index and actual receipts, and update the current handoff/task binding with exact base, branch, owner and provenance.",
-      "verification": "Schema, focused, registered, CI-environment, local-fallback, default-handoff and guidance checks pass; historical 62-file hashes remain unchanged and the current packet remains pending-head and non-acceptance evidence."
+      "id": "C-003-3-R7",
+      "subject": "Record PR003 R7 cleanup evidence",
+      "instructions": "Preserve all 71 historical command-receipt/evidence-index bytes from a8cec211, keep the R6 interruption note intact, add a separate R7 index and actual receipts, and update the current handoff/task binding with exact base, branch, owner and provenance.",
+      "verification": "Schema, focused, registered, CI-environment, local-fallback, cleanup-sentinel, default-handoff and guidance checks pass; historical 71-file hashes remain unchanged and the current packet remains pending-head and non-acceptance evidence."
     }
   ],
   "check_commands": [
@@ -44,8 +44,8 @@
   ],
   "evidence_directory": "verification/research-program/pr-003/",
   "binding": {
-    "base_sha": "243a12510eb8ed3c7646d8a4d5d151a46b3cf28a",
-    "base_tree": "e55c6413693acb39661c1457fcfee109603b6cc9",
+    "base_sha": "a8cec211a2d93988e53ee2f85c31c2cac470b4eb",
+    "base_tree": "2a0d1321a908cbb0832252da12460bfe5aca7219",
     "dependency_merge_shas": {
       "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
       "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"

@@ -4,13 +4,13 @@
   "status": "producer_checked",
   "owner": "Grok Co-Engineer (execution.provider grok, dispatch model grok-4; this interface Grok 4.6)",
   "reviewer": "Astra",
-  "base_sha": "243a12510eb8ed3c7646d8a4d5d151a46b3cf28a",
+  "base_sha": "a8cec211a2d93988e53ee2f85c31c2cac470b4eb",
   "head_sha": null,
   "dependency_merge_shas": {
     "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
     "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
   },
-  "branch": "codex/ce-ushso-pr003-grok-r6-2026-grok-r6-portability-90a932fb735a-90573407",
+  "branch": "codex/ce-ushso-pr003-grok-r7-2026-grok-r7-finalize-606127415ace-2aec4b10",
   "github_pr_url": null,
   "changed_files": [
     "docs/research-program/handoffs/schema/README.md",
@@ -73,10 +73,25 @@
     "verification/research-program/pr-003/command-receipts/cmd-c003-r6-ci-environment.json",
     "verification/research-program/pr-003/command-receipts/cmd-c003-r6-local-fallback.json",
     "verification/research-program/pr-003/command-receipts/cmd-c003-r6-start-binding.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r6-historical-preservation.json"
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r6-historical-preservation.json",
+    "verification/research-program/pr-003/c003-r6-interruption.json",
+    "verification/research-program/pr-003/c003-r7-notes.md",
+    "verification/research-program/pr-003/c003-r7-evidence-index.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-focused-suite.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-schema.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-npm-test-research-program.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-verify-pr-guidance.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-ci-environment.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-local-fallback.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-cleanup-sentinel.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-start-binding.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-historical-preservation.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-checker-immutable.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-default-handoff.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r7-sealed-final-default-handoff.json"
   ],
-  "problem": "PR-003 fixture isolation still required an explicit absolute TMPDIR and the observed combined-head ledger regression git-showed non-ancestor 0c29fdb, so CI-like environments and later-branch-free checkouts could not replay the f62ce354 vs 0b28d036 binding_conflict.",
-  "resulting_behavior": "The corrected PR-003 contract requires structured expected and observed outcomes, truthful timestamps, explicit local or external source locations, resolved and hashed artifacts including nested event sources, unique identifiers, exact per-PR task/Git bindings and typed pending-head evidence. R4 applies slash-aware * / ** translation to wildcard-bearing prefixes. R5 isolates historical fixture packets behind an explicit controlled in-repo ledger/context while default live-ledger binding_conflict checks remain strict. R6 honors valid TMPDIR, then RUNNER_TEMP, then an ignored in-repository scratch root, and reproduces the observed f62ce354 vs 0b28d036 conflict from a committed 0c29fdb task-row extraction.",
+  "problem": "The interrupted R6 continuation left a cleanup regression test that created and recursively removed the fixed path fixtures/.scratch/unrelated-keep-me, so a controller-owned sentinel at that path was deleted while the test still passed. Current handoff/task-binding still named the R6 assignment and base 243a125.",
+  "resulting_behavior": "The corrected PR-003 contract requires structured expected and observed outcomes, truthful timestamps, explicit local or external source locations, resolved and hashed artifacts including nested event sources, unique identifiers, exact per-PR task/Git bindings and typed pending-head evidence. R4 applies slash-aware * / ** translation to wildcard-bearing prefixes. R5 isolates historical fixture packets behind an explicit controlled in-repo ledger/context while default live-ledger binding_conflict checks remain strict. R6 honors valid TMPDIR, then RUNNER_TEMP, then an ignored in-repository scratch root, and reproduces the observed f62ce354 vs 0b28d036 conflict from a committed 0c29fdb task-row extraction. R7 allocates the unrelated cleanup control with mkdtemp and removes only that unique directory; a pre-existing controller-style sentinel is preserved. Current task-binding and handoff identify assignment grok-r7-finalize, branch codex/ce-ushso-pr003-grok-r7-2026-grok-r7-finalize-606127415ace-2aec4b10, and base a8cec211a2d93988e53ee2f85c31c2cac470b4eb. R6 run ushso-pr003-grok-r6-20260911 remains cancelled/partial.",
   "commits": [
     {
       "id": "C-003-1",
@@ -151,6 +166,16 @@
     {
       "id": "C-003-3-R6",
       "subject": "Record PR003 R6 portability evidence",
+      "sha": null
+    },
+    {
+      "id": "C-003-2-R7",
+      "subject": "Allocate unique PR003 cleanup control",
+      "sha": "220912e4ad14bf2098b24c797d2e91b7b7bf75a2"
+    },
+    {
+      "id": "C-003-3-R7",
+      "subject": "Record PR003 R7 cleanup evidence",
       "sha": null
     }
   ],
@@ -234,8 +259,8 @@
       "kind": "controller-task-binding",
       "id": "verification/research-program/pr-003/task-binding.json",
       "location": "local",
-      "sha256": "6f236b412ee88dfb03957b7f346195eb6cb159811398eb8fc75d7f0a2de8d12a",
-      "version": "Concrete per-PR task binding established by Co-Engineer dispatch ushso-pr003-grok-r6-20260911 / assignment grok-r6-portability. Not a self-authenticating signature. Local task-binding consistency does not authenticate the producer or replace controller dispatch review. R5 history ushso-pr003-grok-r5-20260911 / grok-r5-fixtures remains distinct."
+      "sha256": "f2f0bfa9b335e7af25443f5e17587dc2edea2206f6718217ff26d2c57d86c194",
+      "version": "Concrete per-PR task binding established by Co-Engineer dispatch ushso-pr003-grok-r7-20260911 / assignment grok-r7-finalize. Not a self-authenticating signature. Local task-binding consistency does not authenticate the producer or replace controller dispatch review. R6 history ushso-pr003-grok-r6-20260911 / grok-r6-portability and R5 history ushso-pr003-grok-r5-20260911 / grok-r5-fixtures remain distinct."
     },
     {
       "kind": "independent-final-contract-review",
@@ -399,6 +424,38 @@
       "location": "local",
       "sha256": "1ddf8c53e59d33f5be1e91597d640d848042a2eeed30dccd4353cf25e4c26d2b",
       "version": "Extracted PR-003 task row from 0c29fdb:docs/research-program/execution-ledger.json; source SHA-256 58a28c0767657d66a9bf35991d1f5e241d6e14f60ff8cd17408ad7c8880e8702; not an ancestor of this branch"
+    },
+    {
+      "kind": "r7-reviewed-r6-continuation-base",
+      "id": "a8cec211a2d93988e53ee2f85c31c2cac470b4eb",
+      "location": "external",
+      "version": "tree 2a0d1321a908cbb0832252da12460bfe5aca7219; interrupted R6 continuation input, not a completed R6 run"
+    },
+    {
+      "kind": "r7-functional-commit",
+      "id": "220912e4ad14bf2098b24c797d2e91b7b7bf75a2",
+      "location": "external",
+      "version": "tree e25563e1e40a4e6658c58c59573b81afbaa98969; C-003-2-R7"
+    },
+    {
+      "kind": "r7-controller-requested-runtime",
+      "id": "ushso-pr003-grok-r7-20260911/grok-4",
+      "location": "external",
+      "version": "execution.provider grok; dispatch execution.model grok-4; this interface Grok 4.6"
+    },
+    {
+      "kind": "r7-r6-interruption-note",
+      "id": "verification/research-program/pr-003/c003-r6-interruption.json",
+      "location": "local",
+      "sha256": "3c448a4ea8c065d2a48424261146418510d29b277f7d9917972c8ba383d00af1",
+      "version": "Controller interruption record; R6 remains cancelled_at_deadline_partial_work_retained"
+    },
+    {
+      "kind": "r7-r6-interruption-receipt",
+      "id": "pr003-controller-review/d6578da-interrupted/receipt.json",
+      "location": "external",
+      "sha256": "e9d5f7654e8becc7a91bad75e316c7b68844f7e3690e4effb0090ecdc65b0a34",
+      "version": "Root retained-partial receipt for cancelled R6 run; not completed Grok work"
     }
   ],
   "commands": [
@@ -1776,6 +1833,306 @@
         "sha256": "2d5a6169845561661390b05ef1a5b1aa78eebbf2b80deadf79b89f48b5037307",
         "bytes": 1205
       }
+    },
+    {
+      "id": "cmd-c003-r7-focused-suite",
+      "command": "node --test tests/research-program/handoff.test.mjs",
+      "started_at": "2026-09-11T05:22:56.840Z",
+      "completed_at": "2026-09-11T05:23:07.550Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with all focused PR-003 handoff tests passing, including unique-directory cleanup control and self-contained captured-ledger binding_conflict",
+      "actual": "exit 0; 51 tests passed, 0 failed, 0 skipped; includes unique mkdtemp cleanup control.",
+      "result": "exit 0; 51 tests passed, 0 failed, 0 skipped; includes unique mkdtemp cleanup control.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-focused-suite",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-focused-suite.json",
+        "sha256": "a126039fe40a8a60dd47613df4f1671bbd3716bdd7213bef00af9036b65cae39",
+        "bytes": 1422
+      }
+    },
+    {
+      "id": "cmd-c003-r7-schema",
+      "command": "node verification/research-program/pr-003/verify-schema-contract.mjs",
+      "started_at": "2026-09-11T05:19:02.766Z",
+      "completed_at": "2026-09-11T05:19:02.959Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the schema contract fixture check passing",
+      "actual": "exit 0; schema contract and all declared fixture outcomes passed.",
+      "result": "exit 0; schema contract and all declared fixture outcomes passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-schema",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-schema.json",
+        "sha256": "515fd9361b802f73c13abbbce9b490a9629050c58e5ff4845791d02e3f835fe3",
+        "bytes": 1214
+      }
+    },
+    {
+      "id": "cmd-c003-r7-npm-test-research-program",
+      "command": "npm run test:research-program",
+      "started_at": "2026-09-11T05:23:07.550Z",
+      "completed_at": "2026-09-11T05:23:18.174Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the registered research-program test script passing under the configured TMPDIR",
+      "actual": "exit 0; registered research-program suite passed with 51 tests, 0 failed, 0 skipped under TMPDIR=/mnt/d/tmp/plumbob using pinned npm 11.19.1.",
+      "result": "exit 0; registered research-program suite passed with 51 tests, 0 failed, 0 skipped under TMPDIR=/mnt/d/tmp/plumbob using pinned npm 11.19.1.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-npm-test-research-program",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-npm-test-research-program.json",
+        "sha256": "df4a8d15110d01a2fa27a3287abb1a99db34ca6eb7620edaa70d686a286e7565",
+        "bytes": 1508
+      }
+    },
+    {
+      "id": "cmd-c003-r7-verify-pr-guidance",
+      "command": "node verification/research-program/pr-003/verify-pr-guidance.mjs",
+      "started_at": "2026-09-11T05:19:23.652Z",
+      "completed_at": "2026-09-11T05:19:23.682Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with PR guidance and test-discovery checks passing",
+      "actual": "exit 0; PR guidance and test-discovery checks passed.",
+      "result": "exit 0; PR guidance and test-discovery checks passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-verify-pr-guidance",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-verify-pr-guidance.json",
+        "sha256": "010526d6865760c7c57fa7727049cb8a7a714cf9ea9b11912517a28c98506bb4",
+        "bytes": 1209
+      }
+    },
+    {
+      "id": "cmd-c003-r7-ci-environment",
+      "command": "TMPDIR unset RUNNER_TEMP=/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-r7-runner-temp CI=1 npm run test:research-program",
+      "started_at": "2026-09-11T05:23:18.175Z",
+      "completed_at": "2026-09-11T05:23:28.775Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the registered suite passing when TMPDIR is absent and an absolute RUNNER_TEMP is present",
+      "actual": "exit 0; registered research-program suite passed with 51 tests, 0 failed, 0 skipped with TMPDIR unset, RUNNER_TEMP set, and CI=1.",
+      "result": "exit 0; registered research-program suite passed with 51 tests, 0 failed, 0 skipped with TMPDIR unset, RUNNER_TEMP set, and CI=1.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-ci-environment",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-ci-environment.json",
+        "sha256": "d6502067257f6351ba7a080ec5d3e7a086ae855eb5a855b6916ac1e4fdfeff29",
+        "bytes": 1705
+      }
+    },
+    {
+      "id": "cmd-c003-r7-local-fallback",
+      "command": "TMPDIR unset RUNNER_TEMP unset CI=1 node --test --test-name-pattern=the observed combined-head ledger base tests/research-program/handoff.test.mjs",
+      "started_at": "2026-09-11T05:19:23.235Z",
+      "completed_at": "2026-09-11T05:19:23.540Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 for the observed combined-head ledger test when both TMPDIR and RUNNER_TEMP are absent, using the ignored in-repository scratch fallback",
+      "actual": "exit 0; 1 test passed, 0 failed, 0 skipped. The originally failing combined-head command now passes with both temp variables absent.",
+      "result": "exit 0; 1 test passed, 0 failed, 0 skipped. The originally failing combined-head command now passes with both temp variables absent.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-local-fallback",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-local-fallback.json",
+        "sha256": "9347982e8f6fe3aab58ee6e07884e95521f13dc401f3bf59969a5c02f85efbad",
+        "bytes": 1588
+      }
+    },
+    {
+      "id": "cmd-c003-r7-cleanup-sentinel",
+      "command": "precreate fixtures/.scratch/unrelated-keep-me/controller-sentinel.txt; node --test --test-name-pattern=owned fixture temps are cleaned tests/research-program/handoff.test.mjs",
+      "started_at": "2026-09-11T05:19:23.541Z",
+      "completed_at": "2026-09-11T05:19:23.652Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0; cleanup test passes; pre-existing controller-style sentinel remains",
+      "actual": "exit 0; test claimed pass=True; controller_preexisting_sentinel_was_removed=False; sentinel content='controller-owned\\n'.",
+      "result": "exit 0; test claimed pass=True; controller_preexisting_sentinel_was_removed=False; sentinel content='controller-owned\\n'.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-cleanup-sentinel",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-cleanup-sentinel.json",
+        "sha256": "aded8f3e7cce6d7e84cc2d865030696a1a40cd94627bc41f40552f48185f3884",
+        "bytes": 1746
+      }
+    },
+    {
+      "id": "cmd-c003-r7-start-binding",
+      "command": "git rev-parse a8cec211a2d93988e53ee2f85c31c2cac470b4eb^{commit} a8cec211a2d93988e53ee2f85c31c2cac470b4eb^{tree}; git merge-base --is-ancestor <PR-001/PR-002> a8cec211a2d93988e53ee2f85c31c2cac470b4eb; git rev-parse HEAD HEAD^{tree}",
+      "started_at": "2026-09-11T05:18:52.345Z",
+      "completed_at": "2026-09-11T05:18:52.357Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with exact base a8cec211a2d93988e53ee2f85c31c2cac470b4eb, tree 2a0d1321a908cbb0832252da12460bfe5aca7219, both accepted dependencies ancestors, and functional head 220912e4ad14bf2098b24c797d2e91b7b7bf75a2",
+      "actual": "exit 0; base a8cec211a2d93988e53ee2f85c31c2cac470b4eb, tree 2a0d1321a908cbb0832252da12460bfe5aca7219, PR-001 and PR-002 are ancestors; HEAD 220912e4ad14bf2098b24c797d2e91b7b7bf75a2 tree e25563e1e40a4e6658c58c59573b81afbaa98969.",
+      "result": "exit 0; base a8cec211a2d93988e53ee2f85c31c2cac470b4eb, tree 2a0d1321a908cbb0832252da12460bfe5aca7219, PR-001 and PR-002 are ancestors; HEAD 220912e4ad14bf2098b24c797d2e91b7b7bf75a2 tree e25563e1e40a4e6658c58c59573b81afbaa98969.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-start-binding",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-start-binding.json",
+        "sha256": "86ea0e085976e122b732701778f6d17e68d79bb72c9724c362ca0cb073d38af9",
+        "bytes": 2192
+      }
+    },
+    {
+      "id": "cmd-c003-r7-historical-preservation",
+      "command": "compare every command-receipt/evidence-index file present at a8cec211a2d93988e53ee2f85c31c2cac470b4eb to current bytes",
+      "started_at": "2026-09-11T05:19:23.682Z",
+      "completed_at": "2026-09-11T05:19:23.817Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with every pre-existing command-receipt/evidence-index hash unchanged (62 prior to R6 plus eight R6 receipts and the R6 index: 71)",
+      "actual": "exit 0; 71/71 files at a8cec211 remained byte-identical (pre-R6 62 + R6 receipts 8 + R6 index 1).",
+      "result": "exit 0; 71/71 files at a8cec211 remained byte-identical (pre-R6 62 + R6 receipts 8 + R6 index 1).",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-historical-preservation",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-historical-preservation.json",
+        "sha256": "a66d38393604c4fc5cda35d82cf57eefa2dae70502e6575cee6a675911af42c3",
+        "bytes": 8089
+      }
+    },
+    {
+      "id": "cmd-c003-r7-checker-immutable",
+      "command": "sha256sum scripts/research-program/check-handoff.mjs",
+      "started_at": "2026-09-11T05:19:23.818Z",
+      "completed_at": "2026-09-11T05:19:23.818Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with SHA-256 45136e123eab6b9b6ac7dc81cc99f81e1db5e458caac2ab9f17f816f8aebe098 and 69506 bytes",
+      "actual": "exit 0; sha256 45136e123eab6b9b6ac7dc81cc99f81e1db5e458caac2ab9f17f816f8aebe098 bytes 69506.",
+      "result": "exit 0; sha256 45136e123eab6b9b6ac7dc81cc99f81e1db5e458caac2ab9f17f816f8aebe098 bytes 69506.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-checker-immutable",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-checker-immutable.json",
+        "sha256": "3848debb327da1b7014fbe5de8ce51fbd0e383e70c82330fcb898651e83cb24d",
+        "bytes": 1237
+      }
+    },
+    {
+      "id": "cmd-c003-r7-default-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json",
+      "started_at": "2026-09-11T05:26:14.321Z",
+      "completed_at": "2026-09-11T05:26:14.681Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with ok=true and every current PR-003 handoff check passed while head_sha remains typed pending",
+      "actual": "exit 0; current PR-003 handoff report was accepted with ok=true, producer_checked status, exact R7 base/task binding, and typed pending head.",
+      "result": "exit 0; current PR-003 handoff report was accepted with ok=true, producer_checked status, exact R7 base/task binding, and typed pending head.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-default-handoff",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-default-handoff.json",
+        "sha256": "a1c3c3d09dc65a2f41ceb34a598ccb1f4d2f3340d4e5a10c19d67bf16fa324b1",
+        "bytes": 1460
+      }
+    },
+    {
+      "id": "cmd-c003-r7-sealed-final-default-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json",
+      "started_at": "2026-09-11T05:26:14.686Z",
+      "completed_at": "2026-09-11T05:26:15.015Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the fully sealed current PR-003 handoff accepted",
+      "actual": "exit 0; fully sealed current R7 handoff accepted with ok=true, live execution ledger, and typed pending head.",
+      "result": "exit 0; fully sealed current R7 handoff accepted with ok=true, live execution ledger, and typed pending head.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r7-sealed-final-default-handoff",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-sealed-final-default-handoff.json",
+        "sha256": "09f18ff95e77c8d526d8a13dfc12e419d691d6a19339866411dc92d90785b5ba",
+        "bytes": 1399
+      }
     }
   ],
   "artifacts": [
@@ -2022,8 +2379,8 @@
     {
       "id": "artifact-current-task-binding",
       "path": "verification/research-program/pr-003/task-binding.json",
-      "sha256": "6f236b412ee88dfb03957b7f346195eb6cb159811398eb8fc75d7f0a2de8d12a",
-      "bytes": 3749
+      "sha256": "f2f0bfa9b335e7af25443f5e17587dc2edea2206f6718217ff26d2c57d86c194",
+      "bytes": 3884
     },
     {
       "id": "artifact-fixture-fractional-timing",
@@ -2312,6 +2669,96 @@
       "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r6-historical-preservation.json",
       "sha256": "2d5a6169845561661390b05ef1a5b1aa78eebbf2b80deadf79b89f48b5037307",
       "bytes": 1205
+    },
+    {
+      "id": "artifact-c003-r7-notes",
+      "path": "verification/research-program/pr-003/c003-r7-notes.md",
+      "sha256": "c7ddda2433a67e5681eeafcb4fbe6642adba1152972de1ad28e0200cf25f4d3e",
+      "bytes": 2742
+    },
+    {
+      "id": "artifact-c003-r6-interruption",
+      "path": "verification/research-program/pr-003/c003-r6-interruption.json",
+      "sha256": "3c448a4ea8c065d2a48424261146418510d29b277f7d9917972c8ba383d00af1",
+      "bytes": 6370
+    },
+    {
+      "id": "artifact-cmd-c003-r7-focused-suite",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-focused-suite.json",
+      "sha256": "a126039fe40a8a60dd47613df4f1671bbd3716bdd7213bef00af9036b65cae39",
+      "bytes": 1422
+    },
+    {
+      "id": "artifact-cmd-c003-r7-schema",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-schema.json",
+      "sha256": "515fd9361b802f73c13abbbce9b490a9629050c58e5ff4845791d02e3f835fe3",
+      "bytes": 1214
+    },
+    {
+      "id": "artifact-cmd-c003-r7-npm-test-research-program",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-npm-test-research-program.json",
+      "sha256": "df4a8d15110d01a2fa27a3287abb1a99db34ca6eb7620edaa70d686a286e7565",
+      "bytes": 1508
+    },
+    {
+      "id": "artifact-cmd-c003-r7-verify-pr-guidance",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-verify-pr-guidance.json",
+      "sha256": "010526d6865760c7c57fa7727049cb8a7a714cf9ea9b11912517a28c98506bb4",
+      "bytes": 1209
+    },
+    {
+      "id": "artifact-cmd-c003-r7-ci-environment",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-ci-environment.json",
+      "sha256": "d6502067257f6351ba7a080ec5d3e7a086ae855eb5a855b6916ac1e4fdfeff29",
+      "bytes": 1705
+    },
+    {
+      "id": "artifact-cmd-c003-r7-local-fallback",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-local-fallback.json",
+      "sha256": "9347982e8f6fe3aab58ee6e07884e95521f13dc401f3bf59969a5c02f85efbad",
+      "bytes": 1588
+    },
+    {
+      "id": "artifact-cmd-c003-r7-cleanup-sentinel",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-cleanup-sentinel.json",
+      "sha256": "aded8f3e7cce6d7e84cc2d865030696a1a40cd94627bc41f40552f48185f3884",
+      "bytes": 1746
+    },
+    {
+      "id": "artifact-cmd-c003-r7-start-binding",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-start-binding.json",
+      "sha256": "86ea0e085976e122b732701778f6d17e68d79bb72c9724c362ca0cb073d38af9",
+      "bytes": 2192
+    },
+    {
+      "id": "artifact-cmd-c003-r7-historical-preservation",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-historical-preservation.json",
+      "sha256": "a66d38393604c4fc5cda35d82cf57eefa2dae70502e6575cee6a675911af42c3",
+      "bytes": 8089
+    },
+    {
+      "id": "artifact-cmd-c003-r7-checker-immutable",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-checker-immutable.json",
+      "sha256": "3848debb327da1b7014fbe5de8ce51fbd0e383e70c82330fcb898651e83cb24d",
+      "bytes": 1237
+    },
+    {
+      "id": "artifact-c003-r7-evidence-index",
+      "path": "verification/research-program/pr-003/c003-r7-evidence-index.json",
+      "sha256": "116afa7af67a5e6a11ed95a96fece5c92331bff33f4bc4cc3a0a5fc9e60f7863",
+      "bytes": 13661
+    },
+    {
+      "id": "artifact-cmd-c003-r7-default-handoff",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-default-handoff.json",
+      "sha256": "a1c3c3d09dc65a2f41ceb34a598ccb1f4d2f3340d4e5a10c19d67bf16fa324b1",
+      "bytes": 1460
+    },
+    {
+      "id": "artifact-cmd-c003-r7-sealed-final-default-handoff",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r7-sealed-final-default-handoff.json",
+      "sha256": "09f18ff95e77c8d526d8a13dfc12e419d691d6a19339866411dc92d90785b5ba",
+      "bytes": 1399
     }
   ],
   "acceptance_results": [
@@ -2669,6 +3116,67 @@
         "artifact-c003-r6-notes",
         "artifact-c003-r6-evidence-index"
       ]
+    },
+    {
+      "id": "acc-c003-2-r7-cleanup-control",
+      "status": "producer_checked",
+      "result": "R7 cleanup control allocates a unique unrelated directory with mkdtemp and removes only that directory; removeOwnedTempDir still refuses an untracked path; a separately pre-existing controller-style sentinel remains.",
+      "command_ids": [
+        "cmd-c003-r7-focused-suite",
+        "cmd-c003-r7-cleanup-sentinel",
+        "cmd-c003-r7-ci-environment",
+        "cmd-c003-r7-local-fallback",
+        "cmd-c003-r7-historical-preservation",
+        "cmd-c003-r7-checker-immutable"
+      ],
+      "artifact_ids": [
+        "artifact-focused-test",
+        "artifact-validator",
+        "artifact-cmd-c003-r7-focused-suite",
+        "artifact-cmd-c003-r7-cleanup-sentinel",
+        "artifact-cmd-c003-r7-ci-environment",
+        "artifact-cmd-c003-r7-local-fallback",
+        "artifact-cmd-c003-r7-historical-preservation",
+        "artifact-cmd-c003-r7-checker-immutable"
+      ]
+    },
+    {
+      "id": "acc-c003-3-r7-evidence",
+      "status": "producer_checked",
+      "result": "R7 command receipts record actual focused, schema, registered, CI-environment, local-fallback, cleanup-sentinel, guidance, start-binding, checker-immutable and historical-preservation checks; the pending head remains typed and no independent or scientific acceptance is asserted. R6 remains cancelled.",
+      "command_ids": [
+        "cmd-c003-r7-schema",
+        "cmd-c003-r7-npm-test-research-program",
+        "cmd-c003-r7-verify-pr-guidance",
+        "cmd-c003-r7-start-binding",
+        "cmd-c003-r7-sealed-final-default-handoff",
+        "cmd-c003-r7-default-handoff"
+      ],
+      "artifact_ids": [
+        "artifact-cmd-c003-r7-schema",
+        "artifact-cmd-c003-r7-npm-test-research-program",
+        "artifact-cmd-c003-r7-verify-pr-guidance",
+        "artifact-cmd-c003-r7-start-binding",
+        "artifact-c003-r7-notes",
+        "artifact-c003-r6-interruption",
+        "artifact-current-task-binding",
+        "artifact-c003-r7-evidence-index",
+        "artifact-cmd-c003-r7-sealed-final-default-handoff",
+        "artifact-cmd-c003-r7-default-handoff"
+      ]
+    },
+    {
+      "id": "acc-c003-r7-default-handoff",
+      "status": "producer_checked",
+      "result": "The current PR-003 handoff checker exited 0 with ok=true while the R7 packet used the exact per-PR base/task binding, matching owner/branch and typed pending head.",
+      "command_ids": [
+        "cmd-c003-r7-default-handoff"
+      ],
+      "artifact_ids": [
+        "artifact-cmd-c003-r7-default-handoff",
+        "artifact-validator",
+        "artifact-c003-r7-evidence-index"
+      ]
     }
   ],
   "failures_and_skipped_checks": [
@@ -2705,7 +3213,7 @@
     {
       "id": "c003-r1-sealed-portable-input-initial-failed",
       "status": "failed",
-      "detail": "The first sealed portable probe (agentctl cmd-0019-d4930fec, 2026-09-11T00:21:58.747Z–2026-09-11T00:21:58.780Z, exit 1) used a parent path that still resolved inside the repository, so its own expected rejection set was not met. It was not used as acceptance evidence; the corrected three-level escape retry cmd-0020-eb5e19c5 exited 0.",
+      "detail": "The first sealed portable probe (agentctl cmd-0019-d4930fec, 2026-09-11T00:21:58.747Z\u20132026-09-11T00:21:58.780Z, exit 1) used a parent path that still resolved inside the repository, so its own expected rejection set was not met. It was not used as acceptance evidence; the corrected three-level escape retry cmd-0020-eb5e19c5 exited 0.",
       "next_action": "Retain the failed attempt and use the corrected explicit escape cases for portable containment replay."
     },
     {
@@ -2713,14 +3221,20 @@
       "status": "skipped",
       "detail": "Root owns full integrated npm test/build/Cloudflare hosted CI, which currently needs a separate PR-085 CI inventory correction. This bounded R2 correction records that known dependency rather than attempting those gates.",
       "next_action": "PR-085 lands the CI inventory correction; root reruns the integration/release gate on the composed candidate."
+    },
+    {
+      "id": "r6-run-cancelled-at-deadline",
+      "status": "failed",
+      "detail": "ushso-pr003-grok-r6-20260911 / grok-r6-portability was CANCELLED at its deadline with partial evidence retained (functional head d6578da, incomplete current handoff). It is not a completed run.",
+      "next_action": "Keep R6 receipts, index and interruption note byte-identical as historical producer evidence."
     }
   ],
   "unresolved_claims": [
     {
       "id": "head-sha-pending-controller-commit",
       "status": "pending",
-      "detail": "This is a precommit producer packet for C-003-3-R6 evidence. head_sha and the C-003-3-R6 commit SHA remain null because a future commit cannot contain its own hash; the controller must bind the exact final commit and tree in an external receipt. C-003-2-R6 is d6578daad24a82f1c8ab587c44fbc74b44573b13. R5 evidence commit is 243a12510eb8ed3c7646d8a4d5d151a46b3cf28a.",
-      "next_action": "Controller records the final R6 correction SHA/tree in an external receipt and updates terminal review state only after independent review."
+      "detail": "This is a precommit producer packet for C-003-3-R7 evidence. head_sha and the C-003-3-R7 commit SHA remain null because a future commit cannot contain its own hash; the controller must bind the exact final commit and tree in an external receipt. C-003-2-R7 is 220912e4ad14bf2098b24c797d2e91b7b7bf75a2. C-003-3-R6 remains null because ushso-pr003-grok-r6-20260911 was cancelled at deadline. R6 functional commit is d6578daad24a82f1c8ab587c44fbc74b44573b13. Continuation input is a8cec211a2d93988e53ee2f85c31c2cac470b4eb.",
+      "next_action": "Controller records the final R7 correction SHA/tree in an external receipt and updates terminal review state only after independent review."
     },
     {
       "id": "independent-review-not-started",
@@ -2751,12 +3265,12 @@
     {
       "id": "layered-authorship-must-not-collapse",
       "status": "accepted",
-      "detail": "Luna R1 and R4 work remain Luna work. The failed 2026-09-10 Grok partial remains failed historical evidence. R2, R3 and R5 Grok work remain their separately scoped historical corrections. This R6 packet is Grok Co-Engineer work on the reviewed R5 result and does not collapse prior authorship.",
+      "detail": "Luna R1 and R4 work remain Luna work. The failed 2026-09-10 Grok partial remains failed historical evidence. R2, R3 and R5 Grok work remain their separately scoped historical corrections. R6 Grok work is retained partial evidence from a cancelled deadline, not a completed run. This R7 packet is Grok Co-Engineer work on that retained input and does not collapse prior authorship.",
       "next_action": "Keep historical receipts byte-identical and label current authored corrections accurately."
     }
   ],
-  "next_consumer": "Astra/controller independent review of the exact committed R6 correction head",
-  "next_action": "Controller binds the final C-003-3-R6 evidence commit and exact tree in an external receipt, then dispatches independent review. This packet remains producer evidence; full npm test/build/CF remains a separate root gate.",
+  "next_consumer": "Astra/controller independent review of the exact committed R7 correction head",
+  "next_action": "Controller binds the final C-003-3-R7 evidence commit and exact tree in an external receipt, then dispatches independent review. This packet remains producer evidence; full npm test/build/CF remains a separate root gate. Do not treat cancelled R6 as completed.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
@@ -2772,7 +3286,8 @@
       "The precommit packet uses a typed pending head claim; a controller-authored external receipt must bind the exact final commit after commit.",
       "Local task-binding consistency does not authenticate the producer or replace controller dispatch review.",
       "Dispatch recorded execution.model grok-4; this interface identifies as Grok 4.6.",
-      "Prior R5/R4/DeepSeek/Grok records remain historical and are not authorship of the R6 patch.",
+      "Prior R6/R5/R4/DeepSeek/Grok records remain historical and are not authorship of the R7 patch.",
+      "R6 run ushso-pr003-grok-r6-20260911 / grok-r6-portability was CANCELLED at its deadline and is not completed work.",
       "WP11 scope review and PR-085 package.json historical-context correction are outside this assignment."
     ]
   }
