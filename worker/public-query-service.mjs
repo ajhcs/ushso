@@ -2,6 +2,15 @@ import { assertCoverageRepository } from '../packages/coverage/coverage-reposito
 import { assertPlannerRepository } from '../packages/planner/planner-repository.mjs';
 import { assertCatalogRepository } from '../packages/registry/catalog-repository.mjs';
 import { assertPublicationReadContext } from '../packages/registry/publication-read-context.mjs';
+import {
+  accessDimensions,
+  auditEvidence,
+  dateDimensions,
+  descriptionQuality,
+  metadataDimensions,
+  retrievalPlan
+} from '../packages/retrieval/tools/catalog-contract.mjs';
+import { projectFreshness } from '../packages/retrieval/tools/retrieval-core-v1.2.mjs';
 import { assertSearchBackend } from '../packages/search/search-backend.mjs';
 
 function retrievalId(value) {
@@ -27,8 +36,8 @@ function queryFromIntent(intent, filters = {}) {
   };
 }
 
-function directResult(record, whyRelevant) {
-  return {
+function directResult(record, whyRelevant, evaluatedAt = null) {
+  const result = {
     rank: 1,
     score: 1,
     record_id: record.record_id,
@@ -46,6 +55,42 @@ function directResult(record, whyRelevant) {
       why_relevant: [whyRelevant]
     },
     record: structuredClone(record)
+  };
+  if (!evaluatedAt) return result;
+  return {
+    ...result,
+    metadata: {
+      dimensions: metadataDimensions(record),
+      dates: dateDimensions(record),
+      access: accessDimensions(record),
+      freshness: projectFreshness(record, evaluatedAt),
+      description_quality: descriptionQuality(record),
+      claim_evidence: auditEvidence(record),
+      retrieval_plan: retrievalPlan(record),
+      named_source_role: 'not_applicable',
+      geographic_compatibility: 'not_requested',
+      observation_time_compatibility: 'not_requested',
+      access_compatibility: 'not_requested'
+    }
+  };
+}
+
+export function resolveRequestEvaluationTime({ now } = {}) {
+  if (now != null && now !== '') {
+    const date = now instanceof Date ? new Date(now.getTime()) : new Date(now);
+    if (Number.isNaN(date.valueOf())) throw new TypeError('evaluation time is invalid');
+    return date.toISOString();
+  }
+  return new Date().toISOString();
+}
+
+function searchInvocation(session) {
+  return {
+    publication: session.publication,
+    request: session.request,
+    env: session.env,
+    signal: session.signal,
+    now: session.evaluatedAt ?? null
   };
 }
 
@@ -68,9 +113,15 @@ export class PublicQueryService {
     this.plannerRepository = assertPlannerRepository(plannerRepository);
   }
 
-  async openRequest({ request, env }) {
+  async openRequest({ request, env, now } = {}) {
     const publication = assertPublicationReadContext(await this.publicationResolver.resolve({ request, env, signal: request.signal }));
-    return Object.freeze({ publication, request, env, signal: request.signal });
+    return Object.freeze({
+      publication,
+      request,
+      env,
+      signal: request.signal,
+      evaluatedAt: resolveRequestEvaluationTime({ now })
+    });
   }
 
   async health(session) {
@@ -89,10 +140,7 @@ export class PublicQueryService {
     const question = 'Browse published health systems data';
     if (typeof options !== 'number' && typeof this.searchBackend.browseAssets === 'function') {
       const result = await this.searchBackend.browseAssets({
-        publication: session.publication,
-        request: session.request,
-        env: session.env,
-        signal: session.signal,
+        ...searchInvocation(session),
         query: { question, ...traversal }
       });
       if (result) {
@@ -102,10 +150,7 @@ export class PublicQueryService {
     }
     const limit = traversal.page_size ?? 20;
     const intent = await this.searchBackend.interpret({
-      publication: session.publication,
-      request: session.request,
-      env: session.env,
-      signal: session.signal,
+      ...searchInvocation(session),
       query: { question, limit: Math.min(limit, 50) }
     });
     const [records, corpus, joinRoutes] = await Promise.all([
@@ -121,7 +166,7 @@ export class PublicQueryService {
       query: queryFromIntent(intent, { mode: 'catalog_browse', limit }),
       ...resultBounds(corpus.record_count, records.length),
       results: records.map((record, index) => ({
-        ...directResult(record, 'Included in the published catalog browse view.'),
+        ...directResult(record, 'Included in the published catalog browse view.', session.evaluatedAt),
         rank: index + 1
       })),
       join_routes: joinRoutes,
@@ -138,10 +183,7 @@ export class PublicQueryService {
     const question = `Open dataset ${record.record_id}`;
     const [intent, familySize, corpus, joinRoutes] = await Promise.all([
       this.searchBackend.interpret({
-        publication: session.publication,
-        request: session.request,
-        env: session.env,
-        signal: session.signal,
+        ...searchInvocation(session),
         query: { question }
       }),
       this.catalogRepository.getFamilySize({ ...session, familyId: record.identity?.family?.family_id }),
@@ -159,7 +201,7 @@ export class PublicQueryService {
         family_sibling_count: Math.max(0, familySize - 1)
       }),
       ...resultBounds(1, 1),
-      results: [directResult(record, 'Opened by its stable published record identifier.')],
+      results: [directResult(record, 'Opened by its stable published record identifier.', session.evaluatedAt)],
       join_routes: joinRoutes,
       warnings: ['This page describes indexed metadata and retrieval routes; it does not prove current endpoint availability or authorize access.']
     };
@@ -167,10 +209,7 @@ export class PublicQueryService {
 
   async discover(session, query) {
     return this.searchBackend.searchAssets({
-      publication: session.publication,
-      request: session.request,
-      env: session.env,
-      signal: session.signal,
+      ...searchInvocation(session),
       query
     });
   }

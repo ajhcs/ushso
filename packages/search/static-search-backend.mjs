@@ -30,11 +30,13 @@ export class StaticSearchBackend {
   }
 
   async searchAssets({ query, ...options }) {
-    return (await this.#engine(options)).retrieve(query, { signal: options.signal });
+    return (await this.#engine(options)).retrieve(query, { signal: options.signal, now: options.now ?? null });
   }
 
   async browseAssets({ query, ...options }) {
     const engine = await this.#engine(options);
-    return typeof engine.browse === 'function' ? engine.browse(query, { signal: options.signal }) : null;
+    return typeof engine.browse === 'function'
+      ? engine.browse(query, { signal: options.signal, now: options.now ?? null })
+      : null;
   }
 }

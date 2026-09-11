@@ -1,0 +1,34 @@
+{
+  "artifact_kind": "proposed_out_of_scope_interface_delta",
+  "status": "proposed",
+  "owner_needed": "PR-085 / WP11 current-input attestation",
+  "reason": "Independent review R005-5 found the WP11 gate blocker spans 11 PR-005 implementation/test/type files, not one ResultCard.test.ts pin. This correction does not edit WP11 adapter, policy, historical pins, approvals, or receipts. A separately bounded current-input attestation follow-up is required before integration acceptance.",
+  "first_reported_mismatch": {
+    "file": "apps/web/src/components/ResultCard.test.ts",
+    "historical_pin_sha256": "16226fad7dbbb87f6ca90541fcb33366b4104d8f7324e1f2373cff8446afe06d",
+    "current_sha256": "f80476d8ba1a0343eaceae664b0f7aa1d4312105779b1c54cd5e2d91bbd85978"
+  },
+  "wp11_pinned_pr005_files": [
+    "apps/web/src/components/ResultCard.test.ts",
+    "apps/web/src/components/ResultCard.tsx",
+    "apps/web/src/lib/catalogAdapter.ts",
+    "apps/web/src/lib/catalogAdapter.test.ts",
+    "apps/web/src/lib/researcherGuidance.ts",
+    "apps/web/src/lib/researcherGuidance.test.tsx",
+    "apps/web/src/pages/DatasetDetailsPage.tsx",
+    "apps/web/src/pages/DatasetDetailsPage.test.tsx",
+    "apps/web/src/types/catalog.ts",
+    "apps/web/src/types/discovery.ts"
+  ],
+  "command": "npm run test:worker",
+  "observed_exit_code": 1,
+  "affected_tests": [
+    "tests/wp11-attestation.test.mjs"
+  ],
+  "not_claimed": [
+    "WP11 historical proof is not updated here.",
+    "Current WP11 technical draft is not re-attested.",
+    "Historical approvals and receipts are unchanged.",
+    "This is not scientific approval or integration acceptance."
+  ]
+}

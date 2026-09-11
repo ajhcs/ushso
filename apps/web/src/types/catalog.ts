@@ -46,6 +46,15 @@ export interface DatasetVerification {
   dataThrough: string | null
   nextReviewDue: string | null
   liveVerified: boolean
+  lastSuccessfulMetadataCheck: string | null
+  latestAttemptAt: string | null
+  latestAttemptOutcome: string
+  latestAttemptScope: 'catalog_metadata'
+  payloadCheckState: 'not_attempted' | 'unknown' | 'succeeded' | 'failed' | 'restricted' | 'unavailable'
+  payloadCheckNote: string
+  staleStatus: 'stale_historical_success' | 'review_overdue' | 'not_stale' | 'unknown'
+  freshnessState: 'deadline_unknown' | 'overdue' | 'within_review_window' | 'unknown'
+  evaluatedAt: string | null
   evidence: DatasetVerificationEvidence[]
 }
 

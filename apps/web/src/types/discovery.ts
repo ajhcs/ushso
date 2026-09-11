@@ -285,6 +285,25 @@ export interface DiscoveryResultMetadata {
     freshness_state: 'deadline_unknown' | 'overdue' | 'within_review_window'
     failed_refresh_state: string
     note: string
+    evaluated_at?: string
+    last_successful_metadata_check?: string | null
+    latest_attempt?: {
+      at: string | null
+      outcome: string
+      scope: 'catalog_metadata'
+    }
+    catalog_metadata_check?: {
+      state: string
+      at: string | null
+      scope: 'catalog_metadata'
+    }
+    payload_check?: {
+      state: 'not_attempted' | 'unknown' | 'succeeded' | 'failed' | 'restricted' | 'unavailable'
+      at: string | null
+      scope: 'payload'
+      note: string
+    }
+    stale_status?: 'stale_historical_success' | 'review_overdue' | 'not_stale'
   }
   description_quality: {
     raw_description: string

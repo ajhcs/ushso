@@ -48,10 +48,33 @@ function geographyDisplay(record: ObservatoryRecord) {
   return jurisdictions.map((value) => value.replace(/^US-/, '')).join(', ') || 'Geography unresolved'
 }
 
-function grainDisplay(record: ObservatoryRecord) {
-  // unit_of_analysis is an inferred search projection in the current wire
-  // contract and has no claim-level evidence linkage.
-  return 'Observation grain unresolved'
+export function isSupportedObservationGrain(state: string | undefined | null): boolean {
+  return state === 'source_asserted' || state === 'verified_first_party'
+}
+
+export function observationGrainPresentation(record: ObservatoryRecord, metadata?: DiscoveryResultItem['metadata']) {
+  const grain = metadata?.dimensions?.observation_grain
+  const values = (grain?.values ?? []).filter((value) => value && value !== 'unknown')
+  const inferredSearchTags = metadata?.dimensions?.inferred_search_tags
+    ?? record.unit_of_analysis.filter((value) => value && value !== 'unknown').map((value) => `unit_of_analysis:${value}`)
+  if (grain && isSupportedObservationGrain(grain.state) && values.length > 0) {
+    return {
+      label: values.map(sentenceCase).join(', '),
+      state: grain.state,
+      values,
+      inferredSearchTags,
+    }
+  }
+  return {
+    label: 'Observation grain unresolved',
+    state: grain?.state === 'inferred' || grain?.state === 'unavailable' ? grain.state : 'unresolved' as const,
+    values: [] as string[],
+    inferredSearchTags,
+  }
+}
+
+function grainDisplay(record: ObservatoryRecord, metadata?: DiscoveryResultItem['metadata']) {
+  return observationGrainPresentation(record, metadata).label
 }
 
 const ACCESS_STATUS_LABELS: Record<ObservatoryRecord['access']['status'], string> = {
@@ -107,7 +130,18 @@ function accessOptions(record: ObservatoryRecord): AccessOption[] {
   })
 }
 
-function verificationDetails(record: ObservatoryRecord): DatasetVerification {
+function successfulCatalogMetadataCheckAt(historical: ObservatoryRecord['freshness_verification']): string | null {
+  if (historical.verification_status === 'current_verified' || historical.verification_status === 'stale') {
+    return historical.metadata_observed_at ?? null
+  }
+  return null
+}
+
+function explicitField<T>(value: T | undefined, fallback: T): T {
+  return value !== undefined ? value : fallback
+}
+
+function verificationDetails(record: ObservatoryRecord, metadata?: DiscoveryResultItem['metadata']): DatasetVerification {
   const provenanceById = new Map(record.provenance.map((source) => [source.provenance_id, source]))
   const evidence = record.evidence.map((item) => ({
     evidenceId: item.evidence_id,
@@ -127,14 +161,28 @@ function verificationDetails(record: ObservatoryRecord): DatasetVerification {
       }]
     }),
   }))
-  const freshness = record.freshness_verification
+  const historical = record.freshness_verification
+  const projected = metadata?.freshness
+  const lastSuccessful = projected && Object.hasOwn(projected, 'last_successful_metadata_check')
+    ? projected.last_successful_metadata_check ?? null
+    : successfulCatalogMetadataCheckAt(historical)
+  const latestAttempt = projected?.latest_attempt
   return {
-    status: freshness.verification_status,
-    method: freshness.verification_method,
-    metadataObservedAt: freshness.metadata_observed_at,
-    dataThrough: freshness.data_through,
-    nextReviewDue: freshness.next_review_due,
-    liveVerified: freshness.verification_status === 'current_verified' && freshness.verification_method === 'first_party_live',
+    status: historical.verification_status,
+    method: historical.verification_method,
+    metadataObservedAt: historical.metadata_observed_at,
+    dataThrough: historical.data_through,
+    nextReviewDue: historical.next_review_due,
+    liveVerified: historical.verification_status === 'current_verified' && historical.verification_method === 'first_party_live',
+    lastSuccessfulMetadataCheck: lastSuccessful,
+    latestAttemptAt: latestAttempt && Object.hasOwn(latestAttempt, 'at') ? latestAttempt.at : lastSuccessful,
+    latestAttemptOutcome: latestAttempt?.outcome ?? historical.verification_status,
+    latestAttemptScope: 'catalog_metadata',
+    payloadCheckState: explicitField(projected?.payload_check?.state, 'not_attempted'),
+    payloadCheckNote: explicitField(projected?.payload_check?.note, 'Catalog metadata observation is not a payload-access check.'),
+    staleStatus: projected?.stale_status ?? (historical.verification_status === 'stale' ? 'stale_historical_success' : 'unknown'),
+    freshnessState: projected?.freshness_state ?? 'unknown',
+    evaluatedAt: projected?.evaluated_at ?? null,
     evidence,
   }
 }
@@ -228,7 +276,7 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
   const latestRelease = record.freshness_verification.data_through
     ? `${record.freshness_verification.data_through} (${sentenceCase(record.freshness_verification.verification_status)})`
     : sentenceCase(record.freshness_verification.verification_status)
-  const verification = verificationDetails(record)
+  const verification = verificationDetails(record, result.metadata)
   const variables = variableDetails(record)
   const id = recordIdForRoute(record.record_id)
 
@@ -243,8 +291,8 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
     relationship: relationshipLabel(record),
     recordType: sentenceCase(record.identity.asset.asset_type),
     geographicApplicability: geographyDisplay(record),
-    grain: grainDisplay(record),
-    reportingUnit: grainDisplay(record),
+    grain: grainDisplay(record, result.metadata),
+    reportingUnit: grainDisplay(record, result.metadata),
     accessStatusLabel: accessStatusLabel(record),
     populationFacilityScope: 'Scope unresolved',
     availableYears: timeDisplay(record),
