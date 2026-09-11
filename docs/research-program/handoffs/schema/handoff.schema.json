@@ -1,0 +1,717 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/schemas/research-program/handoff.v1.schema.json",
+  "title": "ushso implementer handoff and review receipt",
+  "description": "Machine-checkable contract for an implementer handoff/receipt. It preserves exact base/head/dependency SHAs, owned-file and changed-behavior statements, command/exit records, fixture expected/actual observations, artifact hashes, risks, failures and the next consumer. Derived from docs/master-plan/2026-09-10/EXECUTION.md ('Communication and retained notes') and the PR-003 packet. JSON Schema enforces shape, status-specific evidence minima, explicit local vs external source identity, and structured command outcomes. The bounded checker additionally enforces uniqueness, expected/observed matching, event-source hashing, Git object binding and per-PR base lookup. A success claim without an observed command outcome (or with an outcome that does not match the explicit expected outcome) is not acceptable evidence. Packet validity is not independent or scientific acceptance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "pr_id",
+    "status",
+    "owner",
+    "reviewer",
+    "base_sha",
+    "head_sha",
+    "dependency_merge_shas",
+    "branch",
+    "changed_files",
+    "problem",
+    "resulting_behavior",
+    "commits",
+    "source_identities",
+    "commands",
+    "artifacts",
+    "acceptance_results",
+    "failures_and_skipped_checks",
+    "unresolved_claims",
+    "risks",
+    "next_consumer",
+    "next_action",
+    "independent_review"
+  ],
+  "properties": {
+    "format": {
+      "const": "ushso.pr-handoff.v1"
+    },
+    "pr_id": {
+      "$ref": "#/$defs/prId"
+    },
+    "status": {
+      "$ref": "#/$defs/reviewState"
+    },
+    "owner": {
+      "$ref": "#/$defs/nullableString"
+    },
+    "reviewer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "base_sha": {
+      "$ref": "#/$defs/gitSha"
+    },
+    "head_sha": {
+      "$ref": "#/$defs/nullableGitSha"
+    },
+    "dependency_merge_shas": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/prId"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/gitSha"
+      }
+    },
+    "branch": {
+      "type": "string",
+      "pattern": "^codex/[A-Za-z0-9._/-]+$"
+    },
+    "github_pr_url": {
+      "$ref": "#/$defs/nullableUrl"
+    },
+    "changed_files": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "problem": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resulting_behavior": {
+      "type": "string",
+      "minLength": 1
+    },
+    "commits": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/commitRef"
+      }
+    },
+    "source_identities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/sourceIdentity"
+      }
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/command"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "acceptance_results": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/acceptanceResult"
+      }
+    },
+    "failures_and_skipped_checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "unresolved_claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "next_consumer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "independent_review": {
+      "$ref": "#/$defs/independentReview"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "producer_checked",
+              "draft_pr",
+              "independently_verified",
+              "merged",
+              "integrated",
+              "qualified"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "changed_files": {
+            "minItems": 1,
+            "type": "array"
+          },
+          "source_identities": {
+            "minItems": 1,
+            "type": "array"
+          },
+          "commands": {
+            "minItems": 1,
+            "type": "array"
+          },
+          "artifacts": {
+            "minItems": 1,
+            "type": "array"
+          },
+          "acceptance_results": {
+            "minItems": 1,
+            "type": "array"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "gitSha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "prId": {
+      "type": "string",
+      "pattern": "^PR-[0-9]{3}$"
+    },
+    "nullableString": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableGitSha": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/gitSha"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableUrl": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^https://github\\.com/"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reviewState": {
+      "description": "Explicit handoff/task states from EXECUTION.md. Completed producer states require non-empty evidence arrays and a non-null owner. planned/ready/in_progress/blocked/changes_requested/independent_review may be incomplete. Packet validity is not independent verification.",
+      "enum": [
+        "planned",
+        "ready",
+        "in_progress",
+        "producer_checked",
+        "draft_pr",
+        "independent_review",
+        "changes_requested",
+        "independently_verified",
+        "merged",
+        "integrated",
+        "qualified",
+        "blocked"
+      ]
+    },
+    "acceptanceState": {
+      "description": "Typed outcome for one acceptance slice. 'passed', 'producer_checked' and 'independently_verified' are success claims and therefore require at least one command whose observed outcome matches its explicit expected outcome. 'blocked', 'unavailable' and 'unresolved' are preserved as non-pass states, never coerced to success. An expected-negative check may legitimately observe a nonzero exit when that exit is the expected outcome.",
+      "enum": [
+        "pending",
+        "blocked",
+        "unavailable",
+        "unresolved",
+        "failed",
+        "passed",
+        "producer_checked",
+        "independently_verified"
+      ]
+    },
+    "commitRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "subject"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^C-[0-9]{3}-[0-9]+(?:-R[0-9]+)?$"
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha": {
+          "$ref": "#/$defs/nullableGitSha"
+        }
+      }
+    },
+    "sourceIdentity": {
+      "description": "Declared source identity. location=local is a repository-relative current file and requires sha256 plus resolved containment. location=external may name a non-local identity; when git_commit and git_path are present, sha256 is verified against immutable git show bytes at that commit. Do not infer locality from path punctuation.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "location"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "location": {
+          "enum": [
+            "local",
+            "external"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "git_commit": {
+          "$ref": "#/$defs/gitSha"
+        },
+        "git_path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "location": {
+                "const": "local"
+              }
+            },
+            "required": [
+              "location"
+            ]
+          },
+          "then": {
+            "required": [
+              "sha256"
+            ],
+            "properties": {
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "anyOf": [
+              {
+                "properties": {
+                  "git_commit": {}
+                },
+                "required": [
+                  "git_commit"
+                ]
+              },
+              {
+                "properties": {
+                  "git_path": {}
+                },
+                "required": [
+                  "git_path"
+                ]
+              }
+            ]
+          },
+          "then": {
+            "required": [
+              "location",
+              "git_commit",
+              "git_path",
+              "sha256"
+            ],
+            "properties": {
+              "location": {
+                "const": "external"
+              },
+              "git_commit": {
+                "$ref": "#/$defs/gitSha"
+              },
+              "git_path": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+              },
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "commandOutcome": {
+      "description": "Structured expected or observed command outcome. observed_exit requires exit_code. Nonzero exits are valid for explicit expected-negative checks. Typed non-execution or failure kinds require detail that records the provider limitation, blockage, failure or unresolved reason.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "observed_exit",
+            "unavailable",
+            "blocked",
+            "failed",
+            "unresolved"
+          ]
+        },
+        "exit_code": {
+          "type": "integer"
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "observed_exit"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "exit_code"
+            ],
+            "properties": {
+              "exit_code": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "unavailable",
+                  "blocked",
+                  "failed",
+                  "unresolved"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "detail"
+            ],
+            "properties": {
+              "detail": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "command": {
+      "description": "One recorded command with structured expected and observed outcomes. Every command carries RFC3339 UTC start/end timestamps (end at or after start) and explicit outcomes. kind=observed_exit records the numeric exit that actually occurred; nonzero is legitimate when it is the explicit expected-negative outcome. Typed unavailable, blocked, failed and unresolved outcomes require a detail describing the limitation or failure. Narrative expected/actual strings remain commentary.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "command",
+        "result",
+        "started_at",
+        "completed_at",
+        "expected_outcome",
+        "observed_outcome"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^cmd-[A-Za-z0-9._-]+$"
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "started_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "completed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "exit_code": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "completion_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actual": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_outcome": {
+          "$ref": "#/$defs/commandOutcome"
+        },
+        "observed_outcome": {
+          "$ref": "#/$defs/commandOutcome"
+        },
+        "event_source": {
+          "$ref": "#/$defs/artifact"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "acceptanceResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "result",
+        "command_ids"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/acceptanceState"
+        },
+        "result": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "artifact_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "passed",
+                  "producer_checked",
+                  "independently_verified"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "command_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "detail"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "failed",
+            "skipped",
+            "blocked",
+            "unavailable",
+            "unresolved",
+            "pending",
+            "open",
+            "risk",
+            "accepted"
+          ]
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1
+        },
+        "next_action": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "independentReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewed_head_sha",
+        "decisive_checks",
+        "limitations"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_started",
+            "in_review",
+            "changes_requested",
+            "independently_verified"
+          ]
+        },
+        "reviewed_head_sha": {
+          "$ref": "#/$defs/nullableGitSha"
+        },
+        "decisive_checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "timestamp": {
+      "description": "RFC3339 UTC command timestamp. Arbitrary fractional-second precision is allowed. The checker and schema helper compare the full declared fractional instant so completed_at may not precede started_at within the same millisecond; Date.parse truncation is not used. Impossible calendar dates are rejected.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    }
+  }
+}

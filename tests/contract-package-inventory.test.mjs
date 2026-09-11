@@ -138,7 +138,7 @@ test('root npm test preserves legacy gates and invokes the navigator aggregate e
   for (const name of ['test:retrieval', 'test:web', 'test:worker', 'test:evaluation', 'validate:evaluation']) {
     assert.match(rootPackage.scripts.test, new RegExp(`npm run ${name}`, 'u'))
   }
-  assert.equal(rootPackage.scripts.test, 'npm run test:retrieval && npm run test:web && npm run test:worker && npm run test:evaluation && npm run validate:evaluation && npm run verify:research-navigator')
+  assert.equal(rootPackage.scripts.test, 'npm run test:retrieval && npm run test:web && npm run test:worker && npm run test:research-program && npm run test:evaluation && npm run validate:evaluation && npm run verify:research-navigator')
   assert.equal((rootPackage.scripts.test.match(/npm run verify:research-navigator/gu) ?? []).length, 1)
   for (const name of [
     'test:contracts', 'test:evaluator-v2', 'test:evaluator-bridge', 'test:feedback', 'test:wp0', 'test:wp2',

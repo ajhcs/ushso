@@ -1,0 +1,34 @@
+{
+  "format": "ushso.pr003.c003-2.command-receipt.v1",
+  "id": "cmd-c003-2-reject-claimed-pass-without-command",
+  "kind": "handoff_validator_incomplete_packet",
+  "command": "node scripts/research-program/check-handoff.mjs verification/research-program/pr-003/fixtures/handoff.reject-claimed-pass-without-command.json",
+  "cwd": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-deepseek-20260910t220020z",
+  "started_at": "2026-09-10T22:14:21.439Z",
+  "completed_at": "2026-09-10T22:14:21.615Z",
+  "exit_code": 1,
+  "expected": "exit 1 with claimed_pass_without_command_result for a producer_checked result that carries no command result",
+  "actual": "exit 1 with ok=false; schema also rejects the empty command_ids (minItems 1) and the semantic rule claimed_pass_without_command_result fires",
+  "observed": {
+    "ok": false,
+    "outcome": "rejected",
+    "handoff_sha256": "8192b7b5b4a181eb96007c31788969123144944132e36feab42bdb47316257e8",
+    "failed_checks": ["handoff_schema", "command_result_resolution"],
+    "findings": [
+      {
+        "rule": "schema_invalid",
+        "detail": "/acceptance_results/0/command_ids minItems must NOT have fewer than 1 items"
+      },
+      {
+        "rule": "schema_invalid",
+        "detail": "/acceptance_results/0 if must match \"then\" schema"
+      },
+      {
+        "rule": "claimed_pass_without_command_result",
+        "detail": "C-003-1 claims producer_checked with an empty command_ids list"
+      }
+    ]
+  },
+  "sanitized": true,
+  "raw_log_retained_in_git": false
+}
