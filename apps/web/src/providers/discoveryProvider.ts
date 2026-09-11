@@ -1,4 +1,5 @@
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
+import { matchesFacetFilterToken } from '../data/facets'
 import { browserRecordErrors } from '../../../../packages/retrieval/tools/catalog-contract.mjs'
 import { safeExternalHttpsUrl } from '../../../../packages/retrieval/tools/external-url-policy.mjs'
 import type { DiscoveryQuery, DiscoveryResult, DiscoverySort } from '../types/discovery'
@@ -226,6 +227,101 @@ function queryWithTraversal(query: DiscoveryQuery, traversal?: DiscoveryTraversa
   }
 }
 
+function fixtureFacetFilters(query: DiscoveryQuery, traversal?: DiscoveryTraversalRequest) {
+  const grouped: Record<string, string[]> = {}
+  const add = (section: string, value: string) => {
+    if (!section || !value) return
+    grouped[section] = [...(grouped[section] ?? []), value]
+  }
+  for (const [section, values] of Object.entries(query.facet_filters ?? {})) {
+    for (const value of values) add(section, value)
+  }
+  for (const filter of traversal?.filters ?? []) {
+    const separator = filter.indexOf(':')
+    if (separator <= 0 || separator === filter.length - 1) continue
+    add(filter.slice(0, separator), filter.slice(separator + 1))
+  }
+  return grouped
+}
+
+function recomputeFixtureFacets(response: DiscoveryResult) {
+  if (!response.facets) return
+  const records = response.results
+  response.facets = {
+    ...response.facets,
+    collection_scope: 'fixture_response_records_after_local_filter',
+    sections: response.facets.sections
+      .map((section) => ({
+        ...section,
+        options: section.options
+          .map((option) => ({
+            ...option,
+            count: records.filter((result) => matchesFacetFilterToken(result.record, section.id, option.value)).length,
+          }))
+          .filter((option) => option.count > 0),
+      }))
+      .filter((section) => section.options.length > 0),
+  }
+}
+
+function applyFixtureFacetFilters(response: DiscoveryResult, filters: Record<string, string[]>) {
+  const entries = Object.entries(filters).filter(([, values]) => values.length > 0)
+  if (entries.length === 0) return response
+  const selectedIds = new Set<string>()
+  response.results = response.results
+    .filter((result) => {
+      const matches = entries.every(([section, values]) => values.some((value) => matchesFacetFilterToken(result.record, section, value)))
+      if (matches) selectedIds.add(result.record_id)
+      return matches
+    })
+    .map((result, index) => ({ ...result, rank: index + 1 }))
+  response.result_count = response.results.length
+  response.returned_count = response.results.length
+  response.total_matches = response.results.length
+  response.has_more = false
+  if (response.pagination) {
+    response.pagination = {
+      ...response.pagination,
+      cursor: null,
+      next_cursor: null,
+      has_more: false,
+      total_matches: response.results.length,
+    }
+  }
+  if (response.ranking) response.ranking = { ...response.ranking, ordered_ids: response.results.map((result) => result.record_id) }
+  if (response.sections) {
+    response.sections = {
+      ...response.sections,
+      supported: response.sections.supported.filter((id) => selectedIds.has(id)),
+      uncertain: response.sections.uncertain.filter((id) => selectedIds.has(id)),
+      ...(response.sections.contextual ? { contextual: response.sections.contextual.filter((id) => selectedIds.has(id)) } : {}),
+      ...(response.sections.incompatible ? { incompatible: response.sections.incompatible.filter((id) => selectedIds.has(id)) } : {}),
+    }
+  }
+  if (response.receipt) {
+    const orderedIds = response.results.map((result) => result.record_id)
+    response.receipt = {
+      ...response.receipt,
+      displayed_ordered_ids: orderedIds,
+      citations: orderedIds.flatMap((id) => response.receipt?.citations.filter((citation) => citation.record_id === id) ?? []),
+    }
+  }
+  response.query = {
+    ...response.query,
+    filters: {
+      ...response.query.filters,
+      facet_filters: Object.fromEntries(entries),
+    },
+  }
+  response.join_routes = response.join_routes.filter((route) => selectedIds.has(route.from_record_id) && selectedIds.has(route.to_record_id))
+  recomputeFixtureFacets(response)
+  response.warnings = [
+    'Fixture facet filters were applied to the accepted response records; counts are bounded to this fixture response scope.',
+    ...response.warnings,
+  ]
+  return response
+}
+
 export class FixtureDiscoveryProvider implements DiscoveryProvider {
   readonly kind = 'fixture' as const
   private responsePromise?: Promise<DiscoveryResult>
@@ -253,7 +349,7 @@ export class FixtureDiscoveryProvider implements DiscoveryProvider {
         'The checked-in fixture does not contain an accepted response for this question. Configure the API provider for unrestricted queries.',
       )
     }
-    return structuredClone(response)
+    return applyFixtureFacetFilters(structuredClone(response), fixtureFacetFilters(query, options.traversal))
   }
 
   async browse(options: DiscoveryRequestOptions = {}) {
@@ -273,7 +369,7 @@ export class FixtureDiscoveryProvider implements DiscoveryProvider {
       filters: { mode: 'catalog_browse' },
     }
     response.warnings = ['Fixture browse mode lists the accepted published records; order does not imply relevance or quality.', ...response.warnings]
-    return response
+    return applyFixtureFacetFilters(response, fixtureFacetFilters({ question: '' }, options.traversal))
   }
 
   async dataset(id: string, options: DiscoveryRequestOptions = {}) {

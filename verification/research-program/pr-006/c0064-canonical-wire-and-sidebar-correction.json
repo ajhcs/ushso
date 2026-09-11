@@ -1,0 +1,167 @@
+{
+  "format": "ushso.pr006.c0064-canonical-wire-and-sidebar-correction.v1",
+  "status": "producer_checked",
+  "native_interface": {
+    "configured_selection": "gpt-5.6-luna/max",
+    "interface": "native Codex collaboration",
+    "producer_self_label": "Codex, GPT-6",
+    "identity_boundary": "The configured Luna Max interface is recorded separately from the generic producer self-label; this artifact does not attest to a serving-model identity beyond the dispatch selection."
+  },
+  "input": {
+    "base_sha": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+    "base_tree": "caab4b676bbeed085e087d63523317edccdd69ac",
+    "prior_head": "5d8a8dd6d2e9d60d5b18fa1f69a09533c7e0d9e9",
+    "prior_tree": "d5cb2e16c62dcab2ed1267a6072cea96dcd5276d",
+    "packet": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr006-native-dispatch-packet.json",
+    "packet_sha256": "416e75a5fcccd8d63b7d494ba50915c207b9f06763fbc876d36214ab84367c89"
+  },
+  "correction_commits": [
+    {
+      "id": "C-006-4",
+      "sha": "ee0a4c14a00e3cd155381a85ab26a1d35ea44d7d",
+      "subject": "PR-006: preserve exact canonical facet IDs"
+    },
+    {
+      "id": "C-006-5",
+      "sha": "6b2c3d6716d7cf5867f361bafa09ae6d055517aa",
+      "subject": "PR-006: isolate facet availability descriptions"
+    }
+  ],
+  "canonical_matching": {
+    "decision": "Canonical request matching compares the five wire dimensions exactly: source, geography, access_status, unit_of_analysis and capability.",
+    "exact_cases": [
+      "capability:topic:claims",
+      "geography:US-PA",
+      "access_status:public_catalog",
+      "unit_of_analysis:facility_period",
+      "source:fixture:canonical-source"
+    ],
+    "invalid_near_cases": [
+      "capability:topic-claims",
+      "geography:US-PA-near",
+      "access_status:public_catalog-near",
+      "unit_of_analysis:facility-period",
+      "source:fixture:canonical-source-near"
+    ],
+    "legacy_boundary": "matchesLegacyFacetFilter and matchesFacetFilterToken are used only for explicit browser/fixture compatibility: data-category/access/reporting-unit aliases plus geography:pennsylvania -> US-PA and access/catalog-metadata-only -> public_catalog. Canonical API parsing and frozen response fields are unchanged.",
+    "parity": "The actual FixtureDiscoveryProvider filters a synthetic accepted record and is compared with retrieval-core engine responses for exact IDs, invalid near IDs, result totals and recomputed option counts across all five dimensions."
+  },
+  "availability_accessibility": {
+    "decision": "FacetSidebar uses a React useId-derived per-instance prefix for availability reason paragraphs. Each input references the paragraph in its own sidebar instance, preserving visible text and the frozen discovery response schema.",
+    "regression": "Server-rendered tests verify the described-by target exists and two sidebar instances emit unique availability IDs whose references resolve within the rendered markup."
+  },
+  "checks": [
+    {
+      "id": "cmd-correction-web-focused",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-web-focused.json",
+      "sha256": "2d9b82189e3ec89f548674683d09325911b50169bfba517c63db435932ef1fd8",
+      "bytes": 1888,
+      "command": "npm run typecheck --workspace @ushso/observatory-web && npm run test:web -- --run src/data/facets.test.ts src/providers/discoveryProvider.test.ts src/components/FacetSidebar.test.tsx src/pages/SearchResultsPage.test.tsx src/pages/SourcesPage.test.tsx",
+      "started_at": "2026-09-11T18:54:16.754Z",
+      "completed_at": "2026-09-11T18:54:18.703Z",
+      "exit_code": 0,
+      "streams": "Full sanitized stdout and stderr are embedded in the referenced receipt."
+    },
+    {
+      "id": "cmd-correction-lexical-parity",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-lexical-parity.json",
+      "sha256": "cd463d2589e15aff7af8348c80bd0b1e37cb3e01c1c564a66199f1284d734993",
+      "bytes": 942,
+      "command": "node --test packages/retrieval/tests/lexical-index.test.mjs",
+      "started_at": "2026-09-11T18:54:18.705Z",
+      "completed_at": "2026-09-11T18:54:19.198Z",
+      "exit_code": 0,
+      "streams": "Full sanitized stdout and stderr are embedded in the referenced receipt."
+    },
+    {
+      "id": "cmd-correction-direct-base-parity",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-direct-base-parity.json",
+      "sha256": "bfe688b817e3d21ed9667924a0b926282b7155823fdf83cdce26f223c9552485",
+      "bytes": 1468,
+      "command": "node --test tests/direct-base-regression.test.mjs",
+      "started_at": "2026-09-11T18:54:19.199Z",
+      "completed_at": "2026-09-11T18:54:19.411Z",
+      "exit_code": 0,
+      "streams": "Full sanitized stdout and stderr are embedded in the referenced receipt."
+    },
+    {
+      "id": "cmd-correction-isolation",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-isolation.json",
+      "sha256": "3babc4c21a01941a895aa51feab870305649cee0b952894657a8b76c665348c1",
+      "bytes": 1106,
+      "command": "node --test tests/research-program/isolation-and-facets.test.mjs",
+      "started_at": "2026-09-11T18:54:19.412Z",
+      "completed_at": "2026-09-11T18:54:20.999Z",
+      "exit_code": 0,
+      "streams": "Full sanitized stdout and stderr are embedded in the referenced receipt."
+    },
+    {
+      "id": "cmd-correction-web-full",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-web-full.json",
+      "sha256": "6950a524b0d16bdbf2bc71bd2933641dfcf939c91d9b91f52b2dc0b5ba5e97fb",
+      "bytes": 1040,
+      "command": "npm run test:web",
+      "started_at": "2026-09-11T18:54:21.000Z",
+      "completed_at": "2026-09-11T18:54:23.641Z",
+      "exit_code": 0,
+      "streams": "Full sanitized stdout and stderr are embedded in the referenced receipt."
+    },
+    {
+      "id": "cmd-correction-retrieval-full",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-retrieval-full.json",
+      "sha256": "246f57d5b8a229b4b9f417932f7b6cc3529cab0a9bf846c102bd434a296f766c",
+      "bytes": 9878,
+      "command": "npm run test:retrieval",
+      "started_at": "2026-09-11T18:54:23.642Z",
+      "completed_at": "2026-09-11T18:54:27.795Z",
+      "exit_code": 0,
+      "streams": "Full sanitized stdout and stderr are embedded in the referenced receipt."
+    }
+  ],
+  "retained_original_review": {
+    "review_head": "5d8a8dd6d2e9d60d5b18fa1f69a09533c7e0d9e9",
+    "review_tree": "d5cb2e16c62dcab2ed1267a6072cea96dcd5276d",
+    "ui_receipt": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr006-controller-review-5d8a8dd/ui/receipt.json",
+      "sha256": "44caa37ba7063ad8835d45a04fbc3afd180dc880c242bd20f25002f53c4b2ba6",
+      "bytes": 2104,
+      "passed": 8,
+      "failed": 2,
+      "failures": [
+        "canonical-capability-values-are-not-normalized-together",
+        "canonical-unit-values-are-not-normalized-together"
+      ]
+    },
+    "browser_extended_receipt": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr006-controller-browser-extended-5d8a8dd/receipt.json",
+      "sha256": "53e38039fadf20ebe73752da439dd669ee03390aebb2d1680d4b25a1cc16af72",
+      "bytes": 6899,
+      "passed": 8,
+      "failed": 4,
+      "failures": [
+        "api: mobile 390 selected filters remain usable with unique description references",
+        "api: mobile 320 selected filters remain usable with unique description references",
+        "fixture: mobile 390 selected filters remain usable with unique description references",
+        "fixture: mobile 320 selected filters remain usable with unique description references"
+      ]
+    },
+    "preservation": "The original review receipts and screenshots remain external retained evidence; this correction does not rewrite them. Root must replay the corrected controller harness against this final head."
+  },
+  "scope": {
+    "frozen_unchanged": [
+      "packages/retrieval/schemas/discovery-result.schema.json",
+      "apps/web/src/types/discovery.ts",
+      "tests/fixtures/direct-base-control.mjs",
+      "packages/retrieval/fixtures/retrieval-core-before-lexical-index.txt",
+      "historical manifests, fingerprints and source capture bytes"
+    ],
+    "response_fields_added": false,
+    "retrieval_core_label_changes": "No additional retrieval-core edits in this correction; original C0063 label-only boundary is preserved.",
+    "network_or_holdout_work": false
+  },
+  "limitations": [
+    "Fixture counts are bounded to accepted response records after local filtering and are not live catalog totals.",
+    "Legacy browser token adaptation is deliberately isolated from canonical API matching; a future public compatibility contract would require a named successor rather than a frozen-schema edit.",
+    "The producer did not claim browser/participant qualification, live publisher payload access, private holdout access, deployment or scientific acceptance."
+  ]
+}

@@ -1,4 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
+// @ts-expect-error The native retrieval helper is intentionally JavaScript-only; this test compares its emitted contract.
+import { createRetrievalEngine } from '../../../../packages/retrieval/tools/retrieval-core-v1.2.mjs'
+import controlledVocabulary from '../../../../packages/retrieval/fixtures/controlled-vocabulary.json'
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
 import {
   ApiDiscoveryProvider,
@@ -26,6 +29,119 @@ describe('DiscoveryProvider contract', () => {
     await expect(provider.discover({ question: 'A different supported-length question' })).rejects.toMatchObject({
       code: 'fixture_query_unavailable',
     })
+  })
+
+  it('applies canonical fixture filters with OR within a dimension and AND across dimensions', async () => {
+    const provider = new FixtureDiscoveryProvider(loadAcceptedDiscoveryFixture, 'accepted')
+    const pennsylvania = await provider.browse({ traversal: { filters: ['geography:US-PA'] } })
+    expect(pennsylvania.results.length).toBeGreaterThan(0)
+    expect(pennsylvania.results.every((result) => result.record.geography.jurisdictions.includes('US-PA'))).toBe(true)
+    if (pennsylvania.pagination) expect(pennsylvania.pagination.total_matches).toBe(pennsylvania.results.length)
+    expect(pennsylvania.facets?.sections.find((section) => section.id === 'geography')?.options.find((option) => option.value === 'unknown')).toBeUndefined()
+
+    const mixed = await provider.browse({ traversal: { filters: ['geography:US-PA', 'geography:US'] } })
+    expect(mixed.results.length).toBeGreaterThanOrEqual(pennsylvania.results.length)
+    expect(mixed.results.every((result) => ['US-PA', 'US'].some((value) => result.record.geography.jurisdictions.includes(value)))).toBe(true)
+
+    const crossDimension = await provider.browse({ traversal: { filters: ['geography:US-PA', 'access_status:public_direct'] } })
+    expect(crossDimension.results.length).toBeLessThan(pennsylvania.results.length)
+    expect(crossDimension.results.every((result) => result.record.geography.jurisdictions.includes('US-PA'))).toBe(true)
+    expect(crossDimension.results.every((result) => result.record.access.status === 'public_direct')).toBe(true)
+  })
+
+  it('keeps canonical facet IDs exact when filtering an engine response locally', async () => {
+    const record = structuredClone(acceptedResponse.results[0].record)
+    record.record_id = 'fixture:canonical:exact'
+    record.identity.asset.asset_id = record.record_id
+    record.identity.asset.name = record.title = 'Canonical exact filter record'
+    record.description = 'Synthetic canonical filter record for provider parity.'
+    record.identity.source = { source_id: 'fixture:canonical-source', name: 'Canonical source' }
+    record.geography.coverage_level = 'state'
+    record.geography.jurisdictions = ['US-PA']
+    record.access.status = 'public_catalog'
+    record.unit_of_analysis = ['facility_period']
+    record.capabilities.topics = [{ ...record.capabilities.topics[0], id: 'topic:claims', label: 'Claims' }]
+    record.capabilities.use_cases = []
+    const engine = createRetrievalEngine({
+      records: [record],
+      searchDocuments: null,
+      vocabulary: controlledVocabulary,
+      joinRoutes: [],
+      namedSourceRegistry: { sources: [] },
+      corpus: { corpus_id: 'pr006-provider-filter-parity', corpus_version: '1.0.0', record_count: 1, join_route_count: 0, generation: 'pr006-provider-filter-generation' },
+      catalogValidation: { valid: [record], invalid: [] },
+    })
+    const unfiltered = engine.browse({ page_size: 10 })
+    const provider = new FixtureDiscoveryProvider(() => unfiltered)
+
+    const exactSource = await provider.browse({ traversal: { filters: ['source:fixture:canonical-source'] } })
+    const engineSource = engine.browse({ page_size: 10, facet_filters: { source: ['fixture:canonical-source'] } })
+    expect(exactSource.results.map((result: { record_id: string }) => result.record_id)).toEqual(engineSource.results.map((result: { record_id: string }) => result.record_id))
+    expect(exactSource.total_matches).toBe(engineSource.total_matches)
+    expect(exactSource.facets?.sections.find((section) => section.id === 'source')?.options.find((option) => option.value === 'fixture:canonical-source')?.count).toBe(1)
+    const nearSource = await provider.browse({ traversal: { filters: ['source:fixture:canonical-source-near'] } })
+    const engineNearSource = engine.browse({ page_size: 10, facet_filters: { source: ['fixture:canonical-source-near'] } })
+    expect(nearSource.results.map((result: { record_id: string }) => result.record_id)).toEqual(engineNearSource.results.map((result: { record_id: string }) => result.record_id))
+    expect(nearSource.results).toHaveLength(0)
+
+    const exactGeography = await provider.browse({ traversal: { filters: ['geography:US-PA'] } })
+    const engineGeography = engine.browse({ page_size: 10, facet_filters: { geography: ['US-PA'] } })
+    expect(exactGeography.results.map((result: { record_id: string }) => result.record_id)).toEqual(engineGeography.results.map((result: { record_id: string }) => result.record_id))
+    expect(exactGeography.total_matches).toBe(engineGeography.total_matches)
+    expect(exactGeography.facets?.sections.find((section) => section.id === 'geography')?.options.find((option) => option.value === 'US-PA')?.count).toBe(1)
+    const legacyGeography = await provider.browse({ traversal: { filters: ['geography:pennsylvania'] } })
+    expect(legacyGeography.results.map((result: { record_id: string }) => result.record_id)).toEqual(exactGeography.results.map((result: { record_id: string }) => result.record_id))
+    const nearGeography = await provider.browse({ traversal: { filters: ['geography:US-PA-near'] } })
+    const engineNearGeography = engine.browse({ page_size: 10, facet_filters: { geography: ['US-PA-near'] } })
+    expect(nearGeography.results.map((result: { record_id: string }) => result.record_id)).toEqual(engineNearGeography.results.map((result: { record_id: string }) => result.record_id))
+    expect(nearGeography.results).toHaveLength(0)
+
+    const exactAccess = await provider.browse({ traversal: { filters: ['access_status:public_catalog'] } })
+    const engineAccess = engine.browse({ page_size: 10, facet_filters: { access_status: ['public_catalog'] } })
+    expect(exactAccess.results.map((result: { record_id: string }) => result.record_id)).toEqual(engineAccess.results.map((result: { record_id: string }) => result.record_id))
+    expect(exactAccess.total_matches).toBe(engineAccess.total_matches)
+    expect(exactAccess.facets?.sections.find((section) => section.id === 'access_status')?.options.find((option) => option.value === 'public_catalog')?.count).toBe(1)
+    const legacyAccess = await provider.browse({ traversal: { filters: ['access:catalog-metadata-only'] } })
+    expect(legacyAccess.results.map((result: { record_id: string }) => result.record_id)).toEqual(exactAccess.results.map((result: { record_id: string }) => result.record_id))
+    const nearAccess = await provider.browse({ traversal: { filters: ['access_status:public_catalog-near'] } })
+    const engineNearAccess = engine.browse({ page_size: 10, facet_filters: { access_status: ['public_catalog-near'] } })
+    expect(nearAccess.results.map((result: { record_id: string }) => result.record_id)).toEqual(engineNearAccess.results.map((result: { record_id: string }) => result.record_id))
+    expect(nearAccess.results).toHaveLength(0)
+
+    const exactCapability = await provider.browse({ traversal: { filters: ['capability:topic:claims'] } })
+    const engineCapability = engine.browse({ page_size: 10, facet_filters: { capability: ['topic:claims'] } })
+    expect(exactCapability.results.map((result: { record_id: string }) => result.record_id)).toEqual(engineCapability.results.map((result: { record_id: string }) => result.record_id))
+    expect(exactCapability.total_matches).toBe(engineCapability.total_matches)
+    expect(exactCapability.facets?.sections.find((section) => section.id === 'capability')?.options.find((option) => option.value === 'topic:claims')?.count).toBe(1)
+
+    const nearCapability = await provider.browse({ traversal: { filters: ['capability:topic-claims'] } })
+    const engineNearCapability = engine.browse({ page_size: 10, facet_filters: { capability: ['topic-claims'] } })
+    expect(nearCapability.results.map((result: { record_id: string }) => result.record_id)).toEqual(engineNearCapability.results.map((result: { record_id: string }) => result.record_id))
+    expect(nearCapability.results).toHaveLength(0)
+    expect(nearCapability.facets?.sections.find((section) => section.id === 'capability')).toBeUndefined()
+
+    const exactUnit = await provider.browse({ traversal: { filters: ['unit_of_analysis:facility_period'] } })
+    const engineUnit = engine.browse({ page_size: 10, facet_filters: { unit_of_analysis: ['facility_period'] } })
+    expect(exactUnit.results.map((result: { record_id: string }) => result.record_id)).toEqual(engineUnit.results.map((result: { record_id: string }) => result.record_id))
+    expect(exactUnit.total_matches).toBe(1)
+    expect(exactUnit.facets?.sections.find((section) => section.id === 'unit_of_analysis')?.options.find((option) => option.value === 'facility_period')?.count).toBe(1)
+
+    const nearUnit = await provider.browse({ traversal: { filters: ['unit_of_analysis:facility-period'] } })
+    const engineNearUnit = engine.browse({ page_size: 10, facet_filters: { unit_of_analysis: ['facility-period'] } })
+    expect(nearUnit.results.map((result: { record_id: string }) => result.record_id)).toEqual(engineNearUnit.results.map((result: { record_id: string }) => result.record_id))
+    expect(nearUnit.results).toHaveLength(0)
+    expect(nearUnit.facets?.sections.find((section) => section.id === 'unit_of_analysis')).toBeUndefined()
+  })
+
+  it('retains a selected filter through a fixture zero-result roundtrip', async () => {
+    const provider = new FixtureDiscoveryProvider(loadAcceptedDiscoveryFixture, 'accepted')
+    const response = await provider.browse({ traversal: { filters: ['geography:unknown'] } })
+    expect(response.results).toHaveLength(0)
+    expect(response.result_count).toBe(0)
+    expect(response.total_matches).toBe(0)
+    if (response.pagination) expect(response.pagination.total_matches).toBe(0)
+    if (response.facets) expect(response.facets.sections.every((section) => section.options.length === 0)).toBe(true)
+    expect(response.query.filters.facet_filters).toEqual({ geography: ['unknown'] })
   })
 
   it('posts the canonical query and validates the API response boundary', async () => {
