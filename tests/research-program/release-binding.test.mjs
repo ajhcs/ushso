@@ -18,6 +18,7 @@ import {
   nativeIdentifierConformsToCore,
   projectCoreReleaseDecision,
 } from "../../packages/identity/src/index.mjs";
+import { fingerprintTruthRevision } from "../../contracts/core/v2.0.0/tools/common.mjs";
 import { createStaticPublicationReadContext } from "../../packages/registry/publication-read-context.mjs";
 import { lookupMappedProductContext } from "../../packages/registry/generation-identity.mjs";
 import { resolveReleaseDistributions } from "../../packages/registry/release-catalog.mjs";
@@ -705,13 +706,14 @@ test("C-007-1 reuses core v2 native-identifier contracts without fabricating unr
   assert.equal(projectedExactWithoutEnvelope.core_object, null);
   assert.ok(projectedExactWithoutEnvelope.reason_codes.includes("exact_identity_without_core_envelope_is_not_fabricated"));
 
-  const projectedExact = projectCoreReleaseDecision(identity, {
-    envelope: { ...coreRelease, release_id: identity.release_id, entity_id: identity.release_id },
-  });
+  const exactEnvelope = { ...coreRelease, release_id: identity.release_id, entity_id: identity.release_id };
+  exactEnvelope.canonical_content_fingerprint = fingerprintTruthRevision(exactEnvelope);
+  const projectedExact = projectCoreReleaseDecision(identity, { envelope: exactEnvelope });
   assert.equal(projectedExact.projected, true);
   assert.equal(projectedExact.core_object.entity_type, "Release");
   assert.equal(projectedExact.core_object.contract_version, "observatory-core.v2.0.0");
   assert.equal(projectedExact.core_object.release_id, identity.release_id);
+  assert.equal(projectedExact.core_object.canonical_content_fingerprint, fingerprintTruthRevision(projectedExact.core_object));
 });
 
 test("R007-2 unsupported pins, foreign bindings, and stale publications restart", () => {
@@ -831,6 +833,7 @@ async function frozenCoreReleaseControl() {
     observed_at: OBSERVED_AT,
   });
   const envelope = { ...structuredClone(coreRelease), release_id: identity.release_id, entity_id: identity.release_id };
+  envelope.canonical_content_fingerprint = fingerprintTruthRevision(envelope);
   return { bundle, coreRelease, coreNative, identity, envelope };
 }
 
@@ -923,4 +926,114 @@ test("R007-8 Unicode native identifiers stay distinct and preserve exact values"
   assert.match(a.release_id, /^urn:ushso:release:/);
   assert.match(b.release_id, /^urn:ushso:release:/);
   assert.equal(a.release_id.includes("~1F600") && b.release_id.includes("~1F600") && a.release_id === b.release_id, false);
+});
+
+test("R007-9 a changed revision cannot retain a stale canonical fingerprint", async () => {
+  const { identity, envelope } = await frozenCoreReleaseControl();
+  const valid = projectCoreReleaseDecision(identity, { envelope });
+  assert.equal(valid.projected, true);
+  assert.equal(valid.core_object.canonical_content_fingerprint, fingerprintTruthRevision(valid.core_object));
+  assert.equal(valid.core_object.canonical_content_fingerprint, envelope.canonical_content_fingerprint);
+
+  const stale = { ...envelope, publisher_version: `${envelope.publisher_version}-changed` };
+  assert.notEqual(stale.canonical_content_fingerprint, fingerprintTruthRevision(stale));
+  const rejected = projectCoreReleaseDecision(identity, { envelope: stale });
+  assert.equal(rejected.projected, false);
+  assert.equal(rejected.core_object, null);
+  assert.ok(rejected.reason_codes.includes("core_content_fingerprint_mismatch"));
+  assert.equal(rejected.envelope_canonical_content_fingerprint, stale.canonical_content_fingerprint);
+  assert.equal(rejected.actual_canonical_content_fingerprint, fingerprintTruthRevision(stale));
+});
+
+test("R007-10 nested release relationships must be coherent before product context", () => {
+  const map = live20260903GenerationMap();
+  const binding = bindCapturedCatalogRecord({
+    record: captures.cms_record,
+    catalogCapture: captures.cms_catalog,
+    resourcesCapture: captures.cms_resources,
+  });
+  assert.equal(binding.binding_state, "one_to_many");
+  assert.equal(binding.release_identity.asset_id, binding.asset_id);
+  assert.equal(binding.release_identity.source_id, binding.source_id);
+  assert.ok(binding.distributions.length > 1);
+  assert.ok(binding.distributions.every((item) => item.release_id === binding.release_identity.release_id));
+  const lookup = (nextBinding) => lookupProductContext({
+    map,
+    record: captures.cms_record,
+    pin: map.machine_generation.value,
+    binding: nextBinding,
+  });
+
+  const control = lookup(binding);
+  assert.equal(control.restart_required, false);
+  assert.equal(control.release_id, binding.release_identity.release_id);
+  assert.equal(control.distribution_ids.length, binding.distributions.filter((item) => item.distribution_id).length);
+
+  const foreignDistribution = structuredClone(binding);
+  foreignDistribution.distributions[0].release_id = "urn:ushso:release:controller-foreign";
+  const foreignDistributionLookup = lookup(foreignDistribution);
+  assert.equal(foreignDistributionLookup.restart_required, true);
+  assert.equal(foreignDistributionLookup.code, "binding_ownership_mismatch");
+  assert.equal(foreignDistributionLookup.release_id == null || foreignDistributionLookup.release_id === binding.release_identity.release_id, true);
+
+  const foreignNestedAsset = structuredClone(binding);
+  foreignNestedAsset.release_identity.asset_id = "obs:asset:controller-foreign";
+  const foreignNestedAssetLookup = lookup(foreignNestedAsset);
+  assert.equal(foreignNestedAssetLookup.restart_required, true);
+  assert.equal(foreignNestedAssetLookup.code, "binding_ownership_mismatch");
+
+  const foreignNestedSource = structuredClone(binding);
+  foreignNestedSource.release_identity.source_id = "urn:ushso:source:controller-foreign";
+  const foreignNestedSourceLookup = lookup(foreignNestedSource);
+  assert.equal(foreignNestedSourceLookup.restart_required, true);
+  assert.equal(foreignNestedSourceLookup.code, "binding_ownership_mismatch");
+
+  const foreignNestedReleaseId = structuredClone(binding);
+  foreignNestedReleaseId.release_identity.release_id = "urn:ushso:release:controller-foreign";
+  const foreignNestedReleaseIdLookup = lookup(foreignNestedReleaseId);
+  assert.equal(foreignNestedReleaseIdLookup.restart_required, true);
+  assert.equal(foreignNestedReleaseIdLookup.code, "binding_ownership_mismatch");
+
+  const foreignList = structuredClone(binding);
+  foreignList.releases[0] = "urn:ushso:release:controller-foreign";
+  const foreignListLookup = lookup(foreignList);
+  assert.equal(foreignListLookup.restart_required, true);
+  assert.equal(foreignListLookup.code, "binding_ownership_mismatch");
+  assert.notEqual(foreignListLookup.release_id, "urn:ushso:release:controller-foreign");
+
+  const rolling = bindCapturedCatalogRecord({
+    record: captures.cdc_record,
+    catalogCapture: captures.cdc_catalog,
+    observedAt: captures.observed_at,
+  });
+  assert.equal(rolling.binding_state, "rolling");
+  const rollingLookup = lookupProductContext({
+    map,
+    record: captures.cdc_record,
+    pin: map.machine_generation.value,
+    binding: rolling,
+  });
+  assert.equal(rollingLookup.restart_required, false);
+  assert.equal(rollingLookup.release_id, null);
+  assert.equal(rollingLookup.asset_id, captures.cdc_record.record_id);
+
+  const unresolved = bindCapturedCatalogRecord({
+    record: captures.cms_record,
+    catalogCapture: null,
+    observedAt: captures.observed_at,
+  });
+  assert.equal(unresolved.binding_state, "unresolved");
+  const unresolvedLookup = lookup(unresolved);
+  assert.equal(unresolvedLookup.restart_required, false);
+  assert.equal(unresolvedLookup.release_id, null);
+  assert.deepEqual(unresolvedLookup.distribution_ids, []);
+
+  const nullBinding = lookupProductContext({
+    map,
+    record: captures.cms_record,
+    pin: map.machine_generation.value,
+    binding: null,
+  });
+  assert.equal(nullBinding.restart_required, false);
+  assert.equal(nullBinding.release_id, null);
 });

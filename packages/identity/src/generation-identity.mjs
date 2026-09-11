@@ -183,6 +183,15 @@ function normalizeSourceId(value) {
   return value.startsWith("urn:ushso:source:") ? value : `urn:ushso:source:${value}`;
 }
 
+function nonEmptyId(value) {
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+function contextReleaseId(binding) {
+  if (!binding) return null;
+  return nonEmptyId(binding.release_identity?.release_id) ?? nonEmptyId(binding.releases?.[0]) ?? null;
+}
+
 function productContext({ map, record, binding = null }) {
   const assetId = record.record_id ?? record.identity?.asset?.asset_id;
   const sourceId = record.identity?.source?.source_id ?? record.source_id;
@@ -196,7 +205,7 @@ function productContext({ map, record, binding = null }) {
     asset_id: assetId,
     source_id: sourceId,
     source_native_id: sourceNativeId,
-    release_id: binding?.releases?.[0] ?? null,
+    release_id: contextReleaseId(binding),
     distribution_ids: (binding?.distributions ?? []).map((item) => item.distribution_id).filter(Boolean),
   };
   context.product_context_fingerprint = sha256({
@@ -213,27 +222,99 @@ function productContext({ map, record, binding = null }) {
   return deepFreeze(context);
 }
 
+function ownershipMismatch(expected, observed, detail) {
+  return restartGuidance({
+    code: "binding_ownership_mismatch",
+    expected,
+    observed,
+    detail,
+  });
+}
+
+function suppliedReleaseIds(binding) {
+  return {
+    nested: nonEmptyId(binding.release_identity?.release_id),
+    listed: (binding.releases ?? []).map(nonEmptyId).filter(Boolean),
+    associated: (binding.distributions ?? []).map((item) => nonEmptyId(item?.release_id)).filter(Boolean),
+  };
+}
+
 function bindingOwnershipRestart(record, binding) {
   if (!binding) return null;
   const assetId = record.record_id ?? record.identity?.asset?.asset_id ?? null;
   const sourceId = normalizeSourceId(record.identity?.source?.source_id ?? record.source_id);
-  const bindingAsset = binding.asset_id ?? null;
+  const bindingAsset = nonEmptyId(binding.asset_id);
   const bindingSource = normalizeSourceId(binding.source_id);
+  const nestedAsset = nonEmptyId(binding.release_identity?.asset_id);
+  const nestedSource = normalizeSourceId(binding.release_identity?.source_id);
+
   if (bindingAsset && assetId && bindingAsset !== assetId) {
-    return restartGuidance({
-      code: "binding_ownership_mismatch",
-      expected: assetId,
-      observed: bindingAsset,
-      detail: "A foreign asset binding cannot be attached to the requested product.",
-    });
+    return ownershipMismatch(assetId, bindingAsset, "A foreign asset binding cannot be attached to the requested product.");
   }
   if (bindingSource && sourceId && bindingSource !== sourceId) {
-    return restartGuidance({
-      code: "binding_ownership_mismatch",
-      expected: sourceId,
-      observed: bindingSource,
-      detail: "A foreign source binding cannot be attached to the requested product.",
-    });
+    return ownershipMismatch(sourceId, bindingSource, "A foreign source binding cannot be attached to the requested product.");
+  }
+  if (nestedAsset && assetId && nestedAsset !== assetId) {
+    return ownershipMismatch(assetId, nestedAsset, "A nested release belonging to another asset cannot be presented under the requested product.");
+  }
+  if (nestedAsset && bindingAsset && nestedAsset !== bindingAsset) {
+    return ownershipMismatch(bindingAsset, nestedAsset, "A nested release belonging to another asset cannot be presented under the enclosing binding asset.");
+  }
+  if (nestedSource && sourceId && nestedSource !== sourceId) {
+    return ownershipMismatch(sourceId, nestedSource, "A nested release belonging to another source cannot be presented under the requested product.");
+  }
+  if (nestedSource && bindingSource && nestedSource !== bindingSource) {
+    return ownershipMismatch(bindingSource, nestedSource, "A nested release belonging to another source cannot be presented under the enclosing binding source.");
+  }
+
+  const { nested, listed, associated } = suppliedReleaseIds(binding);
+  if (nested) {
+    const foreignListed = listed.find((id) => id !== nested);
+    if (listed.length === 0 || foreignListed) {
+      return ownershipMismatch(
+        nested,
+        foreignListed ?? null,
+        "An enclosing release list must own the nested release and cannot introduce a foreign release into product context.",
+      );
+    }
+    const foreignAssociated = associated.find((id) => id !== nested);
+    if (foreignAssociated) {
+      return ownershipMismatch(
+        nested,
+        foreignAssociated,
+        "A distribution whose release association does not belong to the nested release cannot be attached to the current product context.",
+      );
+    }
+    return null;
+  }
+
+  const uniqueListed = [...new Set(listed)];
+  if (uniqueListed.length > 1) {
+    return ownershipMismatch(
+      uniqueListed[0],
+      uniqueListed[1],
+      "Inconsistent enclosing release IDs cannot be silently selected as the current product context.",
+    );
+  }
+  if (uniqueListed.length === 1) {
+    const foreignAssociated = associated.find((id) => id !== uniqueListed[0]);
+    if (foreignAssociated) {
+      return ownershipMismatch(
+        uniqueListed[0],
+        foreignAssociated,
+        "A distribution whose release association is not in the enclosing release list cannot be attached to the current product context.",
+      );
+    }
+    return null;
+  }
+
+  const uniqueAssociated = [...new Set(associated)];
+  if (uniqueAssociated.length > 0) {
+    return ownershipMismatch(
+      null,
+      uniqueAssociated[0],
+      "A distribution cannot supply an exact release ID when the nested release and enclosing list remain unresolved.",
+    );
   }
   return null;
 }

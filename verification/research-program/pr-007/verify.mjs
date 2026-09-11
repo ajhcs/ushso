@@ -12,6 +12,7 @@ import {
   nativeIdentifierConformsToCore,
   projectCoreReleaseDecision,
 } from "../../../packages/identity/src/index.mjs";
+import { fingerprintTruthRevision } from "../../../contracts/core/v2.0.0/tools/common.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 
@@ -99,9 +100,18 @@ const coreIdentity = mintReleaseIdentity({
   observed_at: captures.observed_at,
 });
 const coreEnvelope = { ...structuredClone(coreRelease), release_id: coreIdentity.release_id, entity_id: coreIdentity.release_id };
+coreEnvelope.canonical_content_fingerprint = fingerprintTruthRevision(coreEnvelope);
 const projectedValid = projectCoreReleaseDecision(coreIdentity, { envelope: coreEnvelope });
 if (projectedValid.projected !== true || projectedValid.core_object?.release_id !== coreIdentity.release_id) {
   fail("valid_core_control_not_projected", JSON.stringify(projectedValid.reason_codes));
+}
+if (projectedValid.core_object.canonical_content_fingerprint !== fingerprintTruthRevision(projectedValid.core_object)) {
+  fail("valid_core_control_stale_fingerprint", projectedValid.core_object.canonical_content_fingerprint);
+}
+const staleEnvelope = { ...coreEnvelope, publisher_version: `${coreEnvelope.publisher_version}-changed` };
+const projectedStale = projectCoreReleaseDecision(coreIdentity, { envelope: staleEnvelope });
+if (projectedStale.projected !== false || !projectedStale.reason_codes.includes("core_content_fingerprint_mismatch")) {
+  fail("stale_core_fingerprint_projected", JSON.stringify(projectedStale));
 }
 const projectedForeignAsset = projectCoreReleaseDecision(coreIdentity, { envelope: { ...coreEnvelope, asset_id: "urn:ushso:asset:foreign" } });
 if (projectedForeignAsset.projected !== false) fail("foreign_asset_projected", "foreign asset_id projected as this release");
@@ -137,6 +147,50 @@ const unicodeB = mintReleaseIdentity({
 if (unicodeA.release_id === unicodeB.release_id) fail("unicode_identifier_collision", "U+1F600 and U+1F60+ASCII 0 minted the same release ID");
 if (unicodeA.publisher_identifiers[0].value !== String.fromCodePoint(0x1f600)) fail("unicode_value_rewritten", "exact native value was not preserved");
 
+function lookupBinding(nextBinding) {
+  return lookupProductContext({
+    map,
+    record: captures.cms_record,
+    pin: CURRENT_LIVE_GENERATION,
+    pin_kind: "publication_generation_label",
+    binding: nextBinding,
+  });
+}
+if (lookupBinding(binding).restart_required) fail("valid_captured_binding_restarted", JSON.stringify(lookupBinding(binding)));
+const foreignDistribution = structuredClone(binding);
+foreignDistribution.distributions[0].release_id = "urn:ushso:release:controller-foreign";
+if (!lookupBinding(foreignDistribution).restart_required) fail("foreign_distribution_release_accepted", JSON.stringify(lookupBinding(foreignDistribution)));
+const foreignNestedAsset = structuredClone(binding);
+foreignNestedAsset.release_identity.asset_id = "obs:asset:controller-foreign";
+if (!lookupBinding(foreignNestedAsset).restart_required) fail("foreign_nested_release_asset_accepted", JSON.stringify(lookupBinding(foreignNestedAsset)));
+const foreignNestedSource = structuredClone(binding);
+foreignNestedSource.release_identity.source_id = "urn:ushso:source:controller-foreign";
+if (!lookupBinding(foreignNestedSource).restart_required) fail("foreign_nested_release_source_accepted", JSON.stringify(lookupBinding(foreignNestedSource)));
+const foreignNestedRelease = structuredClone(binding);
+foreignNestedRelease.release_identity.release_id = "urn:ushso:release:controller-foreign";
+if (!lookupBinding(foreignNestedRelease).restart_required) fail("foreign_nested_release_id_accepted", JSON.stringify(lookupBinding(foreignNestedRelease)));
+const foreignReleaseList = structuredClone(binding);
+foreignReleaseList.releases[0] = "urn:ushso:release:controller-foreign";
+const foreignReleaseListLookup = lookupBinding(foreignReleaseList);
+if (!foreignReleaseListLookup.restart_required || foreignReleaseListLookup.release_id === "urn:ushso:release:controller-foreign") {
+  fail("foreign_release_list_selected", JSON.stringify(foreignReleaseListLookup));
+}
+const rollingBinding = bindCapturedCatalogRecord({
+  record: captures.cdc_record,
+  catalogCapture: captures.cdc_catalog,
+  observedAt: captures.observed_at,
+});
+const rollingLookup = lookupProductContext({
+  map,
+  record: captures.cdc_record,
+  pin: CURRENT_LIVE_GENERATION,
+  pin_kind: "publication_generation_label",
+  binding: rollingBinding,
+});
+if (rollingLookup.restart_required || rollingLookup.release_id != null) fail("rolling_binding_fabricated_release", JSON.stringify(rollingLookup));
+const unresolvedLookup = lookupBinding(urlOnly);
+if (unresolvedLookup.restart_required || unresolvedLookup.release_id != null) fail("unresolved_binding_fabricated_release", JSON.stringify(unresolvedLookup));
+
 const report = {
   ok: true,
   generation: CURRENT_LIVE_GENERATION,
@@ -156,5 +210,13 @@ const report = {
   incomplete_envelope_projected: projectedIncomplete.projected,
   invalid_native_date_accepted: nativeIdentifierConformsToCore({ ...coreNative, effective_from: "invalid-date" }),
   unicode_release_ids_distinct: unicodeA.release_id !== unicodeB.release_id,
+  stale_core_fingerprint_projected: projectedStale.projected,
+  foreign_distribution_release_restart: lookupBinding(foreignDistribution).restart_required,
+  foreign_nested_release_asset_restart: lookupBinding(foreignNestedAsset).restart_required,
+  foreign_nested_release_source_restart: lookupBinding(foreignNestedSource).restart_required,
+  foreign_nested_release_id_restart: lookupBinding(foreignNestedRelease).restart_required,
+  foreign_release_list_restart: foreignReleaseListLookup.restart_required,
+  rolling_binding_release_id: rollingLookup.release_id,
+  unresolved_binding_release_id: unresolvedLookup.release_id,
 };
 process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);

@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
+import { fingerprintTruthRevision } from "../../../contracts/core/v2.0.0/tools/common.mjs";
 import { clone, deepFreeze, uniqueSorted } from "./common.mjs";
 
 export const CORE_CONTRACT_VERSION = "observatory-core.v2.0.0";
@@ -106,12 +107,32 @@ function notProjected(identity, reasonCodes, extra = {}) {
   });
 }
 
+function envelopeFingerprintReason(envelope) {
+  try {
+    const actual = fingerprintTruthRevision(envelope);
+    if (envelope.canonical_content_fingerprint !== actual) {
+      return {
+        reason_codes: ["core_content_fingerprint_mismatch"],
+        extra: {
+          envelope_canonical_content_fingerprint: envelope.canonical_content_fingerprint ?? null,
+          actual_canonical_content_fingerprint: actual,
+        },
+      };
+    }
+    return { reason_codes: [], extra: {} };
+  } catch {
+    return { reason_codes: ["incomplete_or_invalid_core_envelope"], extra: {} };
+  }
+}
+
 /**
  * Exact identity may cite core native identifiers. Unresolved, rolling, and
  * ambiguous identity decisions are not projected as fabricated core
  * Source/Release/Distribution objects. A supplied envelope is this release
- * only when frozen Release schema validation and release/entity/asset/source
- * ownership all bind. Provenance and fingerprints stay on the envelope.
+ * only when frozen Release schema validation, release/entity/asset/source
+ * ownership, and the frozen canonical content fingerprint all bind.
+ * Provenance and fingerprints stay on the envelope; a stale hash is a typed
+ * non-projection, not a silent rewrite.
  */
 export function projectCoreReleaseDecision(identity, { envelope = null } = {}) {
   const identityState = identity?.identity_state ?? "unresolved";
@@ -136,11 +157,13 @@ export function projectCoreReleaseDecision(identity, { envelope = null } = {}) {
   }
 
   const ownership = ownershipReasonCodes(identity, envelope);
-  if (ownership.length > 0) {
-    return notProjected(identity, ownership, {
+  const fingerprint = envelopeFingerprintReason(envelope);
+  if (ownership.length > 0 || fingerprint.reason_codes.length > 0) {
+    return notProjected(identity, [...ownership, ...fingerprint.reason_codes], {
       envelope_release_id: envelope.release_id ?? null,
       envelope_entity_id: envelope.entity_id ?? null,
       envelope_asset_id: envelope.asset_id ?? null,
+      ...fingerprint.extra,
     });
   }
 
