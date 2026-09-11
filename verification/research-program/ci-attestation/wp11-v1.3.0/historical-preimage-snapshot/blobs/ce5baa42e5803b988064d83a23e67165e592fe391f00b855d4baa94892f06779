@@ -1,0 +1,326 @@
+{
+  "schema_version": "observatory-live-verification.v1.0.0",
+  "receipt_id": "live-verification-2026-08-30-current-search-fixture",
+  "observed_at": "2026-08-30T13:47:55.7164695-04:00",
+  "scope": {
+    "retrieval_package": "observatory/retrieval/v1.1.0",
+    "response": "fixtures/responses/q-pa-hospital-finance-utilization.json",
+    "record_count": 15,
+    "boundary": "First-party metadata and locator verification only; no dataset payloads were downloaded."
+  },
+  "records": [
+    {
+      "record_id": "obs:asset:cms-hcris-hospital-cost-reports",
+      "authoritative_url": "https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "CMS publishes HCRIS cost reports for Medicare-certified institutional providers and describes facility characteristics, utilization, cost and charges, settlement, and financial statement data.",
+      "variable_documentation": {
+        "status": "partial",
+        "summary": "Provider-period reports cover facility identity and characteristics, utilization, cost-center costs and charges, Medicare settlement fields, and financial statement items.",
+        "variable_count": null,
+        "variables": [
+          {"name":"provider_identity","label":"Provider identity and characteristics","description":"Provider identifiers, facility type, ownership and other characteristics reported for the cost-reporting provider.","data_type":null,"unit":"provider-period","allowed_values":[]},
+          {"name":"utilization","label":"Utilization","description":"Facility activity and utilization measures reported for the cost-reporting period.","data_type":null,"unit":"provider-period","allowed_values":[]},
+          {"name":"costs_and_charges","label":"Costs and charges","description":"Cost-center and total cost/charge fields, including Medicare-specific amounts where applicable.","data_type":null,"unit":"US dollars","allowed_values":[]},
+          {"name":"settlement_and_financials","label":"Settlement and financial statements","description":"Medicare settlement data and financial statement items; these are provider reports, not consolidated health-system statements.","data_type":null,"unit":"US dollars","allowed_values":[]}
+        ],
+        "codebook": {"title":"CMS HCRIS Cost Reports","url":"https://www.cms.gov/data-research/statistics-trends-and-reports/cost-reports"},
+        "limitations": ["The live check verified source metadata, not every downloadable report file or value."]
+      }
+    },
+    {
+      "record_id": "obs:asset:pa-phc4-custom-data",
+      "authoritative_url": "https://www.phc4.org/request-custom-data/",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "PHC4 offers standard or custom record-level and aggregate inpatient, ambulatory/outpatient, and financial data through an application, quote, payment, and controlled-transfer workflow.",
+      "variable_documentation": {
+        "status": "partial",
+        "summary": "The exact variables depend on the approved request. The source distinguishes inpatient, ambulatory/outpatient and financial data; standard versus custom extracts; record-level datasets versus aggregate reports; and requested time periods.",
+        "variable_count": null,
+        "variables": [
+          {"name":"request_data_domain","label":"Requested data domain","description":"Inpatient, ambulatory/outpatient procedure, or financial data selected for the request.","data_type":"category","unit":null,"allowed_values":["inpatient","ambulatory/outpatient","financial"]},
+          {"name":"delivery_form","label":"Delivery form","description":"Whether the approved product is a record-level dataset or an aggregated report.","data_type":"category","unit":null,"allowed_values":["dataset","report"]},
+          {"name":"time_period","label":"Requested time period","description":"The period covered by the approved standard or custom extract.","data_type":"date range","unit":null,"allowed_values":[]}
+        ],
+        "codebook": {"title":"PHC4 Available Data","url":"https://www.phc4.org/request-custom-data/"},
+        "limitations": ["A final schema is not knowable until PHC4 approves and specifies the requested product."]
+      }
+    },
+    {
+      "record_id": "obs:asset:pa-phc4-public-financial-reports",
+      "authoritative_url": "https://www.phc4.org/report-focus/financial/",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "PHC4's live financial archive lists annual Pennsylvania hospital financial analyses, including fiscal-year 2025.",
+      "variable_documentation": {
+        "status": "partial",
+        "summary": "Published reports provide hospital and health-system financial-condition and utilization measures; the exact metric set varies by report year and publication.",
+        "variable_count": null,
+        "variables": [
+          {"name":"reporting_entity","label":"Hospital or health system","description":"The facility or system represented in the report table.","data_type":"text","unit":"organization","allowed_values":[]},
+          {"name":"fiscal_year","label":"Fiscal year","description":"The fiscal year to which the financial analysis applies.","data_type":"year","unit":"year","allowed_values":[]},
+          {"name":"financial_condition","label":"Financial condition measures","description":"Revenue, expense, margin and other financial-condition measures defined by each report.","data_type":"number","unit":"report-defined","allowed_values":[]}
+        ],
+        "codebook": {"title":"PHC4 Financial Reports","url":"https://www.phc4.org/report-focus/financial/"},
+        "limitations": ["Metric names and definitions must be read from the selected report; the archive page is not a unified record-level dataset."]
+      }
+    },
+    {
+      "record_id": "obs:asset:hrsa-uds-sites",
+      "authoritative_url": "https://data.hrsa.gov/topics/health-centers/uds",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "HRSA publishes annual UDS data for Health Center Program awardees and look-alikes, with national, state or territory, and downloadable data resources.",
+      "variable_documentation": {
+        "status": "partial",
+        "summary": "Annual UDS data describe health-center patients, services, staffing, costs and revenues, clinical and organizational measures, and site locations.",
+        "variable_count": null,
+        "variables": [
+          {"name":"patients_and_services","label":"Patients and services","description":"Annual patient demographics, service use and service-delivery measures.","data_type":"number","unit":"health center-year","allowed_values":[]},
+          {"name":"staffing","label":"Staffing","description":"Workforce counts and staffing measures reported by health-center organizations.","data_type":"number","unit":"health center-year","allowed_values":[]},
+          {"name":"costs_and_revenues","label":"Costs and revenues","description":"Annual financial measures for health-center awardees and look-alikes.","data_type":"number","unit":"US dollars","allowed_values":[]},
+          {"name":"clinical_measures","label":"Clinical quality measures","description":"Clinical performance and outcome measures defined in the annual UDS manual.","data_type":"number","unit":"measure-defined","allowed_values":[]}
+        ],
+        "codebook": {"title":"2025 UDS Manual and Data Resources","url":"https://data.hrsa.gov/topics/health-centers/uds"},
+        "limitations": ["Field definitions change by reporting year; use the matching annual UDS manual."]
+      }
+    },
+    {
+      "record_id": "obs:asset:irs-990-schedules-h-r",
+      "authoritative_url": "https://www.irs.gov/instructions/i990sh",
+      "additional_evidence_urls": ["https://www.irs.gov/instructions/i990sr"],
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "IRS Schedule H covers hospital facilities, community benefit, financial assistance and policies; Schedule R covers related organizations, control, ownership shares, income/assets, and transactions.",
+      "variable_documentation": {
+        "status": "documented",
+        "summary": "Schedule H is facility/community-benefit reporting; Schedule R is an organization-relationship and transaction schedule. Interpret each field at the filing-organization and tax-year perimeter.",
+        "variable_count": null,
+        "variables": [
+          {"name":"community_benefit","label":"Community benefit","description":"Financial assistance and other community-benefit activities, costs, offsets and policies reported on Schedule H.","data_type":"mixed","unit":"filing organization-tax year","allowed_values":[]},
+          {"name":"hospital_facilities","label":"Hospital facilities","description":"Hospital and other health-care facilities operated directly or through specified entities during the tax year.","data_type":"repeating group","unit":"facility","allowed_values":[]},
+          {"name":"related_organizations","label":"Related organizations","description":"Names, EINs, activities, domicile, entity type, control relationships, income/assets and ownership shares reported on Schedule R.","data_type":"repeating group","unit":"related organization","allowed_values":[]},
+          {"name":"related_transactions","label":"Transactions with related organizations","description":"Transaction type, amount and valuation method for reportable related-organization transactions.","data_type":"repeating group","unit":"transaction","allowed_values":[]}
+        ],
+        "codebook": {"title":"IRS Instructions for Schedules H and R","url":"https://www.irs.gov/instructions/i990sh"},
+        "limitations": ["Schedule fields are embedded in Form 990 filings; entity scope must be resolved before analysis."]
+      }
+    },
+    {
+      "record_id": "obs:asset:federal-audit-clearinghouse",
+      "authoritative_url": "https://www.fac.gov/data/",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "The Federal Audit Clearinghouse provides searchable, downloadable CSV, and API access to Single Audit data and documents data reliability, curation, and migration limitations.",
+      "variable_documentation": {
+        "status": "partial",
+        "summary": "FAC data cover auditee identity, audit/reporting period, federal awards, findings, opinions and audit package references.",
+        "variable_count": null,
+        "variables": [
+          {"name":"auditee","label":"Auditee identity","description":"Entity identity and reporting metadata for the organization subject to Single Audit.","data_type":"mixed","unit":"auditee-audit year","allowed_values":[]},
+          {"name":"federal_awards","label":"Federal awards","description":"Federal program, agency and expenditure information reported in the Single Audit package.","data_type":"repeating group","unit":"award/program","allowed_values":[]},
+          {"name":"findings","label":"Audit findings","description":"Finding identifiers, types, questioned costs and related audit metadata where reported.","data_type":"repeating group","unit":"finding","allowed_values":[]}
+        ],
+        "codebook": {"title":"Using FAC data","url":"https://www.fac.gov/data/"},
+        "limitations": ["FAC coverage is threshold-based and is not a complete financial-statement source for every healthcare entity."]
+      }
+    },
+    {
+      "record_id": "obs:asset:irs-teos-990-xml",
+      "authoritative_url": "https://www.irs.gov/charities-non-profits/tax-exempt-organization-search-bulk-data-downloads",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "IRS publishes recent Form 990-series filings in XML with indexes, schemas, and annotated-form documentation.",
+      "variable_documentation": {
+        "status": "documented",
+        "summary": "Each XML package contains filing metadata plus the filed Form 990 core and attached schedules, with schema-defined financial, organizational, program, governance and relationship fields.",
+        "variable_count": null,
+        "variables": [
+          {"name":"filing_metadata","label":"Filing metadata","description":"Return identifiers, EIN, tax period, form type and submission metadata.","data_type":"mixed","unit":"filing","allowed_values":[]},
+          {"name":"financials","label":"Financial fields","description":"Revenue, expenses, assets, liabilities, compensation and other filed financial values.","data_type":"mixed","unit":"filing-tax year","allowed_values":[]},
+          {"name":"schedules","label":"Attached schedules","description":"Schedule-specific facility, community benefit, governance, grants and relationship fields when filed.","data_type":"nested XML","unit":"filing","allowed_values":[]}
+        ],
+        "codebook": {"title":"TEOS schemas and annotated forms","url":"https://www.irs.gov/charities-non-profits/tax-exempt-organization-search-bulk-data-downloads"},
+        "limitations": ["XML fields vary by form version and attached schedules; absence of a schedule field may mean it was not required or not filed."]
+      }
+    },
+    {
+      "record_id": "obs:asset:medicaid-mcpar-mlr",
+      "authoritative_url": "https://www.medicaid.gov/medicaid/managed-care/guidance/medicaid-and-chip-managed-care-reporting/public-access-state-submitted-mcpars",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "CMS publishes annual MCPAR public-use files and a data dictionary covering program characteristics, financial performance, encounter reporting, network adequacy, quality, sanctions, program integrity and other managed-care topics.",
+      "variable_documentation": {
+        "status": "documented",
+        "summary": "Each PUF record is a specific MCPAR data point keyed by state, program and reporting period; Question ID is the stable indicator identifier.",
+        "variable_count": null,
+        "variables": [
+          {"name":"question_id","label":"Question ID","description":"Stable descriptive identifier for the MCPAR indicator; preferred over question number for reproducible analysis.","data_type":"text","unit":"indicator","allowed_values":[]},
+          {"name":"state_program_plan","label":"State, program and plan","description":"Managed-care reporting entities and levels at which an indicator is collected.","data_type":"text","unit":"state/program/plan","allowed_values":[]},
+          {"name":"reporting_period","label":"Reporting period","description":"Performance-year and period dates associated with the reported indicator.","data_type":"date range","unit":null,"allowed_values":[]},
+          {"name":"indicator_value","label":"Reported value","description":"Question-specific value whose format and data type are defined in the MCPAR PUF Data Dictionary.","data_type":"mixed","unit":"question-defined","allowed_values":[]}
+        ],
+        "codebook": {"title":"MCPAR PUF Data Dictionary","url":"https://www.medicaid.gov/medicaid/managed-care/guidance/medicaid-and-chip-managed-care-reporting/public-access-state-submitted-mcpars"},
+        "limitations": ["Indicator availability and reporting level vary by managed-care program type and performance year."]
+      }
+    },
+    {
+      "record_id": "obs:asset:usaspending-awards",
+      "authoritative_url": "https://www.usaspending.gov/search",
+      "additional_evidence_urls": ["https://github.com/fedspendingtransparency/usaspending-api/blob/master/usaspending_api/api_contracts/contracts/v2/search/spending_by_award.md"],
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "USAspending provides public search/API access to federal awards and subawards, including recipient, agency, award, obligation, outlay, location and transaction fields.",
+      "variable_documentation": {
+        "status": "documented",
+        "summary": "Award and subaward search fields identify recipients, awarding/funding agencies, award types and identifiers, dates, amounts, obligations/outlays, locations, descriptions and transaction history.",
+        "variable_count": null,
+        "variables": [
+          {"name":"award_id","label":"Award ID","description":"Natural or generated identifier for a federal award.","data_type":"text","unit":"award","allowed_values":[]},
+          {"name":"recipient","label":"Recipient identity","description":"Recipient name and identifiers such as UEI, plus recipient location.","data_type":"mixed","unit":"recipient","allowed_values":[]},
+          {"name":"agency","label":"Awarding and funding agencies","description":"Top-tier and sub-tier agencies responsible for awarding or funding the action.","data_type":"mixed","unit":"award","allowed_values":[]},
+          {"name":"award_amounts","label":"Award amounts and transactions","description":"Award amount, obligations, outlays and transaction-level action dates and descriptions.","data_type":"number","unit":"US dollars","allowed_values":[]}
+        ],
+        "codebook": {"title":"USAspending Spending by Award API contract","url":"https://github.com/fedspendingtransparency/usaspending-api/blob/master/usaspending_api/api_contracts/contracts/v2/search/spending_by_award.md"},
+        "limitations": ["Healthcare relevance requires recipient/entity resolution and award filtering; USAspending is government-wide."]
+      }
+    },
+    {
+      "record_id": "obs:asset:irs-eo-bmf",
+      "authoritative_url": "https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "IRS publishes a cumulative EO BMF extract in CSV, divided by state and region, with an information sheet explaining codes.",
+      "variable_documentation": {
+        "status": "documented",
+        "summary": "The extract contains current IRS master-file identity, location, exemption/classification, affiliation, NTEE and selected latest-return fields for tax-exempt organizations.",
+        "variable_count": null,
+        "variables": [
+          {"name":"ein_and_name","label":"EIN and organization name","description":"Core identity fields for the tax-exempt organization.","data_type":"text","unit":"organization","allowed_values":[]},
+          {"name":"classification","label":"Exemption and classification codes","description":"Subsection, foundation, affiliation, status and NTEE classification fields interpreted with the information sheet.","data_type":"coded text","unit":"organization","allowed_values":[]},
+          {"name":"location","label":"Organization location","description":"Address, city, state and ZIP fields for the master-file organization.","data_type":"text","unit":"organization","allowed_values":[]},
+          {"name":"latest_return_fields","label":"Latest-return summary fields","description":"Limited filing and financial summary fields from the most recent return represented in the extract.","data_type":"mixed","unit":"organization","allowed_values":[]}
+        ],
+        "codebook": {"title":"EO BMF information sheet","url":"https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf"},
+        "limitations": ["EO BMF is a current master-file extract, not a complete historical filing or consolidated health-system financial source."]
+      }
+    },
+    {
+      "record_id": "eswt-bam9",
+      "authoritative_url": "https://data.pa.gov/api/views/eswt-bam9",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "Pennsylvania's first-party Socrata metadata endpoint returned the named treatment-facility dataset and field definitions.",
+      "variable_documentation": {
+        "status": "documented",
+        "summary": "A 15-column facility directory with facility type/name, address and county, phone, FIPS/county codes and a mapped point, plus platform-generated geography fields.",
+        "variable_count": 15,
+        "variables": [
+          {"name":"type_of_facility","label":"Type of Facility","description":"Category of the DDAP-licensed facility.","data_type":"text","unit":"facility","allowed_values":[]},
+          {"name":"name_of_facility","label":"Name of Facility","description":"Name of the DDAP-licensed facility.","data_type":"text","unit":"facility","allowed_values":[]},
+          {"name":"county","label":"County","description":"Pennsylvania county in which the facility is located.","data_type":"text","unit":"facility","allowed_values":[]},
+          {"name":"phone_number","label":"Phone number","description":"Facility contact telephone number.","data_type":"text","unit":"facility","allowed_values":[]},
+          {"name":"location_1","label":"Location","description":"Latitude/longitude point used for mapping the facility.","data_type":"location","unit":"facility","allowed_values":[]}
+        ],
+        "codebook": {"title":"data.pa.gov Socrata metadata","url":"https://data.pa.gov/api/views/eswt-bam9"},
+        "limitations": ["The dataset describes facilities as of May 2018; live metadata availability does not make the facility roster current."]
+      }
+    },
+    {
+      "record_id": "2ats-ttun",
+      "authoritative_url": "https://data.pa.gov/api/views/2ats-ttun",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "Pennsylvania's first-party Socrata metadata endpoint returned the county NAS dataset and 18 field definitions.",
+      "variable_documentation": {
+        "status": "documented",
+        "summary": "County-level newborn-stay counts and NAS rates per 1,000, with time period, suppression notes, FIPS/county codes and mapped geography fields.",
+        "variable_count": 18,
+        "variables": [
+          {"name":"county_name","label":"County Name","description":"County of residence; COMMONWEALTH represents the Pennsylvania total.","data_type":"text","unit":"county","allowed_values":["COMMONWEALTH","Pennsylvania county"]},
+          {"name":"nas_rate","label":"NAS rate per 1,000 newborn stays","description":"Newborn stays with neonatal abstinence syndrome per 1,000 newborn stays for the county and period.","data_type":"number","unit":"per 1,000 newborn stays","allowed_values":[]},
+          {"name":"newborn_stay_count","label":"Newborn stay count","description":"Count of newborn hospital stays used as the rate denominator, subject to source suppression rules.","data_type":"number","unit":"stays","allowed_values":[]},
+          {"name":"fips_county_code","label":"FIPS County Code","description":"Five-digit Pennsylvania state-plus-county FIPS code used for geographic joins.","data_type":"text","unit":"county","allowed_values":[]}
+        ],
+        "codebook": {"title":"data.pa.gov Socrata metadata","url":"https://data.pa.gov/api/views/2ats-ttun"},
+        "limitations": ["Coverage is fiscal years 2016-2017 and restricted to Pennsylvania-resident newborns hospitalized in Pennsylvania."]
+      }
+    },
+    {
+      "record_id": "3pn6-bews",
+      "authoritative_url": "https://data.pa.gov/api/views/3pn6-bews",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "Pennsylvania's first-party Socrata metadata endpoint returned the gestation-stage delivery-stay dataset and eight field definitions.",
+      "variable_documentation": {
+        "status": "documented",
+        "summary": "Statewide percentages of delivery stays by gestation stage and presence/absence of opioid use, with period and category fields.",
+        "variable_count": 8,
+        "variables": [
+          {"name":"opioid_use","label":"Opioid use status","description":"Whether the delivery stay is categorized with or without opioid use.","data_type":"category","unit":"delivery-stay group","allowed_values":["with opioid use","without opioid use"]},
+          {"name":"gestation_stage","label":"Gestation stage","description":"Premature (36 weeks or less), early term (37-38 weeks), or full term or longer (39 weeks or more).","data_type":"category","unit":"delivery-stay group","allowed_values":["Premature","Early Term","Full Term or Longer"]},
+          {"name":"percent_of_delivery_stays","label":"Percent of delivery stays","description":"Percentage of the opioid-use group in the specified gestation stage.","data_type":"number","unit":"percent","allowed_values":[]}
+        ],
+        "codebook": {"title":"data.pa.gov Socrata metadata","url":"https://data.pa.gov/api/views/3pn6-bews"},
+        "limitations": ["Coverage is 2016-2017 and limited to Pennsylvania-resident delivery stays in Pennsylvania hospitals."]
+      }
+    },
+    {
+      "record_id": "4y4s-y2hd",
+      "authoritative_url": "https://data.pa.gov/api/views/4y4s-y2hd",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "Pennsylvania's first-party Socrata metadata endpoint returned the OUD-at-delivery dataset and 25 field definitions.",
+      "variable_documentation": {
+        "status": "documented",
+        "summary": "Quarterly/annual statewide delivery counts and OUD-diagnosis rates per 1,000, with period dates, suppression notes, county/FIPS fields and mapped geography.",
+        "variable_count": 25,
+        "variables": [
+          {"name":"deliveries_with_oud_diagnosis","label":"Rate of women with OUD diagnosis at delivery","description":"Women diagnosed with OUD per 1,000 deliveries for the reporting period.","data_type":"number","unit":"per 1,000 deliveries","allowed_values":[]},
+          {"name":"number_of_women_with_a","label":"Women with a delivery and OUD diagnosis","description":"Count of women with a delivery and OUD diagnosis; counts below 11 may be suppressed.","data_type":"number","unit":"women","allowed_values":[]},
+          {"name":"total_number_of_deliveries","label":"Total deliveries","description":"Count of live births and stillbirths used as the denominator; counts below 11 may be suppressed.","data_type":"number","unit":"deliveries","allowed_values":[]},
+          {"name":"time_period_dates","label":"Time period dates","description":"Start and end dates of the annual, federal fiscal year, or quarterly measurement period.","data_type":"text","unit":null,"allowed_values":[]}
+        ],
+        "codebook": {"title":"data.pa.gov Socrata metadata","url":"https://data.pa.gov/api/views/4y4s-y2hd"},
+        "limitations": ["Live metadata verification does not independently validate PHC4-submitted values or suppressed counts."]
+      }
+    },
+    {
+      "record_id": "dcug-prfh",
+      "authoritative_url": "https://data.pa.gov/api/views/dcug-prfh",
+      "verification_status": "current_verified",
+      "verification_method": "first_party_live",
+      "http_status": 200,
+      "claim": "Pennsylvania's first-party Socrata metadata endpoint returned the statewide opioid-overdose hospitalization dataset and seven field definitions.",
+      "variable_documentation": {
+        "status": "documented",
+        "summary": "Seven fields identify statewide calendar-year periods, heroin versus opioid pain-medication categories, hospitalization counts and the Pennsylvania FIPS code.",
+        "variable_count": 7,
+        "variables": [
+          {"name":"time_period","label":"Time Period","description":"Calendar-year reporting period on which the measurement is based.","data_type":"text","unit":"year","allowed_values":[]},
+          {"name":"time_period_date_start","label":"Time Period Date Start","description":"Beginning of the period covering the hospitalization discharge date.","data_type":"calendar_date","unit":null,"allowed_values":[]},
+          {"name":"category","label":"Category","description":"Whether the principal diagnosis is heroin overdose or opioid pain-medication overdose.","data_type":"text","unit":null,"allowed_values":["Heroin","Pain Medication"]},
+          {"name":"number_of_hospitalizations","label":"Number of Hospitalizations","description":"Hospitalization count within the period and overdose category.","data_type":"number","unit":"hospitalizations","allowed_values":[]}
+        ],
+        "codebook": {"title":"data.pa.gov Socrata metadata","url":"https://data.pa.gov/api/views/dcug-prfh"},
+        "limitations": ["Restricted to Pennsylvania residents age 15 and older hospitalized in Pennsylvania general acute-care hospitals."]
+      }
+    }
+  ]
+}
