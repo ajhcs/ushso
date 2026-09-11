@@ -1,0 +1,221 @@
+{
+  "format": "ushso.ci-test-context-independent-review.v1",
+  "assignment_id": "grok-ci-test-review",
+  "run_id": "ushso-pr085-ci-tests-review-20260911",
+  "role": "review",
+  "reviewer": {
+    "provider": "grok",
+    "model": "grok-4",
+    "independence": "second-reviewer-of-root-Astra-authored-test-correction"
+  },
+  "at": "2026-09-11T06:04:20Z",
+  "disposition": "independently_verified",
+  "apply_candidate": true,
+  "source": {
+    "worktree_head": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
+    "worktree_tree": "57400b8b500d00d036332a57cddad561886c562a",
+    "composition": {
+      "root": "183305f44302b6fb2e07af6fb874dac73e125c46",
+      "pr003": "4a47dde1676cdb6e4063ba166a2ce3e9e6f47e6e",
+      "pr004": "323dfe54c88322369f417c7fde22597b9ab57d75",
+      "pr085": "01467fe31335b359443902eee4e6740b091d5cec"
+    },
+    "final_head": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
+    "final_tree": "57400b8b500d00d036332a57cddad561886c562a",
+    "final_git_status": ""
+  },
+  "candidate": {
+    "directory": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/ci-test-context-candidate",
+    "receipt_sha256": "7c5b9de4756bd651d4fcef1290516b115f7a138dc798e34376b4ecd4ae03e22e",
+    "files": [
+      {
+        "path": "tests/ci-attestation.test.mjs",
+        "original_sha256": "26e4e7f0187bbbccc4fd6c4d821a288403788278609cc337f401955f018a6f88",
+        "original_bytes": 14002,
+        "candidate_sha256": "3f3a76d0d0b3df3750466a52b4ab14b0ac92ed9f5f48b3e88cc0aef7d4f16878",
+        "candidate_bytes": 14396
+      },
+      {
+        "path": "verification/testing/ci/v1.4.0/tests/ci-integration.test.mjs",
+        "original_sha256": "2cd934cc10d17c99c415994af11c73c29872a0059d4d9ab5a64dc7e8e0ad15ec",
+        "original_bytes": 4124,
+        "candidate_sha256": "0e110c2fc1527c8c3d7ad58a72e60f694a3a3a384bfaa3341654a940a706fd43",
+        "candidate_bytes": 5114
+      }
+    ]
+  },
+  "git_identity": {
+    "HEAD": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
+    "tree": "57400b8b500d00d036332a57cddad561886c562a",
+    "original_pair_commit": "4f90157108a92ce9541c340d5536eac31f24a1d8",
+    "historical_base_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+    "reviewed_pr003_source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+    "standalone_pr085": "01467fe31335b359443902eee4e6740b091d5cec",
+    "ancestors_of_HEAD": [
+      "4f90157108a92ce9541c340d5536eac31f24a1d8",
+      "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "01467fe31335b359443902eee4e6740b091d5cec"
+    ],
+    "original_manifest": {
+      "path": "package.json",
+      "sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
+      "bytes": 3555
+    },
+    "pr003_manifest": {
+      "path": "package.json",
+      "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e",
+      "bytes": 3666
+    },
+    "original_inventory_test": {
+      "path": "tests/contract-package-inventory.test.mjs",
+      "sha256": "2bdf766d6c69875160330d8bdf44fbd8d21bbfec43a9b7671c9d233e3ddc4bfa",
+      "bytes": 7809
+    },
+    "pr003_inventory_test": {
+      "path": "tests/contract-package-inventory.test.mjs",
+      "sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b",
+      "bytes": 7842
+    },
+    "live_combined_manifest_sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e",
+    "standalone_01467fe_manifest_sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
+    "4f90157_pair_matches_historical_base": true,
+    "4f90157_pair_matches_historical_pins": true
+  },
+  "commands": [
+    {
+      "label": "baseline-original-tests-combined",
+      "argv": [
+        "node",
+        "--test",
+        "tests/ci-attestation.test.mjs",
+        "verification/testing/ci/v1.4.0/tests/ci-integration.test.mjs"
+      ],
+      "context": "combined-live-original-tests",
+      "exit_code": 1,
+      "test_counts": {
+        "tests": 15,
+        "pass": 12,
+        "fail": 3
+      },
+      "notes": "Two root-cause failures plus runner cascade. historical proof expected 0 reviewed transitions, live combined has 2. inventory expected original-root-chain, live reports pr003-root-chain. runner test fails because child package tests include the inventory assertion."
+    },
+    {
+      "label": "api-original-git-injection",
+      "context": "original-pair-via-git-4f90157-readCurrentFile",
+      "exit_code": 0,
+      "result": {
+        "live_transitions": 2,
+        "original_transitions": 0,
+        "reviewed_transitions": 2,
+        "partial_and_tamper_negatives": "hold"
+      }
+    },
+    {
+      "label": "focused-tests-overlaid-combined",
+      "argv": [
+        "node",
+        "--test",
+        "tests/ci-attestation.test.mjs",
+        "verification/testing/ci/v1.4.0/tests/ci-integration.test.mjs"
+      ],
+      "context": "combined-candidate-overlay",
+      "exit_code": 0,
+      "test_counts": {
+        "tests": 15,
+        "pass": 15,
+        "fail": 0
+      },
+      "stdout_sha256": "e3b85ff03effd4451dc708071ad7cfdc7039d9d5df2baf183d76585526ffd0db",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "current-verifier-overlaid-combined",
+      "argv": [
+        "node",
+        "scripts/verify-ci-attestation.mjs"
+      ],
+      "context": "combined-candidate-overlay",
+      "exit_code": 0,
+      "stdout_sha256": "0b46da718989c6f3faff52cf3a5ee32116133e8bae144771aed667ca074cb4bc",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "historical_subject_sha256": "11b8c7269bf293e67690d713a9e9748b977fb3197f039cb9966e5647d05d2ccb",
+      "current_subject_sha256": "9d7f797f72803cfbab97bdb0daefead3e04a05797284c315e1fde67b646dbddd",
+      "current_status": "pending_authorized_review",
+      "current_approval": null,
+      "release_gate_pass": false,
+      "release_ready": false,
+      "production_eligibility": false
+    },
+    {
+      "label": "restore-and-reverify",
+      "argv": [
+        "git",
+        "checkout",
+        "--",
+        "tests/ci-attestation.test.mjs",
+        "verification/testing/ci/v1.4.0/tests/ci-integration.test.mjs"
+      ],
+      "exit_code": 0,
+      "restored_original_sha256": [
+        "26e4e7f0187bbbccc4fd6c4d821a288403788278609cc337f401955f018a6f88",
+        "2cd934cc10d17c99c415994af11c73c29872a0059d4d9ab5a64dc7e8e0ad15ec"
+      ],
+      "post_restore_current_subject": "2aec8e75723b1fa7926c0d4312b8d61863ca0967cfe3eb20a4fb9d5caa7063f0",
+      "post_restore_historical_subject": "11b8c7269bf293e67690d713a9e9748b977fb3197f039cb9966e5647d05d2ccb",
+      "git_status": ""
+    }
+  ],
+  "not_run": [
+    "full npm test / build / cf / audit / hosted CI / exact-candidate gate rerun",
+    "full original-context node --test checkout of 01467fe; original context verified via Git byte injection APIs and validateRootTestSequence, not a second managed checkout overlay"
+  ],
+  "findings": [
+    {
+      "severity": "info",
+      "id": "byte-scope",
+      "summary": "Changed byte scope is only the two named test bodies. Diffs match the candidate diffs exactly. Runtime verifier, inventory builder, runner, policy, manifests/lock, historic proof and approvals are unmodified."
+    },
+    {
+      "severity": "info",
+      "id": "fixture-context",
+      "summary": "Correction matches the actual combined PR003 extension. Historical positive control now reads the original pair through Git 4f90157. Current inventory test identifies the live manifest by SHA256+length against only the two reviewed identities, then checks chain, sequence, and the complete research registration object."
+    },
+    {
+      "severity": "info",
+      "id": "failure-detection",
+      "summary": "Atomic-pair partial transition, package.json tamper, missing/wrong research registration, reorder, duplicate aggregate, and duplicate research-program negatives still fail closed. Unknown manifests are not recognized. Current pending/null/release-false/production-false boundaries remain."
+    },
+    {
+      "severity": "info",
+      "id": "approval-separation",
+      "summary": "Historical subject 11b8c726... remains pinned and unreused. Overlaying the two tests changes the current v1.4 subject (tests are inventoried) from 2aec8e75... to 9d7f797f...; current status stays pending_authorized_review with approval null and release/production false. Direct successor remains BLOCKED_APPROVAL_PENDING."
+    },
+    {
+      "severity": "info",
+      "id": "original-context",
+      "summary": "Independent original-context proof used Git read-only injection and validateRootTestSequence on 4f90157/30fa0c59 bytes (identical original pair). A full 01467fe checkout overlay was not performed by this reviewer. Producer standalone receipt 187a46d8... is inspected, not claimed as this run."
+    }
+  ],
+  "producer_receipts_inspected_not_executed": {
+    "candidate": "7c5b9de4756bd651d4fcef1290516b115f7a138dc798e34376b4ecd4ae03e22e",
+    "combined": "e0b98724d8ff6555376ec3513fee87270403d85ab5ec3a9685bc976884a85bbd",
+    "standalone": "187a46d8d328741c8d918862316c07aa0f19aa9f17d847a6a04435d5ddb0478e"
+  },
+  "cleanup": {
+    "overlay_restored": true,
+    "original_test_bytes_restored": true,
+    "historical_receipt_sha256": "8013e0b4700d781a365540e046cd6ac15c8eb1999aca956b30c73591ad648d4b",
+    "historical_receipt_bytes": 32976,
+    "source_integrity": "clean",
+    "no_runtime_or_proof_mutation": true
+  },
+  "limitations": [
+    "Did not rerun the unchanged full exact-candidate gate.",
+    "Did not run full npm test, build, CF dry-run, or unrelated audit.",
+    "Did not perform a full original-context node --test on an 01467fe checkout; original context was verified via Git byte injection/read-only APIs.",
+    "Focused-test stdout hash differs from producer combined receipt because of durations and temp directory names; exit 0 and 15/15 counts match.",
+    "Current-subject hash after overlay is expected to change when these two inventoried test files land; that is a current pending subject update, not historical approval reuse."
+  ],
+  "recommendation": "Root may apply the two candidate test files to the sole PR085 source. No concurrent source writes by this reviewer."
+}
