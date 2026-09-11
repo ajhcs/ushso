@@ -25,6 +25,8 @@ const [artifactBytes, artifact, baseline, cohorts, schema, fieldSchema] = await 
   fs.readFile(schemaPath, 'utf8').then(JSON.parse),
   fs.readFile(fieldSchemaPath, 'utf8').then(JSON.parse)
 ]);
+const cohortsBytes = await fs.readFile(cohortsPath);
+const expectedInputDigest = `sha256:${crypto.createHash('sha256').update(cohortsBytes).digest('hex')}`;
 const ajv = new Ajv2020({ strict: true, strictSchema: true, strictTypes: true, allErrors: true });
 ajv.addFormat('date-time', value => typeof value === 'string' && Number.isFinite(Date.parse(value)));
 ajv.compile(fieldSchema);
@@ -65,7 +67,8 @@ assertCompletenessView(artifact, {
   expectedMembershipHash: membershipHash(membership),
   expectedCohort: 'PR-002 accepted baseline_records (C-002-3)',
   expectedGeneration: cohorts.corpus.generation,
-  expectedAsOf: '2026-09-10T15:32:40.000Z'
+  expectedAsOf: '2026-09-10T15:32:40.000Z',
+  expectedInputDigest
 });
 assert(artifact.membership.record_count === 3434, 'VIEW_RECORD_COUNT');
 assert(artifact.membership.source_membership_count === 3434, 'VIEW_SOURCE_COUNT');
@@ -117,7 +120,15 @@ for (const metric of artifact.aggregates.metrics) {
   assert(metric.partitions.reduce((sum, item) => sum + item.count, 0) === metric.denominator_count, `METRIC_PARTITION:${metric.metric_id}`);
   if (metric.denominator_status !== 'known' || metric.denominator_count === 0) assert(metric.rate === null, `UNSAFE_RATE:${metric.metric_id}`);
 }
-const consumer = createOfflineCompletenessConsumer(artifact, { expectedDigest: artifact.artifact_digest, maxPageSize: 25 });
+const consumer = createOfflineCompletenessConsumer(artifact, {
+  expectedDigest: artifact.artifact_digest,
+  expectedInputDigest,
+  expectedMembershipHash: membershipHash(membership),
+  expectedCohort: 'PR-002 accepted baseline_records (C-002-3)',
+  expectedGeneration: cohorts.corpus.generation,
+  expectedAsOf: '2026-09-10T15:32:40.000Z',
+  maxPageSize: 25
+});
 assert(consumer.listRecords({ limit: 25 }).records.length === 25, 'CONSUMER_BOUND');
 assert(consumer.getRecord(artifact.records[0].record_id)?.record_id === artifact.records[0].record_id, 'CONSUMER_RECORD');
 const fileSha256 = crypto.createHash('sha256').update(artifactBytes).digest('hex');

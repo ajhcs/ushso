@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildCompletenessView } from '../../../packages/coverage/research-program/v1.0.0/src/completeness.mjs';
@@ -60,7 +61,9 @@ function observation({ row, fieldId, fieldRole, unit, value, valueState, applica
 }
 
 const baseline = await readJson(BASELINE_PATH);
-const cohorts = await readJson(COHORTS_PATH);
+const cohortsBytes = await fs.readFile(COHORTS_PATH);
+const cohorts = JSON.parse(cohortsBytes);
+const inputDigest = `sha256:${crypto.createHash('sha256').update(cohortsBytes).digest('hex')}`;
 if (baseline.corpus.record_count !== 3434 || cohorts.baseline_records.length !== 3434) throw new Error('BASELINE_RECORD_COUNT_MISMATCH');
 if (!cohorts.baseline_records.every(row => typeof row.native_id === 'string' && row.native_id.length > 0)) throw new Error('NATIVE_ID_REQUIRED');
 const isolatedReasons = new Map(baseline.corpus.isolated_records.map(row => [row.record_id, row.reason]));
@@ -137,6 +140,7 @@ const view = buildCompletenessView({
   generation: cohorts.corpus.generation,
   asOf: AS_OF,
   generatedAt: AS_OF,
+  inputDigest,
   vectorEncoding: 'compact-v1',
   accessSummary: buildAccessSummary({ observations, asOf: AS_OF, compact: true })
 });

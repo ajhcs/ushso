@@ -191,8 +191,10 @@ function compactObservation(observation) {
     recorded_at: observation.recorded_at,
     attempted_at: observation.attempted_at,
     stale_at: observation.stale_at,
+    access_facts: clone(observation.access_facts),
     browser_observations: clone(observation.browser_observations),
-    history: clone(observation.history)
+    history: clone(observation.history),
+    core_contracts: clone(observation.core_contracts)
   };
 }
 
@@ -206,10 +208,64 @@ function compactRecords(records) {
   }));
 }
 
-function evidenceCatalog(observations) {
+function evidenceCatalog({ membership, observations, asOf }) {
   const refs = new Map();
-  for (const observation of observations) for (const ref of observation.evidence_refs) if (!refs.has(ref.evidence_id)) refs.set(ref.evidence_id, clone(ref));
-  return [...refs.values()].sort((left, right) => left.evidence_id.localeCompare(right.evidence_id));
+  const referenceShape = ref => ({
+    evidence_id: ref.evidence_id,
+    evidence_state: ref.evidence_state,
+    observed_at: ref.observed_at,
+    source_locator: ref.source_locator,
+    claim_paths: [...ref.claim_paths].sort(),
+    staleness_state: ref.staleness_state
+  });
+  const add = (ref, binding) => {
+    const shape = referenceShape(ref);
+    const existing = refs.get(ref.evidence_id);
+    if (existing) {
+      assert(digestJson(evidenceReferenceIdentityShape(existing)) === digestJson(evidenceReferenceIdentityShape(shape)), 'evidence_catalog_reference_drift', ref.evidence_id);
+      existing.claim_paths = [...new Set([...existing.claim_paths, ...shape.claim_paths])].sort();
+      if (!existing.bindings.some(item => digestJson(item) === digestJson(binding))) existing.bindings.push(binding);
+      return;
+    }
+    refs.set(ref.evidence_id, { ...clone(shape), bindings: [binding] });
+  };
+  const observationBinding = (observation, location, revisionId = observation.observation_id) => ({
+    record_id: observation.record_id,
+    source_id: observation.source_id,
+    field_id: observation.field_id,
+    revision_id: revisionId,
+    location
+  });
+  const addObservation = (observation, location = 'observation') => {
+    const binding = observationBinding(observation, location);
+    for (const ref of observation.evidence_refs) add(ref, binding);
+    for (const item of observation.history) {
+      const historyBinding = observationBinding(item, 'history', item.revision_id ?? item.observation_id);
+      for (const ref of item.evidence_refs) add(ref, historyBinding);
+      for (const ref of item.access_facts.evidence_refs) add(ref, { ...historyBinding, location: 'access' });
+      for (const requirement of item.access_facts.credential_requirements) for (const ref of requirement.evidence_refs) add(ref, { ...historyBinding, location: 'credential' });
+      for (const ref of item.access_facts.cost.evidence_refs) add(ref, { ...historyBinding, location: 'cost' });
+      for (const ref of item.access_facts.usage_limit.evidence_refs) add(ref, { ...historyBinding, location: 'usage_limit' });
+      for (const browser of item.browser_observations) for (const ref of browser.evidence_refs) add(ref, { ...historyBinding, location: 'browser' });
+    }
+    for (const ref of observation.access_facts.evidence_refs) add(ref, { ...binding, location: 'access' });
+    for (const requirement of observation.access_facts.credential_requirements) for (const ref of requirement.evidence_refs) add(ref, { ...binding, location: 'credential' });
+    for (const ref of observation.access_facts.cost.evidence_refs) add(ref, { ...binding, location: 'cost' });
+    for (const ref of observation.access_facts.usage_limit.evidence_refs) add(ref, { ...binding, location: 'usage_limit' });
+    for (const browser of observation.browser_observations) for (const ref of browser.evidence_refs) add(ref, { ...binding, location: 'browser' });
+  };
+  for (const row of membership) for (const ref of evidenceRefFromMembership(row, asOf)) add(ref, {
+    record_id: row.record_id,
+    source_id: row.source_id,
+    field_id: null,
+    revision_id: null,
+    location: 'membership'
+  });
+  for (const observation of observations) addObservation(observation);
+  return [...refs.values()].map(item => ({
+    ...item,
+    bindings: item.bindings.sort((left, right) => digestJson(left).localeCompare(digestJson(right)))
+  })).sort((left, right) => left.evidence_id.localeCompare(right.evidence_id));
 }
 
 function buildMembershipSummary(rows, denominatorStatus = 'known') {
@@ -333,7 +389,7 @@ function buildMetrics(records, definitions, context) {
   return metrics;
 }
 
-function unsignedView({ cohort, generation, asOf, generatedAt, rows, definitions, observations, denominatorStatus, vectorEncoding, accessSummary }) {
+function unsignedView({ cohort, generation, asOf, generatedAt, inputDigest, rows, definitions, observations, denominatorStatus, vectorEncoding, accessSummary }) {
   const membershipSummary = buildMembershipSummary(rows, denominatorStatus);
   const observationMap = new Map();
   const observationIds = new Set();
@@ -385,9 +441,10 @@ function unsignedView({ cohort, generation, asOf, generatedAt, rows, definitions
     cohort,
     generation,
     as_of: asOf,
+    input_digest: inputDigest,
     membership: membershipSummary,
     vector_encoding: vectorEncoding,
-    evidence_catalog: vectorEncoding === 'compact-v1' ? evidenceCatalog(renderedObservations) : [],
+    evidence_catalog: evidenceCatalog({ membership: rows, observations: renderedObservations, asOf }),
     access_summary: accessSummary ? clone(accessSummary) : null,
     field_definitions: clone(definitions),
     records: renderedRecords,
@@ -415,11 +472,16 @@ function digestUnsigned(view) {
   return `sha256:${sha256Bytes(digestJson(view))}`;
 }
 
-export function buildCompletenessView({ membership, observations = [], fieldDefinitions, cohort, generation, asOf, generatedAt, denominatorStatus = 'known', vectorEncoding = 'full-v1', accessSummary = null }) {
+/**
+ * Build a self-consistent view. Supply inputDigest when the serialized source
+ * payload is available; null is reserved for generic fixture construction.
+ */
+export function buildCompletenessView({ membership, observations = [], fieldDefinitions, cohort, generation, asOf, generatedAt, inputDigest = null, denominatorStatus = 'known', vectorEncoding = 'full-v1', accessSummary = null }) {
   assert(typeof cohort === 'string' && cohort.length > 0, 'cohort_required');
   assert(typeof generation === 'string' && generation.length > 0, 'generation_required');
   assert(['known', 'unknown', 'incomplete'].includes(denominatorStatus), 'denominator_status_invalid');
   assert(['full-v1', 'compact-v1'].includes(vectorEncoding), 'vector_encoding_invalid');
+  assert(inputDigest === null || typeof inputDigest === 'string' && /^sha256:[a-f0-9]{64}$/u.test(inputDigest), 'input_digest_invalid');
   iso(asOf, 'as_of');
   iso(generatedAt, 'generated_at');
   const rows = normalizeMembership(membership);
@@ -428,7 +490,7 @@ export function buildCompletenessView({ membership, observations = [], fieldDefi
     ? null
     : buildAccessSummary({ observations, asOf, compact: vectorEncoding === 'compact-v1' });
   if (accessSummary !== null) assert(digestJson(accessSummary) === digestJson(expectedAccessSummary), 'access_summary_not_bound');
-  const view = unsignedView({ cohort, generation, asOf, generatedAt, rows, definitions, observations, denominatorStatus, vectorEncoding, accessSummary: expectedAccessSummary });
+  const view = unsignedView({ cohort, generation, asOf, generatedAt, inputDigest, rows, definitions, observations, denominatorStatus, vectorEncoding, accessSummary: expectedAccessSummary });
   const digest = digestUnsigned(view);
   const result = {
     ...view,
@@ -459,20 +521,28 @@ function assertMetric(metricValue, membershipCount) {
   assert(metricValue.denominator_count <= membershipCount * 100, 'metric_denominator_unbounded', metricValue.metric_id);
 }
 
-function compactEvidenceRefs(observation) {
+function compactEvidenceRefs(observation, evidenceById = null) {
   const observedAt = observation.source_observed_at ?? observation.observed_at;
-  return observation.evidence_ids.map(evidenceId => ({
-    evidence_id: evidenceId,
-    evidence_state: observation.evidence_state,
-    observed_at: observedAt,
-    source_locator: null,
-    claim_paths: ['/compact/evidence_ids'],
-    staleness_state: 'unknown'
-  }));
+  return observation.evidence_ids.map(evidenceId => {
+    const catalogRef = evidenceById?.get(evidenceId);
+    if (catalogRef) {
+      const ref = clone(catalogRef);
+      delete ref.bindings;
+      return ref;
+    }
+    return {
+      evidence_id: evidenceId,
+      evidence_state: observation.evidence_state,
+      observed_at: observedAt,
+      source_locator: null,
+      claim_paths: ['/compact/evidence_ids'],
+      staleness_state: 'unknown'
+    };
+  });
 }
 
-function expandCompactObservation(observation) {
-  const evidenceRefs = compactEvidenceRefs(observation);
+function expandCompactObservation(observation, evidenceById = null) {
+  const evidenceRefs = compactEvidenceRefs(observation, evidenceById);
   return {
     schema_version: 'ushso.field-observation.v1.0.0',
     observation_id: observation.observation_id,
@@ -494,27 +564,16 @@ function expandCompactObservation(observation) {
     recorded_at: observation.recorded_at,
     attempted_at: observation.attempted_at,
     stale_at: observation.stale_at,
-    access_facts: {
-      credential_requirements: [],
-      cost: { state: 'unknown', amount: null, currency: null, evidence_refs: clone(evidenceRefs), observed_at: observation.observed_at },
-      usage_limit: { state: 'unknown', limit: null, unit: null, evidence_refs: clone(evidenceRefs), observed_at: observation.observed_at },
-      evidence_refs: clone(evidenceRefs),
-      observed_at: observation.observed_at
-    },
+    access_facts: clone(observation.access_facts),
     browser_observations: observation.browser_observations,
     history: observation.history,
-    core_contracts: {
-      value: 'observatory-core.assertion.claimValue',
-      evidence: 'observatory-core.evidenceReference',
-      applicability: 'observatory-core.schemaField.field_role',
-      attempt: 'observatory-core.accessObservation'
-    }
+    core_contracts: clone(observation.core_contracts)
   };
 }
 
 function assertCompactObservation(observation) {
   assert(observation && typeof observation === 'object', 'compact_observation_required');
-  for (const key of ['observation_id', 'record_id', 'source_id', 'field_id', 'field_role', 'unit', 'value', 'value_state', 'evidence_state', 'applicability_state', 'attempt_state', 'endpoint_scope', 'evidence_ids', 'reason_codes', 'source_observed_at', 'observed_at', 'recorded_at', 'attempted_at', 'stale_at', 'browser_observations', 'history']) assert(Object.hasOwn(observation, key), 'compact_observation_field_missing', key);
+  for (const key of ['observation_id', 'record_id', 'source_id', 'field_id', 'field_role', 'unit', 'value', 'value_state', 'evidence_state', 'applicability_state', 'attempt_state', 'endpoint_scope', 'evidence_ids', 'reason_codes', 'source_observed_at', 'observed_at', 'recorded_at', 'attempted_at', 'stale_at', 'access_facts', 'browser_observations', 'history', 'core_contracts']) assert(Object.hasOwn(observation, key), 'compact_observation_field_missing', key);
   assert(Array.isArray(observation.evidence_ids) && observation.evidence_ids.length > 0 && unique(observation.evidence_ids), 'compact_observation_evidence_invalid');
   assertFieldObservation(expandCompactObservation(observation));
   return true;
@@ -527,6 +586,168 @@ function evidenceIdsOf(value) {
   return [];
 }
 
+function evidenceReferenceShape(ref) {
+  return {
+    evidence_id: ref.evidence_id,
+    evidence_state: ref.evidence_state,
+    observed_at: ref.observed_at,
+    source_locator: ref.source_locator,
+    claim_paths: [...ref.claim_paths].sort(),
+    staleness_state: ref.staleness_state
+  };
+}
+
+function evidenceReferenceIdentityShape(ref) {
+  const shape = evidenceReferenceShape(ref);
+  delete shape.claim_paths;
+  return shape;
+}
+
+function assertEvidenceReferenceMatches(catalogRef, ref, code) {
+  assert(digestJson(evidenceReferenceIdentityShape(catalogRef)) === digestJson(evidenceReferenceIdentityShape(ref)), code, ref.evidence_id);
+  assert(ref.claim_paths.every(path => catalogRef.claim_paths.includes(path)), `${code}_claims`, ref.evidence_id);
+}
+
+function evidenceBindingKey(binding) {
+  return digestJson(binding);
+}
+
+function collectAccessEvidence(access, binding, add) {
+  if (!access || typeof access !== 'object') return;
+  for (const ref of access.evidence_refs ?? []) add(ref, { ...binding, location: 'access' });
+  for (const requirement of access.credential_requirements ?? []) {
+    for (const ref of requirement.evidence_refs ?? []) add(ref, { ...binding, location: 'credential' });
+  }
+  for (const ref of access.cost?.evidence_refs ?? []) add(ref, { ...binding, location: 'cost' });
+  for (const ref of access.usage_limit?.evidence_refs ?? []) add(ref, { ...binding, location: 'usage_limit' });
+}
+
+function collectObservationEvidence(observation, add) {
+  const binding = {
+    record_id: observation.record_id,
+    source_id: observation.source_id,
+    field_id: observation.field_id,
+    revision_id: observation.observation_id,
+    location: 'observation'
+  };
+  for (const ref of observation.evidence_refs ?? []) add(ref, binding);
+  collectAccessEvidence(observation.access_facts, binding, add);
+  for (const browser of observation.browser_observations ?? []) {
+    for (const ref of browser.evidence_refs ?? []) add(ref, { ...binding, location: 'browser' });
+  }
+  for (const item of observation.history ?? []) {
+    const historyBinding = {
+      record_id: item.record_id,
+      source_id: item.source_id,
+      field_id: item.field_id,
+      revision_id: item.revision_id ?? item.observation_id,
+      location: 'history'
+    };
+    for (const ref of item.evidence_refs ?? []) add(ref, historyBinding);
+    collectAccessEvidence(item.access_facts, historyBinding, add);
+    for (const browser of item.browser_observations ?? []) {
+      for (const ref of browser.evidence_refs ?? []) add(ref, { ...historyBinding, location: 'browser' });
+    }
+  }
+}
+
+function assertEvidenceBinding(binding) {
+  assert(binding && typeof binding === 'object' && !Array.isArray(binding), 'completeness_evidence_binding_shape');
+  assert(typeof binding.record_id === 'string' && typeof binding.source_id === 'string', 'completeness_evidence_binding_identity');
+  assert(binding.field_id === null || typeof binding.field_id === 'string', 'completeness_evidence_binding_field');
+  assert(binding.revision_id === null || typeof binding.revision_id === 'string', 'completeness_evidence_binding_revision');
+  assert(['membership', 'observation', 'history', 'access', 'credential', 'cost', 'usage_limit', 'browser'].includes(binding.location), 'completeness_evidence_binding_location');
+}
+
+function assertEvidenceCatalog({ catalog, membership, observations, asOf }) {
+  const catalogById = new Map();
+  for (const item of catalog) {
+    assert(item && typeof item === 'object' && !Array.isArray(item), 'completeness_evidence_catalog_shape');
+    assert(typeof item.evidence_id === 'string' && item.evidence_id.length >= 3, 'completeness_evidence_catalog_id');
+    assert(!catalogById.has(item.evidence_id), 'completeness_evidence_catalog_duplicate');
+    assert(['unknown', 'candidate', 'ambiguous', 'documented', 'observed', 'executed', 'proven', 'disputed'].includes(item.evidence_state), 'completeness_evidence_catalog_state');
+    iso(item.observed_at, 'completeness_evidence_catalog_time');
+    assert(Date.parse(item.observed_at) <= Date.parse(asOf), 'completeness_evidence_catalog_future');
+    assert(item.source_locator === null || typeof item.source_locator === 'string', 'completeness_evidence_catalog_locator');
+    assert(Array.isArray(item.claim_paths) && item.claim_paths.length > 0 && unique(item.claim_paths), 'completeness_evidence_catalog_claims');
+    assert(['current', 'stale', 'unknown', 'not_applicable'].includes(item.staleness_state), 'completeness_evidence_catalog_staleness');
+    assert(Array.isArray(item.bindings) && item.bindings.length > 0, 'completeness_evidence_catalog_bindings');
+    assert(unique(item.bindings.map(evidenceBindingKey)), 'completeness_evidence_catalog_binding_duplicate');
+    for (const binding of item.bindings) assertEvidenceBinding(binding);
+    catalogById.set(item.evidence_id, item);
+  }
+  const actual = new Map();
+  const add = (ref, binding) => {
+    assert(ref && typeof ref === 'object', 'completeness_evidence_reference_shape');
+    const key = `${ref.evidence_id}\u0000${evidenceBindingKey(binding)}`;
+    if (!actual.has(key)) actual.set(key, { ref, binding });
+  };
+  for (const row of membership) {
+    for (const ref of evidenceRefFromMembership(row, asOf)) add(ref, {
+      record_id: row.record_id,
+      source_id: row.source_id,
+      field_id: null,
+      revision_id: null,
+      location: 'membership'
+    });
+  }
+  for (const observation of observations) collectObservationEvidence(observation, add);
+  for (const { ref, binding } of actual.values()) {
+    const item = catalogById.get(ref.evidence_id);
+    assert(item, 'completeness_evidence_reference_unlisted', ref.evidence_id);
+    assertEvidenceReferenceMatches(item, ref, 'completeness_evidence_reference_drift');
+    assert(item.bindings.some(candidate => evidenceBindingKey(candidate) === evidenceBindingKey(binding)), 'completeness_evidence_binding_missing', ref.evidence_id);
+  }
+  const actualKeys = new Set(actual.keys());
+  for (const item of catalog) {
+    for (const binding of item.bindings) assert(actualKeys.has(`${item.evidence_id}\u0000${evidenceBindingKey(binding)}`), 'completeness_evidence_binding_unreferenced', item.evidence_id);
+  }
+  return catalogById;
+}
+
+function assertNestedClock(value, asOf, code) {
+  if (value === null || value === undefined) return;
+  assert(typeof value === 'string' && Number.isFinite(Date.parse(value)), `${code}_invalid`);
+  assert(Date.parse(value) <= Date.parse(asOf), code);
+}
+
+function assertObservationClocks(observation, asOf) {
+  for (const key of ['source_observed_at', 'observed_at', 'recorded_at', 'attempted_at', 'stale_at']) assertNestedClock(observation[key], asOf, `completeness_observation_${key}`);
+  const checkRefs = refs => {
+    for (const ref of refs ?? []) assertNestedClock(ref.observed_at, asOf, 'completeness_observation_evidence_time');
+  };
+  checkRefs(observation.evidence_refs);
+  const checkAccess = access => {
+    if (!access) return;
+    assertNestedClock(access.observed_at, asOf, 'completeness_access_facts_time');
+    checkRefs(access.evidence_refs);
+    for (const requirement of access.credential_requirements ?? []) {
+      assertNestedClock(requirement.observed_at, asOf, 'completeness_credential_time');
+      checkRefs(requirement.evidence_refs);
+    }
+    for (const key of ['cost', 'usage_limit']) {
+      const facts = access[key];
+      if (!facts) continue;
+      assertNestedClock(facts.observed_at, asOf, `completeness_${key}_time`);
+      checkRefs(facts.evidence_refs);
+    }
+  };
+  checkAccess(observation.access_facts);
+  for (const browser of observation.browser_observations ?? []) {
+    assertNestedClock(browser.observed_at, asOf, 'completeness_browser_time');
+    checkRefs(browser.evidence_refs);
+  }
+  for (const item of observation.history ?? []) {
+    for (const key of ['source_observed_at', 'observed_at', 'recorded_at', 'attempted_at', 'stale_at']) assertNestedClock(item[key], asOf, `completeness_history_${key}`);
+    checkRefs(item.evidence_refs);
+    checkAccess(item.access_facts);
+    for (const browser of item.browser_observations ?? []) {
+      assertNestedClock(browser.observed_at, asOf, 'completeness_history_browser_time');
+      checkRefs(browser.evidence_refs);
+    }
+  }
+}
+
 function scopeKeyForAccess(scope) {
   return JSON.stringify([scope.endpoint_id ?? null, scope.resource ?? null, scope.operation]);
 }
@@ -534,12 +755,16 @@ function scopeKeyForAccess(scope) {
 function checkProjection(check) {
   if (check === null || check === undefined) return null;
   return {
+    revision_id: check.revision_id,
     observation_id: check.observation_id,
+    record_id: check.record_id,
+    source_id: check.source_id,
     field_id: check.field_id,
     attempt_state: check.attempt_state,
     attempted_at: check.attempted_at,
     observed_at: check.observed_at,
     source_observed_at: check.source_observed_at,
+    recorded_at: check.recorded_at,
     endpoint_scope: clone(check.endpoint_scope),
     evidence_state: check.evidence_state,
     evidence_ids: evidenceIdsOf(check),
@@ -565,6 +790,7 @@ function accessSummaryProjection(summary) {
       endpoint_scope: clone(scope.endpoint_scope),
       latest_successful_check: checkProjection(scope.latest_successful_check),
       latest_attempt: checkProjection(scope.latest_attempt),
+      revision_history: [...(scope.revision_history ?? [])].sort((left, right) => String(right.attempted_at).localeCompare(String(left.attempted_at)) || String(right.recorded_at).localeCompare(String(left.recorded_at)) || String(right.revision_id).localeCompare(String(left.revision_id))).map(checkProjection),
       browser_observations: [...(scope.browser_observations ?? [])].sort((left, right) => String(left.observed_at).localeCompare(String(right.observed_at)) || scopeKeyForAccess(left.endpoint_scope).localeCompare(scopeKeyForAccess(right.endpoint_scope))).map(browserProjection)
     }))
   };
@@ -610,10 +836,21 @@ function assertAccessSummary(summary, asOf, availableEvidenceIds) {
       if (check === null) continue;
       assert(check && typeof check === 'object', 'access_summary_check_shape');
       if (expectedState) assert(check.attempt_state === expectedState, 'access_summary_success_state');
-      assert(typeof check.observation_id === 'string' && check.attempt_state !== 'not_attempted', 'access_summary_check_identity');
-      assert(timestampAtOrBefore(check.observed_at) && timestampAtOrBefore(check.attempted_at), 'access_summary_check_time');
+      assert(typeof check.revision_id === 'string' && check.revision_id === check.observation_id, 'access_summary_check_revision');
+      assert(typeof check.observation_id === 'string' && typeof check.record_id === 'string' && typeof check.source_id === 'string' && typeof check.field_id === 'string' && check.attempt_state !== 'not_attempted', 'access_summary_check_identity');
+      assert(timestampAtOrBefore(check.observed_at) && timestampAtOrBefore(check.attempted_at) && timestampAtOrBefore(check.recorded_at) && (check.source_observed_at === null || timestampAtOrBefore(check.source_observed_at)), 'access_summary_check_time');
       assert(check.endpoint_scope && scopeKeyForAccess(check.endpoint_scope) === scopeKey, 'access_summary_check_scope');
       assert(evidencePresent(check), 'access_summary_check_evidence');
+    }
+    assert(Array.isArray(scope.revision_history), 'access_summary_revision_history');
+    for (const check of scope.revision_history) {
+      assert(check && typeof check === 'object', 'access_summary_revision_shape');
+      assert(typeof check.revision_id === 'string' && check.revision_id === check.observation_id, 'access_summary_revision_identity');
+      assert(typeof check.record_id === 'string' && typeof check.source_id === 'string' && typeof check.field_id === 'string', 'access_summary_revision_binding');
+      assert(check.attempt_state !== 'not_attempted', 'access_summary_revision_attempt');
+      assert(timestampAtOrBefore(check.observed_at) && timestampAtOrBefore(check.attempted_at) && timestampAtOrBefore(check.recorded_at) && (check.source_observed_at === null || timestampAtOrBefore(check.source_observed_at)), 'access_summary_revision_time');
+      assert(check.endpoint_scope && scopeKeyForAccess(check.endpoint_scope) === scopeKey, 'access_summary_revision_scope');
+      assert(evidencePresent(check), 'access_summary_revision_evidence');
     }
     assert(Array.isArray(scope.browser_observations), 'access_summary_browser');
     for (const browser of scope.browser_observations) {
@@ -625,11 +862,43 @@ function assertAccessSummary(summary, asOf, availableEvidenceIds) {
   return true;
 }
 
-export function assertCompletenessView(view, { expectedMembershipHash = null, expectedCohort = null, expectedGeneration = null, expectedAsOf = null } = {}) {
+function assertAccessSummaryEvidence(summary, catalogById) {
+  const check = value => {
+    if (!value || typeof value !== 'object') return;
+    if (Array.isArray(value.evidence_refs)) {
+      for (const ref of value.evidence_refs) {
+        const catalogRef = catalogById.get(ref.evidence_id);
+        assert(catalogRef, 'completeness_access_summary_evidence_unlisted', ref.evidence_id);
+        assertEvidenceReferenceMatches(catalogRef, ref, 'completeness_access_summary_evidence_drift');
+      }
+    }
+    if (Array.isArray(value.evidence_ids)) for (const evidenceId of value.evidence_ids) assert(catalogById.has(evidenceId), 'completeness_access_summary_evidence_unlisted', evidenceId);
+  };
+  for (const scope of summary.endpoint_scopes ?? []) {
+    check(scope.documented);
+    for (const requirement of scope.documented?.credential_requirements ?? []) check(requirement);
+    check(scope.documented?.cost);
+    check(scope.documented?.usage_limit);
+    check(scope.latest_successful_check);
+    check(scope.latest_attempt);
+    for (const revision of scope.revision_history ?? []) check(revision);
+    for (const browser of scope.browser_observations ?? []) check(browser);
+  }
+}
+
+/**
+ * Validate an artifact's internal arithmetic and provenance. Expected context
+ * arguments are optional for generic fixtures; the offline consumer below
+ * requires them from an independent cohort or manifest caller.
+ */
+export function assertCompletenessView(view, { expectedMembershipHash = null, expectedCohort = null, expectedGeneration = null, expectedAsOf = null, expectedInputDigest = null } = {}) {
   assert(view && typeof view === 'object' && !Array.isArray(view), 'completeness_view_required');
   assert(view.schema_version === COMPLETENESS_VIEW_VERSION, 'completeness_schema_version');
   assert(view.artifact_version === COMPLETENESS_ARTIFACT_VERSION, 'completeness_artifact_version');
   assert(['full-v1', 'compact-v1'].includes(view.vector_encoding), 'completeness_vector_encoding');
+  iso(view.as_of, 'completeness_as_of');
+  iso(view.generated_at, 'completeness_generated_at');
+  assert(view.input_digest === null || typeof view.input_digest === 'string' && /^sha256:[a-f0-9]{64}$/u.test(view.input_digest), 'completeness_input_digest');
   assert(typeof view.artifact_digest === 'string' && /^sha256:[a-f0-9]{64}$/u.test(view.artifact_digest), 'completeness_digest_missing');
   assert(view.artifact_id === 'urn:ushso:completeness-view:' + view.artifact_digest.slice('sha256:'.length, 'sha256:'.length + 40), 'completeness_id_mismatch');
   assert(digestUnsigned(stripDigest(view)) === view.artifact_digest, 'completeness_digest_mismatch');
@@ -637,6 +906,7 @@ export function assertCompletenessView(view, { expectedMembershipHash = null, ex
   if (expectedCohort !== null) assert(view.cohort === expectedCohort, 'completeness_expected_cohort_mismatch');
   if (expectedGeneration !== null) assert(view.generation === expectedGeneration, 'completeness_expected_generation_mismatch');
   if (expectedAsOf !== null) assert(view.as_of === expectedAsOf, 'completeness_expected_as_of_mismatch');
+  if (expectedInputDigest !== null) assert(view.input_digest === expectedInputDigest, 'completeness_expected_input_digest_mismatch');
   assert(Array.isArray(view.records), 'completeness_records_missing');
   assert(view.membership?.record_count === view.records.length, 'completeness_record_count_mismatch');
   assert(view.membership?.source_membership_count === view.records.reduce((sum, record) => sum + record.source_vectors.length, 0), 'completeness_source_count_mismatch');
@@ -654,6 +924,7 @@ export function assertCompletenessView(view, { expectedMembershipHash = null, ex
     evidence_ids: source.evidence_ids,
     source_observed_at: source.source_observed_at
   })));
+  for (const row of reconstructedMembership) assertNestedClock(row.source_observed_at, view.as_of, 'completeness_membership_source_future');
   assert(view.membership?.membership_hash === membershipHash(reconstructedMembership), 'completeness_membership_hash_mismatch');
   const expectedMembership = buildMembershipSummary(reconstructedMembership, view.membership.denominator_status);
   assert(digestJson(expectedMembership) === digestJson(view.membership), 'completeness_membership_summary_mismatch');
@@ -682,11 +953,18 @@ export function assertCompletenessView(view, { expectedMembershipHash = null, ex
       }
     }
   }
-  const vectorObservations = view.records.flatMap(record => record.source_vectors.flatMap(source => source.fields.map(field => view.vector_encoding === 'compact-v1' ? expandCompactObservation(field.observation) : field.observation)));
-  const vectorEvidenceIds = new Set(vectorObservations.flatMap(observation => observation.evidence_refs.map(ref => ref.evidence_id)));
+  const catalogForExpansion = new Map(view.evidence_catalog.map(item => [item.evidence_id, item]));
+  const vectorObservations = view.records.flatMap(record => record.source_vectors.flatMap(source => source.fields.map(field => view.vector_encoding === 'compact-v1' ? expandCompactObservation(field.observation, catalogForExpansion) : field.observation)));
+  for (const observation of vectorObservations) {
+    assertFieldObservation(observation);
+    assertObservationClocks(observation, view.as_of);
+  }
+  const catalogById = assertEvidenceCatalog({ catalog: view.evidence_catalog, membership: reconstructedMembership, observations: vectorObservations, asOf: view.as_of });
+  const vectorEvidenceIds = new Set(catalogById.keys());
   for (const record of view.records) assert(record.readiness_state === buildReadinessState(record.source_vectors.flatMap(source => source.fields)), 'completeness_readiness_recalculation_mismatch');
   if (view.access_summary !== null) {
     assertAccessSummary(view.access_summary, view.as_of, vectorEvidenceIds);
+    assertAccessSummaryEvidence(view.access_summary, catalogById);
     const expectedAccessSummary = buildAccessSummary({ observations: vectorObservations, asOf: view.as_of, compact: view.vector_encoding === 'compact-v1' });
     assert(digestJson(accessSummaryProjection(view.access_summary)) === digestJson(accessSummaryProjection(expectedAccessSummary)), 'completeness_access_summary_mismatch');
   }
@@ -706,9 +984,29 @@ export function assertCompletenessView(view, { expectedMembershipHash = null, ex
   return true;
 }
 
-export function createOfflineCompletenessConsumer(view, { expectedDigest = null, maxPageSize = 100 } = {}) {
-  assertCompletenessView(view);
-  if (expectedDigest !== null) assert(expectedDigest === view.artifact_digest, 'completeness_expected_digest_mismatch');
+/**
+ * Consume a content-addressed view only after an independent caller binds its
+ * artifact, input payload, membership, cohort, generation, and as-of context.
+ * Use assertCompletenessView for generic fixture validation without that gate.
+ */
+export function createOfflineCompletenessConsumer(view, {
+  expectedDigest = null,
+  expectedInputDigest = null,
+  expectedMembershipHash = null,
+  expectedCohort = null,
+  expectedGeneration = null,
+  expectedAsOf = null,
+  maxPageSize = 100
+} = {}) {
+  for (const [name, value] of Object.entries({ expectedDigest, expectedInputDigest, expectedMembershipHash, expectedCohort, expectedGeneration, expectedAsOf })) assert(value !== null, 'completeness_consumer_context_required', name);
+  assert(typeof expectedDigest === 'string' && /^sha256:[a-f0-9]{64}$/u.test(expectedDigest), 'completeness_consumer_digest_invalid');
+  assert(typeof expectedInputDigest === 'string' && /^sha256:[a-f0-9]{64}$/u.test(expectedInputDigest), 'completeness_consumer_input_digest_invalid');
+  assert(typeof expectedMembershipHash === 'string' && /^sha256:[a-f0-9]{64}$/u.test(expectedMembershipHash), 'completeness_consumer_membership_invalid');
+  assert(typeof expectedCohort === 'string' && expectedCohort.length > 0, 'completeness_consumer_cohort_invalid');
+  assert(typeof expectedGeneration === 'string' && expectedGeneration.length > 0, 'completeness_consumer_generation_invalid');
+  iso(expectedAsOf, 'completeness_consumer_as_of');
+  assertCompletenessView(view, { expectedMembershipHash, expectedCohort, expectedGeneration, expectedAsOf, expectedInputDigest });
+  assert(expectedDigest === view.artifact_digest, 'completeness_expected_digest_mismatch');
   assert(Number.isSafeInteger(maxPageSize) && maxPageSize > 0 && maxPageSize <= 1000, 'completeness_page_size_invalid');
   const records = view.records;
   const metrics = new Map((view.aggregates?.metrics ?? []).map(metricValue => [metricValue.metric_id, metricValue]));
@@ -737,6 +1035,7 @@ export function createOfflineCompletenessConsumer(view, { expectedDigest = null,
         cohort: view.cohort,
         generation: view.generation,
         as_of: view.as_of,
+        input_digest: view.input_digest,
         membership: view.membership,
         metric_count: view.aggregates.metrics.length,
         boundaries: view.boundaries

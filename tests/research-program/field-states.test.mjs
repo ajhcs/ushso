@@ -17,6 +17,7 @@ import { sha256Bytes } from '../../packages/normalization/src/canonical.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const OBSERVED_AT = '2026-09-03T22:22:33.908Z';
+const INPUT_DIGEST = 'sha256:' + 'a'.repeat(64);
 const schema = JSON.parse(await fs.readFile(path.join(ROOT, 'packages/normalization/schemas/field-observation.schema.json'), 'utf8'));
 const completenessSchema = JSON.parse(await fs.readFile(path.join(ROOT, 'packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json'), 'utf8'));
 const ajv = new Ajv2020({ strict: true, strictSchema: true, strictTypes: true, allErrors: true });
@@ -193,6 +194,10 @@ test('failed or expired attempts retain the historical successful observation', 
   assert.deepEqual(historyOnly.historical_success.endpoint_scope, historical.endpoint_scope);
   assert.equal(historyOnly.historical_success.access_facts.observed_at, historical.access_facts.observed_at);
   assert.equal(historyOnly.historical_success.recorded_at, historical.recorded_at);
+  const retainedSummary = buildAccessSummary({ observations: [failed], asOf: '2026-03-01T00:00:00.000Z' });
+  const retainedScope = retainedSummary.endpoint_scopes[0];
+  assert.equal(retainedScope.latest_successful_check.observation_id, historical.observation_id);
+  assert.equal(retainedScope.revision_history.some(check => check.revision_id === historical.observation_id && check.record_id === historical.record_id && check.source_id === historical.source_id && check.recorded_at === historical.recorded_at), true);
   assert.throws(() => createFieldObservation({ ...failed, attempt_state: 'failed', attempted_at: null }), { code: 'field_observation_invalid' });
 });
 
@@ -411,6 +416,35 @@ test('completeness binds access summaries to the vector in full and compact view
   assert.throws(() => assertCompletenessView(tampered), { code: 'completeness_access_summary_mismatch' });
 });
 
+test('offline views reject future nested clocks and forged evidence bindings', () => {
+  const membership = [{ record_id: 'record:clock-binding', source_id: 'source:clock-binding', isolated: false, evidence_ids: ['evidence:clock-binding'], source_observed_at: OBSERVED_AT }];
+  const observation = field({
+    record_id: membership[0].record_id,
+    source_id: membership[0].source_id,
+    field_id: 'payload.clock',
+    evidence_refs: [evidence('evidence:clock-observation')],
+    reason_codes: ['clock_fixture']
+  });
+  const view = buildCompletenessView({
+    membership,
+    observations: [observation],
+    fieldDefinitions: [{ field_id: 'payload.clock', field_role: 'measure_description', unit: 'item', description: 'Clock fixture.' }],
+    cohort: 'clock fixture',
+    generation: 'generation-fixture',
+    asOf: '2026-09-04T00:00:00.000Z',
+    generatedAt: '2026-09-05T00:00:00.000Z',
+    inputDigest: INPUT_DIGEST
+  });
+  assertCompletenessView(view, { expectedInputDigest: INPUT_DIGEST });
+  const futureClock = structuredClone(view);
+  futureClock.records[0].source_vectors[0].fields[0].observation.stale_at = '2026-09-05T00:00:00.000Z';
+  assert.throws(() => assertCompletenessView(rehashView(futureClock)), { code: 'completeness_observation_stale_at' });
+  const forgedBinding = structuredClone(view);
+  forgedBinding.evidence_catalog[0].bindings[0].record_id = 'record:forged-binding';
+  assert.throws(() => assertCompletenessView(rehashView(forgedBinding)), { code: 'completeness_evidence_binding_missing' });
+  assert.throws(() => assertCompletenessView(view, { expectedInputDigest: 'sha256:' + '0'.repeat(64) }), { code: 'completeness_expected_input_digest_mismatch' });
+});
+
 test('coverage is derived from frozen membership and keeps isolated records in every partition', () => {
   const membership = [
     { record_id: 'record:001', source_id: 'source:catalog', isolated: false, evidence_ids: ['evidence:membership:001'], source_observed_at: OBSERVED_AT },
@@ -498,16 +532,26 @@ test('offline coverage consumer is bounded and rejects digest drift or unknown m
     cohort: 'consumer fixture',
     generation: 'generation-fixture',
     asOf: '2026-09-04T00:00:00.000Z',
-    generatedAt: '2026-09-04T00:00:00.000Z'
+    generatedAt: '2026-09-04T00:00:00.000Z',
+    inputDigest: INPUT_DIGEST
   });
   assert.equal(validateCompletenessSchema(view), true, JSON.stringify(validateCompletenessSchema.errors));
-  const consumer = createOfflineCompletenessConsumer(view, { expectedDigest: view.artifact_digest, maxPageSize: 1 });
+  const consumerContext = {
+    expectedDigest: view.artifact_digest,
+    expectedInputDigest: INPUT_DIGEST,
+    expectedMembershipHash: view.membership.membership_hash,
+    expectedCohort: 'consumer fixture',
+    expectedGeneration: 'generation-fixture',
+    expectedAsOf: '2026-09-04T00:00:00.000Z'
+  };
+  const consumer = createOfflineCompletenessConsumer(view, { ...consumerContext, maxPageSize: 1 });
   assert.equal(consumer.getSummary().membership.record_count, 2);
   assert.equal(consumer.listRecords({ limit: 1 }).records.length, 1);
   assert.equal(consumer.listRecords({ offset: 1, limit: 1 }).records[0].record_id, 'record:consumer-2');
   assert.equal(consumer.getMetric('not-a-real-metric'), null);
   assert.equal(consumer.getRecord('record:consumer-1').record_id, 'record:consumer-1');
-  assert.throws(() => createOfflineCompletenessConsumer(view, { expectedDigest: 'sha256:' + '0'.repeat(64) }), { code: 'completeness_expected_digest_mismatch' });
+  assert.throws(() => createOfflineCompletenessConsumer(view, { ...consumerContext, expectedDigest: 'sha256:' + '0'.repeat(64) }), { code: 'completeness_expected_digest_mismatch' });
+  assert.throws(() => createOfflineCompletenessConsumer(view, { expectedDigest: view.artifact_digest }), { code: 'completeness_consumer_context_required' });
   assert.throws(() => consumer.listRecords({ limit: 2 }), { code: 'completeness_limit_invalid' });
   const unknownDenominator = buildCompletenessView({
     membership,
@@ -575,8 +619,22 @@ test('checked-in completeness artifact validates as an offline compact view', as
   const artifact = JSON.parse(await fs.readFile(path.join(ROOT, 'verification/research-program/pr-004/completeness-view.json'), 'utf8'));
   assert.equal(validateCompletenessSchema(artifact), true, JSON.stringify(validateCompletenessSchema.errors));
   assertCompletenessView(artifact);
-  const consumer = createOfflineCompletenessConsumer(artifact, { expectedDigest: artifact.artifact_digest, maxPageSize: 25 });
+  const cohortBytes = await fs.readFile(path.join(ROOT, 'evaluation/research-program/cohorts.json'));
+  const artifactContext = {
+    expectedDigest: artifact.artifact_digest,
+    expectedInputDigest: 'sha256:' + sha256Bytes(cohortBytes),
+    expectedMembershipHash: artifact.membership.membership_hash,
+    expectedCohort: artifact.cohort,
+    expectedGeneration: artifact.generation,
+    expectedAsOf: artifact.as_of
+  };
+  const consumer = createOfflineCompletenessConsumer(artifact, { ...artifactContext, maxPageSize: 25 });
   assert.equal(artifact.vector_encoding, 'compact-v1');
+  const compactObservation = artifact.records[0].source_vectors[0].fields[0].observation;
+  assert.equal(typeof compactObservation.access_facts === 'object', true);
+  assert.equal(typeof compactObservation.core_contracts === 'object', true);
+  assert.equal(artifact.evidence_catalog.every(ref => Array.isArray(ref.bindings) && ref.bindings.length > 0), true);
+  assert.equal(artifact.evidence_catalog.every(ref => ref.bindings.some(binding => binding.location === 'membership')), true);
   assert.equal(artifact.membership.record_count, 3434);
   assert.equal(artifact.membership.source_membership_count, 3434);
   assert.equal(artifact.membership.isolated_count, 4);

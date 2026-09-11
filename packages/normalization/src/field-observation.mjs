@@ -396,7 +396,7 @@ export function createFieldObservation(input) {
     endpoint_scope: clone(input.endpoint_scope ?? { endpoint_id: null, resource: null, operation: 'other' }),
     evidence_refs: clone(evidenceRefs),
     reason_codes: [...(input.reason_codes ?? [])],
-    source_observed_at: input.source_observed_at ?? observedAt,
+    source_observed_at: own(input, 'source_observed_at') ? input.source_observed_at : observedAt,
     observed_at: observedAt,
     recorded_at: input.recorded_at ?? observedAt,
     attempted_at: attemptedAt,
@@ -550,12 +550,16 @@ function scopeKey(scope) {
 
 function checkSummary(observation) {
   return {
+    revision_id: observation.observation_id,
     observation_id: observation.observation_id,
+    record_id: observation.record_id,
+    source_id: observation.source_id,
     field_id: observation.field_id,
     attempt_state: observation.attempt_state,
     attempted_at: observation.attempted_at,
     observed_at: observation.observed_at,
     source_observed_at: observation.source_observed_at,
+    recorded_at: observation.recorded_at,
     endpoint_scope: clone(observation.endpoint_scope),
     evidence_state: observation.evidence_state,
     evidence_refs: clone(observation.evidence_refs),
@@ -645,6 +649,7 @@ function compactAccessSummary(summary) {
     },
     latest_successful_check: scope.latest_successful_check ? compactEvidenceObject(scope.latest_successful_check) : null,
     latest_attempt: scope.latest_attempt ? compactEvidenceObject(scope.latest_attempt) : null,
+    revision_history: scope.revision_history.map(compactEvidenceObject),
     browser_observations: scope.browser_observations.map(compactEvidenceObject)
   }));
   for (const scope of output.endpoint_scopes) delete scope.documented.evidence_refs;
@@ -679,6 +684,7 @@ export function buildAccessSummary({ observations, asOf, compact = false }) {
       },
       latest_successful_check: successes[0] ? checkSummary(successes[0]) : null,
       latest_attempt: attempts[0] ? checkSummary(attempts[0]) : null,
+      revision_history: attempts.map(checkSummary),
       browser_observations: browser.sort((left, right) => dateMillis(right.observed_at) - dateMillis(left.observed_at)),
       boundaries: {
         metadata_reachability_is_not_payload_access: true,
