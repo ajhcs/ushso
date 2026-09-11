@@ -1,0 +1,78 @@
+{
+  "format": "ushso.pr009.operating-inputs.v1",
+  "recorded_at": "2026-09-11T18:22:52.161591+00:00",
+  "status": "documented_prices_and_measured_publication_inputs_only",
+  "source_input_head": "ca98b0069ae11976316100ab2e8c6193a0337e7f",
+  "neon": {
+    "url": "https://neon.com/pricing",
+    "observed_at": "2026-09-11T17:54:21.006904+00:00",
+    "response_sha256": "4a9c3a39127211649236973c9d93da688a82c55353cb43e4191247f84780e3ed",
+    "raw_document_published": false,
+    "currency": "USD",
+    "paid_monthly_minimum": 0,
+    "compute_per_CU_hour": {
+      "Launch": 0.106,
+      "Scale": 0.222
+    },
+    "database_per_GB_month": 0.35,
+    "history_per_GB_month": 0.2,
+    "snapshot_per_GB_month": 0.09,
+    "public_transfer_included_GB_per_project_per_billing_month": 500,
+    "public_transfer_overage_per_GB": 0.1,
+    "additional_branch_and_private_network_costs": "Excluded from these partial formula inputs; required if a proposed topology uses them.",
+    "qualification": "Public documented rates, not a procured plan, measured workload, budget authorization or actual invoice."
+  },
+  "cloudflare": {
+    "pricing_url": "https://developers.cloudflare.com/workers/platform/pricing/",
+    "limits_url": "https://developers.cloudflare.com/workers/platform/limits/",
+    "assets_billing_url": "https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/",
+    "observed_date": "2026-09-11",
+    "currency": "USD",
+    "Workers_Standard_monthly_minimum_per_account": 5,
+    "included_requests_per_month": 10000000,
+    "included_CPU_ms_per_month": 30000000,
+    "request_overage_per_million": 0.3,
+    "CPU_ms_overage_per_million": 0.02,
+    "static_files_per_version": {
+      "Free": 20000,
+      "Paid": 100000
+    },
+    "individual_static_asset_max_bytes": 26214400,
+    "static_assets_storage_and_direct_asset_requests": "No extra asset storage charge; direct static requests are free. Worker invocations and Workers Caching request rules must be accounted for separately.",
+    "pinned_run_worker_first": [
+      "/*"
+    ],
+    "qualification": "Published price/limit facts; actual account plan and usage remain unmeasured. No configuration change."
+  },
+  "publication_measurement": {
+    "gate_receipt_sha256": "eb91ff62e7933753c1d1db723f3c56db635baadc0744efb7929753a00a1330d4",
+    "gate_head": "e6da2e2d87c95501e5a1b129989e17bdae3cb882",
+    "gate_tree": "a9d9bca698ffc403a9ad1b82a8c8328af01146aa",
+    "gate_evidence": "verification/research-program/bootstrap/components-e6da2e2/index.json",
+    "asset_count": 41865,
+    "asset_bytes": 1338661425,
+    "largest_asset_bytes": 8383528,
+    "largest_asset_sha256": "8b7403e0d0d363ea5879a9dc2e0e2a774ea31e5cd556bf1826ec02706cd33202",
+    "scope": "Calculated from the previously accepted retained-artifact receipt; not a new artifact-byte verification, database size, transfer volume or invoice."
+  },
+  "constraint_assessment": {
+    "unchanged_artifact_fits_free_static_file_limit": false,
+    "unchanged_artifact_fits_paid_static_file_count_limit": true,
+    "largest_asset_fits_documented_file_size_limit": true,
+    "incremental_account_bill": null,
+    "measured_cheapest_new_topology": null,
+    "selected_new_paid_resources": []
+  },
+  "formula_scope": {
+    "neon_transfer": "Use GB transferred during a billing month, not storage GB-month. Apply the included amount per project, not independently per branch.",
+    "cloudflare": "The account formula includes shared allowances; do not charge an existing minimum again as known project incremental cost.",
+    "all": "Partial rate inputs cannot establish total cost. Recheck rates and include every used product before a concrete procurement decision."
+  },
+  "missing_inputs": [
+    "actual account plan, usage and invoice",
+    "workload CU-hours, database/history/snapshot footprint and transfer",
+    "source rights and required retention classes",
+    "connection, latency, 2x capacity, recovery and residency requirements",
+    "an explicit selected paid budget before paid enrichment or new procurement"
+  ]
+}

@@ -1,8 +1,8 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T18:08:06.331051+00:00",
+  "updated_at": "2026-09-11T18:22:52.161591+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
-  "plan_sha256": "5115ef87c2b5b1c432d807ab25bf48852c76e23a1a0fe7f323fce9be6dce5cb4",
+  "plan_sha256": "423005db30d345dad038698def8e879c31e2c4dadf62b6ce650ec16b3917d6d0",
   "integration_branch": "codex/research-program-integration-20260910",
   "verified_remote_main_sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
   "controller": {
@@ -260,10 +260,10 @@
       "alternative": "Native Luna Max scope reviews completed; PR006 and PR008 implementations are now assigned independently through the user-authorized native collaboration interface. The failed external PR008 scope prompt was not sent."
     },
     "latest_scope_refinement": {
-      "pr_id": "PR-006",
-      "path": "verification/research-program/bootstrap/pr006-scope-20260911/decision.json",
-      "plan_sha256": "5115ef87c2b5b1c432d807ab25bf48852c76e23a1a0fe7f323fce9be6dce5cb4",
-      "implementation_dispatched": true
+      "pr_id": "PR-009",
+      "path": "verification/research-program/bootstrap/pr009-scope-20260911/decision.json",
+      "plan_sha256": "423005db30d345dad038698def8e879c31e2c4dadf62b6ce650ec16b3917d6d0",
+      "implementation_dispatched": false
     },
     "latest_native_dispatch": {
       "pr_id": "PR-006",
@@ -1537,17 +1537,35 @@
       ],
       "dependency_merge_shas": {},
       "owned_paths": [
-        "docs/adr/",
+        "docs/adr/0008-operating-bounds-and-evidence-receipts.md",
+        "docs/adr/README.md",
         "scripts/research-program/policy.json",
-        "packages/connectors/",
-        "packages/ingestion/"
+        "scripts/research-program/operating-bounds.mjs",
+        "scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json",
+        "scripts/research-program/receipts/v1.0.0/README.md",
+        "tests/research-program/operating-bounds.test.mjs",
+        "tests/research-program/fixtures/pr009-census-negative/"
       ],
       "head_sha": null,
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-009.json",
       "evidence_directory": "verification/research-program/pr-009/",
       "github_pr_url": null,
-      "blockers": []
+      "blockers": [
+        {
+          "id": "PR009-PR008-ACCEPTANCE",
+          "kind": "dependency",
+          "detail": "PR008 corrections remain in progress; no implementation has been assigned."
+        }
+      ],
+      "prerequisites_satisfied": false,
+      "scope_decision": "verification/research-program/bootstrap/pr009-scope-20260911/decision.json",
+      "scope_review": "verification/research-program/bootstrap/pr009-scope-20260911/pr009-final-scope-proposal.md.gz",
+      "prepared_inputs": [
+        "verification/research-program/bootstrap/pr009-scope-20260911/operating-inputs.json",
+        "verification/research-program/bootstrap/pr009-scope-20260911/census-negative/manifest.json"
+      ],
+      "next_action": "After accepted PR008, bind its actual merge/handoff and assign this narrowed three-commit packet. Preserve the measured topology decision and unresolved external facts."
     },
     {
       "pr_id": "PR-010",

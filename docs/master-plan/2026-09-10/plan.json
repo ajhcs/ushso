@@ -3,7 +3,7 @@
   "date": "2026-09-10",
   "status": "proposed_not_implemented",
   "mission": "Help humans and AI find, understand and obtain tested routes to US health-systems data.",
-  "source_sha256": "0025e4dcc7c3c44581d999804b6cad0938ea36b78de5a800245fe47de613cf6e",
+  "source_sha256": "d65327e2035d8067d2ad9226c4cdfc79f41faa7e67661475c24901664627ab47",
   "requirements": [
     {
       "id": "R01",
@@ -1036,30 +1036,34 @@
         "F33"
       ],
       "files": [
-        "docs/adr/",
+        "docs/adr/0008-operating-bounds-and-evidence-receipts.md",
+        "docs/adr/README.md",
         "scripts/research-program/policy.json",
-        "packages/connectors/",
-        "packages/ingestion/"
+        "scripts/research-program/operating-bounds.mjs",
+        "scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json",
+        "scripts/research-program/receipts/v1.0.0/README.md",
+        "tests/research-program/operating-bounds.test.mjs",
+        "tests/research-program/fixtures/pr009-census-negative/"
       ],
       "outcome": "Collection, sample retention and infrastructure decisions are explicit and cost bounded.",
       "commits": [
         {
           "id": "C-009-1",
           "subject": "Reconcile the architecture decisions",
-          "instructions": "Write a successor ADR for the cheapest measured control-plane/publication topology using existing PostgreSQL interfaces. Identify retained metadata storage versus any proposed aggregate sample store; preserve current public runtime initially.",
+          "instructions": "Write a successor ADR for the cheapest measured control-plane/publication topology using existing PostgreSQL interfaces. Compare retained publication measurements and timestamped public prices with explicit workload, rights and recovery constraints; mark missing actual usage, bill and capacity facts as unresolved rather than inventing a cheapest result. Preserve the current static public runtime. Identify retained metadata storage versus a separately gated aggregate sample store; do not create paid resources or production bindings. A partial policy/receipt implementation does not by itself satisfy the measured topology decision.",
           "verification": "List exact earlier ADR clauses superseded; no paid resource or production binding is created by a documentation decision."
         },
         {
           "id": "C-009-2",
           "subject": "Define request and retention budgets",
-          "instructions": "Specify source allowlists, per-source concurrency, timeout, redirect, raw/expanded-byte, row, retry and retention limits. Give aggregate previews a separate rights/privacy decision and never accept arbitrary user URLs.",
-          "verification": "Policy fixtures reject a request with no eligible source, an unbounded file or an unauthorized retention class."
+          "instructions": "Define scripts/research-program/policy.json and a pure operating-bounds.mjs validator/composer using existing connector and ingestion exports as read-only dependencies. Specify descriptor/route IDs, per-source concurrency, timeout, redirect, raw/expanded-byte, row, retry and retention limits. Keep activation false; reject arbitrary user URLs and unauthorized operation classes. Ninety days is the active raw metadata/documentation default, with explicit evidenced shorter/longer source-policy overrides; retain existing dependency-aware GC and 365-day security/audit protections. Keep aggregate/sample rights and privacy decisions separate. No connector/ingestion code, live request, receipt persistence, DB, queue, workflow or deletion activation is owned here.",
+          "verification": "Policy fixtures reject missing/foreign route identities, arbitrary URLs, unbounded limits, unauthorized retention classes and activation. Use actual current descriptor, response-bound, retry and retention semantics without creating duplicate execution logic. Underlying strict ingestion records validate unchanged; no matching contract version may be assumed without schema validation."
         },
         {
           "id": "C-009-3",
           "subject": "Implement the evidence receipt contract",
-          "instructions": "Record request type, expected content, final locator, actual size/hash, source and parser identities, attempt outcome and next action without secrets.",
-          "verification": "The Census 200-HTML fixture is an access/content outcome, not success; a truncated file receipt never says fully schema-valid."
+          "instructions": "Add a self-contained strict JSON Schema 2020-12 receipt at scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json plus its boundary README and registered operating-bounds.test.mjs. Compose request type/expected-content basis, safe final locator, scoped actual bytes/hash, source/parser identity, attempt outcome and next action without secrets or body content. Preserve all released ingestion contracts, connector/ingestion packages and WP5 v1.0.0 bytes. Consume the retained Census fixture as an unmatched historical negative observation: do not fabricate approved metadata route IDs, original expectations, connector execution or an unrecorded redirect count. Durable persistence remains PR010/011 scope.",
+          "verification": "Replay the committed retained Census 200-HTML body/hash as an access/content failure with unknown redirect count, not capture/payload/schema success. Test accepted capture, 304 reuse, access-only, pre-egress, typed failure and truncation separately. Truncated bytes never imply complete schema validation. Independently validate underlying strict records, identity/hash/size consistency and absent-secret/body boundaries; no transport or persistent side effect occurs."
         }
       ],
       "acceptance": [
@@ -1071,7 +1075,9 @@
       "status": "planned",
       "evidence_directory": "verification/research-program/pr-009/",
       "verification_scope": "Use the existing affected package tests plus the specific fixtures described below. Add meaningful regression/integration tests for behavior changes; documentation-only commits use link, schema or artifact checks. Full npm test/build/cf:dry-run run at the integration/release gate.",
-      "check_commands": []
+      "check_commands": [
+        "node --test tests/research-program/operating-bounds.test.mjs"
+      ]
     },
     {
       "id": "PR-010",
