@@ -1,0 +1,53 @@
+{
+  "format": "ushso.independent-pr-review.v1",
+  "pr_id": "PR-008",
+  "reviewer": "Astra/root",
+  "recorded_at": "2026-09-11T18:08:06.331051+00:00",
+  "producer_head": "e433effbd2346d3fcb863df061669332375a645b",
+  "producer_tree": "7c3de22518f50a883fc3ca750e250dcc997e7166",
+  "original_base": "a00630c712e3a4e64354a77d268cb168fa3f528a",
+  "disposition": "changes_requested",
+  "implementation_integrated": false,
+  "packet_checks_passed": 8,
+  "artifact_bindings_passed": 28,
+  "semantic_positive_cases": 13,
+  "semantic_negative_failures": 8,
+  "findings": [
+    {
+      "id": "PR008-R1-CONTEXT",
+      "cases": [
+        "foreign-asset-context",
+        "foreign-source-context",
+        "unresolved-schema-field-helper",
+        "trusted-context-replay"
+      ],
+      "correction": "Bind resolved context to independent source/asset/release/distribution/schema/field evidence; do not overwrite trusted caller context with claimant context. Missing parent facts and explicitly unresolved states cannot mint or resolve IDs. Keep old endpoint contracts unchanged; add valid released-shape positive controls."
+    },
+    {
+      "id": "PR008-R1-UNITS",
+      "cases": [
+        "measurement-unit-unknown",
+        "measurement-unit-omitted"
+      ],
+      "correction": "A measurement with unknown or omitted units cannot become complete because type assertions exist. Enforce the same semantics in constructors and the strict schema."
+    },
+    {
+      "id": "PR008-R1-CAPTURE",
+      "cases": [
+        "capture-status-binding",
+        "capture-bytes-required"
+      ],
+      "correction": "Require a successful capture and actual hash-bound bytes or an explicit independently validated equivalent before extraction verification succeeds. Preserve failed/missing-byte outcomes."
+    },
+    {
+      "id": "PR008-R1-LOGS",
+      "cases": [],
+      "correction": "Retain or provide locatable full sanitized producer streams with hashes, preserving the original summary receipts and failures."
+    }
+  ],
+  "corrections_dispatched_to": "/root/pr008_variable_scope_review",
+  "correction_task": "ushso-pr008-variable-identity-20260911",
+  "original_packet": "verification/research-program/bootstrap/pr008-scope-20260911/dispatch-packet.json",
+  "scope_note": "Controller cases are offline synthetic positive/negative contract checks. They do not establish publisher access, actual scientific meaning, payload schema or fitness. No PR008 implementation is included in this root evidence checkpoint.",
+  "reproduction": "On a managed checkout of the recorded producer head, run node pr008-controller-cases.mjs ABS_REPO NEW_RECEIPT. The checks directory retains full root stdout/stderr and the exact commands; the reviewed worktree was clean before and after."
+}

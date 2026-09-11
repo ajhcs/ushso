@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T17:14:23.621321+00:00",
+  "updated_at": "2026-09-11T18:08:06.331051+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "5115ef87c2b5b1c432d807ab25bf48852c76e23a1a0fe7f323fce9be6dce5cb4",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -209,17 +209,19 @@
         "provider": "native Codex collaboration",
         "model": "gpt-5.6-luna",
         "reasoning": "max",
-        "status": "in_progress",
+        "status": "changes_requested",
         "task_id": "ushso-pr008-variable-identity-20260911",
         "branch": "codex/ushso-pr008-variable-identity-20260911",
         "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr008-variable-identity-20260911",
         "base_sha": "a00630c712e3a4e64354a77d268cb168fa3f528a",
         "base_tree": "08452bc996152f3a034833038b5fcc8373ecc5a8",
         "dispatch_packet": "verification/research-program/bootstrap/pr008-scope-20260911/dispatch-packet.json",
-        "dispatch_packet_sha256": "59a44a1a19d616365eb0ab8a38bb035a8a5d89ef95b886477b101561b0e7381f"
+        "dispatch_packet_sha256": "59a44a1a19d616365eb0ab8a38bb035a8a5d89ef95b886477b101561b0e7381f",
+        "reviewed_head": "e433effbd2346d3fcb863df061669332375a645b",
+        "corrections_dispatched": true
       }
     ],
-    "current_review": "verification/research-program/bootstrap/pr007-r3-wp11-combined-review-20260911/index.json",
+    "current_review": "verification/research-program/bootstrap/pr008-review-e433eff/index.json",
     "wp11_input_design_review": {
       "run_id": "ushso-wp11-design-review-grok-20260911",
       "status": "completed",
@@ -243,9 +245,7 @@
     "latest_ci_observation": "verification/research-program/bootstrap/pr007-r3-wp11-combined-review-20260911/hosted-ci/receipt.json",
     "latest_publication_receipt": "verification/research-program/bootstrap/pr007-r3-wp11-combined-review-20260911/prior-publication/receipt.json",
     "latest_corrected_component_reviews": {
-      "PR-007": "verification/research-program/bootstrap/components-e6da2e2/PR-007-REVIEW.md",
-      "PR-086": "verification/research-program/bootstrap/components-e6da2e2/PR-086-REVIEW.md",
-      "combined": "verification/research-program/bootstrap/components-e6da2e2/combined-preflight/preflight.json"
+      "PR-008": "verification/research-program/bootstrap/pr008-review-e433eff/decision.json"
     },
     "provider_dispatch_boundary": {
       "observed_at": "2026-09-11T16:43:08.834411Z",
@@ -1453,7 +1453,7 @@
     },
     {
       "pr_id": "PR-008",
-      "status": "in_progress",
+      "status": "changes_requested",
       "owner": "/root/pr008_variable_scope_review",
       "dependencies": [
         "PR-007"
@@ -1475,12 +1475,33 @@
         "tests/update-cycle.test.mjs",
         "tests/cms-layout.test.mjs"
       ],
-      "head_sha": null,
+      "head_sha": "e433effbd2346d3fcb863df061669332375a645b",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-008.json",
       "evidence_directory": "verification/research-program/pr-008/",
       "github_pr_url": null,
-      "blockers": [],
+      "blockers": [
+        {
+          "id": "PR008-R1-CONTEXT",
+          "kind": "implementation_correction",
+          "detail": "Bind resolved context to independent source/asset/release/distribution/schema/field evidence; do not overwrite trusted caller context with claimant context. Missing parent facts and explicitly unresolved states cannot mint or resolve IDs. Keep old endpoint contracts unchanged; add valid released-shape positive controls."
+        },
+        {
+          "id": "PR008-R1-UNITS",
+          "kind": "implementation_correction",
+          "detail": "A measurement with unknown or omitted units cannot become complete because type assertions exist. Enforce the same semantics in constructors and the strict schema."
+        },
+        {
+          "id": "PR008-R1-CAPTURE",
+          "kind": "implementation_correction",
+          "detail": "Require a successful capture and actual hash-bound bytes or an explicit independently validated equivalent before extraction verification succeeds. Preserve failed/missing-byte outcomes."
+        },
+        {
+          "id": "PR008-R1-LOGS",
+          "kind": "implementation_correction",
+          "detail": "Retain or provide locatable full sanitized producer streams with hashes, preserving the original summary receipts and failures."
+        }
+      ],
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-007": "verification/research-program/bootstrap/components-e6da2e2/pr-007-integration-handoff.json"
@@ -1499,8 +1520,10 @@
       "dispatch_packet": "verification/research-program/bootstrap/pr008-scope-20260911/dispatch-packet.json",
       "dispatch_packet_sha256": "59a44a1a19d616365eb0ab8a38bb035a8a5d89ef95b886477b101561b0e7381f",
       "dispatch_recorded_at": "2026-09-11T16:56:56.612999+00:00",
-      "producer_state": "assigned",
-      "next_action": "Producer completes the three bounded PR008 commits, registered checks and validated handoff; root reviews the exact final head."
+      "producer_state": "original_producer_checked_corrections_in_progress",
+      "next_action": "Producer corrects context, units, capture evidence and full-log retention on its original branch; root replays decisive checks on the new immutable head.",
+      "independent_review": "verification/research-program/bootstrap/pr008-review-e433eff/decision.json",
+      "reviewed_tree": "7c3de22518f50a883fc3ca750e250dcc997e7166"
     },
     {
       "pr_id": "PR-009",
