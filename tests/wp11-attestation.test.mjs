@@ -14,9 +14,11 @@ import {
   usesReviewedWp11CurrentAttestation,
 } from '../scripts/run-contract-suites.mjs'
 import {
+  ALLOWED_PACKAGE_LOCK,
   HISTORICAL_WP11_V1_3,
   ORIGINAL_PR085_PACKAGE_SNAPSHOT,
   PR005_941C9CD_CHANGED_INPUTS,
+  PRE_PR005_CHANGED_INPUTS,
   REVIEWED_PR003_PACKAGE_SNAPSHOT,
   REVIEWED_WP11_ROUTE,
   WP11_BUILDER_UNPINNED_READS,
@@ -92,6 +94,121 @@ async function writeSnapshotInventory(root, inventory) {
   )
 }
 
+function diffIdentity(item) {
+  return {
+    path: item.path,
+    historical_bytes: item.historical_bytes,
+    historical_sha256: item.historical_sha256,
+    current_bytes: item.current_bytes,
+    current_sha256: item.current_sha256,
+  }
+}
+
+async function independentlyDiffAgainstSealedPins({
+  readCurrentFile = async (_root, relativePath) => readFile(path.resolve(repoRoot, relativePath)),
+} = {}) {
+  const retained = await readHistoricalPreimageSnapshot()
+  const changed = []
+  let unchangedCount = 0
+  for (const pin of retained.files) {
+    const bytes = await readCurrentFile(repoRoot, pin.path)
+    assert.ok(bytes && bytes.length > 0, `WP11_INDEPENDENT_CURRENT_EMPTY:${pin.path}`)
+    const currentSha256 = sha256(bytes)
+    if (currentSha256 === pin.sha256 && bytes.length === pin.bytes) {
+      unchangedCount += 1
+      continue
+    }
+    changed.push({
+      path: pin.path,
+      historical_bytes: pin.bytes,
+      historical_sha256: pin.sha256,
+      current_bytes: bytes.length,
+      current_sha256: currentSha256,
+    })
+  }
+  changed.sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0))
+  assert.equal(unchangedCount + changed.length, SEALED_WP11_FILE_COUNT, 'WP11_INDEPENDENT_DIFF_COUNT')
+  return { retained, changed, unchangedCount }
+}
+
+function assertCompleteIndependentDiff(report, independent) {
+  assert.equal(report.compared_file_count, SEALED_WP11_FILE_COUNT)
+  assert.equal(report.changed_count + report.unchanged_count, SEALED_WP11_FILE_COUNT)
+  assert.equal(report.changed_count, independent.changed.length)
+  assert.equal(report.unchanged_count, independent.unchangedCount)
+  assert.deepEqual(report.changed.map(diffIdentity), independent.changed)
+  assert.equal(report.approval, null)
+  assert.equal(report.current_approval_issued, false)
+  assert.equal(report.historical_approval_transferred, false)
+  assert.equal(report.combined_acceptance, false)
+  assert.equal(report.release_qualified, false)
+  for (const item of report.changed) {
+    assert.notEqual(item.historical_sha256, item.current_sha256)
+    assert.equal(item.historical_source, 'retained_historical_preimage_snapshot')
+    assert.ok(item.historical_bytes > 0 && item.current_bytes > 0)
+    if (item.path === 'package.json') {
+      assert.equal(item.role, 'reviewed_pr003_package_transition')
+    } else if (item.path === 'package-lock.json') {
+      assert.equal(item.role, 'pr085_ci_v14_workspace_lock')
+    } else {
+      assert.equal(item.role, 'current_unapproved_input_change')
+    }
+  }
+}
+
+async function readNamedPrePr005CurrentFile(retained, _root, relativePath) {
+  if (relativePath === 'package.json') {
+    const bytes = await readFile(path.resolve(repoRoot, relativePath))
+    assert.deepEqual(
+      { bytes: bytes.length, sha256: sha256(bytes) },
+      { bytes: REVIEWED_PR003_PACKAGE_SNAPSHOT.bytes, sha256: REVIEWED_PR003_PACKAGE_SNAPSHOT.sha256 },
+    )
+    return bytes
+  }
+  if (relativePath === 'package-lock.json') {
+    const bytes = await readFile(path.resolve(repoRoot, relativePath))
+    assert.deepEqual(
+      { bytes: bytes.length, sha256: sha256(bytes) },
+      { bytes: ALLOWED_PACKAGE_LOCK.pr085_ci_v14.bytes, sha256: ALLOWED_PACKAGE_LOCK.pr085_ci_v14.sha256 },
+    )
+    return bytes
+  }
+  const bytes = retained.bytesByPath.get(relativePath)
+  assert.ok(bytes && bytes.length > 0, `WP11_PRE_PR005_FIXTURE_MISSING:${relativePath}`)
+  return bytes
+}
+
+const BUILDER_FIXTURE_EXTRA_FILES = Object.freeze([
+  ...WP11_BUILDER_UNPINNED_READS,
+  'contracts/research-plan/v1.0.0/manifests/package-manifest.json',
+  'packages/planner/planner-repository.mjs',
+  'packages/planner/static-planner-repository.mjs',
+  'packages/coverage/coverage-repository.mjs',
+  'packages/coverage/static-coverage-repository.mjs',
+  'evaluation/planner/v1.0.0/manifests/package-manifest.json',
+  HISTORICAL_WP11_V1_3.predecessor_manifest.path,
+  HISTORICAL_WP11_V1_3.predecessor_receipt.path,
+  HISTORICAL_WP11_V1_3.previous_successor.path,
+])
+
+async function materializeMutableCurrentInputFixture(relativePath) {
+  const retained = await readHistoricalPreimageSnapshot()
+  const root = await mkdtemp(path.join(await verificationTempRoot(), 'ushso-pr086-wp11-current-input-'))
+  const paths = new Set(retained.files.map((pin) => pin.path))
+  for (const extra of BUILDER_FIXTURE_EXTRA_FILES) paths.add(extra)
+  for (const item of paths) {
+    const dest = path.join(root, item)
+    await mkdir(path.dirname(dest), { recursive: true })
+    await cp(path.join(repoRoot, item), dest)
+  }
+  return {
+    root,
+    relativePath,
+    filePath: path.join(root, relativePath),
+    retained,
+  }
+}
+
 test('current WP11 verifier keeps historical proof, technical draft and wrapper subject separate', async () => {
   const result = await verifyWp11Attestation()
   assert.equal(result.status, 'PASS')
@@ -126,13 +243,7 @@ test('current WP11 verifier keeps historical proof, technical draft and wrapper 
   assert.equal(result.historical.input_bindings.git_required, false)
   assert.equal(result.historical.input_bindings.execute_retained_sources, false)
   assert.equal(result.historical.input_bindings.subject_sha256, HISTORICAL_WP11_SUBJECT_SHA256)
-  assert.equal(result.current_versus_historical.changed_count, 2)
-  assert.equal(result.current_versus_historical.approval, null)
-  assert.equal(result.current_versus_historical.combined_acceptance, false)
-  assert.deepEqual(
-    result.current_versus_historical.changed.map((item) => item.path).sort(),
-    ['package-lock.json', 'package.json'],
-  )
+  assertCompleteIndependentDiff(result.current_versus_historical, await independentlyDiffAgainstSealedPins())
   assert.equal(result.builder_coverage_limits.unpinned_legacy_builder_reads.length, WP11_BUILDER_UNPINNED_READS.length)
   const actualPackage = await hashPinned('package.json')
   const reviewedTransition = actualPackage.sha256 === REVIEWED_PR003_PACKAGE_SNAPSHOT.sha256
@@ -286,29 +397,66 @@ test('current technical builder hashes actual current files and remains unapprov
 
 test('actual current-file change updates the pending technical subject while snapshot proof still passes', async () => {
   const relativePath = 'apps/web/src/components/ResultCard.test.ts'
-  const filePath = path.join(repoRoot, relativePath)
-  const original = await readFile(filePath)
+  const fixture = await materializeMutableCurrentInputFixture(relativePath)
+  const original = await readFile(fixture.filePath)
   const mutated = Buffer.from(original)
   mutated[mutated.length - 1] ^= 1
-  const before = await buildCurrentWp11Draft()
+  const historicalPin = fixture.retained.files.find((pin) => pin.path === relativePath)
+  assert.ok(historicalPin)
+  const beforeCurrentSha256 = sha256(original)
+  const afterCurrentSha256 = sha256(mutated)
+  assert.notEqual(beforeCurrentSha256, afterCurrentSha256)
+  const readFixtureFile = async (_root, itemPath) => readFile(path.join(fixture.root, itemPath))
+  const before = await buildCurrentWp11Draft({ root: fixture.root })
   const historicalBefore = await validateHistoricalWp11Proof(await historicalBytes())
+  const beforeReport = await reportCurrentVersusHistoricalInputs({
+    snapshot: fixture.retained,
+    readCurrentFile: readFixtureFile,
+    currentSource: 'task_owned_current_input_fixture',
+  })
+  const beforeChanged = beforeReport.changed.find((item) => item.path === relativePath)
+  if (beforeCurrentSha256 === historicalPin.sha256 && original.length === historicalPin.bytes) {
+    assert.equal(beforeChanged, undefined)
+  } else {
+    assert.ok(beforeChanged)
+    assert.equal(beforeChanged.historical_sha256, historicalPin.sha256)
+    assert.equal(beforeChanged.historical_bytes, historicalPin.bytes)
+    assert.equal(beforeChanged.current_sha256, beforeCurrentSha256)
+    assert.equal(beforeChanged.current_bytes, original.length)
+  }
+  const beforeFile = before.technical_evidence.files.find((file) => file.path === relativePath)
+  assert.equal(beforeFile.sha256, beforeCurrentSha256)
   try {
-    await writeFile(filePath, mutated)
-    const after = await buildCurrentWp11Draft()
+    await writeFile(fixture.filePath, mutated)
+    const after = await buildCurrentWp11Draft({ root: fixture.root })
     assert.notEqual(after.subject_sha256, before.subject_sha256)
     assert.equal(after.approval, null)
     assert.equal(after.status, 'pending_authorized_review')
+    const afterFile = after.technical_evidence.files.find((file) => file.path === relativePath)
+    assert.equal(afterFile.sha256, afterCurrentSha256)
+    assert.equal(afterFile.bytes, mutated.length)
     const historicalAfter = await validateHistoricalWp11Proof(await historicalBytes())
     assert.equal(historicalAfter.subject_sha256, historicalBefore.subject_sha256)
-    const report = await reportCurrentVersusHistoricalInputs()
+    const report = await reportCurrentVersusHistoricalInputs({
+      snapshot: fixture.retained,
+      readCurrentFile: readFixtureFile,
+      currentSource: 'task_owned_current_input_fixture',
+    })
+    const independent = await independentlyDiffAgainstSealedPins({ readCurrentFile: readFixtureFile })
+    assertCompleteIndependentDiff(report, independent)
     const changed = report.changed.find((item) => item.path === relativePath)
     assert.ok(changed)
-    assert.equal(changed.current_sha256, sha256(mutated))
-    assert.equal(changed.historical_sha256, sha256(original))
+    assert.equal(changed.historical_sha256, historicalPin.sha256)
+    assert.equal(changed.historical_bytes, historicalPin.bytes)
+    assert.equal(changed.historical_source, 'retained_historical_preimage_snapshot')
+    assert.equal(changed.current_sha256, afterCurrentSha256)
+    assert.equal(changed.current_bytes, mutated.length)
+    assert.notEqual(changed.current_sha256, beforeCurrentSha256)
     assert.equal(changed.role, 'current_unapproved_input_change')
     assert.equal(report.approval, null)
+    assert.equal(sha256(await readFile(path.join(repoRoot, relativePath))), beforeCurrentSha256)
   } finally {
-    await writeFile(filePath, original)
+    await rm(fixture.root, { recursive: true, force: true })
   }
 })
 
@@ -357,26 +505,37 @@ test('PR005-941c9cd comparison reports all 13 changed inputs and is not combined
   }
 })
 
-test('current integration comparison reports only the two package transitions', async () => {
-  const report = await reportCurrentVersusHistoricalInputs()
+test('named pre-PR005 fixture comparison reports only the two package transitions', async () => {
+  const retained = await readHistoricalPreimageSnapshot()
+  const readCurrentFile = async (root, relativePath) => readNamedPrePr005CurrentFile(retained, root, relativePath)
+  const report = await reportCurrentVersusHistoricalInputs({
+    snapshot: retained,
+    readCurrentFile,
+    currentSource: 'pre_pr005_named_fixture',
+  })
+  const independent = await independentlyDiffAgainstSealedPins({ readCurrentFile })
+  assertCompleteIndependentDiff(report, independent)
   assert.equal(report.changed_count, 2)
-  assert.deepEqual(report.changed.map((item) => item.path).sort(), ['package-lock.json', 'package.json'])
+  assert.deepEqual(report.changed.map((item) => item.path).sort(), [...PRE_PR005_CHANGED_INPUTS].sort())
   assert.equal(report.changed.find((item) => item.path === 'package.json').role, 'reviewed_pr003_package_transition')
   assert.equal(report.changed.find((item) => item.path === 'package-lock.json').role, 'pr085_ci_v14_workspace_lock')
-  assert.equal(report.approval, null)
-  assert.equal(report.combined_acceptance, false)
+  for (const item of report.changed) {
+    assert.equal(item.current_source, 'pre_pr005_named_fixture')
+  }
 })
 
 test('corrected PR005 afb9056 comparison is a complete unapproved report, not combined acceptance', async () => {
+  const readCurrentFile = async (_root, relativePath) => readGitBytes('afb90565456a429e73527f2bb99daf9cf174aa3c', relativePath)
   const report = await reportCurrentVersusHistoricalInputs({
-    readCurrentFile: async (_root, relativePath) => readGitBytes('afb90565456a429e73527f2bb99daf9cf174aa3c', relativePath),
+    readCurrentFile,
     currentSource: 'pr005_afb9056_git_snapshot',
   })
-  assert.ok(report.changed_count >= 2)
-  assert.equal(report.changed_count + report.unchanged_count, SEALED_WP11_FILE_COUNT)
-  assert.equal(report.approval, null)
-  assert.equal(report.combined_acceptance, false)
+  const independent = await independentlyDiffAgainstSealedPins({ readCurrentFile })
+  assertCompleteIndependentDiff(report, independent)
   assert.equal(report.changed.some((item) => item.path === 'apps/web/src/components/ResultCard.test.ts'), true)
+  for (const item of report.changed) {
+    assert.equal(item.current_source, 'pr005_afb9056_git_snapshot')
+  }
 })
 
 test('current technical failure and approval overclaim cannot be represented as a pending draft', async () => {
