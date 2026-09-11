@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// PR-003 slice C-003-2 plus integrity corrections C-003-2-R1 / C-003-2-R2 —
+// PR-003 slice C-003-2 plus integrity corrections C-003-2-R1 / C-003-2-R2
+// and remaining-defect corrections C-003-2-R3 / C-003-3-R3 —
 // bounded handoff-packet validator.
 //
 // Usage:
@@ -31,8 +32,9 @@
 //     synthetic commit;
 //   * streamed immutable Git snapshot hashing with typed missing-path versus
 //     unreadable/size-limit diagnostics;
-//   * schema-invalid JSON (including null/noniterable collections) as a
-//     rejected packet, not an operational tool failure;
+//   * schema-invalid JSON (including null/noniterable collections and
+//     null/non-object collection items) as a rejected packet, not an
+//     operational tool failure;
 //   * status-specific evidence (completed packets cannot have empty evidence
 //     arrays or a null owner).
 //
@@ -56,7 +58,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 /** Repository root, derived from this script's location. */
 export const REPO_ROOT = path.resolve(HERE, '..', '..');
 
-export const FORMAT = 'ushso.pr003.c003-r2.handoff-check.v1';
+export const FORMAT = 'ushso.pr003.c003-r3.handoff-check.v1';
 
 /** Hard cap for streamed `git show` hashing of immutable snapshots. */
 export const GIT_SNAPSHOT_MAX_BYTES = 64 * 1024 * 1024;
@@ -392,16 +394,37 @@ const HAND_OFF_COLLECTION_KEYS = [
   'risks'
 ];
 
+/** Collections whose semantic traversals dereference object fields such as `id`. */
+const OBJECT_ITEM_COLLECTION_KEYS = [
+  'source_identities',
+  'commands',
+  'artifacts',
+  'acceptance_results',
+  'failures_and_skipped_checks',
+  'unresolved_claims',
+  'risks'
+];
+
+function isPlainObjectItem(value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
 /**
  * True when semantic checkers can traverse the packet without throwing on
- * null/noniterable collections. Schema-invalid but structurally safe packets
- * still receive the named semantic rejection rules used by the regression suite.
+ * null/noniterable collections or null/non-object collection items.
+ * Schema-invalid but structurally safe packets still receive the named
+ * semantic rejection rules used by the regression suite.
  */
 export function isStructurallySafeHandoff(value) {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
   for (const key of HAND_OFF_COLLECTION_KEYS) {
     if (value[key] == null) continue;
     if (!Array.isArray(value[key])) return false;
+  }
+  for (const key of OBJECT_ITEM_COLLECTION_KEYS) {
+    const items = value[key];
+    if (!Array.isArray(items)) continue;
+    if (!items.every(isPlainObjectItem)) return false;
   }
   if (value.dependency_merge_shas != null) {
     if (
@@ -412,6 +435,41 @@ export function isStructurallySafeHandoff(value) {
     }
   }
   return true;
+}
+
+function escapeRegexLiteralChar(ch) {
+  return /[.+?^${}()|[\]\\]/.test(ch) ? `\\${ch}` : ch;
+}
+
+/**
+ * Translate documented `*` / `**` tokens independently of regex metacharacter
+ * escaping. `*` is one slash-free segment; `**` is zero or more segments.
+ * A globstar followed by a slash also matches zero intervening directories.
+ */
+function ownedGlobToRegExpSource(pattern) {
+  let source = '';
+  let i = 0;
+  while (i < pattern.length) {
+    if (pattern[i] !== '*') {
+      source += escapeRegexLiteralChar(pattern[i]);
+      i += 1;
+      continue;
+    }
+    let stars = 1;
+    while (pattern[i + stars] === '*') stars += 1;
+    i += stars;
+    if (stars === 1) {
+      source += '[^/]*';
+      continue;
+    }
+    if (pattern[i] === '/') {
+      i += 1;
+      source += '(?:.*/)?';
+    } else {
+      source += '.*';
+    }
+  }
+  return source;
 }
 
 /**
@@ -436,12 +494,7 @@ export function ownedPathMatches(ownedPath, candidatePath) {
     return candidate === prefix || candidate.startsWith(`${prefix}/`);
   }
   if (!owned.includes('*')) return false;
-  const escaped = owned
-    .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
-    .replace(/\\\*\\\*/g, ':::GLOBSTAR:::')
-    .replace(/\\\*/g, '[^/]*')
-    .replace(/:::GLOBSTAR:::/g, '.*');
-  return new RegExp(`^${escaped}$`).test(candidate);
+  return new RegExp(`^${ownedGlobToRegExpSource(owned)}$`).test(candidate);
 }
 
 function gitPathExistsAtCommit(commit, gitPath, cwd) {

@@ -1,8 +1,9 @@
 # PR-003 task and handoff/receipt schemas
 
 Machine-checkable contract material for PR-003 (`C-003-1` plus integrity
-corrections `C-003-1-R1` / `C-003-2-R1` and bounded contract corrections
-`C-003-2-R2` / `C-003-3-R2`). It translates
+corrections `C-003-1-R1` / `C-003-2-R1`, bounded contract corrections
+`C-003-2-R2` / `C-003-3-R2`, and remaining-defect corrections
+`C-003-2-R3` / `C-003-3-R3`). It translates
 [`docs/master-plan/2026-09-10/EXECUTION.md`](../../../master-plan/2026-09-10/EXECUTION.md)
 and the [PR-003 packet](../../../master-plan/2026-09-10/prs/PR-003.md) into
 two JSON Schema documents that preserve the evidence an independent reviewer
@@ -148,14 +149,23 @@ enforces the structural half, and the bounded checkers enforce the rest.
 8. **Completed task scope.** A completed packet's `owner`, `branch` and each
    `changed_files[]` entry are compared with the concrete per-PR task binding.
    Ownership uses exact-file paths, trailing-slash directories, and `*` /
-   `**` globs. A producer-written task-binding file does not authenticate
+   `**` globs. Wildcard tokens are translated separately from regex
+   metacharacter escaping: `*` matches one slash-free segment and `**`
+   matches zero or more segments, including an interior globstar with no
+   intervening directory (`tests/**/*.mjs` matches `tests/one.mjs`). Suffix
+   `dir/**`, trailing-slash `dir/`, exact-file and sibling-boundary rejection
+   are unchanged. A producer-written task-binding file does not authenticate
    itself and does not replace the controller's immutable dispatch review.
 9. **Malformed packet versus tool failure.** A syntactically valid JSON value
-   that is schema-invalid, including `null` or noniterable collection types,
-   returns the normal rejected packet report (`outcome=rejected`, CLI exit 1)
-   with `schema_invalid` findings. It does not throw and is not an operational
-   tool failure (CLI exit 2). Structurally safe incomplete packets still
-   receive the named semantic rejection rules used by the regression suite.
+   that is schema-invalid, including `null` or noniterable collection types
+   and `null` or non-object items inside `commands`, `artifacts`,
+   `source_identities`, `acceptance_results`, `failures_and_skipped_checks`
+   or `unresolved_claims`, returns the normal rejected packet report
+   (`outcome=rejected`, CLI exit 1) with `schema_invalid` findings. It does
+   not throw and is not an operational tool failure (CLI exit 2). File and
+   Git operational failures remain typed and are not reported as packet
+   success. Structurally safe incomplete packets still receive the named
+   semantic rejection rules used by the regression suite.
 
 ## Per-PR binding (no shared sibling)
 
@@ -223,14 +233,15 @@ are retained **byte-identical** as historical records. They are not
 retroactively rewritten, and this schema intentionally does not claim to
 validate them (they carry extra fields and a different evidence shape). Handoffs
 produced from PR-003 onward are expected to satisfy the contract, including the
-R1 integrity corrections and the R2 contract corrections. A handoff is a
+R1 integrity corrections, the R2 contract corrections and the R3
+null-item/wildcard-ownership corrections. A handoff is a
 producer artifact: passing this schema is not independent verification and not
 scientific approval.
 
-Historical C-003-1 / C-003-2 / C-003-3 and R1 command receipts and evidence
+Historical C-003-1 / C-003-2 / C-003-3, R1 and R2 command receipts and evidence
 indexes under `verification/research-program/pr-003/` are preserved
 byte-for-byte. They record runs against earlier validators and remain
-explicitly historical; they are not re-presented as fresh checks. R2
+explicitly historical; they are not re-presented as fresh checks. R3
 correction evidence is a separate additive index that binds current files and
 cites those historical bytes through immutable Git commit/path/hash triples.
 
@@ -256,11 +267,15 @@ hashing, Git object binding and per-PR base lookup.
   (tree `98e04d100daa94cdf9da5905c15d58a0aae6778d`). The independently reviewed
   code was `dc7267bf1c872f1457fa927e2d0403051575f474`; `bf46d92` adds only the
   independently accepted test-chain inventory correction.
+- Remaining-defect correction base (R3): `5115170093512b06b21c01725bb982e457797efe`
+  (tree `24fe636b0370e2e7b9c166d6f1c6bed520ed033e`).
 - Accepted PR-002 merge (dependency): `5647e81457b606bb36456e75c48f990ce21e9c6c`.
 - PR-001 merge (dependency): `035465f3f16d15f02467679d96451d4440a36ca8`.
 - Dispatch prompt SHA-256: `f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d`.
 - Independent final-contract review receipt SHA-256:
   `99b542280dc18a34c22affb1dcc6a87780db58be7b53c1e30c9cf37dc33470e6`.
+- Independent R2 review receipt SHA-256:
+  `91924040dd21957d55eab626d19abbfb86b9243b56b6c4caa12635314aae4681`.
 
 Authorship is layered and must not be collapsed:
 
@@ -274,9 +289,13 @@ Authorship is layered and must not be collapsed:
   `gpt-5.6-luna-max/high`. Root's native dispatch specified `gpt-5.6-luna/max`;
   the producer self-label is not a serving-model attestation. Those R1 records
   are Luna's work, not completed Grok work.
-- This separately scoped R2 correction is Grok Co-Engineer work
+- The separately scoped R2 correction is Grok Co-Engineer work
   (`execution.provider: grok`, `execution.model: grok-4`) on the reviewed
   composed candidate. It is not a replay of the failed 2026-09-10 Grok task.
+- This separately scoped R3 correction is Grok Co-Engineer work
+  (`execution.provider: grok`, `execution.model: grok-4`) on the independently
+  reviewed R2 result. It is not a replay of R1 or of the failed 2026-09-10
+  Grok task.
 
 Reviewer Astra. `head_sha` stays null until the controller records the actual
 final commit; a future commit cannot contain its own hash. Root owns

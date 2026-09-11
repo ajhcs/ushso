@@ -1,5 +1,5 @@
 // Focused suite for PR-003 C-003-2 and integrity corrections C-003-1-R1/C-003-2-R1
-// plus bounded R2 contract corrections.
+// plus bounded R2 contract corrections and remaining-defect R3 corrections.
 //
 // The suite exercises the validator on committed fixtures and ephemeral,
 // write-then-remove symlink probes. A passing packet is producer evidence, not
@@ -293,6 +293,19 @@ test('ownedPathMatches documents exact-file and directory/glob ownership', () =>
   assert.equal(ownedPathMatches('verification/research-program/pr-003/**', 'verification/research-program/pr-003/fixtures/handoff.valid.json'), true);
   assert.equal(ownedPathMatches('docs/research-program/handoffs/', 'docs/research-program/handoffs/PR-003.json'), true);
   assert.equal(ownedPathMatches('docs/research-program/handoffs/schema/**', 'docs/research-program/handoffs/PR-003.json'), false);
+
+  assert.equal(ownedPathMatches('tests/*.mjs', 'tests/one.mjs'), true);
+  assert.equal(ownedPathMatches('tests/*.mjs', 'tests/nested/one.mjs'), false);
+  assert.equal(ownedPathMatches('tests/**/*.mjs', 'tests/one.mjs'), true);
+  assert.equal(ownedPathMatches('tests/**/*.mjs', 'tests/nested/one.mjs'), true);
+  assert.equal(ownedPathMatches('tests/**/*.mjs', 'lib/one.mjs'), false);
+  assert.equal(ownedPathMatches('*.mjs', 'one.mjs'), true);
+  assert.equal(ownedPathMatches('*.mjs', 'tests/one.mjs'), false);
+  assert.equal(ownedPathMatches('foo/**/bar', 'foo/bar'), true);
+  assert.equal(ownedPathMatches('foo/**/bar', 'foo/x/bar'), true);
+  assert.equal(ownedPathMatches('foo**bar', 'foobar'), true);
+  assert.equal(ownedPathMatches('verification/research-program/pr-003/', 'verification/research-program/pr-003'), true);
+  assert.equal(ownedPathMatches('verification/research-program/pr-003/**', 'verification/research-program/pr-003'), true);
 });
 
 test('base SHA must match the concrete per-PR task binding', async () => {
@@ -431,6 +444,102 @@ test('noniterable collection types return schema findings without throwing', asy
   }
 });
 
+const OBJECT_ITEM_COLLECTIONS = [
+  'commands',
+  'artifacts',
+  'source_identities',
+  'acceptance_results',
+  'failures_and_skipped_checks',
+  'unresolved_claims'
+];
+
+for (const key of OBJECT_ITEM_COLLECTIONS) {
+  test(`null ${key} item is a schema-invalid rejected packet (API and CLI)`, async () => {
+    const handoff = await readJson('handoff.valid.json');
+    handoff[key] = [...handoff[key], null];
+    const runtime = await writeRuntimeHandoff(`null-${key}-item.json`, handoff);
+    try {
+      const report = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+      assert.equal(report.ok, false, JSON.stringify(report.findings));
+      assert.equal(report.outcome, 'rejected');
+      assert.ok(rulesOf(report).includes('schema_invalid'));
+      assert.equal(rulesOf(report).includes('validator_operational_error'), false);
+      const cli = runCli(runtime.file);
+      assert.equal(cli.status, 1, cli.stderr);
+      assert.notEqual(cli.status, 2);
+      assert.equal(cli.json?.outcome, 'rejected');
+      assert.ok(rulesOf(cli.json).includes('schema_invalid'));
+    } finally {
+      await rm(runtime.dir, { recursive: true, force: true });
+    }
+  });
+}
+
+test('malformed non-object collection elements are schema-invalid rejected packets', async () => {
+  const handoff = await readJson('handoff.valid.json');
+  const cases = [
+    { key: 'commands', value: 'not-an-object' },
+    { key: 'artifacts', value: 42 },
+    { key: 'source_identities', value: ['nested'] },
+    { key: 'acceptance_results', value: true }
+  ];
+  for (const { key, value } of cases) {
+    const packet = structuredClone(handoff);
+    packet[key] = [...packet[key], value];
+    const runtime = await writeRuntimeHandoff(`nonobject-${key}.json`, packet);
+    try {
+      const report = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+      assert.equal(report.ok, false, key);
+      assert.equal(report.outcome, 'rejected', key);
+      assert.ok(rulesOf(report).includes('schema_invalid'), key);
+      const cli = runCli(runtime.file);
+      assert.equal(cli.status, 1, `${key}: ${cli.stderr}`);
+      assert.equal(cli.json?.outcome, 'rejected', key);
+    } finally {
+      await rm(runtime.dir, { recursive: true, force: true });
+    }
+  }
+
+  const valid = await checkHandoff(fixture('handoff.valid.json'), { repoRoot: REPO_ROOT });
+  assert.equal(valid.ok, true, JSON.stringify(valid.findings));
+  assert.equal(valid.outcome, 'accepted');
+  const validCli = runCli(fixture('handoff.valid.json'));
+  assert.equal(validCli.status, 0, validCli.stderr);
+  assert.equal(validCli.json?.outcome, 'accepted');
+});
+
+test('file and Git operational failures remain typed and are not packet success', async () => {
+  const missing = path.join(FIXTURE_DIR, 'pr003-r3-missing-handoff.json');
+  const missingReport = await checkHandoff(missing, { repoRoot: REPO_ROOT });
+  assert.equal(missingReport.ok, false);
+  assert.notEqual(missingReport.outcome, 'accepted');
+  assert.ok(rulesOf(missingReport).includes('handoff_missing'));
+  const missingCli = runCli(missing);
+  assert.notEqual(missingCli.status, 0);
+  assert.notEqual(missingCli.json?.outcome, 'accepted');
+
+  const handoff = await readJson('handoff.valid.json');
+  const runtime = await writeRuntimeHandoff('missing-git-path.json', handoff);
+  handoff.source_identities.push({
+    kind: 'frozen-cohort-snapshot',
+    id: 'evaluation/research-program/cohorts.json',
+    location: 'external',
+    sha256: '89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543',
+    git_commit: 'f62ce35481cc572e9aad054049c700aac6378f58',
+    git_path: 'evaluation/research-program/pr003-r3-missing-cohorts.json'
+  });
+  await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+  try {
+    const report = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(report.ok, false);
+    assert.notEqual(report.outcome, 'accepted');
+    assert.ok(rulesOf(report).includes('source_git_path_missing_at_commit'));
+    assert.equal(rulesOf(report).includes('schema_invalid'), false);
+  } finally {
+    await rm(runtime.dir, { recursive: true, force: true });
+  }
+});
+
 test('unresolved changed-file symlink is not counted as a deletion', async () => {
   const handoff = await readJson('handoff.valid.json');
   const runtime = await writeRuntimeHandoff('dangling-changed-link.json', handoff);
@@ -487,6 +596,49 @@ test('completed packets must match task-binding owner, branch and owned paths', 
     const scopeReport = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
     assert.equal(scopeReport.ok, false);
     assert.ok(rulesOf(scopeReport).includes('changed_file_outside_owned_paths'));
+  } finally {
+    await rm(runtime.dir, { recursive: true, force: true });
+  }
+});
+
+test('completed packet scope honors slash-aware wildcards', async () => {
+  const handoff = await readJson('handoff.valid.json');
+  const binding = JSON.parse(await readFile(fixture('task-binding.json'), 'utf8'));
+  const runtime = await writeRuntimeHandoff('wildcard-scope.json', handoff, {
+    copyFixtureBinding: false
+  });
+  try {
+    binding.owned_paths = ['tests/*.mjs', 'docs/research-program/handoffs/schema/**'];
+    await writeFile(path.join(runtime.dir, 'task-binding.json'), `${JSON.stringify(binding, null, 2)}\n`);
+
+    handoff.changed_files = ['tests/one.mjs'];
+    await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+    const single = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(statusOf(single, 'task_scope_binding'), 'passed', JSON.stringify(single.findings));
+    assert.equal(rulesOf(single).includes('changed_file_outside_owned_paths'), false);
+
+    handoff.changed_files = ['tests/nested/one.mjs'];
+    await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+    const nested = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.ok(rulesOf(nested).includes('changed_file_outside_owned_paths'));
+
+    binding.owned_paths = ['tests/**/*.mjs'];
+    await writeFile(path.join(runtime.dir, 'task-binding.json'), `${JSON.stringify(binding, null, 2)}\n`);
+
+    handoff.changed_files = ['tests/one.mjs'];
+    await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+    const globZero = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(statusOf(globZero, 'task_scope_binding'), 'passed', JSON.stringify(globZero.findings));
+
+    handoff.changed_files = ['tests/nested/one.mjs'];
+    await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+    const globNested = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(statusOf(globNested, 'task_scope_binding'), 'passed', JSON.stringify(globNested.findings));
+
+    handoff.changed_files = ['lib/one.mjs'];
+    await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+    const outside = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.ok(rulesOf(outside).includes('changed_file_outside_owned_paths'));
   } finally {
     await rm(runtime.dir, { recursive: true, force: true });
   }
