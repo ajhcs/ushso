@@ -3,7 +3,7 @@
   "date": "2026-09-10",
   "status": "proposed_not_implemented",
   "mission": "Help humans and AI find, understand and obtain tested routes to US health-systems data.",
-  "source_sha256": "9e4a7b6bdcc08026eea8a4c9e97bd6db430dddcc856c9fbdf37ff552aae1ef55",
+  "source_sha256": "76b14945a882d1842c93004662aba1525f8c91706ae020497bb3f1697732dc14",
   "requirements": [
     {
       "id": "R01",
@@ -884,7 +884,9 @@
         "packages/identity/src/",
         "packages/identity/schemas/",
         "packages/registry/",
-        "tests/research-program/release-binding.test.mjs"
+        "tests/research-program/release-binding.test.mjs",
+        "packages/identity/manifests/package-manifest.json",
+        "packages/identity/validation/validation-receipt.json"
       ],
       "outcome": "Source-native identities can supply actual context IDs to clients.",
       "commits": [
@@ -903,8 +905,8 @@
         {
           "id": "C-007-3",
           "subject": "Add generation identity mapping",
-          "instructions": "Publish one explicit map between human manifest identity, machine generation and dictionary/source revision. Reject inconsistent cross-generation references.",
-          "verification": "Human-to-machine source lookup returns the same product context; stale or mismatched pins yield typed restart guidance."
+          "instructions": "Publish one explicit map between human manifest identity, machine generation and dictionary/source revision. Reject inconsistent cross-generation references. Refresh the current identity package manifest and validation receipt from actual package bytes after the reviewed source/schema changes. Preserve all frozen contract dependency pins, disabled candidate-only resolution boundaries and external-review counters; do not issue scientific approval or modify historical successor artifacts.",
+          "verification": "Human-to-machine source lookup returns the same product context; stale or mismatched pins yield typed restart guidance. Run the existing identity package tests and npm run validate --prefix packages/identity. Retain the original 25-versus-30 file-count failure; a current package seal must match its actual payload and cannot waive contract or scientific requirements."
         }
       ],
       "acceptance": [
@@ -917,7 +919,9 @@
       "evidence_directory": "verification/research-program/pr-007/",
       "verification_scope": "Use the existing affected package tests plus the specific fixtures described below. Add meaningful regression/integration tests for behavior changes; documentation-only commits use link, schema or artifact checks. Full npm test/build/cf:dry-run run at the integration/release gate.",
       "check_commands": [
-        "node --test tests/research-program/release-binding.test.mjs"
+        "node --test tests/research-program/release-binding.test.mjs",
+        "npm test --prefix packages/identity",
+        "npm run validate --prefix packages/identity"
       ]
     },
     {

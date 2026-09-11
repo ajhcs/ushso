@@ -49,7 +49,7 @@ add(6,'1B','Account for isolated records and unusable facets',[4,5],'R01 R02','F
  'Use public labels for facet values|Map source IDs and controlled enums to readable labels while keeping canonical values in URLs/API requests. Remove internal use-case IDs from visible copy.|Filter selections still round-trip and produce identical record IDs; screen-reader labels identify meaning and current selection.'
  ],['No source row disappears during repair.','Unknown-only facets cannot pretend to narrow the catalog.'])
 add(7,'1C','Bind products to releases and distributions',[4],'R02 R04 R05 R11','F11 F18 F19 F21',
- 'packages/identity/src/ packages/identity/schemas/ packages/registry/ tests/research-program/release-binding.test.mjs',
+ 'packages/identity/src/ packages/identity/schemas/ packages/registry/ tests/research-program/release-binding.test.mjs packages/identity/manifests/package-manifest.json packages/identity/validation/validation-receipt.json',
  'Source-native identities can supply actual context IDs to clients.',[
  'Define release and distribution identity rules|Reuse the existing source/release/distribution contracts; add publisher identifiers, locator, release/revision date roles and hash-scoped identity when a publisher supplies no stable release ID.|Fixtures cover rolling endpoints, a replacement file, multiple distributions and conflicting dates without merging them.',
  'Resolve exact source relationships|Implement deterministic binding from captured catalog/resources records to releases and distributions. Preserve ambiguous and unresolved alternatives with evidence pointers.|One-to-many publisher distributions remain distinct; an ambiguous URL never produces a fabricated exact binding.',
@@ -657,3 +657,11 @@ for pr in PRS:
     pr['commits'][2]['verification'] += ' The exact combined PR003/PR004/PR085 candidate must pass all selected suites, npm test/build/CF dry-run and hosted CI, with current handoffs validated in their explicit immutable/current contexts. No producer-only result, simulated overlay or old full-gate receipt qualifies the combined candidate. Freeze all R01-R16 definitions and cohorts unchanged.'
 PLAN_EXTENSIONS[0]['reason'] += ' A later retained full npm-test failure and independent replay establish WP11 v1.3 stale approval from the additive CI lock. The same exact-package current-evidence boundary is extended only to WP11 v1.3 while all historical proofs and strict direct validation remain immutable.'
 PLAN_EXTENSIONS[0]['wp11_followup_trigger'] = {'candidate_head': '4f90157108a92ce9541c340d5536eac31f24a1d8', 'retained_full_command_id': 'cmd-0022-aa4a557b', 'independent_diagnostic_sha256': 'b2600e7dc71460b0043f869d9f6fae35dc9c9496936c715c11b197780b9605b8'}
+
+
+# Independently observed PR007 package-seal mismatch: authorize only current
+# package accounting metadata, preserving frozen contracts and review boundaries.
+for pr in PRS:
+    if pr['id'] == 'PR-007':
+        pr['commits'][2]['instructions'] += ' Refresh the current identity package manifest and validation receipt from actual package bytes after the reviewed source/schema changes. Preserve all frozen contract dependency pins, disabled candidate-only resolution boundaries and external-review counters; do not issue scientific approval or modify historical successor artifacts.'
+        pr['commits'][2]['verification'] += ' Run the existing identity package tests and npm run validate --prefix packages/identity. Retain the original 25-versus-30 file-count failure; a current package seal must match its actual payload and cannot waive contract or scientific requirements.'

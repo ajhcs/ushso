@@ -1,0 +1,183 @@
+{
+  "format": "ushso.pr005-independent-semantics.v1",
+  "at": "2026-09-11T14:01:35.695Z",
+  "source_path": "packages/retrieval/versions/v1.2.0/corpus/records-0003.jsonl",
+  "source_record_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+  "source_record_sha256": "5a9dc7f03ee5266d4f33f89152b3fe7a3d9b5008cea3674fe3a84ff71f4c7e88",
+  "controlled_fixture_sha256": "cef05c5c53a8672d685d9e59662c05996c8f3f39547fd8dc1cab4d1acd966ecd",
+  "source_unchanged": true,
+  "script_sha256": "9432e5e83c27fd88375b86e7ad4e35ce201296452a523449e119fabe3c20e274",
+  "cases": [
+    {
+      "id": "explicit-clock",
+      "description": "The service forwards an explicit clock without changing source observations",
+      "pass": true,
+      "actual": {
+        "search": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false."
+        },
+        "dataset": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false.",
+          "evaluated_at": "2026-09-10T00:00:00.000Z",
+          "last_successful_metadata_check": "2026-09-03T22:22:33.908Z",
+          "latest_attempt": {
+            "at": "2026-09-03T22:22:33.908Z",
+            "outcome": "succeeded",
+            "scope": "catalog_metadata"
+          },
+          "catalog_metadata_check": {
+            "state": "current_verified",
+            "at": "2026-09-03T22:22:33.908Z",
+            "scope": "catalog_metadata"
+          },
+          "payload_check": {
+            "state": "not_attempted",
+            "at": null,
+            "scope": "payload",
+            "note": "Catalog metadata observation is not a payload-access check."
+          },
+          "stale_status": "review_overdue"
+        },
+        "browse": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false."
+        }
+      },
+      "status": "passed"
+    },
+    {
+      "id": "frozen-clock",
+      "description": "Offline retrieval retains the pinned corpus clock",
+      "pass": true,
+      "actual": {
+        "at": "2026-09-03T00:00:00.000Z",
+        "freshness": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "within_review_window",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review deadline has not passed."
+        }
+      },
+      "status": "passed"
+    },
+    {
+      "id": "projection-parity",
+      "description": "Search and both browse paths expose the same attempt fields as dataset lookup",
+      "pass": false,
+      "actual": {
+        "search": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false."
+        },
+        "browse": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false."
+        },
+        "legacyBrowse": null,
+        "dataset": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false.",
+          "evaluated_at": "2026-09-10T00:00:00.000Z",
+          "last_successful_metadata_check": "2026-09-03T22:22:33.908Z",
+          "latest_attempt": {
+            "at": "2026-09-03T22:22:33.908Z",
+            "outcome": "succeeded",
+            "scope": "catalog_metadata"
+          },
+          "catalog_metadata_check": {
+            "state": "current_verified",
+            "at": "2026-09-03T22:22:33.908Z",
+            "scope": "catalog_metadata"
+          },
+          "payload_check": {
+            "state": "not_attempted",
+            "at": null,
+            "scope": "payload",
+            "note": "Catalog metadata observation is not a payload-access check."
+          },
+          "stale_status": "review_overdue"
+        }
+      },
+      "status": "failed"
+    },
+    {
+      "id": "request-date-clock",
+      "description": "The ordinary client Date header does not replace server evaluation time",
+      "pass": false,
+      "actual": {
+        "resolved": "2026-09-04T12:00:00.000Z",
+        "server_before": "2026-09-11T14:01:35.405Z",
+        "server_after": "2026-09-11T14:01:35.406Z"
+      },
+      "status": "failed"
+    },
+    {
+      "id": "failed-observation-not-success",
+      "description": "A failed catalog observation is not labelled a last successful metadata check",
+      "pass": false,
+      "actual": {
+        "verification_status": "failed",
+        "last_checked": "2026-09-03T00:00:00Z",
+        "next_review_due": null,
+        "freshness_state": "deadline_unknown",
+        "failed_refresh_state": "failed",
+        "note": "No review deadline is documented; historical verification evidence is unchanged.",
+        "evaluated_at": "2026-09-10T00:00:00.000Z",
+        "last_successful_metadata_check": "2026-09-03T00:00:00Z",
+        "latest_attempt": {
+          "at": null,
+          "outcome": "failed",
+          "scope": "catalog_metadata"
+        },
+        "catalog_metadata_check": {
+          "state": "failed",
+          "at": "2026-09-03T00:00:00Z",
+          "scope": "catalog_metadata"
+        },
+        "payload_check": {
+          "state": "not_attempted",
+          "at": null,
+          "scope": "payload",
+          "note": "Catalog metadata observation is not a payload-access check."
+        },
+        "stale_status": "not_stale"
+      },
+      "status": "failed"
+    },
+    {
+      "id": "ui-probe",
+      "status": "probe_error",
+      "exit_code": 1,
+      "error": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr005-controller-review/941c9cd/semantics/ui.cjs:75577\n  if (import_meta2.env.VITE_DISCOVERY_PROVIDER === \"api\") {\n                       ^\n\nTypeError: Cannot read properties of undefined (reading 'VITE_DISCOVERY_PROVIDER')\n    at createDefaultDiscoveryProvider (/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr005-controller-review/941c9cd/semantics/ui.cjs:75577:24)\n    at Object.<anonymous> (/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr005-controller-review/941c9cd/semantics/ui.cjs:75585:23)\n    at Module._compile (node:internal/modules/cjs/loader:1812:14)\n    at Object..js (node:internal/modules/cjs/loader:1943:10)\n    at Module.load (node:internal/modules/cjs/loader:1533:32)\n    at Module._load (node:internal/modules/cjs/loader:1335:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n    at node:internal/main/run_main_module:33:47\n\nNode.js v24.14.0\n"
+    }
+  ],
+  "accepted": false
+}
