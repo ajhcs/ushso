@@ -106,6 +106,28 @@ test('historical proof accepts only the reviewed PR-003 input transition', async
   )
 })
 
+test('reviewed PR-003 input transition is atomic across both root files', async () => {
+  const fixture = await historicalBytes()
+  const reviewedBytes = new Map(await Promise.all(REVIEWED_PR003_CURRENT_INPUTS.map(async (item) => [
+    item.path,
+    await readGitBytes(item.source_commit, item.path),
+  ])))
+  const historicalRootInputs = new Map(await Promise.all(REVIEWED_PR003_CURRENT_INPUTS.map(async (item) => [
+    item.path,
+    await readGitBytes(HISTORICAL_CI_V1_3.source_commit, item.path),
+  ])))
+  for (const reviewedPath of REVIEWED_PR003_CURRENT_INPUTS.map((item) => item.path)) {
+    const readPartialPair = async (root, relativePath) => reviewedPath === relativePath
+      ? reviewedBytes.get(relativePath)
+      : historicalRootInputs.get(relativePath) ?? readFile(path.resolve(root, relativePath))
+    await assert.rejects(
+      validateHistoricalCiProof({ ...fixture, readCurrentFile: readPartialPair }),
+      /CI_CURRENT_REVIEWED_PR003_PARTIAL_TRANSITION/u,
+      `partial transition must fail for ${reviewedPath}`,
+    )
+  }
+})
+
 test('current technical failure cannot be represented as a pending draft', async () => {
   await assert.rejects(
     buildCurrentDraft({ technicalEvidenceBuilder: async () => ({ status: 'FAIL', implementation_files: [] }) }),

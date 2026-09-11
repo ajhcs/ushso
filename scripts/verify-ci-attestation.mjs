@@ -222,6 +222,7 @@ export async function validateHistoricalInputBindings({ root = repositoryRoot, r
   assert.ok(pins.length > 0, 'CI_HISTORICAL_INPUT_PINS_MISSING')
   const seen = new Set()
   const checked = []
+  const reviewedStates = new Map()
   for (const pin of pins) {
     const relativePath = safeRelativePath(pin.path, `${pin.source}_PIN`)
     const key = `${pin.source}:${relativePath}`
@@ -236,8 +237,10 @@ export async function validateHistoricalInputBindings({ root = repositoryRoot, r
           const rootPackage = parseJsonValue(bytes, 'HISTORICAL_PACKAGE')
           validateRootTestSequence(rootPackage)
         }
+        reviewedStates.set(relativePath, 'historical')
         checked.push({ path: relativePath, source: pin.source, historical_bytes: pin.bytes, historical_sha256: pin.sha256, current_bytes: bytes.length, current_sha256: sha256(bytes), current_drift_allowed: false, reviewed_current_transition: false })
       } else {
+        reviewedStates.set(relativePath, 'reviewed_current')
         checked.push({ ...validateReviewedPr003CurrentInput(reviewed, bytes), source: pin.source, current_drift_allowed: true, reviewed_current_transition: true })
       }
     } else if (drift.has(relativePath)) {
@@ -249,11 +252,21 @@ export async function validateHistoricalInputBindings({ root = repositoryRoot, r
       checked.push({ path: relativePath, source: pin.source, historical_bytes: pin.bytes, historical_sha256: pin.sha256, current_bytes: bytes.length, current_sha256: sha256(bytes), current_drift_allowed: false })
     }
   }
+
+  const reviewedPaths = REVIEWED_PR003_CURRENT_INPUTS.map((item) => item.path)
+  for (const relativePath of reviewedPaths) {
+    assert.equal(reviewedStates.has(relativePath), true, `CI_HISTORICAL_REVIEWED_PR003_${relativePath}_PIN_MISSING`)
+  }
+  const transitionStates = new Set(reviewedPaths.map((relativePath) => reviewedStates.get(relativePath)))
+  assert.ok(transitionStates.size === 1, 'CI_CURRENT_REVIEWED_PR003_PARTIAL_TRANSITION')
+  const transitionState = reviewedStates.get(reviewedPaths[0])
   return {
     status: 'PASS',
     source_commit: HISTORICAL_BASE_COMMIT,
     allowed_current_drift: [...drift].sort(),
     reviewed_current_inputs: REVIEWED_PR003_CURRENT_INPUTS.map((item) => ({ ...item })),
+    reviewed_current_transition: transitionState === 'reviewed_current',
+    reviewed_current_transition_state: transitionState,
     checked,
   }
 }
