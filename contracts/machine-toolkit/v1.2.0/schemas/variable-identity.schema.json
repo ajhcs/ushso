@@ -136,6 +136,17 @@
               }
             },
             "type": "object"
+          },
+          "mapping": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "exact",
+                  "reviewed_alias"
+                ]
+              }
+            },
+            "type": "object"
           }
         },
         "type": "object"
@@ -167,6 +178,92 @@
         "properties": {
           "variable_id": {
             "type": "null"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "context_binding": {
+            "properties": {
+              "state": {
+                "const": "resolved"
+              }
+            },
+            "type": "object"
+          },
+          "mapping": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "ambiguous",
+                  "unmatched"
+                ]
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "variable_id": {
+            "type": "null"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "unit": {
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "semantic_role": {
+            "const": "identifier"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "semantic_role": {
+            "enum": [
+              "measure",
+              "measure_description"
+            ]
+          },
+          "unit": {
+            "properties": {
+              "state": {
+                "const": "missing"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "completeness": {
+            "const": "incomplete"
           }
         },
         "type": "object"
@@ -318,6 +415,12 @@
               },
               "reason": {
                 "type": "null"
+              },
+              "schema_field_id": {
+                "$ref": "#/$defs/id"
+              },
+              "field_revision_id": {
+                "$ref": "#/$defs/id"
               }
             },
             "type": "object"
@@ -371,7 +474,55 @@
             "$ref": "#/$defs/id"
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "documented",
+                  "observed"
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "$ref": "#/$defs/text4000"
+              },
+              "evidence_ids": {
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "unknown",
+                  "unavailable"
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            },
+            "type": "object"
+          }
+        }
+      ]
     },
     "sourceType": {
       "allOf": [
@@ -751,6 +902,9 @@
               "candidate_wire_names": {
                 "maxItems": 0,
                 "type": "array"
+              },
+              "documented_name": {
+                "$ref": "#/$defs/text"
               }
             },
             "type": "object"

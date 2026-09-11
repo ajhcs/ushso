@@ -86,12 +86,12 @@ test('Census parent identity and linked endpoint are required during verificatio
 });
 
 test('versioned CDC extraction preserves wire names separately from labels and replays evidence', () => {
- const data={columns:[{fieldName:'ZIP',name:'Postal code',description:'Five-character code',dataTypeName:'text'},{fieldName:'0007',name:'Leading zero',dataTypeName:'text'},{fieldName:'—',name:'Unicode sentinel',dataTypeName:'text'}]};
+ const data={columns:[{fieldName:':id',name:'metadata',dataTypeName:'text'},{fieldName:'ZIP',name:'Postal code',description:'Five-character code',dataTypeName:'text'},{fieldName:'0007',name:'Leading zero',dataTypeName:'text'},{fieldName:'—',name:'Unicode sentinel',dataTypeName:'text'}]};
  const body=JSON.stringify(data),capture={status:'captured',url:'https://example.test/cdc.json',text:body,data,sha256:hash(body),captured_at:'2026-09-11T00:00:00Z',evidence_id:'evidence:test:cdc-v1'};
  const variables=extractVersionedVariables(data.columns,'cdc',{capture});
  assert.deepEqual(variables.map(v=>v.wire_name),['ZIP','0007','—']);
  assert.equal(variables[0].publisher_label,'Postal code');assert.equal(variables[0].definition,'Five-character code');
- assert.equal(variables[1].provenance.pointer,'/columns/1');assert.equal(verifyVersionedVariables(variables,capture),true);
+ assert.equal(variables[0].provenance.pointer,'/columns/1');assert.equal(variables[1].provenance.pointer,'/columns/2');assert.equal(verifyVersionedVariables(variables,capture),true);
  const legacy=dictionaryFrom(data.columns,'cdc');assert.deepEqual(legacy[1],{name:'0007',label:'Leading zero',description:'',data_type:'text',unit:null,allowed_values:[]});
 });
 
@@ -103,6 +103,12 @@ test('versioned Census extraction separates concept from definition and preserve
  assert.deepEqual(variables[0].code_values.values,[{code:'001',label:'Leading zero'},{code:'—',label:'Unicode'}]);
  assert.equal(variables[0].provenance.pointer,'/variables/A~1B~0C');assert.equal(verifyVariableIdentity(variables[0],capture),true);
  assert.equal(variables[1].publisher_concept,null);assert.equal(variables[1].definition,'Definition');
+});
+
+test('dictionary-only rows retain a documented name without inventing a wire mapping', () => {
+ const data={variables:[{documented_name:'Dictionary-only label',label:'Displayed label',description:'Publisher text'}]};const body=JSON.stringify(data),capture={status:'captured',url:'https://example.test/cms-dictionary.json',text:body,data,sha256:hash(body),captured_at:'2026-09-11T00:00:00Z',evidence_id:'evidence:test:cms-dictionary-v1'};
+ const [variable]=extractVersionedVariables(data,'cms',{capture});
+ assert.equal(variable.wire_name,null);assert.equal(variable.mapping.state,'unmatched');assert.equal(variable.mapping.documented_name,'Dictionary-only label');assert.equal(variable.variable_id,null);assert.equal(verifyVariableIdentity(variable,capture),true);
 });
 
 test('versioned extraction defaults missing release context to an unresolved, non-promotable identity', () => {

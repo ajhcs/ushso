@@ -210,9 +210,14 @@ function fieldType(entry, kind) {
 }
 
 function fieldWireName(entry, kind) {
-  if (kind === 'cdc') return entry.fieldName;
-  if (kind === 'census') return entry.__wire_name;
+  if (Object.hasOwn(entry, 'wire_name')) return entry.wire_name;
+  if (kind === 'cdc') return entry.fieldName ?? null;
+  if (kind === 'census') return entry.__wire_name ?? null;
   return entry.name ?? entry.variable_name ?? entry.fieldName ?? null;
+}
+
+function fieldDocumentedName(entry, wireName) {
+  return entry.documented_name ?? wireName ?? entry.label ?? entry.term_name ?? null;
 }
 
 function fieldLabel(entry) {
@@ -228,10 +233,10 @@ function fieldCodes(entry, kind) {
   return entry.code_values ?? entry.allowed_values ?? entry.values ?? null;
 }
 
-function fieldObservedType(entry, options, index) {
+function fieldObservedType(entry, options, index, evidenceIds) {
   const supplied = typeof options.observedTypeFor === 'function' ? options.observedTypeFor(entry, index) : entry.observed_type ?? entry.observedType;
-  if (object(supplied)) return { ...supplied, evidence_ids: supplied.evidence_ids ?? options.evidence_ids ?? [] };
-  if (typeof supplied === 'string' && supplied.length > 0) return { state: 'observed', value: supplied };
+  if (object(supplied)) return { ...supplied, evidence_ids: supplied.evidence_ids ?? options.evidence_ids ?? evidenceIds };
+  if (typeof supplied === 'string' && supplied.length > 0) return { state: 'observed', value: supplied, evidence_ids: options.evidence_ids ?? evidenceIds };
   return { state: 'unknown', value: null, evidence_ids: [] };
 }
 
@@ -243,9 +248,11 @@ function fieldUnit(entry, options, index, evidenceIds) {
   return { state: 'unknown', value: null, evidence_ids: [] };
 }
 
-function fieldMapping(entry, options, index, wireName) {
+function fieldMapping(entry, options, index, wireName, documentedName) {
   const supplied = typeof options.mappingFor === 'function' ? options.mappingFor(entry, index, wireName) : entry.mapping;
   if (supplied) return supplied;
+  if (wireName === null) return { state: 'unmatched', documented_name: documentedName, wire_name: null, candidate_wire_names: [], evidence_ids: [] };
+  if (documentedName !== wireName) throw Error('VERSIONED_VARIABLE_MAPPING_REQUIRED');
   return { state: 'exact', documented_name: wireName, wire_name: wireName, candidate_wire_names: [], evidence_ids: [] };
 }
 
@@ -262,21 +269,22 @@ function fieldLimitations(entry, kind, source) {
   return limitations;
 }
 
-function variableIdentityFromEntry(entry, kind, index, capture, options, evidenceIds) {
+function variableIdentityFromEntry(entry, kind, index, pointer, capture, options, evidenceIds) {
   const wireName = fieldWireName(entry, kind);
-  if (typeof wireName !== 'string' || wireName.length === 0) throw Error('VERSIONED_VARIABLE_NAME_MISSING');
+  const documentedName = fieldDocumentedName(entry, wireName);
+  if ((typeof wireName !== 'string' || wireName.length === 0) && (typeof documentedName !== 'string' || documentedName.length === 0)) throw Error('VERSIONED_VARIABLE_NAME_MISSING');
   const transformation = VERSIONED_VARIABLE_TRANSFORMATIONS[kind];
   const rawEntry = kind === 'census' ? Object.fromEntries(Object.entries(entry).filter(([key]) => key !== '__wire_name')) : entry;
   const sourceTypeValue = fieldType(entry, kind);
   const sourceType = sourceTypeValue ? { state: 'documented', value: sourceTypeValue, evidence_ids: evidenceIds } : { state: 'unknown', value: null, evidence_ids: [] };
-  const observedType = fieldObservedType(entry, options, index);
+  const observedType = fieldObservedType(entry, options, index, evidenceIds);
   const context = fieldContext(options, entry, index);
-  const mapping = fieldMapping(entry, options, index, wireName);
+  const mapping = fieldMapping(entry, options, index, wireName, documentedName);
   const publisherConcept = entry.concept ?? entry.publisher_concept ?? null;
   const definition = fieldDefinition(entry);
   const provenance = createVariableProvenance({
     capture,
-    pointer: versionedEntries(options.raw ?? capture.data, kind)[index]?.pointer ?? (kind === 'census' ? `/variables/${escape(wireName)}` : `/variables/${index}`),
+    pointer,
     raw: rawEntry,
     transformation,
     evidence_ids: evidenceIds,
@@ -284,6 +292,7 @@ function variableIdentityFromEntry(entry, kind, index, capture, options, evidenc
   return createVariableIdentity({
     context_binding: context,
     wire_name: wireName,
+    documented_name: documentedName,
     publisher_label: fieldLabel(entry),
     publisher_concept: publisherConcept,
     definition,
@@ -311,7 +320,7 @@ export function extractVersionedVariables(value, kind, options = {}) {
   const entries = versionedEntries(value, normalizedKind);
   const evidenceIds = versionedEvidenceIds(capture, options);
   const mappedOptions = { ...options, raw: value };
-  return entries.map(({ entry }, index) => variableIdentityFromEntry(entry, normalizedKind, index, capture, mappedOptions, evidenceIds));
+  return entries.map(({ entry, pointer }, index) => variableIdentityFromEntry(entry, normalizedKind, index, pointer, capture, mappedOptions, evidenceIds));
 }
 
 export const extractVariableIdentities = extractVersionedVariables;

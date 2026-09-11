@@ -60,7 +60,8 @@ test("wire names are scoped by release, distribution, schema and field revision"
   assert.notEqual(first, second);
   assert.notEqual(first, third);
   assert.equal(schemaFieldIdForContext(context, "ZIP"), createContextScopedSchemaFieldId(context, "ZIP"));
-  assert.throws(() => variableIdForContext({ ...context, release_id: null }, "ZIP"), { code: "incomplete_variable_context" });
+  assert.throws(() => variableIdForContext({ ...context, release_id: null }, "ZIP"), { code: "unresolved_variable_context" });
+  assert.throws(() => variableIdForContext({ ...context, field_revision_id: null }, "ZIP"), { code: "unresolved_variable_context" });
 });
 
 test("unresolved or non-exact contexts cannot mint a variable identifier", () => {
@@ -69,6 +70,7 @@ test("unresolved or non-exact contexts cannot mint a variable identifier", () =>
   assert.equal(value.variable_id, null);
   assert.equal(value.context_binding.reason, "two publisher releases remain possible");
   assert.equal(value.evidence_state, "candidate");
+  assert.throws(() => variableIdForContext({ ...context, state: "unresolved", binding_state: "unresolved", reason: "release binding is under review" }, "ZIP"), { code: "unresolved_variable_context" });
   assert.throws(() => createVariableContext({ ...context, state: "resolved", binding_state: "ambiguous" }), { code: "unresolved_variable_context" });
 });
 
@@ -126,6 +128,13 @@ test("strict v1.2 schema accepts literal encodings and rejects unauthorized prom
   });
   assert.equal(validate(unresolved), true, JSON.stringify(validate.errors));
   assert.equal(unresolved.variable_id, null);
+  assert.equal(validate({ ...value, context_binding: { ...context, field_revision_id: null } }), false);
+  const resolvedAmbiguous = identity({
+    wire_name: null,
+    mapping: { state: 'ambiguous', documented_name: 'Dictionary name', wire_name: null, candidate_wire_names: ['ZIP'], evidence_ids: evidence },
+  });
+  assert.equal(resolvedAmbiguous.variable_id, null);
+  assert.equal(validate(resolvedAmbiguous), true, JSON.stringify(validate.errors));
 });
 
 test("catalog context helper does not weaken exact endpoint invariants", () => {
@@ -165,4 +174,39 @@ test("retained audit summary remains a discrepancy set, never an alias approval"
   assert.equal(summary.mappings[0].state, "ambiguous");
   assert.equal(summary.mappings[0].wire_name, null);
   assert.deepEqual(summary.payload_names, ["FTE - Employees on Payroll"]);
+});
+
+test('variable assertion and unit cross-field states remain strict', async () => {
+  assert.throws(() => identity({
+    source_type: { state: 'unknown', value: 'unverified guess', evidence_ids: [] },
+  }), { code: 'invalid_variable_assertion' });
+  assert.throws(() => identity({
+    semantic_role: 'measure',
+    unit: { state: 'not_applicable', value: null, rationale: 'Only identifiers have no unit.', evidence_ids: evidence },
+  }), { code: 'unit_not_applicable_requires_identifier' });
+  const schema = JSON.parse(await readFile(new URL('../../contracts/machine-toolkit/v1.2.0/schemas/variable-identity.schema.json', import.meta.url)));
+  const ajv = new Ajv2020({ allErrors: true, strict: true, strictSchema: true, strictTypes: true });
+  const validate = ajv.compile(schema);
+  const measurement = identity({
+    semantic_role: 'measure',
+    unit: { state: 'missing', value: null, rationale: 'The dictionary did not document a unit.', evidence_ids: evidence },
+  });
+  assert.equal(validate({ ...measurement, completeness: 'complete' }), false);
+});
+
+test('retained HCRIS audit remains eleven unresolved literal discrepancies', async () => {
+  const audit = JSON.parse(await readFile(new URL('../../verification/research-program/bootstrap/pr008-scope-20260911/sample-shape-comparison.json', import.meta.url)));
+  const summary = audit.find(record => record.sample === 'cms-hcris');
+  assert.ok(summary);
+  const retained = retainNameDiscrepancySummary({
+    ...summary,
+    mismatch_count: summary.in_payload_not_dictionary.length,
+  });
+  assert.equal(retained.sample_fields, 117);
+  assert.equal(retained.dictionary_fields, 117);
+  assert.equal(retained.mismatch_count, 11);
+  assert.equal(retained.source_acceptance, 'unresolved');
+  assert.ok(retained.mappings.every(mapping => mapping.state === 'ambiguous' && mapping.wire_name === null));
+  assert.deepEqual(retained.payload_names, summary.in_payload_not_dictionary);
+  assert.deepEqual(retained.dictionary_names, summary.in_dictionary_not_payload);
 });

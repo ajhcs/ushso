@@ -32,10 +32,11 @@ const CONTEXT_IDS = Object.freeze([
   "release_id",
   "distribution_id",
   "schema_snapshot_id",
+  "schema_field_id",
+  "field_revision_id",
 ]);
-const OPTIONAL_CONTEXT_IDS = Object.freeze(["schema_field_id", "field_revision_id"]);
 const HEX = /^[a-f0-9]{64}$/u;
-const POINTER = /^(?:|\/)/u;
+const POINTER = /^(?:|(?:\/(?:[^~/]|~[01])*))*$/u;
 
 function record(value, label) {
   assert(value !== null && typeof value === "object" && !Array.isArray(value), `${label} must be an object`, "invalid_variable_identity");
@@ -116,7 +117,8 @@ export function createVariableContext(input = {}) {
 }
 
 export function variableIdForContext(context, wireName) {
-  const bound = createVariableContext({ ...context, state: "resolved", binding_state: "exact" });
+  const bound = createVariableContext(context);
+  assert(bound.state === "resolved", "Unresolved variable context cannot mint an identifier", "unresolved_variable_context");
   const wire = boundedText(wireName, "wire_name");
   return `urn:ushso:variable:${sha256({
     source_id: bound.source_id,
@@ -131,7 +133,8 @@ export function variableIdForContext(context, wireName) {
 }
 
 export function schemaFieldIdForContext(context, wireName) {
-  const bound = createVariableContext({ ...context, state: "resolved", binding_state: "exact" });
+  const bound = createVariableContext(context);
+  assert(bound.state === "resolved", "Unresolved variable context cannot mint a schema field identifier", "unresolved_variable_context");
   return createContextScopedSchemaFieldId(bound, wireName);
 }
 
@@ -143,7 +146,7 @@ function normalizeAssertion(input, label, states, defaultState = "unknown") {
   assert(states.includes(state), `Unknown ${label} state: ${state}`, "invalid_variable_assertion");
   const value = nullableText(input.value, `${label}.value`);
   const ids = evidenceIds(input.evidence_ids, `${label}.evidence_ids`, { required: ["documented", "observed"].includes(state) });
-  assert((state === "documented" || state === "observed") ? value !== null : value === null || typeof value === "string", `${label} state/value mismatch`, "invalid_variable_assertion");
+  assert((state === "documented" || state === "observed") ? value !== null : value === null, `${label} state/value mismatch`, "invalid_variable_assertion");
   return { state, value, evidence_ids: ids };
 }
 
