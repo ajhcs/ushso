@@ -5,7 +5,8 @@ corrections `C-003-1-R1` / `C-003-2-R1`, bounded contract corrections
 `C-003-2-R2` / `C-003-3-R2`, and remaining-defect corrections
 `C-003-2-R3` / `C-003-3-R3`, and the composite-wildcard correction
 `C-003-2-R4` / `C-003-3-R4`, and the fixture-context isolation
-`C-003-2-R5` / `C-003-3-R5`). It translates
+`C-003-2-R5` / `C-003-3-R5`, and the portable-temp / self-contained
+captured-ledger correction `C-003-2-R6` / `C-003-3-R6`). It translates
 [`docs/master-plan/2026-09-10/EXECUTION.md`](../../../master-plan/2026-09-10/EXECUTION.md)
 and the [PR-003 packet](../../../master-plan/2026-09-10/prs/PR-003.md) into
 two JSON Schema documents that preserve the evidence an independent reviewer
@@ -217,6 +218,19 @@ therefore carry a controlled ledger that cannot inherit the controller's
 changing PR task base, while production current-handoff checks omit `--context`
 and keep live-ledger validation.
 
+Historical fixture checks that need a temporary directory honor a valid
+absolute `TMPDIR`, then a valid absolute `RUNNER_TEMP` when `TMPDIR` is
+absent, then an ignored in-repository fixture scratch root. Literal `/tmp`
+and `/home` are not used as bulk scratch. Task-owned children are created
+with `mkdtemp` and removed individually; an existing unrelated directory is
+never recursively removed. The observed `f62ce354` vs `0b28d036`
+`binding_conflict` is reproduced from a committed PR-003 task-row extraction
+of captured ledger `0c29fdb984c7bb4c101650e4bae86c716048c237` (`git_path`
+`docs/research-program/execution-ledger.json`, source SHA-256
+`58a28c0767657d66a9bf35991d1f5e241d6e14f60ff8cd17408ad7c8880e8702`). That
+commit is captured diagnostic data, not an ancestor of this PR-003 branch;
+routine tests do not `git show` it.
+
 The JSON Schemas remain pinned to the validator module's authoritative
 `docs/research-program/handoffs/schema/` directory. `repoRoot` does not select
 an arbitrary replacement schema directory. A caller using another repository
@@ -254,16 +268,18 @@ validate them (they carry extra fields and a different evidence shape). Handoffs
 produced from PR-003 onward are expected to satisfy the contract, including the
 R1 integrity corrections, the R2 contract corrections, the R3
 null-item/wildcard-ownership corrections, the R4 composite-wildcard
-correction and the R5 fixture-context isolation. A handoff is a
+correction, the R5 fixture-context isolation and the R6 portable-temp /
+self-contained captured-ledger correction. A handoff is a
 producer artifact: passing this schema is not independent verification and not
 scientific approval.
 
 Historical C-003-1 / C-003-2 / C-003-3, R1 and R2 command receipts and evidence
 indexes under `verification/research-program/pr-003/` are preserved
 byte-for-byte. They record runs against earlier validators and remain
-explicitly historical; they are not re-presented as fresh checks. R3, R4 and R5
-correction evidence each have separate additive indexes that bind their current
-files and cite historical bytes through immutable Git commit/path/hash triples.
+explicitly historical; they are not re-presented as fresh checks. R3, R4, R5
+and R6 correction evidence each have separate additive indexes that bind their
+current files and cite historical bytes through immutable Git commit/path/hash
+triples.
 
 ## Reproduce
 
@@ -296,6 +312,11 @@ hashing, Git object binding and per-PR base lookup.
 - Fixture-context isolation base (R5): `d1c42eab33e1c21edf805036464f2b64667a489a`
   (tree `d765aa66a6bc360a3c03a86eaf54b6366ccb2be1`), the exact reviewed R4
   candidate.
+- Portable-temp / self-contained captured-ledger base (R6):
+  `243a12510eb8ed3c7646d8a4d5d151a46b3cf28a`
+  (tree `e55c6413693acb39661c1457fcfee109603b6cc9`), the exact reviewed R5
+  candidate. Functional R5 remains `852c0cfe8eb81bbca34306ab5fd192ab1558a07f`
+  (tree `686b8c57095410cd054823dff64342f90ca24de8`).
 - Accepted PR-002 merge (dependency): `5647e81457b606bb36456e75c48f990ce21e9c6c`.
 - PR-001 merge (dependency): `035465f3f16d15f02467679d96451d4440a36ca8`.
 - Dispatch prompt SHA-256: `f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d`.
@@ -336,6 +357,12 @@ Authorship is layered and must not be collapsed:
   fixture packets from the moving live execution ledger without weakening
   default production conflict checks. It is not a replay of R1–R4 or of the
   failed 2026-09-10 Grok task.
+- This separately scoped R6 correction is Grok Co-Engineer work
+  (`execution.provider: grok`, `execution.model: grok-4`; this interface
+  identifies as Grok 4.6) on the reviewed R5 result. It makes fixture
+  temporary storage portable and replaces runtime `git show` of non-ancestor
+  `0c29fdb` with a committed task-row extraction. It is not a replay of
+  R1–R5 or of the failed 2026-09-10 Grok task.
 
 Reviewer Astra. `head_sha` stays null until the controller records the actual
 final commit; a future commit cannot contain its own hash. Root owns

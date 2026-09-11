@@ -1,15 +1,17 @@
 // Focused suite for PR-003 C-003-2 and integrity corrections C-003-1-R1/C-003-2-R1
-// plus bounded R2/R3/R4 contract corrections and the R5 fixture-context isolation.
+// plus bounded R2/R3/R4 contract corrections, the R5 fixture-context isolation,
+// and the R6 portable-temp / self-contained captured-ledger correction.
 //
 // The suite exercises the validator on committed fixtures and ephemeral,
 // write-then-remove symlink probes. Fixture packets run against an explicit
 // controlled ledger/context so they cannot inherit the live controller task
-// base. A passing packet is producer evidence, not independent verification or
-// scientific acceptance.
+// base. Observed combined-head ledger data is a committed extraction, not a
+// later-branch git show. A passing packet is producer evidence, not
+// independent verification or scientific acceptance.
 
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { copyFile, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -25,25 +27,58 @@ import {
 const SCRIPT = path.join(REPO_ROOT, 'scripts', 'research-program', 'check-handoff.mjs');
 const FIXTURE_DIR = path.join(REPO_ROOT, 'verification', 'research-program', 'pr-003', 'fixtures');
 const CONTEXT_PARENT = path.join(FIXTURE_DIR, '.context');
+const LOCAL_SCRATCH_ROOT = path.join(FIXTURE_DIR, '.scratch');
 const FIXTURE_CONTEXT_ROOT = path.join(CONTEXT_PARENT, 'matching');
 const CONTROLLED_LEDGER = path.join(FIXTURE_DIR, 'controlled-execution-ledger.json');
+const CAPTURED_LEDGER_FIXTURE = path.join(FIXTURE_DIR, 'captured-0c29fdb-pr003-task-row.json');
 const PRODUCTION_HANDOFF = 'docs/research-program/handoffs/PR-003.json';
 const FIXTURE_BASE_SHA = 'f62ce35481cc572e9aad054049c700aac6378f58';
 const OBSERVED_LEDGER_COMMIT = '0c29fdb984c7bb4c101650e4bae86c716048c237';
+const OBSERVED_LEDGER_PATH = 'docs/research-program/execution-ledger.json';
+const OBSERVED_LEDGER_BLOB = '6dacddc34cf466337ea39657313256709b2fc9af';
+const OBSERVED_LEDGER_SOURCE_SHA256 = '58a28c0767657d66a9bf35991d1f5e241d6e14f60ff8cd17408ad7c8880e8702';
+const OBSERVED_LEDGER_SOURCE_BYTES = 110819;
 const OBSERVED_LEDGER_BASE_SHA = '0b28d036f1df4b5248732bc62f68edd79f14d06f';
 const OTHER_LEDGER_BASE_SHA = 'e5c44249b9d2448df2e4b6d466077658e42a009d';
+const FORBIDDEN_TEMP_ROOTS = new Set(['/', '/tmp', '/home']);
+const ownedTempDirs = new Set();
 
 const fixture = name => path.join(FIXTURE_DIR, name);
 const rulesOf = report => report.findings.map(finding => finding.rule);
 const statusOf = (report, id) => report.checks.find(check => check.id === id)?.status;
 const readJson = async name => JSON.parse(await readFile(fixture(name), 'utf8'));
-const tmpRoot = () => {
-  const configured = process.env.TMPDIR;
-  if (typeof configured !== 'string' || !path.isAbsolute(configured)) {
-    throw new Error('TMPDIR must be an absolute path for PR-003 fixture isolation temps');
+
+function isUsableTempRoot(value) {
+  if (typeof value !== 'string' || value.length === 0 || !path.isAbsolute(value)) {
+    return false;
   }
-  return configured;
-};
+  return !FORBIDDEN_TEMP_ROOTS.has(path.resolve(value));
+}
+
+function resolveFixtureTempRoot(env = process.env) {
+  if (isUsableTempRoot(env.TMPDIR)) return path.resolve(env.TMPDIR);
+  if (isUsableTempRoot(env.RUNNER_TEMP)) return path.resolve(env.RUNNER_TEMP);
+  return LOCAL_SCRATCH_ROOT;
+}
+
+const tmpRoot = () => resolveFixtureTempRoot();
+
+async function ownedTempDir(prefix) {
+  const root = tmpRoot();
+  await mkdir(root, { recursive: true });
+  const dir = await mkdtemp(path.join(root, prefix));
+  ownedTempDirs.add(dir);
+  return dir;
+}
+
+async function removeOwnedTempDir(dir) {
+  if (!ownedTempDirs.has(dir)) {
+    throw new Error(`refusing to remove untracked path: ${dir}`);
+  }
+  ownedTempDirs.delete(dir);
+  await rm(dir, { recursive: true, force: true });
+}
+
 const fixtureCheckOptions = (overrides = {}) => ({
   repoRoot: REPO_ROOT,
   contextRoot: FIXTURE_CONTEXT_ROOT,
@@ -100,6 +135,10 @@ before(async () => {
 });
 
 after(async () => {
+  for (const dir of [...ownedTempDirs]) {
+    ownedTempDirs.delete(dir);
+    await rm(dir, { recursive: true, force: true });
+  }
   await rm(CONTEXT_PARENT, { recursive: true, force: true });
 });
 
@@ -790,16 +829,24 @@ test('controlled fixture context stays valid while a later live ledger would not
 });
 
 test('the observed combined-head ledger base conflicts with the historical fixture binding', async () => {
-  const tmpDir = await mkdtemp(path.join(tmpRoot(), 'pr003-r5-observed-ledger-'));
+  const captured = JSON.parse(await readFile(CAPTURED_LEDGER_FIXTURE, 'utf8'));
+  assert.equal(captured.extraction.git_commit, OBSERVED_LEDGER_COMMIT);
+  assert.equal(captured.extraction.git_path, OBSERVED_LEDGER_PATH);
+  assert.equal(captured.extraction.git_blob, OBSERVED_LEDGER_BLOB);
+  assert.equal(captured.extraction.source_sha256, OBSERVED_LEDGER_SOURCE_SHA256);
+  assert.equal(captured.extraction.source_bytes, OBSERVED_LEDGER_SOURCE_BYTES);
+  const task = captured.tasks.find(entry => entry.pr_id === 'PR-003');
+  assert.ok(task);
+  assert.equal(task.base_sha, OBSERVED_LEDGER_BASE_SHA);
+
+  const tmpDir = await ownedTempDir('pr003-r6-observed-ledger-');
   const contextName = `observed-${path.basename(tmpDir)}`;
   try {
-    const captured = execFileSync(
-      'git',
-      ['show', `${OBSERVED_LEDGER_COMMIT}:docs/research-program/execution-ledger.json`],
-      { cwd: REPO_ROOT, maxBuffer: 2 * 1024 * 1024 }
-    );
     const capturedPath = path.join(tmpDir, 'execution-ledger.json');
-    await writeFile(capturedPath, captured);
+    await writeFile(
+      capturedPath,
+      `${JSON.stringify({ format: captured.format, tasks: captured.tasks }, null, 2)}\n`
+    );
     const contextRoot = await materializeLedgerContext(contextName, await readFile(capturedPath));
     const report = await checkHandoff(fixture('handoff.valid.json'), {
       repoRoot: REPO_ROOT,
@@ -812,9 +859,42 @@ test('the observed combined-head ledger base conflicts with the historical fixtu
     assert.match(conflict.detail, new RegExp(OBSERVED_LEDGER_BASE_SHA));
     assert.equal(statusOf(report, 'base_sha_binding'), 'failed');
   } finally {
-    await rm(tmpDir, { recursive: true, force: true });
+    await removeOwnedTempDir(tmpDir);
     await rm(path.join(CONTEXT_PARENT, contextName), { recursive: true, force: true });
   }
+});
+
+test('fixture temporary-root helper selects TMPDIR, RUNNER_TEMP, then the in-repository fallback', () => {
+  assert.equal(
+    resolveFixtureTempRoot({ TMPDIR: '/mnt/d/tmp/plumbob/job' }),
+    '/mnt/d/tmp/plumbob/job'
+  );
+  assert.equal(resolveFixtureTempRoot({ RUNNER_TEMP: '/runner/_temp' }), '/runner/_temp');
+  assert.equal(
+    resolveFixtureTempRoot({ TMPDIR: '/tmp', RUNNER_TEMP: '/runner/_temp' }),
+    '/runner/_temp'
+  );
+  assert.equal(resolveFixtureTempRoot({ TMPDIR: '/tmp', RUNNER_TEMP: '/home' }), LOCAL_SCRATCH_ROOT);
+  assert.equal(resolveFixtureTempRoot({ TMPDIR: 'relative', RUNNER_TEMP: '' }), LOCAL_SCRATCH_ROOT);
+  assert.equal(resolveFixtureTempRoot({}), LOCAL_SCRATCH_ROOT);
+});
+
+test('owned fixture temps are cleaned without recursively removing an unrelated directory', async () => {
+  await mkdir(LOCAL_SCRATCH_ROOT, { recursive: true });
+  const unrelated = path.join(LOCAL_SCRATCH_ROOT, 'unrelated-keep-me');
+  await mkdir(unrelated, { recursive: true });
+  const sentinel = path.join(unrelated, 'sentinel.txt');
+  await writeFile(sentinel, 'keep\n');
+  const owned = await ownedTempDir('pr003-r6-owned-');
+  assert.notEqual(path.resolve(owned), path.resolve(unrelated));
+  assert.equal(path.resolve(owned).startsWith(`${path.resolve(unrelated)}${path.sep}`), false);
+  await assert.rejects(
+    () => removeOwnedTempDir(unrelated),
+    /refusing to remove untracked path/
+  );
+  await removeOwnedTempDir(owned);
+  assert.equal(await readFile(sentinel, 'utf8'), 'keep\n');
+  await rm(unrelated, { recursive: true, force: true });
 });
 
 test('a different plausible ledger base in the controlled context still rejects with binding_conflict', async () => {
