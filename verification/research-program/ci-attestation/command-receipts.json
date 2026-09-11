@@ -1,0 +1,515 @@
+{
+  "schema_version": "ushso.pr085.command-receipts.v1",
+  "task_id": "ushso-pr085-ci-attestation-20260910",
+  "capture_scope": "All command attempts recorded by the native Luna Max PR-085 lifecycle through the completed-candidate full npm test.",
+  "agentctl_receipt": {
+    "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/receipt.json",
+    "receipt_digest_at_capture": "8e6062037464c0e72394e7c4ad755c8271cee57ca64d69200d00ae78ab6e8fb2",
+    "event_log_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/events.jsonl",
+    "event_log_sha256": "5ac9f58357d91c40da29c836ab6b1dec6473eff53e595f2466d1352f052a44bd",
+    "event_count": 19,
+    "note": "Agentctl receipt changes when later heartbeat and finish events are recorded; command records below bind immutable command IDs and stream hashes."
+  },
+  "commands": [
+    {
+      "id": "cmd-0001-d2cb68ac",
+      "argv": [
+        "node",
+        "scripts/verify-wp0-attestation.mjs"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:13:34.872Z",
+      "ended_at": "2026-09-11T00:13:54.770Z",
+      "duration_ms": 19898,
+      "exit_code": 1,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0001-d2cb68ac/stdout.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0001-d2cb68ac/stderr.log",
+        "bytes_total": 68,
+        "bytes_retained": 68,
+        "original_sha256": "e3cf15cc1d45fea7da646ee4d9537adac29fbd44c1af93df542b6e060028041d",
+        "retained_sha256": "e3cf15cc1d45fea7da646ee4d9537adac29fbd44c1af93df542b6e060028041d",
+        "truncated": false
+      },
+      "observed_result": "environment_blocked",
+      "note": "Nested execFile boundary replay returned EPERM in the sandbox; later direct/escalated replays passed."
+    },
+    {
+      "id": "cmd-0002-6b609290",
+      "argv": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "tests/product-boundary.test.mjs"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:14:05.816Z",
+      "ended_at": "2026-09-11T00:14:06.112Z",
+      "duration_ms": 296,
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0002-6b609290/stdout.log",
+        "bytes_total": 254,
+        "bytes_retained": 254,
+        "original_sha256": "c21f094bf9fb45e8ea7b5b6287613a5822c90fffbcf4eb58815608cbee299af4",
+        "retained_sha256": "c21f094bf9fb45e8ea7b5b6287613a5822c90fffbcf4eb58815608cbee299af4",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0002-6b609290/stderr.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "observed_result": "passed",
+      "note": "Direct boundary test passed."
+    },
+    {
+      "id": "cmd-0003-125f0176",
+      "argv": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import {execFile} from 'node:child_process'; import {promisify} from 'node:util'; const execute=promisify(execFile); const env={...process.env}; delete env.NODE_TEST_CONTEXT; const {stdout,stderr}=await execute(process.execPath,['--test','--test-reporter=tap','tests/product-boundary.test.mjs'],{cwd:process.cwd(),env,maxBuffer:8*1024*1024}); console.log(JSON.stringify({stdout,stderr,tests:stdout.match(/^# tests (\\d+)$/m)?.[1]}));"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:14:16.587Z",
+      "ended_at": "2026-09-11T00:14:16.887Z",
+      "duration_ms": 299,
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0003-125f0176/stdout.log",
+        "bytes_total": 26,
+        "bytes_retained": 26,
+        "original_sha256": "1db5a9dd524a45f69085c44d9a65c70dd7ccc74a456a7a8aed06a5bab8a65154",
+        "retained_sha256": "1db5a9dd524a45f69085c44d9a65c70dd7ccc74a456a7a8aed06a5bab8a65154",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0003-125f0176/stderr.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "observed_result": "passed",
+      "note": "Escalated execFile boundary replay passed."
+    },
+    {
+      "id": "cmd-0004-96aa21f7",
+      "argv": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import {spawnSync} from 'node:child_process'; const x=spawnSync(process.execPath,['--test','--test-reporter=tap','tests/product-boundary.test.mjs'],{cwd:process.cwd(),encoding:'utf8'}); console.log(JSON.stringify({status:x.status,signal:x.signal,error:x.error?.message,stdoutLength:x.stdout?.length,stderrLength:x.stderr?.length,stdout:x.stdout,stderr:x.stderr}));"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:14:29.232Z",
+      "ended_at": "2026-09-11T00:14:29.531Z",
+      "duration_ms": 299,
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0004-96aa21f7/stdout.log",
+        "bytes_total": 162,
+        "bytes_retained": 162,
+        "original_sha256": "92c302057649bbc69ccb8ba6f855a6d7b4ad8c04e2f18c02af040875adc95c4c",
+        "retained_sha256": "92c302057649bbc69ccb8ba6f855a6d7b4ad8c04e2f18c02af040875adc95c4c",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0004-96aa21f7/stderr.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "observed_result": "passed",
+      "note": "Escalated spawn boundary replay passed."
+    },
+    {
+      "id": "cmd-0005-71f199f9",
+      "argv": [
+        "node",
+        "scripts/verify-wp0-attestation.mjs"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:14:45.481Z",
+      "ended_at": "2026-09-11T00:15:07.459Z",
+      "duration_ms": 21978,
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0005-71f199f9/stdout.log",
+        "bytes_total": 1873,
+        "bytes_retained": 1873,
+        "original_sha256": "296eeff9dc87751d76ba5aab4fdd1b52bd25c36bb93f35a4a492cab1cc51fc7d",
+        "retained_sha256": "296eeff9dc87751d76ba5aab4fdd1b52bd25c36bb93f35a4a492cab1cc51fc7d",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0005-71f199f9/stderr.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "observed_result": "passed",
+      "note": "C1 current attestation replay passed."
+    },
+    {
+      "id": "cmd-0006-3af88de0",
+      "argv": [
+        "node",
+        "scripts/run-contract-suites.mjs",
+        "--suite",
+        "wp0"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:17:47.624Z",
+      "ended_at": "2026-09-11T00:18:30.120Z",
+      "duration_ms": 42496,
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0006-3af88de0/stdout.log",
+        "bytes_total": 3364,
+        "bytes_retained": 3364,
+        "original_sha256": "170951babda9c90c731750298adf9a47701f48653a8d9fafa5984c9e4aa64ec9",
+        "retained_sha256": "170951babda9c90c731750298adf9a47701f48653a8d9fafa5984c9e4aa64ec9",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0006-3af88de0/stderr.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "observed_result": "passed",
+      "note": "Actual WP0 runner route replay passed."
+    },
+    {
+      "id": "cmd-0007-8421748d",
+      "argv": [
+        "node",
+        "--test",
+        "tests/wp0-attestation.test.mjs"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:21:41.047Z",
+      "ended_at": "2026-09-11T00:22:24.607Z",
+      "duration_ms": 43560,
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0007-8421748d/stdout.log",
+        "bytes_total": 4447,
+        "bytes_retained": 4447,
+        "original_sha256": "a9690cac0e67b9337f4280d37a8605d738ac41099439cad567b9ac45b2a56b78",
+        "retained_sha256": "a9690cac0e67b9337f4280d37a8605d738ac41099439cad567b9ac45b2a56b78",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0007-8421748d/stderr.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "observed_result": "passed",
+      "note": "C2 focused suite passed 9 tests before the later bounded correction."
+    },
+    {
+      "id": "cmd-0008-45ee34d1",
+      "argv": [
+        "node",
+        "scripts/verify-wp0-attestation.mjs"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:24:58.118Z",
+      "ended_at": "2026-09-11T00:25:19.805Z",
+      "duration_ms": 21687,
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0008-45ee34d1/stdout.log",
+        "bytes_total": 1873,
+        "bytes_retained": 1873,
+        "original_sha256": "c396c5e11322f8818093d849693872a0d94e65f0e13ef55e8f713e838db172d2",
+        "retained_sha256": "c396c5e11322f8818093d849693872a0d94e65f0e13ef55e8f713e838db172d2",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0008-45ee34d1/stderr.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "observed_result": "passed",
+      "note": "C2 current attestation replay passed before the later bounded correction."
+    },
+    {
+      "id": "cmd-0009-042f6d83",
+      "argv": [
+        "env",
+        "PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+        "test"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:26:05.275Z",
+      "ended_at": "2026-09-11T00:31:50.182Z",
+      "duration_ms": 344907,
+      "exit_code": 1,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0009-042f6d83/stdout.log",
+        "bytes_total": 189920,
+        "bytes_retained": 40000,
+        "original_sha256": "12d8aec0e4c81a83ada3508ad9fac8ac9fd544c2d1bba90c2f4df1901f8289b7",
+        "retained_sha256": "0504a851fd8b044d8bcee36d1082a78a4795301441d727e4c92089becec49fa6",
+        "truncated": true
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0009-042f6d83/stderr.log",
+        "bytes_total": 265,
+        "bytes_retained": 265,
+        "original_sha256": "a95367581dfcd9c9aa2b7d80efcf294cf3b57bb5ebb915c2720beb8ddda7a51a",
+        "retained_sha256": "a95367581dfcd9c9aa2b7d80efcf294cf3b57bb5ebb915c2720beb8ddda7a51a",
+        "truncated": false
+      },
+      "observed_result": "failed_expected_historical_subject_gate",
+      "note": "Earlier full npm test stopped at the known successor stale-subject gate."
+    },
+    {
+      "id": "cmd-0010-33ffc3c1",
+      "argv": [
+        "env",
+        "PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/node",
+        "--test",
+        "tests/wp0-attestation.test.mjs"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:38:09.225Z",
+      "ended_at": "2026-09-11T00:38:09.226Z",
+      "duration_ms": 1,
+      "exit_code": 127,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0010-33ffc3c1/stdout.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0010-33ffc3c1/stderr.log",
+        "bytes_total": 120,
+        "bytes_retained": 120,
+        "original_sha256": "513b5d155309068aeba06275e3aae62bf901918d040fb46d11b52734f47c3d19",
+        "retained_sha256": "513b5d155309068aeba06275e3aae62bf901918d040fb46d11b52734f47c3d19",
+        "truncated": false
+      },
+      "observed_result": "operator_error",
+      "note": "The first retry named a nonexistent pinned node binary; no repository code was executed."
+    },
+    {
+      "id": "cmd-0011-39a503ef",
+      "argv": [
+        "env",
+        "PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+        "node",
+        "--test",
+        "tests/wp0-attestation.test.mjs"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:38:20.967Z",
+      "ended_at": "2026-09-11T00:39:04.608Z",
+      "duration_ms": 43641,
+      "exit_code": 1,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0011-39a503ef/stdout.log",
+        "bytes_total": 6052,
+        "bytes_retained": 6052,
+        "original_sha256": "d079515ff3d638e06e767f10870c81de628cfa9a6a37a439ba25cc340933e3df",
+        "retained_sha256": "d079515ff3d638e06e767f10870c81de628cfa9a6a37a439ba25cc340933e3df",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0011-39a503ef/stderr.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "observed_result": "fixture_error",
+      "note": "Initial zero fixture used an empty test file, which Node counted as one file test; fixture was corrected."
+    },
+    {
+      "id": "cmd-0012-1fd89193",
+      "argv": [
+        "env",
+        "PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+        "node",
+        "--test",
+        "tests/wp0-attestation.test.mjs"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:39:50.513Z",
+      "ended_at": "2026-09-11T00:40:35.340Z",
+      "duration_ms": 44828,
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0012-1fd89193/stdout.log",
+        "bytes_total": 5332,
+        "bytes_retained": 5332,
+        "original_sha256": "6c6d688f262a93b2839c6a7f33c494059365e9a86d0485d96e0d299a130b1279",
+        "retained_sha256": "6c6d688f262a93b2839c6a7f33c494059365e9a86d0485d96e0d299a130b1279",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0012-1fd89193/stderr.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "observed_result": "passed",
+      "note": "Final bounded subprocess fixture suite passed all 10 tests."
+    },
+    {
+      "id": "cmd-0013-376ca93b",
+      "argv": [
+        "env",
+        "PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+        "node",
+        "scripts/verify-wp0-attestation.mjs"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:43:00.433Z",
+      "ended_at": "2026-09-11T00:43:21.447Z",
+      "duration_ms": 21014,
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0013-376ca93b/stdout.log",
+        "bytes_total": 1873,
+        "bytes_retained": 1873,
+        "original_sha256": "2d801361c7658b96aadb7421866653373b04b9c5ba979b92781d6b21b326147b",
+        "retained_sha256": "2d801361c7658b96aadb7421866653373b04b9c5ba979b92781d6b21b326147b",
+        "truncated": false
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0013-376ca93b/stderr.log",
+        "bytes_total": 0,
+        "bytes_retained": 0,
+        "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "observed_result": "passed",
+      "note": "Final current WP0 attestation replay passed after the runner correction."
+    },
+    {
+      "id": "cmd-0014-9cb38845",
+      "argv": [
+        "env",
+        "PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+        "test"
+      ],
+      "working_directory": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+      "working_directory_digest": "de2fc596e06a1a91e0e6b3a9435e471e497b579bd1cb66031f175083700d149b",
+      "started_at": "2026-09-11T00:45:20.258Z",
+      "ended_at": "2026-09-11T00:51:17.709Z",
+      "duration_ms": 357452,
+      "exit_code": 1,
+      "timed_out": false,
+      "interrupted": false,
+      "launch_error": null,
+      "stdout": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0014-9cb38845/stdout.log",
+        "bytes_total": 190806,
+        "bytes_retained": 40000,
+        "original_sha256": "b7896acd2d8a4a742309065ab91cf622b99b593bfcdd75010b500a4c53f295ba",
+        "retained_sha256": "37fa80b986265acb18ba6149ddc1368d95f9932fc883e12aedff145d021618ca",
+        "truncated": true
+      },
+      "stderr": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085/agentctl-state/tasks/ushso-pr085-ci-attestation-20260910/logs/cmd-0014-9cb38845/stderr.log",
+        "bytes_total": 265,
+        "bytes_retained": 265,
+        "original_sha256": "aa3062d69e007a86131cf18286c300475d55ac60721cc1ee0cc834bbafff6ae4",
+        "retained_sha256": "aa3062d69e007a86131cf18286c300475d55ac60721cc1ee0cc834bbafff6ae4",
+        "truncated": false
+      },
+      "observed_result": "failed_expected_historical_subject_gate",
+      "note": "Full npm test on the completed candidate retained the unchanged successor stale-subject failure."
+    }
+  ]
+}

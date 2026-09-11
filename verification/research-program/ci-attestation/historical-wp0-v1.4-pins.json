@@ -1,0 +1,50 @@
+{
+  "schema_version": "ushso.pr085.historical-wp0-pins.v1",
+  "scope": "Immutable historical WP0 v1.4 proof only; these bytes do not authorize the current candidate.",
+  "package_id": "@ushso/wp0-verification-v1.4.0@1.4.0",
+  "subject_sha256": "0098ee424bc58120f48167c580b7db19b556d0aee42929d1da56664f78993cb5",
+  "files": [
+    {
+      "name": "approval",
+      "path": "verification/wp0/v1.4.0/approvals/approval.json",
+      "sha256": "d1636ed70d3cff146666a54ea5f9e493e94386649d827c1a424504c244759c05",
+      "bytes": 672
+    },
+    {
+      "name": "evidence",
+      "path": "verification/wp0/v1.4.0/approvals/evidence.txt",
+      "sha256": "1aed5b57042a3a3609666b7678d6d9e6d17d607850dce4ecc90b99320b25ea42",
+      "bytes": 763
+    },
+    {
+      "name": "receipt",
+      "path": "verification/wp0/v1.4.0/receipts/approved.json",
+      "sha256": "15b79d25a52487597236c545b4f9e27be05203850b6e5076b671d6104390a5b8",
+      "bytes": 242873
+    }
+  ],
+  "validation": {
+    "implementation_path": "scripts/verify-wp0-attestation.mjs",
+    "implementation_sha256": "04c39620d29104b3a096b976f7cb23c420300ee61cf565ff6c605e619afac3cd",
+    "captured_command_id": "cmd-0013-376ca93b",
+    "captured_command": [
+      "node",
+      "scripts/verify-wp0-attestation.mjs"
+    ],
+    "captured_exit_code": 0,
+    "checks": [
+      "approval, evidence and approved-receipt bytes match exact pins",
+      "approval pointer and approved receipt carry the historical subject",
+      "shared successor subject recomputation matches the historical subject",
+      "historical receipt is validated in memory without writing or repinning it"
+    ],
+    "result": "PASS"
+  },
+  "boundaries": {
+    "historical_approval_reused_for_current": false,
+    "historical_receipt_overwritten": false,
+    "current_approval_issued": false,
+    "current_release_qualified": false,
+    "production_authorized": false
+  }
+}

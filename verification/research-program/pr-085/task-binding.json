@@ -1,0 +1,82 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr085-ci-attestation-20260910",
+  "slice_id": "C-085-3",
+  "pr_id": "PR-085",
+  "title": "Implement bounded current WP0 CI attestation and preserve historical approval boundaries",
+  "owner": "Luna Max (OpenAI; reasoning max; actor luna-max)",
+  "reviewer": "Root/controller independent review",
+  "branch": "codex/ushso-pr085-ci-attestation-20260910",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+  "objective": "Read and preserve the immutable WP0 v1.4.0 historical attestation, route only the exact reviewed current WP0 validate path through a technical draft verifier, and publish evidence without issuing current approval or release qualification.",
+  "outcome": "C-085-1, C-085-2, C-085-2-R1 and the C-085-3 evidence package are prepared. The candidate remains pending exact-head controller binding, independent review, current-subject authorization and release qualification.",
+  "dependencies": [
+    "PR-001"
+  ],
+  "owned_paths": [
+    "scripts/verify-wp0-attestation.mjs",
+    "scripts/run-contract-suites.mjs",
+    "tests/wp0-attestation.test.mjs",
+    "verification/research-program/ci-attestation/",
+    "verification/research-program/pr-085/",
+    "docs/research-program/ci-attestations.md",
+    "docs/research-program/handoffs/PR-085.json"
+  ],
+  "commits": [
+    {
+      "id": "C-085-1",
+      "subject": "docs(research): bound current WP0 CI attestation (PR-085 C-085-1)",
+      "instructions": "Pin the original WP0 v1.4.0 approval, evidence and receipt bytes; verify their historical subject; emit only a pending current technical draft.",
+      "verification": "cmd-0013-376ca93b current verifier replay passed with historical pins and no current approval."
+    },
+    {
+      "id": "C-085-2",
+      "subject": "test(research): route WP0 current CI checks (PR-085 C-085-2)",
+      "instructions": "Route only the exact WP0 v1.4.0 validate descriptor through the verifier while retaining normal WP0 tests, other suites, output handling and direct successor behavior.",
+      "verification": "cmd-0006-3af88de0 actual WP0 runner replay passed."
+    },
+    {
+      "id": "C-085-2-R1",
+      "subject": "test(research): cover runner failure paths",
+      "instructions": "Add bounded subprocess fixtures for future-version strict execution, current-attestation child failure, and rejection of a real zero-test child.",
+      "verification": "cmd-0012-1fd89193 passed all 10 focused subprocess tests."
+    },
+    {
+      "id": "C-085-3",
+      "subject": "docs(research): publish CI attestation evidence (PR-085 C-085-3)",
+      "instructions": "Publish hash-bound evidence, strict handoff/task binding and downstream instructions while retaining failures, pending authorization and unaccepted requirements.",
+      "verification": "cmd-0013-376ca93b and cmd-0014-9cb38845 provide the final candidate replay and full-chain outcome."
+    }
+  ],
+  "check_commands": [
+    "node scripts/verify-wp0-attestation.mjs",
+    "node scripts/run-contract-suites.mjs --suite wp0",
+    "node --test tests/wp0-attestation.test.mjs",
+    "npm test",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-085.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-085/",
+  "binding": {
+    "base_sha": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+    "base_tree": "8707c8fc92f35742f58508a83a57a3c4d9b7baf4",
+    "dependency_merge_shas": {
+      "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8"
+    },
+    "prompt_sha256": "1951d641b5d191eac6848d3a1641e528a907382db14df540e0207c695a4e57af"
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "producer_checked"
+}
