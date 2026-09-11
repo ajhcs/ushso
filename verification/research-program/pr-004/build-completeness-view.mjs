@@ -6,9 +6,9 @@ import { fileURLToPath } from 'node:url';
 import { buildCompletenessView } from '../../../packages/coverage/research-program/v1.0.0/src/completeness.mjs';
 import { buildAccessSummary } from '../../../packages/normalization/src/field-observation.mjs';
 import { createFieldObservation } from '../../../packages/normalization/src/field-observation.mjs';
+import { sha256Hex, writePackagedCompletenessView } from './completeness-view-packaging.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const OUTPUT = path.join(ROOT, 'verification/research-program/pr-004/completeness-view.json');
 const BASELINE_PATH = path.join(ROOT, 'docs/research-program/baseline.json');
 const COHORTS_PATH = path.join(ROOT, 'evaluation/research-program/cohorts.json');
 const OBSERVED_AT = '2026-09-03T22:22:33.908Z';
@@ -144,5 +144,19 @@ const view = buildCompletenessView({
   vectorEncoding: 'compact-v1',
   accessSummary: buildAccessSummary({ observations, asOf: AS_OF, compact: true })
 });
-await fs.writeFile(OUTPUT, `${JSON.stringify(view)}\n`);
-process.stdout.write(`${JSON.stringify({ status: 'pass', output: path.relative(ROOT, OUTPUT), record_count: view.records.length, source_membership_count: view.membership.source_membership_count, isolated_count: view.membership.isolated_count, artifact_id: view.artifact_id, artifact_digest: view.artifact_digest })}\n`);
+const decodedBytes = Buffer.from(`${JSON.stringify(view)}\n`);
+const packaged = await writePackagedCompletenessView({ root: ROOT, decodedBytes, view });
+process.stdout.write(`${JSON.stringify({
+  status: 'pass',
+  output: path.relative(ROOT, packaged.paths.transport),
+  manifest: path.relative(ROOT, packaged.paths.manifest),
+  record_count: view.records.length,
+  source_membership_count: view.membership.source_membership_count,
+  isolated_count: view.membership.isolated_count,
+  artifact_id: view.artifact_id,
+  artifact_digest: view.artifact_digest,
+  transport_bytes: packaged.transport.length,
+  transport_sha256: sha256Hex(packaged.transport),
+  decoded_bytes: decodedBytes.length,
+  decoded_sha256: sha256Hex(decodedBytes)
+})}\n`);

@@ -16,6 +16,15 @@ import {
 } from '../../packages/normalization/src/index.mjs';
 import { assertCompletenessView, buildCompletenessView, createOfflineCompletenessConsumer } from '../../packages/coverage/index.mjs';
 import { sha256Bytes } from '../../packages/normalization/src/canonical.mjs';
+import { verificationTempRoot } from '../../scripts/verification-temp-root.mjs';
+import {
+  ORIGINAL_DECODED_BYTES,
+  ORIGINAL_DECODED_SHA256,
+  gzipCompletenessBytes,
+  gunzipCompletenessBytes,
+  loadPackagedCompletenessView,
+  sha256Hex
+} from '../../verification/research-program/pr-004/completeness-view-packaging.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const OBSERVED_AT = '2026-09-03T22:22:33.908Z';
@@ -776,7 +785,11 @@ test('one record keeps successful, restricted and failed checks visible in the v
 });
 
 test('checked-in completeness artifact validates as an offline compact view', async () => {
-  const artifact = JSON.parse(await fs.readFile(path.join(ROOT, 'verification/research-program/pr-004/completeness-view.json'), 'utf8'));
+  const packaged = await loadPackagedCompletenessView({ root: ROOT });
+  const artifact = packaged.view;
+  assert.equal(packaged.decoded.length, ORIGINAL_DECODED_BYTES);
+  assert.equal(sha256Hex(packaged.decoded), ORIGINAL_DECODED_SHA256);
+  assert.equal(gzipCompletenessBytes(packaged.decoded).equals(packaged.transport), true);
   assert.equal(validateCompletenessSchema(artifact), true, JSON.stringify(validateCompletenessSchema.errors));
   assertCompletenessView(artifact);
   const cohortBytes = await fs.readFile(path.join(ROOT, 'evaluation/research-program/cohorts.json'));
@@ -798,8 +811,59 @@ test('checked-in completeness artifact validates as an offline compact view', as
   assert.equal(artifact.membership.record_count, 3434);
   assert.equal(artifact.membership.source_membership_count, 3434);
   assert.equal(artifact.membership.isolated_count, 4);
+  assert.equal(artifact.records.flatMap(record => record.source_vectors.flatMap(source => source.fields)).length, 13736);
+  assert.equal(artifact.aggregates.metrics.length, 25);
   assert.equal(consumer.listRecords({ limit: 25 }).records.length, 25);
   assert.equal(consumer.getSummary().boundaries.aggregate_metrics_are_supplemental_to_full_vector, true);
   assert.equal(artifact.access_summary.boundaries.unknown_cost_is_not_free, true);
   assert.equal(artifact.access_summary.boundaries.unknown_usage_limit_is_not_unlimited, true);
+  await assert.rejects(fs.access(packaged.paths.decodedForbidden), { code: 'ENOENT' });
+});
+
+test('completeness packaging rejects corrupt, truncated, mismatched-hash and oversize decoding', async () => {
+  const packaged = await loadPackagedCompletenessView({ root: ROOT });
+  assert.equal(packaged.transport.length, packaged.manifest.transport.bytes);
+  assert.equal(sha256Hex(packaged.transport), packaged.manifest.transport.sha256);
+
+  const truncated = packaged.transport.subarray(0, 16);
+  assert.throws(() => gunzipCompletenessBytes(truncated), { code: 'completeness_gzip_truncated' });
+
+  const small = Buffer.from('{"fixture":true}\n');
+  const smallGzip = gzipCompletenessBytes(small);
+  const corrupt = Buffer.from(smallGzip);
+  corrupt[corrupt.length - 5] ^= 0xff;
+  assert.throws(() => gunzipCompletenessBytes(corrupt), { code: 'completeness_gzip_corrupt' });
+  assert.throws(() => gunzipCompletenessBytes(smallGzip, { maxOutputLength: small.length - 1 }), { code: 'completeness_decoded_size_bound' });
+  assert.equal(gunzipCompletenessBytes(smallGzip, { maxOutputLength: small.length }).equals(small), true);
+
+  await assert.rejects(
+    loadPackagedCompletenessView({
+      root: ROOT,
+      transportBytes: packaged.transport,
+      expectedDecoded: { bytes: ORIGINAL_DECODED_BYTES, sha256: '0'.repeat(64) }
+    }),
+    { code: 'completeness_decoded_hash_mismatch' }
+  );
+
+  const wrongTransportManifest = structuredClone(packaged.manifest);
+  wrongTransportManifest.transport.sha256 = '0'.repeat(64);
+  await assert.rejects(
+    loadPackagedCompletenessView({
+      root: ROOT,
+      manifestBytes: Buffer.from(`${JSON.stringify(wrongTransportManifest)}\n`),
+      transportBytes: packaged.transport
+    }),
+    { code: 'completeness_transport_hash_mismatch' }
+  );
+
+  const tempRoot = await verificationTempRoot();
+  const fixtureDir = await fs.mkdtemp(path.join(tempRoot, 'pr004-packaging-'));
+  try {
+    const fixtureGzip = path.join(fixtureDir, 'truncated.json.gz');
+    await fs.writeFile(fixtureGzip, truncated);
+    const fixtureBytes = await fs.readFile(fixtureGzip);
+    assert.throws(() => gunzipCompletenessBytes(fixtureBytes), { code: 'completeness_gzip_truncated' });
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
 });
