@@ -13,3 +13,4 @@ export * from "./researcher-guidance.mjs";
 export * from "./review-ledger.mjs";
 export * from "./review-queue.mjs";
 export * from "./schema-catalog.mjs";
+export * from "./variable-identity.mjs";

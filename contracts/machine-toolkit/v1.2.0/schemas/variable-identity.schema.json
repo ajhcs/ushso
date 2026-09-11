@@ -1,0 +1,813 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/contracts/machine-toolkit/v1.2.0/schemas/variable-identity.schema.json",
+  "title": "USHSO variable identity",
+  "description": "Strict additive identity for a publisher wire field and its documented semantics. It carries unresolved states explicitly and never authorizes publication.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "variable_id",
+    "context_binding",
+    "wire_name",
+    "publisher_label",
+    "publisher_concept",
+    "definition",
+    "source_type",
+    "observed_type",
+    "semantic_role",
+    "unit",
+    "code_values",
+    "missingness",
+    "mapping",
+    "provenance",
+    "evidence_ids",
+    "evidence_state",
+    "completeness",
+    "limitations",
+    "publication_authorized",
+    "promotion_eligible"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "ushso.variable-identity.v1.2.0"
+    },
+    "variable_id": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^urn:ushso:variable:[a-f0-9]{32}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "context_binding": {
+      "$ref": "#/$defs/contextBinding"
+    },
+    "wire_name": {
+      "$ref": "#/$defs/nullableWireName"
+    },
+    "publisher_label": {
+      "$ref": "#/$defs/nullableText"
+    },
+    "publisher_concept": {
+      "$ref": "#/$defs/nullableText"
+    },
+    "definition": {
+      "$ref": "#/$defs/nullableText"
+    },
+    "source_type": {
+      "$ref": "#/$defs/sourceType"
+    },
+    "observed_type": {
+      "$ref": "#/$defs/observedType"
+    },
+    "semantic_role": {
+      "enum": [
+        "identifier",
+        "dimension",
+        "measure",
+        "measure_description",
+        "date",
+        "geography",
+        "suppression_flag",
+        "metadata",
+        "unknown"
+      ]
+    },
+    "unit": {
+      "$ref": "#/$defs/unit"
+    },
+    "code_values": {
+      "$ref": "#/$defs/codeSet"
+    },
+    "missingness": {
+      "$ref": "#/$defs/codeSet"
+    },
+    "mapping": {
+      "$ref": "#/$defs/mapping"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "evidence_ids": {
+      "$ref": "#/$defs/evidenceIds"
+    },
+    "evidence_state": {
+      "enum": [
+        "unknown",
+        "candidate",
+        "ambiguous",
+        "documented",
+        "observed"
+      ]
+    },
+    "completeness": {
+      "enum": [
+        "complete",
+        "incomplete",
+        "unknown"
+      ]
+    },
+    "limitations": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "$ref": "#/$defs/text4000"
+      }
+    },
+    "publication_authorized": {
+      "const": false
+    },
+    "promotion_eligible": {
+      "const": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "context_binding": {
+            "properties": {
+              "state": {
+                "const": "resolved"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "variable_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "context_binding": {
+            "properties": {
+              "state": {
+                "const": "unresolved"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "variable_id": {
+            "type": "null"
+          }
+        },
+        "type": "object"
+      }
+    }
+  ],
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "text4000": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "nullableText": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/text4000"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullableWireName": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 256
+    },
+    "nullableId": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidenceIds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "contextBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "binding_state",
+        "source_id",
+        "asset_id",
+        "release_id",
+        "distribution_id",
+        "schema_snapshot_id",
+        "schema_field_id",
+        "field_revision_id",
+        "reason"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "resolved",
+            "unresolved"
+          ]
+        },
+        "binding_state": {
+          "enum": [
+            "exact",
+            "one_to_many",
+            "rolling",
+            "replaced",
+            "ambiguous",
+            "unresolved",
+            "conflicted"
+          ]
+        },
+        "source_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "asset_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "release_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "distribution_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "schema_snapshot_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "schema_field_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "field_revision_id": {
+          "$ref": "#/$defs/nullableId"
+        },
+        "reason": {
+          "$ref": "#/$defs/nullableText"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "resolved"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "binding_state": {
+                "const": "exact"
+              },
+              "source_id": {
+                "$ref": "#/$defs/id"
+              },
+              "asset_id": {
+                "$ref": "#/$defs/id"
+              },
+              "release_id": {
+                "$ref": "#/$defs/id"
+              },
+              "distribution_id": {
+                "$ref": "#/$defs/id"
+              },
+              "schema_snapshot_id": {
+                "$ref": "#/$defs/id"
+              },
+              "reason": {
+                "type": "null"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "unresolved"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "$ref": "#/$defs/text4000"
+              }
+            },
+            "type": "object"
+          }
+        }
+      ]
+    },
+    "assertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "value",
+        "evidence_ids"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "documented",
+            "observed",
+            "unknown",
+            "unavailable"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "sourceType": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/assertion"
+        },
+        {
+          "properties": {
+            "state": {
+              "enum": [
+                "documented",
+                "unknown",
+                "unavailable"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "observedType": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/assertion"
+        },
+        {
+          "properties": {
+            "state": {
+              "enum": [
+                "observed",
+                "unknown",
+                "unavailable"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      ]
+    },
+    "unit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "value",
+        "rationale",
+        "evidence_ids"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "documented",
+            "not_applicable",
+            "missing",
+            "unknown"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "rationale": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "documented"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "$ref": "#/$defs/text4000"
+              },
+              "evidence_ids": {
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "not_applicable"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              },
+              "rationale": {
+                "$ref": "#/$defs/text4000"
+              },
+              "evidence_ids": {
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "missing",
+                  "unknown"
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            },
+            "type": "object"
+          }
+        }
+      ]
+    },
+    "literalValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "label"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/text"
+        },
+        "label": {
+          "$ref": "#/$defs/nullableText"
+        }
+      }
+    },
+    "codeSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "values",
+        "evidence_ids"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "documented",
+            "not_documented",
+            "unknown"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "maxItems": 10000,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/literalValue"
+          }
+        },
+        "evidence_ids": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "documented"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "values": {
+                "minItems": 1,
+                "type": "array"
+              },
+              "evidence_ids": {
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "not_documented",
+                  "unknown"
+                ]
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "values": {
+                "maxItems": 0,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        }
+      ]
+    },
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "documented_name",
+        "wire_name",
+        "candidate_wire_names",
+        "evidence_ids"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "exact",
+            "reviewed_alias",
+            "ambiguous",
+            "unmatched"
+          ]
+        },
+        "documented_name": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "wire_name": {
+          "$ref": "#/$defs/nullableText"
+        },
+        "candidate_wire_names": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        },
+        "evidence_ids": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "exact"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "documented_name": {
+                "$ref": "#/$defs/text"
+              },
+              "wire_name": {
+                "$ref": "#/$defs/text"
+              },
+              "evidence_ids": {
+                "minItems": 0,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "reviewed_alias"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "documented_name": {
+                "$ref": "#/$defs/text"
+              },
+              "wire_name": {
+                "$ref": "#/$defs/text"
+              },
+              "evidence_ids": {
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "ambiguous"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "documented_name": {
+                "$ref": "#/$defs/text"
+              },
+              "wire_name": {
+                "type": "null"
+              },
+              "candidate_wire_names": {
+                "minItems": 1,
+                "type": "array"
+              },
+              "evidence_ids": {
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "unmatched"
+              }
+            },
+            "type": "object"
+          },
+          "then": {
+            "properties": {
+              "wire_name": {
+                "type": "null"
+              },
+              "candidate_wire_names": {
+                "maxItems": 0,
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        }
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_locator",
+        "pointer",
+        "capture_sha256",
+        "raw_value_sha256",
+        "transformation",
+        "evidence_ids"
+      ],
+      "properties": {
+        "source_locator": {
+          "$ref": "#/$defs/text"
+        },
+        "pointer": {
+          "type": "string",
+          "maxLength": 2048,
+          "pattern": "^(?:|(?:/(?:[^~/]|~[01])*))*$"
+        },
+        "capture_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "raw_value_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "transformation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version"
+          ],
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/text"
+            },
+            "version": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        },
+        "evidence_ids": {
+          "$ref": "#/$defs/evidenceIds"
+        }
+      }
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

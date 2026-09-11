@@ -4,6 +4,42 @@ function recordFingerprint(record) {
   return sha256(record);
 }
 
+const CONTEXT_SCOPE_KEYS = Object.freeze([
+  "source_id",
+  "asset_id",
+  "release_id",
+  "distribution_id",
+  "schema_snapshot_id",
+]);
+
+function requireContextScope(context) {
+  assert(context && typeof context === "object" && !Array.isArray(context), "Schema field context must be an object", "invalid_schema_field_context");
+  for (const key of CONTEXT_SCOPE_KEYS) {
+    assert(typeof context[key] === "string" && context[key].length >= 3, "Schema field context requires " + key, "incomplete_schema_field_context");
+  }
+  return context;
+}
+
+/**
+ * Derive a field identifier from the complete source/release/schema scope and
+ * the exact publisher wire name. This helper does not register a field or
+ * relax any of the immutable catalog or endpoint checks below.
+ */
+export function createContextScopedSchemaFieldId(context, wireName) {
+  const scoped = requireContextScope(context);
+  assert(typeof wireName === "string" && wireName.length > 0 && wireName.length <= 2048, "Schema field wire name must be a bounded string", "invalid_schema_field_name");
+  return "urn:ushso:field:" + sha256({
+    source_id: scoped.source_id,
+    asset_id: scoped.asset_id,
+    release_id: scoped.release_id,
+    distribution_id: scoped.distribution_id,
+    schema_snapshot_id: scoped.schema_snapshot_id,
+    schema_field_id: scoped.schema_field_id ?? null,
+    field_revision_id: scoped.field_revision_id ?? null,
+    wire_name: wireName,
+  }).slice(0, 32);
+}
+
 export class ImmutableSchemaCatalog {
   #snapshots = new Map();
   #fields = new Map();
@@ -57,7 +93,21 @@ export class ImmutableSchemaCatalog {
     assert(snapshot.distribution_id === endpoint.distribution_id, "Join endpoint distribution does not match its schema snapshot", "endpoint_distribution_mismatch");
     assert(field.schema_snapshot_id === endpoint.schema_snapshot_id, "Join field does not belong to the exact snapshot", "endpoint_field_mismatch");
     assert(field.revision_id === endpoint.field_revision_id, "Join endpoint must pin the exact field revision", "endpoint_field_revision_mismatch");
+
     return { snapshot: clone(snapshot), field: clone(field) };
+  }
+
+  resolveVariableContext(context) {
+    requireContextScope(context);
+    assert(typeof context.schema_field_id === "string" && context.schema_field_id.length >= 3, "Resolved variable context requires schema_field_id", "incomplete_variable_context");
+    assert(typeof context.field_revision_id === "string" && context.field_revision_id.length >= 3, "Resolved variable context requires field_revision_id", "incomplete_variable_context");
+    return this.resolveEndpoint({
+      release_id: context.release_id,
+      distribution_id: context.distribution_id,
+      schema_snapshot_id: context.schema_snapshot_id,
+      schema_field_id: context.schema_field_id,
+      field_revision_id: context.field_revision_id,
+    });
   }
 
   inventory() {
