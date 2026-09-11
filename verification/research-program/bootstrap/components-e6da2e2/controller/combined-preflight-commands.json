@@ -1,0 +1,89 @@
+[
+  {
+    "id": "wp11-tests",
+    "executable": "node",
+    "args": [
+      "--test",
+      "tests/wp11-attestation.test.mjs"
+    ],
+    "timeout_ms": 180000
+  },
+  {
+    "id": "wp11-adapter",
+    "executable": "node",
+    "args": [
+      "scripts/verify-wp11-attestation.mjs"
+    ],
+    "timeout_ms": 180000
+  },
+  {
+    "id": "wp11-actual-suite",
+    "executable": "node",
+    "args": [
+      "scripts/run-contract-suites.mjs",
+      "--suite",
+      "wp11"
+    ],
+    "timeout_ms": 180000
+  },
+  {
+    "id": "pr005-controller",
+    "executable": "node",
+    "args": [
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr005-independent-semantics-v3.mjs",
+      "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr005-pr086-controller-combined-20260911",
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/combined-corrected-preflight/freshness"
+    ]
+  },
+  {
+    "id": "pr007-controller",
+    "executable": "node",
+    "args": [
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr007-independent-semantics.mjs",
+      "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr005-pr086-controller-combined-20260911",
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/combined-corrected-preflight/identity"
+    ]
+  },
+  {
+    "id": "pr007-core",
+    "executable": "node",
+    "args": [
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr007-independent-r2-extra-v3.mjs",
+      "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr005-pr086-controller-combined-20260911",
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/combined-corrected-preflight/core"
+    ]
+  },
+  {
+    "id": "pr007-relationships",
+    "executable": "node",
+    "args": [
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr007-independent-r3-relationships.mjs",
+      "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr005-pr086-controller-combined-20260911",
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/combined-corrected-preflight/relationships"
+    ]
+  },
+  {
+    "id": "pr005-handoff",
+    "executable": "node",
+    "args": [
+      "scripts/research-program/check-handoff.mjs",
+      "docs/research-program/handoffs/PR-005.json"
+    ]
+  },
+  {
+    "id": "pr007-handoff",
+    "executable": "node",
+    "args": [
+      "scripts/research-program/check-handoff.mjs",
+      "docs/research-program/handoffs/PR-007.json"
+    ]
+  },
+  {
+    "id": "pr086-handoff",
+    "executable": "node",
+    "args": [
+      "scripts/research-program/check-handoff.mjs",
+      "docs/research-program/handoffs/PR-086.json"
+    ]
+  }
+]
