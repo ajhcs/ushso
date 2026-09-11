@@ -82,11 +82,20 @@ test('current WP11 verifier keeps historical proof, technical draft and wrapper 
   assert.equal(result.boundaries.historical_approval_applied_to_wrapper_subject, false)
   assert.equal(result.boundaries.current_approval_issued, false)
   assert.equal(result.boundaries.writes_approval_artifacts, false)
-  assert.equal(result.historical.input_bindings.package_provenance.state, 'original_pr085_git_snapshot')
-  assert.equal(result.historical.input_bindings.package_provenance.location, 'external')
-  assert.equal(result.historical.input_bindings.package_provenance.git_commit, ORIGINAL_PR085_PACKAGE_SNAPSHOT.git_commit)
+  const actualPackage = await hashPinned('package.json')
+  const reviewedTransition = actualPackage.sha256 === REVIEWED_PR003_PACKAGE_SNAPSHOT.sha256
+  const expectedPackage = reviewedTransition ? REVIEWED_PR003_PACKAGE_SNAPSHOT : ORIGINAL_PR085_PACKAGE_SNAPSHOT
+  assert.deepEqual(actualPackage, { bytes: expectedPackage.bytes, sha256: expectedPackage.sha256 })
+  const provenance = result.historical.input_bindings.package_provenance
+  assert.equal(provenance.state, reviewedTransition ? 'reviewed_pr003_current' : 'original_pr085_git_snapshot')
+  assert.equal(provenance.location, 'external')
+  assert.equal(provenance.git_commit, expectedPackage.git_commit)
+  assert.equal(provenance.git_path, expectedPackage.git_path)
+  assert.equal(provenance.sha256, actualPackage.sha256)
+  assert.equal(provenance.bytes, actualPackage.bytes)
   assert.equal(result.historical.input_bindings.lock_state, 'pr085_ci_v14')
-  assert.equal(result.historical.input_bindings.package_provenance.reviewed_pr003_transition, false)
+  assert.equal(provenance.reviewed_pr003_transition, reviewedTransition)
+  if (reviewedTransition) assert.deepEqual(provenance.original_pr085_snapshot, ORIGINAL_PR085_PACKAGE_SNAPSHOT)
 })
 
 test('historical WP11 proof fails closed for missing and altered immutable bytes', async () => {
@@ -114,7 +123,10 @@ test('package provenance keeps the original PR085 Git snapshot and names the PR0
   assert.equal(originalBytes.length, ORIGINAL_PR085_PACKAGE_SNAPSHOT.bytes)
   assert.equal(sha256(originalBytes), ORIGINAL_PR085_PACKAGE_SNAPSHOT.sha256)
 
-  const legacy = await validateHistoricalWp11Proof(fixture)
+  const readOriginalPackage = async (root, relativePath) => relativePath === 'package.json'
+    ? originalBytes
+    : readFile(path.resolve(root, relativePath))
+  const legacy = await validateHistoricalWp11Proof({ ...fixture, readCurrentFile: readOriginalPackage })
   assert.equal(legacy.input_bindings.package_provenance.state, 'original_pr085_git_snapshot')
   assert.equal(legacy.input_bindings.package_provenance.git_commit, ORIGINAL_PR085_PACKAGE_SNAPSHOT.git_commit)
 
