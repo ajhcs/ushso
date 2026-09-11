@@ -1,64 +1,91 @@
 {
   "format": "ushso.research-program.task.v1",
   "task_id": "ushso-pr085-ci-attestation-20260910",
-  "slice_id": "C-085-3",
+  "slice_id": "C-085-3-R2",
   "pr_id": "PR-085",
-  "title": "Implement bounded current WP0 CI attestation and preserve historical approval boundaries",
+  "title": "Implement versioned CI v1.4 attestation inventory and preserve historical approval boundaries",
   "owner": "Luna Max (OpenAI; reasoning max; actor luna-max)",
   "reviewer": "Root/controller independent review",
   "branch": "codex/ushso-pr085-ci-attestation-20260910",
   "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
-  "objective": "Read and preserve the immutable WP0 v1.4.0 historical attestation, route only the exact reviewed current WP0 validate path through a technical draft verifier, and publish evidence without issuing current approval or release qualification.",
-  "outcome": "C-085-1, C-085-2, C-085-2-R1 and the C-085-3 evidence package are prepared. The candidate remains pending exact-head controller binding, independent review, current-subject authorization and release qualification.",
+  "objective": "Preserve the immutable CI v1.3 approval chain while adding a versioned CI v1.4 structural inventory, exact current-attestation route, reviewed PR-003 input transition and failure evidence without issuing current approval or release qualification.",
+  "outcome": "C-085-1, C-085-2, C-085-2-R1, C-085-2-R2, C-085-2-R3 and C-085-2-R4 are implemented by native Luna Max. The current v1.4 draft is pending_authorized_review with no current approval or release qualification; C-085-3 documentation is prepared for root exact-head binding and independent review.",
   "dependencies": [
     "PR-001"
   ],
   "owned_paths": [
     "scripts/verify-wp0-attestation.mjs",
     "scripts/run-contract-suites.mjs",
+    "scripts/verify-ci-attestation.mjs",
     "tests/wp0-attestation.test.mjs",
+    "tests/ci-attestation.test.mjs",
+    "verification/testing/ci/v1.4.0/",
     "verification/research-program/ci-attestation/",
     "verification/research-program/pr-085/",
     "docs/research-program/ci-attestations.md",
-    "docs/research-program/handoffs/PR-085.json"
+    "docs/research-program/handoffs/PR-085.json",
+    "package-lock.json"
   ],
   "commits": [
     {
       "id": "C-085-1",
       "subject": "docs(research): bound current WP0 CI attestation (PR-085 C-085-1)",
       "instructions": "Pin the original WP0 v1.4.0 approval, evidence and receipt bytes; verify their historical subject; emit only a pending current technical draft.",
-      "verification": "cmd-0013-376ca93b current verifier replay passed with historical pins and no current approval."
+      "verification": "Historical WP0 evidence and current-draft behavior remain preserved by the prior focused replay and current v1.4 verifier."
     },
     {
       "id": "C-085-2",
       "subject": "test(research): route WP0 current CI checks (PR-085 C-085-2)",
-      "instructions": "Route only the exact WP0 v1.4.0 validate descriptor through the verifier while retaining normal WP0 tests, other suites, output handling and direct successor behavior.",
-      "verification": "cmd-0006-3af88de0 actual WP0 runner replay passed."
+      "instructions": "Route only the exact reviewed WP0 v1.4.0 validate descriptor through the verifier while retaining normal WP0 tests, other suites, output handling and direct successor behavior.",
+      "verification": "The preserved WP0 focused runner/component checks remain part of the final evidence; v1.4 routing is covered by cmd-0026-fd1a369a."
     },
     {
       "id": "C-085-2-R1",
       "subject": "test(research): cover runner failure paths",
-      "instructions": "Add bounded subprocess fixtures for future-version strict execution, current-attestation child failure, and rejection of a real zero-test child.",
-      "verification": "cmd-0012-1fd89193 passed all 10 focused subprocess tests."
+      "instructions": "Add bounded subprocess fixtures for future-version strict execution, current-attestation child failure and rejection of a real zero-test child.",
+      "verification": "The final v1.4 focused suite and negative-fixture artifact retain nonzero, error, timeout and zero-test outcomes."
+    },
+    {
+      "id": "C-085-2-R2",
+      "subject": "feat(research): add versioned CI v1.4 inventory route",
+      "instructions": "Add the read-only CI v1.4 inventory and exact aggregate route, preserve both root chains, historical v1.3 pins and strict direct commands, and update only required npm workspace lock entries.",
+      "verification": "cmd-0025-1bb26230 passed all five v1.4 package checks; cmd-0026-246ee7e0 passed the focused route and subprocess checks."
+    },
+    {
+      "id": "C-085-2-R3",
+      "subject": "fix(ci): bind reviewed PR003 input transition",
+      "instructions": "Retain historical package/test pins while accepting only the exact reviewed PR-003 current bytes with bounded metadata, root-chain and inventory-test semantic checks.",
+      "verification": "cmd-0021-fd1a369a passed the real git-show transition proof and one-byte tamper negative; cmd-0026-246ee7e0 passed the final nine-test suite."
+    },
+    {
+      "id": "C-085-2-R4",
+      "subject": "fix(ci): require atomic reviewed PR003 inputs",
+      "instructions": "Require the reviewed PR-003 package.json and contract-inventory test transition to move together; accept the complete historical pair or complete reviewed pair and reject both mixed states.",
+      "verification": "cmd-0039-f2390da5 passed the direct 10-test suite with both actual mixed-pair negatives; cmd-0044-9aab8058 passed the corrected verifier replay."
     },
     {
       "id": "C-085-3",
-      "subject": "docs(research): publish CI attestation evidence (PR-085 C-085-3)",
-      "instructions": "Publish hash-bound evidence, strict handoff/task binding and downstream instructions while retaining failures, pending authorization and unaccepted requirements.",
-      "verification": "cmd-0013-376ca93b and cmd-0014-9cb38845 provide the final candidate replay and full-chain outcome."
+      "subject": "docs(research): publish versioned CI attestation evidence (PR-085 C-085-3)",
+      "instructions": "Publish exact current v1.4 replay, historical pins, reviewed PR-003 transition, command metadata, lock evidence, build/dry-run results and full-test failure while retaining pending authorization and unaccepted requirements.",
+      "verification": "cmd-0027-ca1dd0f1, cmd-0029-77c01c6b, cmd-0030-670cc197, cmd-0031-8420d755, cmd-0032-26c45fcf, cmd-0033-0c22cabf, cmd-0041-14adb64d, cmd-0042-1ed26f79, cmd-0044-9aab8058, cmd-0023-f00f3acb and cmd-0024-911db093 provide the producer evidence; cmd-0022-aa4a557b records the full-test block."
     }
   ],
   "check_commands": [
-    "node scripts/verify-wp0-attestation.mjs",
-    "node scripts/run-contract-suites.mjs --suite wp0",
+    "node scripts/verify-ci-attestation.mjs",
+    "node --test tests/ci-attestation.test.mjs",
+    "node tests/ci-attestation.test.mjs",
+    "npm run --prefix verification/testing/ci/v1.4.0 test",
     "node --test tests/wp0-attestation.test.mjs",
+    "npm ci --ignore-scripts --offline --no-audit --no-fund",
     "npm test",
+    "npm run build",
+    "npm run cf:dry-run",
     "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-085.json"
   ],
   "evidence_directory": "verification/research-program/pr-085/",
   "binding": {
-    "base_sha": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
-    "base_tree": "8707c8fc92f35742f58508a83a57a3c4d9b7baf4",
+    "base_sha": "4ad67220df54334f70d891fd26d1778f83328d54",
+    "base_tree": "02544973bf065b3825c8b189f186a598da99a223",
     "dependency_merge_shas": {
       "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8"
     },

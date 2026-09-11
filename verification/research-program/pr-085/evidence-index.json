@@ -3,10 +3,10 @@
   "pr_id": "PR-085",
   "status": "producer_checked",
   "candidate": {
-    "base_sha": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
-    "base_tree": "8707c8fc92f35742f58508a83a57a3c4d9b7baf4",
-    "last_implementation_head": "7cfbb96096d5eba46c37fb5b1885f116aa82ab80",
-    "last_implementation_tree": "e441cd19fe08971dae42c341ac2d1edbf44f25cb",
+    "base_sha": "4ad67220df54334f70d891fd26d1778f83328d54",
+    "base_tree": "02544973bf065b3825c8b189f186a598da99a223",
+    "last_implementation_head": "6ed7fb4cb24199977034cf86bb3f0b4a928513be",
+    "last_implementation_tree": "959cdb237f1b733af839bd72747761d837e8ba04",
     "final_c3_head": null,
     "final_c3_tree": null,
     "final_head_note": "The C3 documentation commit cannot self-embed its own final SHA/tree; root binds them externally.",
@@ -14,13 +14,13 @@
   },
   "plan": {
     "path": "docs/master-plan/2026-09-10/plan.json",
-    "sha256": "cbb1e8f707d7d9a35b1da66d36a217dddd3a1bbd05f80d1fd5a38bf501cdc455",
-    "accepted_review_path": "verification/research-program/bootstrap/ci-attestation-plan-independent-review.json",
-    "accepted_review_sha256": "d17ef616401411d16c12b54e14282d1c1db0abb7fb5c193039e317cfdd0e85f5"
+    "sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15",
+    "accepted_review_path": "verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
+    "accepted_review_sha256": "d3c9c26c7566c74de2e5cec42c24c388a54e3cbe402f9ccf472ea05294f02b8f"
   },
   "dependency": {
-    "PR-001_merge_sha": "035465f3f16d15f02467679d96451d4440a36ca8",
-    "PR-001_producer_sha": "8fc2fbbbaf1016da4c3951ccd238918ce645f4fe"
+    "PR_001_merge_sha": "035465f3f16d15f02467679d96451d4440a36ca8",
+    "PR_001_producer_sha": "8fc2fbbbaf1016da4c3951ccd238918ce645f4fe"
   },
   "commits": [
     {
@@ -43,10 +43,31 @@
       "reason": "bounded review-discovered subprocess failure coverage"
     },
     {
+      "id": "C-085-2-R2",
+      "sha": "3c884d3edcab1c75249508236693f9e82ded5dc3",
+      "tree": "c44be8b852df00af9021c9e3a16064f17461ea29",
+      "authorship": "Luna Max",
+      "reason": "versioned CI v1.4 inventory and exact aggregate route"
+    },
+    {
+      "id": "C-085-2-R3",
+      "sha": "d1826358b0b1e5f8db97b787b5bf74de5e50926b",
+      "tree": "5fec5290858bafddd6d5c4a291c36e5ea169ea0b",
+      "authorship": "Luna Max",
+      "reason": "reviewed PR-003 current-input transition binding"
+    },
+    {
+      "id": "C-085-2-R4",
+      "sha": "6ed7fb4cb24199977034cf86bb3f0b4a928513be",
+      "tree": "959cdb237f1b733af839bd72747761d837e8ba04",
+      "authorship": "Luna Max",
+      "reason": "atomic reviewed PR-003 input transition binding and mixed-pair negatives"
+    },
+    {
       "id": "C-085-3",
       "sha": null,
       "tree": null,
-      "parent": "7cfbb96096d5eba46c37fb5b1885f116aa82ab80",
+      "parent": "6ed7fb4cb24199977034cf86bb3f0b4a928513be",
       "authorship": "Luna Max"
     }
   ],
@@ -54,41 +75,110 @@
     {
       "path": "scripts/verify-wp0-attestation.mjs",
       "sha256": "04c39620d29104b3a096b976f7cb23c420300ee61cf565ff6c605e619afac3cd",
-      "state": "added C-085-1; unchanged thereafter"
+      "bytes": 9396,
+      "state": "unchanged prior WP0 verifier"
     },
     {
       "path": "scripts/run-contract-suites.mjs",
-      "sha256": "854e4e5fbc5e52004d28f06d81ee2b745bae729fe68d3f54f8e82b02250f6bc0",
-      "state": "changed C-085-2 and bounded C-085-2 correction"
+      "sha256": "9cc9efb8f29bf6a9ba93fe619e7fd1d0e519fce5cb0f37bf8747f199611cb647",
+      "bytes": 26687,
+      "state": "current runner with exact CI v1.4 route and preserved failure propagation",
+      "historical_sha256": "acfa8900758bbba0f72e0c1bb0374b6f1b55e6b40d4a8b254218b60e5c41b596"
+    },
+    {
+      "path": "scripts/verify-ci-attestation.mjs",
+      "sha256": "914ad3b3b0d65ff8ba901669d0081f099758442ddfcd328e71aa0d0222fc2b75",
+      "bytes": 22582,
+      "state": "current CI v1.4 historical/current boundary verifier"
     },
     {
       "path": "tests/wp0-attestation.test.mjs",
       "sha256": "e76f72f8765fc8164d5b6ed77c40fb94195e72c8e1aff6af521acbb4cf5719b8",
-      "state": "added C-085-2 and bounded C-085-2 correction"
+      "bytes": 11896,
+      "state": "unchanged prior WP0 focused suite"
+    },
+    {
+      "path": "tests/ci-attestation.test.mjs",
+      "sha256": "26e4e7f0187bbbccc4fd6c4d821a288403788278609cc337f401955f018a6f88",
+      "bytes": 14002,
+      "state": "current CI v1.4 focused suite with real PR003 transition and atomic mixed-pair negatives"
+    },
+    {
+      "path": "tests/contract-package-inventory.test.mjs",
+      "sha256": "2bdf766d6c69875160330d8bdf44fbd8d21bbfec43a9b7671c9d233e3ddc4bfa",
+      "bytes": 7809,
+      "state": "historical candidate input; reviewed PR003 current bytes separately pinned",
+      "historical_sha256": "2bdf766d6c69875160330d8bdf44fbd8d21bbfec43a9b7671c9d233e3ddc4bfa",
+      "reviewed_current": {
+        "source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+        "bytes": 7842,
+        "sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b"
+      }
     },
     {
       "path": "verification/wp0/v1.4.0/tools/verify.mjs",
       "sha256": "fe6b6937e8c0abd22cfecd44e1483620ce6cf4585de01e9edf0d6d97bfcb99ec",
-      "base_sha256": "fe6b6937e8c0abd22cfecd44e1483620ce6cf4585de01e9edf0d6d97bfcb99ec",
-      "state": "unchanged"
+      "bytes": 10822,
+      "state": "unchanged prior WP0 validator",
+      "base_sha256": "fe6b6937e8c0abd22cfecd44e1483620ce6cf4585de01e9edf0d6d97bfcb99ec"
     },
     {
       "path": "verification/successor-support.mjs",
       "sha256": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c",
-      "base_sha256": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c",
-      "state": "unchanged"
+      "bytes": 7191,
+      "state": "unchanged successor helper",
+      "base_sha256": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c"
+    },
+    {
+      "path": "verification/testing/ci/v1.4.0/README.md",
+      "sha256": "3a504432bb8b91a29cdf00ca61ff56ba5dffbcaeecc45b94cd0504b150cea065",
+      "bytes": 880,
+      "state": "versioned CI v1.4 package contract"
+    },
+    {
+      "path": "verification/testing/ci/v1.4.0/package.json",
+      "sha256": "f9fe5b00b2b471e6e60a48d8ed89af9d30c09cbe7ed5bc150e98fe0cec184bf7",
+      "bytes": 412,
+      "state": "versioned CI v1.4 package descriptor"
+    },
+    {
+      "path": "verification/testing/ci/v1.4.0/tests/ci-integration.test.mjs",
+      "sha256": "2cd934cc10d17c99c415994af11c73c29872a0059d4d9ab5a64dc7e8e0ad15ec",
+      "bytes": 4124,
+      "state": "versioned CI v1.4 integration checks"
+    },
+    {
+      "path": "verification/testing/ci/v1.4.0/tools/ci-inventory.mjs",
+      "sha256": "4e51bd9273e2febf8009c868ed8a41f34c9ff3cc3998141b6d8cca493f2bc8dd",
+      "bytes": 17074,
+      "state": "versioned structural inventory and root-chain validator"
+    },
+    {
+      "path": "verification/testing/ci/v1.4.0/tools/validate-package.mjs",
+      "sha256": "0413b0a140ec4e339199be1494d9146a7191e7e5d689b2cbeb5de68a8500bc41",
+      "bytes": 3172,
+      "state": "versioned strict direct validator/evidence builder"
     },
     {
       "path": "package.json",
       "sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
+      "bytes": 3555,
+      "state": "current candidate remains original root chain; reviewed PR003 extended package is external transition input",
       "base_sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
-      "state": "unchanged; root test chain preserved"
+      "historical_sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
+      "reviewed_current": {
+        "source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+        "bytes": 3666,
+        "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e"
+      }
     },
     {
       "path": "package-lock.json",
-      "sha256": "af2070ae111bc67c397b07e33b44c1fbd15bba31b63210990068943998e1bc28",
+      "sha256": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c",
+      "bytes": 134511,
+      "state": "current npm 11.19.1 lock with v1.4 workspace link",
       "base_sha256": "af2070ae111bc67c397b07e33b44c1fbd15bba31b63210990068943998e1bc28",
-      "state": "unchanged; pinned npm install source"
+      "historical_sha256": "af2070ae111bc67c397b07e33b44c1fbd15bba31b63210990068943998e1bc28"
     }
   ],
   "historical": {
@@ -101,38 +191,126 @@
       "path": "verification/research-program/ci-attestation/current-wp0-replay.json",
       "sha256": "2d801361c7658b96aadb7421866653373b04b9c5ba979b92781d6b21b326147b",
       "subject_sha256": "9539bcc84ab68ec049f7a3a5141a0c91c33c910c5ffd45ead336aea1f7d3c5ab"
+    },
+    "ci_v1_3": {
+      "subject_sha256": "11b8c7269bf293e67690d713a9e9748b977fb3197f039cb9966e5647d05d2ccb",
+      "pin_artifact": {
+        "path": "verification/research-program/ci-attestation/historical-ci-v1.3-pins.json",
+        "sha256": "ed68d531b75e96173d1754c0d22caae976f3b65e80e760cc0940e3cd84440d9b",
+        "bytes": 6914
+      },
+      "current_replay": {
+        "path": "verification/research-program/ci-attestation/current-ci-v1.4-replay.json",
+        "sha256": "8449f912452cfc828cbee1b72605634f298304220c0600adbb8359b906987cf4",
+        "bytes": 11054,
+        "subject_sha256": "1530562670b67d96977be8e760ac13a873cbe3aa284145d6fe1d3b878ad8a4fc",
+        "status": "pending_authorized_review"
+      },
+      "reviewed_current_inputs": [
+        {
+          "path": "package.json",
+          "source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+          "bytes": 3666,
+          "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e"
+        },
+        {
+          "path": "tests/contract-package-inventory.test.mjs",
+          "source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+          "bytes": 7842,
+          "sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b"
+        }
+      ],
+      "boundaries": {
+        "current_approval_issued": false,
+        "historical_subject_transferred": false,
+        "current_release_qualified": false
+      }
     }
   },
   "artifacts": [
     {
       "path": "verification/research-program/ci-attestation/command-receipts.json",
       "sha256": "72adc40cfc2fbdb9e235e05804ae8d67ad0d43a58cafc426d8ef390da7e3ec62",
-      "bytes": 29805
+      "bytes": 29805,
+      "id": "artifact-verification-research-program-ci-attestation-command-receipts"
     },
     {
       "path": "verification/research-program/ci-attestation/current-wp0-replay.json",
       "sha256": "2d801361c7658b96aadb7421866653373b04b9c5ba979b92781d6b21b326147b",
-      "bytes": 1873
+      "bytes": 1873,
+      "id": "artifact-verification-research-program-ci-attestation-current-wp0-replay"
     },
     {
       "path": "verification/research-program/ci-attestation/historical-wp0-v1.4-pins.json",
       "sha256": "e33c961f82a14098a463517c0871f0e345fdc3335efdcb94a58afeebe5b1f8d1",
-      "bytes": 1890
+      "bytes": 1890,
+      "id": "artifact-verification-research-program-ci-attestation-historical-wp0-v1.4-pins"
     },
     {
       "path": "verification/research-program/ci-attestation/runner-negative-fixtures.json",
       "sha256": "495bc35821fa52b04c0f2cae88f9ace8ebc00c1360bc6d37fdef6935dd4e5598",
-      "bytes": 3218
+      "bytes": 3218,
+      "id": "artifact-verification-research-program-ci-attestation-runner-negative-fixtures"
+    },
+    {
+      "path": "verification/research-program/ci-attestation/current-ci-v1.4-replay.json",
+      "sha256": "8449f912452cfc828cbee1b72605634f298304220c0600adbb8359b906987cf4",
+      "bytes": 11054,
+      "id": "artifact-verification-research-program-ci-attestation-current-ci-v1.4-replay"
+    },
+    {
+      "path": "verification/research-program/ci-attestation/historical-ci-v1.3-pins.json",
+      "sha256": "ed68d531b75e96173d1754c0d22caae976f3b65e80e760cc0940e3cd84440d9b",
+      "bytes": 6914,
+      "id": "artifact-verification-research-program-ci-attestation-historical-ci-v1.3-pins"
+    },
+    {
+      "path": "verification/research-program/ci-attestation/v1.4-runner-negative-fixtures.json",
+      "sha256": "ce48082de26c4bd619163b74e9ac1200c392d3c212ad984e507f1d74a993a75e",
+      "bytes": 2266,
+      "id": "artifact-verification-research-program-ci-attestation-v1.4-runner-negative-fixtures"
+    },
+    {
+      "path": "verification/research-program/ci-attestation/v1.4-input-transition-negatives.json",
+      "sha256": "6fefb7b4d2947c6faa9c9cc5da90f0f48b0a604728e6a2a30b3ec41588a966b5",
+      "bytes": 2385,
+      "id": "artifact-verification-research-program-ci-attestation-v1.4-input-transition-negatives"
+    },
+    {
+      "path": "verification/research-program/ci-attestation/v1.4-lock-install.json",
+      "sha256": "a55a59017b89f15cf06ce41f52c946c429bc88a6519c2da45bef1dcf1cdbea55",
+      "bytes": 1227,
+      "id": "artifact-verification-research-program-ci-attestation-v1.4-lock-install"
+    },
+    {
+      "path": "verification/research-program/ci-attestation/v1.4-command-receipts.json",
+      "sha256": "fb8c51c68fea8b2d6c3eeedec0d29eed85a658e5afd456c659c5b40227ff82ce",
+      "bytes": 22872,
+      "id": "artifact-verification-research-program-ci-attestation-v1.4-command-receipts"
     },
     {
       "path": "docs/research-program/ci-attestations.md",
-      "sha256": "0aed8269a2a278198b20291eb210435af36ac8be1e0d293184b0cc847e0489d6",
-      "bytes": 6057
+      "sha256": "67e40c3cd2308115a5c0fa74c2e79403cb8ac270f71648ab3420f72df7f6b657",
+      "bytes": 9112,
+      "id": "artifact-docs-research-program-ci-attestations"
+    },
+    {
+      "path": "verification/research-program/pr-085/task-binding.json",
+      "sha256": "24b5909e17af2056b15deadd9a6624cb774fe6d50031165f5235d1869a65b466",
+      "bytes": 6279,
+      "id": "artifact-verification-research-program-pr-085-task-binding"
+    },
+    {
+      "path": "verification/research-program/bootstrap/ci-failure-487f06a.json",
+      "sha256": "95a3a3f84078a4200142d0b912f31c799bc9f15c7335f67595c79b3dacbbf5bb",
+      "bytes": 2769,
+      "id": "artifact-verification-research-program-bootstrap-ci-failure-487f06a"
     }
   ],
   "command_receipts": {
-    "path": "verification/research-program/ci-attestation/command-receipts.json",
-    "sha256": "72adc40cfc2fbdb9e235e05804ae8d67ad0d43a58cafc426d8ef390da7e3ec62"
+    "path": "verification/research-program/ci-attestation/v1.4-command-receipts.json",
+    "sha256": "fb8c51c68fea8b2d6c3eeedec0d29eed85a658e5afd456c659c5b40227ff82ce",
+    "bytes": 22872
   },
   "ci_failures": {
     "committed_prior": {
@@ -155,17 +333,73 @@
       "failed_log_bytes": 743951,
       "build_and_dry_run": "skipped",
       "evidence_basis": "controller-provided sanitized failure facts; latest log is not copied into this candidate"
+    },
+    "producer_full_npm_test": {
+      "command_id": "cmd-0022-aa4a557b",
+      "started_at": "2026-09-11T02:04:05.057Z",
+      "completed_at": "2026-09-11T02:09:54.560Z",
+      "duration_ms": 349503,
+      "exit_code": 1,
+      "failed_stage": "verification/wp11/v1.3.0:validate",
+      "failure_code": "SUCCESSOR_APPROVAL_STALE_SUBJECT",
+      "stdout_bytes": 215642,
+      "stdout_sha256": "bd7d7b42daf4f196c0a3b86c45402ad86b11850604a3d726c82559598e49c603",
+      "stderr_bytes": 259,
+      "stderr_sha256": "a68e7527aaf915307bdba5bde9a67c150ef044dd810d270432d6e79377e3bb92",
+      "evidence_scope": "durable local command receipt; no approval or repin"
     }
   },
   "controls": {
-    "root_test_chain": "npm run test:retrieval && npm run test:web && npm run test:worker && npm run test:evaluation && npm run validate:evaluation && npm run verify:research-navigator",
-    "package_json_sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
+    "root_test_chains": {
+      "candidate": {
+        "chain": "original-root-chain",
+        "sequence": "npm run test:retrieval && npm run test:web && npm run test:worker && npm run test:evaluation && npm run validate:evaluation && npm run verify:research-navigator",
+        "package_json_sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c"
+      },
+      "reviewed_pr003": {
+        "source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+        "chain": "pr003-root-chain",
+        "sequence": "npm run test:retrieval && npm run test:web && npm run test:worker && npm run test:research-program && npm run test:evaluation && npm run validate:evaluation && npm run verify:research-navigator",
+        "package_json_sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e",
+        "inventory_test_sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b"
+      }
+    },
+    "exact_v1_4_route": "ci-verification / verification/testing/ci/v1.4.0 / node tools/validate-package.mjs --validate",
+    "v1_4_current_draft": {
+      "subject_sha256": "1530562670b67d96977be8e760ac13a873cbe3aa284145d6fe1d3b878ad8a4fc",
+      "status": "pending_authorized_review",
+      "approval": null,
+      "release_gate_pass": false,
+      "release_ready": false,
+      "production_eligibility": false
+    },
+    "reviewed_current_input_transition": {
+      "accepted_states": [
+        "both historical inputs",
+        "both exact reviewed PR-003 inputs"
+      ],
+      "mixed_state": "rejected",
+      "evidence_path": "verification/research-program/ci-attestation/v1.4-input-transition-negatives.json"
+    },
+    "npm_toolchain": "11.19.1",
+    "package_lock_sha256": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c",
     "historical_approved_receipt_rewritten": false,
     "current_approval_issued": false,
     "current_release_qualified": false,
     "production_authorized": false,
     "network_or_provider_calls": false,
-    "private_evaluator_inputs_read": false
+    "private_evaluator_inputs_read": false,
+    "producer_build": {
+      "command_id": "cmd-0023-f00f3acb",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    "producer_cf_dry_run": {
+      "command_id": "cmd-0024-911db093",
+      "exit_code": 0,
+      "status": "PASS",
+      "artifact_only": true
+    }
   },
   "requirements": {
     "R01": "unaccepted",
@@ -189,12 +423,12 @@
     "PR-082": "requires exact current-subject successor approval and independent release qualification",
     "PR-003": "consumes its own final handoff schema; no files changed here",
     "PR-004": "consumes its own field-state contract; no files changed here",
-    "root": "bind final exact head/tree and run independent review plus combined release gate"
+    "root": "bind final exact head/tree, validate the handoff against pinned dc7267bf checker/schema, and run the combined release gate"
   },
   "task_binding": {
     "path": "verification/research-program/pr-085/task-binding.json",
-    "sha256": "3aa2688a7476555c0ba6110f047b9b00265208ef4a516610737a7932900df2a0",
-    "bytes": 3978,
+    "sha256": "24b5909e17af2056b15deadd9a6624cb774fe6d50031165f5235d1869a65b466",
+    "bytes": 6279,
     "task_id": "ushso-pr085-ci-attestation-20260910",
     "owner": "Luna Max (OpenAI; reasoning max; actor luna-max)"
   },

@@ -1,0 +1,689 @@
+{
+  "schema_version": "ushso.pr085.ci-v1.4-command-receipts.v1",
+  "status": "PASS",
+  "lifecycle": {
+    "task_id": "ushso-pr085-ci-attestation-v14-20260910",
+    "actor": "luna-max",
+    "origin": "luna",
+    "state_dir": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085-v14/agentctl-state",
+    "receipt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085-v14/agentctl-state/tasks/ushso-pr085-ci-attestation-v14-20260910/receipt.json"
+  },
+  "commands": [
+    {
+      "id": "cmd-0010-01912084",
+      "label": "wp0-preservation-focused",
+      "kind": "test",
+      "command": "node --test tests/wp0-attestation.test.mjs",
+      "started_at": "2026-09-11T01:48:32.663Z",
+      "completed_at": "2026-09-11T01:49:16.670Z",
+      "duration_ms": 44008,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 5330,
+        "sha256": "e66c22aa8cda83f5a5f051fc78e069ff68c24438d9a2607c8d54c5500ec1a3a1",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "ten preserved WP0 tests passed (prior immutable component replay)"
+    },
+    {
+      "id": "cmd-0011-f0c229e3",
+      "label": "direct-v14-validate-pending",
+      "kind": "command",
+      "command": "npm run --prefix verification/testing/ci/v1.4.0 validate (assert inner exit 2)",
+      "started_at": "2026-09-11T01:50:17.779Z",
+      "completed_at": "2026-09-11T01:50:17.981Z",
+      "duration_ms": 201,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 358,
+        "sha256": "6db2e36d865e397c3ccb0be91491c2291576f8cd756333059bd7183b619a072f",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "direct v1.4 validate remained pending without approval"
+    },
+    {
+      "id": "cmd-0012-7511d778",
+      "label": "direct-v14-issue-pending",
+      "kind": "command",
+      "command": "npm run --prefix verification/testing/ci/v1.4.0 receipt:issue (assert inner exit 2)",
+      "started_at": "2026-09-11T01:50:18.127Z",
+      "completed_at": "2026-09-11T01:50:18.332Z",
+      "duration_ms": 205,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 357,
+        "sha256": "cd29c7e277343fd2e6991572cf435deae13b390b032e3e6355e20ca6250353f0",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "direct v1.4 issue remained pending and issued no receipt"
+    },
+    {
+      "id": "cmd-0014-35c5664e",
+      "label": "npm-ci-v14-lock-check",
+      "kind": "command",
+      "command": "npm ci --ignore-scripts --offline --no-audit --no-fund",
+      "started_at": "2026-09-11T01:50:33.866Z",
+      "completed_at": "2026-09-11T01:50:37.553Z",
+      "duration_ms": 3687,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 26,
+        "sha256": "92fcb0c679878ee5f3b9c505bd8fbb62b0e86742f617be41bbcecba6481488a8",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "locked install passed with npm 11.19.1"
+    },
+    {
+      "id": "cmd-0022-aa4a557b",
+      "label": "full-npm-test-v14",
+      "kind": "test",
+      "command": "npm test",
+      "started_at": "2026-09-11T02:04:05.057Z",
+      "completed_at": "2026-09-11T02:09:54.560Z",
+      "duration_ms": 349503,
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 215642,
+        "sha256": "bd7d7b42daf4f196c0a3b86c45402ad86b11850604a3d726c82559598e49c603",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 259,
+        "sha256": "a68e7527aaf915307bdba5bde9a67c150ef044dd810d270432d6e79377e3bb92",
+        "truncated": false
+      },
+      "result": "full test retained exit 1 at verification/wp11/v1.3.0 SUCCESSOR_APPROVAL_STALE_SUBJECT"
+    },
+    {
+      "id": "cmd-0023-f00f3acb",
+      "label": "build-v14",
+      "kind": "test",
+      "command": "npm run build",
+      "started_at": "2026-09-11T02:10:21.576Z",
+      "completed_at": "2026-09-11T02:11:08.245Z",
+      "duration_ms": 46669,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 4747,
+        "sha256": "caceb558ea2ac7e20ef7609041ec34c489bd2e91203bec6fc628b4aba7c7ddee",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "build passed"
+    },
+    {
+      "id": "cmd-0024-911db093",
+      "label": "cf-dry-run-v14",
+      "kind": "test",
+      "command": "npm run cf:dry-run",
+      "started_at": "2026-09-11T02:11:35.610Z",
+      "completed_at": "2026-09-11T02:12:39.493Z",
+      "duration_ms": 63883,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 6403,
+        "sha256": "694d7b2eaac232d6f2fac23b94b22b376a00499bc8cf79c586928758bdb212c6",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 555,
+        "sha256": "31298a36923bbc9374a2f1590259ae5995842a30c933fc620d3025a24f7d4366",
+        "truncated": false
+      },
+      "result": "build and artifact-only Wrangler dry-run passed"
+    },
+    {
+      "id": "cmd-0025-1bb26230",
+      "label": "v14-package-final",
+      "kind": "test",
+      "command": "npm run --prefix verification/testing/ci/v1.4.0 test",
+      "started_at": "2026-09-11T02:13:14.424Z",
+      "completed_at": "2026-09-11T02:13:14.737Z",
+      "duration_ms": 313,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 625,
+        "sha256": "06d5cde56f16f2ac001b4e7f4eb026278673e2bae96c837cd13ed2e8e34cafae",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "v1.4 package tests passed (5 tests)"
+    },
+    {
+      "id": "cmd-0026-246ee7e0",
+      "label": "ci-attestation-final",
+      "kind": "test",
+      "command": "node --test tests/ci-attestation.test.mjs",
+      "started_at": "2026-09-11T02:13:14.888Z",
+      "completed_at": "2026-09-11T02:13:16.920Z",
+      "duration_ms": 2032,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 14137,
+        "sha256": "8681aeecb9ab49c83990658ed7b9b6484f0e685a36133ccccabf1b03025ca2ac",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "focused CI v1.4 runner tests passed (9 tests), including real PR003 input transition"
+    },
+    {
+      "id": "cmd-0027-ca1dd0f1",
+      "label": "v14-verifier-final",
+      "kind": "test",
+      "command": "node scripts/verify-ci-attestation.mjs",
+      "started_at": "2026-09-11T02:13:17.070Z",
+      "completed_at": "2026-09-11T02:13:17.165Z",
+      "duration_ms": 95,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 10953,
+        "sha256": "3f12be82fd28065f1e052fe797b6dcecad8549458f3527d9cae89c071f679409",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "historical v1.3 proof and pending v1.4 draft passed"
+    },
+    {
+      "id": "cmd-0029-77c01c6b",
+      "label": "write-v14-current-replay-final",
+      "kind": "command",
+      "command": "write current-ci-v1.4-replay.json using verifyCiAttestation()",
+      "started_at": "2026-09-11T02:13:44.008Z",
+      "completed_at": "2026-09-11T02:13:44.097Z",
+      "duration_ms": 89,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "current replay artifact written from a passing verifier"
+    },
+    {
+      "id": "cmd-0030-670cc197",
+      "label": "write-v14-historical-pins-final",
+      "kind": "command",
+      "command": "write v1.4 historical pins artifact",
+      "started_at": "2026-09-11T02:14:50.839Z",
+      "completed_at": "2026-09-11T02:14:50.893Z",
+      "duration_ms": 54,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "historical pins and reviewed PR003 input artifact written"
+    },
+    {
+      "id": "cmd-0031-8420d755",
+      "label": "write-v14-negative-fixtures-final",
+      "kind": "command",
+      "command": "write v1.4 runner negative artifact",
+      "started_at": "2026-09-11T02:14:51.057Z",
+      "completed_at": "2026-09-11T02:14:51.088Z",
+      "duration_ms": 31,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "runner negative artifact written from focused passing test"
+    },
+    {
+      "id": "cmd-0032-26c45fcf",
+      "label": "write-v14-lock-install-final",
+      "kind": "command",
+      "command": "write v1.4 lock/install artifact",
+      "started_at": "2026-09-11T02:14:51.238Z",
+      "completed_at": "2026-09-11T02:14:51.274Z",
+      "duration_ms": 36,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "lock/install artifact written"
+    },
+    {
+      "id": "cmd-0033-0c22cabf",
+      "label": "write-v14-command-receipts-final",
+      "kind": "command",
+      "command": "write v1.4 command receipts artifact",
+      "started_at": "2026-09-11T02:14:51.415Z",
+      "completed_at": "2026-09-11T02:14:51.440Z",
+      "duration_ms": 26,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "sanitized command metadata artifact written"
+    },
+    {
+      "id": "cmd-0039-f2390da5",
+      "label": null,
+      "kind": "test",
+      "command": "node tests/ci-attestation.test.mjs",
+      "started_at": "2026-09-11T02:31:23.466Z",
+      "completed_at": "2026-09-11T02:31:25.421Z",
+      "duration_ms": 1955,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 13474,
+        "sha256": "626c3caf8e35b58032d21d28b6375c7a58b4574c6c8a337370c48c51c69842a0",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 480,
+        "sha256": "2b93bdb0ba6f59fc4ab32a5760784fa4cf5a633738c88c46dcc636d55339d103",
+        "truncated": false
+      },
+      "result": "focused CI v1.4 tests passed (10 tests), including both real partial-pair transition negatives"
+    },
+    {
+      "id": "cmd-0041-14adb64d",
+      "label": null,
+      "kind": "command",
+      "command": "write current-ci-v1.4-replay.json using verifyCiAttestation()",
+      "started_at": "2026-09-11T02:33:22.400Z",
+      "completed_at": "2026-09-11T02:33:22.504Z",
+      "duration_ms": 104,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "current replay artifact rewritten after atomic PR003 transition correction"
+    },
+    {
+      "id": "cmd-0042-1ed26f79",
+      "label": null,
+      "kind": "command",
+      "command": "write v1.4-input-transition-negatives.json",
+      "started_at": "2026-09-11T02:33:33.513Z",
+      "completed_at": "2026-09-11T02:33:33.573Z",
+      "duration_ms": 60,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "partial-pair negative artifact written from focused passing test"
+    },
+    {
+      "id": "cmd-0044-9aab8058",
+      "label": null,
+      "kind": "test",
+      "command": "node scripts/verify-ci-attestation.mjs",
+      "started_at": "2026-09-11T02:34:17.124Z",
+      "completed_at": "2026-09-11T02:34:17.232Z",
+      "duration_ms": 109,
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "bytes": 11054,
+        "sha256": "8449f912452cfc828cbee1b72605634f298304220c0600adbb8359b906987cf4",
+        "truncated": false
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncated": false
+      },
+      "result": "current v1.4 verifier passed with atomic reviewed-input transition enforcement"
+    }
+  ],
+  "superseded_attempts": [
+    {
+      "id": "cmd-0001-46e4f411",
+      "label": "v1.4-package-tests",
+      "started_at": "2026-09-11T01:41:36.169Z",
+      "completed_at": "2026-09-11T01:41:36.478Z",
+      "duration_ms": 309,
+      "exit_code": 1,
+      "timed_out": false,
+      "result": "failed during iterative implementation; corrected by later bounded replay"
+    },
+    {
+      "id": "cmd-0002-e0c752b8",
+      "label": "v1.4-package-tests-r2",
+      "started_at": "2026-09-11T01:43:52.036Z",
+      "completed_at": "2026-09-11T01:43:52.338Z",
+      "duration_ms": 302,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0003-0a7f1564",
+      "label": "ci-attestation-focused",
+      "started_at": "2026-09-11T01:43:57.106Z",
+      "completed_at": "2026-09-11T01:43:57.106Z",
+      "duration_ms": 0,
+      "exit_code": 127,
+      "timed_out": false,
+      "result": "failed during iterative implementation; corrected by later bounded replay"
+    },
+    {
+      "id": "cmd-0004-177b22fe",
+      "label": "ci-attestation-focused-r2",
+      "started_at": "2026-09-11T01:44:04.831Z",
+      "completed_at": "2026-09-11T01:44:04.926Z",
+      "duration_ms": 95,
+      "exit_code": 1,
+      "timed_out": false,
+      "result": "failed during iterative implementation; corrected by later bounded replay"
+    },
+    {
+      "id": "cmd-0005-2d0596c3",
+      "label": "ci-attestation-focused-r3",
+      "started_at": "2026-09-11T01:44:17.459Z",
+      "completed_at": "2026-09-11T01:44:19.284Z",
+      "duration_ms": 1824,
+      "exit_code": 1,
+      "timed_out": false,
+      "result": "failed during iterative implementation; corrected by later bounded replay"
+    },
+    {
+      "id": "cmd-0006-204f87ad",
+      "label": "ci-verifier-replay",
+      "started_at": "2026-09-11T01:44:51.600Z",
+      "completed_at": "2026-09-11T01:44:51.691Z",
+      "duration_ms": 91,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0007-0f02765d",
+      "label": "ci-attestation-focused-r4",
+      "started_at": "2026-09-11T01:44:59.019Z",
+      "completed_at": "2026-09-11T01:45:01.437Z",
+      "duration_ms": 2418,
+      "exit_code": 1,
+      "timed_out": false,
+      "result": "failed during iterative implementation; corrected by later bounded replay"
+    },
+    {
+      "id": "cmd-0008-b734440c",
+      "label": "ci-attestation-focused-r5",
+      "started_at": "2026-09-11T01:45:33.671Z",
+      "completed_at": "2026-09-11T01:45:35.704Z",
+      "duration_ms": 2033,
+      "exit_code": 1,
+      "timed_out": false,
+      "result": "failed during iterative implementation; corrected by later bounded replay"
+    },
+    {
+      "id": "cmd-0009-afa5b385",
+      "label": "ci-attestation-focused-r6",
+      "started_at": "2026-09-11T01:46:01.435Z",
+      "completed_at": "2026-09-11T01:46:03.545Z",
+      "duration_ms": 2110,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0013-0f1c75f1",
+      "label": "current-v14-verifier-replay-final",
+      "started_at": "2026-09-11T01:50:25.192Z",
+      "completed_at": "2026-09-11T01:50:25.288Z",
+      "duration_ms": 95,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0015-bf50ec25",
+      "label": "write-current-v14-replay-artifact",
+      "started_at": "2026-09-11T01:53:08.089Z",
+      "completed_at": "2026-09-11T01:53:08.191Z",
+      "duration_ms": 102,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0016-a588d863",
+      "label": "write-historical-v13-pins-artifact",
+      "started_at": "2026-09-11T01:53:40.127Z",
+      "completed_at": "2026-09-11T01:53:40.168Z",
+      "duration_ms": 42,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0017-0e222115",
+      "label": "write-v14-runner-negative-artifact",
+      "started_at": "2026-09-11T01:54:14.403Z",
+      "completed_at": "2026-09-11T01:54:14.433Z",
+      "duration_ms": 31,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0018-5b31f572",
+      "label": "write-v14-lock-install-artifact",
+      "started_at": "2026-09-11T01:54:31.372Z",
+      "completed_at": "2026-09-11T01:54:31.408Z",
+      "duration_ms": 36,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0019-706dae17",
+      "label": "write-v14-command-receipts-artifact",
+      "started_at": "2026-09-11T01:55:09.859Z",
+      "completed_at": "2026-09-11T01:55:09.892Z",
+      "duration_ms": 33,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0020-d6815dae",
+      "label": "c3-pr003-input-transition",
+      "started_at": "2026-09-11T02:03:14.142Z",
+      "completed_at": "2026-09-11T02:03:14.211Z",
+      "duration_ms": 69,
+      "exit_code": 1,
+      "timed_out": false,
+      "result": "failed during iterative implementation; corrected by later bounded replay"
+    },
+    {
+      "id": "cmd-0021-fd1a369a",
+      "label": "c3-pr003-input-transition",
+      "started_at": "2026-09-11T02:03:24.562Z",
+      "completed_at": "2026-09-11T02:03:26.524Z",
+      "duration_ms": 1962,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0028-372024cf",
+      "label": "write-v14-current-replay-final",
+      "started_at": "2026-09-11T02:13:29.140Z",
+      "completed_at": "2026-09-11T02:13:29.230Z",
+      "duration_ms": 90,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0034-c42c701c",
+      "label": "write-v14-command-receipts-final2",
+      "started_at": "2026-09-11T02:18:02.005Z",
+      "completed_at": "2026-09-11T02:18:02.044Z",
+      "duration_ms": 39,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0035-f4523662",
+      "label": "update-v14-task-binding",
+      "started_at": "2026-09-11T02:18:49.359Z",
+      "completed_at": "2026-09-11T02:18:49.386Z",
+      "duration_ms": 27,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0036-c12f6c19",
+      "label": "update-v14-evidence-index",
+      "started_at": "2026-09-11T02:21:55.791Z",
+      "completed_at": "2026-09-11T02:21:55.825Z",
+      "duration_ms": 34,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0037-9eb4a3d7",
+      "label": "update-v14-handoff",
+      "started_at": "2026-09-11T02:25:14.620Z",
+      "completed_at": "2026-09-11T02:25:14.662Z",
+      "duration_ms": 42,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0038-bc9b17ce",
+      "label": null,
+      "started_at": "2026-09-11T02:29:32.749Z",
+      "completed_at": "2026-09-11T02:29:34.746Z",
+      "duration_ms": 1997,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    },
+    {
+      "id": "cmd-0040-dbf2b7a4",
+      "label": null,
+      "started_at": "2026-09-11T02:33:06.522Z",
+      "completed_at": "2026-09-11T02:33:06.608Z",
+      "duration_ms": 86,
+      "exit_code": 1,
+      "timed_out": false,
+      "result": "failed during iterative implementation; corrected by later bounded replay"
+    },
+    {
+      "id": "cmd-0043-802e2100",
+      "label": null,
+      "started_at": "2026-09-11T02:33:53.721Z",
+      "completed_at": "2026-09-11T02:33:53.748Z",
+      "duration_ms": 27,
+      "exit_code": 0,
+      "timed_out": false,
+      "result": "resolved or superseded command"
+    }
+  ],
+  "boundary": {
+    "outputs_are_sanitized_command_metadata_only": true,
+    "private_evaluator_inputs_read": false,
+    "provider_or_network_calls": false,
+    "old_command_receipts_overwritten": false
+  }
+}

@@ -4,7 +4,7 @@
   "status": "producer_checked",
   "owner": "Luna Max (OpenAI; reasoning max; actor luna-max)",
   "reviewer": "Root/controller independent review pending",
-  "base_sha": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+  "base_sha": "4ad67220df54334f70d891fd26d1778f83328d54",
   "head_sha": null,
   "dependency_merge_shas": {
     "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8"
@@ -14,18 +14,28 @@
   "changed_files": [
     "scripts/verify-wp0-attestation.mjs",
     "scripts/run-contract-suites.mjs",
+    "scripts/verify-ci-attestation.mjs",
     "tests/wp0-attestation.test.mjs",
+    "tests/ci-attestation.test.mjs",
+    "verification/testing/ci/v1.4.0/",
     "verification/research-program/ci-attestation/command-receipts.json",
     "verification/research-program/ci-attestation/current-wp0-replay.json",
     "verification/research-program/ci-attestation/historical-wp0-v1.4-pins.json",
     "verification/research-program/ci-attestation/runner-negative-fixtures.json",
+    "verification/research-program/ci-attestation/current-ci-v1.4-replay.json",
+    "verification/research-program/ci-attestation/historical-ci-v1.3-pins.json",
+    "verification/research-program/ci-attestation/v1.4-runner-negative-fixtures.json",
+    "verification/research-program/ci-attestation/v1.4-input-transition-negatives.json",
+    "verification/research-program/ci-attestation/v1.4-lock-install.json",
+    "verification/research-program/ci-attestation/v1.4-command-receipts.json",
     "verification/research-program/pr-085/evidence-index.json",
     "verification/research-program/pr-085/task-binding.json",
     "docs/research-program/ci-attestations.md",
-    "docs/research-program/handoffs/PR-085.json"
+    "docs/research-program/handoffs/PR-085.json",
+    "package-lock.json"
   ],
-  "problem": "The current CI subject changed after PR-002 and the existing WP0 v1.4.0 validation rejected it, while the original approval remains valid only for its exact historical evidence. The runner also needed an explicit, reviewable route for current WP0 validation without weakening the rest of the contract chain.",
-  "resulting_behavior": "The candidate verifies the original WP0 v1.4.0 approval, evidence and receipt bytes in memory and checks their shared historical subject. It creates a current technical draft with a fresh subject, pending_authorized_review status, no current approval and no release or production eligibility. Only the exact reviewed WP0 v1.4.0 validate descriptor uses that verifier; WP0 tests and all other packages retain normal execution. Future versions use their strict normal path, child nonzero results remain failures, and a real zero-test child is rejected. Candidate commits before C3 are 0d82cb98dc7ea1791f84bb471d5c8d2800d96715, 86b7f7e6c875e877653dc6ff13e3850f7afa2743 and 7cfbb96096d5eba46c37fb5b1885f116aa82ab80; C3 files are prepared for the controller to commit and bind externally.",
+  "problem": "The historical CI v1.3 approval is valid only for its original subject, while current runner/input bytes require a versioned read-only inventory. PR-003 also introduces a reviewed root test stage, so the current package and inventory-test inputs need a bounded transition binding without weakening historical proof.",
+  "resulting_behavior": "The candidate verifies the immutable CI v1.3 approval, evidence, approved receipt and predecessor chain in memory. It builds a fresh CI v1.4 technical draft with a different subject and pending_authorized_review status, no current approval, and no release or production eligibility. Only the exact ci-verification / verification/testing/ci/v1.4.0 / validate descriptor uses the current verifier; tests and all other packages retain normal execution. Future versions use the strict path, child nonzero/error/timeout results remain failures, and a real zero-test child is rejected. The original root test chain and the exact reviewed PR-003 extension are the only accepted chains. Historical package.json and contract-inventory test pins remain immutable; the exact reviewed PR-003 bytes are separately hash-bound, semantically checked and required as an atomic pair, with both mixed states rejected. Producer build and CF dry-run passed, while full npm test retained an existing v1.3 WP11 stale-subject failure. Current authorization and combined release qualification remain pending.",
   "commits": [
     {
       "id": "C-085-1",
@@ -43,124 +53,220 @@
       "sha": "7cfbb96096d5eba46c37fb5b1885f116aa82ab80"
     },
     {
+      "id": "C-085-2-R2",
+      "subject": "feat(research): add versioned CI v1.4 inventory route",
+      "sha": "3c884d3edcab1c75249508236693f9e82ded5dc3"
+    },
+    {
+      "id": "C-085-2-R3",
+      "subject": "fix(ci): bind reviewed PR003 input transition",
+      "sha": "d1826358b0b1e5f8db97b787b5bf74de5e50926b"
+    },
+    {
+      "id": "C-085-2-R4",
+      "subject": "fix(ci): require atomic reviewed PR003 inputs",
+      "sha": "6ed7fb4cb24199977034cf86bb3f0b4a928513be"
+    },
+    {
       "id": "C-085-3",
-      "subject": "docs(research): publish CI attestation evidence (PR-085 C-085-3)",
+      "subject": "docs(research): publish versioned CI attestation evidence (PR-085 C-085-3)",
       "sha": null
     }
   ],
   "source_identities": [
     {
-      "kind": "implementation-verifier",
-      "id": "scripts/verify-wp0-attestation.mjs",
       "location": "local",
-      "sha256": "04c39620d29104b3a096b976f7cb23c420300ee61cf565ff6c605e619afac3cd",
-      "version": "candidate bytes after C-085-2-R1 and C-085-3 preparation"
+      "kind": "unchanged-wp0-verifier",
+      "id": "scripts/verify-wp0-attestation.mjs",
+      "version": "unchanged from prior WP0 implementation",
+      "sha256": "04c39620d29104b3a096b976f7cb23c420300ee61cf565ff6c605e619afac3cd"
     },
     {
+      "location": "local",
       "kind": "implementation-runner",
       "id": "scripts/run-contract-suites.mjs",
-      "location": "local",
-      "sha256": "854e4e5fbc5e52004d28f06d81ee2b745bae729fe68d3f54f8e82b02250f6bc0",
-      "version": "candidate bytes after C-085-2-R1 and C-085-3 preparation"
+      "version": "CI v1.4 exact route and preserved strict child execution",
+      "sha256": "9cc9efb8f29bf6a9ba93fe619e7fd1d0e519fce5cb0f37bf8747f199611cb647"
     },
     {
+      "location": "local",
+      "kind": "implementation-verifier",
+      "id": "scripts/verify-ci-attestation.mjs",
+      "version": "CI v1.4 historical proof/current draft verifier",
+      "sha256": "914ad3b3b0d65ff8ba901669d0081f099758442ddfcd328e71aa0d0222fc2b75"
+    },
+    {
+      "location": "local",
       "kind": "focused-subprocess-tests",
-      "id": "tests/wp0-attestation.test.mjs",
-      "location": "local",
-      "sha256": "e76f72f8765fc8164d5b6ed77c40fb94195e72c8e1aff6af521acbb4cf5719b8",
-      "version": "candidate bytes after C-085-2-R1 and C-085-3 preparation"
+      "id": "tests/ci-attestation.test.mjs",
+      "version": "ten-test CI v1.4 route, transition, atomic-pair and failure suite",
+      "sha256": "26e4e7f0187bbbccc4fd6c4d821a288403788278609cc337f401955f018a6f88"
     },
     {
+      "location": "local",
       "kind": "unchanged-wp0-validator",
       "id": "verification/wp0/v1.4.0/tools/verify.mjs",
-      "location": "local",
-      "sha256": "fe6b6937e8c0abd22cfecd44e1483620ce6cf4585de01e9edf0d6d97bfcb99ec",
-      "version": "candidate bytes after C-085-2-R1 and C-085-3 preparation"
+      "version": "unchanged prior WP0 validator",
+      "sha256": "fe6b6937e8c0abd22cfecd44e1483620ce6cf4585de01e9edf0d6d97bfcb99ec"
     },
     {
+      "location": "local",
       "kind": "unchanged-successor-support",
       "id": "verification/successor-support.mjs",
-      "location": "local",
-      "sha256": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c",
-      "version": "candidate bytes after C-085-2-R1 and C-085-3 preparation"
+      "version": "unchanged successor helper",
+      "sha256": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c"
     },
     {
+      "location": "local",
+      "kind": "versioned-ci-v14-readme",
+      "id": "verification/testing/ci/v1.4.0/README.md",
+      "version": "versioned CI v1.4 contract",
+      "sha256": "3a504432bb8b91a29cdf00ca61ff56ba5dffbcaeecc45b94cd0504b150cea065"
+    },
+    {
+      "location": "local",
+      "kind": "versioned-ci-v14-package",
+      "id": "verification/testing/ci/v1.4.0/package.json",
+      "version": "versioned CI v1.4 descriptor",
+      "sha256": "f9fe5b00b2b471e6e60a48d8ed89af9d30c09cbe7ed5bc150e98fe0cec184bf7"
+    },
+    {
+      "location": "local",
+      "kind": "versioned-ci-v14-tests",
+      "id": "verification/testing/ci/v1.4.0/tests/ci-integration.test.mjs",
+      "version": "five-test v1.4 integration suite",
+      "sha256": "2cd934cc10d17c99c415994af11c73c29872a0059d4d9ab5a64dc7e8e0ad15ec"
+    },
+    {
+      "location": "local",
+      "kind": "versioned-ci-v14-inventory",
+      "id": "verification/testing/ci/v1.4.0/tools/ci-inventory.mjs",
+      "version": "root-chain/workspace structural inventory",
+      "sha256": "4e51bd9273e2febf8009c868ed8a41f34c9ff3cc3998141b6d8cca493f2bc8dd"
+    },
+    {
+      "location": "local",
+      "kind": "versioned-ci-v14-validator",
+      "id": "verification/testing/ci/v1.4.0/tools/validate-package.mjs",
+      "version": "strict direct v1.4 validator and evidence builder",
+      "sha256": "0413b0a140ec4e339199be1494d9146a7191e7e5d689b2cbeb5de68a8500bc41"
+    },
+    {
+      "location": "local",
+      "kind": "atomic-transition-negative-evidence",
+      "id": "verification/research-program/ci-attestation/v1.4-input-transition-negatives.json",
+      "version": "two actual mixed reviewed/historical PR003 input-pair negatives",
+      "sha256": "6fefb7b4d2947c6faa9c9cc5da90f0f48b0a604728e6a2a30b3ec41588a966b5"
+    },
+    {
+      "location": "local",
       "kind": "package-manifest",
       "id": "package.json",
-      "location": "local",
-      "sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
-      "version": "candidate bytes after C-085-2-R1 and C-085-3 preparation"
+      "version": "candidate original root chain; reviewed PR-003 extension is external transition input",
+      "sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c"
     },
     {
+      "location": "local",
       "kind": "package-lock",
       "id": "package-lock.json",
-      "location": "local",
-      "sha256": "af2070ae111bc67c397b07e33b44c1fbd15bba31b63210990068943998e1bc28",
-      "version": "candidate bytes after C-085-2-R1 and C-085-3 preparation"
+      "version": "npm 11.19.1 lock with additive v1.4 link",
+      "sha256": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c"
     },
     {
+      "location": "local",
       "kind": "published-ci-doc",
       "id": "docs/research-program/ci-attestations.md",
-      "location": "local",
-      "sha256": "0aed8269a2a278198b20291eb210435af36ac8be1e0d293184b0cc847e0489d6",
-      "version": "candidate bytes after C-085-2-R1 and C-085-3 preparation"
+      "version": "current v1.4 evidence documentation",
+      "sha256": "67e40c3cd2308115a5c0fa74c2e79403cb8ac270f71648ab3420f72df7f6b657"
     },
     {
+      "location": "local",
       "kind": "published-evidence-index",
       "id": "verification/research-program/pr-085/evidence-index.json",
-      "location": "local",
-      "sha256": "1e34746f307d0c6e2901cb6a8c47a8ff2f411af1066524738f05bbff5340f7c7",
-      "version": "candidate bytes after C-085-2-R1 and C-085-3 preparation"
+      "version": "current v1.4 evidence index",
+      "sha256": "5e312cfd25fe254523c43a2b04d53a9ea8bec5ca691f1347b1a3f3a9a3fd6590"
     },
     {
+      "location": "local",
       "kind": "per-pr-task-binding",
       "id": "verification/research-program/pr-085/task-binding.json",
-      "location": "local",
-      "sha256": "3aa2688a7476555c0ba6110f047b9b00265208ef4a516610737a7932900df2a0",
-      "version": "candidate bytes after C-085-2-R1 and C-085-3 preparation"
+      "version": "continuation task binding with v1.4 scope",
+      "sha256": "24b5909e17af2056b15deadd9a6624cb774fe6d50031165f5235d1869a65b466"
     },
     {
       "kind": "dispatch-base-plan",
-      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:docs/master-plan/2026-09-10/plan.json",
+      "id": "4ad67220df54334f70d891fd26d1778f83328d54:docs/master-plan/2026-09-10/plan.json",
       "location": "external",
-      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "git_commit": "4ad67220df54334f70d891fd26d1778f83328d54",
       "git_path": "docs/master-plan/2026-09-10/plan.json",
-      "sha256": "cbb1e8f707d7d9a35b1da66d36a217dddd3a1bbd05f80d1fd5a38bf501cdc455"
+      "sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15"
     },
     {
       "kind": "accepted-independent-plan-review",
-      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/research-program/bootstrap/ci-attestation-plan-independent-review.json",
+      "id": "4ad67220df54334f70d891fd26d1778f83328d54:verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
       "location": "external",
-      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
-      "git_path": "verification/research-program/bootstrap/ci-attestation-plan-independent-review.json",
-      "sha256": "d17ef616401411d16c12b54e14282d1c1db0abb7fb5c193039e317cfdd0e85f5"
+      "git_commit": "4ad67220df54334f70d891fd26d1778f83328d54",
+      "git_path": "verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
+      "sha256": "d3c9c26c7566c74de2e5cec42c24c388a54e3cbe402f9ccf472ea05294f02b8f"
     },
     {
-      "kind": "historical-wp0-approval",
-      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/wp0/v1.4.0/approvals/approval.json",
+      "kind": "reviewed-pr003-root-package",
+      "id": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2:package.json",
       "location": "external",
-      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
-      "git_path": "verification/wp0/v1.4.0/approvals/approval.json",
-      "sha256": "d1636ed70d3cff146666a54ea5f9e493e94386649d827c1a424504c244759c05"
+      "git_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "git_path": "package.json",
+      "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e"
     },
     {
-      "kind": "historical-wp0-evidence",
-      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/wp0/v1.4.0/approvals/evidence.txt",
+      "kind": "reviewed-pr003-inventory-test",
+      "id": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2:tests/contract-package-inventory.test.mjs",
       "location": "external",
-      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
-      "git_path": "verification/wp0/v1.4.0/approvals/evidence.txt",
-      "sha256": "1aed5b57042a3a3609666b7678d6d9e6d17d607850dce4ecc90b99320b25ea42"
+      "git_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "git_path": "tests/contract-package-inventory.test.mjs",
+      "sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b"
     },
     {
-      "kind": "historical-wp0-receipt",
-      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/wp0/v1.4.0/receipts/approved.json",
+      "kind": "historical-ci-v13-approval",
+      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/testing/ci/v1.3.0/approvals/approval.json",
       "location": "external",
       "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
-      "git_path": "verification/wp0/v1.4.0/receipts/approved.json",
-      "sha256": "15b79d25a52487597236c545b4f9e27be05203850b6e5076b671d6104390a5b8"
+      "git_path": "verification/testing/ci/v1.3.0/approvals/approval.json",
+      "sha256": "315d0aa83399238b8e127ca3affae9e4d409fb7834e6c3d3aba6434b41b07ae0"
     },
     {
-      "kind": "retained-prior-ci-failure",
+      "kind": "historical-ci-v13-evidence",
+      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/testing/ci/v1.3.0/approvals/evidence.txt",
+      "location": "external",
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "git_path": "verification/testing/ci/v1.3.0/approvals/evidence.txt",
+      "sha256": "a66da67cfee5c1dc4515aef9464afc222938ce27d3bc169da4393c211e8faa5e"
+    },
+    {
+      "kind": "historical-ci-v13-receipt",
+      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/testing/ci/v1.3.0/receipts/approved.json",
+      "location": "external",
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "git_path": "verification/testing/ci/v1.3.0/receipts/approved.json",
+      "sha256": "8013e0b4700d781a365540e046cd6ac15c8eb1999aca956b30c73591ad648d4b"
+    },
+    {
+      "kind": "historical-ci-v10-predecessor",
+      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/testing/ci/v1.0.0/receipts/ci-integration.json",
+      "location": "external",
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "git_path": "verification/testing/ci/v1.0.0/receipts/ci-integration.json",
+      "sha256": "6e27725cf531e1ced3d546503176af8ae4157366e97594c49ca5c9d2c18215cd"
+    },
+    {
+      "kind": "historical-ci-v12-successor",
+      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/testing/ci/v1.2.0/receipts/approved.json",
+      "location": "external",
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "git_path": "verification/testing/ci/v1.2.0/receipts/approved.json",
+      "sha256": "d5f7b2d29cb6790a4b390f62a988746d8a9de6b36642c9d793179178f7d938e2"
+    },
+    {
+      "kind": "historical-ci-failure",
       "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/research-program/bootstrap/ci-failure-487f06a.json",
       "location": "external",
       "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
@@ -171,8 +277,7 @@
       "kind": "dispatch-prompt",
       "id": "native-pr085-dispatch-prompt.md",
       "location": "external",
-      "sha256": "1951d641b5d191eac6848d3a1641e528a907382db14df540e0207c695a4e57af",
-      "version": "immutable controller dispatch prompt outside candidate repository"
+      "sha256": "1951d641b5d191eac6848d3a1641e528a907382db14df540e0207c695a4e57af"
     },
     {
       "kind": "accepted-dependency-merge",
@@ -453,6 +558,348 @@
         "kind": "observed_exit",
         "exit_code": 1
       }
+    },
+    {
+      "id": "cmd-0021-fd1a369a",
+      "command": "node --test tests/ci-attestation.test.mjs",
+      "result": "Real git-show PR003 transition proof, legacy control and one-byte tamper negative passed.",
+      "started_at": "2026-09-11T02:03:24.562Z",
+      "completed_at": "2026-09-11T02:03:26.524Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0022-aa4a557b",
+      "command": "npm test",
+      "result": "Full npm test retained verification/wp11/v1.3.0:validate SUCCESSOR_APPROVAL_STALE_SUBJECT.",
+      "started_at": "2026-09-11T02:04:05.057Z",
+      "completed_at": "2026-09-11T02:09:54.560Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "expected": "Expected observed exit 1 for this bounded command.",
+      "actual": "Observed exit 1.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      }
+    },
+    {
+      "id": "cmd-0023-f00f3acb",
+      "command": "npm run build",
+      "result": "Producer build passed.",
+      "started_at": "2026-09-11T02:10:21.576Z",
+      "completed_at": "2026-09-11T02:11:08.245Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0024-911db093",
+      "command": "npm run cf:dry-run",
+      "result": "Producer build and artifact-only Wrangler dry-run passed.",
+      "started_at": "2026-09-11T02:11:35.610Z",
+      "completed_at": "2026-09-11T02:12:39.493Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0025-1bb26230",
+      "command": "npm run --prefix verification/testing/ci/v1.4.0 test",
+      "result": "All five CI v1.4 package integration tests passed.",
+      "started_at": "2026-09-11T02:13:14.424Z",
+      "completed_at": "2026-09-11T02:13:14.737Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0026-246ee7e0",
+      "command": "node --test tests/ci-attestation.test.mjs",
+      "result": "All nine focused CI v1.4 runner tests passed, including real PR003 input transition and failure cases.",
+      "started_at": "2026-09-11T02:13:14.888Z",
+      "completed_at": "2026-09-11T02:13:16.920Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0027-ca1dd0f1",
+      "command": "node scripts/verify-ci-attestation.mjs",
+      "result": "Historical CI v1.3 proof and pending CI v1.4 draft replay passed.",
+      "started_at": "2026-09-11T02:13:17.070Z",
+      "completed_at": "2026-09-11T02:13:17.165Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0029-77c01c6b",
+      "command": "write current-ci-v1.4-replay.json using verifyCiAttestation()",
+      "result": "Current CI v1.4 replay artifact written.",
+      "started_at": "2026-09-11T02:13:44.008Z",
+      "completed_at": "2026-09-11T02:13:44.097Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0030-670cc197",
+      "command": "write historical-ci-v1.3-pins.json",
+      "result": "Historical pins and reviewed PR003 input artifact written.",
+      "started_at": "2026-09-11T02:14:50.839Z",
+      "completed_at": "2026-09-11T02:14:50.893Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0031-8420d755",
+      "command": "write v1.4-runner-negative-fixtures.json",
+      "result": "Runner negative-fixture artifact written.",
+      "started_at": "2026-09-11T02:14:51.057Z",
+      "completed_at": "2026-09-11T02:14:51.088Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0032-26c45fcf",
+      "command": "write v1.4-lock-install.json",
+      "result": "Lock/install artifact written.",
+      "started_at": "2026-09-11T02:14:51.238Z",
+      "completed_at": "2026-09-11T02:14:51.274Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0034-c42c701c",
+      "command": "write v1.4-command-receipts.json",
+      "result": "Superseded sanitized command metadata artifact written.",
+      "started_at": "2026-09-11T02:18:02.005Z",
+      "completed_at": "2026-09-11T02:18:02.044Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0035-f4523662",
+      "command": "update verification/research-program/pr-085/task-binding.json",
+      "result": "Continuation task binding written.",
+      "started_at": "2026-09-11T02:18:49.359Z",
+      "completed_at": "2026-09-11T02:18:49.386Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0039-f2390da5",
+      "command": "node tests/ci-attestation.test.mjs",
+      "result": "All ten focused CI v1.4 tests passed, including both actual mixed-pair transition negatives.",
+      "started_at": "2026-09-11T02:31:23.466Z",
+      "completed_at": "2026-09-11T02:31:25.421Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0041-14adb64d",
+      "command": "write current-ci-v1.4-replay.json using verifyCiAttestation()",
+      "result": "Current CI v1.4 replay artifact rewritten after atomic transition correction.",
+      "started_at": "2026-09-11T02:33:22.400Z",
+      "completed_at": "2026-09-11T02:33:22.504Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0042-1ed26f79",
+      "command": "write v1.4-input-transition-negatives.json",
+      "result": "Atomic mixed-pair negative artifact written.",
+      "started_at": "2026-09-11T02:33:33.513Z",
+      "completed_at": "2026-09-11T02:33:33.573Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0044-9aab8058",
+      "command": "node scripts/verify-ci-attestation.mjs",
+      "result": "Historical proof and pending current v1.4 draft replay passed with atomic transition enforcement.",
+      "started_at": "2026-09-11T02:34:17.124Z",
+      "completed_at": "2026-09-11T02:34:17.232Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0045-59836680",
+      "command": "write v1.4-command-receipts.json",
+      "result": "Final sanitized command metadata artifact written.",
+      "started_at": "2026-09-11T02:34:33.059Z",
+      "completed_at": "2026-09-11T02:34:33.092Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
     }
   ],
   "artifacts": [
@@ -483,50 +930,86 @@
     {
       "id": "artifact-evidence-index",
       "path": "verification/research-program/pr-085/evidence-index.json",
-      "sha256": "1e34746f307d0c6e2901cb6a8c47a8ff2f411af1066524738f05bbff5340f7c7",
-      "bytes": 8779
+      "bytes": 19395,
+      "sha256": "5e312cfd25fe254523c43a2b04d53a9ea8bec5ca691f1347b1a3f3a9a3fd6590"
     },
     {
       "id": "artifact-ci-attestations-doc",
       "path": "docs/research-program/ci-attestations.md",
-      "sha256": "0aed8269a2a278198b20291eb210435af36ac8be1e0d293184b0cc847e0489d6",
-      "bytes": 6057
+      "bytes": 9112,
+      "sha256": "67e40c3cd2308115a5c0fa74c2e79403cb8ac270f71648ab3420f72df7f6b657"
     },
     {
       "id": "artifact-task-binding",
       "path": "verification/research-program/pr-085/task-binding.json",
-      "sha256": "3aa2688a7476555c0ba6110f047b9b00265208ef4a516610737a7932900df2a0",
-      "bytes": 3978
+      "bytes": 6279,
+      "sha256": "24b5909e17af2056b15deadd9a6624cb774fe6d50031165f5235d1869a65b466"
     },
     {
       "id": "artifact-prior-ci-failure",
       "path": "verification/research-program/bootstrap/ci-failure-487f06a.json",
       "sha256": "95a3a3f84078a4200142d0b912f31c799bc9f15c7335f67595c79b3dacbbf5bb",
       "bytes": 2769
+    },
+    {
+      "id": "artifact-ci-v14-current-replay",
+      "path": "verification/research-program/ci-attestation/current-ci-v1.4-replay.json",
+      "bytes": 11054,
+      "sha256": "8449f912452cfc828cbee1b72605634f298304220c0600adbb8359b906987cf4"
+    },
+    {
+      "id": "artifact-ci-v13-historical-pins",
+      "path": "verification/research-program/ci-attestation/historical-ci-v1.3-pins.json",
+      "bytes": 6914,
+      "sha256": "ed68d531b75e96173d1754c0d22caae976f3b65e80e760cc0940e3cd84440d9b"
+    },
+    {
+      "id": "artifact-ci-v14-negative-fixtures",
+      "path": "verification/research-program/ci-attestation/v1.4-runner-negative-fixtures.json",
+      "bytes": 2266,
+      "sha256": "ce48082de26c4bd619163b74e9ac1200c392d3c212ad984e507f1d74a993a75e"
+    },
+    {
+      "id": "artifact-ci-v14-lock-install",
+      "path": "verification/research-program/ci-attestation/v1.4-lock-install.json",
+      "bytes": 1227,
+      "sha256": "a55a59017b89f15cf06ce41f52c946c429bc88a6519c2da45bef1dcf1cdbea55"
+    },
+    {
+      "id": "artifact-ci-v14-command-receipts",
+      "path": "verification/research-program/ci-attestation/v1.4-command-receipts.json",
+      "bytes": 22872,
+      "sha256": "fb8c51c68fea8b2d6c3eeedec0d29eed85a658e5afd456c659c5b40227ff82ce"
+    },
+    {
+      "id": "artifact-ci-v14-transition-negative-fixtures",
+      "path": "verification/research-program/ci-attestation/v1.4-input-transition-negatives.json",
+      "bytes": 2385,
+      "sha256": "6fefb7b4d2947c6faa9c9cc5da90f0f48b0a604728e6a2a30b3ec41588a966b5"
     }
   ],
   "acceptance_results": [
     {
       "id": "c085-1-historical-proof",
       "status": "passed",
-      "result": "Historical WP0 v1.4.0 approval, evidence and receipt pins were verified together by the final current verifier replay; no approval bytes were rewritten.",
+      "result": "Historical CI v1.3 approval, evidence, approved receipt and predecessor-chain bytes passed the final v1.4 proof replay without rewriting any receipt.",
       "command_ids": [
-        "cmd-0013-376ca93b"
+        "cmd-0027-ca1dd0f1"
       ],
       "artifact_ids": [
-        "artifact-historical-pins",
-        "artifact-current-replay"
+        "artifact-ci-v13-historical-pins",
+        "artifact-ci-v14-current-replay"
       ]
     },
     {
       "id": "c085-1-current-draft",
       "status": "passed",
-      "result": "The fresh current technical draft is pending_authorized_review with approval absent and release/production eligibility false.",
+      "result": "The fresh CI v1.4 technical draft is pending_authorized_review with approval absent and release/production eligibility false.",
       "command_ids": [
-        "cmd-0013-376ca93b"
+        "cmd-0027-ca1dd0f1"
       ],
       "artifact_ids": [
-        "artifact-current-replay"
+        "artifact-ci-v14-current-replay"
       ]
     },
     {
@@ -543,22 +1026,37 @@
     {
       "id": "c085-2-subprocess-failure-cases",
       "status": "passed",
-      "result": "The final focused subprocess suite passed 10 tests covering future-version strict execution, current child failure propagation and zero-test rejection.",
+      "result": "Real subprocess fixtures preserve future-version strict failure, current child error/timeout, nonzero results and zero-test rejection.",
       "command_ids": [
-        "cmd-0012-1fd89193"
+        "cmd-0026-246ee7e0"
       ],
       "artifact_ids": [
-        "artifact-negative-fixtures"
+        "artifact-ci-v14-negative-fixtures"
       ]
     },
     {
       "id": "c085-3-evidence-package",
       "status": "producer_checked",
-      "result": "Hash-bound evidence, docs and the per-PR task binding are prepared for root exact-head binding and independent review.",
+      "result": "Hash-bound CI v1.4 evidence, docs and per-PR task binding are prepared for root exact-head binding and independent review.",
       "command_ids": [
-        "cmd-0013-376ca93b"
+        "cmd-0027-ca1dd0f1",
+        "cmd-0029-77c01c6b",
+        "cmd-0030-670cc197",
+        "cmd-0031-8420d755",
+        "cmd-0032-26c45fcf",
+        "cmd-0039-f2390da5",
+        "cmd-0041-14adb64d",
+        "cmd-0042-1ed26f79",
+        "cmd-0044-9aab8058",
+        "cmd-0045-59836680",
+        "cmd-0034-c42c701c",
+        "cmd-0035-f4523662"
       ],
       "artifact_ids": [
+        "artifact-ci-v14-current-replay",
+        "artifact-ci-v13-historical-pins",
+        "artifact-ci-v14-command-receipts",
+        "artifact-ci-v14-transition-negative-fixtures",
         "artifact-evidence-index",
         "artifact-ci-attestations-doc",
         "artifact-task-binding"
@@ -567,22 +1065,76 @@
     {
       "id": "full-npm-test",
       "status": "failed",
-      "result": "The completed-candidate full npm test exited 1 at the existing verification/testing/ci/v1.3.0 validate SUCCESSOR_APPROVAL_STALE_SUBJECT gate; build and dry-run were not reached.",
+      "result": "The full npm test exited 1 at verification/wp11/v1.3.0:validate with SUCCESSOR_APPROVAL_STALE_SUBJECT; the failure remains a release block.",
       "command_ids": [
-        "cmd-0014-9cb38845"
+        "cmd-0022-aa4a557b"
       ],
       "artifact_ids": [
-        "artifact-command-receipts",
-        "artifact-prior-ci-failure"
+        "artifact-ci-v14-command-receipts"
       ]
     },
     {
       "id": "release-qualification",
       "status": "pending",
-      "result": "Root must independently bind the final head, obtain exact current-subject authorization for PR-082 and run the applicable combined release gate.",
+      "result": "Root must bind the final head, obtain exact current-subject authorization for PR-082 and run the applicable combined release gate.",
       "command_ids": [],
       "artifact_ids": [
-        "artifact-current-replay"
+        "artifact-ci-v14-current-replay"
+      ]
+    },
+    {
+      "id": "c085-2-r2-v14-inventory",
+      "status": "passed",
+      "result": "The versioned CI v1.4 inventory preserves lock, workflow, offline, child-output, route and both root-chain invariants.",
+      "command_ids": [
+        "cmd-0025-1bb26230",
+        "cmd-0026-246ee7e0"
+      ],
+      "artifact_ids": [
+        "artifact-ci-v14-command-receipts",
+        "artifact-ci-v14-lock-install"
+      ]
+    },
+    {
+      "id": "c085-2-r3-pr003-transition",
+      "status": "passed",
+      "result": "Historical package/test pins remain exact while only the reviewed PR003 bytes pass the bounded semantic transition.",
+      "command_ids": [
+        "cmd-0021-fd1a369a",
+        "cmd-0026-246ee7e0"
+      ],
+      "artifact_ids": [
+        "artifact-ci-v13-historical-pins"
+      ]
+    },
+    {
+      "id": "producer-build",
+      "status": "passed",
+      "result": "Direct producer build passed.",
+      "command_ids": [
+        "cmd-0023-f00f3acb"
+      ],
+      "artifact_ids": []
+    },
+    {
+      "id": "producer-cf-dry-run",
+      "status": "passed",
+      "result": "Direct producer build plus artifact-only Wrangler dry-run passed.",
+      "command_ids": [
+        "cmd-0024-911db093"
+      ],
+      "artifact_ids": []
+    },
+    {
+      "id": "c085-2-r4-atomic-transition",
+      "status": "passed",
+      "result": "The reviewed PR003 package and inventory-test inputs are an atomic pair: both historical or both exact reviewed bytes pass, while both actual mixed states fail closed.",
+      "command_ids": [
+        "cmd-0039-f2390da5",
+        "cmd-0044-9aab8058"
+      ],
+      "artifact_ids": [
+        "artifact-ci-v14-transition-negative-fixtures"
       ]
     }
   ],
@@ -590,88 +1142,109 @@
     {
       "id": "full-chain-stale-subject",
       "status": "failed",
-      "detail": "cmd-0014 exited 1 at verification/testing/ci/v1.3.0:validate with SUCCESSOR_APPROVAL_STALE_SUBJECT; the retained full stdout is truncated but its original stream hash is recorded in command-receipts.json."
+      "detail": "The retained full npm test cmd-0022-aa4a557b exited 1 at verification/wp11/v1.3.0:validate with SUCCESSOR_APPROVAL_STALE_SUBJECT; original stream hashes are recorded in the v1.4 command artifact.",
+      "next_action": "Keep current-subject approval and combined release qualification blocked."
+    },
+    {
+      "id": "historical-controller-stale-subject",
+      "status": "failed",
+      "detail": "Controller-provided run 34544925837 on published head 61ca92638d1aa87573f4d55be0f5c896f4b0818e failed verification/wp0/v1.4.0:validate with SUCCESSOR_APPROVAL_STALE_SUBJECT; failed-log SHA-256 91c573054a4337df19f834aa9f64c449bafab862a2415fcdc3721404fd170f4c.",
+      "next_action": "Retain the controller failure as historical evidence; do not repin approval."
     },
     {
       "id": "initial-sandbox-replay",
       "status": "unavailable",
-      "detail": "cmd-0001 encountered sandbox EPERM/empty output and exited 1; later bounded escalated replays supplied the usable execution evidence."
+      "detail": "The initial sandbox nested replay encountered EPERM/empty output; later bounded escalated replays supplied usable evidence.",
+      "next_action": "Use the retained escalated command receipts."
     },
     {
       "id": "operator-path-retry",
       "status": "failed",
-      "detail": "cmd-0010 exited 127 because an operator retry named a nonexistent pinned node binary; no repository code executed."
+      "detail": "An earlier operator retry named a nonexistent pinned node binary and exited 127; no repository code executed.",
+      "next_action": "Use the corrected pinned npm toolchain."
     },
     {
       "id": "initial-zero-fixture",
       "status": "failed",
-      "detail": "cmd-0011 exited 1 because an empty fixture file was counted as one test by Node; the fixture was corrected before cmd-0012."
+      "detail": "An initial empty fixture was counted as one test by Node; the fixture was corrected before the final negative replay.",
+      "next_action": "Use the final real zero-test fixture result."
     },
     {
-      "id": "build-and-dry-run",
+      "id": "producer-full-chain-blocked",
       "status": "skipped",
-      "detail": "The full chain stopped at the unchanged successor stale-subject validation gate, so later build and dry-run stages were not reached."
-    },
-    {
-      "id": "latest-controller-ci",
-      "status": "failed",
-      "detail": "Controller-provided latest run 34544925837 on published head 61ca92638d1aa87573f4d55be0f5c896f4b0818e failed verification/wp0/v1.4.0:validate with SUCCESSOR_APPROVAL_STALE_SUBJECT; failed log SHA-256 91c573054a4337df19f834aa9f64c449bafab862a2415fcdc3721404fd170f4c (743951 bytes). This fact is retained from the controller and the log is not copied into this candidate."
+      "detail": "The direct producer build and artifact-only CF dry-run passed, but the full npm chain stopped at the stale v1.3 WP11 subject gate before reaching those stages.",
+      "next_action": "Root must rerun the combined exact-candidate chain after binding all dependencies."
     }
   ],
   "unresolved_claims": [
     {
       "id": "pending-head-sha",
       "status": "pending",
-      "detail": "head_sha is null because a producer handoff cannot self-embed the SHA of the future C3 documentation commit; root must bind the exact committed head/tree externally."
+      "detail": "head_sha is null because a producer handoff cannot self-embed the SHA of its future C3 documentation commit; root must bind the exact committed head/tree externally.",
+      "next_action": "Bind the final exact head and tree after this handoff commit."
     },
     {
       "id": "current-subject-authorization",
       "status": "pending",
-      "detail": "The fresh subject is technical evidence only. No current-subject successor approval was issued or inferred from historical approval."
+      "detail": "The fresh CI v1.4 subject is technical evidence only. No current-subject successor approval was issued or inferred from historical approval.",
+      "next_action": "PR-082 resolves current-subject approval."
     },
     {
       "id": "combined-release-gate",
       "status": "pending",
-      "detail": "Independent review, combined candidate build/dry-run/CI and release qualification remain root-owned."
+      "detail": "Independent review and the combined PR-003/PR-085 exact-candidate release gate remain root-owned.",
+      "next_action": "Run the pinned handoff checker and combined tests after final PR003 binding."
     },
     {
       "id": "requirements-r01-r16",
       "status": "pending",
-      "detail": "R01-R16 remain not_yet_evaluated/unaccepted; this PR-085 CI attestation does not claim scientific or product outcomes."
+      "detail": "R01-R16 remain unaccepted and not_yet_evaluated; this PR-085 packet does not claim scientific or product outcomes.",
+      "next_action": "Leave these predicates to their owners and final release process."
     }
   ],
   "risks": [
     {
       "id": "historical-subject-boundary",
       "status": "risk",
-      "detail": "The historical WP0 approval is bound to its original evidence and subject; current implementation bytes produce a different subject and require current authorization."
+      "detail": "The historical CI v1.3 approval is bound to its original subject and exact proof bytes; the current CI v1.4 subject is distinct and requires current authorization.",
+      "next_action": "Do not transfer or repin the historical approval."
     },
     {
-      "id": "truncated-full-output",
+      "id": "reviewed-pr003-transition",
       "status": "risk",
-      "detail": "The full npm test receipt retains original byte count and SHA-256 while agentctl's stored stdout is truncated."
+      "detail": "The package/test transition is limited to exact bytes from reviewed commit bf46d92b0e4fc91457bd3eb78aa1742ae84038f2; arbitrary current input drift and either mixed historical/reviewed pair fail closed.",
+      "next_action": "Recheck exact source hashes and atomic pair state during combined review."
+    },
+    {
+      "id": "full-gate-stale-subject",
+      "status": "risk",
+      "detail": "Producer focused checks/build/dry-run pass, but full npm test still fails an existing v1.3 stale-subject gate at WP11.",
+      "next_action": "Retain the failure and resolve current authorization through PR-082/release gate."
     },
     {
       "id": "test-only-verifier-override",
       "status": "risk",
-      "detail": "The test API permits a scratch verifier path for isolated subprocess fixtures; the CLI and production runner default to the pinned repository verifier."
+      "detail": "The test API permits a scratch verifier path for isolated subprocess fixtures; CLI and production runner defaults remain pinned to the repository verifier.",
+      "next_action": "Keep overrides confined to test-owned temporary fixtures."
     }
   ],
-  "next_consumer": "Root/controller independent reviewer, PR-082 current-subject authorization workflow and the combined release gate",
-  "next_action": "Root must inspect this packet against the immutable PR-003 dc7267bf1c872f1457fa927e2d0403051575f474 handoff/task schemas, bind the exact post-C3 commit and tree externally, then run independent review and retain the stale-subject release block until current authorization exists.",
+  "next_consumer": "Root/controller independent reviewer, PR-082 current-subject authorization workflow and combined release gate",
+  "next_action": "Root must validate this handoff against the immutable PR-003 dc7267bf1c872f1457fa927e2d0403051575f474 checker/schema, bind the final exact head/tree externally, and retain the stale-subject block until current authorization and combined qualification exist.",
   "independent_review": {
     "status": "in_review",
     "reviewed_head_sha": null,
     "decisive_checks": [
-      "PR-003 dc7267bf1c872f1457fa927e2d0403051575f474 checker/schema validation",
-      "Exact C-085-1/C-085-2/C-085-2-R1 commit and changed-path review",
-      "Current draft has pending_authorized_review and no current approval",
-      "Full npm test retains SUCCESSOR_APPROVAL_STALE_SUBJECT exit 1"
+      "Exact C-085-2-R2/C-085-2-R3/C-085-2-R4 commits and changed-path review through 6ed7fb4cb24199977034cf86bb3f0b4a928513be",
+      "Historical CI v1.3 proof bytes and reviewed PR-003 current package/test transition",
+      "Current CI v1.4 draft has pending_authorized_review and no current approval",
+      "Ten-test direct CI v1.4 suite rejects both actual partial PR003 input pairs while retaining legacy and full reviewed-pair passes",
+      "Full npm test retains SUCCESSOR_APPROVAL_STALE_SUBJECT exit 1 at verification/wp11/v1.3.0",
+      "Pinned dc7267bf1c872f1457fa927e2d0403051575f474 handoff checker/schema and combined PR003 review remain root-owned"
     ],
     "limitations": [
-      "Producer packet is not independent acceptance or scientific qualification.",
+      "This is a producer handoff, not independent acceptance or scientific qualification.",
       "head_sha remains pending until the controller commits C-085-3 and records the exact resulting SHA/tree.",
-      "No current-subject approval, release qualification, build/dry-run pass or R01-R16 acceptance is claimed.",
+      "No current-subject approval, release qualification, production authorization or R01-R16 acceptance is claimed.",
       "No provider/network call or private evaluator input was used."
     ]
   }
