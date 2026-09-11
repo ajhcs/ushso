@@ -8,7 +8,7 @@
   "branch": "codex/ushso-pr006-facets-isolation-20260911",
   "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr006-facets-isolation-20260911",
   "objective": "Keep the frozen discovery result contract while making canonical facets honest and usable across live and accepted fixture paths, including unresolved values, narrowed/empty responses and captured labels absent from the current page.",
-  "outcome": "UI-only availability/reasons and count-free include-unknown controls are derived from current result scope; fixture filtering roundtrips locally; retrieval-core changes only existing facet label strings; frozen contracts and both reference engines remain byte-preserved.",
+  "outcome": "UI-only availability/reasons and count-free include-unknown controls are derived from current result scope; fixture filtering roundtrips locally; retrieval-core changes only existing facet label strings; the additive subject parity correction normalizes only facet option labels while independently checking expected public labels and a non-label negative control; frozen contracts and both reference engines remain byte-preserved.",
   "dependencies": [
     "PR-004",
     "PR-005"
@@ -30,7 +30,8 @@
     "apps/web/src/providers/discoveryProvider.ts",
     "apps/web/src/providers/discoveryProvider.test.ts",
     "verification/research-program/pr-006/",
-    "docs/research-program/handoffs/PR-006.json"
+    "docs/research-program/handoffs/PR-006.json",
+    "tests/subject-shortcircuit.test.mjs"
   ],
   "commits": [
     {
@@ -50,12 +51,19 @@
       "subject": "Add facet labels and fixture roundtrip evidence",
       "instructions": "Resolve existing live facet option label strings from complete matching records, isolate intentional label differences in both reference comparisons and record the complete producer handoff.",
       "verification": "Retrieval parity and isolation tests pass; C0063 proves page-absent captured labels and unchanged non-label response fields; full web and retrieval suites pass."
+    },
+    {
+      "id": "C-006-3-R1",
+      "subject": "Isolate subject facet label parity",
+      "instructions": "Own tests/subject-shortcircuit.test.mjs solely to isolate intentional facets.sections[*].options[*].label differences; preserve every other byte/order comparison, frozen engines, fixtures, corpus input and fingerprint.",
+      "verification": "All 16 subject/sort comparisons pass with independent public-label expectations and a representative non-label mutation remains unequal."
     }
   ],
   "check_commands": [
     "node --test packages/retrieval/tests/lexical-index.test.mjs",
     "node --test tests/direct-base-regression.test.mjs",
     "node --test tests/research-program/isolation-and-facets.test.mjs",
+    "node --test tests/subject-shortcircuit.test.mjs",
     "npm run test:web",
     "npm run test:retrieval",
     "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-006.json"
