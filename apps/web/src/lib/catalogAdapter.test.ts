@@ -57,8 +57,97 @@ describe('canonical discovery response adapter', () => {
     const first = adapted.records[0]
     expect(first.grain).toBe('Observation grain unresolved')
     expect(first.reportingUnit).toBe('Observation grain unresolved')
+    expect(first.canonicalResult.metadata?.dimensions.observation_grain.state ?? 'unresolved').toBe('unresolved')
     expect(first.accessStatusLabel).toBeTruthy()
     expect(first.categories.length).toBeGreaterThan(0)
+  })
+
+  it('uses an explicit observation-grain claim and never promotes inferred unit tags', () => {
+    const claimed = structuredClone(acceptedResponse)
+    const item = claimed.results[0]
+    item.metadata = {
+      ...item.metadata,
+      dimensions: {
+        observation_grain: { values: ['hospital_cost_report'], state: 'source_asserted' },
+        sampled_entity: { values: [], state: 'unresolved' },
+        reporting_organization: { values: [], state: 'unresolved' },
+        population_universe: { values: [], state: 'unresolved' },
+        geographic_dimensions: { values: [], state: 'unresolved' },
+        inferred_search_tags: item.record.unit_of_analysis.map((value) => `unit_of_analysis:${value}`),
+      },
+    } as typeof item.metadata
+    const view = adaptDiscoveryResponse(claimed).records[0]
+    expect(view.grain).toBe('Hospital Cost Report')
+    expect(view.reportingUnit).toBe('Hospital Cost Report')
+    expect(view.canonicalResult.record.unit_of_analysis).not.toEqual(['hospital_cost_report'])
+    expect(buildResearcherGuidance(view).useCard.fields.find((field) => field.label === 'Typical unit')).toEqual(expect.objectContaining({
+      values: ['Hospital Cost Report'],
+      evidenceState: 'source_asserted',
+    }))
+  })
+
+  it('projects last successful metadata check separately from payload access', () => {
+    const first = adaptDiscoveryResponse(acceptedResponse).records[0]
+    expect(first.verification.lastSuccessfulMetadataCheck).toBe(first.verification.metadataObservedAt)
+    expect(first.verification.payloadCheckState).toBe('not_attempted')
+    expect(first.verification.payloadCheckNote).toMatch(/not a payload-access check/)
+    expect(first.verification.latestAttemptScope).toBe('catalog_metadata')
+  })
+
+  it.each(['inferred', 'unavailable'] as const)('does not resolve %s observation grain as typical unit', (state) => {
+    const claimed = structuredClone(acceptedResponse)
+    const item = claimed.results[0]
+    item.metadata = {
+      ...item.metadata,
+      dimensions: {
+        observation_grain: { values: ['hospital'], state },
+        sampled_entity: { values: [], state: 'unresolved' },
+        reporting_organization: { values: [], state: 'unresolved' },
+        population_universe: { values: [], state: 'unresolved' },
+        geographic_dimensions: { values: [], state: 'unresolved' },
+        inferred_search_tags: item.record.unit_of_analysis.map((value) => `unit_of_analysis:${value}`),
+      },
+    } as typeof item.metadata
+    const view = adaptDiscoveryResponse(claimed).records[0]
+    expect(view.grain).toBe('Observation grain unresolved')
+    expect(view.reportingUnit).toBe('Observation grain unresolved')
+    const typical = buildResearcherGuidance(view).useCard.fields.find((field) => field.label === 'Typical unit')
+    expect(typical?.evidenceState).toBe('unresolved')
+    expect(typical?.values.join(' ')).toMatch(/unresolved/i)
+    expect(typical?.values.join(' ')).not.toMatch(/Hospital/)
+    const inferred = buildResearcherGuidance(view).useCard.fields.find((field) => field.label === 'Inferred unit tags (search aid only)')
+    expect(inferred?.values.join(' ')).toMatch(/Hospital/)
+    expect(inferred?.values.join(' ')).toMatch(/not a resolved typical unit/)
+  })
+
+  it('preserves explicit null success and attempt timestamps', () => {
+    const failed = structuredClone(acceptedResponse)
+    const item = failed.results[0]
+    item.metadata = {
+      ...item.metadata,
+      freshness: {
+        verification_status: item.record.freshness_verification.verification_status,
+        last_checked: item.record.freshness_verification.metadata_observed_at,
+        next_review_due: item.record.freshness_verification.next_review_due,
+        freshness_state: 'overdue',
+        failed_refresh_state: 'none_recorded',
+        note: 'Review is overdue; this does not by itself mean the preserved metadata is false.',
+        last_successful_metadata_check: null,
+        latest_attempt: { at: null, outcome: 'failed', scope: 'catalog_metadata' },
+        payload_check: {
+          state: 'not_attempted',
+          at: null,
+          scope: 'payload',
+          note: 'Catalog metadata observation is not a payload-access check.',
+        },
+      },
+    } as typeof item.metadata
+    const view = adaptDiscoveryResponse(failed).records[0]
+    expect(view.verification.lastSuccessfulMetadataCheck).toBeNull()
+    expect(view.verification.latestAttemptAt).toBeNull()
+    expect(view.verification.latestAttemptOutcome).toBe('failed')
+    expect(view.verification.payloadCheckState).toBe('not_attempted')
+    expect(view.verification.metadataObservedAt).toBeTruthy()
   })
 
   it('does not reinterpret public catalog visibility as public payload access', () => {

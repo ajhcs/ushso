@@ -1,0 +1,107 @@
+{
+  "schema_version": "ushso.pr086.wp11-v1.3-command-receipts.v1",
+  "status": "producer_checked",
+  "npm": "11.19.1",
+  "node": "v24.14.0",
+  "functional_head": "78745865960bbf85908e5291eac0a8e262befef7",
+  "functional_tree": "9d119dd162279aef245c5da8496dae60142af5f0",
+  "base_sha": "7e10fd637e092d7fbe14cef97c8da22a1f5d1ad1",
+  "base_tree": "76dc30ddb314ae0f00a29986e6ebb2bfd8f0e751",
+  "prior_candidate_receipts_retained": true,
+  "tmpdir_honored": "/mnt/d/tmp/plumbob",
+  "wp11_historical_subject_sha256": "294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98",
+  "wp11_current_technical_subject_sha256": "7e355d27a6deb558b6626c486472763a7cfd61239e054d16e13256162de3829f",
+  "wp11_wrapper_subject_sha256": "87fb320c9f415322f52581f3416ac760a58da684bdafd4592bac909bf182115a",
+  "current_approval_issued": false,
+  "combined_acceptance": false,
+  "commands": [
+    {
+      "id": "cmd-c086-focused",
+      "command": "node --test tests/wp11-attestation.test.mjs",
+      "started_at": "2026-09-11T15:19:54.648Z",
+      "completed_at": "2026-09-11T15:20:01.078Z",
+      "duration_ms": 6430,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "tests": 17,
+      "stdout": {
+        "bytes": 12957,
+        "sha256": "74334a437f8a0c238b831f0223994a333cbac53f7469e5f9b058cd8571265537"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "cmd-c086-verifier",
+      "command": "node scripts/verify-wp11-attestation.mjs",
+      "started_at": "2026-09-11T15:20:01.080Z",
+      "completed_at": "2026-09-11T15:20:01.330Z",
+      "duration_ms": 250,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout": {
+        "bytes": 8353,
+        "sha256": "7fa8d09bc1a6b999c672d859b9bcc3f915ff97f9c61625603d952ec605ca3921"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "cmd-c086-suite",
+      "command": "node scripts/run-contract-suites.mjs --suite wp11",
+      "started_at": "2026-09-11T15:20:01.330Z",
+      "completed_at": "2026-09-11T15:20:02.437Z",
+      "duration_ms": 1107,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout": {
+        "bytes": 9015,
+        "sha256": "af18249dbcc31ea778dd28bdb9a71d209d0b7f0fcd274be8ac0f9d594879777e"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "cmd-c086-direct-validate",
+      "command": "USHSO_ALLOW_RECEIPT_WRITES=0 node verification/wp11/v1.3.0/tools/verify.mjs --validate",
+      "started_at": "2026-09-11T15:20:02.437Z",
+      "completed_at": "2026-09-11T15:20:02.544Z",
+      "duration_ms": 107,
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "failure": "SUCCESSOR_APPROVAL_STALE_SUBJECT",
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 1271,
+        "sha256": "8e0d278eb79671e409f5f59c657d972db8b27e02a71737fbc184d806a7b4dd5f"
+      }
+    },
+    {
+      "id": "cmd-c086-direct-issue",
+      "command": "USHSO_ALLOW_RECEIPT_WRITES=0 node verification/wp11/v1.3.0/tools/verify.mjs --issue",
+      "started_at": "2026-09-11T15:20:02.545Z",
+      "completed_at": "2026-09-11T15:20:02.648Z",
+      "duration_ms": 103,
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "failure": "SUCCESSOR_APPROVAL_STALE_SUBJECT",
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 1271,
+        "sha256": "8e0d278eb79671e409f5f59c657d972db8b27e02a71737fbc184d806a7b4dd5f"
+      }
+    }
+  ]
+}

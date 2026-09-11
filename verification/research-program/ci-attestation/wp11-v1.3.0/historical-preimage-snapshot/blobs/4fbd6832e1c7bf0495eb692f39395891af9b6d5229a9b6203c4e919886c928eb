@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/retrieval/v1.0.0/discovery-result.schema.json",
+  "title": "Canonical Observatory discovery result shared by UI and WebMCP",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version","retrieval_id","evidence_mode","corpus","query","ranking","pagination","facets","sections","named_source_resolution","partial_results","receipt","result_count","returned_count","total_matches","has_more","results","join_routes","warnings"],
+  "properties": {
+    "contract_version":{"const":"observatory-discovery-result.v1.0.0"},
+    "retrieval_id":{"type":"string","pattern":"^retrieval-[a-f0-9]{16}$"},
+    "evidence_mode":{"const":"published_offline_evidence"},
+    "corpus":{
+      "type":"object",
+      "required":["corpus_id","corpus_version","record_count","join_route_count"],
+      "properties":{
+        "corpus_id":{"type":"string","minLength":1},
+        "corpus_version":{"type":"string","minLength":1},
+        "record_count":{"type":"integer","minimum":1},
+        "join_route_count":{"type":"integer","minimum":0},
+        "manifest_sha256":{"type":["string","null"],"pattern":"^[a-f0-9]{64}$"}
+      }
+    },
+    "query":{
+      "type":"object","additionalProperties":false,
+      "required":["question","normalized_question","interpretation","filters"],
+      "properties":{
+        "question":{"type":"string","minLength":3},
+        "normalized_question":{"type":"string","minLength":1},
+        "interpretation":{
+          "type":"object","additionalProperties":false,
+          "required":["geographies","subjects","units_of_analysis","time_window","access_intent","exclusions","named_sources","interpretation_warnings"],
+          "properties":{
+            "geographies":{"$ref":"#/$defs/conceptMatches"},
+            "subjects":{"$ref":"#/$defs/conceptMatches"},
+            "units_of_analysis":{"$ref":"#/$defs/conceptMatches"},
+            "time_window":{
+              "type":["object","null"],
+              "properties":{
+                "start_year":{"type":["integer","null"]},
+                "end_year":{"type":["integer","null"]},
+                "match_basis":{"type":"string"}
+              }
+            },
+            "access_intent":{
+              "type":"object","additionalProperties":false,
+              "required":["include_restricted","public_only","accepts_restricted","match_basis"],
+              "properties":{
+                "include_restricted":{"type":"boolean"},
+                "public_only":{"type":"boolean"},
+                "accepts_restricted":{"type":"boolean"},
+                "match_basis":{"type":"string"},
+                "payload_requirement":{"enum":["documented_public_payload","unspecified"]},
+                "cost_requirement":{"enum":["documented_no_fee","unspecified"]},
+                "ambiguity":{"type":["string","null"]},
+                "matched_phrases":{"type":"array","items":{"type":"string"}},
+                "interpretation_note":{"type":["string","null"]}
+              }
+            },
+            "exclusions":{"type":"array","items":{"type":"object"}},
+            "named_sources":{"type":"array","items":{"type":"object"}},
+            "positive_terms":{"type":"array","items":{"type":"string"}},
+            "interpretation_warnings":{"type":"array","items":{"type":"string"}}
+          }
+        },
+        "filters":{"type":"object"}
+      }
+    },
+    "result_count":{"type":"integer","minimum":0,"description":"Returned result length. Prefer returned_count for new clients."},
+    "returned_count":{"type":"integer","minimum":0,"description":"Number of records included in this bounded response."},
+    "total_matches":{"type":"integer","minimum":0,"description":"Number of scored matches before the request limit was applied. This is not a claim that the Observatory contains only these records."},
+    "has_more":{"type":"boolean","description":"True when total_matches exceeds returned_count because discovery is bounded by limit."},
+    "ranking":{"type":"object","additionalProperties":false,"required":["version","sort","ordered_ids"],"properties":{"version":{"type":"string"},"sort":{"enum":["canonical_relevance","title_asc","release_newest","observation_latest"]},"ordered_ids":{"type":"array","uniqueItems":true,"items":{"type":"string"}}}},
+    "pagination":{"type":"object","additionalProperties":false,"required":["generation","cursor","next_cursor","has_more","page_size","total_matches"],"properties":{"generation":{"type":"string"},"cursor":{"type":["string","null"]},"next_cursor":{"type":["string","null"]},"has_more":{"type":"boolean"},"page_size":{"type":"integer","minimum":1,"maximum":200},"total_matches":{"type":"integer","minimum":0}}},
+    "facets":{"type":"object","additionalProperties":false,"required":["count_basis","collection_scope","approximate","sections"],"properties":{"count_basis":{"const":"records"},"collection_scope":{"const":"all_matching_records_before_pagination"},"approximate":{"const":false},"sections":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["id","label","options"],"properties":{"id":{"type":"string"},"label":{"type":"string"},"options":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["value","label","count"],"properties":{"value":{"type":"string"},"label":{"type":"string"},"count":{"type":"integer","minimum":0}}}}}}}}},
+    "sections":{"type":"object","additionalProperties":false,"required":["supported","uncertain","contextual"],"properties":{"supported":{"$ref":"#/$defs/stringSet"},"uncertain":{"$ref":"#/$defs/stringSet"},"contextual":{"$ref":"#/$defs/stringSet"}}},
+    "named_source_resolution":{"type":"array","items":{"type":"object"}},
+    "partial_results":{"type":"object","additionalProperties":false,"required":["is_partial","invalid_item_count","issues"],"properties":{"is_partial":{"type":"boolean"},"invalid_item_count":{"type":"integer","minimum":0},"issues":{"type":"array","items":{"type":"object"}}}},
+    "receipt":{"type":"object"},
+    "results":{
+      "type":"array","items":{
+        "type":"object","additionalProperties":false,
+        "required":["rank","score","record_id","match_state","uncertainty_reasons","metadata","relevance","record"],
+        "properties":{
+          "rank":{"type":"integer","minimum":1},
+          "score":{"type":"integer","minimum":1},
+          "record_id":{"type":"string","minLength":1},
+          "match_state":{"enum":["supported","uncertain","contextual"]},
+          "uncertainty_reasons":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+          "metadata":{"type":"object"},
+          "relevance":{
+            "type":"object","additionalProperties":false,
+            "required":["matched_subjects","matched_geographies","matched_units","matched_terms","score_components","why_relevant"],
+            "properties":{
+              "matched_subjects":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+              "matched_geographies":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+              "matched_units":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+              "matched_terms":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+              "score_components":{
+                "type":"array","items":{
+                  "type":"object","additionalProperties":false,
+                  "required":["kind","value","reason","evidence_state"],
+                  "properties":{
+                    "kind":{"type":"string"},
+                    "value":{"type":"integer","minimum":0},
+                    "reason":{"type":"string","minLength":1},
+                    "evidence_state":{"enum":["verified_first_party","source_asserted","inferred","unresolved","unavailable"]}
+                  }
+                }
+              },
+              "why_relevant":{"type":"array","minItems":1,"items":{"type":"string","minLength":1}}
+            }
+          },
+          "record":{"type":"object"}
+        }
+      }
+    },
+    "join_routes":{"type":"array","items":{"$ref":"join-route.schema.json"}},
+    "warnings":{"type":"array","items":{"type":"string","minLength":1}}
+  },
+  "$defs":{
+    "stringSet":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+    "conceptMatches":{
+      "type":"array","items":{
+        "type":"object","additionalProperties":false,
+        "required":["id","label","kind","matched_aliases","evidence"],
+        "properties":{
+          "id":{"type":"string","minLength":1},
+          "label":{"type":"string","minLength":1},
+          "kind":{"type":"string","minLength":1},
+          "matched_aliases":{"type":"array","uniqueItems":true,"items":{"type":"string","minLength":1}},
+          "evidence":{"enum":["controlled_vocabulary","explicit_filter"]}
+        }
+      }
+    }
+  }
+}

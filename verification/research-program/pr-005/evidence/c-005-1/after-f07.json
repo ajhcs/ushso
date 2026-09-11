@@ -1,0 +1,37 @@
+{
+  "artifact_kind": "pr005_after_change_f07_observation",
+  "status": "defect_no_longer_reproduced",
+  "observed_at": "2026-09-11T13:26:53.168Z",
+  "command": "node verification/research-program/pr-005/observe-freshness-and-grain.mjs",
+  "exit_code": 0,
+  "finding": "F07",
+  "expected_live_behavior": "A 2026-09-10 evaluation of a record whose next_review_due is 2026-09-05T00:00:00.000Z is overdue.",
+  "observed": {
+    "direct_engine_without_now": {
+      "freshness_state": "within_review_window",
+      "receipt_generated_at": "1970-01-01T00:00:00.000Z",
+      "evaluated_at": "1970-01-01T00:00:00.000Z"
+    },
+    "direct_engine_now_2026_09_10": {
+      "freshness_state": "overdue",
+      "evaluated_at": "2026-09-10T12:00:00.000Z"
+    },
+    "direct_engine_now_2026_09_04": {
+      "freshness_state": "within_review_window",
+      "evaluated_at": "2026-09-04T12:00:00.000Z"
+    },
+    "public_path_pinned_2026_09_10": {
+      "evaluated_at": "2026-09-10T12:00:00.000Z",
+      "freshness_state": "overdue",
+      "receipt_generated_at": "2026-09-10T12:00:00.000Z"
+    },
+    "record_sha256_stable": "551d4f712eea2f8a33fb27755e931822f7af31d4f5605f5bc2024dcd348d7766"
+  },
+  "defect_reproduced": false,
+  "notes": [
+    "PublicQueryService.openRequest now captures evaluatedAt from an explicit now option, a valid Date header, or the live request clock.",
+    "StaticSearchBackend forwards that clock into retrieve/browse.",
+    "Direct engine calls without now remain frozen at corpus published_at/built_at or 1970 and are not time-dependent.",
+    "Immutable source record and evidence hashes are unchanged."
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "artifact_kind": "pr005_evidence_index",
+  "pr_id": "PR-005",
+  "status": "producer_checked",
+  "owner": "Grok",
+  "reviewer": "Astra",
+  "recorded_at": "2026-09-11T14:40:00.000Z",
+  "base_sha": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+  "base_tree": "c46c95ad838b78d4a26c86454be82f3835c49e51",
+  "continuation_execution_base": "941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9",
+  "continuation_execution_tree": "4d3bc23a2e4c97a9fd044bf3157f83a347995407",
+  "correction_commit": "e7cd7e69823dcaf5f95aa578dc846d02b5882821",
+  "dependency_merge_shas": {
+    "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce"
+  },
+  "source_generation": "live-2026-09-03-85b50522b420",
+  "manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e",
+  "commits": [
+    {
+      "id": "C-005-1",
+      "sha": "47c739b1d370f3d61c093fe2f11d9d97958e6a9f",
+      "subject": "Use an explicit observation clock"
+    },
+    {
+      "id": "C-005-2",
+      "sha": "5e51fea2033eb775c74f5425260b5cd21508e5e9",
+      "subject": "Stop promoting inferred unit tags as typical units"
+    },
+    {
+      "id": "C-005-3",
+      "sha": "941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9",
+      "subject": "Explain freshness scope in the UI"
+    },
+    {
+      "id": "C-005-4",
+      "sha": "e7cd7e69823dcaf5f95aa578dc846d02b5882821",
+      "subject": "Correct freshness projection, trusted clock, and grain claims"
+    },
+    {
+      "id": "C-005-5",
+      "sha": null,
+      "subject": "Record PR005 freshness correction evidence"
+    }
+  ],
+  "slices": [
+    {
+      "id": "C-005-1",
+      "finding": "F07",
+      "before": "verification/research-program/pr-005/evidence/c-005-1/before-f07.json",
+      "after": "verification/research-program/pr-005/evidence/c-005-1/after-f07.json",
+      "commands": "verification/research-program/pr-005/evidence/c-005-1/commands.json"
+    },
+    {
+      "id": "C-005-2",
+      "finding": "F06",
+      "before": "verification/research-program/pr-005/evidence/c-005-2/before-f06.json",
+      "after": "verification/research-program/pr-005/evidence/c-005-2/after-f06.json",
+      "commands": "verification/research-program/pr-005/evidence/c-005-2/commands.json"
+    },
+    {
+      "id": "C-005-3",
+      "finding": "F07/R02",
+      "commands": "verification/research-program/pr-005/evidence/c-005-3/commands.json",
+      "worker_commands": "verification/research-program/pr-005/evidence/c-005-3-worker/commands.json",
+      "historical_failed_package_run": "verification/research-program/pr-005/evidence/c-005-3-packages/commands.json"
+    },
+    {
+      "id": "C-005-4",
+      "finding": "R005-1/R005-2/R005-3/R005-4",
+      "commands": "verification/research-program/pr-005/evidence/c-005-4/commands.json",
+      "semantics": "verification/research-program/pr-005/evidence/c-005-4/semantics/semantics.json",
+      "worker_commands": "verification/research-program/pr-005/evidence/c-005-4-worker/commands.json",
+      "worker_functional_retry": "verification/research-program/pr-005/evidence/c-005-4-worker-retry/commands.json"
+    }
+  ],
+  "correction_disposition": {
+    "R005-1": "corrected",
+    "R005-2": "corrected",
+    "R005-3": "corrected",
+    "R005-4": "corrected",
+    "R005-5": "integration_blocked"
+  },
+  "notes": [
+    "Original three planned commits are retained. C-005-4 is an additive correction commit.",
+    "Controller semantics replay of pr005-independent-semantics-v3.mjs has ten passed cases. The script hardcodes accepted=false.",
+    "Frozen retrieve without now still uses catalog-contract freshnessState so lexical/direct-base byte-parity stays deterministic.",
+    "Public search, browse, numeric browse fallback, and dataset lookup project the same attempt/payload-scope fields when a request clock is present.",
+    "An unknown or not_live_verified metadata observation is not last-successful-check evidence. Explicit null attempt timestamps are preserved.",
+    "Inferred and unavailable observation-grain values do not render as resolved Typical unit/Grain.",
+    "npm run test:worker remains failed-closed on the WP11 historical-input gate. That policy is not edited here.",
+    "The first worker-functional recording failed because semantics files were written in parallel; the retry passed 65/65.",
+    "Prior C-005-1/C-005-2/C-005-3 receipts are retained and not rewritten."
+  ]
+}
