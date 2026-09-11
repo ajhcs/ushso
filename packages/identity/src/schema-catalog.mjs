@@ -114,11 +114,28 @@ export class ImmutableSchemaCatalog {
       schema_field_id: context.schema_field_id,
       field_revision_id: context.field_revision_id,
     });
-    assert(relationshipEvidence && typeof relationshipEvidence === "object" && !Array.isArray(relationshipEvidence), "Variable context relationship evidence must be an object", "unresolved_variable_context");
-    const roots = [relationshipEvidence];
-    if (Object.hasOwn(relationshipEvidence, "release_binding")) {
-      assert(relationshipEvidence.release_binding && typeof relationshipEvidence.release_binding === "object" && !Array.isArray(relationshipEvidence.release_binding), "Release relationship binding must be an object", "unresolved_variable_context");
-      roots.push(relationshipEvidence.release_binding);
+    const roots = [];
+    if (relationshipEvidence === null || relationshipEvidence === undefined) {
+      // Preserve the original resolver behavior for registered snapshots that
+      // already carry both source and asset ownership facts. Core snapshots
+      // without those parent fields still require independent relationship
+      // evidence below.
+      assert(typeof resolved.snapshot.source_id === "string" && resolved.snapshot.source_id.length >= 3, "Variable context lacks independently bound source relationship", "unresolved_variable_context");
+      assert(typeof resolved.snapshot.asset_id === "string" && resolved.snapshot.asset_id.length >= 3, "Variable context lacks independently bound asset relationship", "unresolved_variable_context");
+      roots.push({
+        source_id: resolved.snapshot.source_id,
+        asset_id: resolved.snapshot.asset_id,
+        release_id: resolved.snapshot.release_id,
+        distribution_id: resolved.snapshot.distribution_id,
+        schema_snapshot_id: resolved.snapshot.schema_snapshot_id,
+      });
+    } else {
+      assert(typeof relationshipEvidence === "object" && !Array.isArray(relationshipEvidence), "Variable context relationship evidence must be an object", "unresolved_variable_context");
+      roots.push(relationshipEvidence);
+      if (Object.hasOwn(relationshipEvidence, "release_binding")) {
+        assert(relationshipEvidence.release_binding && typeof relationshipEvidence.release_binding === "object" && !Array.isArray(relationshipEvidence.release_binding), "Release relationship binding must be an object", "unresolved_variable_context");
+        roots.push(relationshipEvidence.release_binding);
+      }
     }
 
     const sourceIds = [];
