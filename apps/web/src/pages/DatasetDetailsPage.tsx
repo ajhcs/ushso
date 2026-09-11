@@ -163,7 +163,7 @@ export function DatasetDetailsPage() {
             <h2 id="details-content-heading">Purpose, content, and coverage</h2>
             <dl className="details-list details-list--decision">
               <div><dt>Publisher</dt><dd><ClaimValue evidenceIds={record.evidence.map((item) => item.evidence_id).slice(0, 1)}>{record.identity.source.name}</ClaimValue></dd></div>
-              <div><dt>Observation grain</dt><dd><ClaimValue>{dimensions?.observation_grain.values.map(sentenceCase).join(', ') || 'Unknown'}</ClaimValue></dd></div>
+              <div><dt>Observation grain</dt><dd><ClaimValue>{dataset.grain}</ClaimValue></dd></div>
               <div><dt>Sampled entity</dt><dd><ClaimValue>{dimensions?.sampled_entity.values.map(sentenceCase).join(', ') || 'Unknown'}</ClaimValue></dd></div>
               <div><dt>Population universe</dt><dd><ClaimValue>{dimensions?.population_universe.values.join(', ') || 'Unknown'}</ClaimValue></dd></div>
               <div><dt>Reporting organization</dt><dd><ClaimValue>{dimensions?.reporting_organization.values.join(', ') || 'Unknown'}</ClaimValue></dd></div>

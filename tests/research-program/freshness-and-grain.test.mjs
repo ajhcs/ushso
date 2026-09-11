@@ -137,3 +137,12 @@ test('C-005-1: public request evaluation time reaches freshness projection', asy
   assert.equal(before.results[0].metadata.freshness.freshness_state, 'within_review_window');
   assert.equal(before.receipt.generated_at, headerSession.evaluatedAt);
 });
+
+test('C-005-2: HCRIS-style inferred unit tags do not become observation grain', () => {
+  const record = clockRecord();
+  const result = engineFor([record]).retrieve({ question: 'hospital financials', page_size: 10 }).results[0];
+  assert.deepEqual(result.metadata.dimensions.observation_grain, { values: [], state: 'unresolved' });
+  assert.ok(record.unit_of_analysis.every(value => result.metadata.dimensions.inferred_search_tags.includes(`unit_of_analysis:${value}`)));
+  assert.equal(sha256(result.record.unit_of_analysis), sha256(record.unit_of_analysis));
+  assert.notEqual(result.metadata.dimensions.observation_grain.state, 'source_asserted');
+});

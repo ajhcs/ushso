@@ -57,8 +57,33 @@ describe('canonical discovery response adapter', () => {
     const first = adapted.records[0]
     expect(first.grain).toBe('Observation grain unresolved')
     expect(first.reportingUnit).toBe('Observation grain unresolved')
+    expect(first.canonicalResult.metadata?.dimensions.observation_grain.state ?? 'unresolved').toBe('unresolved')
     expect(first.accessStatusLabel).toBeTruthy()
     expect(first.categories.length).toBeGreaterThan(0)
+  })
+
+  it('uses an explicit observation-grain claim and never promotes inferred unit tags', () => {
+    const claimed = structuredClone(acceptedResponse)
+    const item = claimed.results[0]
+    item.metadata = {
+      ...item.metadata,
+      dimensions: {
+        observation_grain: { values: ['hospital_cost_report'], state: 'source_asserted' },
+        sampled_entity: { values: [], state: 'unresolved' },
+        reporting_organization: { values: [], state: 'unresolved' },
+        population_universe: { values: [], state: 'unresolved' },
+        geographic_dimensions: { values: [], state: 'unresolved' },
+        inferred_search_tags: item.record.unit_of_analysis.map((value) => `unit_of_analysis:${value}`),
+      },
+    } as typeof item.metadata
+    const view = adaptDiscoveryResponse(claimed).records[0]
+    expect(view.grain).toBe('Hospital Cost Report')
+    expect(view.reportingUnit).toBe('Hospital Cost Report')
+    expect(view.canonicalResult.record.unit_of_analysis).not.toEqual(['hospital_cost_report'])
+    expect(buildResearcherGuidance(view).useCard.fields.find((field) => field.label === 'Typical unit')).toEqual(expect.objectContaining({
+      values: ['Hospital Cost Report'],
+      evidenceState: 'source_asserted',
+    }))
   })
 
   it('does not reinterpret public catalog visibility as public payload access', () => {

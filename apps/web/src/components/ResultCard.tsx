@@ -47,7 +47,7 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
   const metadata = result.canonicalResult.metadata
   const description = metadata?.description_quality.display_description ?? result.description
   const corrupted = metadata ? metadata.description_quality.state === 'suspected_encoding_corruption' : hasEncodingDamage(result.description)
-  const observationGrain = metadata?.dimensions.observation_grain.values.map((value) => value.replaceAll('_', ' ')).join(', ') || result.grain
+  const observationGrain = result.grain
   const observationPeriod = metadata?.dates.observation_period
   const observationTime = observationPeriod ? [observationPeriod.start, observationPeriod.end].filter(Boolean).join('–') || observationPeriod.state : result.availableYears
   const whyMatched = result.relevance === 'Browse'

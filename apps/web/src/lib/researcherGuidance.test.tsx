@@ -19,6 +19,7 @@ describe('researcher decision guidance', () => {
       'Not sufficient for',
       'Key analytic cautions',
       'Typical unit',
+      'Inferred unit tags (search aid only)',
       'Known breaks in series',
       'Update frequency and expected lag',
       'Suppression and completeness',
@@ -30,6 +31,22 @@ describe('researcher decision guidance', () => {
     expect(guidance.useCard.fields.every((field) => field.values.length > 0 && field.evidenceIds.length > 0)).toBe(true)
     expect(guidance.reviewStatus).toBe('pending_external_researcher_review')
     expect(JSON.stringify(guidance)).not.toMatch(/analysis_result|market_share|financial_benchmark|computed_estimate/)
+  })
+
+  it('does not promote inferred unit_of_analysis tags as source-asserted typical units', () => {
+    const hcris = adaptDiscoveryResponse(response).records.find((record) =>
+      record.canonicalResult.record_id.includes('hcris') || record.title.toLowerCase().includes('hospital provider cost report') || record.canonicalResult.record.unit_of_analysis.includes('hospital'),
+    )
+    expect(hcris).toBeDefined()
+    const grain = hcris!.canonicalResult.metadata?.dimensions.observation_grain
+    expect(grain?.state ?? 'unresolved').toBe('unresolved')
+    const typical = buildResearcherGuidance(hcris!).useCard.fields.find((field) => field.label === 'Typical unit')
+    expect(typical?.evidenceState).toBe('unresolved')
+    expect(typical?.values.join(' ')).toMatch(/unresolved/i)
+    expect(typical?.values.join(' ')).not.toMatch(/Hospital|Facility|Provider|State/)
+    const inferred = buildResearcherGuidance(hcris!).useCard.fields.find((field) => field.label === 'Inferred unit tags (search aid only)')
+    expect(inferred?.evidenceState).toBe('inferred')
+    expect(inferred?.values.length).toBeGreaterThan(0)
   })
 
   it('keeps access and retrieval explanatory, typed, and non-executing', () => {

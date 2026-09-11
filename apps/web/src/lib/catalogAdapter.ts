@@ -48,10 +48,29 @@ function geographyDisplay(record: ObservatoryRecord) {
   return jurisdictions.map((value) => value.replace(/^US-/, '')).join(', ') || 'Geography unresolved'
 }
 
-function grainDisplay(record: ObservatoryRecord) {
-  // unit_of_analysis is an inferred search projection in the current wire
-  // contract and has no claim-level evidence linkage.
-  return 'Observation grain unresolved'
+export function observationGrainPresentation(record: ObservatoryRecord, metadata?: DiscoveryResultItem['metadata']) {
+  const grain = metadata?.dimensions.observation_grain
+  const values = (grain?.values ?? []).filter((value) => value && value !== 'unknown')
+  const inferredSearchTags = metadata?.dimensions.inferred_search_tags
+    ?? record.unit_of_analysis.filter((value) => value && value !== 'unknown').map((value) => `unit_of_analysis:${value}`)
+  if (grain && grain.state !== 'unresolved' && values.length > 0) {
+    return {
+      label: values.map(sentenceCase).join(', '),
+      state: grain.state,
+      values,
+      inferredSearchTags,
+    }
+  }
+  return {
+    label: 'Observation grain unresolved',
+    state: 'unresolved' as const,
+    values: [] as string[],
+    inferredSearchTags,
+  }
+}
+
+function grainDisplay(record: ObservatoryRecord, metadata?: DiscoveryResultItem['metadata']) {
+  return observationGrainPresentation(record, metadata).label
 }
 
 const ACCESS_STATUS_LABELS: Record<ObservatoryRecord['access']['status'], string> = {
@@ -243,8 +262,8 @@ function resultToView(result: DiscoveryResultItem, response: DiscoveryResult, fa
     relationship: relationshipLabel(record),
     recordType: sentenceCase(record.identity.asset.asset_type),
     geographicApplicability: geographyDisplay(record),
-    grain: grainDisplay(record),
-    reportingUnit: grainDisplay(record),
+    grain: grainDisplay(record, result.metadata),
+    reportingUnit: grainDisplay(record, result.metadata),
     accessStatusLabel: accessStatusLabel(record),
     populationFacilityScope: 'Scope unresolved',
     availableYears: timeDisplay(record),

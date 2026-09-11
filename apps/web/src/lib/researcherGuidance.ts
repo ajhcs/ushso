@@ -94,6 +94,32 @@ function accessFailures(record: ObservatoryRecord) {
   return [...outcomes].sort().map((outcome) => ({ outcome, translateToNotFound: false as const }))
 }
 
+function observationGrainClaim(dataset: DatasetFamily) {
+  const grain = dataset.canonicalResult.metadata?.dimensions.observation_grain
+  const values = (grain?.values ?? []).filter((value) => value && value !== 'unknown')
+  if (grain && grain.state !== 'unresolved' && values.length > 0) {
+    return { values: values.map(sentenceCase), evidenceState: grain.state, resolved: true as const }
+  }
+  return { values: ['Observation grain is unresolved.'], evidenceState: 'unresolved' as const, resolved: false as const }
+}
+
+function typicalUnitField(dataset: DatasetFamily, evidenceIds: string[]): GuidanceField {
+  const grain = observationGrainClaim(dataset)
+  return { label: 'Typical unit', values: grain.values, evidenceState: grain.evidenceState, evidenceIds }
+}
+
+function inferredUnitSearchAidField(record: ObservatoryRecord, evidenceIds: string[]): GuidanceField {
+  const inferred = record.unit_of_analysis.filter((value) => value && value !== 'unknown')
+  return {
+    label: 'Inferred unit tags (search aid only)',
+    values: inferred.length > 0
+      ? inferred.map((value) => `${sentenceCase(value)} (inferred search aid; not observation grain)`)
+      : ['No inferred unit search tags are present.'],
+    evidenceState: 'inferred',
+    evidenceIds,
+  }
+}
+
 export function buildResearcherGuidance(dataset: DatasetFamily): ResearcherGuidance {
   const record = dataset.canonicalResult.record
   const evidenceIds = unique(record.evidence.map((item) => item.evidence_id))
@@ -135,7 +161,8 @@ export function buildResearcherGuidance(dataset: DatasetFamily): ResearcherGuida
         { label: 'Best for', values: bestFor, evidenceState: useCases.length > 0 ? 'mixed' : 'unresolved', evidenceIds: unique(useCases.flatMap((item) => item.evidence_ids).concat(evidenceIds)) },
         { label: 'Not sufficient for', values: ['This metadata does not establish row completeness, schema completeness, access authorization, analytical fitness, or an analytical result.'], evidenceState: 'unresolved', evidenceIds },
         { label: 'Key analytic cautions', values: limitations.length > 0 ? limitations : ['No source-specific analytic caution is captured; analytical fitness remains unresolved.'], evidenceState: limitations.length > 0 ? 'mixed' : 'unresolved', evidenceIds },
-        { label: 'Typical unit', values: record.unit_of_analysis.length > 0 ? record.unit_of_analysis.map(sentenceCase) : ['Unit of observation is unresolved.'], evidenceState: record.unit_of_analysis.length > 0 ? 'source_asserted' : 'unresolved', evidenceIds },
+        typicalUnitField(dataset, evidenceIds),
+        inferredUnitSearchAidField(record, evidenceIds),
         { label: 'Known breaks in series', values: matchingOrUnknown(limitations, /break|series|methodolog|redesign|discontinu/i, 'No break-in-series evidence is captured; continuity is unresolved.'), evidenceState: 'unresolved', evidenceIds },
         { label: 'Update frequency and expected lag', values: [`Source-reported update frequency: ${sentenceCase(record.freshness_verification.update_frequency)}. Data through: ${dataThrough}. Expected publication lag is not captured.`], evidenceState: record.freshness_verification.update_frequency === 'unknown' ? 'unresolved' : 'source_asserted', evidenceIds },
         { label: 'Suppression and completeness', values: matchingOrUnknown(limitations, /suppress|complete|missing|coverage|disclos/i, 'Suppression and row-level completeness are not documented in the published metadata.'), evidenceState: 'unresolved', evidenceIds },

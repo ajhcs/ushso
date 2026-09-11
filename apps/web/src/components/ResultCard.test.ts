@@ -46,4 +46,18 @@ describe('result card six-region presentation contract', () => {
     expect(markup).toContain(result.canonicalResult.relevance.why_relevant[0] ?? 'No evidence-backed match explanation is available.')
     expect(markup).not.toContain('Live verified')
   })
+
+  it('keeps HCRIS-style grain unresolved while inferred unit tags stay search aids', () => {
+    const result = adaptDiscoveryResponse(acceptedResponse).records[0]
+    const markup = renderToStaticMarkup(createElement(
+      MemoryRouter,
+      {},
+      createElement(ResultCard, { result, displayRank: 1 }),
+    ))
+    expect(result.grain).toBe('Observation grain unresolved')
+    expect(markup).toContain('Grain')
+    expect(markup).toContain('Observation grain unresolved')
+    expect(markup).not.toMatch(/<dt>Grain<\/dt><dd>Hospital/)
+    expect(result.canonicalResult.record.unit_of_analysis.length).toBeGreaterThan(0)
+  })
 })
