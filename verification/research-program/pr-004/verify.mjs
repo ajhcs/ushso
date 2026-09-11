@@ -6,9 +6,15 @@ import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { assertCompletenessView, createOfflineCompletenessConsumer, membershipHash } from '../../../packages/coverage/research-program/v1.0.0/src/completeness.mjs';
 import { isRfc3339DateTime } from '../../../packages/normalization/src/field-observation.mjs';
+import {
+  ORIGINAL_DECODED_BYTES,
+  ORIGINAL_DECODED_SHA256,
+  SEARCHABLE_RECORD_COUNT,
+  loadPackagedCompletenessView,
+  sha256Hex
+} from './completeness-view-packaging.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-const artifactPath = path.join(ROOT, 'verification/research-program/pr-004/completeness-view.json');
 const baselinePath = path.join(ROOT, 'docs/research-program/baseline.json');
 const cohortsPath = path.join(ROOT, 'evaluation/research-program/cohorts.json');
 const schemaPath = path.join(ROOT, 'packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json');
@@ -18,9 +24,10 @@ function assert(condition, code) {
   if (!condition) throw new Error(code);
 }
 
-const [artifactBytes, artifact, baseline, cohorts, schema, fieldSchema] = await Promise.all([
-  fs.readFile(artifactPath),
-  fs.readFile(artifactPath, 'utf8').then(JSON.parse),
+const packaged = await loadPackagedCompletenessView({ root: ROOT });
+const artifactBytes = packaged.decoded;
+const artifact = packaged.view;
+const [baseline, cohorts, schema, fieldSchema] = await Promise.all([
   fs.readFile(baselinePath, 'utf8').then(JSON.parse),
   fs.readFile(cohortsPath, 'utf8').then(JSON.parse),
   fs.readFile(schemaPath, 'utf8').then(JSON.parse),
@@ -35,7 +42,10 @@ const validate = ajv.compile(schema);
 assert(validate(artifact), `SCHEMA_INVALID:${JSON.stringify(validate.errors)}`);
 assert(baseline.corpus.record_count === 3434, 'BASELINE_RECORD_COUNT');
 assert(baseline.corpus.unique_record_id_count === 3434, 'BASELINE_UNIQUE_RECORD_COUNT');
-assert(baseline.corpus.searchable_record_count === 3430, 'BASELINE_SEARCHABLE_RECORD_COUNT');
+assert(baseline.corpus.searchable_record_count === SEARCHABLE_RECORD_COUNT, 'BASELINE_SEARCHABLE_RECORD_COUNT');
+assert(packaged.manifest.logical.searchable_record_count === SEARCHABLE_RECORD_COUNT, 'PACKAGING_SEARCHABLE_RECORD_COUNT');
+assert(packaged.decoded.length === ORIGINAL_DECODED_BYTES, 'DECODED_BYTE_COUNT');
+assert(sha256Hex(packaged.decoded) === ORIGINAL_DECODED_SHA256, 'DECODED_SHA256');
 assert(baseline.corpus.search_document_count === 0, 'BASELINE_SEARCH_DOCUMENT_COUNT');
 assert(cohorts.baseline_records.length === 3434, 'COHORT_RECORD_COUNT');
 assert(cohorts.baseline_records.every(row => typeof row.native_id === 'string' && row.native_id.length > 0), 'COHORT_NATIVE_ID');
@@ -132,5 +142,19 @@ const consumer = createOfflineCompletenessConsumer(artifact, {
 });
 assert(consumer.listRecords({ limit: 25 }).records.length === 25, 'CONSUMER_BOUND');
 assert(consumer.getRecord(artifact.records[0].record_id)?.record_id === artifact.records[0].record_id, 'CONSUMER_RECORD');
-const fileSha256 = crypto.createHash('sha256').update(artifactBytes).digest('hex');
-process.stdout.write(`${JSON.stringify({ status: 'pass', artifact_id: artifact.artifact_id, artifact_digest: artifact.artifact_digest, artifact_file_sha256: fileSha256, artifact_bytes: artifactBytes.length, record_count: artifact.membership.record_count, source_membership_count: artifact.membership.source_membership_count, isolated_count: artifact.membership.isolated_count, vector_field_count: vectorFields.length, metric_count: artifact.aggregates.metrics.length, vector_encoding: artifact.vector_encoding })}\n`);
+process.stdout.write(`${JSON.stringify({
+  status: 'pass',
+  artifact_id: artifact.artifact_id,
+  artifact_digest: artifact.artifact_digest,
+  transport_path: packaged.manifest.transport.path,
+  transport_sha256: packaged.manifest.transport.sha256,
+  transport_bytes: packaged.transport.length,
+  decoded_sha256: sha256Hex(artifactBytes),
+  decoded_bytes: artifactBytes.length,
+  record_count: artifact.membership.record_count,
+  source_membership_count: artifact.membership.source_membership_count,
+  isolated_count: artifact.membership.isolated_count,
+  vector_field_count: vectorFields.length,
+  metric_count: artifact.aggregates.metrics.length,
+  vector_encoding: artifact.vector_encoding
+})}\n`);

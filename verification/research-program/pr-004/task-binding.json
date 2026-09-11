@@ -3,7 +3,7 @@
   "task_id": "ushso-pr004-field-states-20260910",
   "pr_id": "PR-004",
   "title": "Introduce field-level completeness and evidence states",
-  "owner": "Luna Max (luna-max-pr004)",
+  "owner": "Grok",
   "reviewer": "Astra",
   "branch": "codex/ushso-pr004-field-states-20260910",
   "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
@@ -38,10 +38,30 @@
       "subject": "Publish a machine-readable completeness view",
       "instructions": "Expose the versioned coverage artifact to offline consumers with field reasons and last-attempt timestamps. Keep aggregate scores supplemental to the full vector. Expose a compact access-summary projection with credential, cost and usage-limit evidence plus the latest successful check and latest attempt, each scoped to its endpoint/resource and operation. Preserve endpoint-specific browser/CORS observations for developer recipes; never infer browser usability from server-side success.",
       "verification": "Validate whole-catalog arithmetic and a record with mixed successful, restricted and failed checks. Metadata/document reachability cannot populate a successful payload-access badge; stale success remains historical and access-summary fields retain documented-versus-observed provenance."
+    },
+    {
+      "id": "C-004-8",
+      "subject": "Package the completeness view with deterministic gzip",
+      "instructions": "Replace the oversize checked-in completeness JSON with a lossless Node zlib gzip transport and inspectable manifest. Keep the logical compact-v1 schema, decoded 49,808,256-byte identity, and consumer semantics unchanged. Original uncompressed bytes remain the Git snapshot at 323dfe54c88322369f417c7fde22597b9ab57d75; the managed continuation base is recorded separately from the logical dispatch base e5c44249b9d2448df2e4b6d466077658e42a009d. Luna Max remains the earlier implementation author.",
+      "verification": "Rebuild matches the committed gzip bytes; decoding reproduces SHA-256 47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74; field-state tests cover transport/decoded identity plus corrupt, truncated, mismatched-hash and bounded-decoding controls."
+    },
+    {
+      "id": "C-004-10",
+      "subject": "Reject inconsistent completeness packaging manifests",
+      "instructions": "Reject packaged completeness manifests whose path, encoding, Git snapshot, compressor, loader/verifier, or logical generation/count/source/identity fields contradict the actual gzip transport or decoded view. Preserve existing format validation, bounded decoding, and corruption/truncation/hash controls. Add independent negative tests so one metadata mismatch cannot hide an unchecked second field.",
+      "verification": "Field-state tests reject independently mutated generation, record_count, transport path/encoding, Git snapshot, compressor, and remaining logical metadata; the canonical payload still verifies with the original gzip and decoded identities."
+    },
+    {
+      "id": "C-004-9",
+      "subject": "Record PR004 lossless packaging evidence and handoff",
+      "instructions": "Add a packaging evidence index and update the current handoff and task-binding. Keep evidence.json and evidence/r2/index.json byte-identical. Current owner must match this task-binding owner. Do not alter frozen semantic pins, prior evidence hashes, or the original 85PR/255-commit graph.",
+      "verification": "Current packet validates with the PR003 checker using this worktree as repoRoot; release:audit passes the 10 MiB rule; prior evidence files remain unchanged."
     }
   ],
   "check_commands": [
-    "node --test tests/research-program/field-states.test.mjs"
+    "node --test tests/research-program/field-states.test.mjs",
+    "node verification/research-program/pr-004/build-completeness-view.mjs",
+    "node verification/research-program/pr-004/verify.mjs"
   ],
   "evidence_directory": "verification/research-program/pr-004/",
   "binding": {
@@ -67,5 +87,5 @@
     "qualified",
     "blocked"
   ],
-  "status": "independent_review"
+  "status": "producer_checked"
 }
