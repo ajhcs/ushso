@@ -1,15 +1,15 @@
 {
   "format": "ushso.research-program.task.v1",
-  "task_id": "ushso-pr003-grok-r5-20260911",
-  "slice_id": "C-003-2-R5",
+  "task_id": "ushso-pr003-grok-r6-20260911",
+  "slice_id": "C-003-2-R6",
   "pr_id": "PR-003",
-  "title": "Isolate PR-003 handoff fixtures from the moving execution ledger",
+  "title": "Make PR-003 fixture temporary storage portable and captured ledger data self-contained",
   "owner": "Grok Co-Engineer (execution.provider grok, dispatch model grok-4; this interface Grok 4.6)",
   "reviewer": "Astra",
-  "branch": "codex/ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
-  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
-  "objective": "Isolate historical PR-003 fixture packets from the moving controller execution ledger while preserving strict production binding_conflict checks.",
-  "outcome": "Fixture packets validate against an explicit controlled in-repo ledger/context; default live-ledger validation remains strict; observed and other plausible ledger-base mismatches still reject with binding_conflict.",
+  "branch": "codex/ce-ushso-pr003-grok-r6-2026-grok-r6-portability-90a932fb735a-90573407",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/.ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323-worktrees/ce-ushso-pr003-grok-r6-2026-grok-r6-portability-90a932fb735a-90573407",
+  "objective": "Make PR003 fixture storage portable and captured ledger regression data self-contained.",
+  "outcome": "Fixture temps honor TMPDIR, then RUNNER_TEMP, then an ignored in-repo scratch root; owned children are cleaned without recursively removing unrelated directories; the observed f62ce354 vs 0b28d036 binding_conflict uses a committed 0c29fdb task-row extraction instead of git show of a non-ancestor object.",
   "dependencies": [
     "PR-001",
     "PR-002"
@@ -23,16 +23,16 @@
   ],
   "commits": [
     {
-      "id": "C-003-2-R5",
-      "subject": "Isolate PR003 fixtures from live ledger",
-      "instructions": "Make historical fixture checks use an explicit controlled in-repo ledger/context so they cannot inherit the controller's changing PR task base, without weakening default live-ledger conflict detection.",
-      "verification": "Positive/negative/CLI fixture checks pass against the controlled ledger; the observed 0c29fdb mismatch and another plausible ledger base reject with binding_conflict; default current-handoff validation still uses the live ledger."
+      "id": "C-003-2-R6",
+      "subject": "Make PR003 fixture storage portable",
+      "instructions": "Honor valid TMPDIR, then RUNNER_TEMP, then a small ignored in-repository scratch root. Replace runtime dependence on git object 0c29fdb with a committed task-row extraction that keeps the observed f62ce354 vs 0b28d036 binding_conflict meaningful.",
+      "verification": "Registered suite passes with configured TMPDIR and with TMPDIR absent plus RUNNER_TEMP present; the observed combined-head command passes with both absent using the local fallback; second plausible base and deliberate dependency-conflict checks remain."
     },
     {
-      "id": "C-003-3-R5",
-      "subject": "Record PR003 R5 fixture isolation evidence",
-      "instructions": "Preserve all 53 historical command-receipt/evidence-index bytes, add R5 command receipts and an evidence index, and update the current handoff/task binding with exact base, branch, owner and provenance.",
-      "verification": "Schema, focused, registered, default-handoff and guidance checks pass; historical 53-file hashes remain unchanged and the current packet remains pending-head and non-acceptance evidence."
+      "id": "C-003-3-R6",
+      "subject": "Record PR003 R6 portability evidence",
+      "instructions": "Preserve all 62 historical command-receipt/evidence-index bytes from 243a125, add a separate R6 index and actual receipts, and update the current handoff/task binding with exact base, branch, owner and provenance.",
+      "verification": "Schema, focused, registered, CI-environment, local-fallback, default-handoff and guidance checks pass; historical 62-file hashes remain unchanged and the current packet remains pending-head and non-acceptance evidence."
     }
   ],
   "check_commands": [
@@ -44,8 +44,8 @@
   ],
   "evidence_directory": "verification/research-program/pr-003/",
   "binding": {
-    "base_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
-    "base_tree": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
+    "base_sha": "243a12510eb8ed3c7646d8a4d5d151a46b3cf28a",
+    "base_tree": "e55c6413693acb39661c1457fcfee109603b6cc9",
     "dependency_merge_shas": {
       "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
       "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
