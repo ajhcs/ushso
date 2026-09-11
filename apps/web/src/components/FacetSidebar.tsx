@@ -1,5 +1,5 @@
 import { ChevronDown, Info, Plus, X } from 'lucide-react'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { facetFilterLabel } from '../data/facets'
 import type { FacetSectionConfig } from '../types/catalog'
 
@@ -12,8 +12,10 @@ interface FacetSidebarProps {
   onClose?: () => void
 }
 
-function availabilityId(sectionId: string) {
-  return 'facet-' + sectionId.replace(/[^a-z0-9]+/gi, '-') + '-availability'
+function availabilityId(instanceId: string, sectionId: string) {
+  const safeInstanceId = instanceId.replace(/[^a-z0-9]+/gi, '-')
+  const safeSectionId = sectionId.replace(/[^a-z0-9]+/gi, '-')
+  return 'facet-' + safeInstanceId + '-' + safeSectionId + '-availability'
 }
 
 function selectedLabel(filter: string, sections: FacetSectionConfig[]) {
@@ -28,16 +30,17 @@ function selectedLabel(filter: string, sections: FacetSectionConfig[]) {
 }
 
 export function FacetSidebar({ selected, onToggle, onClear, sections, mobile = false, onClose }: FacetSidebarProps) {
+  const instanceId = useId()
   const [expandedSections, setExpandedSections] = useState<string[]>([])
 
   const renderAvailability = (section: FacetSectionConfig) => section.availabilityReason
-    ? <p className="facet-section__availability" id={availabilityId(section.id)} role="note">{section.availabilityReason}</p>
+    ? <p className="facet-section__availability" id={availabilityId(instanceId, section.id)} role="note">{section.availabilityReason}</p>
     : null
 
   const renderOptions = (section: FacetSectionConfig) => {
     const expanded = expandedSections.includes(section.id)
     const options = section.expandable && !expanded ? section.options.slice(0, 5) : section.options
-    const reasonId = section.availabilityReason ? availabilityId(section.id) : undefined
+    const reasonId = section.availabilityReason ? availabilityId(instanceId, section.id) : undefined
     return (
       <>
         {options.map((option) => {
