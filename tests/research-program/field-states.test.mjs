@@ -20,6 +20,7 @@ import { verificationTempRoot } from '../../scripts/verification-temp-root.mjs';
 import {
   ORIGINAL_DECODED_BYTES,
   ORIGINAL_DECODED_SHA256,
+  assertPackagedManifestConsistency,
   gzipCompletenessBytes,
   gunzipCompletenessBytes,
   loadPackagedCompletenessView,
@@ -866,4 +867,79 @@ test('completeness packaging rejects corrupt, truncated, mismatched-hash and ove
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
+});
+
+function setManifestField(manifest, field, value) {
+  const next = structuredClone(manifest);
+  const parts = field.split('.');
+  let cursor = next;
+  for (const part of parts.slice(0, -1)) cursor = cursor[part];
+  cursor[parts.at(-1)] = value;
+  return next;
+}
+
+test('completeness packaging rejects independently altered manifest metadata', async () => {
+  const packaged = await loadPackagedCompletenessView({ root: ROOT });
+  const cases = [
+    ['transport.path', 'controller-fixture-wrong-path.json.gz'],
+    ['transport.encoding', 'controller-fixture-wrong-encoding'],
+    ['decoded.path', 'controller-fixture-wrong-decoded.json'],
+    ['decoded.encoding', 'latin1'],
+    ['decoded.git_snapshot.commit', '0'.repeat(40)],
+    ['decoded.git_snapshot.path', 'controller-fixture-wrong-snapshot.json'],
+    ['compressor.module', 'python:gzip'],
+    ['compressor.method', 'compress'],
+    ['compressor.level', 1],
+    ['compressor.header.mtime', 1],
+    ['compressor.header.os', 0],
+    ['compressor.header.xfl', 0],
+    ['offline_consumption.loader', 'controller-fixture-wrong-loader.mjs'],
+    ['offline_consumption.verifier', 'controller-fixture-wrong-verifier.mjs'],
+    ['logical.schema_version', 'ushso.completeness-view.v0.0.0'],
+    ['logical.artifact_id', 'urn:ushso:completeness-view:controller-fixture'],
+    ['logical.artifact_digest', `sha256:${'0'.repeat(64)}`],
+    ['logical.vector_encoding', 'full-v1'],
+    ['logical.cohort', 'controller-fixture-wrong-cohort'],
+    ['logical.generation', 'controller-fixture-wrong-generation'],
+    ['logical.as_of', '1999-01-01T00:00:00.000Z'],
+    ['logical.input_digest', `sha256:${'0'.repeat(64)}`],
+    ['logical.record_count', 1],
+    ['logical.source_membership_count', 1],
+    ['logical.isolated_count', 0],
+    ['logical.searchable_record_count', 1],
+    ['logical.vector_field_count', 1],
+    ['logical.metric_count', 1],
+    ['logical.evidence_catalog_count', 1]
+  ];
+
+  const seen = new Set();
+  for (const [field, value] of cases) {
+    assert.equal(seen.has(field), false, `duplicate negative case for ${field}`);
+    seen.add(field);
+    const mutated = setManifestField(packaged.manifest, field, value);
+    assert.throws(
+      () => assertPackagedManifestConsistency({
+        manifest: mutated,
+        transportBytes: packaged.transport,
+        decodedBytes: packaged.decoded,
+        view: packaged.view
+      }),
+      { code: 'completeness_manifest_inconsistent', field },
+      field
+    );
+  }
+
+  const combined = structuredClone(packaged.manifest);
+  combined.logical.generation = 'controller-fixture-wrong-generation';
+  combined.logical.record_count = 1;
+  combined.transport.path = 'controller-fixture-wrong-path.json.gz';
+  combined.transport.encoding = 'controller-fixture-wrong-encoding';
+  await assert.rejects(
+    loadPackagedCompletenessView({
+      root: ROOT,
+      manifestBytes: Buffer.from(`${JSON.stringify(combined)}\n`),
+      transportBytes: packaged.transport
+    }),
+    { code: 'completeness_manifest_inconsistent' }
+  );
 });
