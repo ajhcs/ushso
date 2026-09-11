@@ -1,97 +1,156 @@
-import { assert, clone, deepFreeze } from "./common.mjs";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import Ajv2020 from "ajv/dist/2020.js";
+import { clone, deepFreeze, uniqueSorted } from "./common.mjs";
 
 export const CORE_CONTRACT_VERSION = "observatory-core.v2.0.0";
 export const CORE_NATIVE_IDENTIFIER_REF = "https://ushso.org/contracts/core/v2.0.0/schemas/common.schema.json#/$defs/nativeIdentifier";
+export const CORE_RELEASE_SCHEMA_ID = "https://ushso.org/contracts/core/v2.0.0/schemas/release.schema.json";
 export const CORE_OPAQUE_ID = /^urn:ushso:[a-z][a-z0-9-]*:[A-Za-z0-9._~-]+$/;
 
-const ENTITY_SCOPES = new Set([
-  "organization", "source", "asset", "release", "distribution",
-  "documentation", "schema", "field", "access_route", "unknown",
-]);
-const AUTHORITIES = new Set(["source_native", "authoritative_cross_source", "legacy_alias"]);
-const UNIQUENESS = new Set(["unique", "reusable_over_time", "source_scoped", "unknown"]);
-const CASE_BEHAVIOR = new Set(["sensitive", "insensitive", "normalization_defined"]);
+const CORE_SCHEMA_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../contracts/core/v2.0.0/schemas");
 
 /**
- * Structural check against core v2 nativeIdentifier. This is not a substitute
- * for schema validation; tests compile the frozen core schema separately.
+ * Format predicates from contracts/core/v2.0.0/tools/schema.mjs. Identity
+ * reuses that frozen facility rather than ajv-formats or a structural
+ * any-string date check.
  */
+function addFrozenCoreFormats(ajv) {
+  ajv.addFormat("date-time", (value) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/u.test(value) && !Number.isNaN(Date.parse(value)));
+  ajv.addFormat("date", (value) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/u.test(value) && !Number.isNaN(Date.parse(`${value}T00:00:00Z`)));
+  ajv.addFormat("uri", (value) => {
+    try {
+      const url = new URL(value);
+      return ["https:", "http:"].includes(url.protocol) && url.username === "" && url.password === "";
+    } catch {
+      return false;
+    }
+  });
+}
+
+let frozenValidators = null;
+
+function loadFrozenCoreValidators() {
+  if (frozenValidators) return frozenValidators;
+  const ajv = new Ajv2020({
+    strict: true,
+    strictSchema: true,
+    strictTypes: true,
+    strictRequired: true,
+    allErrors: true,
+    validateFormats: true,
+    allowUnionTypes: false,
+  });
+  addFrozenCoreFormats(ajv);
+  for (const name of fs.readdirSync(CORE_SCHEMA_DIR).filter((file) => file.endsWith(".schema.json")).sort()) {
+    const schema = JSON.parse(fs.readFileSync(path.join(CORE_SCHEMA_DIR, name), "utf8"));
+    ajv.addSchema(schema, schema.$id ?? name);
+  }
+  frozenValidators = {
+    native: ajv.compile({ $ref: CORE_NATIVE_IDENTIFIER_REF }),
+    release: ajv.getSchema(CORE_RELEASE_SCHEMA_ID),
+  };
+  return frozenValidators;
+}
+
 export function nativeIdentifierConformsToCore(identifier) {
-  if (!identifier || typeof identifier !== "object") return false;
-  if (!CORE_OPAQUE_ID.test(identifier.source_id)) return false;
-  if (typeof identifier.namespace !== "string" || !/^[a-z][a-z0-9._-]{1,79}$/.test(identifier.namespace)) return false;
-  if (typeof identifier.value !== "string" || identifier.value.length < 1) return false;
-  if (identifier.normalized_value != null && (typeof identifier.normalized_value !== "string" || identifier.normalized_value.length < 1)) return false;
-  if (!CASE_BEHAVIOR.has(identifier.case_behavior)) return false;
-  if (identifier.preservation !== "exact") return false;
-  if (!ENTITY_SCOPES.has(identifier.entity_scope)) return false;
-  if (!AUTHORITIES.has(identifier.authority)) return false;
-  if (!UNIQUENESS.has(identifier.uniqueness_policy)) return false;
-  if (!(identifier.effective_from === null || typeof identifier.effective_from === "string")) return false;
-  if (!(identifier.effective_to === null || typeof identifier.effective_to === "string")) return false;
-  if (!Array.isArray(identifier.evidence_ids) || identifier.evidence_ids.length === 0) return false;
-  return identifier.evidence_ids.every((id) => CORE_OPAQUE_ID.test(id));
+  if (!identifier || typeof identifier !== "object" || Array.isArray(identifier)) return false;
+  try {
+    const { native } = loadFrozenCoreValidators();
+    return native(identifier) === true;
+  } catch {
+    return false;
+  }
 }
 
 export function coreNativeIdentifiersFromPublisher(identifiers = []) {
   return identifiers.filter(nativeIdentifierConformsToCore).map(clone);
 }
 
+function nativeKey(identifier) {
+  return `${identifier.source_id}::${identifier.namespace}`;
+}
+
+function ownershipReasonCodes(identity, envelope) {
+  const reasons = [];
+  if (envelope.asset_id !== identity.asset_id) reasons.push("core_asset_id_mismatch");
+  if (envelope.release_id !== identity.release_id) reasons.push("core_release_id_mismatch");
+  if (envelope.entity_id !== identity.release_id) reasons.push("core_entity_id_mismatch");
+  const identityNatives = coreNativeIdentifiersFromPublisher(identity.publisher_identifiers ?? []);
+  const envelopeNatives = Array.isArray(envelope.native_identifiers) ? envelope.native_identifiers : [];
+  if (identity.source_id) {
+    for (const native of [...identityNatives, ...envelopeNatives]) {
+      if (native.source_id && native.source_id !== identity.source_id) reasons.push("core_source_id_mismatch");
+    }
+  }
+  const envelopeByNamespace = new Map(envelopeNatives.map((native) => [nativeKey(native), native.value]));
+  for (const native of identityNatives) {
+    const existing = envelopeByNamespace.get(nativeKey(native));
+    if (existing != null && existing !== native.value) reasons.push("core_native_identifier_mismatch");
+  }
+  return uniqueSorted(reasons);
+}
+
+function notProjected(identity, reasonCodes, extra = {}) {
+  return deepFreeze({
+    projected: false,
+    core_object: null,
+    identity_state: identity?.identity_state ?? "unresolved",
+    release_id: identity?.release_id ?? null,
+    asset_id: identity?.asset_id ?? null,
+    native_identifiers: coreNativeIdentifiersFromPublisher(identity?.publisher_identifiers ?? []),
+    reason_codes: uniqueSorted(reasonCodes),
+    contract_version: CORE_CONTRACT_VERSION,
+    ...extra,
+  });
+}
+
 /**
  * Exact identity may cite core native identifiers. Unresolved, rolling, and
  * ambiguous identity decisions are not projected as fabricated core
- * Source/Release/Distribution objects.
+ * Source/Release/Distribution objects. A supplied envelope is this release
+ * only when frozen Release schema validation and release/entity/asset/source
+ * ownership all bind. Provenance and fingerprints stay on the envelope.
  */
 export function projectCoreReleaseDecision(identity, { envelope = null } = {}) {
   const identityState = identity?.identity_state ?? "unresolved";
-  const nativeIdentifiers = coreNativeIdentifiersFromPublisher(identity?.publisher_identifiers ?? []);
   if (!identity?.release_id || !["exact", "conflicted"].includes(identityState)) {
-    return deepFreeze({
-      projected: false,
-      core_object: null,
-      identity_state: identityState,
-      release_id: identity?.release_id ?? null,
-      native_identifiers: nativeIdentifiers,
-      reason_codes: ["unresolved_identity_is_not_a_core_release"],
-      contract_version: CORE_CONTRACT_VERSION,
+    return notProjected(identity, ["unresolved_identity_is_not_a_core_release"]);
+  }
+  if (!envelope || typeof envelope !== "object" || Array.isArray(envelope)) {
+    return notProjected(identity, envelope == null
+      ? ["exact_identity_without_core_envelope_is_not_fabricated"]
+      : ["incomplete_or_invalid_core_envelope"]);
+  }
+
+  let schemaValid = false;
+  try {
+    const { release } = loadFrozenCoreValidators();
+    schemaValid = release?.(envelope) === true;
+  } catch {
+    schemaValid = false;
+  }
+  if (!schemaValid) {
+    return notProjected(identity, ["incomplete_or_invalid_core_envelope"]);
+  }
+
+  const ownership = ownershipReasonCodes(identity, envelope);
+  if (ownership.length > 0) {
+    return notProjected(identity, ownership, {
+      envelope_release_id: envelope.release_id ?? null,
+      envelope_entity_id: envelope.entity_id ?? null,
+      envelope_asset_id: envelope.asset_id ?? null,
     });
   }
-  if (!envelope) {
-    return deepFreeze({
-      projected: false,
-      core_object: null,
-      identity_state: identityState,
-      release_id: identity.release_id,
-      asset_id: identity.asset_id,
-      native_identifiers: nativeIdentifiers,
-      reason_codes: ["exact_identity_without_core_envelope_is_not_fabricated"],
-      contract_version: CORE_CONTRACT_VERSION,
-    });
-  }
-  assert(envelope.contract_version === CORE_CONTRACT_VERSION, "Core envelope contract_version is required", "invalid_core_envelope");
-  assert(envelope.entity_type === "Release", "Core envelope must be a Release", "invalid_core_envelope");
-  assert(envelope.asset_id && envelope.release_id, "Core envelope requires asset_id and release_id", "invalid_core_envelope");
-  assert(envelope.asset_id === identity.asset_id || identity.asset_id === envelope.entity_id || envelope.asset_id, "Core envelope asset_id is required", "invalid_core_envelope");
-  if (envelope.release_id !== identity.release_id) {
-    return deepFreeze({
-      projected: false,
-      core_object: null,
-      identity_state: identityState,
-      release_id: identity.release_id,
-      envelope_release_id: envelope.release_id,
-      native_identifiers: nativeIdentifiers,
-      reason_codes: ["core_release_id_mismatch"],
-      contract_version: CORE_CONTRACT_VERSION,
-    });
-  }
-  const projected = clone(envelope);
-  if (nativeIdentifiers.length > 0) projected.native_identifiers = nativeIdentifiers;
+
   return deepFreeze({
     projected: true,
-    core_object: projected,
+    core_object: clone(envelope),
     identity_state: identityState,
     release_id: identity.release_id,
-    native_identifiers: nativeIdentifiers,
+    asset_id: identity.asset_id,
+    native_identifiers: clone(envelope.native_identifiers),
     reason_codes: [],
     contract_version: CORE_CONTRACT_VERSION,
   });

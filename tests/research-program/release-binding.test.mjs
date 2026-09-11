@@ -811,3 +811,116 @@ test("C-007-2 source-shaped CMS catalog metadata keeps two 2023 products distinc
   assert.equal(hospital.boundaries.catalog_membership_is_payload_access, false);
   assert.equal(sourceShaped.notes.includes("not payload tests"), true);
 });
+
+async function frozenCoreReleaseControl() {
+  const bundle = JSON.parse(await fs.readFile(path.join(ROOT, "contracts/core/v2.0.0/bundle/valid-bundle.json"), "utf8"));
+  const coreRelease = bundle.releases[0];
+  const coreNative = coreRelease.native_identifiers[0];
+  const identity = mintReleaseIdentity({
+    asset_id: coreRelease.asset_id,
+    source_id: coreNative.source_id,
+    publisher_identifiers: [coreNative],
+    locator: {
+      kind: "exact_distribution",
+      url: "https://data.cms.gov/example-core-release",
+      evidence_ids: coreNative.evidence_ids,
+    },
+    publisher_version: coreRelease.publisher_version,
+    release_kind: coreRelease.release_kind,
+    evidence_ids: coreNative.evidence_ids,
+    observed_at: OBSERVED_AT,
+  });
+  const envelope = { ...structuredClone(coreRelease), release_id: identity.release_id, entity_id: identity.release_id };
+  return { bundle, coreRelease, coreNative, identity, envelope };
+}
+
+test("R007-6 foreign asset_id or entity_id is not projected as this release", async () => {
+  const { identity, envelope } = await frozenCoreReleaseControl();
+  const valid = projectCoreReleaseDecision(identity, { envelope });
+  assert.equal(valid.projected, true);
+  assert.equal(valid.core_object.asset_id, identity.asset_id);
+  assert.equal(valid.core_object.entity_id, identity.release_id);
+  assert.equal(valid.core_object.canonical_content_fingerprint, envelope.canonical_content_fingerprint);
+
+  const foreignAsset = projectCoreReleaseDecision(identity, {
+    envelope: { ...envelope, asset_id: "urn:ushso:asset:foreign" },
+  });
+  assert.equal(foreignAsset.projected, false);
+  assert.equal(foreignAsset.core_object, null);
+  assert.ok(foreignAsset.reason_codes.includes("core_asset_id_mismatch"));
+
+  const foreignEntity = projectCoreReleaseDecision(identity, {
+    envelope: { ...envelope, entity_id: "urn:ushso:release:foreign" },
+  });
+  assert.equal(foreignEntity.projected, false);
+  assert.equal(foreignEntity.core_object, null);
+  assert.ok(foreignEntity.reason_codes.includes("core_entity_id_mismatch"));
+
+  const aliasedForeign = projectCoreReleaseDecision(identity, {
+    envelope: {
+      ...envelope,
+      entity_id: "urn:ushso:release:foreign",
+      legacy_aliases: ["urn:ushso:release:foreign"],
+    },
+  });
+  assert.equal(aliasedForeign.projected, false);
+  assert.ok(aliasedForeign.reason_codes.includes("core_entity_id_mismatch"));
+
+  const foreignSource = projectCoreReleaseDecision(identity, {
+    envelope: {
+      ...envelope,
+      native_identifiers: envelope.native_identifiers.map((item) => ({ ...item, source_id: "urn:ushso:source:foreign" })),
+    },
+  });
+  assert.equal(foreignSource.projected, false);
+  assert.ok(foreignSource.reason_codes.includes("core_source_id_mismatch"));
+});
+
+test("R007-7 incomplete envelopes and malformed dates are not core-conformant", async () => {
+  const { identity, envelope, coreNative } = await frozenCoreReleaseControl();
+  const valid = projectCoreReleaseDecision(identity, { envelope });
+  assert.equal(valid.projected, true);
+  assert.equal(valid.core_object.release_id, identity.release_id);
+  assert.deepEqual(valid.core_object.native_identifiers, envelope.native_identifiers);
+  assert.equal(valid.core_object.canonical_content_fingerprint, envelope.canonical_content_fingerprint);
+
+  const incomplete = projectCoreReleaseDecision(identity, {
+    envelope: {
+      contract_version: "observatory-core.v2.0.0",
+      entity_type: "Release",
+      asset_id: identity.asset_id,
+      release_id: identity.release_id,
+    },
+  });
+  assert.equal(incomplete.projected, false);
+  assert.equal(incomplete.core_object, null);
+  assert.ok(incomplete.reason_codes.includes("incomplete_or_invalid_core_envelope"));
+
+  assert.equal(nativeIdentifierConformsToCore(coreNative), true);
+  assert.equal(nativeIdentifierConformsToCore({ ...coreNative, effective_from: "invalid-date" }), false);
+  assert.equal(nativeIdentifierConformsToCore({ ...coreNative, effective_from: "2026-13-40" }), false);
+  assert.equal(nativeIdentifierConformsToCore({ ...coreNative, effective_from: "2026-01-15" }), true);
+});
+
+test("R007-8 Unicode native identifiers stay distinct and preserve exact values", () => {
+  const valueA = String.fromCodePoint(0x1f600);
+  const valueB = String.fromCodePoint(0x1f60) + "0";
+  const valueC = String.fromCodePoint(0x1f60) + "A";
+  const valueD = String.fromCodePoint(0x1f60a);
+  assert.notEqual(valueA, valueB);
+  const mint = (value) => mintReleaseIdentity(controllerReleaseInput(value));
+  const a = mint(valueA);
+  const b = mint(valueB);
+  const c = mint(valueC);
+  const d = mint(valueD);
+  assert.notEqual(a.release_id, b.release_id);
+  assert.notEqual(c.release_id, d.release_id);
+  assert.equal(a.publisher_identifiers[0].value, valueA);
+  assert.equal(b.publisher_identifiers[0].value, valueB);
+  assert.equal(a.publisher_identifiers[0].normalized_value, valueA);
+  assert.equal(b.publisher_identifiers[0].normalized_value, valueB);
+  assert.equal(a.publisher_identifiers[0].preservation, "exact");
+  assert.match(a.release_id, /^urn:ushso:release:/);
+  assert.match(b.release_id, /^urn:ushso:release:/);
+  assert.equal(a.release_id.includes("~1F600") && b.release_id.includes("~1F600") && a.release_id === b.release_id, false);
+});

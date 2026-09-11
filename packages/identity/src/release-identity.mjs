@@ -97,8 +97,15 @@ function encodeIdentitySegment(value) {
   let encoded = "";
   for (const ch of String(value)) {
     const code = ch.codePointAt(0);
-    if (code < 128 && /[A-Za-z0-9_-]/.test(ch)) encoded += ch;
-    else encoded += `~${code.toString(16).toUpperCase().padStart(4, "0")}`;
+    if (code < 128 && /[A-Za-z0-9_-]/.test(ch)) {
+      encoded += ch;
+      continue;
+    }
+    // BMP uses a fixed 4-hex-digit escape. Supplementary code points use a
+    // `~u` + 6-hex-digit form so U+1F600 and U+1F60 followed by ASCII "0"
+    // cannot both mint `~1F600`.
+    if (code <= 0xFFFF) encoded += `~${code.toString(16).toUpperCase().padStart(4, "0")}`;
+    else encoded += `~u${code.toString(16).toUpperCase().padStart(6, "0")}`;
   }
   return encoded;
 }
