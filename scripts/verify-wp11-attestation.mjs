@@ -65,6 +65,53 @@ export const ALLOWED_PACKAGE_LOCK = Object.freeze({
   }),
 })
 
+export const NAMED_PRE_PR005_FIXTURE_SCHEMA = 'ushso.wp11-named-pre-pr005-fixture.v1'
+export const NAMED_PRE_PR005_FIXTURE_MANIFEST_PATH = 'verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/manifest.json'
+export const NAMED_PRE_PR005_FIXTURE_FILES = Object.freeze({
+  package_json: Object.freeze({
+    path: 'verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/package.json',
+    relative_path: 'package.json',
+    role: 'reviewed_pr003_package_transition',
+    source_state: 'reviewed_pr003_package',
+    source_commit: 'bf46d92b0e4fc91457bd3eb78aa1742ae84038f2',
+    source_path: 'package.json',
+    bytes: REVIEWED_PR003_PACKAGE_SNAPSHOT.bytes,
+    sha256: REVIEWED_PR003_PACKAGE_SNAPSHOT.sha256,
+  }),
+  package_lock: Object.freeze({
+    path: 'verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/package-lock.json',
+    relative_path: 'package-lock.json',
+    role: 'pr085_ci_v14_workspace_lock',
+    source_state: 'previous_current_lock',
+    source_commit: '4f90157108a92ce9541c340d5536eac31f24a1d8',
+    source_path: 'package-lock.json',
+    bytes: ALLOWED_PACKAGE_LOCK.pr085_ci_v14.bytes,
+    sha256: ALLOWED_PACKAGE_LOCK.pr085_ci_v14.sha256,
+  }),
+})
+export const NAMED_PRE_PR005_FIXTURE_PATHS = Object.freeze([
+  NAMED_PRE_PR005_FIXTURE_MANIFEST_PATH,
+  ...Object.values(NAMED_PRE_PR005_FIXTURE_FILES).map((file) => file.path),
+])
+
+export const PR008_REVIEWED_CURRENT_LOCK = Object.freeze({
+  source_commit: '072241ed12f2c0b04deb833eee857ca43920b9d3',
+  source_tree: '85d0f9fb40eec8015f916ca503da9fb3b1bbe79e',
+  path: 'package-lock.json',
+  bytes: 134907,
+  sha256: 'f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8',
+  previous_current_lock: Object.freeze({
+    path: 'package-lock.json',
+    bytes: ALLOWED_PACKAGE_LOCK.pr085_ci_v14.bytes,
+    sha256: ALLOWED_PACKAGE_LOCK.pr085_ci_v14.sha256,
+  }),
+  review: Object.freeze({
+    path: 'verification/research-program/pr-086/pr008-lock-review-072241e/review.json',
+    bytes: 9360,
+    sha256: 'a4d52b75b44f7d3340e8a91ad0dc4716ce4d513b84d18edf8b4ebca656e94b3a',
+  }),
+})
+
 export const WP11_WRAPPER_IMPLEMENTATION_FILES = Object.freeze([
   'scripts/verify-wp11-attestation.mjs',
   'scripts/run-contract-suites.mjs',
@@ -72,6 +119,9 @@ export const WP11_WRAPPER_IMPLEMENTATION_FILES = Object.freeze([
   HISTORICAL_PREIMAGE_READER_PATH,
   HISTORICAL_PREIMAGE_INVENTORY_PATH,
   'verification/research-program/ci-attestation/wp11-v1.3.0/policy.json',
+  NAMED_PRE_PR005_FIXTURE_MANIFEST_PATH,
+  ...Object.values(NAMED_PRE_PR005_FIXTURE_FILES).map((file) => file.path),
+  PR008_REVIEWED_CURRENT_LOCK.review.path,
 ])
 
 export const WP11_POLICY_PATH = 'verification/research-program/ci-attestation/wp11-v1.3.0/policy.json'
@@ -185,6 +235,9 @@ function lockStateFor(bytes) {
   }
   if (digest === ALLOWED_PACKAGE_LOCK.pr085_ci_v14.sha256 && bytes.length === ALLOWED_PACKAGE_LOCK.pr085_ci_v14.bytes) {
     return 'pr085_ci_v14'
+  }
+  if (digest === PR008_REVIEWED_CURRENT_LOCK.sha256 && bytes.length === PR008_REVIEWED_CURRENT_LOCK.bytes) {
+    return 'pr008_reviewed_current'
   }
   throw new Error('WP11_CURRENT_LOCK_UNREVIEWED_DRIFT')
 }
@@ -308,6 +361,7 @@ function currentInputRole(relativePath, bytes) {
   if (relativePath === 'package-lock.json') {
     try {
       const lockState = lockStateFor(bytes)
+      if (lockState === 'pr008_reviewed_current') return 'pr008_workspace_lock_transition'
       return lockState === 'pr085_ci_v14' ? 'pr085_ci_v14_workspace_lock' : 'historical_package_lock'
     } catch {
       return 'unreviewed_package_lock'
@@ -386,6 +440,104 @@ export function builderCoverageLimits() {
   }
 }
 
+async function assertNamedPrePr005FixtureBinding({ root, parsed, implementationFiles }) {
+  const configured = parsed.named_pre_pr005_fixture
+  assert.ok(configured && typeof configured === 'object', 'WP11_WRAPPER_NAMED_FIXTURE_BINDING_MISSING')
+  assert.equal(configured.git_required, false, 'WP11_WRAPPER_NAMED_FIXTURE_GIT_REQUIRED')
+  assert.ok(configured.manifest && typeof configured.manifest === 'object', 'WP11_WRAPPER_NAMED_FIXTURE_MANIFEST_BINDING_MISSING')
+  const manifestPin = implementationFiles.find((file) => file.path === NAMED_PRE_PR005_FIXTURE_MANIFEST_PATH)
+  assert.ok(manifestPin, 'WP11_WRAPPER_NAMED_FIXTURE_MANIFEST_BINDING_MISSING')
+  assert.equal(configured.manifest.path, NAMED_PRE_PR005_FIXTURE_MANIFEST_PATH, 'WP11_WRAPPER_POLICY_STALE_NAMED_FIXTURE_MANIFEST')
+  assert.equal(configured.manifest.bytes, manifestPin.bytes, 'WP11_WRAPPER_POLICY_STALE_NAMED_FIXTURE_MANIFEST')
+  assert.equal(configured.manifest.sha256, manifestPin.sha256, 'WP11_WRAPPER_POLICY_STALE_NAMED_FIXTURE_MANIFEST')
+  const manifestBytes = await readFile(path.resolve(root, NAMED_PRE_PR005_FIXTURE_MANIFEST_PATH))
+  assert.equal(sha256(manifestBytes), manifestPin.sha256, 'WP11_WRAPPER_NAMED_FIXTURE_MANIFEST_CHANGED')
+  assert.equal(manifestBytes.length, manifestPin.bytes, 'WP11_WRAPPER_NAMED_FIXTURE_MANIFEST_BYTES')
+  const manifest = parseJson(manifestBytes, 'NAMED_PRE_PR005_FIXTURE_MANIFEST')
+  assert.equal(manifest.schema_version, NAMED_PRE_PR005_FIXTURE_SCHEMA, 'WP11_WRAPPER_NAMED_FIXTURE_SCHEMA')
+  assert.equal(manifest.fixture_id, 'pre-pr005-package-transitions', 'WP11_WRAPPER_NAMED_FIXTURE_ID')
+  assert.equal(manifest.git_required, false, 'WP11_WRAPPER_NAMED_FIXTURE_GIT_REQUIRED')
+  assert.equal(manifest.file_count, Object.keys(NAMED_PRE_PR005_FIXTURE_FILES).length, 'WP11_WRAPPER_NAMED_FIXTURE_FILE_COUNT')
+  assert.ok(Array.isArray(manifest.files), 'WP11_WRAPPER_NAMED_FIXTURE_FILES_MISSING')
+  assert.equal(manifest.files.length, Object.keys(NAMED_PRE_PR005_FIXTURE_FILES).length, 'WP11_WRAPPER_NAMED_FIXTURE_FILE_COUNT')
+  assert.ok(configured.files && typeof configured.files === 'object', 'WP11_WRAPPER_NAMED_FIXTURE_FILES_BINDING_MISSING')
+  assert.deepEqual(Object.keys(configured.files).sort(), Object.keys(NAMED_PRE_PR005_FIXTURE_FILES).sort(), 'WP11_WRAPPER_POLICY_STALE_NAMED_FIXTURE_FILES')
+  let totalBytes = 0
+  const seen = new Set()
+  for (const [key, expected] of Object.entries(NAMED_PRE_PR005_FIXTURE_FILES)) {
+    const entry = manifest.files.find((item) => item.path === expected.relative_path)
+    assert.ok(entry, `WP11_WRAPPER_NAMED_FIXTURE_FILE_MISSING:${expected.relative_path}`)
+    assert.ok(!seen.has(entry.path), 'WP11_WRAPPER_NAMED_FIXTURE_DUPLICATE_PATH')
+    seen.add(entry.path)
+    assert.equal(entry.fixture_path, path.posix.basename(expected.path), `WP11_WRAPPER_NAMED_FIXTURE_PATH:${expected.relative_path}`)
+    for (const field of ['path', 'relative_path', 'role', 'source_state', 'source_commit', 'source_path', 'bytes', 'sha256']) {
+      if (field === 'path' || field === 'relative_path') continue
+      assert.equal(entry[field], expected[field], `WP11_WRAPPER_NAMED_FIXTURE_${field.toUpperCase()}:${expected.relative_path}`)
+    }
+    const configuredFile = configured.files[key]
+    assert.deepEqual(configuredFile, expected, `WP11_WRAPPER_POLICY_STALE_NAMED_FIXTURE_FILE:${expected.relative_path}`)
+    const pin = implementationFiles.find((file) => file.path === expected.path)
+    assert.ok(pin, `WP11_WRAPPER_NAMED_FIXTURE_BINDING_MISSING:${expected.relative_path}`)
+    assert.equal(pin.bytes, expected.bytes, `WP11_WRAPPER_NAMED_FIXTURE_BYTES:${expected.relative_path}`)
+    assert.equal(pin.sha256, expected.sha256, `WP11_WRAPPER_NAMED_FIXTURE_HASH:${expected.relative_path}`)
+    totalBytes += expected.bytes
+  }
+  assert.equal(seen.size, manifest.files.length, 'WP11_WRAPPER_NAMED_FIXTURE_EXTRA_FILE')
+  assert.equal(manifest.total_bytes, totalBytes, 'WP11_WRAPPER_NAMED_FIXTURE_TOTAL_BYTES')
+}
+
+async function assertPr008ReviewedCurrentLockBinding({ root, parsed, implementationFiles }) {
+  const configured = parsed.reviewed_current_transitions?.pr008_workspace_lock_transition
+  assert.ok(configured && typeof configured === 'object', 'WP11_WRAPPER_PR008_LOCK_REVIEW_BINDING_MISSING')
+  assert.equal(configured.kind, 'current_package_lock_transition', 'WP11_WRAPPER_PR008_LOCK_REVIEW_KIND')
+  assert.equal(configured.status, 'reviewed', 'WP11_WRAPPER_PR008_LOCK_REVIEW_STATUS')
+  assert.deepEqual(configured.previous_current_lock, PR008_REVIEWED_CURRENT_LOCK.previous_current_lock, 'WP11_WRAPPER_POLICY_STALE_PR008_PREVIOUS_LOCK')
+  assert.deepEqual(
+    configured.current_lock,
+    { path: PR008_REVIEWED_CURRENT_LOCK.path, bytes: PR008_REVIEWED_CURRENT_LOCK.bytes, sha256: PR008_REVIEWED_CURRENT_LOCK.sha256 },
+    'WP11_WRAPPER_POLICY_STALE_PR008_CURRENT_LOCK',
+  )
+  assert.equal(configured.source_commit, PR008_REVIEWED_CURRENT_LOCK.source_commit, 'WP11_WRAPPER_POLICY_STALE_PR008_SOURCE_COMMIT')
+  assert.equal(configured.source_tree, PR008_REVIEWED_CURRENT_LOCK.source_tree, 'WP11_WRAPPER_POLICY_STALE_PR008_SOURCE_TREE')
+  assert.deepEqual(configured.review_receipt, PR008_REVIEWED_CURRENT_LOCK.review, 'WP11_WRAPPER_POLICY_STALE_PR008_REVIEW_RECEIPT')
+  assert.equal(configured.current_approval_issued, false, 'WP11_WRAPPER_PR008_CURRENT_APPROVAL_OVERCLAIM')
+  assert.equal(configured.historical_approval_transferred, false, 'WP11_WRAPPER_PR008_HISTORICAL_TRANSFER_OVERCLAIM')
+  const reviewPin = implementationFiles.find((file) => file.path === PR008_REVIEWED_CURRENT_LOCK.review.path)
+  assert.ok(reviewPin, 'WP11_WRAPPER_PR008_LOCK_REVIEW_BINDING_MISSING')
+  assert.equal(reviewPin.bytes, PR008_REVIEWED_CURRENT_LOCK.review.bytes, 'WP11_WRAPPER_PR008_LOCK_REVIEW_BYTES')
+  assert.equal(reviewPin.sha256, PR008_REVIEWED_CURRENT_LOCK.review.sha256, 'WP11_WRAPPER_PR008_LOCK_REVIEW_HASH')
+  const reviewBytes = await readFile(path.resolve(root, PR008_REVIEWED_CURRENT_LOCK.review.path))
+  assert.equal(reviewBytes.length, PR008_REVIEWED_CURRENT_LOCK.review.bytes, 'WP11_WRAPPER_PR008_LOCK_REVIEW_BYTES')
+  assert.equal(sha256(reviewBytes), PR008_REVIEWED_CURRENT_LOCK.review.sha256, 'WP11_WRAPPER_PR008_LOCK_REVIEW_CHANGED')
+  const review = parseJson(reviewBytes, 'PR008_LOCK_REVIEW')
+  assert.equal(review.format, 'ushso.pr008-reviewed-current-lock.v1', 'WP11_WRAPPER_PR008_LOCK_REVIEW_FORMAT')
+  assert.equal(review.status, 'PASS', 'WP11_WRAPPER_PR008_LOCK_REVIEW_STATUS')
+  assert.equal(review.source_commit, PR008_REVIEWED_CURRENT_LOCK.source_commit, 'WP11_WRAPPER_PR008_LOCK_REVIEW_SOURCE_COMMIT')
+  assert.equal(review.source_tree, PR008_REVIEWED_CURRENT_LOCK.source_tree, 'WP11_WRAPPER_PR008_LOCK_REVIEW_SOURCE_TREE')
+  assert.deepEqual(review.previous_current_lock, PR008_REVIEWED_CURRENT_LOCK.previous_current_lock, 'WP11_WRAPPER_PR008_LOCK_REVIEW_PREVIOUS_LOCK')
+  assert.deepEqual(review.current_lock, { path: PR008_REVIEWED_CURRENT_LOCK.path, bytes: PR008_REVIEWED_CURRENT_LOCK.bytes, sha256: PR008_REVIEWED_CURRENT_LOCK.sha256 }, 'WP11_WRAPPER_PR008_LOCK_REVIEW_CURRENT_LOCK')
+  assert.deepEqual(review.allowed_added_entries, {
+    'contracts/machine-toolkit/v1.2.0': {
+      name: '@ushso/machine-toolkit-variable-identity-v1.2',
+      version: '1.2.0',
+      dependencies: { ajv: '8.20.0' },
+      engines: { node: '>=22.15' },
+    },
+    'node_modules/@ushso/machine-toolkit-variable-identity-v1.2': {
+      resolved: 'contracts/machine-toolkit/v1.2.0',
+      link: true,
+    },
+  }, 'WP11_WRAPPER_PR008_LOCK_REVIEW_ALLOWED_DELTA')
+  assert.equal(review.unchanged_preexisting_entries, 354, 'WP11_WRAPPER_PR008_LOCK_REVIEW_UNCHANGED_ENTRIES')
+  assert.deepEqual(review.changed_preexisting_entries, [], 'WP11_WRAPPER_PR008_LOCK_REVIEW_CHANGED_ENTRIES')
+  assert.deepEqual(review.removed_entries, [], 'WP11_WRAPPER_PR008_LOCK_REVIEW_REMOVED_ENTRIES')
+  assert.deepEqual(review.changed_top_level_keys, [], 'WP11_WRAPPER_PR008_LOCK_REVIEW_TOP_LEVEL_DRIFT')
+  assert.equal(review.current_approval_issued, false, 'WP11_WRAPPER_PR008_LOCK_REVIEW_APPROVAL_OVERCLAIM')
+  assert.equal(review.historical_approval_transferred, false, 'WP11_WRAPPER_PR008_LOCK_REVIEW_HISTORICAL_TRANSFER')
+  assert.equal(review.combined_acceptance, false, 'WP11_WRAPPER_PR008_LOCK_REVIEW_COMBINED_ACCEPTANCE')
+  assert.equal(review.release_qualified, false, 'WP11_WRAPPER_PR008_LOCK_REVIEW_RELEASE_OVERCLAIM')
+}
+
 export async function assertCurrentWrapperPolicy({
   root = repoRoot,
   implementationFiles,
@@ -418,6 +570,8 @@ export async function assertCurrentWrapperPolicy({
     assert.ok(declared.includes(name), 'WP11_WRAPPER_POLICY_STALE_BINDINGS')
     assert.ok(implementationFiles.some((file) => file.path === name), 'WP11_WRAPPER_FILE_MISSING')
   }
+  await assertNamedPrePr005FixtureBinding({ root, parsed, implementationFiles })
+  await assertPr008ReviewedCurrentLockBinding({ root, parsed, implementationFiles })
   return parsed
 }
 
