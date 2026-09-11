@@ -99,6 +99,12 @@ export const PR005_941C9CD_CHANGED_INPUTS = Object.freeze([
   'packages/retrieval/tools/retrieval-core-v1.2.mjs',
 ])
 
+/** Named pre-PR005 current-input fixture: reviewed package transitions only. */
+export const PRE_PR005_CHANGED_INPUTS = Object.freeze([
+  'package-lock.json',
+  'package.json',
+])
+
 export const HISTORICAL_WP11_V1_3 = Object.freeze({
   package_id: WP11_PACKAGE_ID,
   subject_sha256: '294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98',
@@ -312,8 +318,10 @@ function currentInputRole(relativePath, bytes) {
 
 /**
  * Compare every sealed historical input against current candidate bytes and
- * report the complete changed set. This is not historical approval, current
- * approval, or combined-candidate acceptance.
+ * report the complete changed set. Callers must recompute that complete
+ * path/hash/length diff independently; a fixed current-tree changed_count is
+ * not historical or future-current truth. This is not historical approval,
+ * current approval, or combined-candidate acceptance.
  */
 export async function reportCurrentVersusHistoricalInputs({
   root = repoRoot,

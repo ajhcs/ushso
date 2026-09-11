@@ -1,0 +1,111 @@
+{
+  "schema_version": "ushso.pr086.wp11-v1.3-r1-command-receipts.v1",
+  "status": "producer_checked",
+  "assignment_id": "pr086-current-candidate-tests-r2",
+  "run_id": "ushso-pr086-grok-r2-20260911",
+  "npm": "11.19.1",
+  "node": "v24.14.0",
+  "functional_head": "bd7c955f28d7cc5ce18c20400cbd171e7afed8ab",
+  "functional_tree": "b574f65be96269184ffa2c9a59e7bb96e2b67d87",
+  "base_sha": "7e10fd637e092d7fbe14cef97c8da22a1f5d1ad1",
+  "base_tree": "76dc30ddb314ae0f00a29986e6ebb2bfd8f0e751",
+  "execution_base": "cb9f5d846f36821540af158b455478fe0e2cdb87",
+  "execution_tree": "f46abd2aff7fc65c2290dac14944fd4320c8bf30",
+  "prior_candidate_receipts_retained": true,
+  "tmpdir_honored": "/mnt/d/tmp/plumbob",
+  "wp11_historical_subject_sha256": "294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98",
+  "wp11_current_technical_subject_sha256": "7e355d27a6deb558b6626c486472763a7cfd61239e054d16e13256162de3829f",
+  "wp11_wrapper_subject_sha256": "822c69777c46a237eefb7da3e299854b1562ec1ac726ef1c9fa37add2c2530eb",
+  "current_approval_issued": false,
+  "combined_acceptance": false,
+  "commands": [
+    {
+      "id": "cmd-c086-r1-focused",
+      "command": "node --test tests/wp11-attestation.test.mjs",
+      "started_at": "2026-09-11T15:52:44.291Z",
+      "completed_at": "2026-09-11T15:52:51.398Z",
+      "duration_ms": 7107,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "tests": 17,
+      "stdout": {
+        "bytes": 12963,
+        "sha256": "b82f73ee7a848d6e312fbdfd37227d9b2c9cc676a7011388499fe1096441d8a6"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "cmd-c086-r1-verifier",
+      "command": "node scripts/verify-wp11-attestation.mjs",
+      "started_at": "2026-09-11T15:52:51.402Z",
+      "completed_at": "2026-09-11T15:52:51.645Z",
+      "duration_ms": 243,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout": {
+        "bytes": 8353,
+        "sha256": "ce69df1aa9c1ca5495e881696e3feafffd760ecf7b61cc9a4b95fe3aa387b0a0"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "cmd-c086-r1-suite",
+      "command": "node scripts/run-contract-suites.mjs --suite wp11",
+      "started_at": "2026-09-11T15:52:51.646Z",
+      "completed_at": "2026-09-11T15:52:52.648Z",
+      "duration_ms": 1002,
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout": {
+        "bytes": 9016,
+        "sha256": "5d1b9ca9b75978f4f0cd0632b637eb1b818c950042904f94bf017a7276474800"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "cmd-c086-r1-direct-validate",
+      "command": "USHSO_ALLOW_RECEIPT_WRITES=0 node verification/wp11/v1.3.0/tools/verify.mjs --validate",
+      "started_at": "2026-09-11T15:52:52.649Z",
+      "completed_at": "2026-09-11T15:52:52.739Z",
+      "duration_ms": 90,
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "failure": "SUCCESSOR_APPROVAL_STALE_SUBJECT",
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 1271,
+        "sha256": "8e0d278eb79671e409f5f59c657d972db8b27e02a71737fbc184d806a7b4dd5f"
+      }
+    },
+    {
+      "id": "cmd-c086-r1-direct-issue",
+      "command": "USHSO_ALLOW_RECEIPT_WRITES=0 node verification/wp11/v1.3.0/tools/verify.mjs --issue",
+      "started_at": "2026-09-11T15:52:52.740Z",
+      "completed_at": "2026-09-11T15:52:52.822Z",
+      "duration_ms": 82,
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "failure": "SUCCESSOR_APPROVAL_STALE_SUBJECT",
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 1271,
+        "sha256": "8e0d278eb79671e409f5f59c657d972db8b27e02a71737fbc184d806a7b4dd5f"
+      }
+    }
+  ]
+}
