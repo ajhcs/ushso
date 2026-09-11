@@ -136,9 +136,17 @@ export class ImmutableSchemaCatalog {
         assert(relationshipEvidence.release_binding && typeof relationshipEvidence.release_binding === "object" && !Array.isArray(relationshipEvidence.release_binding), "Release relationship binding must be an object", "unresolved_variable_context");
         roots.push(relationshipEvidence.release_binding);
       }
+      if (Object.hasOwn(resolved.snapshot, "source_id") || Object.hasOwn(resolved.snapshot, "asset_id")) {
+        // Registered parent facts are immutable constraints. They remain in
+        // the relationship set even when a caller supplies external binding
+        // evidence, so foreign caller facts cannot override the snapshot.
+        assert(typeof resolved.snapshot.source_id === "string" && resolved.snapshot.source_id.length >= 3, "Registered snapshot source relationship is invalid", "unresolved_variable_context");
+        assert(typeof resolved.snapshot.asset_id === "string" && resolved.snapshot.asset_id.length >= 3, "Registered snapshot asset relationship is invalid", "unresolved_variable_context");
+        roots.push({ source_id: resolved.snapshot.source_id, asset_id: resolved.snapshot.asset_id });
+      }
     }
 
-    const sourceIds = [];
+    const sourceIds = []
     const assetIds = [];
     const releaseIds = [];
     const schemaSnapshotIds = [];

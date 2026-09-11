@@ -318,6 +318,12 @@ test("parent relationship evidence rejects missing and contradictory ownership",
   assert.throws(() => catalog.resolveVariableContext(context, { ...binding, releases: ["urn:ushso:release:foreign"] }), { code: "variable_context_release_mismatch" });
   assert.throws(() => catalog.resolveVariableContext(context, { ...binding, distributions: [{ distribution_id: context.distribution_id, release_id: "urn:ushso:release:foreign", identity_state: "exact" }] }), { code: "variable_context_release_mismatch" });
   assert.throws(() => catalog.resolveVariableContext(context, { ...binding, release_identity: { ...binding.release_identity, distributions: [{ distribution_id: context.distribution_id, release_id: "urn:ushso:release:foreign", identity_state: "exact" }] } }), { code: "variable_context_release_mismatch" });
+
+  const parentBoundCatalog = new ImmutableSchemaCatalog();
+  parentBoundCatalog.registerSnapshot({ ...released.snapshot, source_id: "urn:ushso:source:alpha", asset_id: "urn:ushso:asset:alpha" }, released.fields);
+  const betaContext = { ...context, source_id: "urn:ushso:source:beta", asset_id: "urn:ushso:asset:beta" };
+  const betaBinding = { ...binding, source_id: betaContext.source_id, asset_id: betaContext.asset_id, release_identity: { ...binding.release_identity, source_id: betaContext.source_id, asset_id: betaContext.asset_id } };
+  assert.throws(() => parentBoundCatalog.resolveVariableContext(betaContext, betaBinding), { code: "variable_context_source_mismatch" });
 });
 
 test("released core fixture requires accepted relationship evidence before variable resolution", () => {
