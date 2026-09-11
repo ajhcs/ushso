@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T06:25:39.390668Z",
+  "updated_at": "2026-09-11T06:59:10.041717Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -91,7 +91,7 @@
         "PR-085"
       ],
       "failure": "verification/research-program/pr-004/completeness-view.json is 49,808,256bytes and exceeds the existing10MiB cap.",
-      "remediation_run_id": "ushso-pr004-artifact-packaging-grok-20260911",
+      "remediation_run_id": "ushso-pr004-packaging-r2-grok-20260911",
       "accepted": false
     },
     "legacy_program_raw_pin_findings": {
@@ -137,7 +137,26 @@
         ],
         "accepted": false
       }
-    ]
+    ],
+    "latest_packaging_review": {
+      "status": "changes_requested",
+      "head_sha": "877281c81b937829ae18f54075a349697b480a0e",
+      "tree_sha": "1f033f88d58514405a1e4ba1ad040d9545708459",
+      "evidence": "verification/research-program/bootstrap/pr004-packaging-review-877281c/receipt.json",
+      "sha256": "7033d39e6fe243ddf3d139e037e0784e21efb79df9dfd8b2187244b5115a27d5",
+      "passed": [
+        "16 field tests",
+        "deterministic rebuild",
+        "canonical verifier",
+        "release:audit",
+        "exact original decoded bytes",
+        "84 unchanged semantic and prior evidence files"
+      ],
+      "finding": "manifest-payload-consistency",
+      "negative_case_actual_exit": 0,
+      "negative_case_expected_exit": 1,
+      "handoff_finished": false
+    }
   },
   "providers": [
     {
@@ -156,12 +175,12 @@
       "model_reported_by_reviewer": "Grok 4.6",
       "model_identity_note": "The active managed interface records grok-4. The retained Grok 4.6 self-report belongs only to the earlier read-only boundary review and is not asserted for later implementation runs.",
       "latest_run": {
-        "run_id": "ushso-pr004-artifact-packaging-grok-20260911",
-        "task_id": "ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
+        "run_id": "ushso-pr004-packaging-r2-grok-20260911",
+        "task_id": "ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
         "actual_model": "grok-4",
         "status": "running",
-        "evidence": "verification/research-program/bootstrap/pr004-artifact-packaging-grok-dispatch.json",
-        "head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75"
+        "evidence": "verification/research-program/bootstrap/pr004-packaging-r2-dispatch.json",
+        "head_sha": "c516a2ad35c7fa9d93830a169fe87fce9a6be62d"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
@@ -182,7 +201,7 @@
         }
       ],
       "active_runs": [
-        "ushso-pr004-artifact-packaging-grok-20260911"
+        "ushso-pr004-packaging-r2-grok-20260911"
       ],
       "latest_completed_wp11_run": {
         "run_id": "ushso-pr085-wp11-grok-20260911",
@@ -811,7 +830,7 @@
     {
       "pr_id": "PR-004",
       "status": "in_progress",
-      "owner": "ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
+      "owner": "ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
       "dependencies": [
         "PR-002"
       ],
@@ -830,22 +849,22 @@
       "evidence_directory": "verification/research-program/pr-004/",
       "github_pr_url": null,
       "blockers": [
-        "The complete logical artifact must be packaged losslessly under the existing 10MiB file cap, with exact decoded bytes and current handoff verification.",
-        "Independent packaging review, changed combined full gate and fresh combined hosted CI precede component acceptance and PR005/007 dispatch."
+        "Canonical lossless packaging passes the size audit, but the verifier must reject contradictory manifest metadata and the current handoff/evidence must be completed.",
+        "Independent final packaging review, changed combined full gate and fresh combined hosted CI precede component acceptance and PR005/007 dispatch."
       ],
       "dispatch_preparation": "Workspace ready and dispatch initiated; actual model/preflight and execution receipts will establish provider usage.",
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-002": "verification/research-program/pr-002/controller/integration-handoff.json"
       },
-      "branch": "codex/ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
+      "branch": "codex/ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
       "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
       "provider": "Grok Co-Engineer",
       "selected_model": "grok-4",
       "selected_reasoning": "max",
       "actual_model": "grok-4",
-      "run_id": "ushso-pr004-artifact-packaging-grok-20260911",
-      "dispatch_evidence": "verification/research-program/bootstrap/pr004-artifact-packaging-grok-dispatch.json",
+      "run_id": "ushso-pr004-packaging-r2-grok-20260911",
+      "dispatch_evidence": "verification/research-program/bootstrap/pr004-packaging-r2-dispatch.json",
       "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
       "preliminary_review": "verification/research-program/bootstrap/pr004-preliminary-review-21b1b12.json",
       "preliminary_review_scope": "C1/C2 at 21b1b12 only; findings supplied to the active producer for disposition in final work, not a final-head verdict.",
@@ -856,7 +875,7 @@
         "Impossible calendar date accepted"
       ],
       "additional_preliminary_scope": "Immutable C1/C2 head21b1b12 only; sent to active producer for correction and final-head replay.",
-      "review_state": "changes_requested_for_release_artifact_size",
+      "review_state": "changes_requested_manifest_consistency_and_packet",
       "last_producer_head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
       "last_producer_tree_sha": "abfa7c2fd860e35c01ee11902696b015d02f6981",
       "independent_component_checks": "verification/research-program/bootstrap/pr004-r2-final-checks-86cf1b0.json",
@@ -913,20 +932,20 @@
         "provider": "native Codex sub-agent",
         "actual_model": null
       },
-      "provider_task_id": "ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
-      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr004-field-states-20260910-worktrees/ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
+      "provider_task_id": "ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr004-field-states-20260910-worktrees/.ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3-worktrees/ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
       "artifact_packaging_continuation": {
         "format": "ushso.pr004-artifact-packaging-dispatch.v1",
         "run_id": "ushso-pr004-artifact-packaging-grok-20260911",
-        "cursor": "8",
+        "cursor": "15",
         "task_id": "ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
         "provider": "grok",
         "model": "grok-4",
-        "status": "running",
+        "status": "completed_partial",
         "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr004-field-states-20260910-worktrees/ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
         "branch": "codex/ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
         "base_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
-        "deadline_at": "2026-09-11T06:46:36.128Z",
+        "deadline_at": "2026-09-11T06:52:05.245Z",
         "prompt_dispatched": true,
         "dispatch_evidence": "authoritative",
         "scope": [
@@ -947,7 +966,59 @@
         "artifact_decoded_sha256_required": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
         "artifact_decoded_bytes_required": 49808256,
         "current_artifact_file_cap_bytes": 10485760,
-        "semantic_changes_allowed": false
+        "semantic_changes_allowed": false,
+        "finished_at": "2026-09-11T06:46:38.831Z",
+        "terminal_evidence": "verification/research-program/bootstrap/pr004-packaging-r1-terminal.json",
+        "partial_functional_head": "877281c81b937829ae18f54075a349697b480a0e",
+        "retained_continuation_head": "c516a2ad35c7fa9d93830a169fe87fce9a6be62d",
+        "accepted": false
+      },
+      "packaging_review": {
+        "status": "changes_requested",
+        "head_sha": "877281c81b937829ae18f54075a349697b480a0e",
+        "tree_sha": "1f033f88d58514405a1e4ba1ad040d9545708459",
+        "evidence": "verification/research-program/bootstrap/pr004-packaging-review-877281c/receipt.json",
+        "sha256": "7033d39e6fe243ddf3d139e037e0784e21efb79df9dfd8b2187244b5115a27d5",
+        "passed": [
+          "16 field tests",
+          "deterministic rebuild",
+          "canonical verifier",
+          "release:audit",
+          "exact original decoded bytes",
+          "84 unchanged semantic and prior evidence files"
+        ],
+        "finding": "manifest-payload-consistency",
+        "negative_case_actual_exit": 0,
+        "negative_case_expected_exit": 1,
+        "handoff_finished": false
+      },
+      "artifact_packaging_r2": {
+        "format": "ushso.pr004-packaging-r2-dispatch.v1",
+        "run_id": "ushso-pr004-packaging-r2-grok-20260911",
+        "cursor": "8",
+        "task_id": "ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
+        "provider": "grok",
+        "model": "grok-4",
+        "status": "running",
+        "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr004-field-states-20260910-worktrees/.ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3-worktrees/ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
+        "branch": "codex/ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
+        "base_sha": "c516a2ad35c7fa9d93830a169fe87fce9a6be62d",
+        "deadline_at": "2026-09-11T07:21:13.838Z",
+        "started_at": "2026-09-11T06:57:14.307Z",
+        "prompt_dispatched": true,
+        "dispatch_evidence": "authoritative",
+        "scope": [
+          "verification/research-program/pr-004/**",
+          "tests/research-program/field-states.test.mjs",
+          "docs/research-program/handoffs/PR-004.json"
+        ],
+        "consent": {
+          "status": "approved",
+          "duration": "repository_and_selected_providers",
+          "source": "durable_grant"
+        },
+        "logical_dispatch_base_preserved": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+        "evidence": "verification/research-program/bootstrap/pr004-packaging-r2-dispatch.json"
       }
     },
     {
