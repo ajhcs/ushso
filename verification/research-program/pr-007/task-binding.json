@@ -1,13 +1,13 @@
 {
   "format": "ushso.research-program.task.v1",
-  "task_id": "grok-pr007-release-binding",
+  "task_id": "pr007-release-binding-r2",
   "pr_id": "PR-007",
   "title": "Bind products to releases and distributions",
   "owner": "Grok",
   "reviewer": "Astra",
-  "branch": "codex/ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f",
-  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f",
-  "objective": "Implement independently scoped PR007 release/distribution identity using accepted PR004 contracts; return committed candidates for Astra review.",
+  "branch": "codex/ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f-worktrees/ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad",
+  "objective": "Correct independently reproduced release identity, source binding and generation consistency defects and current package seal. Original logical base 15b351a92af729f9ba07359fd210123fdfd76bb3 and original branch/task grok-pr007-release-binding remain the PR provenance; continuation execution base is 994779418cdf4ac2bcc023da66eb1b05aae696d6 on this managed branch.",
   "outcome": "Source-native identities can supply actual context IDs to clients.",
   "dependencies": [
     "PR-004"
@@ -17,6 +17,8 @@
     "packages/identity/schemas/**",
     "packages/registry/**",
     "tests/research-program/release-binding.test.mjs",
+    "packages/identity/manifests/package-manifest.json",
+    "packages/identity/validation/validation-receipt.json",
     "docs/research-program/handoffs/PR-007.json",
     "verification/research-program/pr-007/**"
   ],
@@ -38,10 +40,18 @@
       "subject": "Add generation identity mapping",
       "instructions": "Publish one explicit map between human manifest identity, machine generation and dictionary/source revision. Reject inconsistent cross-generation references.",
       "verification": "Human-to-machine source lookup returns the same product context; stale or mismatched pins yield typed restart guidance."
+    },
+    {
+      "id": "C-007-4-R2",
+      "subject": "Correct release identity, source binding, and generation map",
+      "instructions": "Correct independently reproduced identity, binding and generation defects. Refresh the current identity package seal from actual bytes. Preserve frozen contract pins and original three planned commits.",
+      "verification": "Independent semantics cases pass; npm run validate --prefix packages/identity matches current package bytes."
     }
   ],
   "check_commands": [
     "node --test tests/research-program/release-binding.test.mjs",
+    "npm test --prefix packages/identity",
+    "npm run validate --prefix packages/identity",
     "node verification/research-program/pr-007/verify.mjs"
   ],
   "evidence_directory": "verification/research-program/pr-007/",
