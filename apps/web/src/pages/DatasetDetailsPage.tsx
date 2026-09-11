@@ -38,6 +38,11 @@ function descriptionHasEncodingDamage(value: string) {
   return /\uFFFD|(?:Ã.|Â.|â€|â€™|â€œ|â€)/u.test(value)
 }
 
+function payloadCheckStateLabel(state: string | undefined) {
+  if (!state || state === 'not_attempted') return 'Not attempted'
+  return sentenceCase(state)
+}
+
 export function freshnessPresentation(dataset: DatasetFamily) {
   const projected = dataset.canonicalResult.metadata?.freshness
   const overdue = projected?.freshness_state === 'overdue' || dataset.verification.freshnessState === 'overdue'
@@ -51,9 +56,10 @@ export function freshnessPresentation(dataset: DatasetFamily) {
     label,
     overdue,
     note: projected?.note,
-    lastSuccessful: dataset.verification.lastSuccessfulMetadataCheck ?? projected?.last_successful_metadata_check ?? dataset.verification.metadataObservedAt,
-    latestAttempt: dataset.verification.latestAttemptAt ?? projected?.latest_attempt?.at ?? dataset.verification.metadataObservedAt,
-    latestAttemptOutcome: dataset.verification.latestAttemptOutcome ?? projected?.latest_attempt?.outcome ?? 'unknown',
+    lastSuccessful: dataset.verification.lastSuccessfulMetadataCheck,
+    latestAttempt: dataset.verification.latestAttemptAt,
+    latestAttemptOutcome: dataset.verification.latestAttemptOutcome ?? 'unknown',
+    payloadState: payloadCheckStateLabel(dataset.verification.payloadCheckState ?? projected?.payload_check?.state),
     payloadNote: dataset.verification.payloadCheckNote ?? projected?.payload_check?.note ?? 'Catalog metadata observation is not a payload-access check.',
     stale: dataset.verification.staleStatus === 'stale_historical_success' || dataset.verification.status === 'stale' || projected?.stale_status === 'stale_historical_success',
   }
@@ -219,7 +225,7 @@ export function DatasetDetailsPage() {
               <div><dt>Latest catalog-metadata attempt</dt><dd>{freshness.latestAttempt ? <time dateTime={freshness.latestAttempt}>{formatDate(freshness.latestAttempt)}</time> : 'Unknown'} · {sentenceCase(freshness.latestAttemptOutcome)}</dd></div>
               <div><dt>Historical status</dt><dd>{sentenceCase(metadata?.freshness?.verification_status ?? record.freshness_verification.verification_status)}</dd></div>
               <div><dt>Failed refresh</dt><dd>{sentenceCase(metadata?.freshness?.failed_refresh_state ?? 'None recorded')}</dd></div>
-              <div><dt>Payload check</dt><dd>Not attempted. {freshness.payloadNote}</dd></div>
+              <div><dt>Payload check</dt><dd>{freshness.payloadState}. {freshness.payloadNote}</dd></div>
               <div><dt>Data through</dt><dd>{record.freshness_verification.data_through ?? 'Unknown'}</dd></div>
             </dl>
             <p className="freshness-boundary">An overdue review does not imply that the captured metadata is false. Catalog metadata success is not payload access. A failed refresh, when recorded, must remain distinct from the earlier successful observation.</p>

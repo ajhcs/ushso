@@ -32,11 +32,17 @@ export function resolveObservationClock(now, corpus = {}) {
   return date;
 }
 
+function lastSuccessfulCatalogMetadataCheck(historical = {}) {
+  const status = historical.verification_status;
+  if (status === 'current_verified' || status === 'stale') return historical.metadata_observed_at ?? null;
+  return null;
+}
+
 export function projectFreshness(record, now) {
   const clock = now instanceof Date ? now : resolveObservationClock(now);
   const historical = record?.freshness_verification ?? {};
   const base = freshnessState(record, clock);
-  const lastSuccessful = historical.metadata_observed_at ?? null;
+  const lastSuccessful = lastSuccessfulCatalogMetadataCheck(historical);
   const failedRefresh = historical.failed_refresh_state ?? 'none_recorded';
   const latestAttemptAt = failedRefresh === 'none_recorded' ? lastSuccessful : (historical.latest_attempt_at ?? null);
   const latestAttemptOutcome = failedRefresh !== 'none_recorded'
@@ -60,7 +66,7 @@ export function projectFreshness(record, now) {
     },
     catalog_metadata_check: {
       state: historical.verification_status ?? 'unknown',
-      at: lastSuccessful,
+      at: historical.metadata_observed_at ?? null,
       scope: 'catalog_metadata'
     },
     payload_check: {
@@ -71,6 +77,10 @@ export function projectFreshness(record, now) {
     },
     stale_status: staleStatus
   };
+}
+
+function resultFreshness(record, effectiveNow, requestClockProvided) {
+  return requestClockProvided ? projectFreshness(record, effectiveNow) : freshnessState(record, effectiveNow);
 }
 
 function stableHash(value) {
@@ -577,6 +587,7 @@ export function createRetrievalEngine({ lexicalArtifact = null, diagnostic = nul
       return structuredClone(compileDiscoveryIntent(rawQuery, frozenVocabulary, frozenNamedSources));
     },
     retrieve(rawQuery, { signal, now = null, browse = false } = {}) {
+      const requestClockProvided = now != null && now !== '';
       if (signal?.aborted) throw signal.reason ?? new DOMException('Aborted', 'AbortError');
       const intent = compileDiscoveryIntent(rawQuery, frozenVocabulary, frozenNamedSources);
       const parsed = { ...intent, raw: intent.filters };
@@ -669,7 +680,7 @@ export function createRetrievalEngine({ lexicalArtifact = null, diagnostic = nul
           dimensions: metadataDimensions(item.record),
           dates: dateDimensions(item.record),
           access: { ...(cachedAccessDimensions(item.record, recordScoring.get(item.record.record_id))) },
-          freshness: freshnessState(item.record, effectiveNow),
+          freshness: resultFreshness(item.record, effectiveNow, requestClockProvided),
           description_quality: descriptionQuality(item.record),
           claim_evidence: auditEvidence(item.record),
           retrieval_plan: retrievalPlan(item.record),

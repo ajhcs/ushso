@@ -18,13 +18,19 @@ function formatChecked(value: string | null | undefined) {
   return Number.isNaN(checked.getTime()) ? value : new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(checked)
 }
 
+function payloadCheckStateLabel(state: string | undefined) {
+  if (!state || state === 'not_attempted') return 'not attempted'
+  return state.replaceAll('_', ' ')
+}
+
 function freshnessPresentation(result: DatasetFamily) {
   const projected = result.canonicalResult.metadata?.freshness
   const verification = result.verification
   return {
-    lastSuccessfulText: formatChecked(verification.lastSuccessfulMetadataCheck ?? projected?.last_successful_metadata_check ?? verification.metadataObservedAt),
-    latestAttemptText: formatChecked(verification.latestAttemptAt ?? projected?.latest_attempt?.at ?? verification.metadataObservedAt),
-    latestAttemptOutcome: (verification.latestAttemptOutcome ?? projected?.latest_attempt?.outcome ?? verification.status).replaceAll('_', ' '),
+    lastSuccessfulText: formatChecked(verification.lastSuccessfulMetadataCheck),
+    latestAttemptText: formatChecked(verification.latestAttemptAt),
+    latestAttemptOutcome: (verification.latestAttemptOutcome ?? 'unknown').replaceAll('_', ' '),
+    payloadCheckState: payloadCheckStateLabel(verification.payloadCheckState ?? projected?.payload_check?.state),
     payloadCheck: verification.payloadCheckNote ?? projected?.payload_check?.note ?? 'Catalog metadata observation is not a payload-access check.',
     stale: verification.staleStatus === 'stale_historical_success' || verification.status === 'stale' || projected?.stale_status === 'stale_historical_success',
     overdue: projected?.freshness_state === 'overdue' || verification.freshnessState === 'overdue',
@@ -104,7 +110,7 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
               {freshness.stale && <em>Historical metadata success is stale</em>}
               <small>Last successful metadata check {freshness.lastSuccessfulText}</small>
               <small>Latest catalog-metadata attempt {freshness.latestAttemptText} ({freshness.latestAttemptOutcome})</small>
-              <small>Payload check not attempted. {freshness.payloadCheck}</small>
+              <small>Payload check {freshness.payloadCheckState}. {freshness.payloadCheck}</small>
             </span>
           </p>
           <p className="result-status"><span><small>Access</small><strong>{result.accessStatusLabel}</strong></span></p>

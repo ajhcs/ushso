@@ -49,6 +49,27 @@ describe('researcher decision guidance', () => {
     expect(inferred?.values.length).toBeGreaterThan(0)
   })
 
+  it.each(['inferred', 'unavailable'] as const)('keeps %s observation grain out of Typical unit', (state) => {
+    const claimed = structuredClone(dataset)
+    claimed.canonicalResult.metadata = {
+      ...claimed.canonicalResult.metadata,
+      dimensions: {
+        observation_grain: { values: ['hospital'], state },
+        sampled_entity: { values: [], state: 'unresolved' },
+        reporting_organization: { values: [], state: 'unresolved' },
+        population_universe: { values: [], state: 'unresolved' },
+        geographic_dimensions: { values: [], state: 'unresolved' },
+        inferred_search_tags: claimed.canonicalResult.record.unit_of_analysis.map((value) => `unit_of_analysis:${value}`),
+      },
+    } as typeof claimed.canonicalResult.metadata
+    const typical = buildResearcherGuidance(claimed).useCard.fields.find((field) => field.label === 'Typical unit')
+    const inferred = buildResearcherGuidance(claimed).useCard.fields.find((field) => field.label === 'Inferred unit tags (search aid only)')
+    expect(typical?.evidenceState).not.toBe('source_asserted')
+    expect(typical?.values).toEqual(['Observation grain is unresolved.'])
+    expect(inferred?.values.join(' ')).toMatch(/Hospital/)
+    expect(inferred?.values.join(' ')).toMatch(/not a resolved typical unit/)
+  })
+
   it('keeps access and retrieval explanatory, typed, and non-executing', () => {
     const guidance = buildResearcherGuidance(dataset)
     expect(guidance.accessPlan.typedFailures.every((failure) => failure.translateToNotFound === false)).toBe(true)

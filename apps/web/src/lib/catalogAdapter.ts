@@ -48,12 +48,16 @@ function geographyDisplay(record: ObservatoryRecord) {
   return jurisdictions.map((value) => value.replace(/^US-/, '')).join(', ') || 'Geography unresolved'
 }
 
+export function isSupportedObservationGrain(state: string | undefined | null): boolean {
+  return state === 'source_asserted' || state === 'verified_first_party'
+}
+
 export function observationGrainPresentation(record: ObservatoryRecord, metadata?: DiscoveryResultItem['metadata']) {
   const grain = metadata?.dimensions?.observation_grain
   const values = (grain?.values ?? []).filter((value) => value && value !== 'unknown')
   const inferredSearchTags = metadata?.dimensions?.inferred_search_tags
     ?? record.unit_of_analysis.filter((value) => value && value !== 'unknown').map((value) => `unit_of_analysis:${value}`)
-  if (grain && grain.state !== 'unresolved' && values.length > 0) {
+  if (grain && isSupportedObservationGrain(grain.state) && values.length > 0) {
     return {
       label: values.map(sentenceCase).join(', '),
       state: grain.state,
@@ -63,7 +67,7 @@ export function observationGrainPresentation(record: ObservatoryRecord, metadata
   }
   return {
     label: 'Observation grain unresolved',
-    state: 'unresolved' as const,
+    state: grain?.state === 'inferred' || grain?.state === 'unavailable' ? grain.state : 'unresolved' as const,
     values: [] as string[],
     inferredSearchTags,
   }
@@ -126,6 +130,17 @@ function accessOptions(record: ObservatoryRecord): AccessOption[] {
   })
 }
 
+function successfulCatalogMetadataCheckAt(historical: ObservatoryRecord['freshness_verification']): string | null {
+  if (historical.verification_status === 'current_verified' || historical.verification_status === 'stale') {
+    return historical.metadata_observed_at ?? null
+  }
+  return null
+}
+
+function explicitField<T>(value: T | undefined, fallback: T): T {
+  return value !== undefined ? value : fallback
+}
+
 function verificationDetails(record: ObservatoryRecord, metadata?: DiscoveryResultItem['metadata']): DatasetVerification {
   const provenanceById = new Map(record.provenance.map((source) => [source.provenance_id, source]))
   const evidence = record.evidence.map((item) => ({
@@ -148,7 +163,10 @@ function verificationDetails(record: ObservatoryRecord, metadata?: DiscoveryResu
   }))
   const historical = record.freshness_verification
   const projected = metadata?.freshness
-  const lastSuccessful = projected?.last_successful_metadata_check ?? historical.metadata_observed_at
+  const lastSuccessful = projected && Object.hasOwn(projected, 'last_successful_metadata_check')
+    ? projected.last_successful_metadata_check ?? null
+    : successfulCatalogMetadataCheckAt(historical)
+  const latestAttempt = projected?.latest_attempt
   return {
     status: historical.verification_status,
     method: historical.verification_method,
@@ -157,11 +175,11 @@ function verificationDetails(record: ObservatoryRecord, metadata?: DiscoveryResu
     nextReviewDue: historical.next_review_due,
     liveVerified: historical.verification_status === 'current_verified' && historical.verification_method === 'first_party_live',
     lastSuccessfulMetadataCheck: lastSuccessful,
-    latestAttemptAt: projected?.latest_attempt?.at ?? lastSuccessful,
-    latestAttemptOutcome: projected?.latest_attempt?.outcome ?? historical.verification_status,
+    latestAttemptAt: latestAttempt && Object.hasOwn(latestAttempt, 'at') ? latestAttempt.at : lastSuccessful,
+    latestAttemptOutcome: latestAttempt?.outcome ?? historical.verification_status,
     latestAttemptScope: 'catalog_metadata',
-    payloadCheckState: projected?.payload_check?.state ?? 'not_attempted',
-    payloadCheckNote: projected?.payload_check?.note ?? 'Catalog metadata observation is not a payload-access check.',
+    payloadCheckState: explicitField(projected?.payload_check?.state, 'not_attempted'),
+    payloadCheckNote: explicitField(projected?.payload_check?.note, 'Catalog metadata observation is not a payload-access check.'),
     staleStatus: projected?.stale_status ?? (historical.verification_status === 'stale' ? 'stale_historical_success' : 'unknown'),
     freshnessState: projected?.freshness_state ?? 'unknown',
     evaluatedAt: projected?.evaluated_at ?? null,

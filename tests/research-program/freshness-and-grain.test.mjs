@@ -10,7 +10,7 @@ import { StaticPlannerRepository } from '../../packages/planner/static-planner-r
 import { StaticAssetCatalogRepository } from '../../packages/registry/static-asset-catalog-repository.mjs';
 import { createStaticPublicationReadContext } from '../../packages/registry/publication-read-context.mjs';
 import { StaticSearchBackend } from '../../packages/search/static-search-backend.mjs';
-import { PublicQueryService } from '../../worker/public-query-service.mjs';
+import { PublicQueryService, resolveRequestEvaluationTime } from '../../worker/public-query-service.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const readJson = relative => JSON.parse(fs.readFileSync(path.join(root, relative), 'utf8'));
@@ -74,6 +74,10 @@ test('C-005-1: September 10 evaluation of a September 5 deadline is overdue', ()
   assert.match(overdue.note, /overdue/);
   assert.equal(overdueResult.receipt.generated_at, '2026-09-10T12:00:00.000Z');
   assert.equal(overdue.last_checked, record.freshness_verification.metadata_observed_at);
+  assert.equal(overdue.evaluated_at, '2026-09-10T12:00:00.000Z');
+  assert.equal(overdue.payload_check.state, 'not_attempted');
+  assert.equal(overdue.last_successful_metadata_check, null);
+  assert.equal(overdue.latest_attempt.outcome, 'not_live_verified');
   assert.equal(sha256(retrieval.retrieve({ question: 'hospital financials', page_size: 10 }, { now: '2026-09-10T12:00:00.000Z' }).results[0].record), beforeHash);
 });
 
@@ -103,6 +107,8 @@ test('C-005-1: frozen default clock stays deterministic and does not rewrite sou
   assert.equal(first.receipt.generated_at, '1970-01-01T00:00:00.000Z');
   assert.equal(second.receipt.generated_at, first.receipt.generated_at);
   assert.equal(first.results[0].metadata.freshness.freshness_state, 'within_review_window');
+  assert.equal(Object.hasOwn(first.results[0].metadata.freshness, 'evaluated_at'), false);
+  assert.equal(Object.hasOwn(first.results[0].metadata.freshness, 'payload_check'), false);
   assert.equal(first.receipt.generated_at, '1970-01-01T00:00:00.000Z');
   assert.equal(JSON.stringify(first.ranking.ordered_ids), JSON.stringify(second.ranking.ordered_ids));
   assert.equal(sha256(first.results[0].record), sha256(record));
@@ -127,15 +133,79 @@ test('C-005-1: public request evaluation time reaches freshness projection', asy
   const result = await service.discover(session, { question: 'hospital financials', page_size: 10 });
   assert.equal(result.results[0].metadata.freshness.freshness_state, 'overdue');
   assert.equal(result.receipt.generated_at, '2026-09-10T12:00:00.000Z');
+  assert.equal(result.results[0].metadata.freshness.evaluated_at, session.evaluatedAt);
   assert.equal(sha256(result.results[0].record), sha256(record));
+});
 
-  const headerSession = await service.openRequest({
-    request: new Request('https://ushso.org/api/discover', { headers: { Date: 'Fri, 04 Sep 2026 12:00:00 GMT' } }),
-    env: {}
+test('C-005-4: ordinary caller Date header does not replace server evaluation time', () => {
+  const before = Date.now();
+  const at = resolveRequestEvaluationTime({
+    request: new Request('https://ushso.org/api/discover', { headers: { Date: 'Fri, 04 Sep 2026 12:00:00 GMT' } })
   });
-  const before = await service.discover(headerSession, { question: 'hospital financials', page_size: 10 });
-  assert.equal(before.results[0].metadata.freshness.freshness_state, 'within_review_window');
-  assert.equal(before.receipt.generated_at, headerSession.evaluatedAt);
+  const after = Date.now();
+  assert.ok(Date.parse(at) >= before);
+  assert.ok(Date.parse(at) <= after);
+  assert.notEqual(at, '2026-09-04T12:00:00.000Z');
+  assert.equal(resolveRequestEvaluationTime({ now: '2026-09-10T00:00:00Z' }), '2026-09-10T00:00:00.000Z');
+});
+
+test('C-005-4: search and both browse paths expose the same attempt fields as dataset lookup', async () => {
+  const record = clockRecord();
+  const corpus = { corpus_id: 'pr005-clock', corpus_version: 'test', manifest_sha256: 'a'.repeat(64) };
+  const engine = engineFor([record], corpus);
+  const service = publicService(engine, [record], corpus);
+  const session = await service.openRequest({
+    request: new Request('https://ushso.org/api/discover'),
+    env: {},
+    now: '2026-09-10T00:00:00Z'
+  });
+  const query = { question: 'hospital financials', page_size: 5 };
+  const search = await service.discover(session, query);
+  const browse = await service.browse(session, { page_size: 5 });
+  const legacyBrowse = await service.browse(session, 5);
+  const dataset = await service.dataset(session, record.record_id);
+  for (const [name, response] of Object.entries({ search, browse, legacyBrowse, dataset })) {
+    const freshness = response.results[0].metadata?.freshness;
+    assert.ok(freshness, `${name} missing freshness projection`);
+    assert.equal(freshness.evaluated_at, session.evaluatedAt, `${name} evaluated_at`);
+    assert.equal(freshness.payload_check.state, 'not_attempted', `${name} payload_check`);
+    assert.equal(Object.hasOwn(freshness, 'last_successful_metadata_check'), true, `${name} last_successful_metadata_check`);
+    assert.ok(freshness.latest_attempt, `${name} latest_attempt`);
+    assert.equal(freshness.freshness_state, 'overdue', `${name} freshness_state`);
+  }
+});
+
+test('C-005-4: current_verified catalog observation remains last successful metadata check evidence', () => {
+  const projected = projectFreshness({
+    freshness_verification: {
+      metadata_observed_at: '2026-09-03T22:22:33.908Z',
+      next_review_due: '2026-09-05T00:00:00Z',
+      verification_status: 'current_verified',
+      verification_method: 'first_party_live',
+      failed_refresh_state: 'none_recorded'
+    }
+  }, '2026-09-10T00:00:00.000Z');
+  assert.equal(projected.last_successful_metadata_check, '2026-09-03T22:22:33.908Z');
+  assert.equal(projected.latest_attempt.at, '2026-09-03T22:22:33.908Z');
+  assert.equal(projected.latest_attempt.outcome, 'succeeded');
+});
+
+test('C-005-4: unknown catalog verification is not last successful metadata check evidence', () => {
+  const projected = projectFreshness({
+    freshness_verification: {
+      metadata_observed_at: '2026-09-03T00:00:00Z',
+      next_review_due: null,
+      verification_status: 'unknown',
+      verification_method: 'unknown',
+      failed_refresh_state: 'failed'
+    }
+  }, '2026-09-10T00:00:00.000Z');
+  assert.equal(projected.last_successful_metadata_check, null);
+  assert.equal(projected.latest_attempt.at, null);
+  assert.equal(projected.latest_attempt.outcome, 'failed');
+  assert.equal(projected.catalog_metadata_check.state, 'unknown');
+  assert.equal(projected.catalog_metadata_check.at, '2026-09-03T00:00:00Z');
+  assert.equal(projected.payload_check.state, 'not_attempted');
 });
 
 test('C-005-3: advancing the evaluation clock changes status without rebuilding corpus evidence', async () => {
@@ -163,7 +233,7 @@ test('C-005-3: advancing the evaluation clock changes status without rebuilding 
   const scoped = projectFreshness(after.results[0].record, afterSession.evaluatedAt);
   assert.equal(scoped.stale_status, 'review_overdue');
   assert.equal(scoped.payload_check.state, 'not_attempted');
-  assert.equal(scoped.last_successful_metadata_check, record.freshness_verification.metadata_observed_at);
+  assert.equal(scoped.last_successful_metadata_check, null);
   assert.equal(dataset.results[0].metadata.freshness.freshness_state, 'overdue');
   assert.equal(dataset.results[0].metadata.freshness.payload_check.scope, 'payload');
   assert.equal(sha256(before.results[0].record), recordHash);

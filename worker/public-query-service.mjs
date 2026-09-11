@@ -75,16 +75,11 @@ function directResult(record, whyRelevant, evaluatedAt = null) {
   };
 }
 
-export function resolveRequestEvaluationTime({ now, request } = {}) {
+export function resolveRequestEvaluationTime({ now } = {}) {
   if (now != null && now !== '') {
     const date = now instanceof Date ? new Date(now.getTime()) : new Date(now);
     if (Number.isNaN(date.valueOf())) throw new TypeError('evaluation time is invalid');
     return date.toISOString();
-  }
-  const header = typeof request?.headers?.get === 'function' ? request.headers.get('date') : null;
-  if (header) {
-    const parsed = new Date(header);
-    if (!Number.isNaN(parsed.valueOf())) return parsed.toISOString();
   }
   return new Date().toISOString();
 }
@@ -125,7 +120,7 @@ export class PublicQueryService {
       request,
       env,
       signal: request.signal,
-      evaluatedAt: resolveRequestEvaluationTime({ now, request })
+      evaluatedAt: resolveRequestEvaluationTime({ now })
     });
   }
 
@@ -171,7 +166,7 @@ export class PublicQueryService {
       query: queryFromIntent(intent, { mode: 'catalog_browse', limit }),
       ...resultBounds(corpus.record_count, records.length),
       results: records.map((record, index) => ({
-        ...directResult(record, 'Included in the published catalog browse view.'),
+        ...directResult(record, 'Included in the published catalog browse view.', session.evaluatedAt),
         rank: index + 1
       })),
       join_routes: joinRoutes,

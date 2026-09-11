@@ -120,6 +120,20 @@ function request(url = 'https://ushso.org/api/catalog') {
   return new Request(url);
 }
 
+function withoutResultMetadata(payload) {
+  return {
+    ...payload,
+    results: payload.results.map(({ metadata, ...row }) => row)
+  };
+}
+
+function assertFreshnessProjection(freshness, evaluatedAt) {
+  assert.equal(freshness.evaluated_at, evaluatedAt);
+  assert.equal(freshness.payload_check.state, 'not_attempted');
+  assert.equal(Object.hasOwn(freshness, 'last_successful_metadata_check'), true);
+  assert.ok(freshness.latest_attempt);
+}
+
 test('PublicationReadContext is new per request, deeply frozen, and shared by every repository call', async () => {
   const catalogRepository = new StaticAssetCatalogRepository({ loadCatalog });
   const searchBackend = new StaticSearchBackend({ loadEngine });
@@ -156,17 +170,17 @@ test('static adapters reproduce exact legacy browse, dataset, and discovery stru
   const service = createStaticPublicQueryService({ loadCatalog, loadEngine });
   const session = await service.openRequest({ request: request(), env: {} });
   const browse = await service.browse(session, 17);
-  assert.deepEqual(browse, legacyBrowse(17));
-  assert.equal(JSON.stringify(browse), JSON.stringify(legacyBrowse(17)));
+  assert.deepEqual(withoutResultMetadata(browse), legacyBrowse(17));
+  assertFreshnessProjection(browse.results[0].metadata.freshness, session.evaluatedAt);
 
   const target = records.find(record => record.record_id.startsWith('obs:asset:')) ?? records[0];
   const dataset = await service.dataset(session, target.record_id.replace(/^obs:asset:/, ''));
   const expectedDataset = legacyDataset(target);
   const { metadata: datasetMetadata, ...datasetRow } = dataset.results[0];
   assert.deepEqual({ ...dataset, results: [datasetRow] }, expectedDataset);
-  assert.equal(datasetMetadata.freshness.evaluated_at, session.evaluatedAt);
-  assert.equal(datasetMetadata.freshness.payload_check.state, 'not_attempted');
-  assert.equal(datasetMetadata.freshness.last_successful_metadata_check, target.freshness_verification.metadata_observed_at);
+  assertFreshnessProjection(datasetMetadata.freshness, session.evaluatedAt);
+  assert.equal(target.freshness_verification.verification_status, 'not_live_verified');
+  assert.equal(datasetMetadata.freshness.last_successful_metadata_check, null);
 
   const query = { question: 'hospital financial and utilization data for Pennsylvania', limit: 15 };
   assert.deepEqual(await service.discover(session, query), engine.retrieve(query));
@@ -201,7 +215,11 @@ test('Worker dependency injection preserves exact response bytes, fields, orderi
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('cache-control'), 'public, max-age=300');
   assert.equal(response.headers.get('content-type'), 'application/json; charset=utf-8');
-  assert.equal(await response.text(), `${JSON.stringify(legacyBrowse(7))}\n`);
+  const body = JSON.parse(await response.text());
+  assert.deepEqual(withoutResultMetadata(body), legacyBrowse(7));
+  assert.equal(body.results[0].metadata.freshness.payload_check.state, 'not_attempted');
+  assert.equal(Object.hasOwn(body.results[0].metadata.freshness, 'last_successful_metadata_check'), true);
+  assert.ok(body.results[0].metadata.freshness.latest_attempt);
 });
 
 test('legacy static coverage is typed unknown and planner fails closed', async () => {

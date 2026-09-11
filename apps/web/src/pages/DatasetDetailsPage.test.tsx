@@ -27,8 +27,41 @@ describe('identity-bound research-use guidance', () => {
     const dataset = adaptDiscoveryResponse(acceptedResponse).records[0]
     const freshness = freshnessPresentation(dataset)
     expect(freshness.payloadNote).toMatch(/not a payload-access check/)
+    expect(freshness.payloadState).toBe('Not attempted')
     expect(freshness.lastSuccessful).toBe(dataset.verification.metadataObservedAt)
     expect(freshness.overdue).toBe(false)
+  })
+
+  it('keeps explicit null success and attempt timestamps unknown', () => {
+    const claimed = structuredClone(acceptedResponse)
+    const item = claimed.results[0]
+    item.metadata = {
+      ...item.metadata,
+      freshness: {
+        verification_status: item.record.freshness_verification.verification_status,
+        last_checked: item.record.freshness_verification.metadata_observed_at,
+        next_review_due: item.record.freshness_verification.next_review_due,
+        freshness_state: 'overdue',
+        failed_refresh_state: 'none_recorded',
+        note: 'Review is overdue; this does not by itself mean the preserved metadata is false.',
+        last_successful_metadata_check: null,
+        latest_attempt: { at: null, outcome: 'failed', scope: 'catalog_metadata' },
+        payload_check: {
+          state: 'not_attempted',
+          at: null,
+          scope: 'payload',
+          note: 'Catalog metadata observation is not a payload-access check.',
+        },
+      },
+    } as typeof item.metadata
+    const dataset = adaptDiscoveryResponse(claimed).records[0]
+    const freshness = freshnessPresentation(dataset)
+    expect(dataset.verification.lastSuccessfulMetadataCheck).toBeNull()
+    expect(dataset.verification.latestAttemptAt).toBeNull()
+    expect(freshness.lastSuccessful).toBeNull()
+    expect(freshness.latestAttempt).toBeNull()
+    expect(freshness.latestAttemptOutcome).toBe('failed')
+    expect(freshness.payloadState).toBe('Not attempted')
   })
 
   it('keeps card, detail, and machine grain unresolved for the audited HCRIS-style fixture', () => {
