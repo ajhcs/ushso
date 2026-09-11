@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T18:22:52.161591+00:00",
+  "updated_at": "2026-09-11T18:47:59.555126+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "423005db30d345dad038698def8e879c31e2c4dadf62b6ce650ec16b3917d6d0",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -194,14 +194,16 @@
         "provider": "native Codex collaboration",
         "model": "gpt-5.6-luna",
         "reasoning": "max",
-        "status": "in_progress",
+        "status": "changes_requested",
         "task_id": "ushso-pr006-facets-isolation-20260911",
         "branch": "codex/ushso-pr006-facets-isolation-20260911",
         "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr006-facets-isolation-20260911",
         "base_sha": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
         "base_tree": "caab4b676bbeed085e087d63523317edccdd69ac",
         "dispatch_packet": "verification/research-program/bootstrap/pr006-scope-20260911/dispatch-packet.json",
-        "dispatch_packet_sha256": "416e75a5fcccd8d63b7d494ba50915c207b9f06763fbc876d36214ab84367c89"
+        "dispatch_packet_sha256": "416e75a5fcccd8d63b7d494ba50915c207b9f06763fbc876d36214ab84367c89",
+        "reviewed_head": "5d8a8dd6d2e9d60d5b18fa1f69a09533c7e0d9e9",
+        "corrections_dispatched": true
       },
       {
         "pr_id": "PR-008",
@@ -217,11 +219,11 @@
         "base_tree": "08452bc996152f3a034833038b5fcc8373ecc5a8",
         "dispatch_packet": "verification/research-program/bootstrap/pr008-scope-20260911/dispatch-packet.json",
         "dispatch_packet_sha256": "59a44a1a19d616365eb0ab8a38bb035a8a5d89ef95b886477b101561b0e7381f",
-        "reviewed_head": "e433effbd2346d3fcb863df061669332375a645b",
+        "reviewed_head": "a50f5fae017f894d8bc46be001e6c5d12853db01",
         "corrections_dispatched": true
       }
     ],
-    "current_review": "verification/research-program/bootstrap/pr008-review-e433eff/index.json",
+    "current_review": "verification/research-program/bootstrap/pr008-review-a50f5fa/index.json",
     "wp11_input_design_review": {
       "run_id": "ushso-wp11-design-review-grok-20260911",
       "status": "completed",
@@ -245,7 +247,8 @@
     "latest_ci_observation": "verification/research-program/bootstrap/pr007-r3-wp11-combined-review-20260911/hosted-ci/receipt.json",
     "latest_publication_receipt": "verification/research-program/bootstrap/pr007-r3-wp11-combined-review-20260911/prior-publication/receipt.json",
     "latest_corrected_component_reviews": {
-      "PR-008": "verification/research-program/bootstrap/pr008-review-e433eff/decision.json"
+      "PR-008": "verification/research-program/bootstrap/pr008-review-a50f5fa/decision.json",
+      "PR-006": "verification/research-program/bootstrap/pr006-review-5d8a8dd/decision.json"
     },
     "provider_dispatch_boundary": {
       "observed_at": "2026-09-11T16:43:08.834411Z",
@@ -1331,7 +1334,7 @@
     },
     {
       "pr_id": "PR-006",
-      "status": "in_progress",
+      "status": "changes_requested",
       "owner": "/root/pr006_facet_contract_decision",
       "dependencies": [
         "PR-004",
@@ -1358,12 +1361,23 @@
         "apps/web/src/providers/discoveryProvider.ts",
         "apps/web/src/providers/discoveryProvider.test.ts"
       ],
-      "head_sha": null,
+      "head_sha": "5d8a8dd6d2e9d60d5b18fa1f69a09533c7e0d9e9",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-006.json",
       "evidence_directory": "verification/research-program/pr-006/",
       "github_pr_url": null,
-      "blockers": [],
+      "blockers": [
+        {
+          "id": "PR006-R1-CANONICAL-IDS",
+          "kind": "implementation_correction",
+          "detail": "Canonical fixture matching normalizes distinct capability and unit IDs. topic:claims incorrectly matches topic-claims; facility_period incorrectly matches facility-period. Keep exact identifiers for all five canonical dimensions and do not apply legacy aliases during canonical requests."
+        },
+        {
+          "id": "PR006-R1-DESCRIPTION-IDS",
+          "kind": "implementation_correction",
+          "detail": "Mobile renders desktop and mobile sidebar instances with duplicate availability element IDs. Give each instance a unique prefix and keep aria-describedby bound to its own paragraph. All four mobile API/fixture cases at 390/320 pixels expose this defect."
+        }
+      ],
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-004": "verification/research-program/bootstrap/components-463f092/pr-004-integration-handoff.json",
@@ -1383,8 +1397,11 @@
       "dispatch_packet": "verification/research-program/bootstrap/pr006-scope-20260911/dispatch-packet.json",
       "dispatch_packet_sha256": "416e75a5fcccd8d63b7d494ba50915c207b9f06763fbc876d36214ab84367c89",
       "dispatch_recorded_at": "2026-09-11T17:14:23.621321+00:00",
-      "producer_state": "assigned",
-      "next_action": "Producer completes the three bounded PR006 commits, registered checks and validated handoff; root reviews the exact final head."
+      "producer_state": "producer_checked_corrections_in_progress",
+      "next_action": "Producer appends bounded corrections on its original branch; root independently replays the final immutable head and accepts only after all decisive checks pass.",
+      "independent_review_history": [],
+      "independent_review": "verification/research-program/bootstrap/pr006-review-5d8a8dd/decision.json",
+      "reviewed_tree": "d5cb2e16c62dcab2ed1267a6072cea96dcd5276d"
     },
     {
       "pr_id": "PR-007",
@@ -1475,31 +1492,16 @@
         "tests/update-cycle.test.mjs",
         "tests/cms-layout.test.mjs"
       ],
-      "head_sha": "e433effbd2346d3fcb863df061669332375a645b",
+      "head_sha": "a50f5fae017f894d8bc46be001e6c5d12853db01",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-008.json",
       "evidence_directory": "verification/research-program/pr-008/",
       "github_pr_url": null,
       "blockers": [
         {
-          "id": "PR008-R1-CONTEXT",
+          "id": "PR008-R2-PARENT-CHAIN",
           "kind": "implementation_correction",
-          "detail": "Bind resolved context to independent source/asset/release/distribution/schema/field evidence; do not overwrite trusted caller context with claimant context. Missing parent facts and explicitly unresolved states cannot mint or resolve IDs. Keep old endpoint contracts unchanged; add valid released-shape positive controls."
-        },
-        {
-          "id": "PR008-R1-UNITS",
-          "kind": "implementation_correction",
-          "detail": "A measurement with unknown or omitted units cannot become complete because type assertions exist. Enforce the same semantics in constructors and the strict schema."
-        },
-        {
-          "id": "PR008-R1-CAPTURE",
-          "kind": "implementation_correction",
-          "detail": "Require a successful capture and actual hash-bound bytes or an explicit independently validated equivalent before extraction verification succeeds. Preserve failed/missing-byte outcomes."
-        },
-        {
-          "id": "PR008-R1-LOGS",
-          "kind": "implementation_correction",
-          "detail": "Retain or provide locatable full sanitized producer streams with hashes, preserving the original summary receipts and failures."
+          "detail": "resolveVariableContext accepts partial source/asset-only evidence, foreign nested source or asset, a conflicting release list, and foreign parent releases in both top-level and nested selected distributions. Require complete independent parent edges and reject all supplied contradictory relationships; selecting the first non-null fact is insufficient."
         }
       ],
       "prerequisites_satisfied": true,
@@ -1520,10 +1522,13 @@
       "dispatch_packet": "verification/research-program/bootstrap/pr008-scope-20260911/dispatch-packet.json",
       "dispatch_packet_sha256": "59a44a1a19d616365eb0ab8a38bb035a8a5d89ef95b886477b101561b0e7381f",
       "dispatch_recorded_at": "2026-09-11T16:56:56.612999+00:00",
-      "producer_state": "original_producer_checked_corrections_in_progress",
-      "next_action": "Producer corrects context, units, capture evidence and full-log retention on its original branch; root replays decisive checks on the new immutable head.",
-      "independent_review": "verification/research-program/bootstrap/pr008-review-e433eff/decision.json",
-      "reviewed_tree": "7c3de22518f50a883fc3ca750e250dcc997e7166"
+      "producer_state": "producer_checked_corrections_in_progress",
+      "next_action": "Producer appends bounded corrections on its original branch; root independently replays the final immutable head and accepts only after all decisive checks pass.",
+      "independent_review": "verification/research-program/bootstrap/pr008-review-a50f5fa/decision.json",
+      "reviewed_tree": "1ff528f5fa7780c086620d813e8ae48b4efe011a",
+      "independent_review_history": [
+        "verification/research-program/bootstrap/pr008-review-e433eff/decision.json"
+      ]
     },
     {
       "pr_id": "PR-009",
@@ -1565,7 +1570,14 @@
         "verification/research-program/bootstrap/pr009-scope-20260911/operating-inputs.json",
         "verification/research-program/bootstrap/pr009-scope-20260911/census-negative/manifest.json"
       ],
-      "next_action": "After accepted PR008, bind its actual merge/handoff and assign this narrowed three-commit packet. Preserve the measured topology decision and unresolved external facts."
+      "next_action": "After accepted PR008, bind its actual merge/handoff and assign this narrowed three-commit packet. Preserve the measured topology decision and unresolved external facts.",
+      "scope_independent_review": "verification/research-program/bootstrap/pr009-scope-independent-review-12e8876/index.json",
+      "dispatch_input_actions": [
+        "Bind exact target Census fixture filenames, gzip and decoded hashes."
+      ],
+      "acceptance_input_gaps": [
+        "Measured cheapest-topology comparison needs actual workload/account/capacity/recovery/rights inputs; C2/C3 alone is not acceptance."
+      ]
     },
     {
       "pr_id": "PR-010",
@@ -1607,7 +1619,13 @@
       "handoff": "docs/research-program/handoffs/PR-011.json",
       "evidence_directory": "verification/research-program/pr-011/",
       "github_pr_url": null,
-      "blockers": []
+      "blockers": [
+        {
+          "id": "PR011-WP5-SUCCESSOR-SCOPE",
+          "kind": "verification_scope",
+          "detail": "Before connector changes, bind an additive WP5 successor with owned package/tests/validator/fingerprint/receipts. Preserve v1.0.0 bytes; native scope proposal in progress."
+        }
+      ]
     },
     {
       "pr_id": "PR-012",
