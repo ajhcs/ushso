@@ -1,13 +1,13 @@
 {
   "format": "ushso.research-program.task.v1",
-  "task_id": "pr007-core-identity-r3",
+  "task_id": "pr007-reference-integrity-r4",
   "pr_id": "PR-007",
   "title": "Bind products to releases and distributions",
   "owner": "Grok",
   "reviewer": "Astra",
-  "branch": "codex/ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6",
-  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f-worktrees/.ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad-worktrees/ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6",
-  "objective": "Correct independently reproduced core object ownership/validation failures and Unicode native-identifier collision on PR007. Original logical base 15b351a92af729f9ba07359fd210123fdfd76bb3 and accepted dependency PR004 463f092f71c0ed1ef2aa5baa29b186e5697d04ce remain the PR provenance; continuation execution base is ba0779069c5e75cc49be0e7b79026726ab087cfc. Preserve C0071-3 and R2 commits.",
+  "branch": "codex/ce-ushso-pr007-grok-r4-2026-pr007-reference-integrit-bfaaaef7381e-4bb679e1",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f-worktrees/.ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad-worktrees/.ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6-worktrees/ce-ushso-pr007-grok-r4-2026-pr007-reference-integrit-bfaaaef7381e-4bb679e1",
+  "objective": "Correct independently reproduced stale core fingerprints and inconsistent nested release/distribution product context relationships on PR007. Original logical base 15b351a92af729f9ba07359fd210123fdfd76bb3 and accepted dependency PR004 463f092f71c0ed1ef2aa5baa29b186e5697d04ce remain the PR provenance; continuation execution base is 03dda1e74d4fb30496329592fe4cc4b38084609a. Preserve C0071-3 and R2/R3 commits.",
   "outcome": "Source-native identities can supply actual context IDs to clients.",
   "dependencies": [
     "PR-004"
@@ -57,6 +57,18 @@
       "id": "C-007-7-R3",
       "subject": "Record PR007 core-identity correction evidence and handoff",
       "instructions": "Retain initial and R2 failed and passing artifacts. Record R3 command receipts, extra probe replay, and producer handoff. Do not claim root acceptance.",
+      "verification": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-007.json"
+    },
+    {
+      "id": "C-007-8-R4",
+      "subject": "Correct stale core fingerprints and nested binding relationships",
+      "instructions": "Correct R007-9 and R007-10 across the public contract. Check actual canonical content fingerprints without rewriting provenance. Reject inconsistent nested release/distribution relationships before product context. Preserve unresolved, rolling, and one-to-many forms.",
+      "verification": "Independent 14-case, extra v3, and relationship probes pass; npm run validate --prefix packages/identity matches current package bytes."
+    },
+    {
+      "id": "C-007-9-R4",
+      "subject": "Record PR007 reference-integrity correction evidence and handoff",
+      "instructions": "Retain prior negative and positive artifacts, including the R3 relationship-probe failures and the v3 fingerprint fixture refinement. Record R4 command receipts and producer handoff. Do not claim root acceptance.",
       "verification": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-007.json"
     }
   ],
