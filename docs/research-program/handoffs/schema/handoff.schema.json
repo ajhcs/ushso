@@ -709,7 +709,7 @@
       }
     },
     "timestamp": {
-      "description": "RFC3339 UTC command timestamp; checker also enforces completed_at >= started_at.",
+      "description": "RFC3339 UTC command timestamp. Arbitrary fractional-second precision is allowed. The checker and schema helper compare the full declared fractional instant so completed_at may not precede started_at within the same millisecond; Date.parse truncation is not used. Impossible calendar dates are rejected.",
       "type": "string",
       "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
     }

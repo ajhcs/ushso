@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// PR-003 slice C-003-2 plus integrity corrections C-003-2-R1 — bounded
-// handoff-packet validator.
+// PR-003 slice C-003-2 plus integrity corrections C-003-2-R1 / C-003-2-R2 —
+// bounded handoff-packet validator.
 //
 // Usage:
 //   node scripts/research-program/check-handoff.mjs <handoff.json>
@@ -18,14 +18,21 @@
 //   * structured expected/observed command outcomes: a success claim needs an
 //     observed outcome or explicit typed unavailability, and that outcome must
 //     match the explicit expected outcome. Expected-negative checks may exit
-//     nonzero. Completed observed_exit records need timestamps;
+//     nonzero. Completed observed_exit records need RFC3339 UTC timestamps
+//     compared at full fractional precision;
 //   * dependency SHA matching against a sibling or per-PR task-binding.json
 //     and the committed execution ledger;
 //   * a concrete base SHA from that task binding — a completed packet with
 //     only ledger dependency SHAs is unbound, not accepted;
+//   * completed-packet owner/branch and changed-file scope against that
+//     concrete task binding using exact-file and directory/glob ownership;
 //   * local Git commit existence and ancestry for base, dependencies and any
 //     non-null head; head_sha null remains pending-head transport, not a
 //     synthetic commit;
+//   * streamed immutable Git snapshot hashing with typed missing-path versus
+//     unreadable/size-limit diagnostics;
+//   * schema-invalid JSON (including null/noniterable collections) as a
+//     rejected packet, not an operational tool failure;
 //   * status-specific evidence (completed packets cannot have empty evidence
 //     arrays or a null owner).
 //
@@ -35,12 +42,12 @@
 // the work is independently verified or scientifically accepted.
 //
 // PR-001.json and PR-002.json predate this contract and are not rewritten.
-// Historical C-003-1/2/3 receipts are preserved byte-for-byte and are not
-// re-presented as runs against this corrected validator.
+// Historical C-003-1/2/3 and R1 receipts are preserved byte-for-byte and are
+// not re-presented as runs against this corrected validator.
 
 import { createHash } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
-import { readFile, realpath, stat } from 'node:fs/promises';
+import { execFileSync, spawn } from 'node:child_process';
+import { lstat, readFile, realpath, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -49,7 +56,10 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 /** Repository root, derived from this script's location. */
 export const REPO_ROOT = path.resolve(HERE, '..', '..');
 
-export const FORMAT = 'ushso.pr003.c003-r1.handoff-check.v1';
+export const FORMAT = 'ushso.pr003.c003-r2.handoff-check.v1';
+
+/** Hard cap for streamed `git show` hashing of immutable snapshots. */
+export const GIT_SNAPSHOT_MAX_BYTES = 64 * 1024 * 1024;
 
 /** Acceptance states that assert success and therefore require a matching command outcome. */
 export const SUCCESS_ACCEPTANCE_STATES = new Set([
@@ -87,6 +97,7 @@ const CHECK_ORDER = [
   'task_binding',
   'dependency_sha_binding',
   'base_sha_binding',
+  'task_scope_binding',
   'git_commit_binding',
   'identifier_uniqueness',
   'packet_evidence',
@@ -321,25 +332,217 @@ function completionStatusOutcome(value) {
   return null;
 }
 
-function timestampMillis(value) {
+const RFC3339_UTC =
+  /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$/;
+
+/**
+ * Parse an RFC3339 UTC instant, preserving the declared fractional digits.
+ * Calendar fields are validated by Date.UTC round-trip so impossible dates
+ * (e.g. 2026-02-30) are rejected. Fractional ordering does not use Date.parse,
+ * which would silently truncate to milliseconds.
+ */
+export function parseRfc3339UtcInstant(value) {
   if (typeof value !== 'string' || value.trim() === '') return null;
-  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$/.exec(value);
+  const match = RFC3339_UTC.exec(value);
   if (!match) return null;
-  const parsed = Date.parse(value);
-  if (!Number.isFinite(parsed)) return null;
-  const date = new Date(parsed);
-  const components = [
-    date.getUTCFullYear(),
-    date.getUTCMonth() + 1,
-    date.getUTCDate(),
-    date.getUTCHours(),
-    date.getUTCMinutes(),
-    date.getUTCSeconds()
-  ];
-  const expected = match.slice(1, 7).map(Number);
-  return components.every((component, index) => component === expected[index])
-    ? parsed
-    : null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  const second = Number(match[6]);
+  const fractionDigits = match[7] ?? '';
+  const utcMillis = Date.UTC(year, month - 1, day, hour, minute, second);
+  if (!Number.isFinite(utcMillis)) return null;
+  const date = new Date(utcMillis);
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() + 1 !== month ||
+    date.getUTCDate() !== day ||
+    date.getUTCHours() !== hour ||
+    date.getUTCMinutes() !== minute ||
+    date.getUTCSeconds() !== second
+  ) {
+    return null;
+  }
+  return { utcMillis, fractionDigits };
+}
+
+/** Compare two RFC3339 UTC instants at full declared fractional precision. */
+export function compareRfc3339UtcInstants(left, right) {
+  const a = parseRfc3339UtcInstant(left);
+  const b = parseRfc3339UtcInstant(right);
+  if (!a || !b) return null;
+  if (a.utcMillis !== b.utcMillis) return a.utcMillis < b.utcMillis ? -1 : 1;
+  const width = Math.max(a.fractionDigits.length, b.fractionDigits.length);
+  const aFrac = a.fractionDigits.padEnd(width, '0');
+  const bFrac = b.fractionDigits.padEnd(width, '0');
+  if (aFrac === bFrac) return 0;
+  return aFrac < bFrac ? -1 : 1;
+}
+
+const HAND_OFF_COLLECTION_KEYS = [
+  'changed_files',
+  'source_identities',
+  'commands',
+  'artifacts',
+  'acceptance_results',
+  'failures_and_skipped_checks',
+  'unresolved_claims',
+  'risks'
+];
+
+/**
+ * True when semantic checkers can traverse the packet without throwing on
+ * null/noniterable collections. Schema-invalid but structurally safe packets
+ * still receive the named semantic rejection rules used by the regression suite.
+ */
+export function isStructurallySafeHandoff(value) {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return false;
+  for (const key of HAND_OFF_COLLECTION_KEYS) {
+    if (value[key] == null) continue;
+    if (!Array.isArray(value[key])) return false;
+  }
+  if (value.dependency_merge_shas != null) {
+    if (
+      typeof value.dependency_merge_shas !== 'object' ||
+      Array.isArray(value.dependency_merge_shas)
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Exact-file and directory/glob ownership:
+ * - an exact path matches only that file;
+ * - `dir/` matches `dir` and any descendant;
+ * - `dir/**` matches `dir` and any descendant;
+ * - `*` matches one path segment; `**` matches zero or more segments.
+ */
+export function ownedPathMatches(ownedPath, candidatePath) {
+  if (typeof ownedPath !== 'string' || typeof candidatePath !== 'string') return false;
+  const owned = toPosix(ownedPath);
+  const candidate = toPosix(candidatePath);
+  if (owned === '' || candidate === '') return false;
+  if (owned === candidate) return true;
+  if (owned.endsWith('/')) {
+    const prefix = owned.slice(0, -1);
+    return candidate === prefix || candidate.startsWith(`${prefix}/`);
+  }
+  if (owned.endsWith('/**')) {
+    const prefix = owned.slice(0, -3);
+    return candidate === prefix || candidate.startsWith(`${prefix}/`);
+  }
+  if (!owned.includes('*')) return false;
+  const escaped = owned
+    .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+    .replace(/\\\*\\\*/g, ':::GLOBSTAR:::')
+    .replace(/\\\*/g, '[^/]*')
+    .replace(/:::GLOBSTAR:::/g, '.*');
+  return new RegExp(`^${escaped}$`).test(candidate);
+}
+
+function gitPathExistsAtCommit(commit, gitPath, cwd) {
+  try {
+    execFileSync('git', ['cat-file', '-e', `${commit}:${gitPath}`], { cwd, stdio: 'ignore' });
+    return { ok: true };
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return { ok: false, unavailable: true, detail: 'git executable is not available' };
+    }
+    return {
+      ok: false,
+      unavailable: false,
+      detail: `${commit}:${gitPath} is not present as a Git object`
+    };
+  }
+}
+
+function gitBlobSizeAtCommit(commit, gitPath, cwd) {
+  try {
+    const stdout = execFileSync('git', ['cat-file', '-s', `${commit}:${gitPath}`], {
+      cwd,
+      encoding: 'utf8'
+    });
+    const size = Number.parseInt(String(stdout).trim(), 10);
+    if (!Number.isFinite(size) || size < 0) {
+      return { ok: false, detail: `git cat-file -s returned a non-integer size: ${String(stdout).trim()}` };
+    }
+    return { ok: true, size };
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return { ok: false, unavailable: true, detail: 'git executable is not available' };
+    }
+    return {
+      ok: false,
+      detail: `git cat-file -s ${commit}:${gitPath} failed (${error.status ?? error.code ?? error.message})`
+    };
+  }
+}
+
+function hashGitShowStream(commit, gitPath, cwd, maxBytes = GIT_SNAPSHOT_MAX_BYTES) {
+  return new Promise(resolve => {
+    const child = spawn('git', ['show', `${commit}:${gitPath}`], {
+      cwd,
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    const digest = createHash('sha256');
+    let bytes = 0;
+    let stderr = '';
+    let settled = false;
+    let sizeLimited = false;
+
+    const finish = result => {
+      if (settled) return;
+      settled = true;
+      resolve(result);
+    };
+
+    child.stdout.on('data', chunk => {
+      bytes += chunk.length;
+      if (bytes > maxBytes) {
+        sizeLimited = true;
+        child.kill('SIGTERM');
+        return;
+      }
+      digest.update(chunk);
+    });
+    child.stderr.on('data', chunk => {
+      stderr += chunk.toString('utf8');
+      if (stderr.length > 4096) stderr = stderr.slice(0, 4096);
+    });
+    child.on('error', error => {
+      finish({
+        ok: false,
+        rule: error.code === 'ENOENT' ? 'git_unavailable' : 'source_git_snapshot_unreadable',
+        detail:
+          error.code === 'ENOENT'
+            ? 'git executable is not available for immutable snapshot verification'
+            : `git show failed to execute (${error.code ?? error.message}) after ${bytes} byte(s)`
+      });
+    });
+    child.on('close', (status, signal) => {
+      if (sizeLimited) {
+        finish({
+          ok: false,
+          rule: 'source_git_snapshot_size_limit',
+          detail: `${commit}:${gitPath} exceeded the ${maxBytes} byte snapshot read limit after ${bytes} byte(s)`
+        });
+        return;
+      }
+      if (status === 0) {
+        finish({ ok: true, sha256: digest.digest('hex'), bytes });
+        return;
+      }
+      finish({
+        ok: false,
+        rule: 'source_git_snapshot_unreadable',
+        detail: `${commit}:${gitPath} git show failed (status ${status ?? 'null'}, signal ${signal ?? 'none'}, bytes_read ${bytes})${stderr.trim() ? `: ${stderr.trim()}` : ''}`
+      });
+    });
+  });
 }
 
 function collectDeclaredArtifacts(handoff) {
@@ -454,15 +657,23 @@ async function resolveAuthorities(handoff, handoffDir, repoRoot, reporter, valid
     loaded.push({
       source,
       binding: record.value.binding,
+      task: record.value,
       path: record.sourcePath,
       sha256: record.sha256,
       realPath: candidateReal
     });
   }
 
+  // First readable authority is exclusive: a fixture sibling binding stays
+  // scoped to that fixture and is not required to agree with a later per-PR
+  // correction binding. A producer-written task-binding file is not a
+  // self-authenticating signature; controller dispatch review remains separate.
   await loadCandidate('sibling-task-binding', path.join(handoffDir, 'task-binding.json'));
-  for (const candidate of perPrBindingCandidates(repoRoot, handoff.pr_id)) {
-    await loadCandidate(candidate.source, candidate.absolute);
+  if (loaded.length === 0) {
+    for (const candidate of perPrBindingCandidates(repoRoot, handoff.pr_id)) {
+      await loadCandidate(candidate.source, candidate.absolute);
+      if (loaded.length > 0) break;
+    }
   }
 
   if (loaded.length > 0) {
@@ -574,7 +785,7 @@ async function resolveAuthorities(handoff, handoffDir, repoRoot, reporter, valid
     markCheck('task_binding', 'passed', `handoff bound using ${source}`);
   }
 
-  return { authorities, effective, source };
+  return { authorities, effective, source, taskRecord: primary?.task ?? null };
 }
 
 async function evaluateArtifacts(declaredArtifacts, repoRoot, realRoot, reporter) {
@@ -699,26 +910,69 @@ async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter) {
         sourceOk = false;
         continue;
       }
-      try {
-        const bytes = execFileSync(
-          'git',
-          ['show', `${identity.git_commit}:${identity.git_path}`],
-          { cwd: repoRoot }
+      const pathExists = gitPathExistsAtCommit(identity.git_commit, identity.git_path, repoRoot);
+      if (pathExists.unavailable) {
+        fail(
+          'source_identity_binding',
+          'git_unavailable',
+          `${identity.id}: git executable is not available for immutable snapshot verification`
         );
-        const digest = sha256Buffer(bytes);
-        if (digest !== identity.sha256) {
-          fail(
-            'source_identity_binding',
-            'source_git_snapshot_hash_mismatch',
-            `${identity.id} at ${identity.git_commit}:${identity.git_path} expected ${identity.sha256} got ${digest}`
-          );
-          sourceOk = false;
-        }
-      } catch (error) {
+        sourceOk = false;
+        continue;
+      }
+      if (!pathExists.ok) {
         fail(
           'source_identity_binding',
           'source_git_path_missing_at_commit',
-          `${identity.id}: ${identity.git_commit}:${identity.git_path} cannot be read from the local Git object (${error.status ?? error.code ?? error.message})`
+          `${identity.id}: ${identity.git_commit}:${identity.git_path} is not present as a Git object at that commit`
+        );
+        sourceOk = false;
+        continue;
+      }
+      const sizeInfo = gitBlobSizeAtCommit(identity.git_commit, identity.git_path, repoRoot);
+      if (sizeInfo.unavailable) {
+        fail(
+          'source_identity_binding',
+          'git_unavailable',
+          `${identity.id}: git executable is not available for immutable snapshot verification`
+        );
+        sourceOk = false;
+        continue;
+      }
+      if (!sizeInfo.ok) {
+        fail(
+          'source_identity_binding',
+          'source_git_snapshot_unreadable',
+          `${identity.id}: ${sizeInfo.detail}`
+        );
+        sourceOk = false;
+        continue;
+      }
+      if (sizeInfo.size > GIT_SNAPSHOT_MAX_BYTES) {
+        fail(
+          'source_identity_binding',
+          'source_git_snapshot_size_limit',
+          `${identity.id}: ${identity.git_commit}:${identity.git_path} is ${sizeInfo.size} bytes, above the ${GIT_SNAPSHOT_MAX_BYTES} byte snapshot read limit`
+        );
+        sourceOk = false;
+        continue;
+      }
+      const hashed = await hashGitShowStream(
+        identity.git_commit,
+        identity.git_path,
+        repoRoot,
+        GIT_SNAPSHOT_MAX_BYTES
+      );
+      if (!hashed.ok) {
+        fail('source_identity_binding', hashed.rule, `${identity.id}: ${hashed.detail}`);
+        sourceOk = false;
+        continue;
+      }
+      if (hashed.sha256 !== identity.sha256) {
+        fail(
+          'source_identity_binding',
+          'source_git_snapshot_hash_mismatch',
+          `${identity.id} at ${identity.git_commit}:${identity.git_path} expected ${identity.sha256} got ${hashed.sha256}`
         );
         sourceOk = false;
       }
@@ -769,7 +1023,7 @@ async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter) {
     const verified = localChecked + gitChecked;
     const detail = [
       localChecked ? `${localChecked} current local source hash(es) match on-disk bytes with resolved containment` : null,
-      gitChecked ? `${gitChecked} immutable Git source snapshot hash(es) match git show bytes at their bound commit/path` : null
+      gitChecked ? `${gitChecked} immutable Git source snapshot hash(es) match streamed git show bytes at their bound commit/path` : null
     ].filter(Boolean).join('; ');
     markCheck('source_identity_binding', verified > 0 ? 'passed' : 'not_applicable', detail || 'no locally verifiable source identity declared');
   }
@@ -786,11 +1040,46 @@ async function evaluateChangedFiles(handoff, repoRoot, realRoot, reporter) {
       ok = false;
       continue;
     }
+    let info;
+    try {
+      info = await lstat(contained.absolute);
+    } catch (error) {
+      if (error && error.code === 'ENOENT') {
+        note(
+          'changed_file_not_present',
+          'unresolved',
+          `${changed} is recorded as changed but is not present on disk (a deletion is valid; surface it to the reviewer)`
+        );
+        continue;
+      }
+      fail(
+        'changed_file_containment',
+        'changed_file_unreadable',
+        `${changed}: lstat failed (${error.code ?? error.message})`
+      );
+      ok = false;
+      continue;
+    }
+
     let real;
     try {
       real = await realpath(contained.absolute);
-    } catch {
-      note('changed_file_not_present', 'unresolved', `${changed} is recorded as changed but is not present on disk (a deletion is valid; surface it to the reviewer)`);
+    } catch (error) {
+      if (info.isSymbolicLink()) {
+        fail(
+          'changed_file_containment',
+          'changed_file_symlink_unresolved',
+          `${changed} exists as a symlink whose target cannot be resolved; it is not a deletion and is not verified containment (${error.code ?? error.message})`
+        );
+        ok = false;
+        continue;
+      }
+      fail(
+        'changed_file_containment',
+        'changed_file_unreadable',
+        `${changed}: realpath failed (${error.code ?? error.message})`
+      );
+      ok = false;
       continue;
     }
     if (!isWithin(realRoot, real)) {
@@ -800,6 +1089,62 @@ async function evaluateChangedFiles(handoff, repoRoot, realRoot, reporter) {
   }
 
   if (ok) markCheck('changed_file_containment', 'passed', 'all changed-file records are repository-contained after symlink resolution');
+}
+
+function evaluateTaskScope(handoff, taskRecord, reporter) {
+  const { fail, markCheck } = reporter;
+  if (!taskRecord) {
+    markCheck(
+      'task_scope_binding',
+      'not_applicable',
+      'no concrete task schema binding was resolved, so owner/branch/owned-path scope was not compared'
+    );
+    return;
+  }
+  if (!COMPLETED_PACKET_STATES.has(handoff.status)) {
+    markCheck(
+      'task_scope_binding',
+      'not_applicable',
+      `${handoff.status} packets are not required to match completed owner/branch/owned-path scope`
+    );
+    return;
+  }
+
+  let ok = true;
+  if (handoff.owner !== taskRecord.owner) {
+    fail(
+      'task_scope_binding',
+      'handoff_owner_mismatch',
+      `handoff owner ${JSON.stringify(handoff.owner)} does not match task binding owner ${JSON.stringify(taskRecord.owner)}`
+    );
+    ok = false;
+  }
+  if (handoff.branch !== taskRecord.branch) {
+    fail(
+      'task_scope_binding',
+      'handoff_branch_mismatch',
+      `handoff branch ${JSON.stringify(handoff.branch)} does not match task binding branch ${JSON.stringify(taskRecord.branch)}`
+    );
+    ok = false;
+  }
+  const ownedPaths = Array.isArray(taskRecord.owned_paths) ? taskRecord.owned_paths : [];
+  for (const changed of handoff.changed_files ?? []) {
+    if (!ownedPaths.some(pattern => ownedPathMatches(pattern, changed))) {
+      fail(
+        'task_scope_binding',
+        'changed_file_outside_owned_paths',
+        `${changed} is not within the task binding owned_paths`
+      );
+      ok = false;
+    }
+  }
+  if (ok) {
+    markCheck(
+      'task_scope_binding',
+      'passed',
+      'completed handoff owner, branch and changed-file scope match the concrete task binding'
+    );
+  }
 }
 
 function evaluateIdentifierUniqueness(handoff, reporter) {
@@ -924,12 +1269,11 @@ function evaluateCommandOutcomeConsistency(command, reporter) {
     reporter.fail('command_result_resolution', 'command_observed_outcome_missing', `command ${command.id} has no structured observed_outcome`);
     ok = false;
   }
-  const startedMillis = timestampMillis(command.started_at);
-  const completedMillis = timestampMillis(command.completed_at);
-  if (startedMillis === null || completedMillis === null) {
+  const timing = compareRfc3339UtcInstants(command.started_at, command.completed_at);
+  if (timing === null) {
     reporter.fail('command_result_resolution', 'command_timestamp_invalid', `command ${command.id} requires RFC3339 UTC started_at and completed_at timestamps`);
     ok = false;
-  } else if (completedMillis < startedMillis) {
+  } else if (timing > 0) {
     reporter.fail('command_result_resolution', 'command_timing_order_invalid', `command ${command.id} completed_at precedes started_at`);
     ok = false;
   }
@@ -1295,6 +1639,17 @@ export async function checkHandoff(handoffPath, options = {}) {
     reporter.markCheck('handoff_schema', 'passed', 'handoff.schema.json (Ajv 2020-12) accepted the packet');
   }
 
+  if (!isStructurallySafeHandoff(handoff)) {
+    if (reporter.findings.every(finding => finding.rule !== 'schema_invalid')) {
+      reporter.fail(
+        'handoff_schema',
+        'schema_invalid',
+        'top-level JSON value is not a structurally safe handoff object'
+      );
+    }
+    return finalize();
+  }
+
   // 4. Preserve typed outcomes before any coercion can happen.
   const acceptanceResults = Array.isArray(handoff.acceptance_results) ? handoff.acceptance_results : [];
   state.nonPassResults = acceptanceResults
@@ -1312,7 +1667,7 @@ export async function checkHandoff(handoffPath, options = {}) {
 
   // 5. Authoritative task binding / ledger / per-PR lookup.
   const handoffDir = path.dirname(realInput);
-  const { authorities, effective, source } = await resolveAuthorities(
+  const { authorities, effective, source, taskRecord } = await resolveAuthorities(
     handoff,
     handoffDir,
     repoRoot,
@@ -1321,9 +1676,17 @@ export async function checkHandoff(handoffPath, options = {}) {
   );
   state.authorities = authorities;
   state.authoritySource = source;
+  if (authorities.task_binding) {
+    reporter.note(
+      'task_binding_authority',
+      'bound',
+      `concrete task binding from ${authorities.task_binding.source} at ${authorities.task_binding.path} (sha256 ${authorities.task_binding.sha256}); this producer-written file does not authenticate itself and does not replace controller dispatch review`
+    );
+  }
 
   // 6. Dependency/base matching, uniqueness, evidence minima and cross-reference rules.
   evaluateDependencyBinding(handoff, effective, reporter);
+  evaluateTaskScope(handoff, taskRecord, reporter);
   evaluatePacketEvidence(handoff, reporter);
   const { commands, artifacts } = evaluateIdentifierUniqueness(handoff, reporter);
   evaluateCrossReferences(handoff, commands, artifacts, reporter);
@@ -1343,9 +1706,9 @@ function printUsage(stream) {
   stream.write(
     'usage: node scripts/research-program/check-handoff.mjs <handoff.json>\n' +
       '  Validates one handoff packet: path containment, file existence, SHA-256\n' +
-      '  binding, dependency/base SHA matching, structured command outcomes,\n' +
-      '  unique IDs, event-source artifacts and Git object binding.\n' +
-      '  Exit 0 accepted, 1 rejected, 2 usage/operational error.\n'
+      '  binding, dependency/base SHA matching, owner/branch/owned-path scope,\n' +
+      '  structured command outcomes, unique IDs, event-source artifacts and Git\n' +
+      '  object binding. Exit 0 accepted, 1 rejected, 2 usage/operational error.\n'
   );
 }
 

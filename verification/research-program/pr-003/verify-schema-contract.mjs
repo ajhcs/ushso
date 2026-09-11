@@ -16,29 +16,12 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import { compareRfc3339UtcInstants } from '../../../scripts/research-program/check-handoff.mjs';
+
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '..', '..', '..');
 const SCHEMA_DIR = path.join(REPO_ROOT, 'docs', 'research-program', 'handoffs', 'schema');
 const FIXTURE_DIR = path.join(HERE, 'fixtures');
-
-function timestampMillis(value) {
-  if (typeof value !== 'string' || value.trim() === '') return null;
-  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$/.exec(value);
-  if (!match) return null;
-  const parsed = Date.parse(value);
-  if (!Number.isFinite(parsed)) return null;
-  const date = new Date(parsed);
-  const actual = [
-    date.getUTCFullYear(),
-    date.getUTCMonth() + 1,
-    date.getUTCDate(),
-    date.getUTCHours(),
-    date.getUTCMinutes(),
-    date.getUTCSeconds()
-  ];
-  const expected = match.slice(1, 7).map(Number);
-  return actual.every((component, index) => component === expected[index]) ? parsed : null;
-}
 
 /** Acceptance states that assert success and therefore require a command result. */
 export const SUCCESS_ACCEPTANCE_STATES = new Set([
@@ -98,6 +81,12 @@ export const CASES = [
     file: 'handoff.reject-invalid-timing.json',
     expectRejected: true,
     expectedReason: /command_timing_order_invalid/
+  },
+  {
+    id: 'reject-fractional-timing',
+    file: 'handoff.reject-fractional-timing.json',
+    expectRejected: true,
+    expectedReason: /command_timing_order_invalid/
   }
 ];
 
@@ -148,10 +137,9 @@ export function crossReferenceErrors(task, handoff) {
   const commands = new Map();
   for (const command of handoff.commands ?? []) {
     if (commands.has(command.id)) errors.push(`duplicate_command_id: ${command.id}`);
-    const started = timestampMillis(command.started_at);
-    const completed = timestampMillis(command.completed_at);
-    if (started === null || completed === null) errors.push(`command_timestamp_invalid: ${command.id}`);
-    else if (completed < started) errors.push(`command_timing_order_invalid: ${command.id}`);
+    const timing = compareRfc3339UtcInstants(command.started_at, command.completed_at);
+    if (timing === null) errors.push(`command_timestamp_invalid: ${command.id}`);
+    else if (timing > 0) errors.push(`command_timing_order_invalid: ${command.id}`);
     else commands.set(command.id, command);
     const expected = command.expected_outcome;
     const observed = command.observed_outcome;

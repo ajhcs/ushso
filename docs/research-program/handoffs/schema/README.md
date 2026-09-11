@@ -1,9 +1,10 @@
 # PR-003 task and handoff/receipt schemas
 
 Machine-checkable contract material for PR-003 (`C-003-1` plus integrity
-corrections `C-003-1-R1` / `C-003-2-R1`). It translates
-[`docs/master-plan/2026-09-10/EXECUTION.md`](../../../../master-plan/2026-09-10/EXECUTION.md)
-and the [PR-003 packet](../../../../master-plan/2026-09-10/prs/PR-003.md) into
+corrections `C-003-1-R1` / `C-003-2-R1` and bounded contract corrections
+`C-003-2-R2` / `C-003-3-R2`). It translates
+[`docs/master-plan/2026-09-10/EXECUTION.md`](../../../master-plan/2026-09-10/EXECUTION.md)
+and the [PR-003 packet](../../../master-plan/2026-09-10/prs/PR-003.md) into
 two JSON Schema documents that preserve the evidence an independent reviewer
 needs without reading a chat transcript.
 
@@ -55,7 +56,11 @@ parsed. The contract is:
 - Missing `exit_code` / `completion_status` / `actual` with no structured
   observed outcome is not a captured execution result.
 - Completed `observed_exit` records require RFC3339 UTC `started_at` and
-  `completed_at` timestamps, with `completed_at` at or after `started_at`.
+  `completed_at` timestamps. The schema permits arbitrary fractional-second
+  precision. The checker and schema helper compare the full declared
+  fractional instant so `completed_at` may not precede `started_at` within the
+  same millisecond; `Date.parse` truncation is not used. Impossible calendar
+  dates remain rejected.
 - `commands[].event_source`, when present, is an artifact and is checked with
   the same existence, containment and SHA-256 rules as `artifacts[]`.
 
@@ -73,11 +78,17 @@ Locality is **not** inferred from `/` or a leading `.` in `id`.
 An immutable Git snapshot source supplies `location: "external"`, the exact
 40-character `git_commit`, repository-relative `git_path`, and the SHA-256 of
 that commit/path's bytes. The checker verifies the commit exists in the
-configured `repoRoot`, rejects absolute or traversal paths, and hashes the
-`git show` bytes. It does not silently substitute the current working-tree
-file. This distinction lets mutable controller documents such as the execution
-ledger remain bound to their historical input bytes while current correction
-artifacts continue to be checked on disk.
+configured `repoRoot`, rejects absolute or traversal paths, proves the path
+exists at that commit with `git cat-file -e`, and hashes streamed `git show`
+bytes. It does not silently substitute the current working-tree file and does
+not use Node's default subprocess buffer. A genuinely missing Git path is
+reported as `source_git_path_missing_at_commit`. Execution failures and
+explicit size-limit failures are reported separately as
+`source_git_snapshot_unreadable` or `source_git_snapshot_size_limit`. This
+distinction lets mutable controller documents such as the execution ledger
+remain bound to their historical input bytes while current correction
+artifacts continue to be checked on disk. Large frozen inputs such as
+`evaluation/research-program/cohorts.json` are in scope.
 
 ## Status-specific evidence
 
@@ -128,8 +139,23 @@ enforces the structural half, and the bounded checkers enforce the rest.
    (`duplicate_command_id`, `duplicate_artifact_id`).
 7. **Changed-file and local-reference containment.** Declared local paths,
    including existing `changed_files[]` entries, are checked lexically and
-   after symlink resolution. A missing changed path is a typed deletion note,
-   not a pass through an outside symlink.
+   after symlink resolution. The checker `lstat`s each listed path first.
+   Only true absence (`ENOENT`) is a typed deletion note
+   (`changed_file_not_present`). An existing unresolved symlink is
+   `changed_file_symlink_unresolved`: it is not a deletion and is not verified
+   containment. A missing changed path is not a pass through an outside
+   symlink.
+8. **Completed task scope.** A completed packet's `owner`, `branch` and each
+   `changed_files[]` entry are compared with the concrete per-PR task binding.
+   Ownership uses exact-file paths, trailing-slash directories, and `*` /
+   `**` globs. A producer-written task-binding file does not authenticate
+   itself and does not replace the controller's immutable dispatch review.
+9. **Malformed packet versus tool failure.** A syntactically valid JSON value
+   that is schema-invalid, including `null` or noniterable collection types,
+   returns the normal rejected packet report (`outcome=rejected`, CLI exit 1)
+   with `schema_invalid` findings. It does not throw and is not an operational
+   tool failure (CLI exit 2). Structurally safe incomplete packets still
+   receive the named semantic rejection rules used by the regression suite.
 
 ## Per-PR binding (no shared sibling)
 
@@ -138,6 +164,19 @@ would bind every later PR to PR-003. The C-003-1 task schema and the PR-003
 dispatch/task-binding evidence live under
 `verification/research-program/pr-003/`. Other PRs add their own
 `verification/research-program/pr-NNN/` binding when they exist.
+
+Lookup is exclusive first-match so historical fixture bindings stay scoped to
+their own fixtures:
+
+1. a sibling `task-binding.json` next to the handoff (used by the committed
+   fixtures);
+2. otherwise `verification/research-program/pr-NNN/task-binding.json`;
+3. otherwise that directory's `fixtures/task-binding.json`.
+
+A later per-PR correction binding is not required to agree with a fixture
+sibling from an earlier recovery. Ledger dependency SHAs are still compared
+when present. The resolved binding path and SHA-256 identify which concrete
+file established the packet's task binding; that file is not a signature.
 
 ## Validator roots and schema authority
 
@@ -184,14 +223,16 @@ are retained **byte-identical** as historical records. They are not
 retroactively rewritten, and this schema intentionally does not claim to
 validate them (they carry extra fields and a different evidence shape). Handoffs
 produced from PR-003 onward are expected to satisfy the contract, including the
-R1 integrity corrections. A handoff is a producer artifact: passing this schema
-is not independent verification and not scientific approval.
+R1 integrity corrections and the R2 contract corrections. A handoff is a
+producer artifact: passing this schema is not independent verification and not
+scientific approval.
 
-Historical C-003-1 / C-003-2 / C-003-3 command receipts and evidence indexes
-under `verification/research-program/pr-003/` are also preserved byte-for-byte.
-They record runs against the uncorrected validator. Correction evidence is a
-separate index that binds current files and cites those historical bytes through
-immutable Git `f62ce35481cc572e9aad054049c700aac6378f58`.
+Historical C-003-1 / C-003-2 / C-003-3 and R1 command receipts and evidence
+indexes under `verification/research-program/pr-003/` are preserved
+byte-for-byte. They record runs against earlier validators and remain
+explicitly historical; they are not re-presented as fresh checks. R2
+correction evidence is a separate additive index that binds current files and
+cites those historical bytes through immutable Git commit/path/hash triples.
 
 ## Reproduce
 
@@ -211,10 +252,34 @@ hashing, Git object binding and per-PR base lookup.
 - Original PR-003 integration base: `e5c44249b9d2448df2e4b6d466077658e42a009d`.
 - Integrity-correction base (R1): `f62ce35481cc572e9aad054049c700aac6378f58`
   (tree `548d34311909ab3c4bb36c126896c7787d9b3dab`).
+- Final-contract correction base (R2): `bf46d92b0e4fc91457bd3eb78aa1742ae84038f2`
+  (tree `98e04d100daa94cdf9da5905c15d58a0aae6778d`). The independently reviewed
+  code was `dc7267bf1c872f1457fa927e2d0403051575f474`; `bf46d92` adds only the
+  independently accepted test-chain inventory correction.
 - Accepted PR-002 merge (dependency): `5647e81457b606bb36456e75c48f990ce21e9c6c`.
 - PR-001 merge (dependency): `035465f3f16d15f02467679d96451d4440a36ca8`.
 - Dispatch prompt SHA-256: `f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d`.
-- Authored under slices `C-003-1` (DeepSeek) and `C-003-1-R1`/`C-003-2-R1`
-  (Grok integrity corrections). Reviewer Astra. `head_sha` stays null until the
-  controller records the actual final commit; a future commit cannot contain
-  its own hash.
+- Independent final-contract review receipt SHA-256:
+  `99b542280dc18a34c22affb1dcc6a87780db58be7b53c1e30c9cf37dc33470e6`.
+
+Authorship is layered and must not be collapsed:
+
+- Initial PR-003 implementation (`C-003-1` / `C-003-2` / `C-003-3`) was native
+  DeepSeek.
+- The earlier Grok partial `ushso-pr003-grok-corrections-20260910` failed with
+  no commit. Its snapshot, terminal receipt and retained patch remain
+  historical evidence, not completed Grok work.
+- Luna completed the R1 recovery (`C-003-1-R1` / `C-003-2-R1`). Historical R1
+  receipts and the R1 evidence index retain Luna's producer self-label
+  `gpt-5.6-luna-max/high`. Root's native dispatch specified `gpt-5.6-luna/max`;
+  the producer self-label is not a serving-model attestation. Those R1 records
+  are Luna's work, not completed Grok work.
+- This separately scoped R2 correction is Grok Co-Engineer work
+  (`execution.provider: grok`, `execution.model: grok-4`) on the reviewed
+  composed candidate. It is not a replay of the failed 2026-09-10 Grok task.
+
+Reviewer Astra. `head_sha` stays null until the controller records the actual
+final commit; a future commit cannot contain its own hash. Root owns
+independent review, publication, merge and deployment. Full integrated
+`npm test` / build / Cloudflare hosted CI currently needs a separate PR-085
+CI inventory correction and is not claimed here.

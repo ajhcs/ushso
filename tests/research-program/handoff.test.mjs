@@ -1,4 +1,5 @@
-// Focused suite for PR-003 C-003-2 and integrity corrections C-003-1-R1/C-003-2-R1.
+// Focused suite for PR-003 C-003-2 and integrity corrections C-003-1-R1/C-003-2-R1
+// plus bounded R2 contract corrections.
 //
 // The suite exercises the validator on committed fixtures and ephemeral,
 // write-then-remove symlink probes. A passing packet is producer evidence, not
@@ -7,12 +8,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
+import { copyFile, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import {
   REPO_ROOT,
   checkHandoff,
+  compareRfc3339UtcInstants,
+  ownedPathMatches,
+  parseRfc3339UtcInstant,
   resolveContainedPath
 } from '../../scripts/research-program/check-handoff.mjs';
 
@@ -23,10 +27,15 @@ const fixture = name => path.join(FIXTURE_DIR, name);
 const rulesOf = report => report.findings.map(finding => finding.rule);
 const statusOf = (report, id) => report.checks.find(check => check.id === id)?.status;
 const readJson = async name => JSON.parse(await readFile(fixture(name), 'utf8'));
-const writeRuntimeHandoff = async (name, handoff) => {
+const writeRuntimeHandoff = async (name, handoff, options = {}) => {
   const dir = await mkdtemp(path.join(FIXTURE_DIR, '.runtime-handoff-'));
   const file = path.join(dir, name);
   await writeFile(file, `${JSON.stringify(handoff, null, 2)}\n`);
+  // Runtime copies of historical fixtures keep the fixture sibling binding so
+  // they are not rebound to a later per-PR correction task-binding.json.
+  if (options.copyFixtureBinding !== false) {
+    await copyFile(fixture('task-binding.json'), path.join(dir, 'task-binding.json'));
+  }
   return { dir, file };
 };
 
@@ -252,6 +261,40 @@ test('command timing must be valid RFC3339 UTC and end no earlier than start', a
   }
 });
 
+test('RFC3339 comparison keeps full fractional precision and rejects impossible calendars', () => {
+  assert.equal(
+    compareRfc3339UtcInstants('2026-09-11T00:00:00.1239Z', '2026-09-11T00:00:00.1231Z'),
+    1
+  );
+  assert.equal(
+    compareRfc3339UtcInstants('2026-09-11T00:00:00.1231Z', '2026-09-11T00:00:00.1239Z'),
+    -1
+  );
+  assert.equal(
+    compareRfc3339UtcInstants('2026-09-11T00:00:00.12310Z', '2026-09-11T00:00:00.1231Z'),
+    0
+  );
+  assert.equal(parseRfc3339UtcInstant('2026-02-30T00:00:00.1239Z'), null);
+  assert.equal(compareRfc3339UtcInstants('2026-02-30T00:00:00Z', '2026-02-30T00:00:01Z'), null);
+});
+
+test('completed_at earlier within the same millisecond is rejected', async () => {
+  const report = await checkHandoff(fixture('handoff.reject-fractional-timing.json'), {
+    repoRoot: REPO_ROOT
+  });
+  assert.equal(report.ok, false);
+  assert.ok(rulesOf(report).includes('command_timing_order_invalid'));
+});
+
+test('ownedPathMatches documents exact-file and directory/glob ownership', () => {
+  assert.equal(ownedPathMatches('scripts/research-program/check-handoff.mjs', 'scripts/research-program/check-handoff.mjs'), true);
+  assert.equal(ownedPathMatches('scripts/research-program/check-handoff.mjs', 'scripts/research-program/other.mjs'), false);
+  assert.equal(ownedPathMatches('docs/research-program/handoffs/schema/**', 'docs/research-program/handoffs/schema/README.md'), true);
+  assert.equal(ownedPathMatches('verification/research-program/pr-003/**', 'verification/research-program/pr-003/fixtures/handoff.valid.json'), true);
+  assert.equal(ownedPathMatches('docs/research-program/handoffs/', 'docs/research-program/handoffs/PR-003.json'), true);
+  assert.equal(ownedPathMatches('docs/research-program/handoffs/schema/**', 'docs/research-program/handoffs/PR-003.json'), false);
+});
+
 test('base SHA must match the concrete per-PR task binding', async () => {
   const report = await checkHandoff(fixture('handoff.reject-stale-base-sha.json'), {
     repoRoot: REPO_ROOT
@@ -286,7 +329,9 @@ test('local source and changed-file paths reject symlink escapes', async () => {
 
 test('sibling task-binding symlink is rejected before JSON fallback', async () => {
   const handoff = await readJson('handoff.valid.json');
-  const runtime = await writeRuntimeHandoff('binding-symlink.json', handoff);
+  const runtime = await writeRuntimeHandoff('binding-symlink.json', handoff, {
+    copyFixtureBinding: false
+  });
   const bindingLink = path.join(runtime.dir, 'task-binding.json');
   await symlink('/etc/hosts', bindingLink);
   try {
@@ -326,6 +371,127 @@ test('a handoff outside the repository root is rejected before it is read', asyn
   assert.equal(statusOf(report, 'handoff_readable'), 'not_executed');
 });
 
+test('immutable Git snapshots larger than Node default maxBuffer hash from Git bytes', async () => {
+  const handoff = await readJson('handoff.valid.json');
+  const runtime = await writeRuntimeHandoff('large-git-snapshot.json', handoff);
+  const commit = 'f62ce35481cc572e9aad054049c700aac6378f58';
+  const gitPath = 'evaluation/research-program/cohorts.json';
+  handoff.source_identities.push({
+    kind: 'frozen-cohort-snapshot',
+    id: 'evaluation/research-program/cohorts.json',
+    location: 'external',
+    sha256: '89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543',
+    git_commit: commit,
+    git_path: gitPath
+  });
+  await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+  try {
+    const report = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(report.ok, true, JSON.stringify(report.findings));
+
+    handoff.source_identities.at(-1).git_path = 'evaluation/research-program/pr003-r2-missing-cohorts.json';
+    await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+    const missing = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(missing.ok, false);
+    assert.ok(rulesOf(missing).includes('source_git_path_missing_at_commit'));
+    assert.equal(rulesOf(missing).includes('source_git_snapshot_unreadable'), false);
+  } finally {
+    await rm(runtime.dir, { recursive: true, force: true });
+  }
+});
+
+test('schema-invalid null JSON returns a rejected packet report rather than throwing', async () => {
+  const runtime = await writeRuntimeHandoff('null-packet.json', null);
+  try {
+    const report = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(report.ok, false);
+    assert.equal(report.outcome, 'rejected');
+    assert.ok(rulesOf(report).includes('schema_invalid'));
+    assert.equal(rulesOf(report).includes('validator_operational_error'), false);
+    const cli = runCli(runtime.file);
+    assert.equal(cli.status, 1, cli.stderr);
+    assert.equal(cli.json?.outcome, 'rejected');
+  } finally {
+    await rm(runtime.dir, { recursive: true, force: true });
+  }
+});
+
+test('noniterable collection types return schema findings without throwing', async () => {
+  const handoff = await readJson('handoff.valid.json');
+  handoff.commands = { not: 'an-array' };
+  const runtime = await writeRuntimeHandoff('noniterable-commands.json', handoff);
+  try {
+    const report = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(report.ok, false);
+    assert.equal(report.outcome, 'rejected');
+    assert.ok(rulesOf(report).includes('schema_invalid'));
+    assert.equal(statusOf(report, 'command_result_resolution'), 'not_executed');
+  } finally {
+    await rm(runtime.dir, { recursive: true, force: true });
+  }
+});
+
+test('unresolved changed-file symlink is not counted as a deletion', async () => {
+  const handoff = await readJson('handoff.valid.json');
+  const runtime = await writeRuntimeHandoff('dangling-changed-link.json', handoff);
+  const link = path.join(runtime.dir, 'pr003-r2-unresolved-changed-link');
+  await symlink(path.join(runtime.dir, 'pr003-r2-missing-symlink-target'), link);
+  handoff.changed_files = [path.relative(REPO_ROOT, link)];
+  await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+  try {
+    const report = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(report.ok, false);
+    assert.ok(rulesOf(report).includes('changed_file_symlink_unresolved'));
+    assert.equal(report.notes.some(note => note.rule === 'changed_file_not_present'), false);
+  } finally {
+    await rm(runtime.dir, { recursive: true, force: true });
+  }
+});
+
+test('absent changed files remain typed deletions', async () => {
+  const handoff = await readJson('handoff.valid.json');
+  const runtime = await writeRuntimeHandoff('deleted-changed-file.json', handoff);
+  handoff.changed_files = [
+    'verification/research-program/pr-003/fixtures/pr003-r2-absent-changed-file.json'
+  ];
+  await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+  try {
+    const report = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.ok(report.notes.some(note => note.rule === 'changed_file_not_present'));
+    assert.equal(rulesOf(report).includes('changed_file_symlink_unresolved'), false);
+  } finally {
+    await rm(runtime.dir, { recursive: true, force: true });
+  }
+});
+
+test('completed packets must match task-binding owner, branch and owned paths', async () => {
+  const handoff = await readJson('handoff.valid.json');
+  const runtime = await writeRuntimeHandoff('task-scope.json', handoff);
+  try {
+    handoff.owner = 'Not the bound owner';
+    await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+    const ownerReport = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(ownerReport.ok, false);
+    assert.ok(rulesOf(ownerReport).includes('handoff_owner_mismatch'));
+
+    handoff.owner = 'Luna Max (gpt-5.6-luna-max, reasoning high)';
+    handoff.branch = 'codex/not-the-bound-branch';
+    await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+    const branchReport = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(branchReport.ok, false);
+    assert.ok(rulesOf(branchReport).includes('handoff_branch_mismatch'));
+
+    handoff.branch = 'codex/ushso-pr003-integrity-recovery-20260910';
+    handoff.changed_files = ['package.json'];
+    await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+    const scopeReport = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(scopeReport.ok, false);
+    assert.ok(rulesOf(scopeReport).includes('changed_file_outside_owned_paths'));
+  } finally {
+    await rm(runtime.dir, { recursive: true, force: true });
+  }
+});
+
 test('CLI exits 0 for accepted packets and 1 for rejected packets', () => {
   for (const name of ['handoff.valid.json', 'handoff.valid-expected-negative.json', 'handoff.valid-unavailable.json']) {
     const valid = runCli(fixture(name));
@@ -344,7 +510,8 @@ test('CLI exits 0 for accepted packets and 1 for rejected packets', () => {
     'handoff.reject-missing-event-source.json',
     'handoff.reject-invalid-head.json',
     'handoff.reject-stale-base-sha.json',
-    'handoff.reject-invalid-timing.json'
+    'handoff.reject-invalid-timing.json',
+    'handoff.reject-fractional-timing.json'
   ]) {
     const result = runCli(fixture(name));
     assert.equal(result.status, 1, `${name}: ${result.stderr}`);
