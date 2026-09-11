@@ -1,0 +1,188 @@
+{
+  "format": "ushso.pr008.controller-semantic-probes.v1",
+  "author": "Astra/root",
+  "prepared_case_plan": "pr008-controller-case-plan.json",
+  "head": "e433effbd2346d3fcb863df061669332375a645b",
+  "tree": "7c3de22518f50a883fc3ca750e250dcc997e7166",
+  "recorded_at": "2026-09-11T18:01:26.291Z",
+  "script_sha256": "72b81aa9caf37d0d3e634c2bf35c6655fdc336b82f2d6441d6f708fa3cffe3de",
+  "scope": "Offline synthetic negative and positive cases; no payload access or scientific acceptance.",
+  "passed": 13,
+  "failed": 8,
+  "cases": [
+    {
+      "id": "context-identity",
+      "purpose": "All seven identity dimensions and literal punctuation distinguish derived identifiers.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "unresolved-context",
+      "purpose": "Missing context cannot mint a variable identifier.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "literal-extraction",
+      "purpose": "Wire, label, concept, definition and types stay separate.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "raw-values-and-pointers",
+      "purpose": "Exact literal codes, sentinel and JSON pointer replay.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "immutable-catalog",
+      "purpose": "Existing snapshot and field revisions cannot be changed through registration or returned references.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "foreign-asset-context",
+      "purpose": "Variable context resolver must not resolve an asset belonging to another snapshot.",
+      "status": "failed",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Foreign asset was returned as a resolved variable context",
+        "actual": false,
+        "expected": true
+      }
+    },
+    {
+      "id": "foreign-source-context",
+      "purpose": "Variable context resolver must not resolve a foreign source as the same registered snapshot.",
+      "status": "failed",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Foreign source was returned as a resolved variable context",
+        "actual": false,
+        "expected": true
+      }
+    },
+    {
+      "id": "unresolved-schema-field-helper",
+      "purpose": "Direct exported field helper cannot turn explicitly unresolved context into a stable field ID.",
+      "status": "failed",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Explicitly unresolved context minted a field ID",
+        "actual": false,
+        "expected": true
+      }
+    },
+    {
+      "id": "measurement-unit-unknown",
+      "purpose": "A measurement without any documented unit is never labeled complete.",
+      "status": "failed",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Expected \"actual\" to be strictly unequal to:\n\n'complete'",
+        "actual": "complete",
+        "expected": "complete"
+      }
+    },
+    {
+      "id": "measurement-unit-omitted",
+      "purpose": "Omitted measurement units remain incomplete or unknown even if both type assertions exist.",
+      "status": "failed",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Expected \"actual\" to be strictly unequal to:\n\n'complete'",
+        "actual": "complete",
+        "expected": "complete"
+      }
+    },
+    {
+      "id": "identifier-applicability",
+      "purpose": "An identifier supports reasoned unit non-applicability without measurement coercion.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "trusted-context-replay",
+      "purpose": "Verification must use the caller trusted context instead of copying the claim context.",
+      "status": "failed",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "A claim from a foreign release verified against a different trusted release",
+        "actual": false,
+        "expected": true
+      }
+    },
+    {
+      "id": "capture-bytes-binding",
+      "purpose": "Changed capture bytes or locator and wrong raw-value hashes cannot verify.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "capture-status-binding",
+      "purpose": "A failed retained capture cannot be used as verified variable extraction.",
+      "status": "failed",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "Failed capture verified successfully",
+        "actual": false,
+        "expected": true
+      }
+    },
+    {
+      "id": "capture-bytes-required",
+      "purpose": "Verified extraction needs actual captured bytes or an independently checked body binding.",
+      "status": "failed",
+      "error": {
+        "name": "AssertionError",
+        "code": "ERR_ASSERTION",
+        "message": "No retained raw bytes but the variable verifier claimed success",
+        "actual": false,
+        "expected": true
+      }
+    },
+    {
+      "id": "arbitrary-extraction-source",
+      "purpose": "Extraction cannot claim a raw pointer from different supplied data as verified capture provenance.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "mapping-evidence",
+      "purpose": "Aliases need evidence; literal differences remain ambiguous or unmatched.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "cms-parser-compatibility",
+      "purpose": "Existing CMS parser rows are unchanged by the additive adapter.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "cms-dictionary-only",
+      "purpose": "A dictionary-only label never becomes a selected wire field.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "retained-audit",
+      "purpose": "Actual retained 117/117 counts and eleven difference sets are unchanged and unresolved.",
+      "status": "passed",
+      "observation": null
+    },
+    {
+      "id": "frozen-legacy-bytes",
+      "purpose": "Legacy schema, machine routes, parsers and the old extractor implementation remain byte-identical.",
+      "status": "passed",
+      "observation": null
+    }
+  ]
+}
