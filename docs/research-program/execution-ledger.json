@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T06:09:36.999777Z",
+  "updated_at": "2026-09-11T06:25:39.390668Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -64,35 +64,34 @@
     },
     "ledger_fact_corrections": "verification/research-program/bootstrap/ledger-fact-corrections-487f06a.json",
     "latest_component_composition": {
-      "head_sha": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
-      "tree_sha": "57400b8b500d00d036332a57cddad561886c562a",
-      "status": "full_gate_failed_two_CI_test_context_assumptions",
-      "research_tests_passed": 66,
+      "head_sha": "34ca9dd1d68896a091fe18116bcff8abf8bed33b",
+      "tree_sha": "c7b56b946e5d75481d0cbfc9202006b90f28df1a",
+      "status": "release_audit_failed_artifact_over_file_size_cap",
+      "evidence": "verification/research-program/bootstrap/component-gate-failed-34ca9dd.json",
+      "gate_run_id": "20260911T061113Z-d780b1e766c7",
+      "passed_stages": [
+        "preflight",
+        "bootstrap",
+        "dependency-tree",
+        "tests",
+        "build",
+        "local-e2e"
+      ],
+      "failed_stage": "release-audit",
+      "unreached": [
+        "cloudflare-dry-run",
+        "retain-deployable-artifacts"
+      ],
+      "worker_tests_passed": 345,
+      "complete_npm_test_chain_passed": true,
+      "build_count": 1,
       "current_handoffs_passed": [
         "PR-003",
         "PR-004",
         "PR-085"
       ],
-      "preflight_evidence": "verification/research-program/bootstrap/component-composition-preflight-c70b079.json",
-      "failed_gate": "verification/research-program/bootstrap/component-gate-failed-c70b079.json",
-      "failed_gate_run_id": "20260911T053646Z-6f05088050e8",
-      "worker_tests": {
-        "total": 345,
-        "passed": 343,
-        "failed": 2
-      },
-      "unreached": [
-        "build",
-        "local-e2e",
-        "release-audit",
-        "cloudflare-dry-run",
-        "retain-deployable-artifacts"
-      ],
-      "correction_head_sha": "70c7a4c3231041f22a1c7475e70c6186a1aa7d6c",
-      "remaining": [
-        "New full gate on changed combined candidate",
-        "Fresh actual combined hosted CI"
-      ],
+      "failure": "verification/research-program/pr-004/completeness-view.json is 49,808,256bytes and exceeds the existing10MiB cap.",
+      "remediation_run_id": "ushso-pr004-artifact-packaging-grok-20260911",
       "accepted": false
     },
     "legacy_program_raw_pin_findings": {
@@ -104,7 +103,41 @@
       ],
       "consumer_pr": "PR-081",
       "meaning": "Track historical provenance reconciliation separately; no blind repin or inferred acceptance from structural PASS."
-    }
+    },
+    "retained_component_gate_failures": [
+      {
+        "head_sha": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
+        "tree_sha": "57400b8b500d00d036332a57cddad561886c562a",
+        "status": "full_gate_failed_two_CI_test_context_assumptions",
+        "research_tests_passed": 66,
+        "current_handoffs_passed": [
+          "PR-003",
+          "PR-004",
+          "PR-085"
+        ],
+        "preflight_evidence": "verification/research-program/bootstrap/component-composition-preflight-c70b079.json",
+        "failed_gate": "verification/research-program/bootstrap/component-gate-failed-c70b079.json",
+        "failed_gate_run_id": "20260911T053646Z-6f05088050e8",
+        "worker_tests": {
+          "total": 345,
+          "passed": 343,
+          "failed": 2
+        },
+        "unreached": [
+          "build",
+          "local-e2e",
+          "release-audit",
+          "cloudflare-dry-run",
+          "retain-deployable-artifacts"
+        ],
+        "correction_head_sha": "70c7a4c3231041f22a1c7475e70c6186a1aa7d6c",
+        "remaining": [
+          "New full gate on changed combined candidate",
+          "Fresh actual combined hosted CI"
+        ],
+        "accepted": false
+      }
+    ]
   },
   "providers": [
     {
@@ -123,11 +156,12 @@
       "model_reported_by_reviewer": "Grok 4.6",
       "model_identity_note": "The active managed interface records grok-4. The retained Grok 4.6 self-report belongs only to the earlier read-only boundary review and is not asserted for later implementation runs.",
       "latest_run": {
-        "run_id": "ushso-pr085-ci-tests-review-20260911",
+        "run_id": "ushso-pr004-artifact-packaging-grok-20260911",
+        "task_id": "ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
         "actual_model": "grok-4",
-        "status": "completed_review",
-        "evidence": "verification/research-program/bootstrap/pr085-ci-test-context-independent-review.json",
-        "reviewed_candidate_receipt_sha256": "7c5b9de4756bd651d4fcef1290516b115f7a138dc798e34376b4ecd4ae03e22e"
+        "status": "running",
+        "evidence": "verification/research-program/bootstrap/pr004-artifact-packaging-grok-dispatch.json",
+        "head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
@@ -147,7 +181,9 @@
           "cleanup": "normal/inactive_empty/unlocked"
         }
       ],
-      "active_runs": [],
+      "active_runs": [
+        "ushso-pr004-artifact-packaging-grok-20260911"
+      ],
       "latest_completed_wp11_run": {
         "run_id": "ushso-pr085-wp11-grok-20260911",
         "head": "574f15f8b5d137560f371e1ef81e415f267b1959",
@@ -569,7 +605,7 @@
       "evidence_directory": "verification/research-program/pr-003/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/15",
       "blockers": [
-        "A changed actual combined candidate must pass the full release gate and fresh hosted CI before component acceptance and downstream dispatch."
+        "Full tests, build and local E2E pass on combined34ca9dd; the PR004 artifact-size correction, changed full gate and fresh combined hosted CI precede component acceptance."
       ],
       "dispatch_preparation": "Three native DeepSeek slices completed; clean terminal lifecycle and producer final head are recorded.",
       "prerequisites_satisfied": true,
@@ -774,8 +810,8 @@
     },
     {
       "pr_id": "PR-004",
-      "status": "independent_review",
-      "owner": "ushso-pr004-field-states-20260910",
+      "status": "in_progress",
+      "owner": "ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
       "dependencies": [
         "PR-002"
       ],
@@ -794,21 +830,22 @@
       "evidence_directory": "verification/research-program/pr-004/",
       "github_pr_url": null,
       "blockers": [
-        "Final component and metadata checks pass; exact reviewed323dfe5 is published as draftPR16. The combined release gate remains pending."
+        "The complete logical artifact must be packaged losslessly under the existing 10MiB file cap, with exact decoded bytes and current handoff verification.",
+        "Independent packaging review, changed combined full gate and fresh combined hosted CI precede component acceptance and PR005/007 dispatch."
       ],
       "dispatch_preparation": "Workspace ready and dispatch initiated; actual model/preflight and execution receipts will establish provider usage.",
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-002": "verification/research-program/pr-002/controller/integration-handoff.json"
       },
-      "branch": "codex/ushso-pr004-field-states-20260910",
+      "branch": "codex/ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
       "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
-      "provider": "native Codex sub-agent",
-      "selected_model": "gpt-5.6-luna",
+      "provider": "Grok Co-Engineer",
+      "selected_model": "grok-4",
       "selected_reasoning": "max",
-      "actual_model": null,
-      "run_id": "ushso-pr004-field-states-20260910",
-      "dispatch_evidence": "verification/research-program/bootstrap/pr003-pr004-dispatch.json",
+      "actual_model": "grok-4",
+      "run_id": "ushso-pr004-artifact-packaging-grok-20260911",
+      "dispatch_evidence": "verification/research-program/bootstrap/pr004-artifact-packaging-grok-dispatch.json",
       "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
       "preliminary_review": "verification/research-program/bootstrap/pr004-preliminary-review-21b1b12.json",
       "preliminary_review_scope": "C1/C2 at 21b1b12 only; findings supplied to the active producer for disposition in final work, not a final-head verdict.",
@@ -819,7 +856,7 @@
         "Impossible calendar date accepted"
       ],
       "additional_preliminary_scope": "Immutable C1/C2 head21b1b12 only; sent to active producer for correction and final-head replay.",
-      "review_state": "final_component_verified_integrated_gate_pending",
+      "review_state": "changes_requested_for_release_artifact_size",
       "last_producer_head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
       "last_producer_tree_sha": "abfa7c2fd860e35c01ee11902696b015d02f6981",
       "independent_component_checks": "verification/research-program/bootstrap/pr004-r2-final-checks-86cf1b0.json",
@@ -869,6 +906,48 @@
         "head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
         "identity_and_body_readback_verified": true,
         "evidence": "verification/research-program/bootstrap/pr004-draft-publication-323dfe5.json"
+      },
+      "prior_packaging_owner": {
+        "owner": "ushso-pr004-field-states-20260910",
+        "branch": "codex/ushso-pr004-field-states-20260910",
+        "provider": "native Codex sub-agent",
+        "actual_model": null
+      },
+      "provider_task_id": "ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr004-field-states-20260910-worktrees/ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
+      "artifact_packaging_continuation": {
+        "format": "ushso.pr004-artifact-packaging-dispatch.v1",
+        "run_id": "ushso-pr004-artifact-packaging-grok-20260911",
+        "cursor": "8",
+        "task_id": "ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
+        "provider": "grok",
+        "model": "grok-4",
+        "status": "running",
+        "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr004-field-states-20260910-worktrees/ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
+        "branch": "codex/ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3",
+        "base_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
+        "deadline_at": "2026-09-11T06:46:36.128Z",
+        "prompt_dispatched": true,
+        "dispatch_evidence": "authoritative",
+        "scope": [
+          "verification/research-program/pr-004/**",
+          "tests/research-program/field-states.test.mjs",
+          "docs/research-program/handoffs/PR-004.json"
+        ],
+        "consent": {
+          "status": "approved",
+          "duration": "repository_and_selected_providers",
+          "source": "durable_grant"
+        },
+        "source_head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
+        "source_tree_sha": "abfa7c2fd860e35c01ee11902696b015d02f6981",
+        "logical_dispatch_base_preserved": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+        "failure": "verification/research-program/bootstrap/component-gate-failed-34ca9dd.json",
+        "bounded_input": "verification/research-program/bootstrap/pr004-artifact-size-remediation-input.json",
+        "artifact_decoded_sha256_required": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
+        "artifact_decoded_bytes_required": 49808256,
+        "current_artifact_file_cap_bytes": 10485760,
+        "semantic_changes_allowed": false
       }
     },
     {
@@ -2828,8 +2907,8 @@
       "evidence_directory": "verification/research-program/pr-085/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/17",
       "blockers": [
-        "Changed combined PR003/004/085 candidate full gate and hosted CI remain required.",
-        "Current WP0/CI/WP11 subject approvals remain PR082 work; component checks do not issue them."
+        "Full tests, build and local E2E pass on combined34ca9dd; PR004 artifact packaging must close release audit before a changed combined gate and hosted CI.",
+        "Current WP0/CI/WP11 approvals remain pending PR082 review."
       ],
       "planned_atomic_commits": 3,
       "prerequisites_satisfied": true,
@@ -2934,10 +3013,9 @@
       },
       "publication": {
         "url": "https://github.com/ajhcs/ushso/pull/17",
-        "head_sha": "01467fe31335b359443902eee4e6740b091d5cec",
+        "head_sha": "70c7a4c3231041f22a1c7475e70c6186a1aa7d6c",
         "draft": true,
-        "evidence": "verification/research-program/bootstrap/pr085-wp11-draft-publication-01467fe.json",
-        "new_ci_test_correction_publication_pending": true
+        "evidence": "verification/research-program/bootstrap/pr085-ci-context-draft-publication-70c7a4c.json"
       },
       "prior_wp11_owner_dispatch": {
         "owner": "ushso-pr085-ci-attestation-20260910",
