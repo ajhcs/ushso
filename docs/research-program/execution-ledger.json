@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T18:47:59.555126+00:00",
+  "updated_at": "2026-09-11T19:24:49.996285+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "423005db30d345dad038698def8e879c31e2c4dadf62b6ce650ec16b3917d6d0",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -179,13 +179,20 @@
       "findings": []
     },
     "next_component_candidate": {
-      "status": "accepted_and_integrated",
-      "head_sha": "e6da2e2d87c95501e5a1b129989e17bdae3cb882",
-      "tree_sha": "a9d9bca698ffc403a9ad1b82a8c8328af01146aa",
-      "merge_sha": "0d730aaf07b89bb16fb66fc224841a2d66c80d49",
-      "full_gate_pending": false,
-      "combined_hosted_ci_pending": false,
-      "accepted": true
+      "status": "independently_reviewed_pending_gate",
+      "components": {
+        "PR-006": "7e5819515b2f625d63de82efdd13571af096fbf6",
+        "PR-008": "a90071e261bee496fad1e3b1f98b07e0504a0fdd"
+      },
+      "isolated_composition_head": "39f583cb37e6e4ea9071c2b6bccc1d0dae2d693b",
+      "isolated_composition_tree": "f71a010717daeadf1c91b001fbbc11bf67e3d5bc",
+      "local_component_merge_shas": {
+        "PR-006": "3e0aff42bf9e7937f1ba3f456f31ce4e4a674c0c",
+        "PR-008": "39f583cb37e6e4ea9071c2b6bccc1d0dae2d693b"
+      },
+      "full_gate_pending": true,
+      "combined_hosted_ci_pending": true,
+      "accepted": false
     },
     "active_assignments": [
       {
@@ -1334,8 +1341,8 @@
     },
     {
       "pr_id": "PR-006",
-      "status": "changes_requested",
-      "owner": "/root/pr006_facet_contract_decision",
+      "status": "independently_verified",
+      "owner": null,
       "dependencies": [
         "PR-004",
         "PR-005"
@@ -1361,23 +1368,12 @@
         "apps/web/src/providers/discoveryProvider.ts",
         "apps/web/src/providers/discoveryProvider.test.ts"
       ],
-      "head_sha": "5d8a8dd6d2e9d60d5b18fa1f69a09533c7e0d9e9",
+      "head_sha": "7e5819515b2f625d63de82efdd13571af096fbf6",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-006.json",
       "evidence_directory": "verification/research-program/pr-006/",
-      "github_pr_url": null,
-      "blockers": [
-        {
-          "id": "PR006-R1-CANONICAL-IDS",
-          "kind": "implementation_correction",
-          "detail": "Canonical fixture matching normalizes distinct capability and unit IDs. topic:claims incorrectly matches topic-claims; facility_period incorrectly matches facility-period. Keep exact identifiers for all five canonical dimensions and do not apply legacy aliases during canonical requests."
-        },
-        {
-          "id": "PR006-R1-DESCRIPTION-IDS",
-          "kind": "implementation_correction",
-          "detail": "Mobile renders desktop and mobile sidebar instances with duplicate availability element IDs. Give each instance a unique prefix and keep aria-describedby bound to its own paragraph. All four mobile API/fixture cases at 390/320 pixels expose this defect."
-        }
-      ],
+      "github_pr_url": "https://github.com/ajhcs/ushso/pull/23",
+      "blockers": [],
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-004": "verification/research-program/bootstrap/components-463f092/pr-004-integration-handoff.json",
@@ -1397,11 +1393,14 @@
       "dispatch_packet": "verification/research-program/bootstrap/pr006-scope-20260911/dispatch-packet.json",
       "dispatch_packet_sha256": "416e75a5fcccd8d63b7d494ba50915c207b9f06763fbc876d36214ab84367c89",
       "dispatch_recorded_at": "2026-09-11T17:14:23.621321+00:00",
-      "producer_state": "producer_checked_corrections_in_progress",
-      "next_action": "Producer appends bounded corrections on its original branch; root independently replays the final immutable head and accepts only after all decisive checks pass.",
-      "independent_review_history": [],
-      "independent_review": "verification/research-program/bootstrap/pr006-review-5d8a8dd/decision.json",
-      "reviewed_tree": "d5cb2e16c62dcab2ed1267a6072cea96dcd5276d"
+      "producer_state": "producer_checked",
+      "next_action": "Exact combined release gate and hosted CI are pending; shared integration and product qualification are not yet accepted.",
+      "independent_review_history": [
+        "verification/research-program/bootstrap/pr006-review-5d8a8dd/decision.json"
+      ],
+      "independent_review": "verification/research-program/bootstrap/pr006-review-7e58195/final-review/decision.json.gz",
+      "reviewed_tree": "554137e2c615ef74bb9bc0cf4a1690141e003cc0",
+      "review_evidence": "verification/research-program/bootstrap/pr006-review-7e58195/index.json"
     },
     {
       "pr_id": "PR-007",
@@ -1470,8 +1469,8 @@
     },
     {
       "pr_id": "PR-008",
-      "status": "changes_requested",
-      "owner": "/root/pr008_variable_scope_review",
+      "status": "independently_verified",
+      "owner": null,
       "dependencies": [
         "PR-007"
       ],
@@ -1492,18 +1491,12 @@
         "tests/update-cycle.test.mjs",
         "tests/cms-layout.test.mjs"
       ],
-      "head_sha": "a50f5fae017f894d8bc46be001e6c5d12853db01",
+      "head_sha": "a90071e261bee496fad1e3b1f98b07e0504a0fdd",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-008.json",
       "evidence_directory": "verification/research-program/pr-008/",
-      "github_pr_url": null,
-      "blockers": [
-        {
-          "id": "PR008-R2-PARENT-CHAIN",
-          "kind": "implementation_correction",
-          "detail": "resolveVariableContext accepts partial source/asset-only evidence, foreign nested source or asset, a conflicting release list, and foreign parent releases in both top-level and nested selected distributions. Require complete independent parent edges and reject all supplied contradictory relationships; selecting the first non-null fact is insufficient."
-        }
-      ],
+      "github_pr_url": "https://github.com/ajhcs/ushso/pull/24",
+      "blockers": [],
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-007": "verification/research-program/bootstrap/components-e6da2e2/pr-007-integration-handoff.json"
@@ -1522,13 +1515,15 @@
       "dispatch_packet": "verification/research-program/bootstrap/pr008-scope-20260911/dispatch-packet.json",
       "dispatch_packet_sha256": "59a44a1a19d616365eb0ab8a38bb035a8a5d89ef95b886477b101561b0e7381f",
       "dispatch_recorded_at": "2026-09-11T16:56:56.612999+00:00",
-      "producer_state": "producer_checked_corrections_in_progress",
-      "next_action": "Producer appends bounded corrections on its original branch; root independently replays the final immutable head and accepts only after all decisive checks pass.",
-      "independent_review": "verification/research-program/bootstrap/pr008-review-a50f5fa/decision.json",
-      "reviewed_tree": "1ff528f5fa7780c086620d813e8ae48b4efe011a",
+      "producer_state": "producer_checked",
+      "next_action": "Exact combined release gate and hosted CI are pending; shared integration and product qualification are not yet accepted.",
+      "independent_review": "verification/research-program/bootstrap/pr008-review-a90071e/final-review/decision.json.gz",
+      "reviewed_tree": "9b05e1bb1c087150195fcc1dccd6287dcbc1f4a1",
       "independent_review_history": [
-        "verification/research-program/bootstrap/pr008-review-e433eff/decision.json"
-      ]
+        "verification/research-program/bootstrap/pr008-review-e433eff/decision.json",
+        "verification/research-program/bootstrap/pr008-review-a50f5fa/decision.json"
+      ],
+      "review_evidence": "verification/research-program/bootstrap/pr008-review-a90071e/index.json"
     },
     {
       "pr_id": "PR-009",
@@ -1625,7 +1620,12 @@
           "kind": "verification_scope",
           "detail": "Before connector changes, bind an additive WP5 successor with owned package/tests/validator/fingerprint/receipts. Preserve v1.0.0 bytes; native scope proposal in progress."
         }
-      ]
+      ],
+      "scope_proposals": {
+        "index": "verification/research-program/bootstrap/pr011-wp5-scope-proposals-20260911/index.json",
+        "disposition": "provisional_not_adopted",
+        "remaining_decision": "Bind an acyclic local component-composition input to the successor; no shared integration or public component merge while the joint gate is failing."
+      }
     },
     {
       "pr_id": "PR-012",
