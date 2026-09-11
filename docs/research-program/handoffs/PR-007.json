@@ -9,7 +9,7 @@
   "dependency_merge_shas": {
     "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce"
   },
-  "branch": "codex/ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad",
+  "branch": "codex/ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6",
   "github_pr_url": null,
   "changed_files": [
     "docs/research-program/handoffs/PR-007.json",
@@ -73,10 +73,38 @@
     "verification/research-program/pr-007/fixtures/catalog-resources.captures.json",
     "verification/research-program/pr-007/fixtures/cms-source-shaped.captures.json",
     "verification/research-program/pr-007/task-binding.json",
-    "verification/research-program/pr-007/verify.mjs"
+    "verification/research-program/pr-007/verify.mjs",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-focused.json",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-focused.stderr",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-focused.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-identity-package.json",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-identity-package.stderr",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-identity-package.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-identity-validate.json",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-identity-validate.stderr",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-identity-validate.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-independent-extra-v2.json",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-independent-extra-v2.stderr",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-independent-extra-v2.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-independent-semantics.json",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-independent-semantics.stderr",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-independent-semantics.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-verify.json",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-verify.stderr",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-verify.stdout",
+    "verification/research-program/pr-007/evidence/r007-r3/after-change.json",
+    "verification/research-program/pr-007/evidence/r007-r3/controller-r2-extra-semantics-failed.json",
+    "verification/research-program/pr-007/evidence/r007-r3/extra-semantics.json",
+    "verification/research-program/pr-007/evidence/r007-r3/semantics.json",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-check-handoff-before.json",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-check-handoff-before.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-check-handoff-before.stderr",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-check-handoff.json",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-check-handoff.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-r007-r3-check-handoff.stderr"
   ],
-  "problem": "Independent exact-head review of 9947794 found colliding publisher release IDs, reusable-over-time distribution collapse, vintage-as-global-release, unbound pin/publication mismatches, unrelated resources attachment, order-dependent date conflicts, invented dictionary revision identity, and a stale identity package seal (file_count 25 vs 30).",
-  "resulting_behavior": "Correction commit d6c82c71fed88e91f0e7957103998f114db70b33 keeps original C-007-1/2/3 history. Publisher namespace/punctuation/long values stay distinct; reusable-over-time identifiers are not immutable IDs; c_vintage is not a global release ID; publication/map/record ownership bind together; unrelated resources require a captured link; conflicting date literals remain inspectable; dictionary revision stays unresolved rather than copying the generation label; the current identity package seal matches exact current bytes. Frozen contract pins and automatic_rule_state=disabled_candidate_only are unchanged. Execution.provider grok, dispatch model grok-4; this interface is Grok 4.6 and is not a serving-model attestation.",
+  "problem": "Independent extra probe of ba077906 found five additional failures with a valid frozen-core control passing: foreign asset_id/entity_id projected as this release because the ownership check was always truthy; an incomplete envelope of only contract_version/entity_type/asset_id/release_id projected as a core Release; nativeIdentifierConformsToCore accepted effective_from=invalid-date; and Unicode U+1F600 collided with U+1F60 followed by ASCII 0 as ~1F600.",
+  "resulting_behavior": "Correction commit 20c97410620750efffdc79aed85818ff289718a0 keeps original C-007-1/2/3 and R2 history. Foreign asset_id/entity_id/source_id do not project as this release; incomplete envelopes fail frozen Release schema validation; malformed native dates are not core-conformant; supplementary-plane publisher identifiers use ~u plus 6 hex digits so U+1F600 and U+1F60+ASCII 0 stay distinct; exact native values and envelope fingerprints are preserved. Frozen contract pins and automatic_rule_state=disabled_candidate_only are unchanged. Execution.provider grok, dispatch model grok-4; this interface is Grok 4.6 and is not a serving-model attestation.",
   "commits": [
     {
       "id": "C-007-1",
@@ -101,6 +129,16 @@
     {
       "id": "C-007-5-R2",
       "subject": "Record PR007 release-binding correction evidence and handoff",
+      "sha": "ba0779069c5e75cc49be0e7b79026726ab087cfc"
+    },
+    {
+      "id": "C-007-6-R3",
+      "subject": "Correct core ownership, envelope validation, and Unicode identity encoding",
+      "sha": "20c97410620750efffdc79aed85818ff289718a0"
+    },
+    {
+      "id": "C-007-7-R3",
+      "subject": "Record PR007 core-identity correction evidence and handoff",
       "sha": null
     }
   ],
@@ -201,7 +239,7 @@
       "kind": "tracked PR-007 correction source",
       "id": "packages/identity/src/release-identity.mjs",
       "location": "local",
-      "sha256": "316aecedc8e73df4ea4a0c83d9ce41f4f794d1c1d63dad0b89b807e6c275a939"
+      "sha256": "36de1365f74415c5cd1a3bf2e5bf36349515e032d0f2f69153a620b1002be07a"
     },
     {
       "kind": "tracked PR-007 correction source",
@@ -219,37 +257,37 @@
       "kind": "tracked PR-007 correction source",
       "id": "packages/identity/src/core-conformance.mjs",
       "location": "local",
-      "sha256": "6d3e4685a3c5bcce6e8e431338baeb4afb97aef25fc984fab8955b01bb8b2d63"
+      "sha256": "44fbcde1873ba821652bb793e1a2896c77eb89658f7c80a75142f0e88de265ed"
     },
     {
       "kind": "tracked PR-007 correction source",
       "id": "tests/research-program/release-binding.test.mjs",
       "location": "local",
-      "sha256": "56aab62f6776c187f3ee9743cf0acc43a9e09dcef99edadb3c42a002b4180930"
+      "sha256": "81d59dd2565841e834df863049fe9105bb952c9cdaaa35814bbf03bb2d28f9bc"
     },
     {
       "kind": "tracked PR-007 correction source",
       "id": "packages/identity/manifests/package-manifest.json",
       "location": "local",
-      "sha256": "b297d290adffc33bb95745b922e007dafd8f200511adac4de61cf11b2d0f0726"
+      "sha256": "ad10d28c22edace91a93b33659e7bc71baf515e2b02ff1fa4d7d99adb3e0a68b"
     },
     {
       "kind": "tracked PR-007 correction source",
       "id": "packages/identity/validation/validation-receipt.json",
       "location": "local",
-      "sha256": "bee0c601bb8457e1499af20d06491f6a20a9a35094113cc5592fb75ed8116d0b"
+      "sha256": "24aaecef67d9ac207fdfeda487c8e738577137f1d6bb0253f771ef6d0cf9563f"
     },
     {
       "kind": "current task binding",
       "id": "verification/research-program/pr-007/task-binding.json",
       "location": "local",
-      "sha256": "99a22818bab1ad44ed2af69208d293481d836bed402b98dcb54e3c88184fcce0"
+      "sha256": "fac079ef1cd824b7a368d217d8eb06b45088d17f10af9065847dc84fcbfb9d8c"
     },
     {
       "kind": "current evidence index",
       "id": "verification/research-program/pr-007/evidence-index.json",
       "location": "local",
-      "sha256": "e0c89ad554315a4b339d343e8aa3a9eacc718c8df7a92ee57184b43554f7ff32"
+      "sha256": "d25c9ccfc6fffcdd0861316cdb60b4bcc45f6c8dc5776076c8722bd5f2e4e8f8"
     },
     {
       "kind": "source-shaped fixture",
@@ -274,6 +312,24 @@
       "id": "d6c82c71fed88e91f0e7957103998f114db70b33",
       "location": "external",
       "version": "tree dd0e06a7a3358efcf8fc3a713a2d04ea30c66268"
+    },
+    {
+      "kind": "continuation-execution-base",
+      "id": "ba0779069c5e75cc49be0e7b79026726ab087cfc",
+      "location": "external",
+      "version": "tree acb28d36f4355c196dbc931702b070cca44d79a2; original logical base remains 15b351a92af729f9ba07359fd210123fdfd76bb3"
+    },
+    {
+      "kind": "correction-commit",
+      "id": "20c97410620750efffdc79aed85818ff289718a0",
+      "location": "external",
+      "version": "tree 785909fdd8061670815831fa10ab03e118350767"
+    },
+    {
+      "kind": "tracked PR-007 R3 source",
+      "id": "verification/research-program/pr-007/verify.mjs",
+      "location": "local",
+      "sha256": "7a9d1da53dc2c402f2236ab2c955dcf94ed6c6ddefd0606cae3b2a00919bdf71"
     }
   ],
   "commands": [
@@ -601,14 +657,189 @@
         "sha256": "8e038c73692443f7d553acf894412744f3b504f1d872230d4d5011f598b82d27",
         "bytes": 6700
       }
+    },
+    {
+      "id": "cmd-r007-r3-focused",
+      "command": "node --test tests/research-program/release-binding.test.mjs",
+      "started_at": "2026-09-11T15:11:51.946Z",
+      "completed_at": "2026-09-11T15:11:52.316Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "R3 focused suite passed: 21 tests including R007-6/7/8.",
+      "expected": "exit 0 with original C-007/R007 fixtures and R007-6 through R007-8 regressions",
+      "actual": "exit 0; tests 21 pass 21 fail 0 skipped 0 duration_ms 337.47527",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-r007-r3-focused",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-r007-r3-focused.stdout",
+        "sha256": "bf8a9b6655ef9b6911039307468a7cbed341d3587f60d98380ce291eeea68fa7",
+        "bytes": 2580
+      }
+    },
+    {
+      "id": "cmd-r007-r3-identity-package",
+      "command": "npm test --prefix packages/identity",
+      "started_at": "2026-09-11T15:11:52.316Z",
+      "completed_at": "2026-09-11T15:11:52.620Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Existing identity package tests passed: 20 tests.",
+      "expected": "exit 0 with existing identity suites unchanged",
+      "actual": "exit 0; tests 20 pass 20 fail 0 skipped 0",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-r007-r3-identity-package",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-r007-r3-identity-package.stdout",
+        "sha256": "25c0e7460d5ced7883ebe9a9c8035537db7d1b655e8c91274580e4ed68c31425",
+        "bytes": 2650
+      }
+    },
+    {
+      "id": "cmd-r007-r3-identity-validate",
+      "command": "npm run validate --prefix packages/identity",
+      "started_at": "2026-09-11T15:11:52.620Z",
+      "completed_at": "2026-09-11T15:11:52.780Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Current identity package seal matches exact current bytes; frozen contract pins and disabled_candidate_only preserved.",
+      "expected": "exit 0 with file_count matching actual payload and automatic_rule_state disabled_candidate_only",
+      "actual": "exit 0; valid true; file_count 31; package_payload_digest_sha256 7a4ec4f8dca0525b9cdca70962e601ea3ffe424ab01914adac83a2a73655d162; automatic_rule_state disabled_candidate_only",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-r007-r3-identity-validate",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-r007-r3-identity-validate.stdout",
+        "sha256": "a361aca6e5ee60932a4cae0757bc8abe017672301583f599da411a78e9fd7628",
+        "bytes": 568
+      }
+    },
+    {
+      "id": "cmd-r007-r3-verify",
+      "command": "node verification/research-program/pr-007/verify.mjs",
+      "started_at": "2026-09-11T15:14:27.812Z",
+      "completed_at": "2026-09-11T15:14:28.036Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Producer verifier confirmed prior binding invariants plus R007-6/7/8: valid core control projected, foreign asset/entity not projected, incomplete envelope not projected, invalid native date rejected, Unicode IDs distinct.",
+      "expected": "exit 0 JSON report with ok true, foreign_asset_projected false, unicode_release_ids_distinct true",
+      "actual": "exit 0; core_control_projected true; foreign_asset_projected false; foreign_entity_projected false; incomplete_envelope_projected false; invalid_native_date_accepted false; unicode_release_ids_distinct true; dictionary_revision_kind unresolved",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-r007-r3-verify",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-r007-r3-verify.stdout",
+        "sha256": "ca17b2692d8f478d38255c1c1064dff2eb8c6428afd69a34fb3aaf8860cab40f",
+        "bytes": 784
+      }
+    },
+    {
+      "id": "cmd-r007-r3-independent-semantics",
+      "command": "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr007-independent-semantics.mjs /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f-worktrees/.ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad-worktrees/ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6 /mnt/d/tmp/plumbob/ushso-research-program-20260910/tmp-pr007-r3/semantics",
+      "started_at": "2026-09-11T15:11:52.875Z",
+      "completed_at": "2026-09-11T15:11:52.927Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Independent 14-case semantics replay: 14 passed, 0 failed, 0 probe errors. Synthetic fixture hash unchanged.",
+      "expected": "exit 0 with all 14 cases passed and source_fixture_unchanged true",
+      "actual": "exit 0; 14 passed; source_fixture_sha256 6cd70aac157dcb6a71f3d48c2b201017e8cd8cc0e59124edf36253d4389ce679",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-r007-r3-independent-semantics",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-r007-r3-independent-semantics.stdout",
+        "sha256": "9419d897849bf333997b3038a7729fff57f6c8ac73fa7939b340826f40d7ecc3",
+        "bytes": 789
+      }
+    },
+    {
+      "id": "cmd-r007-r3-independent-extra-v2",
+      "command": "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr007-independent-r2-extra-v2.mjs /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f-worktrees/.ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad-worktrees/ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6 /mnt/d/tmp/plumbob/ushso-research-program-20260910/tmp-pr007-r3/semantics-extra",
+      "started_at": "2026-09-11T15:11:52.927Z",
+      "completed_at": "2026-09-11T15:11:53.159Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Independent extra v2 probe: valid core control plus five previously failing contract cases all passed. Script uses installed AJV and explicit formats; ajv-formats was not installed.",
+      "expected": "exit 0 with all 6 cases passed",
+      "actual": "exit 0; control-valid-core-envelope, foreign-core-asset, foreign-core-entity-id, incomplete-core-envelope, invalid-native-effective-date, unicode-identifier-collision all passed; core_fixture_sha256 f593b3a43fc970c855f72bb83813b39b45d08a1d7e51fa28d37842c794395f0e",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-r007-r3-independent-extra-v2",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-r007-r3-independent-extra-v2.stdout",
+        "sha256": "e421012e5f1993f6b32d388618cffb3a2cc1cd8f111892c22a7e0ce7281502da",
+        "bytes": 434
+      }
+    },
+    {
+      "id": "cmd-r007-r3-check-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-007.json",
+      "started_at": "2026-09-11T15:21:53.054Z",
+      "completed_at": "2026-09-11T15:21:53.352Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "PR-003 checker accepted the R3 correction packet with zero findings; head_sha pending is typed. The recorded stdout is the packet immediately before this command row was appended.",
+      "expected": "exit 0 with outcome accepted and findings []",
+      "actual": "exit 0; ok true; outcome accepted; findings []; head_sha_pending true; packet sha256 98bd547df6639a97ffc8fc2d08c165be9fd201a29a47b20c7c9ce04154746511",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-r007-r3-check-handoff",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-r007-r3-check-handoff.stdout",
+        "sha256": "cebd83d14b4b97dfe2c321a84feb8811e6ad7c55d2fa3ccfe26c2cbdc294f3a3",
+        "bytes": 7231
+      }
     }
   ],
   "artifacts": [
     {
       "id": "artifact-release-identity-src",
       "path": "packages/identity/src/release-identity.mjs",
-      "sha256": "316aecedc8e73df4ea4a0c83d9ce41f4f794d1c1d63dad0b89b807e6c275a939",
-      "bytes": 19247
+      "sha256": "36de1365f74415c5cd1a3bf2e5bf36349515e032d0f2f69153a620b1002be07a",
+      "bytes": 19554
     },
     {
       "id": "artifact-release-binding-src",
@@ -649,26 +880,26 @@
     {
       "id": "artifact-focused-test",
       "path": "tests/research-program/release-binding.test.mjs",
-      "sha256": "56aab62f6776c187f3ee9743cf0acc43a9e09dcef99edadb3c42a002b4180930",
-      "bytes": 34263
+      "sha256": "81d59dd2565841e834df863049fe9105bb952c9cdaaa35814bbf03bb2d28f9bc",
+      "bytes": 39537
     },
     {
       "id": "artifact-verify",
       "path": "verification/research-program/pr-007/verify.mjs",
-      "sha256": "6b89b1cb8e689070a656fe590c1d713b42093f36962118e6dfd3d02600faa067",
-      "bytes": 4837
+      "sha256": "7a9d1da53dc2c402f2236ab2c955dcf94ed6c6ddefd0606cae3b2a00919bdf71",
+      "bytes": 8943
     },
     {
       "id": "artifact-task-binding",
       "path": "verification/research-program/pr-007/task-binding.json",
-      "sha256": "99a22818bab1ad44ed2af69208d293481d836bed402b98dcb54e3c88184fcce0",
-      "bytes": 4091
+      "sha256": "fac079ef1cd824b7a368d217d8eb06b45088d17f10af9065847dc84fcbfb9d8c",
+      "bytes": 5194
     },
     {
       "id": "artifact-evidence-index",
       "path": "verification/research-program/pr-007/evidence-index.json",
-      "sha256": "e0c89ad554315a4b339d343e8aa3a9eacc718c8df7a92ee57184b43554f7ff32",
-      "bytes": 2531
+      "sha256": "d25c9ccfc6fffcdd0861316cdb60b4bcc45f6c8dc5776076c8722bd5f2e4e8f8",
+      "bytes": 3367
     },
     {
       "id": "artifact-fixtures",
@@ -679,19 +910,19 @@
     {
       "id": "artifact-core-conformance-src",
       "path": "packages/identity/src/core-conformance.mjs",
-      "sha256": "6d3e4685a3c5bcce6e8e431338baeb4afb97aef25fc984fab8955b01bb8b2d63",
-      "bytes": 4916
+      "sha256": "44fbcde1873ba821652bb793e1a2896c77eb89658f7c80a75142f0e88de265ed",
+      "bytes": 6272
     },
     {
       "id": "artifact-package-manifest-r2",
       "path": "packages/identity/manifests/package-manifest.json",
-      "sha256": "b297d290adffc33bb95745b922e007dafd8f200511adac4de61cf11b2d0f0726",
+      "sha256": "ad10d28c22edace91a93b33659e7bc71baf515e2b02ff1fa4d7d99adb3e0a68b",
       "bytes": 1581
     },
     {
       "id": "artifact-validation-receipt-r2",
       "path": "packages/identity/validation/validation-receipt.json",
-      "sha256": "bee0c601bb8457e1499af20d06491f6a20a9a35094113cc5592fb75ed8116d0b",
+      "sha256": "24aaecef67d9ac207fdfeda487c8e738577137f1d6bb0253f771ef6d0cf9563f",
       "bytes": 929
     },
     {
@@ -711,6 +942,66 @@
       "path": "verification/research-program/pr-007/evidence/r007/semantics.json",
       "sha256": "d7daacd112ddef697d75c4fca9959ccd3613dc92fa1f10c69cea1fa150814550",
       "bytes": 15329
+    },
+    {
+      "id": "artifact-core-conformance-src-r3",
+      "path": "packages/identity/src/core-conformance.mjs",
+      "sha256": "44fbcde1873ba821652bb793e1a2896c77eb89658f7c80a75142f0e88de265ed",
+      "bytes": 6272
+    },
+    {
+      "id": "artifact-release-identity-src-r3",
+      "path": "packages/identity/src/release-identity.mjs",
+      "sha256": "36de1365f74415c5cd1a3bf2e5bf36349515e032d0f2f69153a620b1002be07a",
+      "bytes": 19554
+    },
+    {
+      "id": "artifact-package-manifest-r3",
+      "path": "packages/identity/manifests/package-manifest.json",
+      "sha256": "ad10d28c22edace91a93b33659e7bc71baf515e2b02ff1fa4d7d99adb3e0a68b",
+      "bytes": 1581
+    },
+    {
+      "id": "artifact-validation-receipt-r3",
+      "path": "packages/identity/validation/validation-receipt.json",
+      "sha256": "24aaecef67d9ac207fdfeda487c8e738577137f1d6bb0253f771ef6d0cf9563f",
+      "bytes": 929
+    },
+    {
+      "id": "artifact-focused-test-r3",
+      "path": "tests/research-program/release-binding.test.mjs",
+      "sha256": "81d59dd2565841e834df863049fe9105bb952c9cdaaa35814bbf03bb2d28f9bc",
+      "bytes": 39537
+    },
+    {
+      "id": "artifact-verify-r3",
+      "path": "verification/research-program/pr-007/verify.mjs",
+      "sha256": "7a9d1da53dc2c402f2236ab2c955dcf94ed6c6ddefd0606cae3b2a00919bdf71",
+      "bytes": 8943
+    },
+    {
+      "id": "artifact-r007-r3-after-change",
+      "path": "verification/research-program/pr-007/evidence/r007-r3/after-change.json",
+      "sha256": "6402a1cff08e4def7085e8a34c93d69a7be29299f85008b4628e18d4ae98b895",
+      "bytes": 2768
+    },
+    {
+      "id": "artifact-r007-r3-semantics",
+      "path": "verification/research-program/pr-007/evidence/r007-r3/semantics.json",
+      "sha256": "96e549e76b93f36334cba4b342dd5883aebb7597003b2b8bf6e3aa0ff4c11984",
+      "bytes": 15329
+    },
+    {
+      "id": "artifact-r007-r3-extra-semantics",
+      "path": "verification/research-program/pr-007/evidence/r007-r3/extra-semantics.json",
+      "sha256": "c11a099bdcd7028218934c3ac650e2a73c148f5529c7f0e3199b0b83f892dfbc",
+      "bytes": 6395
+    },
+    {
+      "id": "artifact-r007-r3-controller-failed-extra",
+      "path": "verification/research-program/pr-007/evidence/r007-r3/controller-r2-extra-semantics-failed.json",
+      "sha256": "030991533a08d10cc1ddde90bc874c8cfabf2d715ca69b8f522deb56abebda06",
+      "bytes": 13199
     }
   ],
   "acceptance_results": [
@@ -808,9 +1099,69 @@
         "artifact-package-manifest-r2",
         "artifact-validation-receipt-r2"
       ]
+    },
+    {
+      "id": "R007-6",
+      "status": "passed",
+      "result": "Foreign asset_id, entity_id, and source_id do not project as this release. A valid frozen core envelope still projects. Envelope fingerprints and native identifiers are not replaced from unrelated identity.",
+      "command_ids": [
+        "cmd-r007-r3-focused",
+        "cmd-r007-r3-verify",
+        "cmd-r007-r3-independent-extra-v2"
+      ],
+      "artifact_ids": [
+        "artifact-core-conformance-src-r3",
+        "artifact-focused-test-r3"
+      ]
+    },
+    {
+      "id": "R007-7",
+      "status": "passed",
+      "result": "Incomplete core envelopes are not projected. nativeIdentifierConformsToCore reuses frozen common/release schemas with contract date/date-time/URI predicates; invalid-date is rejected. The valid frozen Release fixture remains a positive control.",
+      "command_ids": [
+        "cmd-r007-r3-focused",
+        "cmd-r007-r3-verify",
+        "cmd-r007-r3-independent-extra-v2"
+      ],
+      "artifact_ids": [
+        "artifact-core-conformance-src-r3",
+        "artifact-focused-test-r3"
+      ]
+    },
+    {
+      "id": "R007-8",
+      "status": "passed",
+      "result": "Qualified identity encoding is injective for supplementary-plane code points. U+1F600 and U+1F60 followed by ASCII 0 mint distinct release IDs; exact native values are preserved.",
+      "command_ids": [
+        "cmd-r007-r3-focused",
+        "cmd-r007-r3-verify",
+        "cmd-r007-r3-independent-extra-v2"
+      ],
+      "artifact_ids": [
+        "artifact-release-identity-src-r3",
+        "artifact-focused-test-r3"
+      ]
+    },
+    {
+      "id": "R007-5-r3-seal",
+      "status": "passed",
+      "result": "Current identity package seal file_count=31 and digest 7a4ec4f8dca0525b9cdca70962e601ea3ffe424ab01914adac83a2a73655d162 match exact current bytes. Frozen contract pins and automatic_rule_state=disabled_candidate_only are unchanged. The prior 25-versus-30 failure is retained.",
+      "command_ids": [
+        "cmd-r007-r3-identity-validate"
+      ],
+      "artifact_ids": [
+        "artifact-package-manifest-r3",
+        "artifact-validation-receipt-r3"
+      ]
     }
   ],
   "failures_and_skipped_checks": [
+    {
+      "id": "controller-r2-extra-semantics",
+      "status": "failed",
+      "detail": "Independent extra probe at ba077906: five contract cases failed with a valid frozen-core control passing. Retained at verification/research-program/pr-007/evidence/r007-r3/controller-r2-extra-semantics-failed.json.",
+      "next_action": "Do not treat ba077906 extra-probe failures as current. Replay pr007-independent-r2-extra-v2.mjs on the correction head."
+    },
     {
       "id": "identity-package-seal-prior-head",
       "status": "failed",
@@ -834,14 +1185,14 @@
     {
       "id": "head-sha-pending-controller-commit",
       "status": "pending",
-      "detail": "head_sha and C-007-5-R2 sha remain null so this packet cannot contain its own future hash. Continuation implementation commit is d6c82c71fed88e91f0e7957103998f114db70b33 tree dd0e06a7a3358efcf8fc3a713a2d04ea30c66268. A controller-authored external receipt must bind the exact final commit and tree.",
-      "next_action": "Controller records the final C-007-5-R2 commit SHA/tree after commit."
+      "detail": "head_sha and C-007-7-R3 sha remain null so this packet cannot contain its own future hash. Continuation implementation commit is 20c97410620750efffdc79aed85818ff289718a0 tree 785909fdd8061670815831fa10ab03e118350767. A controller-authored external receipt must bind the exact final commit and tree.",
+      "next_action": "Controller records the final C-007-7-R3 commit SHA/tree after commit."
     },
     {
       "id": "independent-review-of-correction-not-started",
       "status": "unresolved",
-      "detail": "Astra independently reviewed 9947794 and requested R007-1 through R007-5. This correction candidate has not been independently reviewed. Producer checks are not independent verification or scientific approval.",
-      "next_action": "Astra independently inspects the new exact head and replays the decisive semantics plus package validate."
+      "detail": "Astra independently reviewed ba077906 and requested R007-6 through R007-8. This correction candidate has not been independently reviewed. Producer checks are not independent verification or scientific approval.",
+      "next_action": "Astra independently inspects the new exact head and replays the decisive extra v2 probe plus package validate."
     },
     {
       "id": "dictionary-schema-applicability",
@@ -858,8 +1209,8 @@
       "next_action": "Replay npm run validate --prefix packages/identity on the exact correction head."
     }
   ],
-  "next_consumer": "Astra independent review of the exact PR-007 correction head",
-  "next_action": "Controller binds the final C-007-5-R2 SHA/tree, reviews the diff, replays the decisive independent semantics and package validate, and publishes a draft PR. Do not merge or deploy from this producer packet. Do not declare acceptance merely because the old producer tests pass.",
+  "next_consumer": "Astra independent review of the exact PR-007 R3 correction head",
+  "next_action": "Controller binds the final C-007-7-R3 SHA/tree, reviews the diff, replays pr007-independent-semantics.mjs and pr007-independent-r2-extra-v2.mjs plus package validate, and publishes a draft PR. Do not merge or deploy from this producer packet. Do not claim root acceptance.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
@@ -872,10 +1223,10 @@
     ],
     "limitations": [
       "Producer-side checks only; no independent acceptance or scientific claim.",
-      "Prior independent review of 9947794 requested changes; that failing semantics report is retained in the controller review corpus.",
+      "Prior independent review of ba077906 requested R007-6 through R007-8; that failing extra probe is retained.",
       "Full root npm/build/Cloudflare gates remain separately owned.",
       "The precommit packet uses a typed pending head claim; a controller receipt must bind the exact final commit after commit.",
-      "Source-shaped CMS controls are retained public catalog metadata, not payload access."
+      "Dictionary/source revision remains unresolved without supporting evidence."
     ]
   }
 }
