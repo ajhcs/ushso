@@ -431,6 +431,54 @@ test('flat observation ledgers retain prior revisions and scope local revision i
   assert.throws(() => buildAccessSummary({ observations: [old, { ...old, value: { kind: 'integer', value: 99 } }], asOf }), { code: 'field_observation_revision_conflict' });
 });
 
+
+test('mixed flat and nested revisions deduplicate canonical payloads and reject content conflicts', () => {
+  const asOf = '2026-09-10T00:00:00.000Z';
+  const a = field({
+    observation_id: 'revision:mixed-a',
+    observed_at: '2026-09-01T00:00:00.1001Z',
+    recorded_at: '2026-09-01T00:00:00.1001Z',
+    attempted_at: '2026-09-01T00:00:00.1001Z',
+    source_observed_at: '2026-09-01T00:00:00.1001Z',
+    evidence_refs: [evidence('evidence:mixed-a', '2026-09-01T00:00:00.1001Z')],
+    reason_codes: ['mixed_revision_a']
+  });
+  const b = appendFieldObservationRevision(a, field({
+    observation_id: 'revision:mixed-b',
+    observed_at: '2026-09-02T00:00:00.1002Z',
+    recorded_at: '2026-09-02T00:00:00.1002Z',
+    attempted_at: '2026-09-02T00:00:00.1002Z',
+    source_observed_at: '2026-09-02T00:00:00.1002Z',
+    evidence_refs: [evidence('evidence:mixed-b', '2026-09-02T00:00:00.1002Z')],
+    reason_codes: ['mixed_revision_b'],
+    value: { kind: 'integer', value: 5 }
+  }));
+  const c = appendFieldObservationRevision(b, field({
+    observation_id: 'revision:mixed-c',
+    observed_at: '2026-09-03T00:00:00.1003Z',
+    recorded_at: '2026-09-03T00:00:00.1003Z',
+    attempted_at: '2026-09-03T00:00:00.1003Z',
+    source_observed_at: '2026-09-03T00:00:00.1003Z',
+    evidence_refs: [evidence('evidence:mixed-c', '2026-09-03T00:00:00.1003Z')],
+    reason_codes: ['mixed_revision_c'],
+    value: { kind: 'unknown', value: null },
+    value_state: 'unknown',
+    attempt_state: 'failed'
+  }));
+
+  const summary = buildAccessSummary({ observations: [a, b, c], asOf });
+  const revisions = summary.endpoint_scopes[0].revision_history;
+  assert.deepEqual(revisions.map(item => item.revision_id), ['revision:mixed-c', 'revision:mixed-b', 'revision:mixed-a']);
+  assert.equal(new Set(revisions.map(item => item.revision_id)).size, 3);
+  assert.deepEqual(revisions.find(item => item.revision_id === 'revision:mixed-a').evidence_refs.map(item => item.evidence_id), ['evidence:mixed-a']);
+  assert.deepEqual(buildAccessSummary({ observations: [c], asOf }).endpoint_scopes[0].revision_history.map(item => item.revision_id), ['revision:mixed-c', 'revision:mixed-b', 'revision:mixed-a']);
+
+  const conflictingNestedRevision = structuredClone(c);
+  const nestedB = conflictingNestedRevision.history.find(item => item.revision_id === b.observation_id);
+  nestedB.value = { kind: 'integer', value: 99 };
+  assert.throws(() => buildAccessSummary({ observations: [c, conflictingNestedRevision], asOf }), { code: 'field_observation_revision_conflict' });
+});
+
 test('strict RFC3339 validation rejects normalized dates and preserves sub-millisecond ordering', () => {
   assert.equal(isRfc3339DateTime('2026-02-31T00:00:00.000Z'), false);
   assert.equal(isRfc3339DateTime('09/01/2026'), false);

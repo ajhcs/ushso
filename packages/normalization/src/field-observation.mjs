@@ -524,13 +524,41 @@ function revisionConflict(identity) {
   throw issue;
 }
 
+function revisionPayload(value) {
+  const snapshot = clone(value);
+  delete snapshot.history;
+  return canonicalJson(snapshot);
+}
+
+function historyEntryIdentity(item) {
+  return revisionIdentity(item, item.revision_id);
+}
+
+function mergeRevisionRepresentations(existing, candidate) {
+  const identity = revisionIdentity(candidate);
+  if (revisionPayload(existing) !== revisionPayload(candidate)) revisionConflict(identity);
+  const historyByIdentity = new Map();
+  for (const item of [...(existing.history ?? []), ...(candidate.history ?? [])]) {
+    const historyIdentity = historyEntryIdentity(item);
+    const prior = historyByIdentity.get(historyIdentity);
+    if (prior && canonicalJson(prior) !== canonicalJson(item)) revisionConflict(historyIdentity);
+    if (!prior) historyByIdentity.set(historyIdentity, clone(item));
+  }
+  const history = [...historyByIdentity.values()].sort((left, right) => {
+    return compareRfc3339(left.observed_at, right.observed_at)
+      || compareRfc3339(left.recorded_at, right.recorded_at)
+      || String(left.revision_id).localeCompare(String(right.revision_id));
+  });
+  return { ...clone(existing), history };
+}
+
 function expandObservationHistory(observations) {
   const byIdentity = new Map();
   const add = candidate => {
     const identity = revisionIdentity(candidate);
     const existing = byIdentity.get(identity);
     if (existing) {
-      if (canonicalJson(existing) !== canonicalJson(candidate)) revisionConflict(identity);
+      byIdentity.set(identity, mergeRevisionRepresentations(existing, candidate));
       return;
     }
     byIdentity.set(identity, candidate);
