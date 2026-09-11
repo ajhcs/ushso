@@ -3,13 +3,13 @@
   "task_id": "ushso-pr085-ci-attestation-20260910",
   "slice_id": "C-085-3-R2",
   "pr_id": "PR-085",
-  "title": "Implement versioned CI v1.4 attestation inventory and preserve historical approval boundaries",
-  "owner": "Luna Max (OpenAI; reasoning max; actor luna-max)",
+  "title": "Implement WP11 v1.3 current-attestation adapter and preserve historical approval boundaries",
+  "owner": "Grok (xAI; grok-4; assignment grok-wp11). Original native owner remains Luna Max; this is a managed continuation after the native thread became unavailable. Root Astra authored only the separately reviewed C-085-2-R6 test-context correction and C-085-3-R2 evidence.",
   "reviewer": "Root/controller independent review",
   "branch": "codex/ushso-pr085-ci-attestation-20260910",
   "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
-  "objective": "Preserve the immutable CI v1.3 approval chain while adding a versioned CI v1.4 structural inventory, exact current-attestation route, reviewed PR-003 input transition and failure evidence without issuing current approval or release qualification.",
-  "outcome": "C-085-1, C-085-2, C-085-2-R1, C-085-2-R2, C-085-2-R3 and C-085-2-R4 are implemented by native Luna Max. The current v1.4 draft is pending_authorized_review with no current approval or release qualification; C-085-3 documentation is prepared for root exact-head binding and independent review. Original dispatch base is 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0 (tree 8707c8fc92f35742f58508a83a57a3c4d9b7baf4); the reviewed CI v1.4 continuation input is 4ad67220df54334f70d891fd26d1778f83328d54 (tree 02544973bf065b3825c8b189f186a598da99a223) under plan f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15 with independent review d3c9c26c7566c74de2e5cec42c24c388a54e3cbe402f9ccf472ea05294f02b8f; that continuation provenance remains explicit and does not replace the task base.",
+  "objective": "Preserve the immutable CI v1.3 and WP11 v1.3 approval chains while adding the reviewed WP11 current-attestation adapter, exact aggregate route, original PR085 package Git-snapshot provenance and failure evidence without issuing current approval or release qualification.",
+  "outcome": "C-085-1 through C-085-2-R4 remain native Luna Max work. C-085-2-R5 is the Grok continuation that adds the WP11 adapter, focused tests and exact aggregate route. Current WP11 technical draft 8d3409bc360d9b295c5c21f9b1a2d6ad91f42ff5c946a14aff92cd4b7d97c259 and wrapper subject 0e55f850f52b292b1172223abc7eb9980eb1c10a739af806a3bf55571415957c are pending_authorized_review with no current approval or release qualification. Original dispatch base remains 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0 (tree 8707c8fc92f35742f58508a83a57a3c4d9b7baf4). This continuation starts from prepared source 30dc908c27269710763241887dcd5b6215196668 (tree 1db855220a66bf973d290426eab74047cbd5433f) under plan 176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d with independent review 03ebb668ccdc75becb8818d67d3169e40d1f2d660c1f769e1df424cf20c9fe48; that provenance is recorded separately and does not replace the original task base. Root Astra authored the bounded C-085-2-R6 test-context correction, separately approved by Grok/grok-4; its functional commit is 344a56c63c624132bce4d3db4d72d6ce81944309. New command evidence is additive; earlier producer subjects remain historical.",
   "dependencies": [
     "PR-001"
   ],
@@ -24,7 +24,10 @@
     "verification/research-program/pr-085/",
     "docs/research-program/ci-attestations.md",
     "docs/research-program/handoffs/PR-085.json",
-    "package-lock.json"
+    "package-lock.json",
+    "scripts/verify-wp11-attestation.mjs",
+    "tests/wp11-attestation.test.mjs",
+    "verification/research-program/ci-attestation/wp11-v1.3.0/"
   ],
   "commits": [
     {
@@ -64,13 +67,40 @@
       "verification": "cmd-0039-f2390da5 passed the direct 10-test suite with both actual mixed-pair negatives; cmd-0044-9aab8058 passed the corrected verifier replay."
     },
     {
+      "id": "C-085-2-R5",
+      "subject": "feat(research): add WP11 current-attestation adapter (PR-085 C-085-2-R5)",
+      "instructions": "Add the read-only WP11 v1.3 adapter, exact aggregate route and focused subprocess tests; pin historical proof and predecessor receipts; invoke the existing current builder/validator; bind adapter/policy/runner/test bytes as a distinct wrapper subject.",
+      "verification": "cmd-0101-wp11-focused passed nine focused tests; cmd-0103-wp11-suite executed the real four-test WP11 suite then the adapter; cmd-0108-wp11-direct-validate retained SUCCESSOR_APPROVAL_STALE_SUBJECT."
+    },
+    {
       "id": "C-085-3",
       "subject": "docs(research): publish versioned CI attestation evidence (PR-085 C-085-3)",
       "instructions": "Publish exact current v1.4 replay, historical pins, reviewed PR-003 transition, command metadata, lock evidence, build/dry-run results and full-test failure while retaining pending authorization and unaccepted requirements.",
       "verification": "cmd-0027-ca1dd0f1, cmd-0029-77c01c6b, cmd-0030-670cc197, cmd-0031-8420d755, cmd-0032-26c45fcf, cmd-0033-0c22cabf, cmd-0041-14adb64d, cmd-0042-1ed26f79, cmd-0044-9aab8058, cmd-0023-f00f3acb and cmd-0024-911db093 provide the producer evidence; cmd-0022-aa4a557b records the full-test block."
+    },
+    {
+      "id": "C-085-3-R1",
+      "subject": "docs(research): record WP11 current-attestation evidence (PR-085 C-085-3-R1)",
+      "instructions": "Publish WP11 historical pins, current/wrapper subjects, original PR085 package Git-snapshot provenance, command metadata and a new continuation index without rewriting prior receipts or the historical evidence index.",
+      "verification": "cmd-0102/cmd-0109 WP11 verifier replay, cmd-0101 focused tests, cmd-0103 exact suite routing, cmd-0104/cmd-0106 preserved CI/WP0 focused tests, and cmd-0108 direct stale-subject failure."
+    },
+    {
+      "id": "C-085-2-R6",
+      "subject": "Verify WP11 across reviewed manifest contexts",
+      "instructions": "Apply only the separately reviewed two-test candidate.",
+      "verification": "Nine focused tests and the current verifier pass on the exact committed functional correction; separate Grok review covers combined-context and original-manifest controls."
+    },
+    {
+      "id": "C-085-3-R2",
+      "subject": "Record separately reviewed WP11 test-context evidence",
+      "instructions": "Preserve prior receipts and indexes while recording new current wrapper evidence and explicit root authorship.",
+      "verification": "Root current packet and independent review artifact are hash-bound."
     }
   ],
   "check_commands": [
+    "node scripts/verify-wp11-attestation.mjs",
+    "node --test tests/wp11-attestation.test.mjs",
+    "node scripts/run-contract-suites.mjs --suite wp11",
     "node scripts/verify-ci-attestation.mjs",
     "node --test tests/ci-attestation.test.mjs",
     "node tests/ci-attestation.test.mjs",
