@@ -1,0 +1,223 @@
+{
+  "format": "ushso.pr004.r2-evidence.v1",
+  "correction_scope": {
+    "prior_reviewed_head": "2976d98f39b782f6742b3f2f78cd919d8fce8d2d",
+    "correction_code_commit": "698089727450f6d91cfde604df0340494254a281",
+    "planned_correction_commits": [
+      "C-004-5",
+      "C-004-6"
+    ],
+    "evidence_commit": "pending-head-self-reference",
+    "summary": "Mixed flat and nested representations of the same revision are compared without their ancestry container, ancestry is merged by full record/source/field/revision identity, and conflicting content remains rejected."
+  },
+  "review_inputs": [
+    {
+      "kind": "independent_review_receipt",
+      "location": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/receipt.json",
+      "sha256": "b327e8d982d66d4fc8f7e9239e7771779c27f5372e5522996ca8f992283cb9"
+    },
+    {
+      "kind": "controller_mixed_revision_fixture",
+      "location": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/2976d98-functional/flat-nested-revisions.mjs",
+      "source_binding": "read-only scratch fixture; no repository mutation"
+    },
+    {
+      "kind": "controller_history_replay_receipt",
+      "location": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/2976d98-functional/history-receipt.json",
+      "sha256": "3567e6d2bb593108eb985782d219a56afbbfbaeac5205b7fb71b8024fd04fbfb"
+    }
+  ],
+  "history_replay": {
+    "identity_rule": "record_id + source_id + field_id + revision_id",
+    "canonical_comparison": "revision payload excludes only the history ancestry container; all other content, including evidence, remains part of the comparison.",
+    "nested_control": {
+      "revision_count": 3,
+      "status": "passed"
+    },
+    "mixed_flat_and_nested": {
+      "revision_count": 3,
+      "status": "passed"
+    },
+    "content_conflict_control": {
+      "status": "passed",
+      "error_code": "field_observation_revision_conflict",
+      "case": "same revision identity with altered nested value"
+    },
+    "published_surfaces": [
+      "vector history",
+      "evidence catalog bindings",
+      "access-summary revision_history"
+    ]
+  },
+  "artifact": {
+    "path": "verification/research-program/pr-004/completeness-view.json",
+    "artifact_id": "urn:ushso:completeness-view:7b6d763bfc652aa094b7d68c76ebc534de401c1e",
+    "artifact_digest": "sha256:7b6d763bfc652aa094b7d68c76ebc534de401c1e5904738932231b7824b42fab",
+    "sha256": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
+    "bytes": 49808256,
+    "records": 3434,
+    "source_memberships": 3434,
+    "isolated_records": 4,
+    "vector_fields": 13736,
+    "metrics": 25,
+    "encoding": "compact-v1",
+    "previous_artifact_sha256": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
+    "previous_artifact_bytes": 49808256,
+    "unchanged_from_prior_rebuild": true
+  },
+  "source_hashes": {
+    "docs/research-program/baseline.json": "09f8f507697da7d40e1cea452e39c5f07c45a16ffd1ca8a7f723de61c40961dc",
+    "evaluation/research-program/cohorts.json": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+    "packages/retrieval/versions/v1.2.0/corpus/corpus.json": "56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633",
+    "config/research-assets.lock.json": "75f362a1545f469a74bef00b7d7126fd03ffbfc79e4e6421bafe9fcf62db6c3b",
+    "packages/coverage/research-program/v1.0.0/src/completeness.mjs": "ef2e4e53758bdba0d97e0cfe77f472ae6a02d8959f867f0d3b04e3fcdb093b78",
+    "packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json": "fb4c38e72fdb1a9e686f7d238cc3fdaf5ddd78f836349560a57f7f0bfb5c3639",
+    "packages/normalization/manifests/package-manifest.json": "695081de875d2b21b2c4dbe6f0ea5fe389ef5c9cd02d6d374deec9d6968c7601",
+    "packages/normalization/schemas/field-observation.schema.json": "96ee40618f8f8703a4cb6797abecea3ba0120314d6751e033dc64dfc1d3ea007",
+    "packages/normalization/src/field-observation.mjs": "d52f7cc9c631541a38f33773223486e68a010452ddaaf7528475c9d7c1ad2aab",
+    "packages/normalization/tools/validate-package.mjs": "287521e927696e2dc75c4f58a467726b399836d5186036d10d6159bd8348f2da",
+    "tests/research-program/field-states.test.mjs": "4e233f3b06fa6ac7b501ab8c897c6bf8f5b2321b9474edf3654cab23e1912722",
+    "verification/research-program/pr-004/build-completeness-view.mjs": "8c9aba55062777b1423714bc31a02c1368d0a5b7dcf6f85f9785540df55c89a4",
+    "verification/research-program/pr-004/completeness-view.json": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
+    "verification/research-program/pr-004/verify.mjs": "c7abef0f310146475de8f549949bcead2d56c457067750284e74fdc449bf5754",
+    "verification/research-program/pr-004/task-binding.json": "9da41a7d27d32e2053582648332ea1d51d3141b4db7067e13ba8289cad08f0e3"
+  },
+  "checks": [
+    {
+      "id": "focused-field-state-regressions",
+      "command_id": "cmd-0005-d84b543a",
+      "argv": [
+        "node",
+        "--test",
+        "tests/research-program/field-states.test.mjs"
+      ],
+      "started_at": "2026-09-11T02:19:38.482Z",
+      "completed_at": "2026-09-11T02:20:02.552Z",
+      "exit_code": 0,
+      "result": "15 field-state tests pass, including mixed flat/nested and conflict controls."
+    },
+    {
+      "id": "controller-flat-nested-replay",
+      "command_id": "cmd-0006-0cf3afe9",
+      "argv": [
+        "node",
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/2976d98-functional/flat-nested-revisions.mjs",
+        "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+      ],
+      "started_at": "2026-09-11T02:20:14.627Z",
+      "completed_at": "2026-09-11T02:20:14.684Z",
+      "exit_code": 0,
+      "result": "Nested-only and flat-plus-nested three-revision fixture both produce three revisions."
+    },
+    {
+      "id": "normalization-manifest-refresh",
+      "command_id": "cmd-0007-8fd2eedc",
+      "argv": [
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+        "--prefix",
+        "packages/normalization",
+        "run",
+        "manifest"
+      ],
+      "started_at": "2026-09-11T02:21:44.079Z",
+      "completed_at": "2026-09-11T02:21:44.264Z",
+      "exit_code": 0,
+      "result": "Manifest generation passes after the field-observation source change."
+    },
+    {
+      "id": "normalization-package-tests",
+      "command_id": "cmd-0008-fe35f784",
+      "argv": [
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+        "--prefix",
+        "packages/normalization",
+        "test"
+      ],
+      "started_at": "2026-09-11T02:22:38.209Z",
+      "completed_at": "2026-09-11T02:22:54.690Z",
+      "exit_code": 0,
+      "result": "All 32 normalization package tests pass."
+    },
+    {
+      "id": "normalization-package-validation",
+      "command_id": "cmd-0009-ac15dc30",
+      "argv": [
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+        "--prefix",
+        "packages/normalization",
+        "run",
+        "validate"
+      ],
+      "started_at": "2026-09-11T02:22:54.830Z",
+      "completed_at": "2026-09-11T02:22:58.790Z",
+      "exit_code": 0,
+      "result": "Offline normalization package validation passes with the refreshed manifest."
+    },
+    {
+      "id": "completeness-artifact-rebuild",
+      "command_id": "cmd-0010-0ee53eb7",
+      "argv": [
+        "node",
+        "verification/research-program/pr-004/build-completeness-view.mjs"
+      ],
+      "started_at": "2026-09-11T02:24:13.892Z",
+      "completed_at": "2026-09-11T02:24:33.896Z",
+      "exit_code": 0,
+      "result": "Deterministic compact artifact rebuild passes with the accepted frozen cohort."
+    },
+    {
+      "id": "completeness-artifact-verification",
+      "command_id": "cmd-0011-dcb9106c",
+      "argv": [
+        "node",
+        "verification/research-program/pr-004/verify.mjs"
+      ],
+      "started_at": "2026-09-11T02:24:34.497Z",
+      "completed_at": "2026-09-11T02:24:57.518Z",
+      "exit_code": 0,
+      "result": "Offline artifact verifier passes counts, digest, evidence, metrics, and bound context."
+    },
+    {
+      "id": "diff-whitespace",
+      "command_id": "cmd-0012-12acbfe4",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "started_at": "2026-09-11T02:26:43.423Z",
+      "completed_at": "2026-09-11T02:26:43.430Z",
+      "exit_code": 0,
+      "result": "Current mixed-history correction diff passes git diff --check."
+    },
+    {
+      "id": "pinned-pr003-handoff-checker",
+      "command_id": "cmd-0014-a5c6bbc8",
+      "argv": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import { checkHandoff } from '/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-integrity-recovery-20260910/scripts/research-program/check-handoff.mjs'; const report = await checkHandoff('docs/research-program/handoffs/PR-004.json', { repoRoot: process.cwd() }); console.log(JSON.stringify({ status: report.ok ? 'pass' : 'fail', findings: report.findings.length, checks: report.checks.length, handoff: report.handoff })); process.exitCode = report.ok ? 0 : 1;"
+      ],
+      "started_at": "2026-09-11T02:36:44.416Z",
+      "completed_at": "2026-09-11T02:36:44.874Z",
+      "exit_code": 0,
+      "result": "Pinned PR003 handoff checker accepted the typed PR004 packet with zero findings using the PR004 worktree as repoRoot."
+    }
+  ],
+  "agentctl": {
+    "task_id": "ushso-pr004-field-states-r2-20260911",
+    "state_dir": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic/agentctl-r2-state",
+    "receipt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic/agentctl-r2-state/tasks/ushso-pr004-field-states-r2-20260911/receipt.json",
+    "receipt_digest": "e120141961c1a3871a1115a9a420a4abc4621a5029bf93ef1bfef4822b7273b3",
+    "event_log_sha256": "683431fd5fbf44897e71668b53fcebeb5384d171f9ca14cfdae9587a7db0eb5f",
+    "captured_before_final_handoff": true
+  },
+  "limitations": [
+    "Producer checks do not constitute root/Astra independent acceptance; replay must bind the final immutable head and tree.",
+    "The full integrated npm test/build/cf:dry-run gate remains root-owned and is not represented by this doc-scope lifecycle.",
+    "R01-R16 scientific qualification, source fitness, payload access and schema applicability remain downstream concerns.",
+    "Generated_at may be later than as_of; observations and nested evidence/access/browser clocks are bounded by as_of under strict RFC3339 validation."
+  ],
+  "downstream_instruction": "PR-005 may consume the unchanged compact artifact only after root binds and accepts this final head; use the source identity and artifact hashes above for replay."
+}

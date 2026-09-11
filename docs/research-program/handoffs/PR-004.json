@@ -25,10 +25,13 @@
     "verification/research-program/pr-004/completeness-view.json",
     "verification/research-program/pr-004/evidence.json",
     "verification/research-program/pr-004/verify.mjs",
-    "verification/research-program/pr-004/task-binding.json"
+    "verification/research-program/pr-004/task-binding.json",
+    "packages/normalization/tools/validate-package.mjs",
+    "verification/research-program/pr-004/evidence/r2/index.json",
+    "verification/research-program/pr-004/evidence/r2/README.md"
   ],
   "problem": "The research program needed versioned field observations and a complete, replayable coverage vector that preserves unknown, failed, blocked, unavailable, stale, and isolated states while keeping access evidence separate from catalog membership.",
-  "resulting_behavior": "PR-004 emits validated versioned field observations, deterministic as-of access summaries, exact frozen-cohort membership projections, and a hash-bound content-addressed offline compact completeness artifact. Full and compact vectors retain access facts and core contracts; a bound evidence catalog carries record/source/revision bindings and source locators. Offline consumers require independently supplied digest, membership, cohort, generation, and as-of context. Publisher-native identifiers remain distinct from stable USHSO record identifiers.",
+  "resulting_behavior": "PR-004 emits validated versioned field observations, deterministic as-of access summaries, exact frozen-cohort membership projections, and a hash-bound content-addressed offline compact completeness artifact. Full and compact vectors retain access facts and core contracts; a bound evidence catalog carries record/source/revision bindings and source locators. Offline consumers require independently supplied digest, membership, cohort, generation, and as-of context. Publisher-native identifiers remain distinct from stable USHSO record identifiers. Flat and nested observation-ledger representations of the same revision are compared without their ancestry container, merged by record/source/field/revision identity, and conflicting content is rejected.",
   "commits": [
     {
       "id": "C-004-1",
@@ -48,6 +51,21 @@
     {
       "id": "C-004-4",
       "subject": "Bind completeness provenance and independent context",
+      "sha": null
+    },
+    {
+      "id": "C-004-5",
+      "subject": "Correct PR004 history access and temporal binding",
+      "sha": "2976d98f39b782f6742b3f2f78cd919d8fce8d2d"
+    },
+    {
+      "id": "C-004-6",
+      "subject": "Deduplicate mixed flat and nested observation revisions",
+      "sha": "698089727450f6d91cfde604df0340494254a281"
+    },
+    {
+      "id": "C-004-7",
+      "subject": "Record PR004 R2 semantic correction evidence and handoff",
       "sha": null
     }
   ],
@@ -92,13 +110,13 @@
       "kind": "tracked PR-004 source or artifact",
       "id": "packages/coverage/research-program/v1.0.0/src/completeness.mjs",
       "location": "local",
-      "sha256": "c4fd448c99d2bdda8e6f0403544476288533cb8b1427e2ec3662ef7bf82d9ac0"
+      "sha256": "ef2e4e53758bdba0d97e0cfe77f472ae6a02d8959f867f0d3b04e3fcdb093b78"
     },
     {
       "kind": "tracked PR-004 source or artifact",
       "id": "packages/normalization/manifests/package-manifest.json",
       "location": "local",
-      "sha256": "ce26fe7a26265ce9c13a7d9b98a0b6acab4d60327aa5febaed68b1d164ac0a03"
+      "sha256": "695081de875d2b21b2c4dbe6f0ea5fe389ef5c9cd02d6d374deec9d6968c7601"
     },
     {
       "kind": "tracked PR-004 source or artifact",
@@ -110,7 +128,7 @@
       "kind": "tracked PR-004 source or artifact",
       "id": "packages/normalization/src/field-observation.mjs",
       "location": "local",
-      "sha256": "6e18c72101e3a12b69be025512eb6d76ca54f2ff5ed3d6a29fd80f3682ed2639"
+      "sha256": "d52f7cc9c631541a38f33773223486e68a010452ddaaf7528475c9d7c1ad2aab"
     },
     {
       "kind": "tracked PR-004 source or artifact",
@@ -122,7 +140,7 @@
       "kind": "tracked PR-004 source or artifact",
       "id": "tests/research-program/field-states.test.mjs",
       "location": "local",
-      "sha256": "63338e398202f64adbb99b11d601fbfc7ef309fbaf2056e77df62d89b1afeb8d"
+      "sha256": "4e233f3b06fa6ac7b501ab8c897c6bf8f5b2321b9474edf3654cab23e1912722"
     },
     {
       "kind": "tracked PR-004 source or artifact",
@@ -140,7 +158,7 @@
       "kind": "tracked PR-004 source or artifact",
       "id": "verification/research-program/pr-004/verify.mjs",
       "location": "local",
-      "sha256": "dfc458fb4e5752b7f00049ad6e29806fb24fe527e526c013d516b2d476e1fcf8"
+      "sha256": "c7abef0f310146475de8f549949bcead2d56c457067750284e74fdc449bf5754"
     },
     {
       "kind": "accepted transitive dependency commit through PR-002",
@@ -166,15 +184,39 @@
     },
     {
       "kind": "current correction lifecycle receipt",
-      "id": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/receipt.json",
+      "id": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic/agentctl-r2-state/tasks/ushso-pr004-field-states-r2-20260911/receipt.json",
       "location": "external",
-      "sha256": "d7a8d3fbcbca2fda5175ce66f1604d120f8ac60a5f97faf619c895599ab53258"
+      "sha256": "6b770fe03d41e2a33f500676f43085c4baffae8e22e3d1e8ff33aad95843e501"
     },
     {
       "kind": "controller-reconstructed exact dispatch binding",
       "id": "verification/research-program/pr-004/task-binding.json",
       "location": "local",
       "sha256": "9da41a7d27d32e2053582648332ea1d51d3141b4db7067e13ba8289cad08f0e3"
+    },
+    {
+      "kind": "R2 correction evidence",
+      "id": "packages/normalization/tools/validate-package.mjs",
+      "location": "local",
+      "sha256": "287521e927696e2dc75c4f58a467726b399836d5186036d10d6159bd8348f2da"
+    },
+    {
+      "kind": "R2 correction evidence",
+      "id": "verification/research-program/pr-004/evidence/r2/index.json",
+      "location": "local",
+      "sha256": "905f5e3a8c824935db2d6b5430559b89c3a9edd41684f40d43b42435b6ae5693"
+    },
+    {
+      "kind": "R2 correction evidence",
+      "id": "verification/research-program/pr-004/evidence/r2/README.md",
+      "location": "local",
+      "sha256": "abdc316e6c86b89b573fb8666e93ed86d044899bed6ed4b8a7d044ea774f22ac"
+    },
+    {
+      "kind": "controller mixed flat/nested revision fixture",
+      "id": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/2976d98-functional/flat-nested-revisions.mjs",
+      "location": "external",
+      "sha256": "1aef0dbbd3df18789b514e8288efb6c52e7467ee698fcf9423e9ef7f46c6bdad"
     }
   ],
   "commands": [
@@ -417,6 +459,150 @@
         "kind": "observed_exit",
         "exit_code": 0
       }
+    },
+    {
+      "id": "cmd-0005-d84b543a",
+      "command": "node --test tests/research-program/field-states.test.mjs",
+      "started_at": "2026-09-11T02:19:38.482Z",
+      "completed_at": "2026-09-11T02:20:02.552Z",
+      "exit_code": 0,
+      "result": "Focused field-state suite passed 15 tests, including mixed flat/nested and conflict controls.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0006-0cf3afe9",
+      "command": "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/2976d98-functional/flat-nested-revisions.mjs /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+      "started_at": "2026-09-11T02:20:14.627Z",
+      "completed_at": "2026-09-11T02:20:14.684Z",
+      "exit_code": 0,
+      "result": "Read-only controller fixture passed nested-only and flat-plus-nested three-revision cases.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0007-8fd2eedc",
+      "command": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm --prefix packages/normalization run manifest",
+      "started_at": "2026-09-11T02:21:44.079Z",
+      "completed_at": "2026-09-11T02:21:44.264Z",
+      "exit_code": 0,
+      "result": "Normalization manifest generation passed after the mixed-history source correction.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0008-fe35f784",
+      "command": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm --prefix packages/normalization test",
+      "started_at": "2026-09-11T02:22:38.209Z",
+      "completed_at": "2026-09-11T02:22:54.690Z",
+      "exit_code": 0,
+      "result": "Pinned npm normalization package tests passed all 32 tests.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0009-ac15dc30",
+      "command": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm --prefix packages/normalization run validate",
+      "started_at": "2026-09-11T02:22:54.830Z",
+      "completed_at": "2026-09-11T02:22:58.790Z",
+      "exit_code": 0,
+      "result": "Pinned npm offline normalization package validation passed with refreshed manifest.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0010-0ee53eb7",
+      "command": "node verification/research-program/pr-004/build-completeness-view.mjs",
+      "started_at": "2026-09-11T02:24:13.892Z",
+      "completed_at": "2026-09-11T02:24:33.896Z",
+      "exit_code": 0,
+      "result": "Deterministic compact completeness artifact rebuild passed for the accepted frozen cohort.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0011-dcb9106c",
+      "command": "node verification/research-program/pr-004/verify.mjs",
+      "started_at": "2026-09-11T02:24:34.497Z",
+      "completed_at": "2026-09-11T02:24:57.518Z",
+      "exit_code": 0,
+      "result": "Offline completeness verifier passed independent digest, count, metric, identifier, evidence and context checks.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0012-12acbfe4",
+      "command": "git diff --check",
+      "started_at": "2026-09-11T02:26:43.423Z",
+      "completed_at": "2026-09-11T02:26:43.430Z",
+      "exit_code": 0,
+      "result": "Mixed-history correction diff passed git diff --check.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0014-a5c6bbc8",
+      "command": "node --input-type=module -e 'import { checkHandoff } from '\"'\"'/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-integrity-recovery-20260910/scripts/research-program/check-handoff.mjs'\"'\"'; const report = await checkHandoff('\"'\"'docs/research-program/handoffs/PR-004.json'\"'\"', { repoRoot: process.cwd() }); console.log(JSON.stringify({ status: report.ok ? '\"'\"'pass'\"'\"' : '\"'\"'fail'\"'\"', findings: report.findings.length, checks: report.checks.length, handoff: report.handoff })); process.exitCode = report.ok ? 0 : 1;'",
+      "started_at": "2026-09-11T02:36:44.416Z",
+      "completed_at": "2026-09-11T02:36:44.874Z",
+      "exit_code": 0,
+      "result": "Pinned PR003 handoff checker accepted the typed PR004 packet with zero findings using the PR004 worktree as repoRoot.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
     }
   ],
   "artifacts": [
@@ -429,8 +615,8 @@
     {
       "id": "artifact-completeness-module",
       "path": "packages/coverage/research-program/v1.0.0/src/completeness.mjs",
-      "sha256": "c4fd448c99d2bdda8e6f0403544476288533cb8b1427e2ec3662ef7bf82d9ac0",
-      "bytes": 57363
+      "sha256": "ef2e4e53758bdba0d97e0cfe77f472ae6a02d8959f867f0d3b04e3fcdb093b78",
+      "bytes": 59783
     },
     {
       "id": "artifact-completeness-schema",
@@ -441,20 +627,20 @@
     {
       "id": "artifact-field-observation",
       "path": "packages/normalization/src/field-observation.mjs",
-      "sha256": "6e18c72101e3a12b69be025512eb6d76ca54f2ff5ed3d6a29fd80f3682ed2639",
-      "bytes": 49946
+      "sha256": "d52f7cc9c631541a38f33773223486e68a010452ddaaf7528475c9d7c1ad2aab",
+      "bytes": 54598
     },
     {
       "id": "artifact-normalization-manifest",
       "path": "packages/normalization/manifests/package-manifest.json",
-      "sha256": "ce26fe7a26265ce9c13a7d9b98a0b6acab4d60327aa5febaed68b1d164ac0a03",
+      "sha256": "695081de875d2b21b2c4dbe6f0ea5fe389ef5c9cd02d6d374deec9d6968c7601",
       "bytes": 9490
     },
     {
       "id": "artifact-field-state-tests",
       "path": "tests/research-program/field-states.test.mjs",
-      "sha256": "63338e398202f64adbb99b11d601fbfc7ef309fbaf2056e77df62d89b1afeb8d",
-      "bytes": 34053
+      "sha256": "4e233f3b06fa6ac7b501ab8c897c6bf8f5b2321b9474edf3654cab23e1912722",
+      "bytes": 42289
     },
     {
       "id": "artifact-build-script",
@@ -465,8 +651,8 @@
     {
       "id": "artifact-offline-verifier",
       "path": "verification/research-program/pr-004/verify.mjs",
-      "sha256": "dfc458fb4e5752b7f00049ad6e29806fb24fe527e526c013d516b2d476e1fcf8",
-      "bytes": 10799
+      "sha256": "c7abef0f310146475de8f549949bcead2d56c457067750284e74fdc449bf5754",
+      "bytes": 10839
     },
     {
       "id": "artifact-field-observation-schema",
@@ -491,6 +677,24 @@
       "path": "verification/research-program/pr-004/task-binding.json",
       "sha256": "9da41a7d27d32e2053582648332ea1d51d3141b4db7067e13ba8289cad08f0e3",
       "bytes": 4051
+    },
+    {
+      "id": "artifact-normalization-validation-tool",
+      "path": "packages/normalization/tools/validate-package.mjs",
+      "sha256": "287521e927696e2dc75c4f58a467726b399836d5186036d10d6159bd8348f2da",
+      "bytes": 15679
+    },
+    {
+      "id": "artifact-r2-evidence-index",
+      "path": "verification/research-program/pr-004/evidence/r2/index.json",
+      "sha256": "905f5e3a8c824935db2d6b5430559b89c3a9edd41684f40d43b42435b6ae5693",
+      "bytes": 10899
+    },
+    {
+      "id": "artifact-r2-evidence-readme",
+      "path": "verification/research-program/pr-004/evidence/r2/README.md",
+      "sha256": "abdc316e6c86b89b573fb8666e93ed86d044899bed6ed4b8a7d044ea774f22ac",
+      "bytes": 791
     }
   ],
   "acceptance_results": [
@@ -571,6 +775,61 @@
         "cmd-0032-98f8a0d7"
       ],
       "artifact_ids": []
+    },
+    {
+      "id": "acc-r2-mixed-flat-nested-history",
+      "status": "producer_checked",
+      "result": "The three-revision chain passes in nested-only and mixed flat-plus-nested forms; equivalent representations retain one canonical history entry per full record/source/field/revision identity, while altered nested content raises field_observation_revision_conflict.",
+      "command_ids": [
+        "cmd-0005-d84b543a",
+        "cmd-0006-0cf3afe9"
+      ],
+      "artifact_ids": [
+        "artifact-field-observation",
+        "artifact-field-state-tests",
+        "artifact-r2-evidence-index"
+      ]
+    },
+    {
+      "id": "acc-r2-package-and-artifact",
+      "status": "producer_checked",
+      "result": "The refreshed normalization manifest, 32-test package suite, package validation, deterministic 49,808,256-byte compact artifact rebuild, and offline verifier all passed.",
+      "command_ids": [
+        "cmd-0007-8fd2eedc",
+        "cmd-0008-fe35f784",
+        "cmd-0009-ac15dc30",
+        "cmd-0010-0ee53eb7",
+        "cmd-0011-dcb9106c"
+      ],
+      "artifact_ids": [
+        "artifact-normalization-manifest",
+        "artifact-completeness-view",
+        "artifact-completeness-module",
+        "artifact-offline-verifier",
+        "artifact-r2-evidence-index"
+      ]
+    },
+    {
+      "id": "acc-r2-diff-review",
+      "status": "producer_checked",
+      "result": "The mixed-history source/test correction diff passed whitespace validation.",
+      "command_ids": [
+        "cmd-0012-12acbfe4"
+      ],
+      "artifact_ids": [
+        "artifact-r2-evidence-index"
+      ]
+    },
+    {
+      "id": "acc-r2-handoff-contract",
+      "status": "producer_checked",
+      "result": "The pinned PR003 handoff checker accepted the current PR004 typed packet with zero findings; producer-side validation does not constitute independent acceptance.",
+      "command_ids": [
+        "cmd-0014-a5c6bbc8"
+      ],
+      "artifact_ids": [
+        "artifact-r2-evidence-index"
+      ]
     }
   ],
   "failures_and_skipped_checks": [
@@ -591,19 +850,25 @@
       "status": "skipped",
       "detail": "Network, runtime, provider, evaluator, and production deployment checks are outside this offline normalization/coverage PR.",
       "next_action": "Use the release gate and later source-intake PRs for those checks."
+    },
+    {
+      "id": "r2-initial-handoff-check-failure",
+      "status": "failed",
+      "detail": "The first R2 handoff-checker replay rejected a duplicate source identity for packages/normalization/tools/validate-package.mjs after the additive evidence update. The duplicate was removed before the successful replay; the failed agentctl command remains in the external lifecycle receipt.",
+      "next_action": "Use the subsequent pinned checker replay as the producer-side handoff validation and retain this failed attempt as historical context."
     }
   ],
   "unresolved_claims": [
     {
       "id": "head-sha-pending-controller-commit",
       "status": "unresolved",
-      "detail": "The final C-004-4 commit SHA is intentionally null because a commit cannot contain its own hash. Root records the immutable final head and tree after the normal producer commit.",
-      "next_action": "Bind head_sha and tree in the controller review record after commit."
+      "detail": "C-004-5 and C-004-6 are immutable producer commits. C-004-7 is the current evidence/handoff commit and head_sha remains null here because a commit cannot contain its own hash; root records the final immutable head and tree after the normal producer commit.",
+      "next_action": "Bind the final head SHA and tree in the controller review record after the producer commit."
     },
     {
       "id": "independent-review-pending",
       "status": "open",
-      "detail": "Producer checks do not constitute Astra/root independent verification or acceptance.",
+      "detail": "Producer R2 checks passed, but Astra/root independent verification and acceptance of the final immutable head remain pending; root should replay the mixed flat/nested fixture against that head.",
       "next_action": "Replay the decisive checks against the final head."
     },
     {
@@ -628,17 +893,22 @@
     }
   ],
   "next_consumer": "PR-005",
-  "next_action": "After root binds and accepts the final C-004-4 head, PR-005 consumes the exact artifact digest and normalization exports through the bound offline consumer; no scientific qualification is implied.",
+  "next_action": "After root binds and accepts the final C-004-7 head, PR-005 consumes the exact artifact digest and normalization exports through the bound offline consumer; no scientific qualification is implied.",
   "independent_review": {
     "status": "in_review",
     "reviewed_head_sha": null,
     "decisive_checks": [
-      "node verification/research-program/pr-004/verify.mjs",
       "node --test tests/research-program/field-states.test.mjs",
+      "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/2976d98-functional/flat-nested-revisions.mjs <repo-root>",
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm --prefix packages/normalization test",
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm --prefix packages/normalization run validate",
+      "node verification/research-program/pr-004/build-completeness-view.mjs",
+      "node verification/research-program/pr-004/verify.mjs",
       "root-owned full npm test/build/cf:dry-run gate"
     ],
     "limitations": [
-      "This is a producer_checked packet; the controller has not yet recorded independent acceptance or a final head binding."
+      "This is a producer_checked R2 packet; the controller has not yet recorded independent acceptance or a final head binding.",
+      "The current agentctl receipt is captured before final handoff/finish events; the final lifecycle receipt is reported separately by the producer."
     ]
   }
 }
