@@ -6,7 +6,8 @@ corrections `C-003-1-R1` / `C-003-2-R1`, bounded contract corrections
 `C-003-2-R3` / `C-003-3-R3`, and the composite-wildcard correction
 `C-003-2-R4` / `C-003-3-R4`, and the fixture-context isolation
 `C-003-2-R5` / `C-003-3-R5`, and the portable-temp / self-contained
-captured-ledger correction `C-003-2-R6` / `C-003-3-R6`). It translates
+captured-ledger correction `C-003-2-R6` / `C-003-3-R6`, and the unique
+cleanup-control correction `C-003-2-R7` / `C-003-3-R7`). It translates
 [`docs/master-plan/2026-09-10/EXECUTION.md`](../../../master-plan/2026-09-10/EXECUTION.md)
 and the [PR-003 packet](../../../master-plan/2026-09-10/prs/PR-003.md) into
 two JSON Schema documents that preserve the evidence an independent reviewer
@@ -223,7 +224,10 @@ absolute `TMPDIR`, then a valid absolute `RUNNER_TEMP` when `TMPDIR` is
 absent, then an ignored in-repository fixture scratch root. Literal `/tmp`
 and `/home` are not used as bulk scratch. Task-owned children are created
 with `mkdtemp` and removed individually; an existing unrelated directory is
-never recursively removed. The observed `f62ce354` vs `0b28d036`
+never recursively removed. The cleanup-control test allocates its unrelated
+sentinel directory with `mkdtemp` and removes only that unique directory in
+`finally`; it does not create or recursively remove a fixed pre-existing
+path. The observed `f62ce354` vs `0b28d036`
 `binding_conflict` is reproduced from a committed PR-003 task-row extraction
 of captured ledger `0c29fdb984c7bb4c101650e4bae86c716048c237` (`git_path`
 `docs/research-program/execution-ledger.json`, source SHA-256
@@ -268,18 +272,21 @@ validate them (they carry extra fields and a different evidence shape). Handoffs
 produced from PR-003 onward are expected to satisfy the contract, including the
 R1 integrity corrections, the R2 contract corrections, the R3
 null-item/wildcard-ownership corrections, the R4 composite-wildcard
-correction, the R5 fixture-context isolation and the R6 portable-temp /
-self-contained captured-ledger correction. A handoff is a
+correction, the R5 fixture-context isolation, the R6 portable-temp /
+self-contained captured-ledger correction, and the R7 unique cleanup-control
+correction. A handoff is a
 producer artifact: passing this schema is not independent verification and not
 scientific approval.
 
 Historical C-003-1 / C-003-2 / C-003-3, R1 and R2 command receipts and evidence
 indexes under `verification/research-program/pr-003/` are preserved
 byte-for-byte. They record runs against earlier validators and remain
-explicitly historical; they are not re-presented as fresh checks. R3, R4, R5
-and R6 correction evidence each have separate additive indexes that bind their
-current files and cite historical bytes through immutable Git commit/path/hash
-triples.
+explicitly historical; they are not re-presented as fresh checks. R3, R4, R5,
+R6 and R7 correction evidence each have separate additive indexes that bind
+their current files and cite historical bytes through immutable Git
+commit/path/hash triples. The interrupted R6 receipts, index and interruption
+note remain historical producer evidence and are not rewritten as completed
+R6 work.
 
 ## Reproduce
 
@@ -317,6 +324,13 @@ hashing, Git object binding and per-PR base lookup.
   (tree `e55c6413693acb39661c1457fcfee109603b6cc9`), the exact reviewed R5
   candidate. Functional R5 remains `852c0cfe8eb81bbca34306ab5fd192ab1558a07f`
   (tree `686b8c57095410cd054823dff64342f90ca24de8`).
+- Unique cleanup-control base (R7):
+  `a8cec211a2d93988e53ee2f85c31c2cac470b4eb`
+  (tree `2a0d1321a908cbb0832252da12460bfe5aca7219`), the interrupted R6
+  continuation input. Functional R6 remains
+  `d6578daad24a82f1c8ab587c44fbc74b44573b13`
+  (tree `ed9ca3c22a93a46f0cdd39a0f5202a0c3e486c96`). R6 dispatch base remains
+  `243a12510eb8ed3c7646d8a4d5d151a46b3cf28a`.
 - Accepted PR-002 merge (dependency): `5647e81457b606bb36456e75c48f990ce21e9c6c`.
 - PR-001 merge (dependency): `035465f3f16d15f02467679d96451d4440a36ca8`.
 - Dispatch prompt SHA-256: `f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d`.
@@ -362,7 +376,15 @@ Authorship is layered and must not be collapsed:
   identifies as Grok 4.6) on the reviewed R5 result. It makes fixture
   temporary storage portable and replaces runtime `git show` of non-ancestor
   `0c29fdb` with a committed task-row extraction. It is not a replay of
-  R1–R5 or of the failed 2026-09-10 Grok task.
+  R1–R5 or of the failed 2026-09-10 Grok task. Run
+  `ushso-pr003-grok-r6-20260911` / `grok-r6-portability` was CANCELLED at its
+  deadline with partial evidence retained; it is not a completed run.
+- This separately scoped R7 correction is Grok Co-Engineer work
+  (`execution.provider: grok`, `execution.model: grok-4`; this interface
+  identifies as Grok 4.6) on that retained R6 input. It allocates the
+  cleanup-control directory with `mkdtemp` and removes only that unique
+  directory. It is not a replay of R1–R6 or of the failed 2026-09-10 Grok
+  task.
 
 Reviewer Astra. `head_sha` stays null until the controller records the actual
 final commit; a future commit cannot contain its own hash. Root owns

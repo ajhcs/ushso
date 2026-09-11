@@ -1,6 +1,7 @@
 // Focused suite for PR-003 C-003-2 and integrity corrections C-003-1-R1/C-003-2-R1
 // plus bounded R2/R3/R4 contract corrections, the R5 fixture-context isolation,
-// and the R6 portable-temp / self-contained captured-ledger correction.
+// the R6 portable-temp / self-contained captured-ledger correction, and the R7
+// unique-directory cleanup-control correction.
 //
 // The suite exercises the validator on committed fixtures and ephemeral,
 // write-then-remove symlink probes. Fixture packets run against an explicit
@@ -881,20 +882,22 @@ test('fixture temporary-root helper selects TMPDIR, RUNNER_TEMP, then the in-rep
 
 test('owned fixture temps are cleaned without recursively removing an unrelated directory', async () => {
   await mkdir(LOCAL_SCRATCH_ROOT, { recursive: true });
-  const unrelated = path.join(LOCAL_SCRATCH_ROOT, 'unrelated-keep-me');
-  await mkdir(unrelated, { recursive: true });
-  const sentinel = path.join(unrelated, 'sentinel.txt');
-  await writeFile(sentinel, 'keep\n');
-  const owned = await ownedTempDir('pr003-r6-owned-');
-  assert.notEqual(path.resolve(owned), path.resolve(unrelated));
-  assert.equal(path.resolve(owned).startsWith(`${path.resolve(unrelated)}${path.sep}`), false);
-  await assert.rejects(
-    () => removeOwnedTempDir(unrelated),
-    /refusing to remove untracked path/
-  );
-  await removeOwnedTempDir(owned);
-  assert.equal(await readFile(sentinel, 'utf8'), 'keep\n');
-  await rm(unrelated, { recursive: true, force: true });
+  const unrelated = await mkdtemp(path.join(LOCAL_SCRATCH_ROOT, 'pr003-r7-unrelated-'));
+  try {
+    const sentinel = path.join(unrelated, 'sentinel.txt');
+    await writeFile(sentinel, 'keep\n');
+    const owned = await ownedTempDir('pr003-r7-owned-');
+    assert.notEqual(path.resolve(owned), path.resolve(unrelated));
+    assert.equal(path.resolve(owned).startsWith(`${path.resolve(unrelated)}${path.sep}`), false);
+    await assert.rejects(
+      () => removeOwnedTempDir(unrelated),
+      /refusing to remove untracked path/
+    );
+    await removeOwnedTempDir(owned);
+    assert.equal(await readFile(sentinel, 'utf8'), 'keep\n');
+  } finally {
+    await rm(unrelated, { recursive: true, force: true });
+  }
 });
 
 test('a different plausible ledger base in the controlled context still rejects with binding_conflict', async () => {
