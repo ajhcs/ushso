@@ -1,0 +1,576 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-006",
+  "status": "producer_checked",
+  "owner": "/root/pr006_facet_contract_decision",
+  "reviewer": "Astra/root",
+  "base_sha": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+  "head_sha": null,
+  "dependency_merge_shas": {
+    "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+    "PR-005": "4fa2e0b5c8ee210cff9750a59e69df4b4a527fdc"
+  },
+  "branch": "codex/ushso-pr006-facets-isolation-20260911",
+  "github_pr_url": null,
+  "changed_files": [
+    "docs/research-program/handoffs/PR-006.json",
+    "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+    "packages/retrieval/tests/lexical-index.test.mjs",
+    "tests/direct-base-regression.test.mjs",
+    "tests/research-program/isolation-and-facets.test.mjs",
+    "apps/web/src/data/facets.ts",
+    "apps/web/src/data/facets.test.ts",
+    "apps/web/src/pages/SearchResultsPage.tsx",
+    "apps/web/src/pages/SearchResultsPage.test.tsx",
+    "apps/web/src/pages/SourcesPage.tsx",
+    "apps/web/src/pages/SourcesPage.test.tsx",
+    "apps/web/src/components/FacetSidebar.tsx",
+    "apps/web/src/components/FacetSidebar.test.tsx",
+    "apps/web/src/types/catalog.ts",
+    "apps/web/src/providers/discoveryProvider.ts",
+    "apps/web/src/providers/discoveryProvider.test.ts",
+    "verification/research-program/pr-006/c0061-isolation.json",
+    "verification/research-program/pr-006/c0062-facets-ui.json",
+    "verification/research-program/pr-006/c0063-labels-parity.json",
+    "verification/research-program/pr-006/command-receipts/cmd-c0061-c0062-c0063.json",
+    "verification/research-program/pr-006/command-receipts/cmd-direct-base-parity.json",
+    "verification/research-program/pr-006/command-receipts/cmd-lexical-parity.json",
+    "verification/research-program/pr-006/command-receipts/cmd-retrieval-full.json",
+    "verification/research-program/pr-006/command-receipts/cmd-web-focused.json",
+    "verification/research-program/pr-006/command-receipts/cmd-web-full.json",
+    "verification/research-program/pr-006/command-receipts/cmd-handoff-check.json"
+  ],
+  "problem": "The existing UI hid unresolved facet controls after a known-value narrowing, reported no scoped reason for uniform or unknown-only dimensions, and let accepted fixture filtering return the unfiltered response. Live facet labels also came from raw IDs, so values absent from the current page could not use captured source or capability names. The frozen discovery-result v1.0.0 schema cannot accept new option fields or section metadata.",
+  "resulting_behavior": "Canonical source, geography, access_status, unit_of_analysis and capability facets are projected into browser-only availability/reason metadata. Unknown geography/access controls remain usable without fabricated counts; selected values survive narrowed and empty responses and remain removable. Existing count values remain current matching records before pagination for live responses, while filtered fixture counts are explicitly bounded to accepted fixture records. FixtureDiscoveryProvider applies same-dimension OR and cross-dimension AND filters and keeps response pagination/ranking/sections consistent. Retrieval-core changes only existing facet option label strings, resolving unambiguous captured source/capability names from complete matches and using readable bounded labels for known IDs. Frozen schemas, types, reference engines, manifests, fingerprints and source bytes are unchanged.",
+  "commits": [
+    {
+      "id": "C-006-1",
+      "subject": "Preserve isolated catalog record accounting",
+      "sha": "4a7da7c2f2cc4cc027033e8138e4dd9fcfc51fb1"
+    },
+    {
+      "id": "C-006-2",
+      "subject": "Bound facet availability to current results",
+      "sha": "78c27bb7130bb74e0fa84659a03149074fe9b40a"
+    },
+    {
+      "id": "C-006-3",
+      "subject": "Add facet labels and fixture roundtrip evidence",
+      "sha": null
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "PR006 current source",
+      "id": "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+      "location": "local",
+      "sha256": "b42ef12b6efda9e10c02f8b8ef4589fb7c2bcfd1f77e38c321b15081c220d23a"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "packages/retrieval/tests/lexical-index.test.mjs",
+      "location": "local",
+      "sha256": "39ce5950da9a6e23ec3c6f1fe2b0f13fbd9df1795cfaa5cdfa2a4e3c1a0f36de"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "tests/direct-base-regression.test.mjs",
+      "location": "local",
+      "sha256": "50955a0efb0e5c33cfa2e463f05df54943c5756d47e1b977fb48a482b8444ba8"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "tests/research-program/isolation-and-facets.test.mjs",
+      "location": "local",
+      "sha256": "c21da856a6219760a7ddf400e22e370751d0018cf6a867fc63f6f6bcb2795d85"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/data/facets.ts",
+      "location": "local",
+      "sha256": "0de863cba40f1ae37cccfbf1137f054575c9be46322a1cc8ddcd177501835e9e"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/data/facets.test.ts",
+      "location": "local",
+      "sha256": "b6f471f4a9f5e5e96b2f6eb36cc53df32c0c4e49418ab6d60b65020fef4de532"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/components/FacetSidebar.tsx",
+      "location": "local",
+      "sha256": "c6b866ff6d5a9e1fe5644bcbf4cd0dbde0d7be3bc3f38b3be0e81a7649c573f6"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/components/FacetSidebar.test.tsx",
+      "location": "local",
+      "sha256": "cecc3e714a3c45752795ac89e3c8334bfd6f4f50ce7b3559f18deadea0b5fed2"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/providers/discoveryProvider.ts",
+      "location": "local",
+      "sha256": "f86ba0e2dccefa1841c0373d9189abc89295fb0165e76c8a2b8d8c8e8713a768"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/providers/discoveryProvider.test.ts",
+      "location": "local",
+      "sha256": "3ccb14e9f09acb4fa42e5fb203d65da4b5277b28e60782c46aaedfd92708a5ce"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "verification/research-program/pr-006/task-binding.json",
+      "location": "local",
+      "sha256": "77cec5221ef0d6bf1ae69712fc0d451b968bfc557edf5d608dff57f5e2d626a6"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "evaluation/research-program/cohorts.json",
+      "location": "local",
+      "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "verification/research-program/pr-004/evidence.json",
+      "location": "local",
+      "sha256": "21c8191004eca6f58b8f05fb8a404548ad8f686af0cd951b4a1df09b6a447e73"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "packages/retrieval/versions/v1.2.0/corpus/corpus.json",
+      "location": "local",
+      "sha256": "56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "verification/research-program/bootstrap/pr006-scope-20260911/decision.json",
+      "location": "local",
+      "sha256": "aa1b3a40d35054278d529210ff74767fd36ce2d586a1374b5d36fd8071c86015"
+    },
+    {
+      "kind": "frozen discovery-result schema",
+      "id": "packages/retrieval/schemas/discovery-result.schema.json@c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "location": "external",
+      "git_commit": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "git_path": "packages/retrieval/schemas/discovery-result.schema.json",
+      "sha256": "4fbd6832e1c7bf0495eb692f39395891af9b6d5229a9b6203c4e919886c928eb"
+    },
+    {
+      "kind": "frozen browser discovery types",
+      "id": "apps/web/src/types/discovery.ts@c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "location": "external",
+      "git_commit": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "git_path": "apps/web/src/types/discovery.ts",
+      "sha256": "3d56804e6dc368a7688216e46c3309cadf9546a48e3e44e3098e12f682c2b01a"
+    },
+    {
+      "kind": "frozen direct-base reference engine",
+      "id": "tests/fixtures/direct-base-control.mjs@c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "location": "external",
+      "git_commit": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "git_path": "tests/fixtures/direct-base-control.mjs",
+      "sha256": "9d672c8b8fb9602e820ffafe731db2dfadd9ffb9abb581b8f01a688b8705f14d"
+    },
+    {
+      "kind": "frozen retrieval-core reference bytes",
+      "id": "packages/retrieval/fixtures/retrieval-core-before-lexical-index.txt@c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "location": "external",
+      "git_commit": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "git_path": "packages/retrieval/fixtures/retrieval-core-before-lexical-index.txt",
+      "sha256": "6aa9d8f0ea943fc3a3278eb2aade82f544c8fe810fad52a0ad908a4aea5efd5f"
+    },
+    {
+      "kind": "dispatch packet",
+      "id": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr006-native-dispatch-packet.json",
+      "location": "external",
+      "version": "ushso.native-implementation-dispatch.v1; plan_sha256 5115ef87c2b5b1c432d807ab25bf48852c76e23a1a0fe7f323fce9be6dce5cb4",
+      "sha256": "416e75a5fcccd8d63b7d494ba50915c207b9f06763fbc876d36214ab84367c89"
+    },
+    {
+      "kind": "prior native contract decision",
+      "id": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr006-native-contract-decision.md",
+      "location": "external",
+      "version": "read-only bounded contract review; decoded SHA 4f94915f439b663f1d3da138c8a3bf7e52a6307fac041dcd816432ca54be8900",
+      "sha256": "4f94915f439b663f1d3da138c8a3bf7e52a6307fac041dcd816432ca54be8900"
+    },
+    {
+      "kind": "accepted integration dependency",
+      "id": "0d730aaf07b89bb16fb66fc224841a2d66c80d49",
+      "location": "external",
+      "version": "accepted PR005/007/086 integration tree used to create base"
+    },
+    {
+      "kind": "accepted dependency merge",
+      "id": "PR-004@463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+      "location": "external"
+    },
+    {
+      "kind": "accepted dependency merge",
+      "id": "PR-005@4fa2e0b5c8ee210cff9750a59e69df4b4a527fdc",
+      "location": "external"
+    },
+    {
+      "kind": "execution interface selection",
+      "id": "gpt-5.6-luna/max",
+      "location": "external",
+      "version": "native Codex collaboration; configured model gpt-5.6-luna, reasoning max"
+    },
+    {
+      "kind": "producer self-label boundary",
+      "id": "Codex, GPT-6",
+      "location": "external",
+      "version": "self-label retained only as prose; not a serving-model attestation"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-lexical-parity",
+      "command": "node --test packages/retrieval/tests/lexical-index.test.mjs",
+      "started_at": "2026-09-11T18:18:20.785Z",
+      "completed_at": "2026-09-11T18:18:21.343Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Lexical projected and on-demand parity checks passed.",
+      "expected": "Expected exit 0.",
+      "actual": "2 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-lexical-parity.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-direct-base-parity",
+      "command": "node --test tests/direct-base-regression.test.mjs",
+      "started_at": "2026-09-11T18:18:21.345Z",
+      "completed_at": "2026-09-11T18:18:21.563Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Direct-base response parity and input immutability checks passed.",
+      "expected": "Expected exit 0.",
+      "actual": "9 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-direct-base-parity.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c0061-c0062-c0063",
+      "command": "node --test tests/research-program/isolation-and-facets.test.mjs",
+      "started_at": "2026-09-11T18:18:21.564Z",
+      "completed_at": "2026-09-11T18:18:23.284Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Isolation, current-scope facets, OR/AND filters and complete-match label checks passed.",
+      "expected": "Expected exit 0.",
+      "actual": "3 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-c0061-c0062-c0063.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-web-focused",
+      "command": "npm run typecheck --workspace @ushso/observatory-web; npm run test:web -- --run src/data/facets.test.ts src/providers/discoveryProvider.test.ts src/components/FacetSidebar.test.tsx src/pages/SearchResultsPage.test.tsx src/pages/SourcesPage.test.tsx",
+      "started_at": "2026-09-11T18:18:23.284Z",
+      "completed_at": "2026-09-11T18:18:25.758Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Focused web typecheck and facet/provider/sidebar/page checks passed.",
+      "expected": "Expected exit 0.",
+      "actual": "Typecheck passed; 32 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-web-focused.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-web-full",
+      "command": "npm run test:web",
+      "started_at": "2026-09-11T18:18:25.759Z",
+      "completed_at": "2026-09-11T18:18:28.548Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Full observatory web suite passed.",
+      "expected": "Expected exit 0.",
+      "actual": "31 test files and 173 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-web-full.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-retrieval-full",
+      "command": "npm run test:retrieval",
+      "started_at": "2026-09-11T18:18:28.548Z",
+      "completed_at": "2026-09-11T18:18:32.886Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Full retrieval suite passed.",
+      "expected": "Expected exit 0.",
+      "actual": "105 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-retrieval-full.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-handoff-check",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-006.json",
+      "started_at": "2026-09-11T18:20:05.229Z",
+      "completed_at": "2026-09-11T18:20:05.502Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "PR-006 handoff validator passed after receipt binding; task scope, source identities, artifacts and pending-head transport are valid.",
+      "expected": "Expected exit 0.",
+      "actual": "Validator replay passed with exit 0. Full stdout/stderr are retained at verification/research-program/pr-006/command-receipts/cmd-handoff-check.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-c0061-isolation",
+      "path": "verification/research-program/pr-006/c0061-isolation.json",
+      "sha256": "96a9e3dfdb53c6a5be45a8d08d55326d327064a6de7fe12f41d0693e22b19e5d",
+      "bytes": 1602
+    },
+    {
+      "id": "artifact-c0062-facets-ui",
+      "path": "verification/research-program/pr-006/c0062-facets-ui.json",
+      "sha256": "b572879c51c34bccac37bd476db5c1f67b8d65b2d0b6e0a10888d174ced5d1e3",
+      "bytes": 2497
+    },
+    {
+      "id": "artifact-c0063-labels-parity",
+      "path": "verification/research-program/pr-006/c0063-labels-parity.json",
+      "sha256": "8c985d0e1eefac9c88aafc8af22a1f6d8d1f388c040a4b501bb79de0bae6a4f2",
+      "bytes": 4123
+    },
+    {
+      "id": "artifact-cmd-c0061-c0062-c0063",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-c0061-c0062-c0063.json",
+      "sha256": "d691b3a921240fd7a89049c60f0e170268496d63e3af2e7dd5fa3bf76e6aa1e5",
+      "bytes": 971
+    },
+    {
+      "id": "artifact-cmd-direct-base-parity",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-direct-base-parity.json",
+      "sha256": "1dac642b63a05eee9b55675ea9093eabf84c1ff228b454e50f0dc8720cccd2bd",
+      "bytes": 1324
+    },
+    {
+      "id": "artifact-cmd-lexical-parity",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-lexical-parity.json",
+      "sha256": "3f3d02fab63d8904b65b0e5890ca382fcf51682cf9212fb2ee0ec14642be6794",
+      "bytes": 801
+    },
+    {
+      "id": "artifact-cmd-retrieval-full",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-retrieval-full.json",
+      "sha256": "1739847c98caee7237c03247da4959742a1175d2d2dc20a08b41b555815398eb",
+      "bytes": 9734
+    },
+    {
+      "id": "artifact-cmd-web-focused",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-web-focused.json",
+      "sha256": "9c03caa058f2d872ff99ae2ac45ed17c938c0e147458239c6953aadce7503527",
+      "bytes": 1782
+    },
+    {
+      "id": "artifact-cmd-web-full",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-web-full.json",
+      "sha256": "5b9898391766d2111e7e89a6ccf4b90f9679e1c2d06137d1901a993cd6d3568c",
+      "bytes": 918
+    },
+    {
+      "id": "artifact-cmd-handoff-check",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-handoff-check.json",
+      "sha256": "652d2dfbf087bd16985001edce7272fc46ba3dbffabdaf17df7ee6e5ddd49d2b",
+      "bytes": 16940
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C0061-isolation",
+      "status": "producer_checked",
+      "result": "The accepted denominator remains 3434 records, 3430 searchable records and exactly four CDC records with typed nonempty-description failures; the response retains partial_results without exposing invalid records.",
+      "command_ids": [
+        "cmd-c0061-c0062-c0063"
+      ],
+      "artifact_ids": [
+        "artifact-c0061-isolation",
+        "artifact-cmd-c0061-c0062-c0063"
+      ]
+    },
+    {
+      "id": "C0062-facets-ui",
+      "status": "producer_checked",
+      "result": "The browser facet adapter preserves unresolved controls and selected removal, supplies scoped availability reasons and does not add fields to the frozen API response. Fixture filter behavior and current-scope counts are covered by the final isolation test.",
+      "command_ids": [
+        "cmd-web-focused",
+        "cmd-c0061-c0062-c0063"
+      ],
+      "artifact_ids": [
+        "artifact-c0062-facets-ui",
+        "artifact-cmd-web-focused",
+        "artifact-cmd-c0061-c0062-c0063"
+      ]
+    },
+    {
+      "id": "C0063-labels-parity",
+      "status": "producer_checked",
+      "result": "Live label-only projection resolves complete-match captured labels; both frozen comparison paths isolate only option.label differences and assert all other response fields exactly.",
+      "command_ids": [
+        "cmd-lexical-parity",
+        "cmd-direct-base-parity",
+        "cmd-c0061-c0062-c0063",
+        "cmd-web-full",
+        "cmd-retrieval-full"
+      ],
+      "artifact_ids": [
+        "artifact-c0063-labels-parity",
+        "artifact-cmd-lexical-parity",
+        "artifact-cmd-direct-base-parity",
+        "artifact-cmd-c0061-c0062-c0063",
+        "artifact-cmd-web-full",
+        "artifact-cmd-retrieval-full"
+      ]
+    },
+    {
+      "id": "PR006-handoff-validation",
+      "status": "producer_checked",
+      "result": "The handoff is prepared as pending-head transport for independent root binding.",
+      "command_ids": [
+        "cmd-handoff-check"
+      ],
+      "artifact_ids": [
+        "artifact-cmd-handoff-check"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "H-PR006-HEAD",
+      "status": "pending",
+      "detail": "C-006-3 is committed together with this handoff, so its final Git SHA cannot be embedded in the commit that contains the handoff. head_sha remains typed pending-head transport.",
+      "next_action": "Root binds the final C-006-3 HEAD and tree during independent acceptance/publication."
+    },
+    {
+      "id": "H-PR006-BROWSER",
+      "status": "pending",
+      "detail": "The controller owns the corrected real-Chrome API and FixtureDiscoveryProvider interaction replay; the producer makes no browser or participant qualification claim.",
+      "next_action": "Root replays the browser harness against the final committed head."
+    },
+    {
+      "id": "H-PR006-SETUP",
+      "status": "failed",
+      "detail": "One attempted full-web bootstrap wrapper used a mistyped nested worktree path and exited before running tests. The lock released normally and the corrected invocation passed the full 170-test suite.",
+      "next_action": "Retain as harness history; use the corrected command receipt for acceptance."
+    },
+    {
+      "id": "H-PR006-SCIENCE",
+      "status": "unresolved",
+      "detail": "R01-R16 and scientific, participant and production acceptance remain outside this implementation handoff.",
+      "next_action": "Resolve only through the program acceptance process."
+    },
+    {
+      "id": "H-PR006-NETWORK",
+      "status": "skipped",
+      "detail": "No live collection, private holdout access, server binding, publisher payload request or deployment was performed.",
+      "next_action": "None for this bounded packet."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "U-PR006-HEAD-SHA",
+      "status": "pending",
+      "detail": "Final C-006-3 head SHA/tree transport is pending root binding."
+    },
+    {
+      "id": "U-PR006-BROWSER",
+      "status": "pending",
+      "detail": "Real-Chrome interaction and hosted API/fixture path replay are pending independent controller review."
+    },
+    {
+      "id": "U-PR006-LIVE-PAYLOAD",
+      "status": "unresolved",
+      "detail": "Facet availability describes the current response/catalog scope and does not establish publisher payload access or authorization."
+    },
+    {
+      "id": "U-PR006-SCIENTIFIC",
+      "status": "unresolved",
+      "detail": "No R01-R16 scientific claim or participant qualification is asserted."
+    }
+  ],
+  "risks": [
+    {
+      "id": "R-PR006-FINGERPRINT",
+      "status": "risk",
+      "detail": "The historical v1.2.0 corpus algorithm fingerprint and reference pins remain unchanged while retrieval-core facet labels change. Differential tests normalize only option.label and compare all other response fields exactly; publication must preserve that historical boundary.",
+      "next_action": "Root independently checks the label-only diff against publication policy."
+    },
+    {
+      "id": "R-PR006-FIXTURE-SCOPE",
+      "status": "risk",
+      "detail": "Fixture filtering is bounded to accepted response records and its recomputed counts are explicitly marked as fixture response scope, not live catalog totals.",
+      "next_action": "Keep fixture provider unpromoted for unrestricted queries."
+    },
+    {
+      "id": "R-PR006-LABEL-CONFLICT",
+      "status": "risk",
+      "detail": "When captured source/capability labels conflict or are absent, the projection retains a static or raw bounded label and does not infer scientific meaning from an ID.",
+      "next_action": "Review any newly observed label vocabulary in a successor contract if it requires new fields."
+    }
+  ],
+  "next_consumer": "Astra/root",
+  "next_action": "Replay the bounded packet checks and corrected Chrome API/fixture interaction receipt against the final head, bind the pending C-006-3 SHA/tree, and publish/integrate only after independent acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [
+      "non-label parity against both frozen reference engines",
+      "C0061 denominator and exact CDC isolation",
+      "C0062 current-scope availability/roundtrip semantics",
+      "C0063 complete-match labels absent from the current page",
+      "full web and retrieval suites",
+      "corrected real-Chrome API and FixtureDiscoveryProvider replay"
+    ],
+    "limitations": [
+      "Producer checks are offline and local; no private holdouts, live publisher payload, participant study, deployment or scientific acceptance was performed.",
+      "head_sha remains pending because the final C-006-3 commit cannot contain its own object ID."
+    ]
+  }
+}

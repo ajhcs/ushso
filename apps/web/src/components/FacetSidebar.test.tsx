@@ -13,7 +13,7 @@ describe('FacetSidebar accessibility and bounded availability', () => {
         availability: 'unavailable',
         availabilityReason: 'All matching records have unresolved geography in this catalog scope; no geography-specific narrowing is available.',
         options: [
-          { value: 'unknown', label: 'Include records with unresolved geography (if present)' },
+          { value: 'unknown', label: 'Include records with unresolved geography (if present)', disabled: true },
           { value: 'US-PA', label: 'Pennsylvania', count: 0 },
         ],
       }],
@@ -28,6 +28,8 @@ describe('FacetSidebar accessibility and bounded availability', () => {
     expect(markup).toContain('aria-label=\"Geography: Pennsylvania, selected. All matching records')
     expect(markup).toContain('Selected filters')
     expect(markup).toContain('Remove Pennsylvania filter')
-    expect(markup).not.toContain('disabled')
+    expect(markup).toContain('aria-label="Geography: Include records with unresolved geography (if present).')
+    expect(markup).toMatch(/facet-option facet-option--disabled[^>]*>.*Include records with unresolved geography/)
+    expect(markup).not.toMatch(/aria-label="Geography: Pennsylvania, selected[^>]*disabled/)
   })
 })

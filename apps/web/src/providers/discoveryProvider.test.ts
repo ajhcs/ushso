@@ -33,6 +33,8 @@ describe('DiscoveryProvider contract', () => {
     const pennsylvania = await provider.browse({ traversal: { filters: ['geography:US-PA'] } })
     expect(pennsylvania.results.length).toBeGreaterThan(0)
     expect(pennsylvania.results.every((result) => result.record.geography.jurisdictions.includes('US-PA'))).toBe(true)
+    if (pennsylvania.pagination) expect(pennsylvania.pagination.total_matches).toBe(pennsylvania.results.length)
+    expect(pennsylvania.facets?.sections.find((section) => section.id === 'geography')?.options.find((option) => option.value === 'unknown')).toBeUndefined()
 
     const mixed = await provider.browse({ traversal: { filters: ['geography:US-PA', 'geography:US'] } })
     expect(mixed.results.length).toBeGreaterThanOrEqual(pennsylvania.results.length)
@@ -50,6 +52,8 @@ describe('DiscoveryProvider contract', () => {
     expect(response.results).toHaveLength(0)
     expect(response.result_count).toBe(0)
     expect(response.total_matches).toBe(0)
+    if (response.pagination) expect(response.pagination.total_matches).toBe(0)
+    if (response.facets) expect(response.facets.sections.every((section) => section.options.length === 0)).toBe(true)
     expect(response.query.filters.facet_filters).toEqual({ geography: ['unknown'] })
   })
 

@@ -27,7 +27,6 @@ const canonicalSectionLabels: Record<CanonicalFacetSectionId, string> = {
 }
 
 const canonicalOrder: CanonicalFacetSectionId[] = ['source', 'geography', 'access_status', 'unit_of_analysis', 'capability']
-const fallbackOnlySections = new Set(['years', 'variables-codebook', 'record-type', 'verification'])
 const legacySectionAliases: Record<string, CanonicalFacetSectionId> = {
   'data-category': 'capability',
   access: 'access_status',
@@ -215,8 +214,9 @@ function defaultCanonicalOptionLabel(sectionId: string, value: string) {
 
 /**
  * Presents canonical facet labels from captured record evidence when it is
- * consistent. A response label equal to the ID is treated as an old/raw
- * projection and is resolved again from the current page or static vocabulary.
+ * consistent. An explicitly supplied response label equal to the ID is
+ * treated as an unresolved/raw projection and abstains from re-inferring a
+ * label from the current page, which may contain conflicting evidence.
  */
 export function facetOptionLabel(
   sectionId: string,
@@ -224,7 +224,11 @@ export function facetOptionLabel(
   items: FacetInput[] = [],
   capturedLabel?: string,
 ) {
-  if (capturedLabel && capturedLabel !== value) return capturedLabel
+  if (sectionId === 'geography' && value === 'unknown') return 'Include records with unresolved geography (if present)'
+  if (sectionId === 'access_status' && value === 'unknown') return 'Include records with unresolved access status (if present)'
+  if (capturedLabel !== undefined) {
+    return capturedLabel !== value ? capturedLabel : defaultCanonicalOptionLabel(sectionId, value)
+  }
   const captured = capturedFacetLabels(sectionId, value, items)
   if (captured.length === 1) return captured[0]
   return defaultCanonicalOptionLabel(sectionId, value)
@@ -368,6 +372,7 @@ function canonicalSection(
         value,
         label: facetOptionLabel(sectionId, value, items),
         ...(typeof count === 'number' ? { count } : {}),
+        ...(typeof count === 'number' && total > 0 && count === total ? { disabled: true } : {}),
       })),
   }
 }
@@ -412,9 +417,7 @@ export function buildCanonicalFacetSections(
     records,
     totalScope,
   ))
-  const metadataSections = buildFacetSections(items)
-    .filter((section) => fallbackOnlySections.has(section.id))
-  return [...canonicalSections, ...metadataSections]
+  return canonicalSections
 }
 
 export function normalizeDiscoveryFacetSections(
@@ -457,6 +460,7 @@ export function normalizeDiscoveryFacetSections(
             value,
             label: facetOptionLabel(sectionId, value, records, sourceOption?.label),
             ...(typeof count === 'number' ? { count } : {}),
+            ...(typeof count === 'number' && totalScope > 0 && count === totalScope ? { disabled: true } : {}),
           }
         }),
     }

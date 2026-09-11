@@ -86,7 +86,7 @@ describe('backend-derived facets', () => {
     expect(geography?.availability).toBe('available')
     expect(access?.options).toEqual(expect.arrayContaining([
       expect.objectContaining({ value: 'public_catalog', count: 1 }),
-      expect.objectContaining({ value: 'unknown', label: 'Access unresolved', count: 1 }),
+      expect.objectContaining({ value: 'unknown', label: 'Include records with unresolved access status (if present)', count: 1 }),
     ]))
     expect(access?.availability).toBe('available')
 
@@ -114,6 +114,30 @@ describe('backend-derived facets', () => {
     expect(geography?.options.find((option) => option.value === 'US-PA')?.label).toBe('Pennsylvania')
     expect(geography?.availability).toBe('unavailable')
     expect(geography?.availabilityReason).toContain('do not narrow')
+  })
+
+  it('abstains from a conflicting current-page label when the response supplies a raw ID', () => {
+    const catalog = adaptDiscoveryResponse(acceptedResponse)
+    const record = structuredClone(catalog.records[0])
+    record.canonicalResult.record.identity.source.name = 'Conflicting current-page source label'
+    record.canonicalResult.record.capabilities.topics = record.canonicalResult.record.capabilities.topics.map((topic) => (
+      topic.id === 'topic:hospital-financials' ? { ...topic, label: 'Conflicting current-page capability label' } : topic
+    ))
+
+    expect(facetOptionLabel('source', 'cms-data-catalog', [record], 'cms-data-catalog'))
+      .toBe('Centers for Medicare & Medicaid Services Data Catalog')
+    expect(facetOptionLabel('capability', 'topic:hospital-financials', [record], 'topic:hospital-financials'))
+      .toBe('Hospital financials')
+  })
+
+  it('keeps search fallback controls on the five canonical dimensions', () => {
+    const records = adaptDiscoveryResponse(acceptedResponse).records
+    const sections = buildCanonicalFacetSections(records, records.length)
+
+    expect(sections.map((section) => section.id)).toEqual([
+      'source', 'geography', 'access_status', 'unit_of_analysis', 'capability',
+    ])
+    expect(sections.some((section) => ['years', 'variables-codebook', 'record-type', 'verification'].includes(section.id))).toBe(false)
   })
 
   it('uses captured and bounded labels for canonical IDs', () => {

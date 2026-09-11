@@ -244,19 +244,68 @@ function fixtureFacetFilters(query: DiscoveryQuery, traversal?: DiscoveryTravers
   return grouped
 }
 
+function recomputeFixtureFacets(response: DiscoveryResult) {
+  if (!response.facets) return
+  const records = response.results
+  response.facets = {
+    ...response.facets,
+    collection_scope: 'fixture_response_records_after_local_filter',
+    sections: response.facets.sections
+      .map((section) => ({
+        ...section,
+        options: section.options
+          .map((option) => ({
+            ...option,
+            count: records.filter((result) => matchesFacetFilter(result.record, section.id, option.value)).length,
+          }))
+          .filter((option) => option.count > 0),
+      }))
+      .filter((section) => section.options.length > 0),
+  }
+}
+
 function applyFixtureFacetFilters(response: DiscoveryResult, filters: Record<string, string[]>) {
   const entries = Object.entries(filters).filter(([, values]) => values.length > 0)
   if (entries.length === 0) return response
   const selectedIds = new Set<string>()
-  response.results = response.results.filter((result) => {
-    const matches = entries.every(([section, values]) => values.some((value) => matchesFacetFilter(result.record, section, value)))
-    if (matches) selectedIds.add(result.record_id)
-    return matches
-  })
+  response.results = response.results
+    .filter((result) => {
+      const matches = entries.every(([section, values]) => values.some((value) => matchesFacetFilter(result.record, section, value)))
+      if (matches) selectedIds.add(result.record_id)
+      return matches
+    })
+    .map((result, index) => ({ ...result, rank: index + 1 }))
   response.result_count = response.results.length
   response.returned_count = response.results.length
   response.total_matches = response.results.length
   response.has_more = false
+  if (response.pagination) {
+    response.pagination = {
+      ...response.pagination,
+      cursor: null,
+      next_cursor: null,
+      has_more: false,
+      total_matches: response.results.length,
+    }
+  }
+  if (response.ranking) response.ranking = { ...response.ranking, ordered_ids: response.results.map((result) => result.record_id) }
+  if (response.sections) {
+    response.sections = {
+      ...response.sections,
+      supported: response.sections.supported.filter((id) => selectedIds.has(id)),
+      uncertain: response.sections.uncertain.filter((id) => selectedIds.has(id)),
+      ...(response.sections.contextual ? { contextual: response.sections.contextual.filter((id) => selectedIds.has(id)) } : {}),
+      ...(response.sections.incompatible ? { incompatible: response.sections.incompatible.filter((id) => selectedIds.has(id)) } : {}),
+    }
+  }
+  if (response.receipt) {
+    const orderedIds = response.results.map((result) => result.record_id)
+    response.receipt = {
+      ...response.receipt,
+      displayed_ordered_ids: orderedIds,
+      citations: orderedIds.flatMap((id) => response.receipt?.citations.filter((citation) => citation.record_id === id) ?? []),
+    }
+  }
   response.query = {
     ...response.query,
     filters: {
@@ -265,6 +314,7 @@ function applyFixtureFacetFilters(response: DiscoveryResult, filters: Record<str
     },
   }
   response.join_routes = response.join_routes.filter((route) => selectedIds.has(route.from_record_id) && selectedIds.has(route.to_record_id))
+  recomputeFixtureFacets(response)
   response.warnings = [
     'Fixture facet filters were applied to the accepted response records; counts are bounded to this fixture response scope.',
     ...response.warnings,

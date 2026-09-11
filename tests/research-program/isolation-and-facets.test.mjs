@@ -90,3 +90,136 @@ test('C0061 retains the frozen 3434 baseline and isolates exactly four CDC recor
   assert.deepEqual(response.partial_results.issues.map((row) => row.record_id), expectedIds);
   assert.equal(response.results.some((row) => expectedIds.includes(row.record_id)), false);
 });
+
+function facetOption(response, sectionId, value) {
+  return response.facets.sections.find((section) => section.id === sectionId)?.options.find((option) => option.value === value);
+}
+
+function makeFacetRecord(template, {
+  id,
+  title,
+  sourceId,
+  sourceName,
+  coverage,
+  jurisdictions,
+  accessStatus,
+  capabilityId,
+  capabilityLabel,
+}) {
+  const record = structuredClone(template);
+  record.record_id = id;
+  record.identity.asset.asset_id = id;
+  record.identity.asset.name = title;
+  record.identity.source.source_id = sourceId;
+  record.identity.source.name = sourceName;
+  record.title = title;
+  record.description = title + ' description';
+  record.geography.coverage_level = coverage;
+  record.geography.jurisdictions = jurisdictions;
+  record.access.status = accessStatus;
+  const capability = structuredClone(record.capabilities.topics[0]);
+  capability.id = capabilityId;
+  capability.label = capabilityLabel;
+  capability.evidence_state = 'source_asserted';
+  record.capabilities.topics = [capability];
+  record.capabilities.use_cases = [];
+  return record;
+}
+
+async function createFacetFixtureEngine() {
+  const { corpus, records } = await loadV12Corpus();
+  const template = records.find((record) => record.description.length > 0);
+  const fixture = [
+    makeFacetRecord(template, {
+      id: 'fixture:facet:pa',
+      title: 'A Pennsylvania known record',
+      sourceId: 'fixture:source:alpha',
+      sourceName: 'Alpha captured source',
+      coverage: 'state',
+      jurisdictions: ['US-PA'],
+      accessStatus: 'public_catalog',
+      capabilityId: 'fixture:concept:alpha',
+      capabilityLabel: 'Alpha captured concept',
+    }),
+    makeFacetRecord(template, {
+      id: 'fixture:facet:ca',
+      title: 'B California known record',
+      sourceId: 'fixture:source:beta',
+      sourceName: 'Beta captured source',
+      coverage: 'state',
+      jurisdictions: ['US-CA'],
+      accessStatus: 'public_direct',
+      capabilityId: 'fixture:concept:beta',
+      capabilityLabel: 'Beta captured concept',
+    }),
+    makeFacetRecord(template, {
+      id: 'fixture:facet:unknown',
+      title: 'C unresolved record',
+      sourceId: 'fixture:source:gamma',
+      sourceName: 'Gamma captured source',
+      coverage: 'unknown',
+      jurisdictions: [],
+      accessStatus: 'unknown',
+      capabilityId: 'fixture:concept:gamma',
+      capabilityLabel: 'Gamma captured concept',
+    }),
+  ];
+  const vocabulary = JSON.parse(await fs.readFile(new URL('packages/retrieval/fixtures/controlled-vocabulary.json', root)));
+  const fixtureCorpus = {
+    corpus_id: 'pr006-facet-fixture',
+    corpus_version: '1.0.0',
+    record_count: fixture.length,
+    join_route_count: 0,
+  };
+  return createRetrievalEngine({
+    records: fixture,
+    searchDocuments: null,
+    vocabulary,
+    joinRoutes: [],
+    corpus: fixtureCorpus,
+    catalogValidation: { valid: fixture, invalid: [] },
+  });
+}
+
+test('C0062 keeps facet counts scoped and preserves same-dimension OR and cross-dimension AND', async () => {
+  const engine = await createFacetFixtureEngine();
+  const initial = engine.browse({ sort: 'title_asc', page_size: 1 });
+  assert.equal(initial.pagination.total_matches, 3);
+  assert.equal(initial.facets.count_basis, 'records');
+  assert.equal(initial.facets.collection_scope, 'all_matching_records_before_pagination');
+  assert.equal(facetOption(initial, 'geography', 'state').count, 2);
+  assert.equal(facetOption(initial, 'geography', 'US-PA').count, 1);
+  assert.equal(facetOption(initial, 'geography', 'unknown').count, 1);
+  assert.equal(facetOption(initial, 'access_status', 'public_catalog').count, 1);
+  assert.equal(facetOption(initial, 'access_status', 'unknown').count, 1);
+  assert.deepEqual(initial.results.map((result) => result.record_id), ['fixture:facet:pa']);
+
+  const knownOrUnknown = engine.browse({
+    sort: 'title_asc',
+    page_size: 10,
+    facet_filters: { geography: ['US-PA', 'unknown'] },
+  });
+  assert.equal(knownOrUnknown.pagination.total_matches, 2);
+  assert.deepEqual(new Set(knownOrUnknown.results.map((result) => result.record_id)), new Set(['fixture:facet:pa', 'fixture:facet:unknown']));
+  assert.equal(facetOption(knownOrUnknown, 'geography', 'unknown').count, 1);
+  assert.equal(facetOption(knownOrUnknown, 'geography', 'US-PA').count, 1);
+  assert.equal(facetOption(knownOrUnknown, 'geography', 'US-CA'), undefined);
+
+  const crossDimension = engine.browse({
+    sort: 'title_asc',
+    page_size: 10,
+    facet_filters: { geography: ['US-PA', 'unknown'], access_status: ['public_catalog'] },
+  });
+  assert.equal(crossDimension.pagination.total_matches, 1);
+  assert.deepEqual(crossDimension.results.map((result) => result.record_id), ['fixture:facet:pa']);
+});
+
+test('C0063 resolves labels from complete pre-pagination matches', async () => {
+  const engine = await createFacetFixtureEngine();
+  const response = engine.browse({ sort: 'title_asc', page_size: 1 });
+  assert.deepEqual(response.results.map((result) => result.record_id), ['fixture:facet:pa']);
+  assert.equal(facetOption(response, 'source', 'fixture:source:beta').label, 'Beta captured source');
+  assert.equal(facetOption(response, 'capability', 'fixture:concept:beta').label, 'Beta captured concept');
+  assert.equal(facetOption(response, 'geography', 'US-CA').label, 'California');
+  assert.equal(facetOption(response, 'access_status', 'public_catalog').label, 'Public catalog metadata; payload access unresolved');
+});
