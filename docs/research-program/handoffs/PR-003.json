@@ -2,60 +2,49 @@
   "format": "ushso.pr-handoff.v1",
   "pr_id": "PR-003",
   "status": "producer_checked",
-  "owner": "Luna Max (gpt-5.6-luna-max, reasoning high)",
+  "owner": "Grok (grok-4)",
   "reviewer": "Astra",
-  "base_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+  "base_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
   "head_sha": null,
   "dependency_merge_shas": {
     "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
     "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
   },
-  "branch": "codex/ushso-pr003-integrity-recovery-20260910",
+  "branch": "codex/ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
   "github_pr_url": null,
   "changed_files": [
     "docs/research-program/handoffs/schema/README.md",
     "docs/research-program/handoffs/schema/handoff.schema.json",
-    "docs/research-program/handoffs/schema/task.schema.json",
     "scripts/research-program/check-handoff.mjs",
     "tests/research-program/handoff.test.mjs",
     "verification/research-program/pr-003/verify-schema-contract.mjs",
-    "verification/research-program/pr-003/fixtures/task-binding.json",
+    "verification/research-program/pr-003/task-binding.json",
+    "verification/research-program/pr-003/fixtures/handoff.valid.json",
+    "verification/research-program/pr-003/fixtures/handoff.valid-expected-negative.json",
+    "verification/research-program/pr-003/fixtures/handoff.valid-unavailable.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-artifact-hash-mismatch.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-claimed-pass-without-command.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-duplicate-command.json",
-    "verification/research-program/pr-003/fixtures/handoff.reject-empty-evidence.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-fractional-timing.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-invalid-head.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-invalid-timing.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-missing-artifact.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-missing-event-source.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-nonzero-success.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-source-hash-omitted.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-stale-base-sha.json",
     "verification/research-program/pr-003/fixtures/handoff.reject-stale-dependency-sha.json",
-    "verification/research-program/pr-003/fixtures/handoff.valid-expected-negative.json",
-    "verification/research-program/pr-003/fixtures/handoff.valid-unavailable.json",
-    "verification/research-program/pr-003/fixtures/handoff.valid.json",
-    "verification/research-program/pr-003/README.md",
-    "verification/research-program/pr-003/c003-3-notes.md",
-    "verification/research-program/pr-003/c003-3-evidence-index.json",
     "docs/research-program/handoffs/PR-003.json",
-    "verification/research-program/pr-003/fixtures/handoff.reject-invalid-timing.json",
-    "verification/research-program/pr-003/c003-r1-notes.md",
-    "verification/research-program/pr-003/c003-r1-evidence-index.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-postcommit-schema.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-postcommit-focused.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-postcommit-default.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-portable-input.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-historical-hash-audit.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-sealed-schema.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-sealed-focused.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-sealed-portable-input-initial-failed.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-sealed-portable-input-retry.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-sealed-historical-hash-audit.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-sealed-default-handoff.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r1-sealed-final-default-handoff.json"
+    "verification/research-program/pr-003/c003-r2-notes.md",
+    "verification/research-program/pr-003/c003-r2-evidence-index.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r2-schema.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r2-focused.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r2-npm-test-research-program.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r2-default-handoff.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r2-sealed-final-default-handoff.json"
   ],
-  "problem": "PR-003 handoff evidence could claim completed work without proving structured command outcomes, exact local source bytes, per-PR task binding or repository-contained artifact references.",
-  "resulting_behavior": "The corrected PR-003 contract requires structured expected and observed outcomes with RFC3339 UTC timestamps whose end is not before start, explicit local or external source locations, resolved and hashed artifacts including nested event sources, unique identifiers, exact per-PR task/Git bindings, realpath containment, and typed pending-head evidence before a controller records the final commit. It preserves expected-negative nonzero exits and typed provider limitations.",
+  "problem": "The independently reviewed PR-003 candidate still truncated RFC3339 fractional timestamps, misdiagnosed large Git snapshots as missing paths, threw on schema-invalid null/noniterable packets, counted unresolved changed-file symlinks as deletions, and did not compare completed owner/branch/changed-file scope with the concrete per-PR task binding.",
+  "resulting_behavior": "The R2 checker compares full RFC3339 fractional instants, streams immutable Git snapshot bytes with typed missing versus unreadable/size-limit diagnostics, returns schema-invalid packets as rejected reports, uses lstat so only true absence is a typed deletion, and compares completed owner/branch/owned-path scope with the exclusive first-match per-PR task binding. Historical receipts remain byte-identical and explicitly historical.",
   "commits": [
     {
       "id": "C-003-1",
@@ -75,11 +64,21 @@
     {
       "id": "C-003-1-R1",
       "subject": "Enforce complete PR-003 handoff evidence",
-      "sha": null
+      "sha": "59ae43c592bde7d6e7a9298351593c6f5b642a7f"
     },
     {
       "id": "C-003-2-R1",
       "subject": "Bind PR-003 evidence to exact local roots",
+      "sha": "dc7267bf1c872f1457fa927e2d0403051575f474"
+    },
+    {
+      "id": "C-003-2-R2",
+      "subject": "fix(research): correct PR003 final contract checks",
+      "sha": "57e990e3bcbb8b7a731f4910c5adff451557ffa9"
+    },
+    {
+      "id": "C-003-3-R2",
+      "subject": "docs(research): record PR003 R2 evidence and provenance",
       "sha": null
     }
   ],
@@ -107,18 +106,17 @@
       "version": "tree 548d34311909ab3c4bb36c126896c7787d9b3dab"
     },
     {
+      "kind": "final-contract-correction-base",
+      "id": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "location": "external",
+      "version": "tree 98e04d100daa94cdf9da5905c15d58a0aae6778d; reviewed code dc7267b plus accepted inventory correction"
+    },
+    {
       "kind": "dispatch-prompt",
       "id": "native-pr003-prompts.v3.md",
       "location": "external",
       "version": "v3",
       "sha256": "f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d"
-    },
-    {
-      "kind": "correction-prompt",
-      "id": "pr003-grok-correction-prompt.md",
-      "location": "external",
-      "version": "C-003-1-R1/C-003-2-R1",
-      "sha256": "3d651086ca17da358b7df4061a82152307e3a050644eabfdc6711b1c92247c9a"
     },
     {
       "kind": "execution-contract",
@@ -161,16 +159,33 @@
       "git_path": "docs/research-program/execution-ledger.json"
     },
     {
-      "kind": "task-binding",
-      "id": "verification/research-program/pr-003/fixtures/task-binding.json",
+      "kind": "controller-task-binding",
+      "id": "verification/research-program/pr-003/task-binding.json",
       "location": "local",
-      "sha256": "f2392c63dfc51aa275b706d417b9c59f6c2a00062181f85c5e5ebb728f67c30a"
+      "sha256": "0dea1407c432c620a7650811cd8c77f48956bb2f563361f2e1082a110cf00a7d",
+      "version": "Concrete per-PR task binding established by Co-Engineer dispatch ushso-pr003-grok-final-contract-20260911 / assignment grok-final-contract. Not a self-authenticating signature."
+    },
+    {
+      "kind": "independent-final-contract-review",
+      "id": "pr003-final-contract-review/receipt.json",
+      "location": "external",
+      "sha256": "99b542280dc18a34c22affb1dcc6a87780db58be7b53c1e30c9cf37dc33470e6",
+      "version": "Reviewed code dc7267b; bf46d92 adds only the independently accepted test-chain inventory correction"
+    },
+    {
+      "kind": "frozen-cohort-snapshot",
+      "id": "evaluation/research-program/cohorts.json",
+      "location": "external",
+      "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+      "git_commit": "f62ce35481cc572e9aad054049c700aac6378f58",
+      "git_path": "evaluation/research-program/cohorts.json",
+      "version": "2.45MB immutable Git snapshot used to prove streamed hashing"
     },
     {
       "kind": "historical-failed-provider-run",
       "id": "ushso-pr003-grok-corrections-20260910",
       "location": "external",
-      "version": "grok/grok-4; terminal cleanup inactive_empty/unlocked"
+      "version": "grok/grok-4; terminal cleanup inactive_empty/unlocked; not completed Grok work"
     },
     {
       "kind": "historical-retained-patch",
@@ -179,10 +194,10 @@
       "version": "sha256 67dbf6bb4302bbc073bdfcb56646b5e1d50b341855aa560e46db2e4b76d86e99"
     },
     {
-      "kind": "historical-producer-head",
-      "id": "7593591037d37a7105770ab6d4875a40dd9db3a0",
+      "kind": "historical-r1-producer-head",
+      "id": "dc7267bf1c872f1457fa927e2d0403051575f474",
       "location": "external",
-      "version": "Grok C3 producer head; not this correction base"
+      "version": "Luna R1 sealed head; not this R2 correction and not completed Grok work"
     }
   ],
   "commands": [
@@ -710,6 +725,131 @@
         "sha256": "38f02fd6d7c53cea3c3fb5c1b4da0b5bd37566741100cb20e492d0a449385e8b",
         "bytes": 1171
       }
+    },
+    {
+      "id": "cmd-c003-r2-schema",
+      "command": "node verification/research-program/pr-003/verify-schema-contract.mjs",
+      "started_at": "2026-09-11T01:28:51.831Z",
+      "completed_at": "2026-09-11T01:28:51.993Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the schema contract check passing, including fractional-timing rejection",
+      "actual": "exit 0; task schema and 12 handoff fixture cases passed; expected-negative and unavailable fixtures accepted; fractional same-millisecond reversal rejected; declared negative cases rejected.",
+      "result": "Schema-contract fixture replay passed, including full-precision fractional timestamp ordering.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r2-schema",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r2-schema.json",
+        "sha256": "692ce9ba768bd37aa27d0cb14a6d58f6a1638daf8673d425ea3fc24665559590",
+        "bytes": 1214
+      }
+    },
+    {
+      "id": "cmd-c003-r2-focused",
+      "command": "node --test tests/research-program/handoff.test.mjs",
+      "started_at": "2026-09-11T01:28:51.993Z",
+      "completed_at": "2026-09-11T01:28:57.932Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the focused PR-003 handoff suite passing",
+      "actual": "exit 0; 32 tests passed, 0 failed, 0 skipped, including fractional timing, 2.45MB Git snapshot hashing, null/noniterable packet rejection, unresolved-symlink accounting, and task-scope binding.",
+      "result": "Focused handoff suite passed: 32 tests passed, 0 failed, 0 skipped.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r2-focused",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r2-focused.json",
+        "sha256": "f69107852dcdde82aa2d7b480e15b067280fd65e832e60e4783540c04c8317b2",
+        "bytes": 1168
+      }
+    },
+    {
+      "id": "cmd-c003-r2-npm-test-research-program",
+      "command": "npm run test:research-program",
+      "started_at": "2026-09-11T01:28:57.933Z",
+      "completed_at": "2026-09-11T01:29:04.196Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0; registered script executes tests/research-program/handoff.test.mjs",
+      "actual": "exit 0; tests 32, pass 32, fail 0 using pinned npm 11.19.1 and Node 24.14.",
+      "result": "Registered npm run test:research-program executed the handoff suite (32/32).",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r2-npm-test-research-program",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r2-npm-test-research-program.json",
+        "sha256": "73e8db9bb85e280d5b0fc55ac12a012f83507e554e4eb53cbd6716aea3538ce0",
+        "bytes": 1068
+      }
+    },
+    {
+      "id": "cmd-c003-r2-default-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json",
+      "started_at": "2026-09-11T01:34:33.634Z",
+      "completed_at": "2026-09-11T01:34:33.934Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the current PR-003 handoff accepted",
+      "actual": "exit 0; current R2 producer handoff accepted with zero findings; historical Git snapshots including 2.45MB cohorts.json verified; typed pending head preserved.",
+      "result": "Current PR-003 producer handoff accepted with zero findings after R2 contract corrections.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r2-default-handoff",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r2-default-handoff.json",
+        "sha256": "eb78903eebb300f964b77818fda10783eb998054cee463fa877cb3135ffa8183",
+        "bytes": 1186
+      }
+    },
+    {
+      "id": "cmd-c003-r2-sealed-final-default-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json",
+      "started_at": "2026-09-11T01:34:33.936Z",
+      "completed_at": "2026-09-11T01:34:34.236Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the fully sealed current PR-003 handoff accepted",
+      "actual": "exit 0; fully sealed current R2 handoff accepted with no findings after receipt binding; immutable Git snapshots and current artifact hashes verified.",
+      "result": "Fully sealed current PR-003 handoff accepted with zero findings after receipt/index binding.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r2-sealed-final-default-handoff",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r2-sealed-final-default-handoff.json",
+        "sha256": "a822d446aab5d730198c748a0e4b057d7824d636b8cf9c7fd10ef835fc41dad8",
+        "bytes": 1203
+      }
     }
   ],
   "artifacts": [
@@ -722,32 +862,32 @@
     {
       "id": "artifact-handoff-schema",
       "path": "docs/research-program/handoffs/schema/handoff.schema.json",
-      "sha256": "fcc03794837731594a9172c902637b01b83b87376b198e02c4456e45ff7b2bfc",
-      "bytes": 17704
+      "sha256": "4c62652b5a03104eb69a0f66e5c025c5ecb66297fa8931a43dcc3440a7ca842e",
+      "bytes": 17926
     },
     {
       "id": "artifact-schema-readme",
       "path": "docs/research-program/handoffs/schema/README.md",
-      "sha256": "3454220831129d527a7734829cd8708bd1562bfa3aa50971610cd51527458172",
-      "bytes": 13070
+      "sha256": "25422753c5905e2dc60850048d51e28402659a0599ec68c237287be355b8a2bf",
+      "bytes": 17032
     },
     {
       "id": "artifact-validator",
       "path": "scripts/research-program/check-handoff.mjs",
-      "sha256": "7588aa8b337496d24ca1cd00205256f03d28d3b290ba382156d3999272bb3e05",
-      "bytes": 50620
+      "sha256": "c403bd1c9a064039f1591c6e5843b62d42bf143dc37ffc4765740fc7e438001d",
+      "bytes": 62926
     },
     {
       "id": "artifact-focused-test",
       "path": "tests/research-program/handoff.test.mjs",
-      "sha256": "cfae76bc3ebebaa839e93843378034477be35ab0a4ffe2565041ced586c619e4",
-      "bytes": 15774
+      "sha256": "02c66333186c01646b26f7fa97d8f36490112eb31f2551d064439f9978ff47fe",
+      "bytes": 23940
     },
     {
       "id": "artifact-schema-contract-checker",
       "path": "verification/research-program/pr-003/verify-schema-contract.mjs",
-      "sha256": "0afb5dd4e150d62c37ccb0f8ea65bdd9eeb615eda5784e0914a3e8b68c541f92",
-      "bytes": 10418
+      "sha256": "1285373ef21553de9f2f25602a9b0c0c82d7f6b2e8e5164a27c99f8c964ab844",
+      "bytes": 9967
     },
     {
       "id": "artifact-fixture-task-binding",
@@ -952,6 +1092,60 @@
       "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r1-sealed-final-default-handoff.json",
       "sha256": "38f02fd6d7c53cea3c3fb5c1b4da0b5bd37566741100cb20e492d0a449385e8b",
       "bytes": 1171
+    },
+    {
+      "id": "artifact-current-task-binding",
+      "path": "verification/research-program/pr-003/task-binding.json",
+      "sha256": "0dea1407c432c620a7650811cd8c77f48956bb2f563361f2e1082a110cf00a7d",
+      "bytes": 3589
+    },
+    {
+      "id": "artifact-fixture-fractional-timing",
+      "path": "verification/research-program/pr-003/fixtures/handoff.reject-fractional-timing.json",
+      "sha256": "30663a247b3b0f386306f73d9ff971c0668aa971332186fba012d8bc1623f884",
+      "bytes": 12265
+    },
+    {
+      "id": "artifact-cmd-c003-r2-schema",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r2-schema.json",
+      "sha256": "692ce9ba768bd37aa27d0cb14a6d58f6a1638daf8673d425ea3fc24665559590",
+      "bytes": 1214
+    },
+    {
+      "id": "artifact-cmd-c003-r2-focused",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r2-focused.json",
+      "sha256": "f69107852dcdde82aa2d7b480e15b067280fd65e832e60e4783540c04c8317b2",
+      "bytes": 1168
+    },
+    {
+      "id": "artifact-cmd-c003-r2-npm-test-research-program",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r2-npm-test-research-program.json",
+      "sha256": "73e8db9bb85e280d5b0fc55ac12a012f83507e554e4eb53cbd6716aea3538ce0",
+      "bytes": 1068
+    },
+    {
+      "id": "artifact-c003-r2-notes",
+      "path": "verification/research-program/pr-003/c003-r2-notes.md",
+      "sha256": "77e7236db9eaf0be992c92cd57d1ce9e429c257965c31ff618f2261821baf9ad",
+      "bytes": 2454
+    },
+    {
+      "id": "artifact-c003-r2-evidence-index",
+      "path": "verification/research-program/pr-003/c003-r2-evidence-index.json",
+      "sha256": "6b1a467eeccb34c968b7a39c048d8d3d78f066401f1624d4ccb237dd9717dd15",
+      "bytes": 6509
+    },
+    {
+      "id": "artifact-cmd-c003-r2-default-handoff",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r2-default-handoff.json",
+      "sha256": "eb78903eebb300f964b77818fda10783eb998054cee463fa877cb3135ffa8183",
+      "bytes": 1186
+    },
+    {
+      "id": "artifact-cmd-c003-r2-sealed-final-default-handoff",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r2-sealed-final-default-handoff.json",
+      "sha256": "a822d446aab5d730198c748a0e4b057d7824d636b8cf9c7fd10ef835fc41dad8",
+      "bytes": 1203
     }
   ],
   "acceptance_results": [
@@ -1094,6 +1288,49 @@
       "artifact_ids": [
         "artifact-cmd-c003-r1-sealed-final-default-handoff"
       ]
+    },
+    {
+      "id": "acc-c003-2-r2-contract",
+      "status": "producer_checked",
+      "result": "R2 contract corrections passed: full-precision timestamps, streamed 2.45MB Git snapshot hashing, schema-invalid null/noniterable rejection, unresolved-symlink accounting, and completed task-scope binding. Producer evidence only.",
+      "command_ids": [
+        "cmd-c003-r2-schema",
+        "cmd-c003-r2-focused",
+        "cmd-c003-r2-npm-test-research-program"
+      ],
+      "artifact_ids": [
+        "artifact-validator",
+        "artifact-focused-test",
+        "artifact-schema-contract-checker",
+        "artifact-current-task-binding",
+        "artifact-cmd-c003-r2-schema",
+        "artifact-cmd-c003-r2-focused",
+        "artifact-cmd-c003-r2-npm-test-research-program",
+        "artifact-c003-r2-notes"
+      ]
+    },
+    {
+      "id": "acc-c003-r2-default-handoff",
+      "status": "producer_checked",
+      "result": "The current R2 PR-003 handoff was accepted with zero findings, including streamed large Git snapshot verification and a typed pending head.",
+      "command_ids": [
+        "cmd-c003-r2-default-handoff"
+      ],
+      "artifact_ids": [
+        "artifact-cmd-c003-r2-default-handoff",
+        "artifact-c003-r2-evidence-index"
+      ]
+    },
+    {
+      "id": "acc-c003-r2-final-default-handoff",
+      "status": "producer_checked",
+      "result": "The fully sealed current PR-003 R2 handoff was rechecked after receipt binding and accepted with zero findings.",
+      "command_ids": [
+        "cmd-c003-r2-sealed-final-default-handoff"
+      ],
+      "artifact_ids": [
+        "artifact-cmd-c003-r2-sealed-final-default-handoff"
+      ]
     }
   ],
   "failures_and_skipped_checks": [
@@ -1132,13 +1369,19 @@
       "status": "failed",
       "detail": "The first sealed portable probe (agentctl cmd-0019-d4930fec, 2026-09-11T00:21:58.747Z\u20132026-09-11T00:21:58.780Z, exit 1) used a parent path that still resolved inside the repository, so its own expected rejection set was not met. It was not used as acceptance evidence; the corrected three-level escape retry cmd-0020-eb5e19c5 exited 0.",
       "next_action": "Retain the failed attempt and use the corrected explicit escape cases for portable containment replay."
+    },
+    {
+      "id": "full-npm-test-build-cf-needs-pr085",
+      "status": "skipped",
+      "detail": "Root owns full integrated npm test/build/Cloudflare hosted CI, which currently needs a separate PR-085 CI inventory correction. This bounded R2 correction records that known dependency rather than attempting those gates.",
+      "next_action": "PR-085 lands the CI inventory correction; root reruns the integration/release gate on the composed candidate."
     }
   ],
   "unresolved_claims": [
     {
       "id": "head-sha-pending-controller-commit",
       "status": "pending",
-      "detail": "This is a precommit producer packet. head_sha and the new correction commit SHA fields remain null because a future commit cannot contain its own hash; a controller-authored external receipt binds the exact final commit and tree after commit.",
+      "detail": "This is a precommit producer packet for C-003-3-R2 evidence. head_sha and the C-003-3-R2 commit SHA remain null because a future commit cannot contain its own hash; a controller-authored external receipt binds the exact final commit and tree after commit. C-003-2-R2 is already 57e990e3bcbb8b7a731f4910c5adff451557ffa9.",
       "next_action": "Controller records the final correction SHA/tree in an external acceptance receipt and updates terminal review state only after independent review."
     },
     {
@@ -1148,18 +1391,18 @@
       "next_action": "Astra independently reviews and replays the exact committed head."
     },
     {
-      "id": "historical-c3-head-context",
+      "id": "pr085-ci-inventory-dependency",
       "status": "unresolved",
-      "detail": "The Grok C3 producer head 7593591037d37a7105770ab6d4875a40dd9db3a0 is preserved as historical context; this recovery intentionally starts from exact f62ce35481cc572e9aad054049c700aac6378f58.",
-      "next_action": "Controller keeps the exact parent/base binding visible in acceptance evidence."
+      "detail": "Full hosted CI currently needs a separate PR-085 CI inventory correction. Passing focused research-program tests here does not claim that root npm test/build/cf:dry-run is green.",
+      "next_action": "Keep PR-085 as an external integration dependency."
     }
   ],
   "risks": [
     {
       "id": "shared-sibling-binding-would-break-later-prs",
       "status": "accepted",
-      "detail": "No docs/research-program/handoffs/task-binding.json is added. The validator resolves PR-003 dependency SHAs from the committed execution ledger; a single PR-003-specific sibling file in the shared handoffs directory would make later PR-004..PR-084 handoff validation fail with task_binding_pr_mismatch.",
-      "next_action": "If per-PR sibling bindings are needed later, extend check-handoff.mjs to select a PR-scoped binding file."
+      "detail": "No docs/research-program/handoffs/task-binding.json is added. The current producer binding is verification/research-program/pr-003/task-binding.json. Fixture packets keep their sibling fixtures/task-binding.json via exclusive first-match lookup.",
+      "next_action": "Later PRs add verification/research-program/pr-NNN/task-binding.json when they exist."
     },
     {
       "id": "producer-evidence-not-approval",
@@ -1168,14 +1411,14 @@
       "next_action": "Astra performs the independent replay; PR-082 consumes the accepted evidence at closure."
     },
     {
-      "id": "mixed-authorship-retained-grok-work",
-      "status": "risk",
-      "detail": "A failed Grok run left a retained partial patch. Luna reviewed the immutable snapshot and adopted/reworked only useful portions; no Grok commit or success is implied.",
-      "next_action": "Controller independently reviews the allowlisted Luna diff and retained authorship evidence."
+      "id": "layered-authorship-must-not-collapse",
+      "status": "accepted",
+      "detail": "Luna R1 work remains Luna work. The failed 2026-09-10 Grok partial remains failed historical evidence. This R2 packet is Grok Co-Engineer work only for the files it actually produced.",
+      "next_action": "Keep historical receipts byte-identical and label current authored corrections accurately."
     }
   ],
-  "next_consumer": "Astra/controller independent review of the exact committed correction head",
-  "next_action": "Controller commits the allowlisted correction, binds the resulting SHA/tree in an external receipt, and dispatches independent review. Active PR-004 and PR-085 handoffs must use the migrated contract: RFC3339 UTC command start/end with structured expected_outcome and observed_outcome, typed pending head before commit, current local artifact hashes, exact Git-bound historical inputs, and status-specific evidence. Keep legacy PR-001/PR-002 packets byte-identical under the documented migration boundary.",
+  "next_consumer": "Astra/controller independent review of the exact committed R2 correction head",
+  "next_action": "Controller commits the allowlisted C-003-3-R2 evidence, binds the resulting SHA/tree in an external receipt, and dispatches independent review. Do not treat historical R1 indexes as fresh checks. Full npm test/build/CF remains a PR-085-dependent root gate.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
@@ -1186,7 +1429,7 @@
     ],
     "limitations": [
       "Producer-side checks only; no independent acceptance or scientific claim.",
-      "Full root npm/build/Cloudflare gates are outside this metadata correction and remain separately owned.",
+      "Full root npm/build/Cloudflare gates currently need a separate PR-085 CI inventory correction and remain separately owned.",
       "The precommit packet uses a typed pending head claim; a controller-authored external receipt must bind the exact final commit after commit."
     ]
   }
