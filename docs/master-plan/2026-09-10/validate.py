@@ -25,6 +25,9 @@ check({'apps/web/src/providers/discoveryProvider.ts','apps/web/src/pages/SearchR
 check(not {'packages/coverage/','packages/retrieval/schemas/discovery-result.schema.json','tests/fixtures/direct-base-control.mjs','packages/retrieval/fixtures/retrieval-core-before-lexical-index.txt'}&set(prs.get('PR-006',{}).get('files',[])),'PR006 must preserve frozen contracts/reference engines and reuse existing completeness accounting')
 check({'contracts/machine-toolkit/v1.2.0/schemas/variable-identity.schema.json','packages/identity/manifests/package-manifest.json','packages/identity/validation/validation-receipt.json'}<=set(prs.get('PR-008',{}).get('files',[])),'PR008 must own its additive schema and current identity seal')
 check('contracts/machine-toolkit/' not in prs.get('PR-008',{}).get('files',[]),'PR008 must not own frozen machine contracts through a blanket directory scope')
+check('tests/subject-shortcircuit.test.mjs' in prs['PR-006']['files'],'PR006 must retain label-only subject parity coverage')
+check({'contracts/machine-toolkit/v1.2.0/package.json','contracts/machine-toolkit/v1.2.0/README.md','contracts/machine-toolkit/v1.2.0/tools/verify.mjs','contracts/machine-toolkit/v1.2.0/tests/variable-identity.test.mjs','package-lock.json'}<=set(prs['PR-008']['files']),'PR008 must own complete bounded variable package and additive lock metadata')
+check(not {'package.json','scripts/run-contract-suites.mjs','scripts/verify-wp11-attestation.mjs','tests/wp11-attestation.test.mjs'}&set(prs['PR-008']['files']),'PR008 package completion cannot alter root scripts or WP11 evidence authority')
 commit_ids=[];mapped_reqs=set();mapped_findings=set()
 for p in prs.values():
     check(p['phase'] in phases,p['id']+' missing phase')
