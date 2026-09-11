@@ -1,0 +1,534 @@
+[32m✔ access cache preserves ordinary, public, free, and restricted response semantics [90m(48.230682ms)[39m[39m
+[32m✔ access metadata stays isolated from response, engine, and input mutation [90m(19.587781ms)[39m[39m
+[32m✔ access metadata remains byte-stable across cursor continuation and browse output [90m(17.344156ms)[39m[39m
+(node:864561) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[32m✔ advertised schemas compile without network and validate all actual typed errors plus success [90m(497.926772ms)[39m[39m
+[32m✔ missing advertised schema disguised by successful SPA HTML fails [90m(2.807143ms)[39m[39m
+[32m✔ incorrect schema identity fails despite JSON and HTTP200 [90m(3.434106ms)[39m[39m
+[32m✔ small body drains to completion [90m(40.752544ms)[39m[39m
+[32m✔ over-limit body cancels after bounded bytes [90m(1.164075ms)[39m[39m
+[32m✔ erroring body preserves early response path [90m(1.43696ms)[39m[39m
+[32m✔ stalled body has bounded cleanup [90m(25.675936ms)[39m[39m
+[32m✔ never-settling cancellation has bounded cleanup [90m(43.916124ms)[39m[39m
+[32m✔ cancellation failure is swallowed [90m(0.842427ms)[39m[39m
+[32m✔ bounded text accepts exact byte limit [90m(6.933658ms)[39m[39m
+[32m✔ bounded text maps over-limit body [90m(1.886141ms)[39m[39m
+[32m✔ bounded text maps stream failure [90m(1.791302ms)[39m[39m
+[32m✔ bounded text maps stalled read [90m(24.6144ms)[39m[39m
+[32m✔ current CI v1.4 verifier keeps historical proof separate from pending current draft [90m(141.303622ms)[39m[39m
+[32m✔ historical v1.3 proof fails closed for missing and altered immutable bytes [90m(30.044492ms)[39m[39m
+[32m✔ historical proof accepts only the reviewed PR-003 input transition [90m(41.790204ms)[39m[39m
+[32m✔ reviewed PR-003 input transition is atomic across both root files [90m(27.309892ms)[39m[39m
+[32m✔ current technical failure cannot be represented as a pending draft [90m(0.497698ms)[39m[39m
+[32m✔ only exact CI v1.4 validate descriptor selects the current route [90m(0.260557ms)[39m[39m
+
+[verify] verification/testing/ci/v1.4.0 :: test
+
+> @ushso/ci-verification-successor-v1-4@1.4.0 test
+> node --test tests/*.test.mjs
+
+✔ v1.4 inventory retains structural discovery and locked workspace invariants (73.735113ms)
+✔ root chain accepts the exact PR-003 extension and rejects structural drift (1.092238ms)
+✔ version and hash drift are refused without editing stored evidence (1.674918ms)
+✔ missing workspace inventory fails lock consistency (2.786581ms)
+✔ predecessor remains byte-identical and v1.4 evidence stays unapproved (58.46243ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 209.89147
+
+[verify] verification/testing/ci/v1.4.0 :: validate
+{
+  "schema_version": "ushso.ci-v14-attestation.v1.0.0",
+  "status": "PASS",
+  "package_id": "@ushso/ci-verification-successor-v1-4@1.4.0",
+  "historical": {
+    "package_id": "@ushso/ci-verification-successor-v1-3@1.3.0",
+    "subject_sha256": "11b8c7269bf293e67690d713a9e9748b977fb3197f039cb9966e5647d05d2ccb",
+    "approval_status": "approved_original_subject_only",
+    "receipt_status": "approved_scoped_attestation",
+    "reviewer": {
+      "id": "github:176340565",
+      "role": "repository_owner"
+    },
+    "recorded_at": "2026-09-09T13:02:53Z",
+    "evidence_sha256": "a66da67cfee5c1dc4515aef9464afc222938ce27d3bc169da4393c211e8faa5e",
+    "source_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+    "files": {
+      "approval": {
+        "path": "verification/testing/ci/v1.3.0/approvals/approval.json",
+        "bytes": 686,
+        "sha256": "315d0aa83399238b8e127ca3affae9e4d409fb7834e6c3d3aba6434b41b07ae0"
+      },
+      "evidence": {
+        "path": "verification/testing/ci/v1.3.0/approvals/evidence.txt",
+        "bytes": 770,
+        "sha256": "a66da67cfee5c1dc4515aef9464afc222938ce27d3bc169da4393c211e8faa5e"
+      },
+      "receipt": {
+        "path": "verification/testing/ci/v1.3.0/receipts/approved.json",
+        "bytes": 32976,
+        "sha256": "8013e0b4700d781a365540e046cd6ac15c8eb1999aca956b30c73591ad648d4b"
+      }
+    },
+    "predecessor": {
+      "path": "verification/testing/ci/v1.0.0/receipts/ci-integration.json",
+      "bytes": 24148,
+      "sha256": "6e27725cf531e1ced3d546503176af8ae4157366e97594c49ca5c9d2c18215cd"
+    },
+    "previous_successor": {
+      "path": "verification/testing/ci/v1.2.0/receipts/approved.json",
+      "bytes": 32440,
+      "sha256": "d5f7b2d29cb6790a4b390f62a988746d8a9de6b36642c9d793179178f7d938e2"
+    },
+    "input_bindings": {
+      "status": "PASS",
+      "source_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "allowed_current_drift": [
+        "package-lock.json",
+        "scripts/run-contract-suites.mjs"
+      ],
+      "reviewed_current_inputs": [
+        {
+          "path": "package.json",
+          "role": "root-package",
+          "source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+          "historical_bytes": 3555,
+          "historical_sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
+          "current_bytes": 3666,
+          "current_sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e"
+        },
+        {
+          "path": "tests/contract-package-inventory.test.mjs",
+          "role": "root-inventory-test",
+          "source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+          "historical_bytes": 7809,
+          "historical_sha256": "2bdf766d6c69875160330d8bdf44fbd8d21bbfec43a9b7671c9d233e3ddc4bfa",
+          "current_bytes": 7842,
+          "current_sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b"
+        }
+      ],
+      "reviewed_current_transition": true,
+      "reviewed_current_transition_state": "reviewed_current",
+      "checked": [
+        {
+          "path": "verification/successor-support.mjs",
+          "source": "implementation",
+          "historical_bytes": 7191,
+          "historical_sha256": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c",
+          "current_bytes": 7191,
+          "current_sha256": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c",
+          "current_drift_allowed": false
+        },
+        {
+          "path": "verification/testing/ci/v1.3.0/README.md",
+          "source": "implementation",
+          "historical_bytes": 316,
+          "historical_sha256": "84b4473fc8a614821aab3390c3d0c25f68d801adf3b000a3be44e29d056b48f8",
+          "current_bytes": 316,
+          "current_sha256": "84b4473fc8a614821aab3390c3d0c25f68d801adf3b000a3be44e29d056b48f8",
+          "current_drift_allowed": false
+        },
+        {
+          "path": "verification/testing/ci/v1.3.0/package.json",
+          "source": "implementation",
+          "historical_bytes": 412,
+          "historical_sha256": "d4acc030be30d9837c2c6fece64c6379af02ec083947303d30363cd34be2424b",
+          "current_bytes": 412,
+          "current_sha256": "d4acc030be30d9837c2c6fece64c6379af02ec083947303d30363cd34be2424b",
+          "current_drift_allowed": false
+        },
+        {
+          "path": "verification/testing/ci/v1.3.0/tests/ci-integration.test.mjs",
+          "source": "implementation",
+          "historical_bytes": 1807,
+          "historical_sha256": "f90efebc4f2166283de1d2b5a8adb13bd2cc7fcd93a000d0b20e179fcaa6df6b",
+          "current_bytes": 1807,
+          "current_sha256": "f90efebc4f2166283de1d2b5a8adb13bd2cc7fcd93a000d0b20e179fcaa6df6b",
+          "current_drift_allowed": false
+        },
+        {
+          "path": "verification/testing/ci/v1.3.0/tools/ci-inventory.mjs",
+          "source": "implementation",
+          "historical_bytes": 13576,
+          "historical_sha256": "543a728eb7d4874816ea470aaaccbbc1346145d4cfc93301e936788144a5f73a",
+          "current_bytes": 13576,
+          "current_sha256": "543a728eb7d4874816ea470aaaccbbc1346145d4cfc93301e936788144a5f73a",
+          "current_drift_allowed": false
+        },
+        {
+          "path": "verification/testing/ci/v1.3.0/tools/validate-package.mjs",
+          "source": "implementation",
+          "historical_bytes": 3086,
+          "historical_sha256": "be0db8c467717488d2312360535650cdecf3700b1e671d42f9a1b88e6a03f581",
+          "current_bytes": 3086,
+          "current_sha256": "be0db8c467717488d2312360535650cdecf3700b1e671d42f9a1b88e6a03f581",
+          "current_drift_allowed": false
+        },
+        {
+          "path": "package.json",
+          "role": "root-package",
+          "source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+          "bytes": 3666,
+          "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e",
+          "historical_bytes": 3555,
+          "historical_sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
+          "semantic": {
+            "chain": "pr003-root-chain",
+            "sequence": [
+              "npm run test:retrieval",
+              "npm run test:web",
+              "npm run test:worker",
+              "npm run test:research-program",
+              "npm run test:evaluation",
+              "npm run validate:evaluation",
+              "npm run verify:research-navigator"
+            ],
+            "registered_research_program": "node --test tests/research-program/*.test.mjs"
+          },
+          "source": "inventory",
+          "current_drift_allowed": true,
+          "reviewed_current_transition": true
+        },
+        {
+          "path": "package-lock.json",
+          "source": "inventory",
+          "historical_bytes": 134190,
+          "historical_sha256": "af2070ae111bc67c397b07e33b44c1fbd15bba31b63210990068943998e1bc28",
+          "current_bytes": 134511,
+          "current_sha256": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c",
+          "current_drift_allowed": true
+        },
+        {
+          "path": ".nvmrc",
+          "source": "inventory",
+          "historical_bytes": 8,
+          "historical_sha256": "e1677620f62097e30fac6695180333d8eb9ead4fe5b1d1d6e01b76e049780059",
+          "current_bytes": 8,
+          "current_sha256": "e1677620f62097e30fac6695180333d8eb9ead4fe5b1d1d6e01b76e049780059",
+          "current_drift_allowed": false
+        },
+        {
+          "path": ".github/workflows/ci.yml",
+          "source": "inventory",
+          "historical_bytes": 1514,
+          "historical_sha256": "7f8a7cadc6d6b4b974cf3014a3df68fd3a18671304244cb31a08f87200e330fc",
+          "current_bytes": 1514,
+          "current_sha256": "7f8a7cadc6d6b4b974cf3014a3df68fd3a18671304244cb31a08f87200e330fc",
+          "current_drift_allowed": false
+        },
+        {
+          "path": "scripts/run-contract-suites.mjs",
+          "source": "inventory",
+          "historical_bytes": 23034,
+          "historical_sha256": "acfa8900758bbba0f72e0c1bb0374b6f1b55e6b40d4a8b254218b60e5c41b596",
+          "current_bytes": 29025,
+          "current_sha256": "3a13c51986e1cd90b530465d4e8fc30cc3763a86189d06930c4dbf6f65c5e261",
+          "current_drift_allowed": true
+        },
+        {
+          "path": "tests/contract-package-inventory.test.mjs",
+          "role": "root-inventory-test",
+          "source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+          "bytes": 7842,
+          "sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b",
+          "historical_bytes": 7809,
+          "historical_sha256": "2bdf766d6c69875160330d8bdf44fbd8d21bbfec43a9b7671c9d233e3ddc4bfa",
+          "semantic": {
+            "sequence_assertion": "assert.equal(rootPackage.scripts.test, 'npm run test:retrieval && npm run test:web && npm run test:worker && npm run test:research-program && npm run test:evaluation && npm run validate:evaluation && npm run verify:research-navigator')",
+            "aggregate_assertion": "navigator aggregate count assertion",
+            "legacy_assertions": true
+          },
+          "source": "inventory",
+          "current_drift_allowed": true,
+          "reviewed_current_transition": true
+        },
+        {
+          "path": "verification/testing/ci/v1.3.0/README.md",
+          "source": "inventory",
+          "historical_bytes": 316,
+          "historical_sha256": "84b4473fc8a614821aab3390c3d0c25f68d801adf3b000a3be44e29d056b48f8",
+          "current_bytes": 316,
+          "current_sha256": "84b4473fc8a614821aab3390c3d0c25f68d801adf3b000a3be44e29d056b48f8",
+          "current_drift_allowed": false
+        },
+        {
+          "path": "verification/testing/ci/v1.3.0/package.json",
+          "source": "inventory",
+          "historical_bytes": 412,
+          "historical_sha256": "d4acc030be30d9837c2c6fece64c6379af02ec083947303d30363cd34be2424b",
+          "current_bytes": 412,
+          "current_sha256": "d4acc030be30d9837c2c6fece64c6379af02ec083947303d30363cd34be2424b",
+          "current_drift_allowed": false
+        },
+        {
+          "path": "verification/testing/ci/v1.3.0/tests/ci-integration.test.mjs",
+          "source": "inventory",
+          "historical_bytes": 1807,
+          "historical_sha256": "f90efebc4f2166283de1d2b5a8adb13bd2cc7fcd93a000d0b20e179fcaa6df6b",
+          "current_bytes": 1807,
+          "current_sha256": "f90efebc4f2166283de1d2b5a8adb13bd2cc7fcd93a000d0b20e179fcaa6df6b",
+          "current_drift_allowed": false
+        },
+        {
+          "path": "verification/testing/ci/v1.3.0/tools/ci-inventory.mjs",
+          "source": "inventory",
+          "historical_bytes": 13576,
+          "historical_sha256": "543a728eb7d4874816ea470aaaccbbc1346145d4cfc93301e936788144a5f73a",
+          "current_bytes": 13576,
+          "current_sha256": "543a728eb7d4874816ea470aaaccbbc1346145d4cfc93301e936788144a5f73a",
+          "current_drift_allowed": false
+        },
+        {
+          "path": "verification/testing/ci/v1.3.0/tools/validate-package.mjs",
+          "source": "inventory",
+          "historical_bytes": 3086,
+          "historical_sha256": "be0db8c467717488d2312360535650cdecf3700b1e671d42f9a1b88e6a03f581",
+          "current_bytes": 3086,
+          "current_sha256": "be0db8c467717488d2312360535650cdecf3700b1e671d42f9a1b88e6a03f581",
+          "current_drift_allowed": false
+        }
+      ]
+    }
+  },
+  "current": {
+    "subject_sha256": "9d7f797f72803cfbab97bdb0daefead3e04a05797284c315e1fde67b646dbddd",
+    "technical_status": "PASS",
+    "status": "pending_authorized_review",
+    "approval": null,
+    "approval_status": "absent_for_current_subject",
+    "release_gate_pass": false,
+    "release_ready": false,
+    "production_eligibility": false,
+    "implementation_file_count": 8,
+    "current_verifier_in_implementation_inventory": true
+  },
+  "boundaries": {
+    "historical_approval_reused": false,
+    "historical_receipt_overwritten": false,
+    "current_approval_issued": false,
+    "current_release_qualified": false,
+    "production_authorized": false,
+    "structural_inventory_only": true
+  }
+}
+[32m✔ actual CI v1.4 runner executes test first and routes only validate through current verifier [90m(899.308702ms)[39m[39m
+
+[verify] /mnt/d/tmp/plumbob/ushso-pr085-v14-runner-Q9WERl :: test
+
+> @ushso/pr085-v14-future-ci-fixture@1.5.0 test
+> node --test tests/pass.test.mjs
+
+✔ fixture test (0.787439ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 59.680941
+
+[verify] /mnt/d/tmp/plumbob/ushso-pr085-v14-runner-Q9WERl :: validate
+
+> @ushso/pr085-v14-future-ci-fixture@1.5.0 validate
+> node -e "process.exit(17)"
+
+
+[verify] verification/testing/ci/v1.4.0 :: validate
+file:///mnt/d/tmp/plumbob/ushso-pr085-v14-error-Evfb2H/error.mjs:1
+throw new Error('fixture verifier error')
+      ^
+
+Error: fixture verifier error
+    at file:///mnt/d/tmp/plumbob/ushso-pr085-v14-error-Evfb2H/error.mjs:1:7
+    at ModuleJob.run (node:internal/modules/esm/module_job:430:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:661:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.14.0
+
+[verify] verification/testing/ci/v1.4.0 :: validate
+
+[verify] /mnt/d/tmp/plumbob/ushso-pr085-v14-runner-r1hO7o :: test
+
+> @ushso/pr085-v14-zero-fixture@1.0.0 test
+> node --test
+
+ℹ tests 0
+ℹ suites 0
+ℹ pass 0
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10.932168
+[32m✔ real runner subprocesses retain nonzero, error, timeout, and zero-test failures [90m(1458.321403ms)[39m[39m
+{"status":"BLOCKED_APPROVAL_PENDING","package_id":"@ushso/ci-verification-successor-v1-4@1.4.0","subject_sha256":"17cd726e2b3aa61539302373683568a7300e58980f43a2255bd95896ea90bd5f","technical_status":"PASS","release_gate_pass":false}
+[32m✔ direct successor v1.4 validation remains strict and cannot issue a receipt [90m(1.493443ms)[39m[39m
+[32m✔ child execution helper and parser retain explicit failure semantics [90m(0.552443ms)[39m[39m
+[32m✔ byte parity and immutable input: Hospital costs [90m(59.34717ms)[39m[39m
+[32m✔ byte parity and immutable input: Cities and counties [90m(18.363081ms)[39m[39m
+[32m✔ byte parity and immutable input: Boxes churches dishes [90m(12.784788ms)[39m[39m
+[32m✔ byte parity and immutable input: Café naïve HÔSPITAL [90m(18.861243ms)[39m[39m
+[32m✔ byte parity and immutable input: hospital-costs, county/rates [90m(11.221201ms)[39m[39m
+[32m✔ byte parity and immutable input: hospital [90m(13.500829ms)[39m[39m
+[32m✔ byte parity and immutable input: hospitals hospitals hospital [90m(11.89387ms)[39m[39m
+[32m✔ byte parity and immutable input: buses bus business [90m(11.915732ms)[39m[39m
+[32m✔ raw-token dedup preserves singular-token order including duplicates and boundaries [90m(0.830266ms)[39m[39m
+[32m✔ private normalized phrase predicate rejects empty invalid input without hanging [90m(9.838428ms)[39m[39m
+[32m✔ subject short circuit preserves byte order and reasons: document aliases without capability [90m(70.912234ms)[39m[39m
+[32m✔ subject short circuit preserves byte order and reasons: contextual capability independently matches [90m(25.368643ms)[39m[39m
+[32m✔ subject short circuit preserves byte order and reasons: identity capability preserves exact reasons [90m(17.398267ms)[39m[39m
+[32m✔ subject short circuit preserves byte order and reasons: multiple aliases preserve capability order and ties [90m(21.887298ms)[39m[39m
+[32m✔ health exposes the deterministic compiler boundary [90m(47.193524ms)[39m[39m
+[32m✔ discover accepts bounded JSON and returns the canonical result contract [90m(5.007082ms)[39m[39m
+[32m✔ discover rejects wrong methods, media types, invalid JSON, and invalid queries [90m(4.902076ms)[39m[39m
+[32m✔ unknown API routes fail closed [90m(1.061454ms)[39m[39m
+[32m✔ supports health HEAD and cross-origin API preflight [90m(1.932778ms)[39m[39m
+[32m✔ catalog browsing and dataset dereferencing do not depend on a question [90m(14.090638ms)[39m[39m
+[32m✔ versioned machine routes return strict toolkit envelopes without touching legacy routes [90m(24.624455ms)[39m[39m
+[32m✔ serves machine files with their real types and gives unknown pages HTTP 404 [90m(1.508153ms)[39m[39m
+[32m✔ historical proof validates by bytes and shared successor subject rules [90m(3.966625ms)[39m[39m
+[32m✔ historical proof fails for each missing or altered immutable input [90m(5.148507ms)[39m[39m
+[32m✔ historical proof fails closed for malformed JSON and wrong or malformed subjects [90m(2.927448ms)[39m[39m
+[32m✔ current technical failure cannot become a pending draft [90m(0.614068ms)[39m[39m
+[32m✔ current draft remains pending and seals the verifier in its inventory [90m(0.333659ms)[39m[39m
+[32m✔ only the reviewed WP0 v1.4.0 validate descriptor selects the current route [90m(0.328794ms)[39m[39m
+[32m✔ child failures, absent status, signals and zero test summaries fail closed [90m(0.51854ms)[39m[39m
+{"status":"BLOCKED_APPROVAL_PENDING","package_id":"@ushso/wp0-verification-v1.4.0@1.4.0","subject_sha256":"3309e3b1d01850381fe91244f43df7b61e69f5d0589129b6ee84a142d85eaef6","technical_status":"PASS","release_gate_pass":false}
+[32m✔ direct successor validation remains pending without issuing a receipt [90m(9.860993ms)[39m[39m
+
+[verify] verification/wp0/v1.4.0 :: test
+
+> @ushso/wp0-verification-v1.4.0@1.4.0 test
+> node --test tests/*.test.mjs
+
+✔ all original historical checks and current production checks pass without approval (21704.891251ms)
+{"status":"BLOCKED_APPROVAL_PENDING","package_id":"unit-fixture-only","subject_sha256":"e4d9145f8f21059b79b2194882322e95bbff5213008e987a1c80b4e6e6c7d74b","technical_status":"PASS","release_gate_pass":false}
+{"status":"BLOCKED_APPROVAL_PENDING","package_id":"unit-fixture-only","subject_sha256":"e4d9145f8f21059b79b2194882322e95bbff5213008e987a1c80b4e6e6c7d74b","technical_status":"PASS","release_gate_pass":false}
+✔ CLI rejects ambiguous flags and never issues a receipt for missing or explicit pending approval (5.068596ms)
+✔ historical path remapping cannot substitute current algorithms (2.503953ms)
+✔ @ushso/wp0-verification-v1.4.0@1.4.0: shared approval boundary refuses missing, stale, wrong-scope and tampered evidence (1.552775ms)
+✔ @ushso/wp11-verification-v1.3.0@1.3.0: shared approval boundary refuses missing, stale, wrong-scope and tampered evidence (0.998048ms)
+✔ @ushso/ci-verification-successor-v1-3@1.3.0: shared approval boundary refuses missing, stale, wrong-scope and tampered evidence (0.885813ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21860.493358
+
+[verify] verification/wp0/v1.4.0 :: validate
+{
+  "schema_version": "ushso.wp0-ci-attestation.v1.0.0",
+  "status": "PASS",
+  "package_id": "@ushso/wp0-verification-v1.4.0@1.4.0",
+  "historical": {
+    "package_id": "@ushso/wp0-verification-v1.4.0@1.4.0",
+    "subject_sha256": "0098ee424bc58120f48167c580b7db19b556d0aee42929d1da56664f78993cb5",
+    "approval_status": "approved_original_subject_only",
+    "receipt_status": "approved_scoped_attestation",
+    "reviewer": {
+      "id": "github:176340565",
+      "role": "repository_owner"
+    },
+    "recorded_at": "2026-09-09T13:02:53Z",
+    "evidence_sha256": "1aed5b57042a3a3609666b7678d6d9e6d17d607850dce4ecc90b99320b25ea42",
+    "files": {
+      "approval": {
+        "path": "verification/wp0/v1.4.0/approvals/approval.json",
+        "sha256": "d1636ed70d3cff146666a54ea5f9e493e94386649d827c1a424504c244759c05"
+      },
+      "evidence": {
+        "path": "verification/wp0/v1.4.0/approvals/evidence.txt",
+        "sha256": "1aed5b57042a3a3609666b7678d6d9e6d17d607850dce4ecc90b99320b25ea42"
+      },
+      "receipt": {
+        "path": "verification/wp0/v1.4.0/receipts/approved.json",
+        "sha256": "15b79d25a52487597236c545b4f9e27be05203850b6e5076b671d6104390a5b8"
+      }
+    }
+  },
+  "current": {
+    "subject_sha256": "9d36ed65100e8ce89caf8b66c0b198f7d7edf83824a8df549d1a7181afe4276c",
+    "technical_status": "PASS",
+    "status": "pending_authorized_review",
+    "approval": null,
+    "approval_status": "absent_for_current_subject",
+    "release_gate_pass": false,
+    "release_ready": false,
+    "production_eligibility": false,
+    "implementation_file_count": 561,
+    "current_verifier_in_implementation_inventory": true
+  },
+  "boundaries": {
+    "historical_approval_reused": false,
+    "historical_receipt_overwritten": false,
+    "current_approval_issued": false,
+    "current_release_qualified": false,
+    "production_authorized": false
+  }
+}
+[32m✔ actual WP0 runner keeps the test stage and reports a positive count before current validation [90m(44017.915902ms)[39m[39m
+
+[verify] /mnt/d/tmp/plumbob/ushso-pr085-runner-fixture-V4a115 :: test
+
+> @ushso/pr085-future-wp0-fixture@1.5.0 test
+> node --test tests/pass.test.mjs
+
+✔ fixture test (0.775854ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 58.019811
+
+[verify] /mnt/d/tmp/plumbob/ushso-pr085-runner-fixture-V4a115 :: validate
+
+> @ushso/pr085-future-wp0-fixture@1.5.0 validate
+> node -e "process.exit(17)"
+
+
+[verify] /mnt/d/tmp/plumbob/ushso-pr085-runner-fixture-2q1U2o :: test
+
+> @ushso/pr085-zero-test-fixture@1.0.0 test
+> node --test
+
+ℹ tests 0
+ℹ suites 0
+ℹ pass 0
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12.629185
+
+[verify] verification/wp0/v1.4.0 :: validate
+fixture current attestation failure
+[32m✔ actual runner retains future-version failures, child failures, and zero-test failures [90m(1190.4851ms)[39m[39m
+[32m✔ PublicationReadContext is new per request, deeply frozen, and shared by every repository call [90m(63.587348ms)[39m[39m
+[32m✔ static adapters reproduce exact legacy browse, dataset, and discovery structures [90m(493.241215ms)[39m[39m
+[32m✔ public search forwards the request evaluation clock into retrieve without changing v1.1 bytes [90m(414.205619ms)[39m[39m
+[32m✔ Worker dependency injection preserves exact response bytes, fields, ordering, and cache headers [90m(12.335719ms)[39m[39m
+[32m✔ legacy static coverage is typed unknown and planner fails closed [90m(1.307156ms)[39m[39m
+[32m✔ static asset-only entry requires only the ASSETS binding [90m(1177.272738ms)[39m[39m
+[32m✔ historical v1.1 retrieval remains immutable while the Worker selects v1.2 [90m(1.488317ms)[39m[39m
+[34mℹ tests 65[39m
+[34mℹ suites 0[39m
+[34mℹ pass 65[39m
+[34mℹ fail 0[39m
+[34mℹ cancelled 0[39m
+[34mℹ skipped 0[39m
+[34mℹ todo 0[39m
+[34mℹ duration_ms 45517.358778[39m
