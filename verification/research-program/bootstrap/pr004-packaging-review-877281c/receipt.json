@@ -1,0 +1,142 @@
+{
+  "format": "ushso.pr004-packaging-functional-review.v1",
+  "reviewer": "root Astra, independent of Grok implementation",
+  "head": "877281c81b937829ae18f54075a349697b480a0e",
+  "tree": "1f033f88d58514405a1e4ba1ad040d9545708459",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-packaging-controller-review-20260911",
+  "started_at": "2026-09-11T06:47:05.518938Z",
+  "scope": [
+    "tests/research-program/field-states.test.mjs",
+    "verification/research-program/pr-004/.gitignore",
+    "verification/research-program/pr-004/README.md",
+    "verification/research-program/pr-004/build-completeness-view.mjs",
+    "verification/research-program/pr-004/completeness-view-packaging.mjs",
+    "verification/research-program/pr-004/completeness-view.json",
+    "verification/research-program/pr-004/completeness-view.json.gz",
+    "verification/research-program/pr-004/completeness-view.manifest.json",
+    "verification/research-program/pr-004/verify.mjs"
+  ],
+  "transport": {
+    "bytes": 1904678,
+    "sha256": "9f72a19a39f9e6a664ce8fdd36f1b5d31b61adea848ad40c0d72c9af3a95a064"
+  },
+  "decoded": {
+    "bytes": 49808256,
+    "sha256": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
+    "equals_original_git_bytes": true
+  },
+  "semantic_and_prior_evidence_files_unchanged": 84,
+  "commands": [
+    {
+      "label": "field-tests",
+      "argv": [
+        "node",
+        "--test",
+        "tests/research-program/field-states.test.mjs"
+      ],
+      "started_at": "2026-09-11T06:47:05.613642Z",
+      "completed_at": "2026-09-11T06:47:29.833694Z",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "591470414f60beaf37919f70c942ca635915978b8e2ec82e4a787bd5a92cd9d4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_counts": [
+        16
+      ]
+    },
+    {
+      "label": "rebuild",
+      "argv": [
+        "node",
+        "verification/research-program/pr-004/build-completeness-view.mjs"
+      ],
+      "started_at": "2026-09-11T06:47:29.833915Z",
+      "completed_at": "2026-09-11T06:47:49.444362Z",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "1de98577802ab4470161b116fe17f9bd5bd1c2377cd1d75319d6f37173deb444",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_counts": []
+    },
+    {
+      "label": "verify",
+      "argv": [
+        "node",
+        "verification/research-program/pr-004/verify.mjs"
+      ],
+      "started_at": "2026-09-11T06:47:49.444410Z",
+      "completed_at": "2026-09-11T06:48:13.893282Z",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "52152fd40c636ecd2887148f86ad0dd56088cb89bbf05d5b026f6b315f2d1fd3",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_counts": []
+    },
+    {
+      "label": "release-audit",
+      "argv": [
+        "npm",
+        "run",
+        "release:audit"
+      ],
+      "started_at": "2026-09-11T06:48:13.893315Z",
+      "completed_at": "2026-09-11T06:48:14.277873Z",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "147de837c8e7c6da689e4f8bdbb9b4c3425aeda02ca53b86ffe990c59491c3af",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_counts": []
+    },
+    {
+      "label": "contradictory-manifest-verifier",
+      "argv": [
+        "node",
+        "verification/research-program/pr-004/verify.mjs"
+      ],
+      "started_at": "2026-09-11T06:48:14.278685Z",
+      "completed_at": "2026-09-11T06:48:37.308938Z",
+      "exit_code": 0,
+      "expected_exit_code": 1,
+      "stdout_sha256": "4497ca43fdf2a64599a37835b099e1b359a83775f745a3c543de8f25047859d1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test_counts": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "manifest-payload-consistency",
+      "severity": "blocking",
+      "problem": "The current verifier accepts a manifest with the wrong generation, record count, transport path and encoding, then prints the false transport path while reporting PASS.",
+      "changed_manifest_fields": {
+        "logical.generation": "controller-fixture-wrong-generation",
+        "logical.record_count": 1,
+        "transport.path": "controller-fixture-wrong-path.json.gz",
+        "transport.encoding": "controller-fixture-wrong-encoding"
+      },
+      "actual_cli_report": {
+        "status": "pass",
+        "artifact_id": "urn:ushso:completeness-view:7b6d763bfc652aa094b7d68c76ebc534de401c1e",
+        "artifact_digest": "sha256:7b6d763bfc652aa094b7d68c76ebc534de401c1e5904738932231b7824b42fab",
+        "transport_path": "controller-fixture-wrong-path.json.gz",
+        "transport_sha256": "9f72a19a39f9e6a664ce8fdd36f1b5d31b61adea848ad40c0d72c9af3a95a064",
+        "transport_bytes": 1904678,
+        "decoded_sha256": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
+        "decoded_bytes": 49808256,
+        "record_count": 3434,
+        "source_membership_count": 3434,
+        "isolated_count": 4,
+        "vector_field_count": 13736,
+        "metric_count": 25,
+        "vector_encoding": "compact-v1"
+      },
+      "expected": "Reject contradictory manifest metadata before returning a successfully verified packaged artifact.",
+      "scope": "Cross-check the complete manifest identity/metadata against decoded view and actual transport; preserve exact payload bytes and existing semantic checks."
+    }
+  ],
+  "restored_manifest_sha256": "2f5b97e0084d601f334c40b1c2b67d2b9d7436b6706a09d97b4888019c00e550",
+  "final_head": "877281c81b937829ae18f54075a349697b480a0e",
+  "git_status": "",
+  "decoded_file_absent": true,
+  "completed_at": "2026-09-11T06:48:37.330141Z",
+  "status": "changes_requested"
+}
