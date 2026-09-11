@@ -4,7 +4,7 @@
   "status": "producer_checked",
   "owner": "Luna Max (OpenAI; reasoning max; actor luna-max)",
   "reviewer": "Root/controller independent review pending",
-  "base_sha": "4ad67220df54334f70d891fd26d1778f83328d54",
+  "base_sha": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
   "head_sha": null,
   "dependency_merge_shas": {
     "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8"
@@ -34,7 +34,7 @@
     "docs/research-program/handoffs/PR-085.json",
     "package-lock.json"
   ],
-  "problem": "The historical CI v1.3 approval is valid only for its original subject, while current runner/input bytes require a versioned read-only inventory. PR-003 also introduces a reviewed root test stage, so the current package and inventory-test inputs need a bounded transition binding without weakening historical proof.",
+  "problem": "The original PR-085 task dispatch is bound to 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0 (tree 8707c8fc92f35742f58508a83a57a3c4d9b7baf4). The reviewed CI v1.4 continuation was applied from 4ad67220df54334f70d891fd26d1778f83328d54 (tree 02544973bf065b3825c8b189f186a598da99a223) under plan f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15 with independent review d3c9c26c7566c74de2e5cec42c24c388a54e3cbe402f9ccf472ea05294f02b8f; that continuation provenance is retained while the historical CI v1.3 approval remains valid only for its original subject. Current runner/input bytes require a versioned read-only inventory. PR-003 also introduces a reviewed root test stage, so the current package and inventory-test inputs need a bounded transition binding without weakening historical proof.",
   "resulting_behavior": "The candidate verifies the immutable CI v1.3 approval, evidence, approved receipt and predecessor chain in memory. It builds a fresh CI v1.4 technical draft with a different subject and pending_authorized_review status, no current approval, and no release or production eligibility. Only the exact ci-verification / verification/testing/ci/v1.4.0 / validate descriptor uses the current verifier; tests and all other packages retain normal execution. Future versions use the strict path, child nonzero/error/timeout results remain failures, and a real zero-test child is rejected. The original root test chain and the exact reviewed PR-003 extension are the only accepted chains. Historical package.json and contract-inventory test pins remain immutable; the exact reviewed PR-003 bytes are separately hash-bound, semantically checked and required as an atomic pair, with both mixed states rejected. Producer build and CF dry-run passed, while full npm test retained an existing v1.3 WP11 stale-subject failure. Current authorization and combined release qualification remain pending.",
   "commits": [
     {
@@ -177,37 +177,39 @@
       "kind": "published-ci-doc",
       "id": "docs/research-program/ci-attestations.md",
       "version": "current v1.4 evidence documentation",
-      "sha256": "67e40c3cd2308115a5c0fa74c2e79403cb8ac270f71648ab3420f72df7f6b657"
+      "sha256": "9d570d337df03cdd5750c9ad84a053b99ede618750a80b6c4fb5dc26ee53c886"
     },
     {
       "location": "local",
       "kind": "published-evidence-index",
       "id": "verification/research-program/pr-085/evidence-index.json",
-      "version": "current v1.4 evidence index",
-      "sha256": "5e312cfd25fe254523c43a2b04d53a9ea8bec5ca691f1347b1a3f3a9a3fd6590"
+      "version": "published evidence index with original dispatch base and explicit CI v1.4 continuation provenance",
+      "sha256": "ec0722290556a0dddf7305ecb983ae2633b5d6d436d39abc4da184999023e3b9"
     },
     {
       "location": "local",
       "kind": "per-pr-task-binding",
       "id": "verification/research-program/pr-085/task-binding.json",
-      "version": "continuation task binding with v1.4 scope",
-      "sha256": "24b5909e17af2056b15deadd9a6624cb774fe6d50031165f5235d1869a65b466"
+      "version": "dispatch task binding restored to original base; reviewed CI v1.4 continuation recorded separately",
+      "sha256": "18f191c1cd76cd862d3b4620519691b3d2d84eef4368856836b736849470f7c6"
     },
     {
-      "kind": "dispatch-base-plan",
+      "kind": "continuation-plan-input",
       "id": "4ad67220df54334f70d891fd26d1778f83328d54:docs/master-plan/2026-09-10/plan.json",
       "location": "external",
       "git_commit": "4ad67220df54334f70d891fd26d1778f83328d54",
       "git_path": "docs/master-plan/2026-09-10/plan.json",
-      "sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15"
+      "sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15",
+      "version": "Explicit continuation provenance from 4ad67220df54334f70d891fd26d1778f83328d54 tree 02544973bf065b3825c8b189f186a598da99a223; original dispatch base is 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0 tree 8707c8fc92f35742f58508a83a57a3c4d9b7baf4"
     },
     {
-      "kind": "accepted-independent-plan-review",
+      "kind": "continuation-plan-review",
       "id": "4ad67220df54334f70d891fd26d1778f83328d54:verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
       "location": "external",
       "git_commit": "4ad67220df54334f70d891fd26d1778f83328d54",
       "git_path": "verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
-      "sha256": "d3c9c26c7566c74de2e5cec42c24c388a54e3cbe402f9ccf472ea05294f02b8f"
+      "sha256": "d3c9c26c7566c74de2e5cec42c24c388a54e3cbe402f9ccf472ea05294f02b8f",
+      "version": "Accepted continuation review for 4ad67220df54334f70d891fd26d1778f83328d54 tree 02544973bf065b3825c8b189f186a598da99a223; original dispatch base is 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0 tree 8707c8fc92f35742f58508a83a57a3c4d9b7baf4"
     },
     {
       "kind": "reviewed-pr003-root-package",
@@ -930,20 +932,20 @@
     {
       "id": "artifact-evidence-index",
       "path": "verification/research-program/pr-085/evidence-index.json",
-      "bytes": 19395,
-      "sha256": "5e312cfd25fe254523c43a2b04d53a9ea8bec5ca691f1347b1a3f3a9a3fd6590"
+      "bytes": 19861,
+      "sha256": "ec0722290556a0dddf7305ecb983ae2633b5d6d436d39abc4da184999023e3b9"
     },
     {
       "id": "artifact-ci-attestations-doc",
       "path": "docs/research-program/ci-attestations.md",
-      "bytes": 9112,
-      "sha256": "67e40c3cd2308115a5c0fa74c2e79403cb8ac270f71648ab3420f72df7f6b657"
+      "bytes": 9507,
+      "sha256": "9d570d337df03cdd5750c9ad84a053b99ede618750a80b6c4fb5dc26ee53c886"
     },
     {
       "id": "artifact-task-binding",
       "path": "verification/research-program/pr-085/task-binding.json",
-      "bytes": 6279,
-      "sha256": "24b5909e17af2056b15deadd9a6624cb774fe6d50031165f5235d1869a65b466"
+      "bytes": 6775,
+      "sha256": "18f191c1cd76cd862d3b4620519691b3d2d84eef4368856836b736849470f7c6"
     },
     {
       "id": "artifact-prior-ci-failure",
