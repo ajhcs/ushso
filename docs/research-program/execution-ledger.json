@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T15:00:06.087443Z",
+  "updated_at": "2026-09-11T15:07:11.847296Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "380f3bed7fc5c9135d2000ba8f4a477e7348819f222298b441ff254ea99625f3",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -174,8 +174,65 @@
       "combined_hosted_ci_pending": false,
       "accepted": true
     },
-    "active_assignments": [],
-    "current_review": "verification/research-program/bootstrap/wp11-plan-and-pr007-r2-review-20260911/index.json",
+    "active_assignments": [
+      {
+        "pr_id": "PR-007",
+        "run_id": "ushso-pr007-grok-r3-20260911",
+        "task_id": "ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6",
+        "assignment_id": "pr007-core-identity-r3",
+        "provider": "grok",
+        "model": "grok-4",
+        "role": "implement",
+        "status": "running",
+        "execution_base_sha": "ba0779069c5e75cc49be0e7b79026726ab087cfc",
+        "logical_pr_base_sha": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+        "branch": "codex/ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6",
+        "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f-worktrees/.ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad-worktrees/ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6",
+        "deadline_at": "2026-09-11T15:44:09.679Z",
+        "expected_duration_ms": 2100000,
+        "prompt_dispatched": true,
+        "write_scope": [
+          "packages/identity/src/**",
+          "packages/identity/schemas/**",
+          "packages/registry/**",
+          "tests/research-program/release-binding.test.mjs",
+          "packages/identity/manifests/package-manifest.json",
+          "packages/identity/validation/validation-receipt.json",
+          "docs/research-program/handoffs/PR-007.json",
+          "verification/research-program/pr-007/**"
+        ],
+        "consent": "approved durable repository/provider grant",
+        "cursor": "8"
+      },
+      {
+        "pr_id": "PR-086",
+        "run_id": "ushso-pr086-wp11-grok-20260911",
+        "task_id": "ce-ushso-pr086-wp11-grok-20-pr086-wp11-current-input-d5d7f0169e56-ebf15eab",
+        "assignment_id": "pr086-wp11-current-input",
+        "provider": "grok",
+        "model": "grok-4",
+        "role": "implement",
+        "status": "running",
+        "execution_base_sha": "7e10fd637e092d7fbe14cef97c8da22a1f5d1ad1",
+        "logical_pr_base_sha": "7e10fd637e092d7fbe14cef97c8da22a1f5d1ad1",
+        "branch": "codex/ce-ushso-pr086-wp11-grok-20-pr086-wp11-current-input-d5d7f0169e56-ebf15eab",
+        "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-pr086-wp11-grok-20-pr086-wp11-current-input-d5d7f0169e56-ebf15eab",
+        "deadline_at": "2026-09-11T16:02:30.049Z",
+        "expected_duration_ms": 3000000,
+        "prompt_dispatched": true,
+        "write_scope": [
+          "scripts/verify-wp11-attestation.mjs",
+          "tests/wp11-attestation.test.mjs",
+          "verification/research-program/ci-attestation/wp11-v1.3.0/**",
+          "docs/research-program/ci-attestations.md",
+          "verification/research-program/pr-086/**",
+          "docs/research-program/handoffs/PR-086.json"
+        ],
+        "consent": "approved durable repository/provider grant",
+        "cursor": "8"
+      }
+    ],
+    "current_review": "verification/research-program/bootstrap/pr005-r2-review-and-next-dispatch-20260911/index.json",
     "wp11_input_design_review": {
       "run_id": "ushso-wp11-design-review-grok-20260911",
       "status": "completed",
@@ -194,7 +251,8 @@
       "status": "node22_failed_build_skipped",
       "evidence": "verification/research-program/bootstrap/wp11-plan-and-pr007-r2-review-20260911/ci-pr005-941c9cd/receipt.json",
       "actual_checkout_independently_verified": false
-    }
+    },
+    "current_provider_dispatch": "verification/research-program/bootstrap/pr005-r2-review-and-next-dispatch-20260911/dispatch-summary.json"
   },
   "providers": [
     {
@@ -1104,7 +1162,7 @@
     },
     {
       "pr_id": "PR-005",
-      "status": "independent_review",
+      "status": "blocked",
       "owner": "ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
       "dependencies": [
         "PR-004",
@@ -1136,7 +1194,7 @@
       "evidence_directory": "verification/research-program/pr-005/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/19",
       "blockers": [
-        "Independent correction review and combined PR086 current-input gate remain required."
+        "PR086 current-input implementation and exact combined candidate gate/CI remain required; worker currently fails four WP11 cases."
       ],
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
@@ -1154,8 +1212,8 @@
       "active_run_id": "ushso-pr005-grok-r2-20260911",
       "assignment_id": "pr005-freshness-r2",
       "deadline_at": "2026-09-11T15:10:08.411Z",
-      "independent_review": "verification/research-program/bootstrap/review-pr005-pr007-20260911/REVIEW.md",
-      "review_evidence": "verification/research-program/bootstrap/review-pr005-pr007-20260911/index.json",
+      "independent_review": "verification/research-program/bootstrap/pr005-r2-review-and-next-dispatch-20260911/PR-005-REVIEW.md",
+      "review_evidence": "verification/research-program/bootstrap/pr005-r2-review-and-next-dispatch-20260911/index.json",
       "provider_status": "completed",
       "producer_partial": true,
       "independent_semantic_results": {
@@ -1172,7 +1230,8 @@
       "producer_dependency_context": {
         "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce"
       },
-      "published_head_sha": "941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9"
+      "published_head_sha": "941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9",
+      "functional_review_status": "correction_cases_passed"
     },
     {
       "pr_id": "PR-006",
@@ -1198,8 +1257,8 @@
     },
     {
       "pr_id": "PR-007",
-      "status": "changes_requested",
-      "owner": "ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad",
+      "status": "in_progress",
+      "owner": "ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6",
       "dependencies": [
         "PR-004"
       ],
@@ -1227,29 +1286,31 @@
         "PR-004": "verification/research-program/bootstrap/components-463f092/pr-004-integration-handoff.json"
       },
       "dispatch_preparation": "PR004 is independently accepted and merged; consume its exact integration handoff and manifest. PR003 validation and PR085 technical attestation boundaries are present in the integration base.",
-      "branch": "codex/ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad",
-      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f-worktrees/ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad",
+      "branch": "codex/ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f-worktrees/.ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad-worktrees/ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6",
       "base_sha": "15b351a92af729f9ba07359fd210123fdfd76bb3",
       "base_tree": "c46c95ad838b78d4a26c86454be82f3835c49e51",
       "dispatch_evidence": "verification/research-program/bootstrap/pr005-pr007-grok/dispatch.json",
       "dispatch_request": "verification/research-program/bootstrap/pr005-pr007-grok/request.json",
       "actual_provider": "grok",
       "actual_model": "grok-4",
-      "active_run_id": "ushso-pr007-grok-r2-20260911",
-      "assignment_id": "pr007-release-binding-r2",
-      "deadline_at": "2026-09-11T15:16:26.104Z",
+      "active_run_id": "ushso-pr007-grok-r3-20260911",
+      "assignment_id": "pr007-core-identity-r3",
+      "deadline_at": "2026-09-11T15:44:09.679Z",
       "independent_review": "verification/research-program/bootstrap/wp11-plan-and-pr007-r2-review-20260911/PR-007-REVIEW.md",
       "review_evidence": "verification/research-program/bootstrap/wp11-plan-and-pr007-r2-review-20260911/index.json",
-      "provider_status": "completed",
+      "provider_status": "running",
       "producer_partial": true,
       "independent_semantic_results": {
         "passed": 4,
         "failed": 10,
         "probe_errors": 0
       },
-      "continuation_execution_base_sha": "994779418cdf4ac2bcc023da66eb1b05aae696d6",
-      "correction_dispatch": "verification/research-program/bootstrap/pr005-pr007-corrections/pr005-pr007-corrections-dispatch-summary.json",
-      "published_head_sha": "994779418cdf4ac2bcc023da66eb1b05aae696d6"
+      "continuation_execution_base_sha": "ba0779069c5e75cc49be0e7b79026726ab087cfc",
+      "correction_dispatch": "verification/research-program/bootstrap/pr005-r2-review-and-next-dispatch-20260911/dispatch-summary.json",
+      "published_head_sha": "994779418cdf4ac2bcc023da66eb1b05aae696d6",
+      "provider": "Grok Co-Engineer",
+      "selected_model": "grok-4"
     },
     {
       "pr_id": "PR-008",
@@ -3317,8 +3378,8 @@
     },
     {
       "pr_id": "PR-086",
-      "status": "ready",
-      "owner": null,
+      "status": "in_progress",
+      "owner": "ce-ushso-pr086-wp11-grok-20-pr086-wp11-current-input-d5d7f0169e56-ebf15eab",
       "dependencies": [
         "PR-003",
         "PR-085"
@@ -3343,7 +3404,19 @@
       "prerequisites_satisfied": true,
       "parent_pr": "PR-005",
       "independent_plan_review": "verification/research-program/bootstrap/wp11-plan-and-pr007-r2-review-20260911/wp11-design-review.md",
-      "controller_preimage_audit": "verification/research-program/bootstrap/wp11-plan-and-pr007-r2-review-20260911/wp11-historical-preimages-controller-audit.json"
+      "controller_preimage_audit": "verification/research-program/bootstrap/wp11-plan-and-pr007-r2-review-20260911/wp11-historical-preimages-controller-audit.json",
+      "branch": "codex/ce-ushso-pr086-wp11-grok-20-pr086-wp11-current-input-d5d7f0169e56-ebf15eab",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-pr086-wp11-grok-20-pr086-wp11-current-input-d5d7f0169e56-ebf15eab",
+      "continuation_execution_base_sha": "7e10fd637e092d7fbe14cef97c8da22a1f5d1ad1",
+      "active_run_id": "ushso-pr086-wp11-grok-20260911",
+      "assignment_id": "pr086-wp11-current-input",
+      "deadline_at": "2026-09-11T16:02:30.049Z",
+      "provider_status": "running",
+      "provider": "Grok Co-Engineer",
+      "actual_model": "grok-4",
+      "selected_model": "grok-4",
+      "correction_dispatch": "verification/research-program/bootstrap/pr005-r2-review-and-next-dispatch-20260911/dispatch-summary.json",
+      "base_sha": "7e10fd637e092d7fbe14cef97c8da22a1f5d1ad1"
     }
   ],
   "external_inputs": [
