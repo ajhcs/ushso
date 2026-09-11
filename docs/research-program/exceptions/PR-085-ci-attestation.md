@@ -13,3 +13,14 @@ Owned files and three atomic commits are in the generated PR-085 packet. Reuse e
 A passing result requires independent reproduction of changed-subject behavior, immutable historical pin checks, current technical failures still failing, and actual full root test/CI execution. The current technical draft remains pending approval when it differs from the historical subject. PR-082 must resolve current-subject successor approvals and the exact release gate; green development CI is not that decision.
 
 The original R01–R16 predicates, cohorts, denominators and production boundaries are unchanged. Handoff/publication/review follow EXECUTION.md.
+
+
+## Additional CI subject discovered by the full replay
+
+PR-085 command cmd-0014-9cb38845 ran full npm test on the implementation at 7cfbb96096d5eba46c37fb5b1885f116aa82ab80 and failed the CI v1.3 validation. Independent draft replay proves the sole changed technical-evidence input is scripts/run-contract-suites.mjs, from 23,034 to 24,729 bytes. The historical approved CI subject is 11b8c7269bf293e67690d713a9e9748b977fb3197f039cb9966e5647d05d2ccb; the fresh unapproved subject is 59fcc355ec9c46599fa6afcbb7c91d9857532b3f3383c8fbc86fc5bbfd0ec098. These identities describe that candidate, not later code.
+
+Independent replay on composed PR-003 bf46d92b0e4fc91457bd3eb78aa1742ae84038f2 also fails the old CI inventory's exact root npm-test sequence check. PR-003 deliberately registered its previously undiscovered handoff tests. The existing CI v1.3 implementation and approvals remain immutable; a versioned v1.4 inventory must represent this reviewed transition using actual current input bytes.
+
+The PR-085 ownership extension is limited to a CI v1.4 workspace, its read-only attestation verifier and focused tests, and the required local workspace lock entries. The existing runner remains under its single PR-085 owner. Root package.json remains owned by PR-003. The original root sequence and the exact PR-003 extended sequence are the only supported transitional contracts; neither may lose a legacy gate or gain duplicate aggregate execution. The new CI suite preserves the prior integration-test behaviors and adds actual routing/failure cases.
+
+Independent review of this amendment is required before implementation. No historical CI package, receipt or approval may change. Direct successor validation/issuance remains strict. The aggregate's current technical result does not issue current-subject approval or claim actual test execution from a structural inventory. Full combined checks and hosted CI remain mandatory before acceptance, and PR-082 retains both current approval decisions and final release qualification. The frozen cohorts, all R01–R16 targets, dependency graph, task count and planned atomic-commit count are unchanged.
