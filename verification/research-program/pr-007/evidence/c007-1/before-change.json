@@ -1,0 +1,43 @@
+{
+  "slice_id": "C-007-1",
+  "kind": "before_change_failure",
+  "preserved": true,
+  "base_sha": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+  "base_tree": "c46c95ad838b78d4a26c86454be82f3835c49e51",
+  "recorded_at": "2026-09-11T13:24:18.550Z",
+  "commands": [
+    {
+      "id": "cmd-c007-1-before-import",
+      "command": "node --input-type=module -e 'await import(\"./packages/identity/src/release-identity.mjs\")'",
+      "started_at": "2026-09-11T13:24:18.502Z",
+      "completed_at": "2026-09-11T13:24:18.550Z",
+      "exit_code": 1,
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "actual": "ERR_MODULE_NOT_FOUND for packages/identity/src/release-identity.mjs"
+    },
+    {
+      "id": "cmd-c007-1-before-test",
+      "command": "node --test tests/research-program/release-binding.test.mjs",
+      "started_at": "2026-09-11T13:24:18.550Z",
+      "completed_at": "2026-09-11T13:24:18.580Z",
+      "exit_code": 1,
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "actual": "Could not find 'tests/research-program/release-binding.test.mjs'"
+    }
+  ],
+  "note": "Genuine pre-implementation absence of the C-007-1 module and focused test. Retained as evidence; passing tests are not committed until the identity rules exist."
+}

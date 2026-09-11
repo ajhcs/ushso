@@ -1,0 +1,328 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/identity/v1.0.0/release-identity.schema.json",
+  "title": "Release and distribution identity rule",
+  "description": "Identity-package rule for minting release and distribution IDs from publisher identifiers, locators, typed date roles, and hash-scoped content when a publisher supplies no stable release ID. Reuses core v2.0.0 source/release/distribution field names. A URL alone cannot mint an exact release. Existing observatory asset IDs do not change meaning.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "asset_id",
+    "source_id",
+    "identity_state",
+    "identity_rule",
+    "release_kind",
+    "publisher_identifiers",
+    "locator",
+    "date_roles",
+    "distributions",
+    "evidence_ids",
+    "observed_at",
+    "boundaries"
+  ],
+  "properties": {
+    "schema_version": { "const": "identity.release-identity.v1.0.0" },
+    "asset_id": { "type": "string", "minLength": 3 },
+    "source_id": { "type": "string", "minLength": 3 },
+    "release_id": {
+      "oneOf": [
+        { "$ref": "#/$defs/opaqueId" },
+        { "type": "null" }
+      ]
+    },
+    "identity_state": {
+      "enum": ["exact", "rolling", "replaced", "unresolved", "conflicted", "ambiguous"]
+    },
+    "identity_rule": {
+      "oneOf": [
+        { "enum": ["publisher_stable_release_id", "hash_scoped_content_identity"] },
+        { "type": "null" }
+      ]
+    },
+    "release_kind": {
+      "enum": ["edition", "vintage", "snapshot", "filing_period", "api_version", "rolling_current", "other", "unknown"]
+    },
+    "publisher_version": {
+      "oneOf": [
+        { "type": "string", "minLength": 1, "maxLength": 300 },
+        { "type": "null" }
+      ]
+    },
+    "publisher_identifiers": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/publisherIdentifier" }
+    },
+    "locator": { "$ref": "#/$defs/locator" },
+    "date_roles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/dateRole" }
+    },
+    "content_sha256": {
+      "oneOf": [
+        { "$ref": "#/$defs/sha256" },
+        { "type": "null" }
+      ]
+    },
+    "distributions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/distributionIdentity" }
+    },
+    "alternatives": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/alternative" }
+    },
+    "replacement_of": {
+      "oneOf": [
+        { "$ref": "#/$defs/opaqueId" },
+        { "type": "null" }
+      ]
+    },
+    "evidence_ids": { "$ref": "#/$defs/evidenceIds" },
+    "evidence_pointers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidencePointer" }
+    },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "reason_codes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "existing_stable_id_rewritten",
+        "url_alone_is_exact_release",
+        "date_roles_merged",
+        "catalog_membership_is_payload_access",
+        "scientific_fitness_claimed"
+      ],
+      "properties": {
+        "existing_stable_id_rewritten": { "const": false },
+        "url_alone_is_exact_release": { "const": false },
+        "date_roles_merged": { "const": false },
+        "catalog_membership_is_payload_access": { "const": false },
+        "scientific_fitness_claimed": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "opaqueId": {
+      "type": "string",
+      "pattern": "^urn:ushso:[a-z][a-z0-9-]*:[A-Za-z0-9._~-]+$",
+      "minLength": 12,
+      "maxLength": 240
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "evidenceIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "publisherIdentifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "namespace",
+        "value",
+        "normalized_value",
+        "case_behavior",
+        "preservation",
+        "entity_scope",
+        "authority",
+        "uniqueness_policy",
+        "evidence_ids"
+      ],
+      "properties": {
+        "source_id": { "type": "string", "minLength": 3 },
+        "namespace": { "type": "string", "pattern": "^[a-z][a-z0-9._-]{1,79}$" },
+        "value": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "normalized_value": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "case_behavior": { "enum": ["sensitive", "insensitive", "normalization_defined"] },
+        "preservation": { "const": "exact" },
+        "entity_scope": {
+          "enum": ["organization", "source", "asset", "release", "distribution", "documentation", "schema", "field", "access_route", "unknown"]
+        },
+        "authority": { "enum": ["source_native", "authoritative_cross_source", "legacy_alias"] },
+        "uniqueness_policy": { "enum": ["unique", "reusable_over_time", "source_scoped", "unknown"] },
+        "effective_from": {
+          "oneOf": [
+            { "type": "string", "format": "date" },
+            { "type": "null" }
+          ]
+        },
+        "effective_to": {
+          "oneOf": [
+            { "type": "string", "format": "date" },
+            { "type": "null" }
+          ]
+        },
+        "evidence_ids": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "url", "evidence_ids"],
+      "properties": {
+        "kind": {
+          "enum": ["exact_distribution", "rolling_current", "landing_page", "replacement", "ambiguous", "unknown"]
+        },
+        "url": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "canonical": { "type": "boolean" },
+        "repeated": { "type": "boolean" },
+        "evidence_ids": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "dateRole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "value", "value_state", "evidence_ids"],
+      "properties": {
+        "role": {
+          "enum": [
+            "observation_period_start",
+            "observation_period_end",
+            "fiscal_period",
+            "vintage",
+            "publisher_released_at",
+            "publisher_modified_at",
+            "catalog_issued",
+            "catalog_modified",
+            "metadata_observed_at",
+            "revision_at"
+          ]
+        },
+        "value": {
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "null" }
+          ]
+        },
+        "value_state": { "enum": ["known", "unknown", "conflicted"] },
+        "period_basis": {
+          "enum": ["calendar", "fiscal", "rolling", "point_in_time", "mixed", "unknown"]
+        },
+        "evidence_ids": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "distributionIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "distribution_id",
+        "release_id",
+        "distribution_kind",
+        "format",
+        "locator",
+        "identity_state",
+        "identity_rule",
+        "evidence_ids"
+      ],
+      "properties": {
+        "distribution_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/opaqueId" },
+            { "type": "null" }
+          ]
+        },
+        "release_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/opaqueId" },
+            { "type": "null" }
+          ]
+        },
+        "distribution_kind": {
+          "enum": ["download", "api", "query_service", "web_interface", "document", "other", "unknown"]
+        },
+        "format": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "media_type": {
+          "oneOf": [
+            { "type": "string", "minLength": 3 },
+            { "type": "null" }
+          ]
+        },
+        "locator": { "$ref": "#/$defs/locator" },
+        "content_sha256": {
+          "oneOf": [
+            { "$ref": "#/$defs/sha256" },
+            { "type": "null" }
+          ]
+        },
+        "identity_state": {
+          "enum": ["exact", "rolling", "replaced", "unresolved", "conflicted", "ambiguous"]
+        },
+        "identity_rule": {
+          "oneOf": [
+            { "enum": ["publisher_stable_release_id", "hash_scoped_content_identity"] },
+            { "type": "null" }
+          ]
+        },
+        "replacement_of": {
+          "oneOf": [
+            { "$ref": "#/$defs/opaqueId" },
+            { "type": "null" }
+          ]
+        },
+        "evidence_ids": { "$ref": "#/$defs/evidenceIds" }
+      }
+    },
+    "evidencePointer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "pointer"],
+      "properties": {
+        "evidence_id": { "type": "string", "minLength": 3 },
+        "capture_sha256": {
+          "oneOf": [
+            { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            { "type": "null" }
+          ]
+        },
+        "pointer": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "locator": {
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "alternative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "reason_codes", "evidence_ids"],
+      "properties": {
+        "state": { "enum": ["ambiguous", "unresolved", "conflicted", "rolling", "replaced"] },
+        "release_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/opaqueId" },
+            { "type": "null" }
+          ]
+        },
+        "distribution_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/opaqueId" },
+            { "type": "null" }
+          ]
+        },
+        "reason_codes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "evidence_ids": { "$ref": "#/$defs/evidenceIds" },
+        "evidence_pointers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidencePointer" }
+        }
+      }
+    }
+  }
+}
