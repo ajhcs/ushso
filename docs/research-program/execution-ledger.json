@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T04:12:02.881950+00:00",
+  "updated_at": "2026-09-11T04:28:27.547976+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -64,23 +64,23 @@
     },
     "ledger_fact_corrections": "verification/research-program/bootstrap/ledger-fact-corrections-487f06a.json",
     "latest_component_composition": {
-      "head_sha": "062a980e3c206856db9411f6c31c15127f614c9e",
-      "tree_sha": "f3089e022a8aa6811f6267bda9d2acbd039e0741",
-      "status": "failed_bounded_checks",
-      "evidence": "verification/research-program/bootstrap/component-composition-initial-062a980.json",
+      "head_sha": "a3b54458709872f6cc459f5fd31bde1ddc8a2d13",
+      "tree_sha": "1ed16f74ea5d42027db3d9a94b602a65e9fc6a9a",
+      "status": "bounded_checks_pass_with_known_blockers",
+      "evidence": "verification/research-program/bootstrap/component-composition-r5-context-a3b5445.json",
       "accepted": false,
-      "findings": [
-        "PR003 fixture/live-ledger coupling",
-        "WP11 strict current subject mismatch",
-        "PR085 package.json historical-context binding"
+      "passing_checks": [
+        "64 registered research tests",
+        "current PR003 handoff",
+        "current PR004 handoff",
+        "WP0 current technical attestation pending approval",
+        "CI current technical attestation pending approval"
       ],
-      "remaining_selected_suite_check": {
-        "status": "PASS",
-        "package_count": 5,
-        "evidence": "verification/research-program/bootstrap/component-composition-remaining-suites-062a980.json",
-        "sealed_files_unchanged": true,
-        "full_gate": false
-      }
+      "findings": [
+        "PR003 missing-TMPDIR portability failure under R6 correction",
+        "WP11 strict current subject mismatch under PR085 correction",
+        "PR085 historical package.json source context under correction"
+      ]
     },
     "legacy_program_raw_pin_findings": {
       "status": "unresolved",
@@ -110,12 +110,12 @@
       "model_reported_by_reviewer": "Grok 4.6",
       "model_identity_note": "The active managed interface records grok-4. The retained Grok 4.6 self-report belongs only to the earlier read-only boundary review and is not asserted for later implementation runs.",
       "latest_run": {
-        "run_id": "ushso-pr085-wp11-grok-20260911",
-        "task_id": "ce-ushso-pr085-wp11-grok-20-grok-wp11-29992045ca68-40d94a09",
+        "run_id": "ushso-pr003-grok-r6-20260911",
+        "task_id": "ce-ushso-pr003-grok-r6-2026-grok-r6-portability-90a932fb735a-90573407",
         "actual_model": "grok-4",
         "status": "running",
-        "evidence": "verification/research-program/bootstrap/pr085-wp11-grok-dispatch.json",
-        "head_sha": "30dc908c27269710763241887dcd5b6215196668"
+        "evidence": "verification/research-program/bootstrap/pr003-grok-r6-dispatch.json",
+        "head_sha": "243a12510eb8ed3c7646d8a4d5d151a46b3cf28a"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
@@ -136,7 +136,7 @@
         }
       ],
       "active_runs": [
-        "ushso-pr003-grok-r5-20260911",
+        "ushso-pr003-grok-r6-20260911",
         "ushso-pr085-wp11-grok-20260911"
       ]
     },
@@ -532,7 +532,7 @@
     {
       "pr_id": "PR-003",
       "status": "in_progress",
-      "owner": "ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
+      "owner": "ce-ushso-pr003-grok-r6-2026-grok-r6-portability-90a932fb735a-90573407",
       "dependencies": [
         "PR-001",
         "PR-002"
@@ -555,24 +555,25 @@
       "evidence_directory": "verification/research-program/pr-003/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/15",
       "blockers": [
-        "Actual isolated composition062a980 ran57 research tests:50pass/7fail because static PR003 fixtures read the moving controller ledger. Grok R5 is isolating controlled fixture contexts and retaining strict real ledger conflict validation; all actual PR003/PR004 current handoffs passed. Final combined gate remains required."
+        "Grok R6 corrects the independently reproduced missing-TMPDIR test failure and makes captured ledger regression data self-contained. The R5 checker is held byte-identical; real default ledger validation remains strict.",
+        "Final corrected combined gate and current handoffs remain required before PR003/004 acceptance and downstream implementation."
       ],
       "dispatch_preparation": "Three native DeepSeek slices completed; clean terminal lifecycle and producer final head are recorded.",
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-002": "verification/research-program/pr-002/controller/integration-handoff.json"
       },
-      "branch": "codex/ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
-      "base_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
+      "branch": "codex/ce-ushso-pr003-grok-r6-2026-grok-r6-portability-90a932fb735a-90573407",
+      "base_sha": "243a12510eb8ed3c7646d8a4d5d151a46b3cf28a",
       "provider": "Grok Co-Engineer",
       "selected_model": "grok-4",
       "selected_reasoning": "max",
       "actual_model": "grok-4",
-      "run_id": "ushso-pr003-grok-r5-20260911",
-      "dispatch_evidence": "verification/research-program/bootstrap/pr003-grok-r5-dispatch.json",
+      "run_id": "ushso-pr003-grok-r6-20260911",
+      "dispatch_evidence": "verification/research-program/bootstrap/pr003-grok-r6-dispatch.json",
       "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
       "producer_completion": "verification/research-program/bootstrap/pr003-native-completion-f62ce35.json",
-      "independent_review": "verification/research-program/bootstrap/component-composition-initial-062a980.json",
+      "independent_review": "verification/research-program/bootstrap/pr003-r5-ci-environment-243a125.json",
       "run_history": [
         {
           "run_id": "ushso-pr003-deepseek-20260910t220020z",
@@ -640,7 +641,7 @@
       ],
       "review_state": "changes_requested",
       "original_integration_base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
-      "provider_task_id": "ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
+      "provider_task_id": "ce-ushso-pr003-grok-r6-2026-grok-r6-portability-90a932fb735a-90573407",
       "last_producer_head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
       "publication_branch": "codex/ushso-pr003-deepseek-20260910t220020z",
       "supplemental_review_evidence": "verification/research-program/bootstrap/pr003-independent-review-93793bf.json",
@@ -648,7 +649,7 @@
       "expected_duration_ms": null,
       "deadline_at": null,
       "controller_adjunct": "A disjoint C-003-3 inventory-test correction is authorized separately; it must not change the validator or its evolving evidence.",
-      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/.ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323-worktrees/ce-ushso-pr003-grok-r6-2026-grok-r6-portability-90a932fb735a-90573407",
       "recovery_scope": "Inspect Grok retained partial patch and finish only schema, validator, fixture and evidence corrections; original Grok run remains failed and was not replayed.",
       "inventory_correction": {
         "status": "composed_independently_checked",
@@ -673,7 +674,7 @@
       "latest_completion": "verification/research-program/bootstrap/pr003-grok-r3-completion-0b28d03.json",
       "independent_registered_checks": "verification/research-program/bootstrap/pr003-r4-final-checks-d1c42ea.json",
       "remaining_semantic_checks": [
-        "verification/research-program/bootstrap/component-composition-initial-062a980.json"
+        "verification/research-program/bootstrap/pr003-r5-ci-environment-243a125.json"
       ],
       "separate_final_review": {
         "status": "completed_changes_requested",
@@ -682,9 +683,9 @@
         "candidate_tree": "24fe636b0370e2e7b9c166d6f1c6bed520ed033e",
         "receipt": "verification/research-program/bootstrap/pr003-grok-r2-independent-review-5115170.json"
       },
-      "base_tree": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
+      "base_tree": "e55c6413693acb39661c1457fcfee109603b6cc9",
       "published_head_sha": "5115170093512b06b21c01725bb982e457797efe",
-      "model_identity_note": "Grok R5 actual model is grok-4 through the supported Co-Engineer interface; durable project/provider grant was reused.",
+      "model_identity_note": "Grok R6 uses supported Co-Engineer with interface-attested grok-4; durable project/provider grant reused.",
       "current_component": {
         "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
         "tree_sha": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
@@ -703,6 +704,23 @@
         "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
         "draft": true,
         "evidence": "verification/research-program/bootstrap/pr003-r4-draft-publication-d1c42ea.json"
+      },
+      "r5_review": {
+        "head_sha": "243a12510eb8ed3c7646d8a4d5d151a46b3cf28a",
+        "tree_sha": "e55c6413693acb39661c1457fcfee109603b6cc9",
+        "functional_head": "852c0cfe8eb81bbca34306ab5fd192ab1558a07f",
+        "actual_provider": "grok",
+        "actual_model": "grok-4",
+        "provider_completion": "verification/research-program/bootstrap/pr003-grok-r5-terminal.json",
+        "registered_checks": "verification/research-program/bootstrap/pr003-r5-final-checks-243a125.json",
+        "registered_handoff_tests": 49,
+        "inventory_tests": 9,
+        "prior_receipts_preserved": 53,
+        "actual_composition": "verification/research-program/bootstrap/component-composition-r5-context-a3b5445.json",
+        "actual_composition_research_tests": 64,
+        "portability_failure": "verification/research-program/bootstrap/pr003-r5-ci-environment-243a125.json",
+        "disposition": "changes_requested_for_demonstrated_test_environment_failure",
+        "note": "Context isolation works on the actual composed current ledger; absent TMPDIR still causes a test helper failure. Provider-authored Grok4.6 self-identification is not an independent backend attestation."
       }
     },
     {
