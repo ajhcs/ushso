@@ -78,7 +78,12 @@ async function readGitBytes(commit, relativePath) {
 
 test('historical proof accepts only the reviewed PR-003 input transition', async () => {
   const fixture = await historicalBytes()
-  const legacy = await validateHistoricalCiProof(fixture)
+  const originalBytes = new Map(await Promise.all(REVIEWED_PR003_CURRENT_INPUTS.map(async (item) => [
+    item.path,
+    await readGitBytes('4f90157108a92ce9541c340d5536eac31f24a1d8', item.path),
+  ])))
+  const readOriginalCurrentFile = async (root, relativePath) => originalBytes.get(relativePath) ?? readFile(path.resolve(root, relativePath))
+  const legacy = await validateHistoricalCiProof({ ...fixture, readCurrentFile: readOriginalCurrentFile })
   assert.equal(legacy.input_bindings.status, 'PASS')
   assert.equal(legacy.input_bindings.checked.filter((item) => item.reviewed_current_transition).length, 0)
 

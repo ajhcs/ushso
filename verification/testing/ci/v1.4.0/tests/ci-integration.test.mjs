@@ -31,9 +31,22 @@ test('v1.4 inventory retains structural discovery and locked workspace invariant
   assert.ok(result.verification_suites.some((item) => item.path === 'verification/testing/ci/v1.4.0'))
   assert.ok(result.contract_packages.every((item) => item.node_test_file_count > 0))
   assert.ok(result.verification_suites.every((item) => item.node_test_file_count > 0))
-  assert.equal(result.root_test_chain, 'original-root-chain')
-  assert.deepEqual(result.root_test_sequence, ORIGINAL_ROOT_TEST_SEQUENCE)
-  assert.equal(result.root_test_research_program.declared, false)
+  const { readFile } = await import('node:fs/promises')
+  const { createHash } = await import('node:crypto')
+  const packageBytes = await readFile(new URL('../../../../../package.json', import.meta.url))
+  const packageSha256 = createHash('sha256').update(packageBytes).digest('hex')
+  const recognized = [
+    { sha256: '25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c', bytes: 3555, chain: 'original-root-chain', sequence: ORIGINAL_ROOT_TEST_SEQUENCE, declared: false },
+    { sha256: 'b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e', bytes: 3666, chain: 'pr003-root-chain', sequence: EXTENDED_ROOT_TEST_SEQUENCE, declared: true },
+  ].find((item) => item.sha256 === packageSha256 && item.bytes === packageBytes.length)
+  assert.ok(recognized, 'current manifest must be one of the exact reviewed original or PR003 inputs')
+  assert.equal(result.root_test_chain, recognized.chain)
+  assert.deepEqual(result.root_test_sequence, recognized.sequence)
+  assert.deepEqual(result.root_test_research_program, {
+    declared: recognized.declared,
+    command: recognized.declared ? RESEARCH_PROGRAM_SCRIPT : null,
+    stage_count: recognized.declared ? 1 : 0,
+  })
   assert.equal(result.external_requests, 0)
   assert.equal(result.external_mutations, 0)
   assert.equal(result.sealed_receipts_mutated, false)
