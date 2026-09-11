@@ -60,6 +60,7 @@ for p in prs:
     if any(f.startswith('packages/retrieval/') for f in p['files']):p['check_commands'].append('npm run test:retrieval')
     if any(f.startswith('worker/') for f in p['files']):p['check_commands'].append('npm run test:worker')
     if p['id'] in ['PR-007','PR-008']:p['check_commands'].extend(['npm test --prefix packages/identity','npm run validate --prefix packages/identity'])
+    if p['id']=='PR-008':p['check_commands'].extend(['npm run validate --prefix contracts/machine-toolkit/v1.2.0','npm run test:contracts','node --test tests/contract-package-inventory.test.mjs'])
     if p['id']=='PR-086':p['check_commands'].extend(['node scripts/verify-wp11-attestation.mjs','node scripts/run-contract-suites.mjs --suite wp11'])
 model=dict(format='ushso.research-master-plan.v1',date='2026-09-10',status='proposed_not_implemented',
  mission='Help humans and AI find, understand and obtain tested routes to US health-systems data.',

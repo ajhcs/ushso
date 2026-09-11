@@ -3,7 +3,7 @@
   "date": "2026-09-10",
   "status": "proposed_not_implemented",
   "mission": "Help humans and AI find, understand and obtain tested routes to US health-systems data.",
-  "source_sha256": "d65327e2035d8067d2ad9226c4cdfc79f41faa7e67661475c24901664627ab47",
+  "source_sha256": "73b20863ef721fb49b847d5e35f9e1abfae4aff9d0c2848823fd268455654b85",
   "requirements": [
     {
       "id": "R01",
@@ -837,7 +837,8 @@
         "apps/web/src/components/FacetSidebar.test.tsx",
         "apps/web/src/types/catalog.ts",
         "apps/web/src/providers/discoveryProvider.ts",
-        "apps/web/src/providers/discoveryProvider.test.ts"
+        "apps/web/src/providers/discoveryProvider.test.ts",
+        "tests/subject-shortcircuit.test.mjs"
       ],
       "outcome": "Source defects are visible without making missing values useful filters.",
       "commits": [
@@ -856,8 +857,8 @@
         {
           "id": "C-006-3",
           "subject": "Use public labels for facet values",
-          "instructions": "Map source/capability values to captured readable labels and controlled enums to public labels while preserving canonical URL/API values. The live engine may change only existing facet label strings; use complete pre-pagination matches so a label need not depend on the current page. The shared web adapter derives the five canonical dimensions from canonical records and does not expose fallback aliases such as other-states or open-data-api as live filters. Preserve both frozen differential reference engines. In their current comparison tests, isolate only intentional label differences and assert the entire remaining response unchanged, with independent expected-label cases. Do not rewrite frozen fixtures, source artifacts or historical fingerprints.",
-          "verification": "Filter selections retain canonical values and identical record IDs/counts across pagination, live responses and fixture fallback. A facet value absent from the current page still has the correct captured label. Accessible names, checked state and described unavailability remain meaningful; controls without counts render no fabricated count. Differential tests preserve exact parity for every non-label field."
+          "instructions": "Map source/capability values to captured readable labels and controlled enums to public labels while preserving canonical URL/API values. The live engine may change only existing facet label strings; use complete pre-pagination matches so a label need not depend on the current page. The shared web adapter derives the five canonical dimensions from canonical records and does not expose fallback aliases such as other-states or open-data-api as live filters. Preserve both frozen differential reference engines. In their current comparison tests, isolate only intentional label differences and assert the entire remaining response unchanged, with independent expected-label cases. Do not rewrite frozen fixtures, source artifacts or historical fingerprints. The full combined gate additionally identifies tests/subject-shortcircuit.test.mjs as a frozen-control comparison. Own that current test solely to isolate facets.sections[*].options[*].label differences. Preserve exact JSON byte/order comparison for every other field, all four subject fixtures and four sort modes, frozen engines, corpus input and algorithm fingerprint. Assert the captured public labels independently and prove a non-label mutation still fails parity. Record this as an additive correction, retaining the original failed gate and dispatch packet.",
+          "verification": "Filter selections retain canonical values and identical record IDs/counts across pagination, live responses and fixture fallback. A facet value absent from the current page still has the correct captured label. Accessible names, checked state and described unavailability remain meaningful; controls without counts render no fabricated count. Differential tests preserve exact parity for every non-label field. All 16 subject/sort comparisons pass with only option-label normalization; counts, values, ordering, scores, reasons and result fields remain checked. The separately asserted expected label map and a non-label negative control pass."
         }
       ],
       "acceptance": [
@@ -873,6 +874,7 @@
         "node --test packages/retrieval/tests/lexical-index.test.mjs",
         "node --test tests/direct-base-regression.test.mjs",
         "node --test tests/research-program/isolation-and-facets.test.mjs",
+        "node --test tests/subject-shortcircuit.test.mjs",
         "npm run test:web",
         "npm run test:retrieval"
       ]
@@ -970,15 +972,20 @@
         "tests/research-extractors.test.mjs",
         "tests/dictionary-review.test.mjs",
         "tests/update-cycle.test.mjs",
-        "tests/cms-layout.test.mjs"
+        "tests/cms-layout.test.mjs",
+        "contracts/machine-toolkit/v1.2.0/package.json",
+        "contracts/machine-toolkit/v1.2.0/README.md",
+        "contracts/machine-toolkit/v1.2.0/tools/verify.mjs",
+        "contracts/machine-toolkit/v1.2.0/tests/variable-identity.test.mjs",
+        "package-lock.json"
       ],
       "outcome": "Dictionary information can coexist with exact API keys without false schema claims.",
       "commits": [
         {
           "id": "C-008-1",
           "subject": "Define variable identity and semantics",
-          "instructions": "Add the strict additive contracts/machine-toolkit/v1.2.0/schemas/variable-identity.schema.json with wire_name, publisher_label, definition, publisher_concept, source_type, observed_type, unit/applicability, code values, missingness and exact source/asset/release/distribution/schema/field-revision context. Preserve frozen v1.0/v1.1 schemas and machine routes. Unresolved context carries nulls and a reason and cannot mint a resolved variable ID. Use context-scoped IDs without weakening existing immutable schema-catalog or join-endpoint contracts; update the current identity package seal through its existing tooling.",
-          "verification": "An identifier field accepts a reasoned not-applicable unit; a measurement missing units remains incomplete. Identical wire names in distinct release/distribution/schema contexts have distinct IDs. Invalid or foreign context cannot become resolved. The current identity package seal and frozen machine compatibility checks pass."
+          "instructions": "Add the strict additive contracts/machine-toolkit/v1.2.0/schemas/variable-identity.schema.json with wire_name, publisher_label, definition, publisher_concept, source_type, observed_type, unit/applicability, code values, missingness and exact source/asset/release/distribution/schema/field-revision context. Preserve frozen v1.0/v1.1 schemas and machine routes. Unresolved context carries nulls and a reason and cannot mint a resolved variable ID. Use context-scoped IDs without weakening existing immutable schema-catalog or join-endpoint contracts; update the current identity package seal through its existing tooling. Complete the existing v1.2.0 variable schema as a private bounded contract package with its own package.json, README, offline strict Ajv2020 validator and meaningful positive/negative tests. Preserve the schema bytes reviewed at a90071e, all v1.0/v1.1 contracts and the existing all-version contract runner. This package grants no route activation, release approval or scientific authority. Use the committed Node/npm versions and existing Ajv 8.20.0 resolution. Root package.json is unchanged; package-lock.json may change only the v1.2 workspace descriptor and its local node_modules link. Do not rewrite earlier package metadata, dependency resolutions, receipt pins or historical evidence.",
+          "verification": "An identifier field accepts a reasoned not-applicable unit; a measurement missing units remains incomplete. Identical wire names in distinct release/distribution/schema contexts have distinct IDs. Invalid or foreign context cannot become resolved. The current identity package seal and frozen machine compatibility checks pass. Contract discovery recognizes all three machine-toolkit versions and separately executes each test/validate command. The v1.2 schema remains strict and self-contained; literal encodings, mapping ambiguity, concept-versus-definition, unresolved context and unit applicability retain their established meanings. Independently compare the entire lock object before and after, permitting only the two exact workspace/link entries."
         },
         {
           "id": "C-008-2",
@@ -989,13 +996,14 @@
         {
           "id": "C-008-3",
           "subject": "Represent name mappings explicitly",
-          "instructions": "Add evidence-bearing documented-name to wire-name mappings with exact, reviewed alias, ambiguous or unmatched state. Do not normalize away semantic differences automatically.",
+          "instructions": "Add evidence-bearing documented-name to wire-name mappings with exact, reviewed alias, ambiguous or unmatched state. Do not normalize away semantic differences automatically. Retain the original missing-package gate failure and append package-completion, lockfile and evidence correction commits without rebasing or relabeling the historical PR008 base/dependency packet. The new lock is a separately reviewed current input for PR086; do not widen WP11 historical approval, alter the current wrapper, or claim combined acceptance from contract-package tests. A precise PR086 current-input amendment and joint exact-candidate gate remain prerequisites to integration acceptance.",
           "verification": "The retained sample-shape-comparison.json audit records 117 payload and 117 dictionary fields with 11 identifier discrepancies; keep those supplied literal differences unresolved until additional payload/document context supports each match. The audit is a discrepancy summary, not a full 117-field inventory. Exact, reviewed-alias, ambiguous and unmatched cases retain evidence and alternatives; counts or punctuation normalization alone never approve a mapping."
         }
       ],
       "acceptance": [
         "A 117-field count cannot conceal mismatched field identifiers.",
-        "Variable IDs are scoped by source release/distribution/schema."
+        "Variable IDs are scoped by source release/distribution/schema.",
+        "The complete v1.2 variable package executes alongside both earlier machine-toolkit versions. Its additive workspace lock requires separate current-input review, with historical/current approvals kept distinct and the combined gate passing before acceptance."
       ],
       "owner_role": "Luna Max, Grok or DeepSeek; assign one owner at dispatch",
       "reviewer_role": "Astra; named human domain/owner decision when required",
@@ -1008,8 +1016,12 @@
         "node --test tests/dictionary-review.test.mjs",
         "node --test tests/update-cycle.test.mjs",
         "node --test tests/cms-layout.test.mjs",
+        "node --test contracts/machine-toolkit/v1.2.0/tests/variable-identity.test.mjs",
         "npm test --prefix packages/identity",
-        "npm run validate --prefix packages/identity"
+        "npm run validate --prefix packages/identity",
+        "npm run validate --prefix contracts/machine-toolkit/v1.2.0",
+        "npm run test:contracts",
+        "node --test tests/contract-package-inventory.test.mjs"
       ]
     },
     {

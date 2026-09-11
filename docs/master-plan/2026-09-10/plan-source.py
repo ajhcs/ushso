@@ -765,3 +765,24 @@ for pr in PRS:
         pr["dependencies"].append("PR-086")
     if pr["id"] == "PR-005":
         pr["acceptance"].append("The separately reviewed PR086 current-input correction must be integrated and the combined PR005/PR086 exact candidate must pass required checks before PR005 integration acceptance. Earlier producer work retains its original dependency/plan provenance.")
+
+
+# PR006_PR008_INTEGRATION_CORRECTIONS: bounded corrections from the retained
+# a30cd77 first-pass gate; original dispatches and implementation history remain.
+for pr in PRS:
+    if pr['id'] == 'PR-006':
+        pr['files'].append('tests/subject-shortcircuit.test.mjs')
+        pr['commits'][2]['instructions'] += ' The full combined gate additionally identifies tests/subject-shortcircuit.test.mjs as a frozen-control comparison. Own that current test solely to isolate facets.sections[*].options[*].label differences. Preserve exact JSON byte/order comparison for every other field, all four subject fixtures and four sort modes, frozen engines, corpus input and algorithm fingerprint. Assert the captured public labels independently and prove a non-label mutation still fails parity. Record this as an additive correction, retaining the original failed gate and dispatch packet.'
+        pr['commits'][2]['verification'] += ' All 16 subject/sort comparisons pass with only option-label normalization; counts, values, ordering, scores, reasons and result fields remain checked. The separately asserted expected label map and a non-label negative control pass.'
+    if pr['id'] == 'PR-008':
+        pr['files'].extend([
+            'contracts/machine-toolkit/v1.2.0/package.json',
+            'contracts/machine-toolkit/v1.2.0/README.md',
+            'contracts/machine-toolkit/v1.2.0/tools/verify.mjs',
+            'contracts/machine-toolkit/v1.2.0/tests/variable-identity.test.mjs',
+            'package-lock.json',
+        ])
+        pr['commits'][0]['instructions'] += ' Complete the existing v1.2.0 variable schema as a private bounded contract package with its own package.json, README, offline strict Ajv2020 validator and meaningful positive/negative tests. Preserve the schema bytes reviewed at a90071e, all v1.0/v1.1 contracts and the existing all-version contract runner. This package grants no route activation, release approval or scientific authority. Use the committed Node/npm versions and existing Ajv 8.20.0 resolution. Root package.json is unchanged; package-lock.json may change only the v1.2 workspace descriptor and its local node_modules link. Do not rewrite earlier package metadata, dependency resolutions, receipt pins or historical evidence.'
+        pr['commits'][0]['verification'] += ' Contract discovery recognizes all three machine-toolkit versions and separately executes each test/validate command. The v1.2 schema remains strict and self-contained; literal encodings, mapping ambiguity, concept-versus-definition, unresolved context and unit applicability retain their established meanings. Independently compare the entire lock object before and after, permitting only the two exact workspace/link entries.'
+        pr['commits'][2]['instructions'] += ' Retain the original missing-package gate failure and append package-completion, lockfile and evidence correction commits without rebasing or relabeling the historical PR008 base/dependency packet. The new lock is a separately reviewed current input for PR086; do not widen WP11 historical approval, alter the current wrapper, or claim combined acceptance from contract-package tests. A precise PR086 current-input amendment and joint exact-candidate gate remain prerequisites to integration acceptance.'
+        pr['acceptance'].append('The complete v1.2 variable package executes alongside both earlier machine-toolkit versions. Its additive workspace lock requires separate current-input review, with historical/current approvals kept distinct and the combined gate passing before acceptance.')
