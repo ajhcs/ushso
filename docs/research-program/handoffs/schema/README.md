@@ -3,7 +3,8 @@
 Machine-checkable contract material for PR-003 (`C-003-1` plus integrity
 corrections `C-003-1-R1` / `C-003-2-R1`, bounded contract corrections
 `C-003-2-R2` / `C-003-3-R2`, and remaining-defect corrections
-`C-003-2-R3` / `C-003-3-R3`). It translates
+`C-003-2-R3` / `C-003-3-R3`, and the composite-wildcard correction
+`C-003-2-R4` / `C-003-3-R4`). It translates
 [`docs/master-plan/2026-09-10/EXECUTION.md`](../../../master-plan/2026-09-10/EXECUTION.md)
 and the [PR-003 packet](../../../master-plan/2026-09-10/prs/PR-003.md) into
 two JSON Schema documents that preserve the evidence an independent reviewer
@@ -152,10 +153,13 @@ enforces the structural half, and the bounded checkers enforce the rest.
    `**` globs. Wildcard tokens are translated separately from regex
    metacharacter escaping: `*` matches one slash-free segment and `**`
    matches zero or more segments, including an interior globstar with no
-   intervening directory (`tests/**/*.mjs` matches `tests/one.mjs`). Suffix
-   `dir/**`, trailing-slash `dir/`, exact-file and sibling-boundary rejection
-   are unchanged. A producer-written task-binding file does not authenticate
-   itself and does not replace the controller's immutable dispatch review.
+   intervening directory (`tests/**/*.mjs` matches `tests/one.mjs`). Composite
+   wildcard prefixes remain wildcard-aware when followed by a suffix `/**`
+   or trailing slash (`tests/*/**`, `docs/**/fixtures/**`, and `tests/*/`).
+   Suffix `dir/**`, trailing-slash `dir/`, exact-file and sibling-boundary
+   rejection are unchanged. A producer-written task-binding file does not
+   authenticate itself and does not replace the controller's immutable
+   dispatch review.
 9. **Malformed packet versus tool failure.** A syntactically valid JSON value
    that is schema-invalid, including `null` or noniterable collection types
    and `null` or non-object items inside `commands`, `artifacts`,
@@ -233,17 +237,18 @@ are retained **byte-identical** as historical records. They are not
 retroactively rewritten, and this schema intentionally does not claim to
 validate them (they carry extra fields and a different evidence shape). Handoffs
 produced from PR-003 onward are expected to satisfy the contract, including the
-R1 integrity corrections, the R2 contract corrections and the R3
-null-item/wildcard-ownership corrections. A handoff is a
+R1 integrity corrections, the R2 contract corrections, the R3
+null-item/wildcard-ownership corrections and the R4 composite-wildcard
+correction. A handoff is a
 producer artifact: passing this schema is not independent verification and not
 scientific approval.
 
 Historical C-003-1 / C-003-2 / C-003-3, R1 and R2 command receipts and evidence
 indexes under `verification/research-program/pr-003/` are preserved
 byte-for-byte. They record runs against earlier validators and remain
-explicitly historical; they are not re-presented as fresh checks. R3
-correction evidence is a separate additive index that binds current files and
-cites those historical bytes through immutable Git commit/path/hash triples.
+explicitly historical; they are not re-presented as fresh checks. R3 and R4
+correction evidence each have separate additive indexes that bind their current
+files and cite historical bytes through immutable Git commit/path/hash triples.
 
 ## Reproduce
 
@@ -269,6 +274,9 @@ hashing, Git object binding and per-PR base lookup.
   independently accepted test-chain inventory correction.
 - Remaining-defect correction base (R3): `5115170093512b06b21c01725bb982e457797efe`
   (tree `24fe636b0370e2e7b9c166d6f1c6bed520ed033e`).
+- Composite-wildcard correction base (R4): `0b28d036f1df4b5248732bc62f68edd79f14d06f`
+  (tree `6e2de2232e2aa0f19055751d70e5a904a38216f9`), the exact reviewed R3
+  candidate.
 - Accepted PR-002 merge (dependency): `5647e81457b606bb36456e75c48f990ce21e9c6c`.
 - PR-001 merge (dependency): `035465f3f16d15f02467679d96451d4440a36ca8`.
 - Dispatch prompt SHA-256: `f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d`.
@@ -276,6 +284,8 @@ hashing, Git object binding and per-PR base lookup.
   `99b542280dc18a34c22affb1dcc6a87780db58be7b53c1e30c9cf37dc33470e6`.
 - Independent R2 review receipt SHA-256:
   `91924040dd21957d55eab626d19abbfb86b9243b56b6c4caa12635314aae4681`.
+- R4 composite-wildcard correction prompt SHA-256:
+  `b1a0895101086a2843c96a4089763717091e16b4c073ab2cd9045dea8d259edc`.
 
 Authorship is layered and must not be collapsed:
 
@@ -296,6 +306,11 @@ Authorship is layered and must not be collapsed:
   (`execution.provider: grok`, `execution.model: grok-4`) on the independently
   reviewed R2 result. It is not a replay of R1 or of the failed 2026-09-10
   Grok task.
+- This separately scoped R4 correction is a controller-requested native Luna
+  continuation (`gpt-5.6-luna`, reasoning `max`) on the reviewed Grok R3
+  result. The serving backend identity is not independently inspectable through
+  this interface; the R3 Grok implementation remains historical evidence and
+  is not credited with the R4 patch.
 
 Reviewer Astra. `head_sha` stays null until the controller records the actual
 final commit; a future commit cannot contain its own hash. Root owns

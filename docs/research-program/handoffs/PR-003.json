@@ -2,15 +2,15 @@
   "format": "ushso.pr-handoff.v1",
   "pr_id": "PR-003",
   "status": "producer_checked",
-  "owner": "Grok (grok-4)",
+  "owner": "Luna Max (controller-requested gpt-5.6-luna, reasoning max)",
   "reviewer": "Astra",
-  "base_sha": "5115170093512b06b21c01725bb982e457797efe",
+  "base_sha": "0b28d036f1df4b5248732bc62f68edd79f14d06f",
   "head_sha": null,
   "dependency_merge_shas": {
     "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
     "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
   },
-  "branch": "codex/ce-ushso-pr003-grok-r3-2026-grok-r3-contract-aa54f33d148b-f9711d5b",
+  "branch": "codex/ushso-pr003-composite-glob-20260911",
   "github_pr_url": null,
   "changed_files": [
     "docs/research-program/handoffs/schema/README.md",
@@ -39,10 +39,21 @@
     "verification/research-program/pr-003/command-receipts/cmd-c003-r3-focused.json",
     "verification/research-program/pr-003/command-receipts/cmd-c003-r3-npm-test-research-program.json",
     "verification/research-program/pr-003/command-receipts/cmd-c003-r3-default-handoff.json",
-    "verification/research-program/pr-003/command-receipts/cmd-c003-r3-sealed-final-default-handoff.json"
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r3-sealed-final-default-handoff.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-empty-evidence.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r4-focused-suite.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r4-schema.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r4-npm-test-research-program.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r4-verify-pr-guidance.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r4-composite-controls.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r4-historical-preservation.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r4-start-binding.json",
+    "verification/research-program/pr-003/c003-r4-notes.md",
+    "verification/research-program/pr-003/c003-r4-evidence-index.json",
+    "verification/research-program/pr-003/command-receipts/cmd-c003-r4-default-handoff.json"
   ],
-  "problem": "The independently reviewed PR-003 R2 checker still threw TypeError on null items in semantically traversed collections and did not honor documented slash-aware * / ** owned-path globs.",
-  "resulting_behavior": "The R3 checker returns schema-invalid rejected reports (CLI exit 1) for null or non-object items in commands, artifacts, source_identities, acceptance_results, failures_and_skipped_checks and unresolved_claims, and translates wildcard tokens independently of regex escaping so tests/*.mjs, tests/**/*.mjs and *.mjs match documented one-segment and globstar rules. Historical receipts remain byte-identical and explicitly historical.",
+  "problem": "PR-003 handoff evidence required exact source, command, task and Git bindings; the remaining composite wildcard branch also treated wildcard-bearing prefixes literally.",
+  "resulting_behavior": "The corrected PR-003 contract requires structured expected and observed outcomes, truthful timestamps, explicit local or external source locations, resolved and hashed artifacts including nested event sources, unique identifiers, exact per-PR task/Git bindings and typed pending-head evidence. R4 additionally applies the existing slash-aware * / ** translation to wildcard-bearing prefixes followed by /** or a trailing slash while retaining literal directory and boundary behavior.",
   "commits": [
     {
       "id": "C-003-1",
@@ -87,6 +98,16 @@
     {
       "id": "C-003-3-R3",
       "subject": "docs(research): record PR003 R3 evidence and provenance",
+      "sha": null
+    },
+    {
+      "id": "C-003-2-R4",
+      "subject": "Honor composite wildcard ownership",
+      "sha": "b41c27db36b58b4bda16ded02bde3211ca02fb9d"
+    },
+    {
+      "id": "C-003-3-R4",
+      "subject": "Record PR003 R4 composite wildcard evidence",
       "sha": null
     }
   ],
@@ -170,7 +191,7 @@
       "kind": "controller-task-binding",
       "id": "verification/research-program/pr-003/task-binding.json",
       "location": "local",
-      "sha256": "25785027c1a4b80bcb71194c39c5a2bf9c062071df52fa4e7beeb8f73c80d93c",
+      "sha256": "9401b0afdf36ac7e4424821644a537211ed09369a3c130555a2c2c222ca3dbe4",
       "version": "Concrete per-PR task binding established by Co-Engineer dispatch ushso-pr003-grok-r3-20260911 / assignment grok-r3-contract. Not a self-authenticating signature. Local task-binding consistency does not authenticate the producer or replace controller dispatch review."
     },
     {
@@ -233,6 +254,37 @@
       "location": "external",
       "sha256": "d5be04adbdb2c2cea16b05bea232bd21115a60d9cf2eccdd99e490804ff279b8",
       "version": "Root reproduction of documented wildcard ownership failures at 5115170"
+    },
+    {
+      "kind": "r4-composite-wildcard-correction-prompt",
+      "id": "pr003-r4-composite-glob-prompt.md",
+      "version": "R4 bounded implementation continuation",
+      "sha256": "b1a0895101086a2843c96a4089763717091e16b4c073ab2cd9045dea8d259edc",
+      "location": "external"
+    },
+    {
+      "kind": "r4-reviewed-r3-base",
+      "id": "0b28d036f1df4b5248732bc62f68edd79f14d06f",
+      "version": "tree 6e2de2232e2aa0f19055751d70e5a904a38216f9; exact Grok R3 candidate base",
+      "location": "external"
+    },
+    {
+      "kind": "r4-controller-requested-runtime",
+      "id": "gpt-5.6-luna",
+      "version": "controller-requested native Luna Max role; reasoning max; serving backend not independently inspectable",
+      "location": "external"
+    },
+    {
+      "kind": "r3-registered-replay",
+      "id": "pr003-controller-review/0b28d03-registered/receipt.json",
+      "sha256": "d05ecaac6fbadf8b6e644b42c1a24756a8fbc21a606f89777c7d1fb838165cd6",
+      "location": "external"
+    },
+    {
+      "kind": "r3-semantic-replay",
+      "id": "pr003-controller-review/0b28d03-semantic-host/receipt.json",
+      "sha256": "978621198cc5ae0804ed7c0bed6ca925d08ddcd4ba95eb8357d3a59def163e55",
+      "location": "external"
     }
   ],
   "commands": [
@@ -1010,6 +1062,206 @@
         "kind": "observed_exit",
         "exit_code": 0
       }
+    },
+    {
+      "id": "cmd-c003-r4-focused-suite",
+      "command": "node --test tests/research-program/handoff.test.mjs",
+      "started_at": "2026-09-11T02:58:30.155Z",
+      "completed_at": "2026-09-11T02:58:39.397Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with all focused PR-003 handoff tests passing, including direct and completed-packet composite wildcard regressions",
+      "actual": "exit 0; 42 tests passed, 0 failed, 0 skipped; includes direct and completed-packet composite wildcard regressions.",
+      "result": "exit 0; 42 tests passed, 0 failed, 0 skipped; includes direct and completed-packet composite wildcard regressions.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r4-focused-suite",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-focused-suite.json",
+        "sha256": "58337be1be392ea0e0d0c6be62e7129f517e0f147803dddd71444ed05506209d",
+        "bytes": 1209
+      }
+    },
+    {
+      "id": "cmd-c003-r4-schema",
+      "command": "node verification/research-program/pr-003/verify-schema-contract.mjs",
+      "started_at": "2026-09-11T02:58:39.400Z",
+      "completed_at": "2026-09-11T02:58:39.605Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the schema contract fixture check passing",
+      "actual": "exit 0; schema contract and all declared fixture outcomes passed.",
+      "result": "exit 0; schema contract and all declared fixture outcomes passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r4-schema",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-schema.json",
+        "sha256": "8b46f91166290e80edc5f3fbefe0d99f28c55f659fffc24e6ab62aaca4f93232",
+        "bytes": 1102
+      }
+    },
+    {
+      "id": "cmd-c003-r4-npm-test-research-program",
+      "command": "npm run test:research-program",
+      "started_at": "2026-09-11T02:58:39.606Z",
+      "completed_at": "2026-09-11T02:58:49.228Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the registered research-program test script passing",
+      "actual": "exit 0; registered research-program suite passed with 42 tests, 0 failed, 0 skipped.",
+      "result": "exit 0; registered research-program suite passed with 42 tests, 0 failed, 0 skipped.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r4-npm-test-research-program",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-npm-test-research-program.json",
+        "sha256": "3d5c5962285108413c54eab698ee59609a00e5e3a5053e0cb52a66324d22197c",
+        "bytes": 1130
+      }
+    },
+    {
+      "id": "cmd-c003-r4-verify-pr-guidance",
+      "command": "node verification/research-program/pr-003/verify-pr-guidance.mjs",
+      "started_at": "2026-09-11T02:58:49.229Z",
+      "completed_at": "2026-09-11T02:58:49.263Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with PR guidance and test-discovery checks passing",
+      "actual": "exit 0; PR guidance and test-discovery checks passed.",
+      "result": "exit 0; PR guidance and test-discovery checks passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r4-verify-pr-guidance",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-verify-pr-guidance.json",
+        "sha256": "1c28229ffa7cf92b4ce6b2f2b4c858d1de4b828f448091e2288cf05b6601b941",
+        "bytes": 1122
+      }
+    },
+    {
+      "id": "cmd-c003-r4-composite-controls",
+      "command": "node --input-type=module -e <nine exact composite wildcard controls>",
+      "started_at": "2026-09-11T02:58:49.263Z",
+      "completed_at": "2026-09-11T02:58:49.300Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with all nine exact composite wildcard controls matching the documented acceptance boundary",
+      "actual": "exit 0; nine exact controls passed (9/9).",
+      "result": "exit 0; nine exact controls passed (9/9).",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r4-composite-controls",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-composite-controls.json",
+        "sha256": "ccc3a597f8d588378fd0e4b163e87ad7294ecf54dbd0cde417f296537b7ee80d",
+        "bytes": 1144
+      }
+    },
+    {
+      "id": "cmd-c003-r4-historical-preservation",
+      "command": "node <hash every path in pr003-r4-composite-glob-review/historical-files.txt and compare to historical-hashes.txt>",
+      "started_at": "2026-09-11T02:59:40.167Z",
+      "completed_at": "2026-09-11T02:59:40.175Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with every pre-existing command-receipt/evidence-index hash unchanged",
+      "actual": "exit 0; 44/44 pre-existing command-receipt/evidence-index files remained byte-identical.",
+      "result": "exit 0; 44/44 pre-existing command-receipt/evidence-index files remained byte-identical.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r4-historical-preservation",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-historical-preservation.json",
+        "sha256": "359f8d2e83c85b5109dbb1b95dbc6be76f095257e45b58b51af33d439e2b3f50",
+        "bytes": 1028
+      }
+    },
+    {
+      "id": "cmd-c003-r4-start-binding",
+      "command": "git rev-parse 0b28d036f1df4b5248732bc62f68edd79f14d06f^{commit} 0b28d036f1df4b5248732bc62f68edd79f14d06f^{tree}; git merge-base --is-ancestor <PR-001/PR-002> 0b28d036f1df4b5248732bc62f68edd79f14d06f",
+      "started_at": "2026-09-11T03:00:11.496Z",
+      "completed_at": "2026-09-11T03:00:11.511Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with exact base 0b28d036f1df4b5248732bc62f68edd79f14d06f, tree 6e2de2232e2aa0f19055751d70e5a904a38216f9, and both accepted dependencies ancestors",
+      "actual": "exit 0; base 0b28d036f1df4b5248732bc62f68edd79f14d06f, tree 6e2de2232e2aa0f19055751d70e5a904a38216f9, PR-001 and PR-002 are ancestors.",
+      "result": "exit 0; base 0b28d036f1df4b5248732bc62f68edd79f14d06f, tree 6e2de2232e2aa0f19055751d70e5a904a38216f9, PR-001 and PR-002 are ancestors.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r4-start-binding",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-start-binding.json",
+        "sha256": "69139d060775087bbb79d8bc0d7b37062ab861ee21c11e206691861852e9eb5b",
+        "bytes": 1637
+      }
+    },
+    {
+      "id": "cmd-c003-r4-default-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json",
+      "started_at": "2026-09-11T03:03:56.113Z",
+      "completed_at": "2026-09-11T03:03:56.566Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with ok=true and every current PR-003 handoff check passed while head_sha remains typed pending",
+      "actual": "exit 0; current PR-003 handoff report was accepted with ok=true, producer_checked status, exact R4 base/task binding, and typed pending head.",
+      "result": "exit 0; current PR-003 handoff report was accepted with ok=true, producer_checked status, exact R4 base/task binding, and typed pending head.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-cmd-c003-r4-default-handoff",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-default-handoff.json",
+        "sha256": "627af2f23794d60c795d4608f21469f758a3bd08b12cf1668eda60439c7cd871",
+        "bytes": 1288
+      }
     }
   ],
   "artifacts": [
@@ -1028,20 +1280,20 @@
     {
       "id": "artifact-schema-readme",
       "path": "docs/research-program/handoffs/schema/README.md",
-      "sha256": "ca37e377cc6abf9d0882e174c7751a21960e6a9d425d5b9d08ec5f7bffb8d2c6",
-      "bytes": 18249
+      "sha256": "d94ef82c90312f3395e96a809094eedea9638807e805076125eb3104e5ad1408",
+      "bytes": 19169
     },
     {
       "id": "artifact-validator",
       "path": "scripts/research-program/check-handoff.mjs",
-      "sha256": "a39643834961a69940efb11ff16e732868dd6c86fe3532af5843046d25023aae",
-      "bytes": 64333
+      "sha256": "9a691294228356d56d012c66aa0af1cb1f1db5c9142f9960670b78275027d2b5",
+      "bytes": 64628
     },
     {
       "id": "artifact-focused-test",
       "path": "tests/research-program/handoff.test.mjs",
-      "sha256": "ca878a03ca313ca1cf32b017e9455effb96870c6054348b9aa7af764774ee401",
-      "bytes": 31417
+      "sha256": "bd43c94f07cacc946745a4725f0b184135aec010b478199f6887487b27c2c07e",
+      "bytes": 34219
     },
     {
       "id": "artifact-schema-contract-checker",
@@ -1256,13 +1508,13 @@
     {
       "id": "artifact-current-task-binding",
       "path": "verification/research-program/pr-003/task-binding.json",
-      "sha256": "25785027c1a4b80bcb71194c39c5a2bf9c062071df52fa4e7beeb8f73c80d93c",
-      "bytes": 3477
+      "sha256": "9401b0afdf36ac7e4424821644a537211ed09369a3c130555a2c2c222ca3dbe4",
+      "bytes": 3511
     },
     {
       "id": "artifact-fixture-fractional-timing",
       "path": "verification/research-program/pr-003/fixtures/handoff.reject-fractional-timing.json",
-      "sha256": "d9cb7dc2d295d0e12fcd373e4d7c78b7bb8d0a2686ceac3508e56d7dbea1116f",
+      "sha256": "6686fe4bd3f24bb885c8813a1475de2b95f9296289d98f57179996ad86ab2d2e",
       "bytes": 12265
     },
     {
@@ -1348,6 +1600,66 @@
       "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r3-sealed-final-default-handoff.json",
       "sha256": "d82499b5cc642ca8a573ed1b21069c67c5d1700991505dda23ff7d80f61c527e",
       "bytes": 1213
+    },
+    {
+      "id": "artifact-cmd-c003-r4-focused-suite",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-focused-suite.json",
+      "sha256": "58337be1be392ea0e0d0c6be62e7129f517e0f147803dddd71444ed05506209d",
+      "bytes": 1209
+    },
+    {
+      "id": "artifact-cmd-c003-r4-schema",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-schema.json",
+      "sha256": "8b46f91166290e80edc5f3fbefe0d99f28c55f659fffc24e6ab62aaca4f93232",
+      "bytes": 1102
+    },
+    {
+      "id": "artifact-cmd-c003-r4-npm-test-research-program",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-npm-test-research-program.json",
+      "sha256": "3d5c5962285108413c54eab698ee59609a00e5e3a5053e0cb52a66324d22197c",
+      "bytes": 1130
+    },
+    {
+      "id": "artifact-cmd-c003-r4-verify-pr-guidance",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-verify-pr-guidance.json",
+      "sha256": "1c28229ffa7cf92b4ce6b2f2b4c858d1de4b828f448091e2288cf05b6601b941",
+      "bytes": 1122
+    },
+    {
+      "id": "artifact-cmd-c003-r4-composite-controls",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-composite-controls.json",
+      "sha256": "ccc3a597f8d588378fd0e4b163e87ad7294ecf54dbd0cde417f296537b7ee80d",
+      "bytes": 1144
+    },
+    {
+      "id": "artifact-cmd-c003-r4-historical-preservation",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-historical-preservation.json",
+      "sha256": "359f8d2e83c85b5109dbb1b95dbc6be76f095257e45b58b51af33d439e2b3f50",
+      "bytes": 1028
+    },
+    {
+      "id": "artifact-cmd-c003-r4-start-binding",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-start-binding.json",
+      "sha256": "69139d060775087bbb79d8bc0d7b37062ab861ee21c11e206691861852e9eb5b",
+      "bytes": 1637
+    },
+    {
+      "id": "artifact-cmd-c003-r4-default-handoff",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-r4-default-handoff.json",
+      "sha256": "627af2f23794d60c795d4608f21469f758a3bd08b12cf1668eda60439c7cd871",
+      "bytes": 1288
+    },
+    {
+      "id": "artifact-c003-r4-notes",
+      "path": "verification/research-program/pr-003/c003-r4-notes.md",
+      "sha256": "95e87d3b41b87e812b23304513f9359ce1a7a2ad7083fb097742048c80589532",
+      "bytes": 2361
+    },
+    {
+      "id": "artifact-c003-r4-evidence-index",
+      "path": "verification/research-program/pr-003/c003-r4-evidence-index.json",
+      "sha256": "09295595a827cb9167eca4d15b9dea669c49500f413e3dcebf58105f9f030b76",
+      "bytes": 17669
     }
   ],
   "acceptance_results": [
@@ -1576,6 +1888,57 @@
       "artifact_ids": [
         "artifact-cmd-c003-r3-sealed-final-default-handoff"
       ]
+    },
+    {
+      "id": "acc-c003-2-r4-composite-wildcard",
+      "status": "producer_checked",
+      "result": "The R4 checker correction accepts tests/*/** for tests/unit/one.mjs and tests/unit, docs/**/fixtures/** for nested and zero-interior fixtures paths, and tests/*/ for descendants; direct controls and completed-packet scope controls reject outside paths.",
+      "command_ids": [
+        "cmd-c003-r4-composite-controls",
+        "cmd-c003-r4-focused-suite"
+      ],
+      "artifact_ids": [
+        "artifact-validator",
+        "artifact-focused-test",
+        "artifact-cmd-c003-r4-composite-controls",
+        "artifact-cmd-c003-r4-focused-suite"
+      ]
+    },
+    {
+      "id": "acc-c003-3-r4-evidence",
+      "status": "producer_checked",
+      "result": "R4 command receipts record actual focused, schema, registered, guidance, start-binding and historical-preservation checks; the pending head remains typed and no independent or scientific acceptance is asserted.",
+      "command_ids": [
+        "cmd-c003-r4-schema",
+        "cmd-c003-r4-npm-test-research-program",
+        "cmd-c003-r4-verify-pr-guidance",
+        "cmd-c003-r4-start-binding",
+        "cmd-c003-r4-historical-preservation",
+        "cmd-c003-r4-default-handoff"
+      ],
+      "artifact_ids": [
+        "artifact-cmd-c003-r4-schema",
+        "artifact-cmd-c003-r4-npm-test-research-program",
+        "artifact-cmd-c003-r4-verify-pr-guidance",
+        "artifact-cmd-c003-r4-start-binding",
+        "artifact-cmd-c003-r4-historical-preservation",
+        "artifact-cmd-c003-r4-default-handoff",
+        "artifact-c003-r4-notes",
+        "artifact-c003-r4-evidence-index"
+      ]
+    },
+    {
+      "id": "acc-c003-r4-default-handoff",
+      "status": "producer_checked",
+      "result": "The current PR-003 handoff checker exited 0 with ok=true while the R4 packet used the exact per-PR base/task binding, matching owner/branch and typed pending head.",
+      "command_ids": [
+        "cmd-c003-r4-default-handoff"
+      ],
+      "artifact_ids": [
+        "artifact-cmd-c003-r4-default-handoff",
+        "artifact-validator",
+        "artifact-c003-r4-evidence-index"
+      ]
     }
   ],
   "failures_and_skipped_checks": [
@@ -1612,7 +1975,7 @@
     {
       "id": "c003-r1-sealed-portable-input-initial-failed",
       "status": "failed",
-      "detail": "The first sealed portable probe (agentctl cmd-0019-d4930fec, 2026-09-11T00:21:58.747Z\u20132026-09-11T00:21:58.780Z, exit 1) used a parent path that still resolved inside the repository, so its own expected rejection set was not met. It was not used as acceptance evidence; the corrected three-level escape retry cmd-0020-eb5e19c5 exited 0.",
+      "detail": "The first sealed portable probe (agentctl cmd-0019-d4930fec, 2026-09-11T00:21:58.747Z–2026-09-11T00:21:58.780Z, exit 1) used a parent path that still resolved inside the repository, so its own expected rejection set was not met. It was not used as acceptance evidence; the corrected three-level escape retry cmd-0020-eb5e19c5 exited 0.",
       "next_action": "Retain the failed attempt and use the corrected explicit escape cases for portable containment replay."
     },
     {
@@ -1626,8 +1989,8 @@
     {
       "id": "head-sha-pending-controller-commit",
       "status": "pending",
-      "detail": "This is a precommit producer packet for C-003-3-R3 evidence. head_sha and the C-003-3-R3 commit SHA remain null because a future commit cannot contain its own hash; a controller-authored external receipt binds the exact final commit and tree after commit. C-003-2-R3 is already 56ec38e3bb4c1af0e558a76c996816a7a604132f.",
-      "next_action": "Controller records the final correction SHA/tree in an external acceptance receipt and updates terminal review state only after independent review."
+      "detail": "This is a precommit producer packet for C-003-3-R4 evidence. head_sha and the C-003-3-R4 commit SHA remain null because a future commit cannot contain its own hash; the controller must bind the exact final commit and tree in an external receipt. C-003-2-R4 is b41c27db36b58b4bda16ded02bde3211ca02fb9d.",
+      "next_action": "Controller records the final R4 correction SHA/tree in an external receipt and updates terminal review state only after independent review."
     },
     {
       "id": "independent-review-not-started",
@@ -1658,25 +2021,28 @@
     {
       "id": "layered-authorship-must-not-collapse",
       "status": "accepted",
-      "detail": "Luna R1 work remains Luna work. The failed 2026-09-10 Grok partial remains failed historical evidence. R2 Grok work remains R2. This R3 packet is Grok Co-Engineer work only for the files it actually produced.",
+      "detail": "Luna R1 work remains Luna work. The failed 2026-09-10 Grok partial remains failed historical evidence. R2 and R3 Grok work remain their separately scoped historical corrections. This R4 packet is the controller-requested native Luna continuation and does not attribute the R4 patch to Grok.",
       "next_action": "Keep historical receipts byte-identical and label current authored corrections accurately."
     }
   ],
-  "next_consumer": "Astra/controller independent review of the exact committed R3 correction head",
-  "next_action": "Controller commits the allowlisted C-003-3-R3 evidence, binds the resulting SHA/tree in an external receipt, and dispatches independent review. Do not treat historical R2 indexes as fresh checks. Full npm test/build/CF remains a PR-085-dependent root gate.",
+  "next_consumer": "Astra/controller independent review of the exact committed R4 correction head",
+  "next_action": "Controller binds the final C-003-3-R4 evidence commit and exact tree in an external receipt, then dispatches independent review. This packet remains producer evidence; full npm test/build/CF remains a separate root gate.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
     "decisive_checks": [
       "node verification/research-program/pr-003/verify-schema-contract.mjs",
       "node --test tests/research-program/handoff.test.mjs",
-      "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json"
+      "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json",
+      "node verification/research-program/pr-003/verify-pr-guidance.mjs"
     ],
     "limitations": [
       "Producer-side checks only; no independent acceptance or scientific claim.",
       "Full root npm/build/Cloudflare gates currently need a separate PR-085 CI inventory correction and remain separately owned.",
       "The precommit packet uses a typed pending head claim; a controller-authored external receipt must bind the exact final commit after commit.",
-      "Local task-binding consistency does not authenticate the producer or replace controller dispatch review."
+      "Local task-binding consistency does not authenticate the producer or replace controller dispatch review.",
+      "The controller-requested gpt-5.6-luna/max role is recorded separately; serving backend identity is not independently inspectable through this interface.",
+      "Grok R3 is historical input evidence for this continuation, not authorship of the R4 patch."
     ]
   }
 }

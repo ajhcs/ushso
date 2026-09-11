@@ -1,54 +1,56 @@
 {
   "format": "ushso.research-program.task.v1",
-  "task_id": "ushso-pr003-grok-r3-20260911",
-  "slice_id": "C-003-2-R3",
+  "task_id": "ushso-pr003-composite-glob-20260911",
+  "slice_id": "C-003-2-R4",
   "pr_id": "PR-003",
-  "title": "Correct remaining PR-003 null-item and wildcard-ownership defects",
-  "owner": "Grok (grok-4)",
+  "title": "Finish PR-003 composite wildcard ownership",
+  "owner": "Luna Max (controller-requested gpt-5.6-luna, reasoning max)",
   "reviewer": "Astra",
-  "branch": "codex/ce-ushso-pr003-grok-r3-2026-grok-r3-contract-aa54f33d148b-f9711d5b",
-  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/ce-ushso-pr003-grok-r3-2026-grok-r3-contract-aa54f33d148b-f9711d5b",
-  "objective": "Finish the two independently reproduced PR003 null-item rejection and wildcard ownership defects with additive evidence.",
-  "outcome": "The PR-003 checker returns schema-invalid rejected reports for null or non-object collection items without throwing, and honors documented slash-aware * / ** owned-path globs including an interior globstar with no intervening directory.",
+  "branch": "codex/ushso-pr003-composite-glob-20260911",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/.ce-ushso-pr003-grok-r3-2026-grok-r3-contract-aa54f33d148b-f9711d5b-worktrees/ushso-pr003-composite-glob-20260911",
+  "objective": "Correct the remaining composite wildcard ownership defect while preserving documented slash-aware *, **, exact-file, literal directory and typed handoff semantics.",
+  "outcome": "Composite wildcard prefixes are matched as globs when followed by suffix /** or a trailing slash, while literal directory prefixes, exact files, malformed-packet reports, and boundary rejection remain unchanged.",
   "dependencies": [
     "PR-001",
     "PR-002"
   ],
   "owned_paths": [
     "scripts/research-program/check-handoff.mjs",
-    "docs/research-program/handoffs/schema/**",
     "tests/research-program/handoff.test.mjs",
+    "docs/research-program/handoffs/schema/**",
     "verification/research-program/pr-003/**",
     "docs/research-program/handoffs/PR-003.json"
   ],
   "commits": [
     {
-      "id": "C-003-2-R3",
-      "subject": "Reject null packet items and honor documented globs",
-      "instructions": "Guard semantically traversed collection item shapes so null or non-object items return schema_invalid rejected reports with CLI exit 1, and translate wildcard tokens independently of regex metacharacter escaping while preserving exact-file, dir/ and suffix dir/** ownership.",
-      "verification": "Focused tests cover the six failing collections, malformed non-object elements, a valid-packet control, direct matcher cases, and completed-packet wildcard scope; named semantic diagnostics for structurally safe incomplete packets remain."
+      "id": "C-003-2-R4",
+      "subject": "Honor composite wildcard ownership",
+      "instructions": "Make wildcard-bearing prefixes in suffix /** and trailing-slash ownership patterns use the existing slash-aware glob translation, preserving literal suffix and directory behavior.",
+      "verification": "Direct matcher controls and completed-packet scope regressions accept the five demonstrated composite cases and reject outside or malformed boundaries; the focused handoff suite passes."
     },
     {
-      "id": "C-003-3-R3",
-      "subject": "Record PR003 R3 evidence and provenance",
-      "instructions": "Keep all 38 existing command-receipt and evidence-index files byte-identical, add an additive R3 index and actual command receipts, preserve the R2 index as historical, and bind the managed branch/owner, exact starting head/tree and controller review/dispatch input.",
-      "verification": "Current PR-003.json validates, historical receipts remain unchanged, and the R3 index cites historical R2 bytes as historical rather than as fresh checks."
+      "id": "C-003-3-R4",
+      "subject": "Record PR003 R4 composite wildcard evidence",
+      "instructions": "Preserve all historical command-receipt/evidence-index bytes, add R4 command receipts and an evidence index, and update the current handoff/task binding with exact base, branch, owner and provenance.",
+      "verification": "Schema, focused, registered, default-handoff and guidance checks pass; historical 44-file hashes remain unchanged and the current packet remains pending-head and non-acceptance evidence."
     }
   ],
   "check_commands": [
     "node verification/research-program/pr-003/verify-schema-contract.mjs",
     "node --test tests/research-program/handoff.test.mjs",
     "npm run test:research-program",
+    "node verification/research-program/pr-003/verify-pr-guidance.mjs",
     "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json"
   ],
   "evidence_directory": "verification/research-program/pr-003/",
   "binding": {
-    "base_sha": "5115170093512b06b21c01725bb982e457797efe",
-    "base_tree": "24fe636b0370e2e7b9c166d6f1c6bed520ed033e",
+    "base_sha": "0b28d036f1df4b5248732bc62f68edd79f14d06f",
+    "base_tree": "6e2de2232e2aa0f19055751d70e5a904a38216f9",
     "dependency_merge_shas": {
       "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
       "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
-    }
+    },
+    "prompt_sha256": "b1a0895101086a2843c96a4089763717091e16b4c073ab2cd9045dea8d259edc"
   },
   "review_states": [
     "planned",
@@ -64,5 +66,5 @@
     "qualified",
     "blocked"
   ],
-  "status": "in_progress"
+  "status": "producer_checked"
 }
