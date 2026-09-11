@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T20:28:18.220670+00:00",
+  "updated_at": "2026-09-11T20:39:58.170048+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "a30e035fc1cf883e7e789487cb3ec0aebde1ddb58177556b9b16f9811d271ef8",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -363,7 +363,31 @@
       "execution": "interrupted before process start; remote update not confirmed",
       "evidence": "verification/research-program/bootstrap/pr006-pr008-gate-corrections-20260911/publication-approval.json.gz"
     },
-    "latest_wp11_correction_scope": "verification/research-program/bootstrap/pr086-current-inventory-scope-20260911/decision.json"
+    "latest_wp11_correction_scope": "verification/research-program/bootstrap/pr086-current-inventory-scope-20260911/decision.json",
+    "latest_pr008_current_lock_review": {
+      "path": "verification/research-program/bootstrap/pr008-lock-review-072241e/review.json",
+      "sha256": "a4d52b75b44f7d3340e8a91ad0dc4716ce4d513b84d18edf8b4ebca656e94b3a",
+      "source_commit": "072241ed12f2c0b04deb833eee857ca43920b9d3",
+      "current_lock_sha256": "f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8",
+      "joint_acceptance": false
+    },
+    "current_correction_dispatches": [
+      {
+        "path": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr006-integration-correction-dispatch.json",
+        "sha256": "55dfc62981a96ba0000942ce293632ca24380f72a11059121175c2bac6905f60",
+        "bytes": 4143
+      },
+      {
+        "path": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr008-integration-correction-dispatch.json",
+        "sha256": "5dcaf75074cce4bdc96ebcfbba45180eb24ac1b0f6bb68e84542842dd4477f55",
+        "bytes": 4811
+      },
+      {
+        "path": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr086-current-input-correction-dispatch.json",
+        "sha256": "802a056e95e6e0ad1a7f9cfec67bfa536971a5ed0f511b574b728dafcb173360",
+        "bytes": 4512
+      }
+    ]
   },
   "providers": [
     {
@@ -1411,14 +1435,15 @@
       "dispatch_packet": "verification/research-program/bootstrap/pr006-scope-20260911/dispatch-packet.json",
       "dispatch_packet_sha256": "416e75a5fcccd8d63b7d494ba50915c207b9f06763fbc876d36214ab84367c89",
       "dispatch_recorded_at": "2026-09-11T17:14:23.621321+00:00",
-      "producer_state": "focused_checks_passed_integration_correction_required",
+      "producer_state": "integration_correction_dispatched",
       "next_action": "Append only the reviewed correction under an explicit amended scope packet. Preserve original base, dependencies and all prior evidence; independently review the settled head and joint candidate before acceptance.",
       "independent_review_history": [
         "verification/research-program/bootstrap/pr006-review-5d8a8dd/decision.json"
       ],
       "independent_review": "verification/research-program/bootstrap/pr006-review-7e58195/decision.json",
       "reviewed_tree": "554137e2c615ef74bb9bc0cf4a1690141e003cc0",
-      "scope_amendment": "verification/research-program/bootstrap/pr006-pr008-gate-corrections-20260911/decision.json"
+      "scope_amendment": "verification/research-program/bootstrap/pr006-pr008-gate-corrections-20260911/decision.json",
+      "current_correction_dispatch": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr006-integration-correction-dispatch.json"
     },
     {
       "pr_id": "PR-007",
@@ -1544,7 +1569,7 @@
       "dispatch_packet": "verification/research-program/bootstrap/pr008-scope-20260911/dispatch-packet.json",
       "dispatch_packet_sha256": "59a44a1a19d616365eb0ab8a38bb035a8a5d89ef95b886477b101561b0e7381f",
       "dispatch_recorded_at": "2026-09-11T16:56:56.612999+00:00",
-      "producer_state": "focused_checks_passed_integration_correction_required",
+      "producer_state": "integration_correction_dispatched",
       "next_action": "Append only the reviewed correction under an explicit amended scope packet. Preserve original base, dependencies and all prior evidence; independently review the settled head and joint candidate before acceptance.",
       "independent_review": "verification/research-program/bootstrap/pr008-review-a90071e/decision.json",
       "reviewed_tree": "9b05e1bb1c087150195fcc1dccd6287dcbc1f4a1",
@@ -1552,7 +1577,8 @@
         "verification/research-program/bootstrap/pr008-review-e433eff/decision.json",
         "verification/research-program/bootstrap/pr008-review-a50f5fa/decision.json"
       ],
-      "scope_amendment": "verification/research-program/bootstrap/pr006-pr008-gate-corrections-20260911/decision.json"
+      "scope_amendment": "verification/research-program/bootstrap/pr006-pr008-gate-corrections-20260911/decision.json",
+      "current_correction_dispatch": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr008-integration-correction-dispatch.json"
     },
     {
       "pr_id": "PR-009",
@@ -3683,12 +3709,14 @@
       "independent_acceptance": "verification/research-program/bootstrap/components-e6da2e2/acceptance.json",
       "integration_evidence": "verification/research-program/bootstrap/components-e6da2e2/index.json",
       "current_input_correction": {
-        "status": "scope_reviewed",
+        "status": "implementation_in_progress",
         "decision": "verification/research-program/bootstrap/pr086-current-inventory-scope-20260911/decision.json",
         "prior_acceptance_preserved": true,
-        "implementation_dispatched": false,
-        "reviewed_lock_input": "pending",
-        "next_action": "Dispatch current-set test/portable-fixture correction; do not enable a new current lock role until its committed bytes have separate controller review."
+        "implementation_dispatched": true,
+        "reviewed_lock_input": "verification/research-program/bootstrap/pr008-lock-review-072241e/review.json",
+        "next_action": "Dispatch current-set test/portable-fixture correction; do not enable a new current lock role until its committed bytes have separate controller review.",
+        "dispatch": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr086-current-input-correction-dispatch.json",
+        "reviewed_lock_sha256": "f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8"
       }
     }
   ],
