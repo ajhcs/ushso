@@ -284,6 +284,42 @@ test("strict schema keeps unknown measurement units incomplete or unknown", asyn
   assert.equal(validate({ ...value, completeness: "complete" }), false);
 });
 
+test("parent relationship evidence rejects missing and contradictory ownership", () => {
+  const catalog = new ImmutableSchemaCatalog();
+  const released = schemaFixture("parent-chain");
+  catalog.registerSnapshot(released.snapshot, released.fields);
+  const context = {
+    source_id: "urn:ushso:source:parent-chain",
+    asset_id: "urn:ushso:asset:parent-chain",
+    release_id: released.snapshot.release_id,
+    distribution_id: released.snapshot.distribution_id,
+    schema_snapshot_id: released.snapshot.schema_snapshot_id,
+    schema_field_id: released.fields[0].schema_field_id,
+    field_revision_id: released.fields[0].revision_id,
+  };
+  const binding = {
+    binding_state: "one_to_many",
+    source_id: context.source_id,
+    asset_id: context.asset_id,
+    release_identity: {
+      identity_state: "exact",
+      source_id: context.source_id,
+      asset_id: context.asset_id,
+      release_id: context.release_id,
+      distributions: [{ distribution_id: context.distribution_id, release_id: context.release_id, identity_state: "exact" }],
+    },
+    releases: [context.release_id],
+    distributions: [{ distribution_id: context.distribution_id, release_id: context.release_id, identity_state: "exact" }],
+  };
+  assert.equal(catalog.resolveVariableContext(context, binding).field.schema_field_id, context.schema_field_id);
+  assert.throws(() => catalog.resolveVariableContext(context, { binding_state: "exact", source_id: context.source_id, asset_id: context.asset_id }), { code: "unresolved_variable_context" });
+  assert.throws(() => catalog.resolveVariableContext(context, { ...binding, release_identity: { ...binding.release_identity, asset_id: "urn:ushso:asset:foreign" } }), { code: "variable_context_asset_mismatch" });
+  assert.throws(() => catalog.resolveVariableContext(context, { ...binding, release_identity: { ...binding.release_identity, source_id: "urn:ushso:source:foreign" } }), { code: "variable_context_source_mismatch" });
+  assert.throws(() => catalog.resolveVariableContext(context, { ...binding, releases: ["urn:ushso:release:foreign"] }), { code: "variable_context_release_mismatch" });
+  assert.throws(() => catalog.resolveVariableContext(context, { ...binding, distributions: [{ distribution_id: context.distribution_id, release_id: "urn:ushso:release:foreign", identity_state: "exact" }] }), { code: "variable_context_release_mismatch" });
+  assert.throws(() => catalog.resolveVariableContext(context, { ...binding, release_identity: { ...binding.release_identity, distributions: [{ distribution_id: context.distribution_id, release_id: "urn:ushso:release:foreign", identity_state: "exact" }] } }), { code: "variable_context_release_mismatch" });
+});
+
 test("released core fixture requires accepted relationship evidence before variable resolution", () => {
   const catalog = new ImmutableSchemaCatalog();
   const released = schemaFixture("left");

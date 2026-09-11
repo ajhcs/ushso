@@ -105,8 +105,8 @@ export class ImmutableSchemaCatalog {
     assert(typeof context.field_revision_id === "string" && context.field_revision_id.length >= 3, "Resolved variable context requires field_revision_id", "incomplete_variable_context");
     // Keep the frozen endpoint wire shape unchanged. Relationship evidence is
     // an additive guard around the existing exact release/distribution/field
-    // lookup; it may be either direct facts or an accepted PR-007 release
-    // binding with nested release/distribution facts.
+    // lookup. A resolved variable needs an independently supplied source ->
+    // asset -> release -> selected distribution chain.
     const resolved = this.resolveEndpoint({
       release_id: context.release_id,
       distribution_id: context.distribution_id,
@@ -114,33 +114,110 @@ export class ImmutableSchemaCatalog {
       schema_field_id: context.schema_field_id,
       field_revision_id: context.field_revision_id,
     });
-    const binding = relationshipEvidence?.release_binding ?? relationshipEvidence;
-    const releaseIdentity = binding?.release_identity;
-    const distributionRecords = Array.isArray(binding?.distributions) ? binding.distributions : [];
-    const relationshipSource = binding?.source_id ?? binding?.source?.source_id ?? null;
-    const relationshipAsset = binding?.asset_id ?? binding?.asset?.asset_id ?? null;
-    const relationshipRelease = binding?.release_id ?? releaseIdentity?.release_id ?? (Array.isArray(binding?.releases) && binding.releases.length === 1 ? binding.releases[0] : null);
-    const relationshipDistributionIds = [...new Set([
-      binding?.distribution_id,
-      ...(Array.isArray(binding?.distribution_ids) ? binding.distribution_ids : []),
-      ...distributionRecords.map((item) => item?.distribution_id),
-    ].filter((value) => typeof value === "string" && value.length >= 3))];
-    const relationshipSnapshot = binding?.schema_snapshot_id ?? null;
-    const snapshotSource = resolved.snapshot.source_id ?? relationshipSource;
-    const snapshotAsset = resolved.snapshot.asset_id ?? relationshipAsset;
-    assert(typeof snapshotSource === "string" && snapshotSource.length >= 3, "Variable context lacks independently bound source relationship", "unresolved_variable_context");
-    assert(typeof snapshotAsset === "string" && snapshotAsset.length >= 3, "Variable context lacks independently bound asset relationship", "unresolved_variable_context");
-    assert(snapshotSource === context.source_id, "Variable context source does not match its released schema snapshot", "variable_context_source_mismatch");
-    assert(snapshotAsset === context.asset_id, "Variable context asset does not match its released schema snapshot", "variable_context_asset_mismatch");
-    if (relationshipSource !== null) assert(relationshipSource === snapshotSource, "Relationship evidence source conflicts with the released schema snapshot", "variable_context_source_mismatch");
-    if (relationshipAsset !== null) assert(relationshipAsset === snapshotAsset, "Relationship evidence asset conflicts with the released schema snapshot", "variable_context_asset_mismatch");
-    if (relationshipRelease !== null) assert(relationshipRelease === context.release_id, "Relationship evidence release does not match the variable context", "variable_context_release_mismatch");
-    if (relationshipDistributionIds.length > 0) assert(relationshipDistributionIds.includes(context.distribution_id), "Relationship evidence does not contain the variable distribution", "variable_context_distribution_mismatch");
-    if (relationshipSnapshot !== null) assert(relationshipSnapshot === context.schema_snapshot_id, "Relationship evidence schema snapshot does not match the variable context", "variable_context_snapshot_mismatch");
-    if (binding?.binding_state !== undefined) assert(binding.binding_state === "exact", "A non-exact release relationship cannot resolve a variable context", "unresolved_variable_context");
+    assert(relationshipEvidence && typeof relationshipEvidence === "object" && !Array.isArray(relationshipEvidence), "Variable context relationship evidence must be an object", "unresolved_variable_context");
+    const roots = [relationshipEvidence];
+    if (Object.hasOwn(relationshipEvidence, "release_binding")) {
+      assert(relationshipEvidence.release_binding && typeof relationshipEvidence.release_binding === "object" && !Array.isArray(relationshipEvidence.release_binding), "Release relationship binding must be an object", "unresolved_variable_context");
+      roots.push(relationshipEvidence.release_binding);
+    }
+
+    const sourceIds = [];
+    const assetIds = [];
+    const releaseIds = [];
+    const schemaSnapshotIds = [];
+    const selectedDistributionIds = [];
+    const listedDistributionIds = [];
+    const distributionRecords = [];
+    const bindingStates = [];
+    const relationshipId = (value, label, target) => {
+      assert(typeof value === "string" && value.length >= 3, label + " must be an identifier", "unresolved_variable_context");
+      target.push(value);
+    };
+    const scalar = (record, key, label, target) => {
+      if (Object.hasOwn(record, key)) relationshipId(record[key], label, target);
+    };
+    const idList = (record, key, label, target) => {
+      if (!Object.hasOwn(record, key)) return;
+      assert(Array.isArray(record[key]) && record[key].length > 0, label + " must contain at least one identifier", "unresolved_variable_context");
+      record[key].forEach((value, index) => relationshipId(value, label + "[" + index + "]", target));
+    };
+    const distributionList = (record, key, label) => {
+      if (!Object.hasOwn(record, key)) return;
+      assert(Array.isArray(record[key]) && record[key].length > 0, label + " must contain at least one distribution", "unresolved_variable_context");
+      record[key].forEach((item, index) => {
+        assert(item && typeof item === "object" && !Array.isArray(item), label + "[" + index + "] must be an object", "unresolved_variable_context");
+        distributionRecords.push(item);
+        if (Object.hasOwn(item, "distribution_id") && item.distribution_id !== null && item.distribution_id !== undefined) {
+          relationshipId(item.distribution_id, label + "[" + index + "].distribution_id", listedDistributionIds);
+        }
+        if (Object.hasOwn(item, "release_id") && item.release_id !== null && item.release_id !== undefined) {
+          relationshipId(item.release_id, label + "[" + index + "].release_id", releaseIds);
+        }
+      });
+    };
+    for (const root of roots) {
+      if (Object.hasOwn(root, "binding_state")) {
+        assert(["exact", "one_to_many"].includes(root.binding_state), "A non-exact release relationship cannot resolve a variable context", "unresolved_variable_context");
+        bindingStates.push(root.binding_state);
+      }
+      scalar(root, "source_id", "relationship source_id", sourceIds);
+      scalar(root, "asset_id", "relationship asset_id", assetIds);
+      scalar(root, "release_id", "relationship release_id", releaseIds);
+      scalar(root, "schema_snapshot_id", "relationship schema_snapshot_id", schemaSnapshotIds);
+      scalar(root, "distribution_id", "relationship distribution_id", selectedDistributionIds);
+      idList(root, "distribution_ids", "relationship distribution_ids", listedDistributionIds);
+      idList(root, "releases", "relationship releases", releaseIds);
+      distributionList(root, "distributions", "relationship distributions");
+      if (Object.hasOwn(root, "source")) {
+        assert(root.source && typeof root.source === "object" && !Array.isArray(root.source), "Relationship source must be an object", "unresolved_variable_context");
+        scalar(root.source, "source_id", "relationship source.source_id", sourceIds);
+      }
+      if (Object.hasOwn(root, "asset")) {
+        assert(root.asset && typeof root.asset === "object" && !Array.isArray(root.asset), "Relationship asset must be an object", "unresolved_variable_context");
+        scalar(root.asset, "asset_id", "relationship asset.asset_id", assetIds);
+      }
+      if (Object.hasOwn(root, "release_identity")) {
+        const release = root.release_identity;
+        assert(release && typeof release === "object" && !Array.isArray(release), "Release identity must be an object", "unresolved_variable_context");
+        if (Object.hasOwn(release, "identity_state")) {
+          assert(release.identity_state === "exact", "A non-exact release identity cannot resolve a variable context", "unresolved_variable_context");
+        }
+        scalar(release, "source_id", "release_identity.source_id", sourceIds);
+        scalar(release, "asset_id", "release_identity.asset_id", assetIds);
+        scalar(release, "release_id", "release_identity.release_id", releaseIds);
+        scalar(release, "schema_snapshot_id", "release_identity.schema_snapshot_id", schemaSnapshotIds);
+        scalar(release, "distribution_id", "release_identity.distribution_id", selectedDistributionIds);
+        idList(release, "distribution_ids", "release_identity.distribution_ids", listedDistributionIds);
+        idList(release, "releases", "release_identity.releases", releaseIds);
+        distributionList(release, "distributions", "release_identity.distributions");
+      }
+    }
+
+    const allDistributionIds = [...selectedDistributionIds, ...listedDistributionIds];
+    assert(sourceIds.length > 0, "Variable context lacks independently bound source relationship", "unresolved_variable_context");
+    assert(assetIds.length > 0, "Variable context lacks independently bound asset relationship", "unresolved_variable_context");
+    assert(releaseIds.length > 0, "Variable context lacks independently bound release relationship", "unresolved_variable_context");
+    assert(schemaSnapshotIds.every((value) => value === context.schema_snapshot_id), "Relationship evidence schema snapshot does not match the variable context", "variable_context_snapshot_mismatch");
+    assert(allDistributionIds.length > 0, "Variable context lacks independently bound distribution relationship", "unresolved_variable_context");
+    assert(sourceIds.every((value) => value === context.source_id), "Variable context source does not match its release relationship", "variable_context_source_mismatch");
+    assert(assetIds.every((value) => value === context.asset_id), "Variable context asset does not match its release relationship", "variable_context_asset_mismatch");
+    assert(releaseIds.every((value) => value === context.release_id), "Relationship evidence release does not match the variable context", "variable_context_release_mismatch");
+    assert(selectedDistributionIds.every((value) => value === context.distribution_id), "Relationship evidence selected distribution does not match the variable context", "variable_context_distribution_mismatch");
+    assert(allDistributionIds.includes(context.distribution_id), "Relationship evidence does not contain the variable distribution", "variable_context_distribution_mismatch");
+
+    const selectedRecords = distributionRecords.filter((item) => item.distribution_id === context.distribution_id);
+    if (distributionRecords.length > 0) {
+      assert(selectedRecords.length > 0, "Relationship distribution records do not contain the variable distribution", "variable_context_distribution_mismatch");
+    }
+    for (const distribution of selectedRecords) {
+      assert(distribution.identity_state === undefined || distribution.identity_state === "exact", "The selected distribution is not exact", "unresolved_variable_context");
+      assert(distribution.release_id === context.release_id, "Selected distribution release does not match the variable context", "variable_context_release_mismatch");
+    }
+    if (bindingStates.includes("one_to_many")) {
+      assert(selectedRecords.length > 0, "A one-to-many release relationship requires an explicitly selected distribution record", "unresolved_variable_context");
+    }
     return resolved;
   }
-
   inventory() {
     return {
       snapshots: [...this.#snapshots.values()].map(clone).sort((left, right) => left.schema_snapshot_id.localeCompare(right.schema_snapshot_id)),
