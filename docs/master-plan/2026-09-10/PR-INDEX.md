@@ -18,6 +18,7 @@ Exact baseline plus fixed success criteria and review protocol.
 | [PR-002: Freeze research cohorts and acceptance denominators](prs/PR-002.md) | A stable catalog denominator, 100-product core cohort, missing-source set and MRF pilot selection. | PR-001 |
 | [PR-003: Make implementer handoffs and review evidence enforceable](prs/PR-003.md) | Every implementer PR arrives with enough evidence for independent review. | PR-001, PR-002 |
 | [PR-085: Verify current CI work without transferring historical approval](prs/PR-085.md) | Current technical checks run on changed candidates while immutable historical approval remains bound to its original subject. | PR-001 |
+| [PR-086: Separate original WP11 input proof from current verification](prs/PR-086.md) | Historical WP11 approval remains bound to its exact original inputs while actual current inputs receive separate, unapproved technical checks. | PR-003, PR-085 |
 
 ### 1B — Truth repairs
 
@@ -26,7 +27,7 @@ Accurate field states, freshness, inference labels and catalog dispositions.
 | PR | Outcome | Dependencies |
 |---|---|---|
 | [PR-004: Introduce field-level completeness and evidence states](prs/PR-004.md) | Completeness measures facts, applicability and test attempts separately. | PR-002 |
-| [PR-005: Correct freshness and inferred-unit evidence labels](prs/PR-005.md) | The live clock and scientific evidence labels agree across cards, detail and APIs. | PR-004 |
+| [PR-005: Correct freshness and inferred-unit evidence labels](prs/PR-005.md) | The live clock and scientific evidence labels agree across cards, detail and APIs. | PR-004, PR-086 |
 | [PR-006: Account for isolated records and unusable facets](prs/PR-006.md) | Source defects are visible without making missing values useful filters. | PR-004, PR-005 |
 
 ### 1C — Versioned source model
@@ -327,7 +328,7 @@ Exact artifact qualification, authorized rollout and sustained verification.
 
 | PR | Outcome | Dependencies |
 |---|---|---|
-| [PR-082: Build and qualify the exact release candidate](prs/PR-082.md) | The final release artifact is reproducible, independently gated and ready for a concrete decision. | PR-001 through PR-081 plus PR-085 (all required work before release) |
+| [PR-082: Build and qualify the exact release candidate](prs/PR-082.md) | The final release artifact is reproducible, independently gated and ready for a concrete decision. | PR-001 through PR-081 plus PR-085, PR-086 (all required work before release) |
 | [PR-083: Roll out the reviewed release and verify production](prs/PR-083.md) | The authorized production release serves the bytes and data that were reviewed. | PR-082 |
 | [PR-084: Verify sustained operation and publish the completion report](prs/PR-084.md) | The program closes only after the product stays useful and honest under actual refresh. | PR-083 |
 

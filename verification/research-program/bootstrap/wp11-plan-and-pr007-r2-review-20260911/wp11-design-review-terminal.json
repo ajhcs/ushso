@@ -1,0 +1,395 @@
+{
+  "task": {
+    "id": "ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+    "status": "completed",
+    "provider": "grok",
+    "model": "grok-4",
+    "run_id": "ushso-wp11-design-review-grok-20260911",
+    "assignment_id": "wp11-current-input-review",
+    "access": "read_only",
+    "write_scope": [],
+    "capabilities": [
+      "read_run_receipts",
+      "read_provider_logs",
+      "read_own_worktree"
+    ],
+    "child_envelope_digest": "4a15e5e60e2f99a7d912a017badb8f4465ef43c1891fdb47cde225fb97c80982",
+    "role": "review",
+    "source_repo": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910",
+    "cwd": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+    "branch": "codex/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+    "start_sha": "bc496ee80810b197b484d8e8e73c491b9bf2d871",
+    "worktree_task": "ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+    "workspace_mode": "managed",
+    "workspace_kind": "managed-worktree",
+    "launch_reservation": null,
+    "timeout_ms": 1800000,
+    "expected_duration_ms": 1500000,
+    "duration_margin": 1.2,
+    "deadline_at": "2026-09-11T14:51:21.272Z",
+    "deadline_source": "margin",
+    "deadline_extensions": [],
+    "silence_timeout_ms": 300000,
+    "create_pr": false,
+    "schema": "codex-co-engineer.task.v1",
+    "created_at": "2026-09-11T14:21:21.285Z",
+    "updated_at": "2026-09-11T14:47:10.264Z",
+    "revision": 11,
+    "transport": "acp",
+    "started_at": "2026-09-11T14:21:21.739Z",
+    "acp_session_id": "01a090d8-2e35-74e1-85f9-ffbba9151368",
+    "dispatch_intent": true,
+    "fallback_safe": false,
+    "request_id": "e72b21f1-6804-4046-b644-61847eba6e2b",
+    "prompt_dispatched": true,
+    "dispatch_evidence": "authoritative",
+    "stop_reason": "end_turn",
+    "last_event": {
+      "type": "status",
+      "text": "available commands updated (29)",
+      "tag": "available_commands_update"
+    },
+    "result": "…ch-program/ci-attestation/wp11-v1.3.0/` (policy, expanded 154-pin record, snapshot, reader, new replay/receipts), `docs/research-program/ci-attestations.md`, plus the follow-up’s own handoff/evidence. Not the runner unless a later exact necessity appears (none found).\n\n**Tests to add**\n- Positive: snapshot reconstitutes all 154 pins; historical subject still `294d8b40…`; current builder still pending.\n- Missing / extra / one-byte tamper on a snapshot blob.\n- Historical substitution: current `ResultCard.test.ts` bytes offered as historical.\n- Incomplete inventory vs sealed 154.\n- Injected current-file change → new pending technical subject, historical snapshot still PASS.\n- Stale wrapper/policy pin (omit reader or wrong snapshot hash).\n- Complete diff report for a PR-005-shaped fixture lists all 13 paths (must not first-fail).\n- Integration-shaped fixture lists only the two package transitions; neither fixture is approval.\n- Existing overclaim, `--validate`/`--issue` `SUCCESSOR_APPROVAL_STALE_SUBJECT`, future-version, zero-test, timeout, child-error cases retained.\n\n**Suggested three commits**\n1. Snapshot + reader + adapter split + tests + policy.\n2. Replay / historical-pins / command receipts / evidence index for the new PR.\n3. Docs + handoff. Leave final head unbound for root.\n\n---\n\n## Structured receipt\n\n```\nschema: ushso.wp11-current-input-design-review.v1\nassignment_id: wp11-current-input-review\nrole: review\naccess: read_only\ndisposition: pass_with_implementation_conditions\nimplementation: not_performed\napproval_issued: false\nrelease_qualified: false\nsnapshot_probe_is_approved_artifact: false\n\nsource:\n  head: bc496ee80810b197b484d8e8e73c491b9bf2d871\n  tree: 6dc42ed3ad951a9fc807c35afc1abc4a114581f8\n  branch: codex/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c\n  clean: true\n  integration_ancestor_0b4d699: true\n  pr005_941c9cd_ancestor: false\n\nhistorical:\n  source_commit: 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0\n  subject_sha256: 294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98\n  receipt_bytes: 32419\n  receipt_sha256: e596e1b18a0251f611990c9752e1d12fb36cd05dab16bf55cf96e8d1fc431f9d\n  sealed_file_count: 154\n  sealed_total_bytes: 1347732\n  original_bytes_at_source_commit: 154/154\n  unavailable_pins: []\n  git_shallow: false\n\ncurrent_live_probe:\n  adapter_status: PASS\n  technical_subject_sha256: 7e355d27a6deb558b6626c486472763a7cfd61239e054d16e13256162de3829f\n  recorded_replay_technical_subject: 8d3409bc360d9b295c5c21f9b1a2d6ad91f42ff5c946a14aff92cd4b7d97c259\n  wrapper_subject_sha256: 0cb968456fd29f32ad7b3555f81bf1d75f098b219acc9bd9d653b15dc9ae539c\n  recorded_replay_wrapper_subject: 0e55f850f52b292b1172223abc7eb9980eb1c10a739af806a3bf55571415957c\n  current_file_count: 154\n  current_approval: null\n  direct_validate: { exit: 1, error: SUCCESSOR_APPROVAL_STALE_SUBJECT }\n\nbuilder_validator_pins:\n  technical-evidence.mjs: a49f9b19868ccadfc4bca5b748513ffdaf2f873b77c2da7e3609f7d7fe5b3838\n  verify.mjs: 442b6cc6e69fae121b25a5c4f44e7b8eb3a96d2a102d115d9d206806ac9085c4\n  technical-evidence.test.mjs: 00944978337fe92fbb8c33d2db42af63721aabfb0b03529ef437d89943ec6392\n  successor-support.mjs: 233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c\n  verify-wp11-attestation.mjs: fa711977fa6898210cc93b6fef30b0ab5e2db67797fc30d3a4eec4472c2790bc\n  wp11-attestation.test.mjs: 15eaeb96ff4ec7d61b1aedd040edd1b19441e755d0e0fc26a24720ab9232aade\n\npr005_new_input_changes: 11\nalready_reviewed_package_transitions: 2\none_file_repin_sufficient: false\n```\n\nDecisive commands (read-only): `git rev-parse HEAD` / `'HEAD^{tree}'`; `git cat-file -t 30fa0c59…`; `git rev-parse --is-shallow-repository` → `false`; in-memory Node pin audit (154/154 historical match); `buildTechnicalEvidence()`; `verifyWp11Attestation()`; `USHSO_ALLOW_RECEIPT_WRITES=0 node verification/wp11/v1.3.0/tools/verify.mjs --validate` → exit 1.\n\n**Next step for the controller:** amend a new stable PR plan with the bindings, rejected designs, negative tests, and three-commit split above. Do not start implementation from this review snapshot.",
+    "result_truncated": true,
+    "result_original_chars": 12821,
+    "cleanup": {
+      "status": "normal",
+      "boundary": "inactive_empty",
+      "lock": "unlocked"
+    },
+    "finished_at": "2026-09-11T14:30:35.089Z",
+    "provider_result_sink": {
+      "schema": "codex-co-engineer.local-provider-result-sink.v1",
+      "version": 1,
+      "published": true,
+      "empty": false,
+      "run_id": "ushso-wp11-design-review-grok-20260911",
+      "assignment_id": "wp11-current-input-review",
+      "provider": "grok",
+      "model": "grok-4",
+      "child_envelope_digest": "4a15e5e60e2f99a7d912a017badb8f4465ef43c1891fdb47cde225fb97c80982",
+      "artifact_kind": "provider_report",
+      "relative_path": "runs/ushso-wp11-design-review-grok-20260911/wp11-current-input-review/grok/864b89e60b54b997f2bc7e984e0d292f5681934eeeb67e1cf20e555c1b0f0e39/provider-report.txt",
+      "media_type": "text/plain",
+      "raw_ref": {
+        "schema": "codex-co-engineer.artifact-ref.v1",
+        "run_id": "ushso-wp11-design-review-grok-20260911",
+        "assignment_id": "wp11-current-input-review",
+        "artifact_kind": "provider_report",
+        "artifact_class": "raw",
+        "relative_path": "runs/ushso-wp11-design-review-grok-20260911/wp11-current-input-review/grok/864b89e60b54b997f2bc7e984e0d292f5681934eeeb67e1cf20e555c1b0f0e39/provider-report.txt",
+        "byte_length": 12939,
+        "sha256": "15aa02045e670ad67ba087114292328e1d034be3e8f2d8265eaec8a47a09fc39",
+        "media_type": "text/plain",
+        "content_encoding": "identity"
+      },
+      "sanitized_ref": {
+        "schema": "codex-co-engineer.artifact-ref.v1",
+        "run_id": "ushso-wp11-design-review-grok-20260911",
+        "assignment_id": "wp11-current-input-review",
+        "artifact_kind": "provider_report",
+        "artifact_class": "sanitized",
+        "relative_path": "runs/ushso-wp11-design-review-grok-20260911/wp11-current-input-review/grok/864b89e60b54b997f2bc7e984e0d292f5681934eeeb67e1cf20e555c1b0f0e39/provider-report.txt",
+        "byte_length": 12939,
+        "sha256": "15aa02045e670ad67ba087114292328e1d034be3e8f2d8265eaec8a47a09fc39",
+        "media_type": "text/plain",
+        "content_encoding": "identity"
+      },
+      "raw_digest": "15aa02045e670ad67ba087114292328e1d034be3e8f2d8265eaec8a47a09fc39",
+      "sanitized_digest": "15aa02045e670ad67ba087114292328e1d034be3e8f2d8265eaec8a47a09fc39",
+      "ref_digest_raw": "a3d5d1913bdf1b2263b5fa70edd30c14cb1a660c7be7f6f89ad52d22386a0b83",
+      "ref_digest_sanitized": "dfdc1d24388762f20ae445f2b4889460387cfb11e587a7d24cfeb2cec11c8b62",
+      "source_byte_length": 12939,
+      "sanitized_byte_length": 12939,
+      "redaction_counts": {
+        "env_assignments": 0
+      },
+      "sanitizer_version": 1,
+      "policy_id": "codex-co-engineer.artifact-redaction.v1",
+      "complete": true,
+      "source_truncated": false,
+      "provenance": {
+        "schema": "codex-co-engineer.artifact-sanitizer.v1",
+        "sanitizer_version": 1,
+        "policy_id": "codex-co-engineer.artifact-redaction.v1",
+        "source_digest": "15aa02045e670ad67ba087114292328e1d034be3e8f2d8265eaec8a47a09fc39",
+        "source_byte_length": 12939,
+        "raw_ref": {
+          "schema": "codex-co-engineer.artifact-ref.v1",
+          "run_id": "ushso-wp11-design-review-grok-20260911",
+          "assignment_id": "wp11-current-input-review",
+          "artifact_kind": "provider_report",
+          "artifact_class": "raw",
+          "relative_path": "runs/ushso-wp11-design-review-grok-20260911/wp11-current-input-review/grok/864b89e60b54b997f2bc7e984e0d292f5681934eeeb67e1cf20e555c1b0f0e39/provider-report.txt",
+          "byte_length": 12939,
+          "sha256": "15aa02045e670ad67ba087114292328e1d034be3e8f2d8265eaec8a47a09fc39",
+          "media_type": "text/plain",
+          "content_encoding": "identity"
+        },
+        "sanitized_ref": {
+          "schema": "codex-co-engineer.artifact-ref.v1",
+          "run_id": "ushso-wp11-design-review-grok-20260911",
+          "assignment_id": "wp11-current-input-review",
+          "artifact_kind": "provider_report",
+          "artifact_class": "sanitized",
+          "relative_path": "runs/ushso-wp11-design-review-grok-20260911/wp11-current-input-review/grok/864b89e60b54b997f2bc7e984e0d292f5681934eeeb67e1cf20e555c1b0f0e39/provider-report.txt",
+          "byte_length": 12939,
+          "sha256": "15aa02045e670ad67ba087114292328e1d034be3e8f2d8265eaec8a47a09fc39",
+          "media_type": "text/plain",
+          "content_encoding": "identity"
+        },
+        "sanitized_digest": "15aa02045e670ad67ba087114292328e1d034be3e8f2d8265eaec8a47a09fc39",
+        "sanitized_byte_length": 12939,
+        "redaction_counts": {
+          "env_assignments": 0
+        },
+        "complete": true,
+        "source_truncated": false
+      },
+      "inline_tail": {
+        "encoding": "utf8",
+        "text": "ci-attestation/wp11-v1.3.0/` (policy, expanded 154-pin record, snapshot, reader, new replay/receipts), `docs/research-program/ci-attestations.md`, plus the follow-up’s own handoff/evidence. Not the runner unless a later exact necessity appears (none found).\n\n**Tests to add**\n- Positive: snapshot reconstitutes all 154 pins; historical subject still `294d8b40…`; current builder still pending.\n- Missing / extra / one-byte tamper on a snapshot blob.\n- Historical substitution: current `ResultCard.test.ts` bytes offered as historical.\n- Incomplete inventory vs sealed 154.\n- Injected current-file change → new pending technical subject, historical snapshot still PASS.\n- Stale wrapper/policy pin (omit reader or wrong snapshot hash).\n- Complete diff report for a PR-005-shaped fixture lists all 13 paths (must not first-fail).\n- Integration-shaped fixture lists only the two package transitions; neither fixture is approval.\n- Existing overclaim, `--validate`/`--issue` `SUCCESSOR_APPROVAL_STALE_SUBJECT`, future-version, zero-test, timeout, child-error cases retained.\n\n**Suggested three commits**\n1. Snapshot + reader + adapter split + tests + policy.\n2. Replay / historical-pins / command receipts / evidence index for the new PR.\n3. Docs + handoff. Leave final head unbound for root.\n\n---\n\n## Structured receipt\n\n```\nschema: ushso.wp11-current-input-design-review.v1\nassignment_id: wp11-current-input-review\nrole: review\naccess: read_only\ndisposition: pass_with_implementation_conditions\nimplementation: not_performed\napproval_issued: false\nrelease_qualified: false\nsnapshot_probe_is_approved_artifact: false\n\nsource:\n  head: bc496ee80810b197b484d8e8e73c491b9bf2d871\n  tree: 6dc42ed3ad951a9fc807c35afc1abc4a114581f8\n  branch: codex/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c\n  clean: true\n  integration_ancestor_0b4d699: true\n  pr005_941c9cd_ancestor: false\n\nhistorical:\n  source_commit: 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0\n  subject_sha256: 294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98\n  receipt_bytes: 32419\n  receipt_sha256: e596e1b18a0251f611990c9752e1d12fb36cd05dab16bf55cf96e8d1fc431f9d\n  sealed_file_count: 154\n  sealed_total_bytes: 1347732\n  original_bytes_at_source_commit: 154/154\n  unavailable_pins: []\n  git_shallow: false\n\ncurrent_live_probe:\n  adapter_status: PASS\n  technical_subject_sha256: 7e355d27a6deb558b6626c486472763a7cfd61239e054d16e13256162de3829f\n  recorded_replay_technical_subject: 8d3409bc360d9b295c5c21f9b1a2d6ad91f42ff5c946a14aff92cd4b7d97c259\n  wrapper_subject_sha256: 0cb968456fd29f32ad7b3555f81bf1d75f098b219acc9bd9d653b15dc9ae539c\n  recorded_replay_wrapper_subject: 0e55f850f52b292b1172223abc7eb9980eb1c10a739af806a3bf55571415957c\n  current_file_count: 154\n  current_approval: null\n  direct_validate: { exit: 1, error: SUCCESSOR_APPROVAL_STALE_SUBJECT }\n\nbuilder_validator_pins:\n  technical-evidence.mjs: a49f9b19868ccadfc4bca5b748513ffdaf2f873b77c2da7e3609f7d7fe5b3838\n  verify.mjs: 442b6cc6e69fae121b25a5c4f44e7b8eb3a96d2a102d115d9d206806ac9085c4\n  technical-evidence.test.mjs: 00944978337fe92fbb8c33d2db42af63721aabfb0b03529ef437d89943ec6392\n  successor-support.mjs: 233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c\n  verify-wp11-attestation.mjs: fa711977fa6898210cc93b6fef30b0ab5e2db67797fc30d3a4eec4472c2790bc\n  wp11-attestation.test.mjs: 15eaeb96ff4ec7d61b1aedd040edd1b19441e755d0e0fc26a24720ab9232aade\n\npr005_new_input_changes: 11\nalready_reviewed_package_transitions: 2\none_file_repin_sufficient: false\n```\n\nDecisive commands (read-only): `git rev-parse HEAD` / `'HEAD^{tree}'`; `git cat-file -t 30fa0c59…`; `git rev-parse --is-shallow-repository` → `false`; in-memory Node pin audit (154/154 historical match); `buildTechnicalEvidence()`; `verifyWp11Attestation()`; `USHSO_ALLOW_RECEIPT_WRITES=0 node verification/wp11/v1.3.0/tools/verify.mjs --validate` → exit 1.\n\n**Next step for the controller:** amend a new stable PR plan with the bindings, rejected designs, negative tests, and three-commit split above. Do not start implementation from this review snapshot.",
+        "byte_length": 4096,
+        "offset": 8843,
+        "max_bytes": 4096,
+        "inline_clipped": true,
+        "source_truncated": false,
+        "complete": true,
+        "reader_clipped": false,
+        "more": false,
+        "next_offset": null
+      }
+    },
+    "handoff": {
+      "branch": "codex/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+      "common_git_dir": "/mnt/d/Coding Projects/ushso/.git",
+      "dirty": false,
+      "files": [],
+      "generated_at": "2026-09-11T14:30:38.291731Z",
+      "git_status": "## codex/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+      "head_sha": "bc496ee80810b197b484d8e8e73c491b9bf2d871",
+      "merge_base": "bc496ee80810b197b484d8e8e73c491b9bf2d871",
+      "ownership": {
+        "policy_sha256": null,
+        "required": false,
+        "source": null
+      },
+      "receipt_path": "/home/plumbob/.local/state/worktree-bootstrap/repositories/ushso-375cca760f7dab38/tasks/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c/handoffs/20260911T143038Z-4fb1de53.json",
+      "repository_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+      "schema": "worktree-bootstrap-handoff/v1",
+      "start_sha": "bc496ee80810b197b484d8e8e73c491b9bf2d871",
+      "summary": {
+        "changed_files": 0,
+        "changed_hunks": 0,
+        "ownership_violations": []
+      },
+      "task": "ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+      "tool": {
+        "implementation_sha256": "4138a49e42148db9e5c63dfd5386fdac235f19e445453e702f342b1a7002b813",
+        "version": "1.1.0"
+      },
+      "workspace_verification": {
+        "branch": "codex/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+        "errors": [],
+        "node_modules_roots": [
+          "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c/node_modules"
+        ],
+        "ok": true,
+        "repository_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+        "start_sha": "bc496ee80810b197b484d8e8e73c491b9bf2d871",
+        "task": "ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+        "verified_at": "2026-09-11T14:30:38.254129Z",
+        "writer_lock": null
+      }
+    },
+    "state": "succeeded",
+    "deadline": {
+      "expected_duration_ms": 1500000,
+      "duration_margin": 1.2,
+      "timeout_ms": 1800000,
+      "deadline_at": "2026-09-11T14:51:21.272Z",
+      "deadline_source": "margin",
+      "extensions": [],
+      "remaining_ms": 219367
+    }
+  },
+  "runtime": {
+    "task_id": "ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+    "process_group": null,
+    "process_start_ticks": "723834107",
+    "process_boundary": {
+      "version": 1,
+      "boundary": "systemd-user-service-cgroup",
+      "unit": "codex-co-engineer-7f618c74f19e4302aec950cf13504aa3.service",
+      "description": "codex-co-engineer-task:7f618c74f19e4302aec950cf13504aa3",
+      "invocation_id": "ae0281af923a4482a22fcb0e699bb0ec",
+      "control_group": "/user.slice/user-1000.slice/user@1000.service/app.slice/codex-co-engineer-7f618c74f19e4302aec950cf13504aa3.service"
+    },
+    "updated_at": "2026-09-11T14:47:10.266Z",
+    "lifecycle_proof": {
+      "status": "normal",
+      "boundary": "inactive_empty",
+      "lock": "unlocked",
+      "code": null,
+      "recovered": false,
+      "git": null
+    }
+  },
+  "progress": {
+    "event_cursor": "905549",
+    "last_event": {
+      "type": "status",
+      "text": "available commands updated (29)",
+      "tag": "available_commands_update"
+    },
+    "new_event_count": 0,
+    "more_events": false,
+    "waited_ms": 1,
+    "wait_reason": "terminal",
+    "wait_until": "progress"
+  },
+  "state": "succeeded",
+  "summary": {
+    "task_id": "ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+    "state": "succeeded",
+    "status": "completed",
+    "provider": "grok",
+    "message": "The delegated task completed.",
+    "error_code": null,
+    "failed_stage": "end_turn",
+    "retryable": false,
+    "suggested_action": "Inspect the receipt, handoff, and resulting commits before merging.",
+    "last_successful_stage": "prompt_dispatched",
+    "last_event": {
+      "type": "status",
+      "text": "available commands updated (29)",
+      "tag": "available_commands_update"
+    },
+    "deadline": {
+      "expected_duration_ms": 1500000,
+      "duration_margin": 1.2,
+      "timeout_ms": 1800000,
+      "deadline_at": "2026-09-11T14:51:21.272Z",
+      "deadline_source": "margin",
+      "extensions": [],
+      "remaining_ms": 219367
+    },
+    "event_cursor": "905549",
+    "wait_reason": "terminal",
+    "capabilities": {
+      "live_progress": true,
+      "same_session_reply": true,
+      "restart_recovery": true,
+      "cancellation_confirmation": true,
+      "detailed_tool_events": true,
+      "evidence": "local",
+      "notes": "ACP persistent session. Same-session reply is supported while the local worker is alive."
+    },
+    "evidence": {
+      "task_id": "ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+      "files": [
+        "task.json",
+        "events.jsonl",
+        "runtime.json",
+        "worker.log",
+        "attention.json"
+      ]
+    }
+  },
+  "diagnostic": {
+    "task_id": "ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+    "provider": "grok",
+    "session_id": "01a090d8-2e35-74e1-85f9-ffbba9151368",
+    "provider_run_id": null,
+    "question_id": null,
+    "state": "succeeded",
+    "status": "completed",
+    "error_code": "ok",
+    "message": "The delegated task completed.",
+    "failed_stage": "end_turn",
+    "retryable": false,
+    "suggested_action": "Inspect the receipt, handoff, and resulting commits before merging.",
+    "started_at": "2026-09-11T14:21:21.739Z",
+    "last_activity_at": "2026-09-11T14:47:10.264Z",
+    "alert_at": "2026-09-11T14:30:35.089Z",
+    "finished_at": "2026-09-11T14:30:35.089Z",
+    "last_successful_stage": "prompt_dispatched",
+    "last_event": {
+      "type": "status",
+      "text": "available commands updated (29)",
+      "tag": "available_commands_update"
+    },
+    "transport": "acp",
+    "process_boundary": {
+      "version": 1,
+      "boundary": "systemd-user-service-cgroup",
+      "unit": "codex-co-engineer-7f618c74f19e4302aec950cf13504aa3.service",
+      "description": "codex-co-engineer-task:7f618c74f19e4302aec950cf13504aa3",
+      "invocation_id": "ae0281af923a4482a22fcb0e699bb0ec",
+      "control_group": "/user.slice/user-1000.slice/user@1000.service/app.slice/codex-co-engineer-7f618c74f19e4302aec950cf13504aa3.service"
+    },
+    "cancellation": {
+      "status": null,
+      "cancel_requested": false
+    },
+    "cleanup": {
+      "status": "normal",
+      "boundary": "inactive_empty",
+      "lock": "unlocked"
+    },
+    "git": {
+      "source_repo": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910",
+      "cwd": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+      "worktree_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+      "branch": "codex/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+      "start_sha": "bc496ee80810b197b484d8e8e73c491b9bf2d871",
+      "resulting_commit": null,
+      "remote_branch": "codex/ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+      "pull_request": null,
+      "validation": null,
+      "workspace_kind": "managed-worktree",
+      "workspace_mode": "managed"
+    },
+    "deadline": {
+      "expected_duration_ms": 1500000,
+      "duration_margin": 1.2,
+      "timeout_ms": 1800000,
+      "deadline_at": "2026-09-11T14:51:21.272Z",
+      "deadline_source": "margin",
+      "extensions": [],
+      "remaining_ms": 219367
+    },
+    "capabilities": {
+      "live_progress": true,
+      "same_session_reply": true,
+      "restart_recovery": true,
+      "cancellation_confirmation": true,
+      "detailed_tool_events": true,
+      "evidence": "local",
+      "notes": "ACP persistent session. Same-session reply is supported while the local worker is alive."
+    },
+    "evidence": {
+      "task_id": "ce-ushso-wp11-design-review-wp11-current-input-revie-1d8f6f69ff2e-7b9ee63c",
+      "files": [
+        "task.json",
+        "events.jsonl",
+        "runtime.json",
+        "worker.log",
+        "attention.json"
+      ]
+    },
+    "dispatch_uncertain": false,
+    "wait_reason": "terminal"
+  },
+  "diagnostics": null,
+  "capabilities": {
+    "live_progress": true,
+    "same_session_reply": true,
+    "restart_recovery": true,
+    "cancellation_confirmation": true,
+    "detailed_tool_events": true,
+    "evidence": "local",
+    "notes": "ACP persistent session. Same-session reply is supported while the local worker is alive."
+  },
+  "view": "summary"
+}

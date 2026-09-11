@@ -665,3 +665,103 @@ for pr in PRS:
     if pr['id'] == 'PR-007':
         pr['commits'][2]['instructions'] += ' Refresh the current identity package manifest and validation receipt from actual package bytes after the reviewed source/schema changes. Preserve all frozen contract dependency pins, disabled candidate-only resolution boundaries and external-review counters; do not issue scientific approval or modify historical successor artifacts.'
         pr['commits'][2]['verification'] += ' Run the existing identity package tests and npm run validate --prefix packages/identity. Retain the original 25-versus-30 file-count failure; a current package seal must match its actual payload and cannot waive contract or scientific requirements.'
+
+
+# New bounded scope, independently reviewed before implementation.
+PRS.append({'id': 'PR-086',
+ 'phase': 'P1',
+ 'subphase': '1A',
+ 'title': 'Separate original WP11 input proof from current verification',
+ 'dependencies': ['PR-003', 'PR-085'],
+ 'requirements': ['R16'],
+ 'findings': ['F01', 'F32'],
+ 'files': ['scripts/verify-wp11-attestation.mjs',
+           'tests/wp11-attestation.test.mjs',
+           'verification/research-program/ci-attestation/wp11-v1.3.0/',
+           'docs/research-program/ci-attestations.md'],
+ 'outcome': 'Historical WP11 approval remains bound to its exact original inputs while actual current inputs '
+            'receive separate, unapproved technical checks.',
+ 'commits': [{'id': 'C-086-1',
+              'subject': 'Retain and verify original WP11 input bytes',
+              'instructions': 'Retain all 154 actual historical preimages from commit '
+                              '30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0 in a portable content-addressed '
+                              'snapshot outside verification/wp11/v1.3.0. Match exact path, length and '
+                              'SHA-256 against the immutable approved receipt '
+                              'e596e1b18a0251f611990c9752e1d12fb36cd05dab16bf55cf96e8d1fc431f9d, subject '
+                              '294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98. Add a '
+                              'bounded snapshot reader under the owned current-attestation directory and use '
+                              'it for historical input proof. Preserve the historical package, approvals, '
+                              'evidence, receipts and predecessor chain byte-for-byte. Historical validation '
+                              'must work without Git/network and cannot substitute current or synthetic '
+                              'bytes. Keep the existing historical-pins and current-replay records as '
+                              'prior-candidate evidence; new records are additive and clearly identified.',
+              'verification': 'Recover and verify 154 files totaling 1,347,732 bytes against the sealed '
+                              'inventory. Test missing, extra, one-byte-tampered and current-substituted '
+                              'blobs, incomplete inventories, duplicate paths and invalid path references. '
+                              'Prove verification from retained bytes with Git unavailable and unchanged '
+                              'historical subject. Rejected bytes cannot yield a passing historical proof.'},
+             {'id': 'C-086-2',
+              'subject': 'Bind current WP11 checks without transferring approval',
+              'instructions': 'Keep the existing WP11 v1.3.0 technical builder, validator, successor helper '
+                              'and general runner unchanged. Invoke the actual builder on current source '
+                              'bytes and validate its complete current inventory. Separately bind adapter, '
+                              'tests, policy, unchanged runner, snapshot and snapshot reader into an '
+                              'explicit current wrapper subject. Preserve distinct technical and wrapper '
+                              'package identities and approval=null on both. Emit every '
+                              'historical-versus-current changed input with both hashes, sizes and source '
+                              'roles; no first-failure-only report or silent allowlist of the 11 PR005 '
+                              'files. Preserve all current technical/disabled-feature checks, strict direct '
+                              '--validate/--issue, exact aggregate routing, actual suite execution, '
+                              'future-version behavior, nonzero-test requirement, error, signal, timeout and '
+                              'output-bound propagation. Do not merge product inputs into a wrapper that '
+                              'substitutes for the existing technical subject or rebuild historical evidence '
+                              'from mixed current/snapshot reads. Record the existing builder coverage '
+                              'limits explicitly without expanding historical package scope or implying full '
+                              'release qualification.',
+              'verification': 'An actual current-file change changes its pending technical subject while '
+                              'original snapshot proof still passes. Missing snapshot/reader bindings, stale '
+                              'policy pins, failed/malformed current evidence and any approval/release '
+                              'overclaim fail. A PR005-941c9cd comparison reports all 13 changed inputs (11 '
+                              'new plus two package transitions); the pre-PR005 integration comparison '
+                              'reports two. Preserve existing real runner, future-version, zero-test, '
+                              'timeout and child-error tests; strict direct validation and issuance still '
+                              'reject historical approval on the current subject.'},
+             {'id': 'C-086-3',
+              'subject': 'Publish current-input evidence and combined acceptance boundary',
+              'instructions': 'Retain sanitized complete commands, snapshot provenance, all original failed '
+                              'receipts, fresh candidate-specific replays and an evidence index. Explain '
+                              'historical approval, current technical draft, wrapper draft and their '
+                              'separate identities in the current-attestation documentation and PR086 '
+                              'handoff. Bind exact integration/dependency/source hashes; a typed pending '
+                              'final head avoids self-reference. PR005 functional work produced under its '
+                              'earlier dependency packet remains historical producer evidence and can '
+                              'integrate only after the combined PR005/PR086 candidate passes independent '
+                              'checks. PR082 consumes this assignment and still resolves current-subject '
+                              'approval and exact release qualification. No historical approval is widened, '
+                              'no current approval is issued and no deployment is performed.',
+              'verification': 'Run the focused WP11 attestation tests, actual selected WP11 aggregate, '
+                              'current adapter and handoff validation. The controller independently inspects '
+                              'original byte hashes, decisive negative cases and the final immutable head, '
+                              'then runs the applicable full gate and hosted CI on the combined candidate. '
+                              'Producer-only success, synthetic overlays and old gate receipts do not '
+                              'qualify the combined result; R01-R16 definitions and frozen cohorts remain '
+                              'unchanged.'}],
+ 'acceptance': ['Complete original WP11 byte proof remains immutable and independently reproducible offline.',
+                'Every current difference is inspectable and current technical/wrapper subjects remain '
+                'explicitly unapproved.',
+                'PR005/PR086 combined tests and the exact candidate gate pass without changing strict '
+                'successor approval or current scientific boundaries.']})
+PLAN_EXTENSIONS.append({'id': 'PR-086',
+ 'parent_pr': 'PR-005',
+ 'kind': 'bounded_wp11_current_input_remediation',
+ 'trigger': 'Independent review of PR005 head 941c9cd and GitHub CI run 34610410659 prove 11 changed WP11 '
+            'inputs beyond the two historical package transitions.',
+ 'reason': 'Retain all 154 original sealed input preimages portably and verify current bytes in a separate '
+           'pending technical subject, preserving historical approval and every current execution gate.',
+ 'independent_design_review_sha256': '15aa02045e670ad67ba087114292328e1d034be3e8f2d8265eaec8a47a09fc39',
+ 'controller_preimage_audit': 'verification/research-program/bootstrap/wp11-plan-and-pr007-r2-review-20260911/wp11-historical-preimages-controller-audit.json'})
+for pr in PRS:
+    if pr["id"] in ["PR-005", "PR-082"]:
+        pr["dependencies"].append("PR-086")
+    if pr["id"] == "PR-005":
+        pr["acceptance"].append("The separately reviewed PR086 current-input correction must be integrated and the combined PR005/PR086 exact candidate must pass required checks before PR005 integration acceptance. Earlier producer work retains its original dependency/plan provenance.")

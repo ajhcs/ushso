@@ -1,0 +1,11 @@
+# PR-007 correction review at ba077906
+
+Disposition: changes requested. Head ba0779069c5e75cc49be0e7b79026726ab087cfc, tree acb28d36f4355c196dbc931702b070cca44d79a2. Grok interface model grok-4. Root Astra independently replayed all previous 14 semantic cases and required focused/package checks; they pass, including the corrected package seal. The new adapter and identifier encoding require further correction before acceptance.
+
+- R007-6: projectCoreReleaseDecision accepts a supplied core envelope with a foreign asset_id or entity_id and returns projected=true. The asset assertion ends with `|| envelope.asset_id`, so any nonempty asset bypasses ownership. Bind release, entity, asset and source/native ownership explicitly; keep any legacy alias conversion evidenced and explicit.
+- R007-7: an envelope containing only contract_version, entity_type, asset_id and release_id is projected as a core Release even though required truth-envelope/release fields are absent. nativeIdentifierConformsToCore also accepts effective_from='invalid-date', rejected by the frozen common schema. Reuse actual frozen contract validation with appropriate formats; do not label incomplete projections as core-conformant. A valid frozen Release fixture remains a positive control.
+- R007-8: variable-width Unicode escapes collide: U+1F600 and U+1F60 followed by ASCII '0' both mint a token ending `~1F600`. Distinct exact publisher identifiers must stay distinct. Use an unambiguous encoding or scoped canonical hash, preserving exact wire values and documented identity scope.
+
+Additional root probe: one valid core control passes, five contract cases fail, zero probe errors. The initial probe could not load ajv-formats, which is not a committed dependency; no product test executed. The corrected probe uses the existing AJV with declared date/date-time/URI predicates and frozen schemas. Both receipts and scripts are retained. No dependency was installed or production code edited by the controller.
+
+Scripts: pr007-independent-semantics.mjs and pr007-independent-r2-extra-v2.mjs under the task scratch directory. The full current PR007 contract and original failure history remain applicable; these decisive failures are not an exhaustive scientific qualification. Keep the dictionary/source revision typed unresolved absent evidence. No merge or deployment is accepted.

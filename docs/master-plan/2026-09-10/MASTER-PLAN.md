@@ -175,6 +175,13 @@ Run `python3 docs/master-plan/2026-09-10/validate.py` to validate the plan's gra
 
 ## Bounded CI remediation added during execution
 
-PR-085 adds three commits under P1/1A after CI run 34541539731 exposed a stale WP0 approval subject. The initial 84 PRs and 252 planned commits are retained; the current model contains 85 PRs and 255 planned commits across the same eight phases and 28 sub-phases. Initial sub-phase membership remains intact, with PR-085 explicitly added to 1A. PR-082 also depends on PR-085.
+PR-085 adds three commits under P1/1A after CI run 34541539731 exposed a stale WP0 approval subject. The initial 84 PRs and 252 planned commits are retained; the model at that checkpoint contained 85 PRs and 255 planned commits across the same eight phases and 28 sub-phases. Initial sub-phase membership remains intact, with PR-085 explicitly added to 1A. PR-082 also depends on PR-085.
 
 The correction must preserve immutable historical approval, run the current technical checks with fresh code/hash identities, and leave current-subject successor approval separate from development CI. It does not lower R01–R16 thresholds, change frozen cohorts, grant scientific approval, or authorize production. See the PR-085 packet and the evidence-backed exception record in docs/research-program/exceptions/PR-085-ci-attestation.md.
+
+
+## Bounded WP11 current-input follow-up
+
+PR-086 adds three planned commits under P1/1A after PR-005 exposed 11 changed historical input pins beyond the two prior package transitions. The current model contains 86 PRs and 258 planned commits; the initial 84-PR/252-commit model, eight phases, 28 sub-phases and frozen acceptance cohorts remain intact. PR-086 depends on accepted PR-003 and PR-085. PR-005 integration and PR-082 release qualification consume PR-086. Earlier PR-005 producer heads retain the original packet and dependency provenance; this new edge governs integration acceptance after discovery.
+
+An independent Grok design review and controller byte audit recovered all 154 original inputs (1,347,732 bytes) matching the sealed WP11 receipt. The new assignment retains those preimages outside the historical package and checks actual current bytes in separate pending technical and wrapper subjects. Historical approvals, the technical builder/validator, general runner, frozen cohorts and disabled features stay immutable. Missing original bytes, incomplete snapshots, current technical failures and approval overclaims remain failures. Current implementation and combined-candidate qualification are still required. See [PR-086](prs/PR-086.md).
