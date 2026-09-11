@@ -268,6 +268,38 @@
         },
         "type": "object"
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "semantic_role": {
+            "enum": [
+              "measure",
+              "measure_description"
+            ]
+          },
+          "unit": {
+            "properties": {
+              "state": {
+                "const": "unknown"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "then": {
+        "properties": {
+          "completeness": {
+            "enum": [
+              "incomplete",
+              "unknown"
+            ]
+          }
+        },
+        "type": "object"
+      }
     }
   ],
   "$defs": {

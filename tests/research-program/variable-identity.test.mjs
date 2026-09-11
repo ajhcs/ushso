@@ -12,6 +12,7 @@ import {
   schemaFieldIdForContext,
   variableIdForContext,
 } from "../../packages/identity/src/index.mjs";
+import { schemaFixture } from "../../packages/identity/fixtures/production-shaped.mjs";
 
 const digest = "a".repeat(64);
 const evidence = ["evidence:variable-identity:test"];
@@ -87,6 +88,14 @@ test("identifier applicability and measurement unit absence remain distinct", ()
   });
   assert.equal(measurement.unit.state, "missing");
   assert.equal(measurement.completeness, "incomplete");
+  const unknown = identity({
+    wire_name: "TOTAL",
+    publisher_label: "Total",
+    semantic_role: "measure",
+    unit: { state: "unknown", value: null, evidence_ids: [] },
+    mapping: { state: "exact", documented_name: "TOTAL", wire_name: "TOTAL", candidate_wire_names: [], evidence_ids: [] },
+  });
+  assert.equal(unknown.completeness, "unknown");
 });
 
 test("mapping states preserve literal alternatives and refuse punctuation-only aliasing", () => {
@@ -144,6 +153,8 @@ test("catalog context helper does not weaken exact endpoint invariants", () => {
     schema_snapshot_id: "urn:ushso:schema:catalog",
     release_id: "urn:ushso:release:catalog",
     distribution_id: "urn:ushso:distribution:catalog",
+    source_id: "urn:ushso:source:catalog",
+    asset_id: "urn:ushso:asset:catalog",
     field_ids: ["urn:ushso:field:catalog"],
     immutable: true,
   };
@@ -209,4 +220,96 @@ test('retained HCRIS audit remains eleven unresolved literal discrepancies', asy
   assert.ok(retained.mappings.every(mapping => mapping.state === 'ambiguous' && mapping.wire_name === null));
   assert.deepEqual(retained.payload_names, summary.in_payload_not_dictionary);
   assert.deepEqual(retained.dictionary_names, summary.in_dictionary_not_payload);
+});
+
+test("variable context resolution requires source/asset relationship evidence for released core shapes", () => {
+  const catalog = new ImmutableSchemaCatalog();
+  const snapshot = {
+    entity_type: "SchemaSnapshot",
+    schema_snapshot_id: "urn:ushso:schema:released-core",
+    release_id: "urn:ushso:release:released-core",
+    distribution_id: "urn:ushso:distribution:released-core",
+    field_ids: ["urn:ushso:field:released-core"],
+    immutable: true,
+  };
+  const field = {
+    entity_type: "SchemaField",
+    entity_id: "urn:ushso:field:released-core",
+    schema_field_id: "urn:ushso:field:released-core",
+    schema_snapshot_id: snapshot.schema_snapshot_id,
+    revision_id: "urn:ushso:revision:released-core",
+    ordinal: 0,
+  };
+  catalog.registerSnapshot(snapshot, [field]);
+  const context = {
+    source_id: "urn:ushso:source:released-core",
+    asset_id: "urn:ushso:asset:released-core",
+    release_id: snapshot.release_id,
+    distribution_id: snapshot.distribution_id,
+    schema_snapshot_id: snapshot.schema_snapshot_id,
+    schema_field_id: field.schema_field_id,
+    field_revision_id: field.revision_id,
+  };
+  assert.throws(() => catalog.resolveVariableContext(context), { code: "unresolved_variable_context" });
+  const relationship = {
+    binding_state: "exact",
+    source_id: context.source_id,
+    asset_id: context.asset_id,
+    release_id: context.release_id,
+    distribution_id: context.distribution_id,
+    schema_snapshot_id: context.schema_snapshot_id,
+    evidence_ids: ["evidence:released-core"],
+  };
+  assert.equal(catalog.resolveVariableContext(context, relationship).field.revision_id, field.revision_id);
+  assert.throws(() => catalog.resolveVariableContext({ ...context, asset_id: "urn:ushso:asset:foreign" }, relationship), { code: "variable_context_asset_mismatch" });
+  assert.throws(() => catalog.resolveVariableContext(context, { ...relationship, source_id: "urn:ushso:source:foreign" }), { code: "variable_context_source_mismatch" });
+});
+
+test("explicit unresolved field context cannot mint a stable field ID", () => {
+  assert.throws(() => createContextScopedSchemaFieldId({ ...context, state: "unresolved", binding_state: "ambiguous", reason: "relationship evidence is ambiguous" }, "ZIP"), { code: "unresolved_variable_context" });
+});
+
+test("strict schema keeps unknown measurement units incomplete or unknown", async () => {
+  const schema = JSON.parse(await readFile(new URL("../../contracts/machine-toolkit/v1.2.0/schemas/variable-identity.schema.json", import.meta.url)));
+  const validate = new Ajv2020({ allErrors: true, strict: true, strictSchema: true, strictTypes: true }).compile(schema);
+  const value = identity({
+    wire_name: "TOTAL",
+    publisher_label: "Total",
+    semantic_role: "measure",
+    unit: { state: "unknown", value: null, evidence_ids: [] },
+    mapping: { state: "exact", documented_name: "TOTAL", wire_name: "TOTAL", candidate_wire_names: [], evidence_ids: [] },
+  });
+  assert.notEqual(value.completeness, "complete");
+  assert.equal(validate(value), true, JSON.stringify(validate.errors));
+  assert.equal(validate({ ...value, completeness: "complete" }), false);
+});
+
+test("released core fixture requires accepted relationship evidence before variable resolution", () => {
+  const catalog = new ImmutableSchemaCatalog();
+  const released = schemaFixture("left");
+  catalog.registerSnapshot(released.snapshot, released.fields);
+  const context = {
+    source_id: "urn:ushso:source:controlled-fixture",
+    asset_id: "urn:ushso:asset:left",
+    release_id: released.snapshot.release_id,
+    distribution_id: released.snapshot.distribution_id,
+    schema_snapshot_id: released.snapshot.schema_snapshot_id,
+    schema_field_id: released.fields[0].schema_field_id,
+    field_revision_id: released.fields[0].revision_id,
+  };
+  assert.throws(() => catalog.resolveVariableContext(context), { code: "unresolved_variable_context" });
+  const acceptedPr007Binding = {
+    schema_version: "identity.release-binding.v1.0.0",
+    binding_state: "exact",
+    source_id: context.source_id,
+    asset_id: context.asset_id,
+    release_identity: { source_id: context.source_id, asset_id: context.asset_id, release_id: context.release_id },
+    releases: [context.release_id],
+    distributions: [{ distribution_id: context.distribution_id, release_id: context.release_id }],
+    evidence_pointers: [{ evidence_id: "evidence:pr007:released-core", capture_sha256: null, pointer: "/dataset/0", locator: null }],
+  };
+  const resolved = catalog.resolveVariableContext(context, acceptedPr007Binding);
+  assert.equal(resolved.snapshot.schema_snapshot_id, released.snapshot.schema_snapshot_id);
+  assert.equal(resolved.field.revision_id, released.fields[0].revision_id);
+  assert.throws(() => catalog.resolveVariableContext(context, { ...acceptedPr007Binding, asset_id: "urn:ushso:asset:foreign" }), { code: "variable_context_asset_mismatch" });
 });

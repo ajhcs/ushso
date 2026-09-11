@@ -116,3 +116,19 @@ test('versioned extraction defaults missing release context to an unresolved, no
  const [variable]=extractVersionedVariables(data.columns,'cdc',{capture});
  assert.equal(variable.variable_id,null);assert.equal(variable.context_binding.state,'unresolved');assert.equal(variable.publication_authorized,false);assert.equal(variable.promotion_eligible,false);
 });
+
+test('versioned verification requires a successful capture and retained raw bytes', () => {
+const data={variables:{COUNT:{label:'Count',predicateType:'int'}}};const body=JSON.stringify(data);const capture={status:'captured',url:'https://example.test/capture-gate.json',text:body,data,sha256:hash(body),captured_at:'2026-09-11T00:00:00Z',evidence_id:'evidence:test:capture-gate'};
+const [claim]=extractVersionedVariables(data.variables,'census',{capture});
+assert.throws(()=>verifyVariableIdentity(claim,{...capture,status:'failed'}),/VARIABLE_CAPTURE_NOT_SUCCESSFUL/);
+const {text,...withoutBytes}=capture;
+assert.throws(()=>verifyVariableIdentity(claim,withoutBytes),/VARIABLE_CAPTURE_BYTES_REQUIRED/);
+});
+test('resolved versioned replay uses an independently supplied context and capture evidence', () => {
+const data={variables:{COUNT:{label:'Count',predicateType:'int'}}};const body=JSON.stringify(data);const capture={status:'captured',url:'https://example.test/trusted-replay.json',text:body,data,sha256:hash(body),captured_at:'2026-09-11T00:00:00Z',evidence_id:'evidence:test:trusted-replay'};
+const context={source_id:'urn:ushso:source:trusted',asset_id:'urn:ushso:asset:trusted',release_id:'urn:ushso:release:trusted',distribution_id:'urn:ushso:distribution:trusted',schema_snapshot_id:'urn:ushso:schema:trusted',schema_field_id:'urn:ushso:field:trusted',field_revision_id:'urn:ushso:revision:trusted'};
+const [claim]=extractVersionedVariables(data.variables,'census',{capture,context_binding:context});
+assert.equal(verifyVariableIdentity(claim,capture,{context_binding:context}),true);
+assert.throws(()=>verifyVariableIdentity({...claim,context_binding:{...claim.context_binding,release_id:'urn:ushso:release:foreign'}},capture,{context_binding:context}),/VARIABLE_TRUSTED_CONTEXT_MISMATCH|UNSUPPORTED_VERSIONED_VALUE/);
+assert.throws(()=>verifyVariableIdentity(claim,capture),/VARIABLE_TRUSTED_CONTEXT_REQUIRED/);
+});

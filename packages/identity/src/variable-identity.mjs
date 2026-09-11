@@ -252,6 +252,7 @@ function normalizeProvenance(input, defaultEvidenceIds = []) {
 function completenessFor({ context, semanticRole, unit, mapping, sourceType, observedType }) {
   const measurement = semanticRole === "measure" || semanticRole === "measure_description";
   if (measurement && unit.state === "missing") return "incomplete";
+  if (measurement && unit.state === "unknown") return "unknown";
   if (context.state !== "resolved" || ["ambiguous", "unmatched"].includes(mapping.state)) return "unknown";
   if (sourceType.state === "unknown" || observedType.state === "unknown") return "unknown";
   return "complete";

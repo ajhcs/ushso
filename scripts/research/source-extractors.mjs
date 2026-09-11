@@ -1,4 +1,4 @@
-import { createVariableIdentity, createVariableProvenance } from '../../packages/identity/src/index.mjs';
+import { createVariableContext, createVariableIdentity, createVariableProvenance } from '../../packages/identity/src/index.mjs';
 import {createHash} from 'node:crypto';
 import {isDeepStrictEqual} from 'node:util';
 export const hash = value => createHash('sha256').update(value).digest('hex');
@@ -156,9 +156,11 @@ function versionedKind(kind) {
   throw Error('UNSUPPORTED_VERSIONED_VARIABLE_KIND');
 }
 
-function requireVersionedCapture(capture) {
+function requireVersionedCapture(capture, { requireBytes = false } = {}) {
   if (!object(capture) || !text(capture.url) || !/^[a-f0-9]{64}$/.test(capture.sha256 ?? '')) throw Error('VARIABLE_CAPTURE_REQUIRED');
+  if (capture.status !== 'captured') throw Error('VARIABLE_CAPTURE_NOT_SUCCESSFUL');
   if (capture.data === undefined) throw Error('VARIABLE_CAPTURE_DATA_REQUIRED');
+  if (requireBytes && typeof capture.text !== 'string') throw Error('VARIABLE_CAPTURE_BYTES_REQUIRED');
   return capture;
 }
 
@@ -348,22 +350,41 @@ function captureForClaim(claim, captures) {
 
 export function verifyVariableIdentity(claim, captures, options = {}) {
   if (!object(claim) || !object(claim.provenance)) throw Error('VARIABLE_CLAIM_MALFORMED');
-  const capture = requireVersionedCapture(captureForClaim(claim, captures));
+  const capture = requireVersionedCapture(captureForClaim(claim, captures), { requireBytes: true });
   if (claim.publication_authorized !== false || claim.promotion_eligible !== false) throw Error('UNAUTHORIZED_VARIABLE_APPROVAL');
   if (capture.sha256 !== claim.provenance.capture_sha256) throw Error('VARIABLE_CAPTURE_BINDING');
-  if (capture.text !== undefined && hash(capture.text) !== capture.sha256) throw Error('VARIABLE_CAPTURE_BINDING');
-  if (capture.text !== undefined && capture.data !== undefined && JSON.stringify(JSON.parse(capture.text)) !== JSON.stringify(capture.data)) throw Error('VARIABLE_CAPTURE_BODY_MISMATCH');
+  if (hash(capture.text) !== capture.sha256) throw Error('VARIABLE_CAPTURE_BINDING');
+  if (capture.data !== undefined && JSON.stringify(JSON.parse(capture.text)) !== JSON.stringify(capture.data)) throw Error('VARIABLE_CAPTURE_BODY_MISMATCH');
   const raw = pointerValue(capture.data, claim.provenance.pointer);
   if (raw === undefined || hash(JSON.stringify(raw)) !== claim.provenance.raw_value_sha256) throw Error('VARIABLE_PASSAGE_BINDING');
   const kind = VERSIONED_TRANSFORMATION_KINDS[claim.provenance.transformation?.name];
   if (!kind || claim.provenance.transformation.version !== VERSIONED_VARIABLE_TRANSFORMATIONS[kind].version) throw Error('UNKNOWN_VERSIONED_TRANSFORMATION');
+
+  const claimContext = createVariableContext(claim.context_binding ?? {});
+  const resolvedClaim = claimContext.state === 'resolved';
+  const suppliedContext = options.context_binding;
+  if (resolvedClaim && suppliedContext === undefined) throw Error('VARIABLE_TRUSTED_CONTEXT_REQUIRED');
+  const trustedContext = suppliedContext === undefined ? claimContext : createVariableContext(suppliedContext);
+  if (resolvedClaim) {
+    if (trustedContext.state !== 'resolved' || trustedContext.binding_state !== 'exact') throw Error('VARIABLE_TRUSTED_CONTEXT_UNRESOLVED');
+    if (!isDeepStrictEqual(trustedContext, claimContext)) throw Error('VARIABLE_TRUSTED_CONTEXT_MISMATCH');
+  }
+  const trustedEvidenceIds = Array.isArray(options.evidence_ids)
+    ? options.evidence_ids
+    : versionedEvidenceIds(capture);
+  if (resolvedClaim && trustedEvidenceIds.length === 0) throw Error('VARIABLE_TRUSTED_EVIDENCE_REQUIRED');
+  // A resolved replay defaults to documented capture evidence. The claim's
+  // evidence state/IDs are never used to authorize a resolved context.
+  const trustedEvidenceState = options.evidence_state ?? (resolvedClaim ? 'documented' : claim.evidence_state);
   const collection = kind === 'cdc' ? capture.data.columns : kind === 'census' ? capture.data.variables : capture.data;
   const expected = extractVersionedVariables(collection, kind, {
     ...options,
+    // A caller hook cannot override the independently trusted replay context.
+    contextFor: undefined,
     capture,
-    context_binding: claim.context_binding,
-    evidence_ids: claim.provenance.evidence_ids,
-    evidence_state: claim.evidence_state,
+    context_binding: trustedContext,
+    evidence_ids: trustedEvidenceIds,
+    evidence_state: trustedEvidenceState,
   }).find((item) => item.provenance.pointer === claim.provenance.pointer);
   if (!expected || !isDeepStrictEqual(expected, claim)) throw Error('UNSUPPORTED_VERSIONED_VALUE');
   return true;
