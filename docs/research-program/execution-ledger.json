@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T06:59:10.041717Z",
+  "updated_at": "2026-09-11T07:25:11.105137Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -139,23 +139,35 @@
       }
     ],
     "latest_packaging_review": {
-      "status": "changes_requested",
-      "head_sha": "877281c81b937829ae18f54075a349697b480a0e",
-      "tree_sha": "1f033f88d58514405a1e4ba1ad040d9545708459",
-      "evidence": "verification/research-program/bootstrap/pr004-packaging-review-877281c/receipt.json",
-      "sha256": "7033d39e6fe243ddf3d139e037e0784e21efb79df9dfd8b2187244b5115a27d5",
-      "passed": [
-        "16 field tests",
-        "deterministic rebuild",
-        "canonical verifier",
-        "release:audit",
-        "exact original decoded bytes",
-        "84 unchanged semantic and prior evidence files"
-      ],
-      "finding": "manifest-payload-consistency",
-      "negative_case_actual_exit": 0,
-      "negative_case_expected_exit": 1,
-      "handoff_finished": false
+      "status": "independently_verified_pending_combined_gate",
+      "head_sha": "78d164e816049c45193b17c2267f64c8fb783399",
+      "tree_sha": "618d3e8bf4e9e147b8e523e813de3648b3742b11",
+      "functional_head_sha": "af642ce8e3cc3fe2ee2a3da2a4fc5e1e30be9aa9",
+      "functional_evidence": "verification/research-program/bootstrap/pr004-packaging-review-af642ce/receipt.json",
+      "functional_evidence_sha256": "e592c7e24492f113fde355bae83b7c7126432040288d47fce254822b566fe1d5",
+      "packet_evidence": "verification/research-program/bootstrap/pr004-packaging-final-packet-78d164e/receipt.json",
+      "packet_evidence_sha256": "412c6477f0fb21c346a961936283efc63456b8e851747d926f59cda3c3d91914",
+      "original_cli_failure_replay": "verification/research-program/bootstrap/pr004-packaging-cli-replay-af642ce/receipt.json",
+      "independent_manifest_cases": 72,
+      "registered_field_tests": 17,
+      "current_and_historical_refs_verified": 48,
+      "evidence_index_refs_verified": 24,
+      "protected_files_unchanged": 92,
+      "decoded_payload_sha256": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
+      "decoded_payload_bytes": 49808256,
+      "transport_bytes": 1904678,
+      "size_audit_passed": true,
+      "current_handoff_passed": true,
+      "findings": []
+    },
+    "next_component_candidate": {
+      "pr003_head": "4a47dde1676cdb6e4063ba166a2ce3e9e6f47e6e",
+      "pr004_head": "78d164e816049c45193b17c2267f64c8fb783399",
+      "pr085_head": "70c7a4c3231041f22a1c7475e70c6186a1aa7d6c",
+      "status": "reviewed_components_ready_for_changed_composition",
+      "full_gate_pending": true,
+      "combined_hosted_ci_pending": true,
+      "accepted": false
     }
   },
   "providers": [
@@ -178,9 +190,9 @@
         "run_id": "ushso-pr004-packaging-r2-grok-20260911",
         "task_id": "ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
         "actual_model": "grok-4",
-        "status": "running",
-        "evidence": "verification/research-program/bootstrap/pr004-packaging-r2-dispatch.json",
-        "head_sha": "c516a2ad35c7fa9d93830a169fe87fce9a6be62d"
+        "status": "completed_with_retained_transport_marker",
+        "evidence": "verification/research-program/bootstrap/pr004-packaging-r2-terminal.json",
+        "head_sha": "78d164e816049c45193b17c2267f64c8fb783399"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
@@ -200,9 +212,7 @@
           "cleanup": "normal/inactive_empty/unlocked"
         }
       ],
-      "active_runs": [
-        "ushso-pr004-packaging-r2-grok-20260911"
-      ],
+      "active_runs": [],
       "latest_completed_wp11_run": {
         "run_id": "ushso-pr085-wp11-grok-20260911",
         "head": "574f15f8b5d137560f371e1ef81e415f267b1959",
@@ -624,7 +634,7 @@
       "evidence_directory": "verification/research-program/pr-003/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/15",
       "blockers": [
-        "Full tests, build and local E2E pass on combined34ca9dd; the PR004 artifact-size correction, changed full gate and fresh combined hosted CI precede component acceptance."
+        "PR004 packaging is independently verified. Changed combined full gate and fresh combined hosted CI precede component acceptance."
       ],
       "dispatch_preparation": "Three native DeepSeek slices completed; clean terminal lifecycle and producer final head are recorded.",
       "prerequisites_satisfied": true,
@@ -829,7 +839,7 @@
     },
     {
       "pr_id": "PR-004",
-      "status": "in_progress",
+      "status": "independent_review",
       "owner": "ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
       "dependencies": [
         "PR-002"
@@ -843,14 +853,13 @@
         "packages/coverage/",
         "tests/research-program/field-states.test.mjs"
       ],
-      "head_sha": null,
+      "head_sha": "78d164e816049c45193b17c2267f64c8fb783399",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-004.json",
       "evidence_directory": "verification/research-program/pr-004/",
       "github_pr_url": null,
       "blockers": [
-        "Canonical lossless packaging passes the size audit, but the verifier must reject contradictory manifest metadata and the current handoff/evidence must be completed.",
-        "Independent final packaging review, changed combined full gate and fresh combined hosted CI precede component acceptance and PR005/007 dispatch."
+        "Corrected lossless packaging and the final current handoff are independently verified. A changed complete component gate and fresh combined hosted CI precede acceptance and PR005/007 dispatch."
       ],
       "dispatch_preparation": "Workspace ready and dispatch initiated; actual model/preflight and execution receipts will establish provider usage.",
       "prerequisites_satisfied": true,
@@ -875,7 +884,7 @@
         "Impossible calendar date accepted"
       ],
       "additional_preliminary_scope": "Immutable C1/C2 head21b1b12 only; sent to active producer for correction and final-head replay.",
-      "review_state": "changes_requested_manifest_consistency_and_packet",
+      "review_state": "component_verified_pending_combined_gate",
       "last_producer_head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
       "last_producer_tree_sha": "abfa7c2fd860e35c01ee11902696b015d02f6981",
       "independent_component_checks": "verification/research-program/bootstrap/pr004-r2-final-checks-86cf1b0.json",
@@ -974,36 +983,39 @@
         "accepted": false
       },
       "packaging_review": {
-        "status": "changes_requested",
-        "head_sha": "877281c81b937829ae18f54075a349697b480a0e",
-        "tree_sha": "1f033f88d58514405a1e4ba1ad040d9545708459",
-        "evidence": "verification/research-program/bootstrap/pr004-packaging-review-877281c/receipt.json",
-        "sha256": "7033d39e6fe243ddf3d139e037e0784e21efb79df9dfd8b2187244b5115a27d5",
-        "passed": [
-          "16 field tests",
-          "deterministic rebuild",
-          "canonical verifier",
-          "release:audit",
-          "exact original decoded bytes",
-          "84 unchanged semantic and prior evidence files"
-        ],
-        "finding": "manifest-payload-consistency",
-        "negative_case_actual_exit": 0,
-        "negative_case_expected_exit": 1,
-        "handoff_finished": false
+        "status": "independently_verified_pending_combined_gate",
+        "head_sha": "78d164e816049c45193b17c2267f64c8fb783399",
+        "tree_sha": "618d3e8bf4e9e147b8e523e813de3648b3742b11",
+        "functional_head_sha": "af642ce8e3cc3fe2ee2a3da2a4fc5e1e30be9aa9",
+        "functional_evidence": "verification/research-program/bootstrap/pr004-packaging-review-af642ce/receipt.json",
+        "functional_evidence_sha256": "e592c7e24492f113fde355bae83b7c7126432040288d47fce254822b566fe1d5",
+        "packet_evidence": "verification/research-program/bootstrap/pr004-packaging-final-packet-78d164e/receipt.json",
+        "packet_evidence_sha256": "412c6477f0fb21c346a961936283efc63456b8e851747d926f59cda3c3d91914",
+        "original_cli_failure_replay": "verification/research-program/bootstrap/pr004-packaging-cli-replay-af642ce/receipt.json",
+        "independent_manifest_cases": 72,
+        "registered_field_tests": 17,
+        "current_and_historical_refs_verified": 48,
+        "evidence_index_refs_verified": 24,
+        "protected_files_unchanged": 92,
+        "decoded_payload_sha256": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
+        "decoded_payload_bytes": 49808256,
+        "transport_bytes": 1904678,
+        "size_audit_passed": true,
+        "current_handoff_passed": true,
+        "findings": []
       },
       "artifact_packaging_r2": {
         "format": "ushso.pr004-packaging-r2-dispatch.v1",
         "run_id": "ushso-pr004-packaging-r2-grok-20260911",
-        "cursor": "8",
+        "cursor": "44",
         "task_id": "ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
         "provider": "grok",
         "model": "grok-4",
-        "status": "running",
+        "status": "completed_with_retained_transport_marker",
         "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr004-field-states-20260910-worktrees/.ce-ushso-pr004-artifact-pac-grok-artifact-packaging-bcc571e7a0f2-1fc99af3-worktrees/ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
         "branch": "codex/ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
         "base_sha": "c516a2ad35c7fa9d93830a169fe87fce9a6be62d",
-        "deadline_at": "2026-09-11T07:21:13.838Z",
+        "deadline_at": "2026-09-11T07:24:17.315Z",
         "started_at": "2026-09-11T06:57:14.307Z",
         "prompt_dispatched": true,
         "dispatch_evidence": "authoritative",
@@ -1018,8 +1030,45 @@
           "source": "durable_grant"
         },
         "logical_dispatch_base_preserved": "e5c44249b9d2448df2e4b6d466077658e42a009d",
-        "evidence": "verification/research-program/bootstrap/pr004-packaging-r2-dispatch.json"
-      }
+        "evidence": "verification/research-program/bootstrap/pr004-packaging-r2-dispatch.json",
+        "head_sha": "78d164e816049c45193b17c2267f64c8fb783399",
+        "finished_at": "2026-09-11T07:20:56.747Z",
+        "cleanup": {
+          "status": "normal",
+          "boundary": "inactive_empty",
+          "lock": "unlocked"
+        },
+        "terminal_evidence": "verification/research-program/bootstrap/pr004-packaging-r2-terminal.json",
+        "aggregate_partial": true,
+        "aggregate_error": {
+          "code": "transport_lost",
+          "message": "The provider operation failed."
+        },
+        "actual_git_status": "",
+        "task_handoff_dirty_flag": true,
+        "reconciliation": "Aggregate transport/partial and task dirty flags are retained. Actual final Git tree is clean and independent final-packet checks pass; no error-free provider run is claimed."
+      },
+      "retained_packaging_reviews": [
+        {
+          "status": "changes_requested",
+          "head_sha": "877281c81b937829ae18f54075a349697b480a0e",
+          "tree_sha": "1f033f88d58514405a1e4ba1ad040d9545708459",
+          "evidence": "verification/research-program/bootstrap/pr004-packaging-review-877281c/receipt.json",
+          "sha256": "7033d39e6fe243ddf3d139e037e0784e21efb79df9dfd8b2187244b5115a27d5",
+          "passed": [
+            "16 field tests",
+            "deterministic rebuild",
+            "canonical verifier",
+            "release:audit",
+            "exact original decoded bytes",
+            "84 unchanged semantic and prior evidence files"
+          ],
+          "finding": "manifest-payload-consistency",
+          "negative_case_actual_exit": 0,
+          "negative_case_expected_exit": 1,
+          "handoff_finished": false
+        }
+      ]
     },
     {
       "pr_id": "PR-005",
@@ -2978,7 +3027,7 @@
       "evidence_directory": "verification/research-program/pr-085/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/17",
       "blockers": [
-        "Full tests, build and local E2E pass on combined34ca9dd; PR004 artifact packaging must close release audit before a changed combined gate and hosted CI.",
+        "PR004 packaging is independently verified. Changed combined full gate and fresh combined hosted CI precede component acceptance.",
         "Current WP0/CI/WP11 approvals remain pending PR082 review."
       ],
       "planned_atomic_commits": 3,
@@ -3147,6 +3196,14 @@
         "current_handoff_passed": true,
         "current_approval": null,
         "accepted": false
+      },
+      "ci_head70_status": {
+        "evidence": "verification/research-program/bootstrap/pr085-ci70-status-observation.json",
+        "head_sha": "70c7a4c3231041f22a1c7475e70c6186a1aa7d6c",
+        "run_id": 34569375118,
+        "status": "completed",
+        "conclusion": "success",
+        "limitation": "Component status observation only; actual final combined checkout and tree still require fresh hosted CI."
       }
     }
   ],
