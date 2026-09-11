@@ -5,6 +5,7 @@ export * from "./exact-identifier-policy.mjs";
 export * from "./family-graph.mjs";
 export * from "./join-routes.mjs";
 export * from "./projection-rebuilder.mjs";
+export * from "./release-identity.mjs";
 export * from "./researcher-guidance.mjs";
 export * from "./review-ledger.mjs";
 export * from "./review-queue.mjs";
