@@ -1,0 +1,213 @@
+{
+  "acceptance_scope": "Plan and accounting review only. No implementation, current-subject approval, full-gate acceptance, merge, publication or deployment is asserted.",
+  "candidate": {
+    "base_head": "0c29fdb984c7bb4c101650e4bae86c716048c237",
+    "base_tree": "5f61f364fb6b23646600da7355ce582672e77268",
+    "new_owned_paths": [
+      "scripts/verify-wp11-attestation.mjs",
+      "tests/wp11-attestation.test.mjs",
+      "verification/research-program/ci-attestation/wp11-v1.3.0/"
+    ],
+    "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/wp11-plan-amendment-candidate",
+    "plan_sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
+    "receipt_hash_matches_expected": true,
+    "receipt_sha256": "bbae964e9481ee43a06184f208f4ed0125b7fccb22f1ca31c4398a51009177dc",
+    "receipt_sha256_expected": "bbae964e9481ee43a06184f208f4ed0125b7fccb22f1ca31c4398a51009177dc"
+  },
+  "disposition": "pass_with_implementation_conditions",
+  "findings": [],
+  "format": "ushso.pr085.wp11-plan-amendment-review.v1",
+  "implementation_conditions": [
+    {
+      "condition": "Serialize the three new paths under the existing PR085 owner/branch/worktree and retain the existing runner as the single integration point. The implementation may extend the already PR085-owned runner, but must not edit PR003 package.json or create a second generic runner.",
+      "id": "PR085-WP11-IMPL-001",
+      "severity": "required",
+      "source_locations": [
+        "docs/master-plan/2026-09-10/prs/PR-085.md:17-30",
+        "docs/master-plan/2026-09-10/plan-source.py:641-659",
+        "scripts/run-contract-suites.mjs (existing PR085-owned route)"
+      ]
+    },
+    {
+      "condition": "Special-case only the exact WP11 descriptor (alias wp11, path verification/wp11/v1.3.0, version 1.3.0, package @ushso/wp11-verification-v1.3.0@1.3.0, validate script node tools/verify.mjs --validate) for the read-only aggregate adapter. Keep direct WP11 --validate/--issue strict, and keep future/unknown versions and altered descriptors on ordinary strict execution.",
+      "id": "PR085-WP11-IMPL-002",
+      "severity": "required",
+      "source_locations": [
+        "docs/master-plan/2026-09-10/prs/PR-085.md:38-46",
+        "verification/wp11/v1.3.0/tools/verify.mjs",
+        "verification/wp11/v1.3.0/tools/technical-evidence.mjs",
+        "verification/successor-support.mjs"
+      ]
+    },
+    {
+      "condition": "Validate the complete historical WP11 v1.3 approval/evidence/approved receipt and required predecessor proof byte-for-byte against the original recomputed subject, with current drift explicitly recorded. Run the existing current builder/validator separately; preserve current implementation hashes, disabled-feature/pending fields, null approval and false release flags. Do not use historical bytes to make current evidence pass.",
+      "id": "PR085-WP11-IMPL-003",
+      "severity": "required",
+      "source_locations": [
+        "docs/master-plan/2026-09-10/prs/PR-085.md:38-46",
+        "verification/wp11/v1.3.0/approvals/",
+        "verification/wp11/v1.3.0/receipts/",
+        "verification/wp11/v1.2.0/receipts/approved.json",
+        "verification/wp11/v1.0.0/receipts/"
+      ]
+    },
+    {
+      "condition": "Use actual subprocess routing and retain runner failure semantics. The focused tests must prove the real four-test WP11 suite executes, exact descriptor negatives fail, and nonzero/signaled/timed-out/zero-test children fail; sealed historical approval/evidence/receipt files remain byte-identical and no approval artifact is written.",
+      "id": "PR085-WP11-IMPL-004",
+      "severity": "required",
+      "source_locations": [
+        "docs/master-plan/2026-09-10/prs/PR-085.md:40-46",
+        "docs/master-plan/2026-09-10/plan-source.py:653-655"
+      ]
+    },
+    {
+      "condition": "For the composed PR003/PR004/PR085 candidate, bind PR085 historical package.json from its exact Git snapshot and name the PR003 current package/test transition separately; never relabel the producer snapshot as the combined manifest. Preserve earlier receipts/indexes and keep current WP11 approval pending until PR082 resolves it.",
+      "id": "PR085-WP11-IMPL-005",
+      "severity": "required",
+      "source_locations": [
+        "docs/research-program/exceptions/PR-085-ci-attestation.md:29-39",
+        "docs/master-plan/2026-09-10/prs/PR-085.md:48-57"
+      ]
+    },
+    {
+      "condition": "Complete the separately running selected-package input audit before the next combined gate. A different validated source failure requires its own bounded amendment/review; this plan only authorizes the demonstrated WP11 stale-subject adapter. Then run focused tests, exact combined npm test/build/cf:dry-run/hosted CI and current handoff checks. No producer-only or simulated result qualifies.",
+      "id": "PR085-WP11-IMPL-006",
+      "severity": "required",
+      "source_locations": [
+        "docs/master-plan/2026-09-10/prs/PR-085.md:48-57",
+        "docs/research-program/exceptions/PR-085-ci-attestation.md:27-39"
+      ]
+    }
+  ],
+  "independent_checks": [
+    {
+      "check": "pinned Git identity and cleanliness",
+      "detail": "git rev-parse produced 0c29fdb984c7bb4c101650e4bae86c716048c237 and tree 5f61f364fb6b23646600da7355ce582672e77268; pinned review worktree was clean at inspection.",
+      "outcome": "PASS"
+    },
+    {
+      "check": "candidate receipt manifest",
+      "detail": "All five listed candidate file sizes and SHA-256 values match receipt.json; candidate receipt hash matches the supplied value.",
+      "evidence": "reviewed_file_hashes",
+      "outcome": "PASS"
+    },
+    {
+      "check": "candidate versus exact base file scope",
+      "detail": "Byte comparison of the full candidate snapshot against the pinned base found exactly the five listed documentation/plan files changed; only receipt.json is candidate-local metadata.",
+      "outcome": "PASS"
+    },
+    {
+      "check": "generated plan structural preservation",
+      "detail": "Only PR-085 changed in the plan object; all other 84 PR rows, phases, subphases, requirements, finding IDs and non-PR085 dependency edges are equal. Both base and candidate are 85 PRs/255 atomic commits. The existing PR-082 dependency on PR-085 is retained.",
+      "outcome": "PASS"
+    },
+    {
+      "check": "source/generated identity",
+      "detail": "plan.json source_sha256 and validation.json plan_sha256 independently recompute to the candidate hashes; retained candidate build/validate evidence reports exit 0/PASS with 8 phases, 28 subphases, 85 PRs, 255 commits, 16 requirements and 33 findings.",
+      "evidence": {
+        "plan_json_sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
+        "plan_json_source_sha256": "9e4a7b6bdcc08026eea8a4c9e97bd6db430dddcc856c9fbdf37ff552aae1ef55",
+        "plan_source_sha256": "9e4a7b6bdcc08026eea8a4c9e97bd6db430dddcc856c9fbdf37ff552aae1ef55",
+        "source_hash_matches": true,
+        "validation_hash_matches": true,
+        "validation_plan_sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d"
+      },
+      "outcome": "PASS"
+    },
+    {
+      "check": "WP11 trigger and bounded scope",
+      "detail": "The amendment binds the supplied command/diagnosis, adds exactly scripts/verify-wp11-attestation.mjs, tests/wp11-attestation.test.mjs and verification/research-program/ci-attestation/wp11-v1.3.0/, preserves existing PR085 ownership, and explicitly forbids broad fallback.",
+      "outcome": "PASS"
+    },
+    {
+      "check": "routing/failure contract coverage",
+      "detail": "The planned C-085-2 checks require exact alias/path/version/package/validate identity, real four-test execution, future/wrong-package/altered-command/nonmatching-path rejection, nonzero/signaled/timeout/zero-test failures, preserved WP0/CI/WP14 behavior and no approval/evidence mutation.",
+      "outcome": "PASS"
+    },
+    {
+      "check": "historical/current provenance",
+      "detail": "The plan requires byte-for-byte WP11 historical proof/predecessor validation and separate current builder/validator evidence, pending/null approval and false release flags. The composed package.json mismatch is explicitly identified and must be handled with original Git-snapshot plus separately named PR003 current provenance.",
+      "outcome": "PASS_WITH_CONDITION"
+    }
+  ],
+  "limits": [
+    "No repository, candidate plan or Git metadata was edited; no implementation or producer worktree was mutated.",
+    "The candidate build/validate results were retained and verified as supplied; generators were not rerun because they rewrite candidate generated outputs.",
+    "The supplied WP11 diagnostic/composition receipts were hash-verified and inspected; their child commands were not re-executed in this plan-only review.",
+    "The all-selected-package audit, full combined npm test/build/cf:dry-run/hosted CI, current approval, release qualification, merge, publication and deployment remain outstanding.",
+    "The separate PR003 fixture-coupling failure reported in the later composition receipt is explicitly outside this WP11 amendment scope."
+  ],
+  "pinned_supporting_evidence": [
+    {
+      "expected_sha256": "b2600e7dc71460b0043f869d9f6fae35dc9c9496936c715c11b197780b9605b8",
+      "hash_matches_expected": true,
+      "observed": "WP11 v1.3 draft technical checks PASS/pending; strict --validate exit 1 with stale subject; one changed input is package-lock.json on the diagnostic candidate.",
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/wp11-controller-diagnosis-4f90157/receipt.json",
+      "sha256": "b2600e7dc71460b0043f869d9f6fae35dc9c9496936c715c11b197780b9605b8"
+    },
+    {
+      "expected_sha256": "309a401e4a2b6f3bd78c1491b040031176f6e72c3305af4f60d4580db1c6dba4",
+      "hash_matches_expected": true,
+      "observed": "No component path overlap; PR085 package.json source-context mismatch is retained for explicit Git-snapshot/current provenance handling.",
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/component-composition-input-preflight-0c29fdb.json",
+      "sha256": "309a401e4a2b6f3bd78c1491b040031176f6e72c3305af4f60d4580db1c6dba4"
+    },
+    {
+      "expected_sha256": "2c6949e914ed59686739e32c0b3666b209c91d15e63806c70fc8ba7f7a8592e1",
+      "hash_matches_expected": true,
+      "observed": "Later combined composition records current WP11 draft PASS/pending, strict validation exit 1, and the known PR085 package.json source mismatch; its separate PR003 fixture failure is outside this WP11 scope.",
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/component-composition-initial/receipt.json",
+      "sha256": "2c6949e914ed59686739e32c0b3666b209c91d15e63806c70fc8ba7f7a8592e1"
+    }
+  ],
+  "review_mode": "bounded_read_only_candidate_vs_pinned_base",
+  "reviewed_file_hashes": [
+    {
+      "bytes": 7577,
+      "hash_and_size_match": true,
+      "path": "docs/research-program/exceptions/PR-085-ci-attestation.md",
+      "receipt_bytes": 7577,
+      "receipt_hash": "6a25ce3b72c60c1ea70e526d47914d76e15646367c717360d56ddc92f41255d6",
+      "sha256": "6a25ce3b72c60c1ea70e526d47914d76e15646367c717360d56ddc92f41255d6"
+    },
+    {
+      "bytes": 136383,
+      "hash_and_size_match": true,
+      "path": "docs/master-plan/2026-09-10/plan-source.py",
+      "receipt_bytes": 136383,
+      "receipt_hash": "9e4a7b6bdcc08026eea8a4c9e97bd6db430dddcc856c9fbdf37ff552aae1ef55",
+      "sha256": "9e4a7b6bdcc08026eea8a4c9e97bd6db430dddcc856c9fbdf37ff552aae1ef55"
+    },
+    {
+      "bytes": 1720,
+      "hash_and_size_match": true,
+      "path": "docs/master-plan/2026-09-10/validation.json",
+      "receipt_bytes": 1720,
+      "receipt_hash": "f3a5fa504017c3de91c48986e0b7190c1da88e8a9e0ab7f5624cd05ca940a130",
+      "sha256": "f3a5fa504017c3de91c48986e0b7190c1da88e8a9e0ab7f5624cd05ca940a130"
+    },
+    {
+      "bytes": 270458,
+      "hash_and_size_match": true,
+      "path": "docs/master-plan/2026-09-10/plan.json",
+      "receipt_bytes": 270458,
+      "receipt_hash": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
+      "sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d"
+    },
+    {
+      "bytes": 12316,
+      "hash_and_size_match": true,
+      "path": "docs/master-plan/2026-09-10/prs/PR-085.md",
+      "receipt_bytes": 12316,
+      "receipt_hash": "55f6e390ae59a28b00c6138628396fcfd8315f2dabe36e8ee0d474a82fb50bd0",
+      "sha256": "55f6e390ae59a28b00c6138628396fcfd8315f2dabe36e8ee0d474a82fb50bd0"
+    }
+  ],
+  "reviewer": {
+    "agent": "/root/pr003_final_contract_review",
+    "controller_requested_model": "gpt-5.6-luna",
+    "controller_requested_reasoning": "max",
+    "dispatch_note": "Controller-requested native Luna Max role; serving backend identity is not independently exposed by this interface.",
+    "serving_backend_identity": "not independently inspectable in this reviewer runtime"
+  }
+}

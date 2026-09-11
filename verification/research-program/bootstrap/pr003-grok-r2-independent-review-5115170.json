@@ -1,0 +1,144 @@
+{
+  "format": "ushso.pr003.grok-r2-independent-review.v1",
+  "disposition": "changes_requested",
+  "candidate": {
+    "head": "5115170093512b06b21c01725bb982e457797efe",
+    "tree": "24fe636b0370e2e7b9c166d6f1c6bed520ed033e",
+    "parent_component": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+    "parent_tree": "98e04d100daa94cdf9da5905c15d58a0aae6778d",
+    "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
+    "branch": "codex/ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
+    "clean_at_review": true,
+    "git_diff_check": "pass"
+  },
+  "review_execution": {
+    "agent": "/root/pr003_final_contract_review",
+    "controller_requested_model": "gpt-5.6-luna",
+    "controller_requested_reasoning_effort": "max",
+    "controller_requested_fork_turns": "none",
+    "serving_backend_identity": null,
+    "serving_backend_note": "The serving backend identity is not independently exposed by this interface; controller-requested model and reasoning are recorded separately.",
+    "scope": "Read-only bounded contract review; no repository, worktree, Git metadata, or producer-test mutation."
+  },
+  "reviewed_file_sha256_at_pinned_head": {
+    "scripts/research-program/check-handoff.mjs": "c403bd1c9a064039f1591c6e5843b62d42bf143dc37ffc4765740fc7e438001d",
+    "docs/research-program/handoffs/schema/README.md": "25422753c5905e2dc60850048d51e28402659a0599ec68c237287be355b8a2bf",
+    "docs/research-program/handoffs/schema/handoff.schema.json": "4c62652b5a03104eb69a0f66e5c025c5ecb66297fa8931a43dcc3440a7ca842e",
+    "tests/research-program/handoff.test.mjs": "02c66333186c01646b26f7fa97d8f36490112eb31f2551d064439f9978ff47fe",
+    "verification/research-program/pr-003/verify-schema-contract.mjs": "1285373ef21553de9f2f25602a9b0c0c82d7f6b2e8e5164a27c99f8c964ab844",
+    "verification/research-program/pr-003/task-binding.json": "0dea1407c432c620a7650811cd8c77f48956bb2f563361f2e1082a110cf00a7d",
+    "docs/research-program/handoffs/PR-003.json": "d7d3e7a928d4fe929b979dd584c71a6c1f8ac14bdd79c4e195aff99a4ccac13c",
+    "verification/research-program/pr-003/c003-r2-evidence-index.json": "6b1a467eeccb34c968b7a39c048d8d3d78f066401f1624d4ccb237dd9717dd15"
+  },
+  "findings": [
+    {
+      "id": "PR003-R2-F6",
+      "severity": "P1",
+      "file_lines": "scripts/research-program/check-handoff.mjs:400-414,548-560,1150-1197,1200-1213,1653-1665",
+      "trigger": "Append null to commands, artifacts, source_identities, acceptance_results, failures_and_skipped_checks, or unresolved_claims in an otherwise valid packet.",
+      "impact": "The structural guard checks array shape but not null elements. Later state maps, identifier checks, or packet checks dereference null and throw TypeError. The API does not return outcome=rejected; a CLI invocation reaches the catch and reports outcome=error with exit 2, violating docs/research-program/handoffs/schema/README.md:153-158.",
+      "minimal_fix": "Reject null elements in every semantically traversed collection before traversal, or add null-safe guards at each traversal; add API and CLI regression cases asserting schema_invalid, rejected, and exit 1."
+    },
+    {
+      "id": "PR003-R2-F7",
+      "severity": "P2",
+      "file_lines": "scripts/research-program/check-handoff.mjs:438-444; docs/research-program/handoffs/schema/README.md:148-151",
+      "trigger": "Use documented generic globs tests/*.mjs with tests/one.mjs, tests/**/*.mjs with tests/nested/one.mjs, or *.mjs with one.mjs.",
+      "impact": "The wildcard replacements look for escaped stars even though the first expression leaves stars unescaped. Single-star patterns return false; generic double-star and root-star patterns throw SyntaxError from invalid RegExp. Completed task-scope validation can reject a valid changed file or fail operationally. The current packet's suffix /** paths bypass this branch.",
+      "minimal_fix": "Translate wildcard tokens independently of regex metacharacter escaping, with slash-aware handling for ** zero-or-more segments; add one-star, interior-globstar, zero-segment, and boundary tests."
+    }
+  ],
+  "prior_findings_rechecked": {
+    "F1_fractional_timestamp_order": "fixed: full comparator orders .1239Z after .1231Z, treats .12310Z equal to .1231Z, and rejects 2026-02-30.",
+    "F2_large_git_snapshot": "fixed in pinned code: streamed Git path and typed missing/unreadable/size-limit branches are present; direct shell hashing matched the 2,449,368-byte cohorts snapshot and missing probe was absent; controller host replay passed the checker cases.",
+    "F3_top_level_malformed_packet": "fixed for null top-level and non-array collections; partially regressed by F6 for null elements.",
+    "F4_dangling_changed_symlink": "fixed: lstat distinguishes unresolved existing symlink from true absence.",
+    "F5_owner_branch_scope": "current exact and suffix-directory paths pass for all 29 changed files; generic glob behavior remains F7."
+  },
+  "executed_cases": [
+    {
+      "case": "pinned identity",
+      "result": "pass",
+      "detail": "HEAD/tree/parent matched requested pins; worktree clean; git diff --check passed."
+    },
+    {
+      "case": "verify-schema-contract",
+      "result": "pass",
+      "detail": "node verification/research-program/pr-003/verify-schema-contract.mjs returned exit 0 with task schema and 12 handoff cases."
+    },
+    {
+      "case": "fractional timestamp/calendar",
+      "result": "pass",
+      "detail": "Full fractional order and impossible-calendar controls passed."
+    },
+    {
+      "case": "immutable Git snapshot",
+      "result": "pass_with_runtime_limit",
+      "detail": "Direct pinned Git show hash for f62ce35481cc572e9aad054049c700aac6378f58:evaluation/research-program/cohorts.json matched 89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543 at 2,449,368 bytes; missing path was absent. In-process checker replay was blocked by sandbox Node child-git EPERM; controller host receipt corroborates valid and typed missing-path cases."
+    },
+    {
+      "case": "per-PR first-match binding",
+      "result": "pass",
+      "detail": "Read-only current fixture resolved sibling-task-binding and current PR-003 handoff resolved per-pr-task-binding. Scratch PR-004 did not use the PR-003 binding and reported task_binding_missing."
+    },
+    {
+      "case": "current owner/branch/scope",
+      "result": "pass",
+      "detail": "Handoff owner/branch equal the per-PR binding and all 29 changed files match exact or suffix-directory owned paths."
+    },
+    {
+      "case": "changed-file deletion versus dangling symlink",
+      "result": "pass",
+      "detail": "Scratch-root probes produced changed_file_symlink_unresolved without a deletion note for a dangling link, and changed_file_not_present only for true absence."
+    },
+    {
+      "case": "schema-invalid null/collection",
+      "result": "changes_requested",
+      "detail": "Non-array commands returned a rejected schema report, but null elements in six collections each threw TypeError."
+    },
+    {
+      "case": "expected/observed outcomes",
+      "result": "pass_for_success_claims",
+      "detail": "Current packet has 26 command records and 12 success acceptance claims; all success references resolve to matching expected/observed outcomes. One explicitly retained failed portable probe has expected 0/observed 1 and is not referenced by a success claim."
+    },
+    {
+      "case": "historical receipt/index preservation",
+      "result": "pass",
+      "detail": "All 32 preexisting receipt or evidence-index files at bf46d92 were byte-identical at the pinned head (drift 0); only five new R2 receipts and the additive R2 index appeared in the scoped diff."
+    },
+    {
+      "case": "provenance and links",
+      "result": "pass",
+      "detail": "Both schema README master-plan links resolve; R2 notes/index/schema README distinguish initial DeepSeek, failed earlier Grok, Luna R1, and Grok R2, and explicitly state packet validity is not scientific or independent acceptance."
+    }
+  ],
+  "probe_artifacts": {
+    "null_elements": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-grok-r2-independent-review/null-elements.mjs",
+      "sha256": "5728432a3c9465fae0785c1c883497d73a5c41392e2dcf4f0928363696fea71e"
+    },
+    "binding_probes": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-grok-r2-independent-review/binding-probes.mjs",
+      "sha256": "d81f88d4a403cabd072e80814d4c15a67ef43dbe8d6fd951ddb5641caf568ee5"
+    },
+    "symlink_probes": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-grok-r2-independent-review/symlink-probes.mjs",
+      "sha256": "4c5918bc6b99928be345652b17a7719302ddd80a68b0a7fc7a3cc03ccb806fad"
+    }
+  },
+  "controller_corroboration": {
+    "semantic_host_receipt": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-controller-review/5115170-semantic-host/receipt.json",
+    "semantic_host_receipt_sha256": "c6503896a31cc45732c19003b87f84965ed3af661702a9f9ea18b6ce7a671a2e",
+    "owned_path_receipt": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-controller-review/5115170-owned-path.json",
+    "owned_path_receipt_sha256": "d5be04adbdb2c2cea16b05bea232bd21115a60d9cf2eccdd99e490804ff279b8"
+  },
+  "raw_terminal_receipt": {
+    "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-grok-final-contract-terminal.json",
+    "sha256": "0d5ef369dc8754b5c1028c89178139bc67083af29f5405bb768bc989210d1d31"
+  },
+  "limitations": [
+    "The normal focused test file was not run by this reviewer because its temporary symlink/file probes write under the producer worktree; root owns that registered execution. Producer-reported 32/32 and controller host semantic replay are corroboration, not this reviewer's execution.",
+    "In-process checkHandoff against pinned main/fixture packets saw source_git_snapshot_unreadable because this sandbox denies Node child-git spawn with EPERM; direct shell Git hashing succeeded and the controller host replay passed the valid and typed negative cases.",
+    "This is packet-contract review only; it does not establish scientific acceptance, merge readiness, publication, deployment, or signature/key authenticity."
+  ]
+}

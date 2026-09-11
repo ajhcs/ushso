@@ -1,15 +1,16 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T01:22:04.009550+00:00",
+  "updated_at": "2026-09-11T03:53:13.246284+00:00",
   "plan": "docs/master-plan/2026-09-10/plan.json",
-  "plan_sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15",
+  "plan_sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
   "integration_branch": "codex/research-program-integration-20260910",
   "verified_remote_main_sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
   "controller": {
     "actor": "codex-root",
     "role_requested": "Astra Max",
     "implementation_authorship": [
-      "program documentation import and execution ledger"
+      "program documentation import and execution ledger",
+      "PR004 historical task-binding and direct-dependency handoff metadata reconstruction, separately reviewed before application"
     ],
     "independent_review_of_controller_changes": {
       "bootstrap_commit": "c92465f97df11a1e231983237f27e8c86db792b2",
@@ -36,6 +37,15 @@
         "reviewer": "gpt-5.6-luna/max",
         "evidence": "verification/research-program/bootstrap/pr002-c1-publication-accounting-review.json",
         "scope": "Accounting/publication-boundary review of root-authored receipts; not an independent re-approval of Luna's C1 implementation or its correction."
+      },
+      "pr004_binding_reconstruction": {
+        "parent_head": "cd4076792ecf6b262ae13f0e092baa9123fc2c14",
+        "applied_head": "cb74c3e7ffebd29341c2fca4f435cf36ef9e0485",
+        "reviewer": "separate native review agent, controller-requested gpt-5.6-luna/max",
+        "verdict": "metadata_candidate_passed_21_checks",
+        "review_evidence": "verification/research-program/bootstrap/pr004-final-semantic-review-cd40767.json",
+        "applied_evidence": "verification/research-program/bootstrap/pr004-binding-applied-cb74c3e.json",
+        "scope": "Metadata only; four semantic corrections remain unaccepted."
       }
     },
     "latest_integration": {
@@ -52,7 +62,19 @@
       "required_correction": "PR-085",
       "release_approval": "Both current WP0 and CI subjects require their own approval; technical checks never transfer historical approval."
     },
-    "ledger_fact_corrections": "verification/research-program/bootstrap/ledger-fact-corrections-487f06a.json"
+    "ledger_fact_corrections": "verification/research-program/bootstrap/ledger-fact-corrections-487f06a.json",
+    "latest_component_composition": {
+      "head_sha": "062a980e3c206856db9411f6c31c15127f614c9e",
+      "tree_sha": "f3089e022a8aa6811f6267bda9d2acbd039e0741",
+      "status": "failed_bounded_checks",
+      "evidence": "verification/research-program/bootstrap/component-composition-initial-062a980.json",
+      "accepted": false,
+      "findings": [
+        "PR003 fixture/live-ledger coupling",
+        "WP11 strict current subject mismatch",
+        "PR085 package.json historical-context binding"
+      ]
+    }
   },
   "providers": [
     {
@@ -71,13 +93,12 @@
       "model_reported_by_reviewer": "Grok 4.6",
       "model_identity_note": "The active managed interface records grok-4. The retained Grok 4.6 self-report belongs only to the earlier read-only boundary review and is not asserted for later implementation runs.",
       "latest_run": {
-        "run_id": "ushso-pr003-grok-final-contract-20260911",
-        "assignment_id": "grok-final-contract",
-        "status": "running",
-        "role": "correct_final_PR003_contract",
+        "run_id": "ushso-pr003-grok-r5-20260911",
+        "task_id": "ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
         "actual_model": "grok-4",
-        "evidence": "verification/research-program/bootstrap/pr003-grok-final-contract-dispatch.json",
-        "auth_observation": "Approved durable grant reused; no new login or consent request."
+        "status": "running",
+        "evidence": "verification/research-program/bootstrap/pr003-grok-r5-dispatch.json",
+        "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
@@ -490,7 +511,7 @@
     {
       "pr_id": "PR-003",
       "status": "in_progress",
-      "owner": "ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
+      "owner": "ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
       "dependencies": [
         "PR-001",
         "PR-002"
@@ -513,24 +534,24 @@
       "evidence_directory": "verification/research-program/pr-003/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/15",
       "blockers": [
-        "Final contract review requires bounded precision, large Git snapshot, malformed packet, changed-file and local task-binding consistency corrections; Grok is dispatched on the composed candidate."
+        "Actual isolated composition062a980 ran57 research tests:50pass/7fail because static PR003 fixtures read the moving controller ledger. Grok R5 is isolating controlled fixture contexts and retaining strict real ledger conflict validation; all actual PR003/PR004 current handoffs passed. Final combined gate remains required."
       ],
       "dispatch_preparation": "Three native DeepSeek slices completed; clean terminal lifecycle and producer final head are recorded.",
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-002": "verification/research-program/pr-002/controller/integration-handoff.json"
       },
-      "branch": "codex/ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
-      "base_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "branch": "codex/ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
+      "base_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
       "provider": "Grok Co-Engineer",
       "selected_model": "grok-4",
-      "selected_reasoning": null,
+      "selected_reasoning": "max",
       "actual_model": "grok-4",
-      "run_id": "ushso-pr003-grok-final-contract-20260911",
-      "dispatch_evidence": "verification/research-program/bootstrap/pr003-grok-final-contract-dispatch.json",
+      "run_id": "ushso-pr003-grok-r5-20260911",
+      "dispatch_evidence": "verification/research-program/bootstrap/pr003-grok-r5-dispatch.json",
       "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
       "producer_completion": "verification/research-program/bootstrap/pr003-native-completion-f62ce35.json",
-      "independent_review": "verification/research-program/bootstrap/pr003-final-contract-review-dc7267b.json",
+      "independent_review": "verification/research-program/bootstrap/component-composition-initial-062a980.json",
       "run_history": [
         {
           "run_id": "ushso-pr003-deepseek-20260910t220020z",
@@ -562,19 +583,51 @@
           "status": "completed_changes_requested",
           "evidence": "verification/research-program/bootstrap/pr003-composed-checks-bf46d92.json",
           "independent_review": "verification/research-program/bootstrap/pr003-final-contract-review-dc7267b.json"
+        },
+        {
+          "run_id": "ushso-pr003-grok-final-contract-20260911",
+          "provider": "Grok Co-Engineer",
+          "actual_model": "grok-4",
+          "head_sha": "5115170093512b06b21c01725bb982e457797efe",
+          "tree_sha": "24fe636b0370e2e7b9c166d6f1c6bed520ed033e",
+          "status": "completed_changes_requested",
+          "independent_review": "verification/research-program/bootstrap/pr003-grok-r2-independent-review-5115170.json",
+          "publication": "verification/research-program/bootstrap/pr003-grok-r2-publication-5115170.json"
+        },
+        {
+          "run_id": "ushso-pr003-grok-r3-20260911",
+          "provider": "Grok Co-Engineer",
+          "actual_model": "grok-4",
+          "head_sha": "0b28d036f1df4b5248732bc62f68edd79f14d06f",
+          "tree_sha": "6e2de2232e2aa0f19055751d70e5a904a38216f9",
+          "status": "completed_changes_requested",
+          "evidence": "verification/research-program/bootstrap/pr003-grok-r3-completion-0b28d03.json",
+          "independent_semantic_review": "verification/research-program/bootstrap/pr003-grok-r3-semantic-checks-0b28d03.json",
+          "remaining_finding": "verification/research-program/bootstrap/pr003-grok-r3-owned-path-checks-0b28d03.json"
+        },
+        {
+          "run_id": "ushso-pr003-composite-glob-20260911",
+          "interface": "OpenAI Codex native collaboration followup",
+          "requested_model": "gpt-5.6-luna",
+          "requested_reasoning": "max",
+          "actual_serving_model": null,
+          "status": "completed_component_verified",
+          "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
+          "tree_sha": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
+          "evidence": "verification/research-program/bootstrap/pr003-r4-final-checks-d1c42ea.json"
         }
       ],
       "review_state": "changes_requested",
       "original_integration_base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
-      "provider_task_id": "ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
-      "last_producer_head_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "provider_task_id": "ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
+      "last_producer_head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
       "publication_branch": "codex/ushso-pr003-deepseek-20260910t220020z",
       "supplemental_review_evidence": "verification/research-program/bootstrap/pr003-independent-review-93793bf.json",
       "ci_failure_evidence": "verification/research-program/bootstrap/pr003-ci-failure-f62ce35.json",
       "expected_duration_ms": null,
       "deadline_at": null,
       "controller_adjunct": "A disjoint C-003-3 inventory-test correction is authorized separately; it must not change the validator or its evolving evidence.",
-      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/ce-ushso-pr003-grok-final-c-grok-final-contract-4a5ce75f7a2c-09d51d6c",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr003-deepseek-20260910t220020z-worktrees/ce-ushso-pr003-grok-r5-2026-grok-r5-fixtures-c99b0be1d72f-ffdb9323",
       "recovery_scope": "Inspect Grok retained partial patch and finish only schema, validator, fixture and evidence corrections; original Grok run remains failed and was not replayed.",
       "inventory_correction": {
         "status": "composed_independently_checked",
@@ -594,7 +647,42 @@
         "composed_head_sha": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
         "independent_combined_review": "verification/research-program/bootstrap/pr003-composed-checks-bf46d92.json"
       },
-      "reviewer_identity_note": "The native review was controller-dispatched with gpt-5.6-luna/max. Its retained inability to inspect a serving backend is not evidence that the endpoint was unavailable; the historical raw receipt is preserved without modification."
+      "reviewer_identity_note": "The native review was controller-dispatched with gpt-5.6-luna/max. Its retained inability to inspect a serving backend is not evidence that the endpoint was unavailable; the historical raw receipt is preserved without modification.",
+      "last_producer_tree_sha": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
+      "latest_completion": "verification/research-program/bootstrap/pr003-grok-r3-completion-0b28d03.json",
+      "independent_registered_checks": "verification/research-program/bootstrap/pr003-r4-final-checks-d1c42ea.json",
+      "remaining_semantic_checks": [
+        "verification/research-program/bootstrap/component-composition-initial-062a980.json"
+      ],
+      "separate_final_review": {
+        "status": "completed_changes_requested",
+        "agent": "/root/pr003_final_contract_review",
+        "candidate_head": "5115170093512b06b21c01725bb982e457797efe",
+        "candidate_tree": "24fe636b0370e2e7b9c166d6f1c6bed520ed033e",
+        "receipt": "verification/research-program/bootstrap/pr003-grok-r2-independent-review-5115170.json"
+      },
+      "base_tree": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
+      "published_head_sha": "5115170093512b06b21c01725bb982e457797efe",
+      "model_identity_note": "Grok R5 actual model is grok-4 through the supported Co-Engineer interface; durable project/provider grant was reused.",
+      "current_component": {
+        "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
+        "tree_sha": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
+        "status": "passed_independent_component_review",
+        "functional_head": "b41c27db36b58b4bda16ded02bde3211ca02fb9d",
+        "registered_handoff_tests": 42,
+        "inventory_tests": 9,
+        "independent_composite_path_cases": 15,
+        "current_handoff_artifacts": 66,
+        "current_index_artifacts": 19,
+        "preserved_prior_receipts_indexes": 44,
+        "transport_receipt": "verification/research-program/bootstrap/pr003-r4-composition-d1c42ea.json"
+      },
+      "publication": {
+        "url": "https://github.com/ajhcs/ushso/pull/15",
+        "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
+        "draft": true,
+        "evidence": "verification/research-program/bootstrap/pr003-r4-draft-publication-d1c42ea.json"
+      }
     },
     {
       "pr_id": "PR-004",
@@ -618,7 +706,7 @@
       "evidence_directory": "verification/research-program/pr-004/",
       "github_pr_url": null,
       "blockers": [
-        "Final semantic review and concrete per-PR task-binding reconciliation remain pending. Generated artifact reproduced byte-identically; 12 field-state and 32 normalization tests passed."
+        "Final component and metadata checks pass; exact reviewed323dfe5 is published as draftPR16. The combined release gate remains pending."
       ],
       "dispatch_preparation": "Workspace ready and dispatch initiated; actual model/preflight and execution receipts will establish provider usage.",
       "prerequisites_satisfied": true,
@@ -643,11 +731,57 @@
         "Impossible calendar date accepted"
       ],
       "additional_preliminary_scope": "Immutable C1/C2 head21b1b12 only; sent to active producer for correction and final-head replay.",
-      "review_state": "changes_requested",
-      "last_producer_head_sha": "cd4076792ecf6b262ae13f0e092baa9123fc2c14",
-      "last_producer_tree_sha": "ce01ea2bc7029633116599394ca83ee3b575221c",
-      "independent_component_checks": "verification/research-program/bootstrap/pr004-final-checks-cd40767.json",
-      "handoff_contract_rejection": "verification/research-program/bootstrap/pr004-handoff-rejection-cd40767.json"
+      "review_state": "final_component_verified_integrated_gate_pending",
+      "last_producer_head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
+      "last_producer_tree_sha": "abfa7c2fd860e35c01ee11902696b015d02f6981",
+      "independent_component_checks": "verification/research-program/bootstrap/pr004-r2-final-checks-86cf1b0.json",
+      "handoff_contract_rejection": "verification/research-program/bootstrap/pr004-handoff-rejection-cd40767.json",
+      "independent_review": "verification/research-program/bootstrap/pr004-r2-semantic-checks-6980897.json",
+      "binding_correction": {
+        "head_sha": "cb74c3e7ffebd29341c2fca4f435cf36ef9e0485",
+        "tree_sha": "e81d8c9ba6882e71a6a858e3320d630f5d8e117e",
+        "root_authored": true,
+        "separate_review": "passed",
+        "actual_pinned_pr003_checker": "passed",
+        "evidence": "verification/research-program/bootstrap/pr004-binding-applied-cb74c3e.json"
+      },
+      "continuation": {
+        "status": "completed_component_verified",
+        "agent": "/root/pr_001_release_baseline",
+        "interface": "collaboration.followup_task",
+        "task_id": "ushso-pr004-field-states-20260910",
+        "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+        "branch": "codex/ushso-pr004-field-states-20260910",
+        "base_sha": "cb74c3e7ffebd29341c2fca4f435cf36ef9e0485",
+        "base_tree": "e81d8c9ba6882e71a6a858e3320d630f5d8e117e",
+        "prompt": "verification/research-program/bootstrap/pr004-final-semantic-correction-dispatch.md",
+        "prompt_sha256": "3dacae053e7832c73d63798e717d816d5187e0fce2fa571d3b431993ca1433c6",
+        "controller_requested_model": "gpt-5.6-luna",
+        "controller_requested_reasoning": "max",
+        "backend_serving_identity": null,
+        "dispatch_observation": "The existing-agent followup call returned successfully; this receipt records that observation without inventing a tool-supplied start timestamp."
+      },
+      "current_component": {
+        "head_sha": "698089727450f6d91cfde604df0340494254a281",
+        "status": "passed_independent_component_review",
+        "semantic_cases": 20,
+        "field_tests": 15,
+        "normalization_tests": 32,
+        "artifact_reproduced_exactly": true,
+        "evidence_audit": "verification/research-program/bootstrap/pr004-r2-evidence-audit-86cf1b0.json",
+        "final_head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
+        "final_tree_sha": "abfa7c2fd860e35c01ee11902696b015d02f6981",
+        "final_packet_evidence": "verification/research-program/bootstrap/pr004-final-packet-review-323dfe5.json",
+        "reference_count": 36
+      },
+      "independent_final_packet_review": "verification/research-program/bootstrap/pr004-final-packet-review-323dfe5.json",
+      "publication": {
+        "url": "https://github.com/ajhcs/ushso/pull/16",
+        "draft": true,
+        "head_sha": "323dfe54c88322369f417c7fde22597b9ab57d75",
+        "identity_and_body_readback_verified": true,
+        "evidence": "verification/research-program/bootstrap/pr004-draft-publication-323dfe5.json"
+      }
     },
     {
       "pr_id": "PR-005",
@@ -2578,7 +2712,7 @@
     },
     {
       "pr_id": "PR-085",
-      "status": "changes_requested",
+      "status": "in_progress",
       "owner": "ushso-pr085-ci-attestation-20260910",
       "dependencies": [
         "PR-001"
@@ -2595,7 +2729,10 @@
         "scripts/verify-ci-attestation.mjs",
         "verification/testing/ci/v1.4.0/",
         "tests/ci-attestation.test.mjs",
-        "package-lock.json"
+        "package-lock.json",
+        "scripts/verify-wp11-attestation.mjs",
+        "tests/wp11-attestation.test.mjs",
+        "verification/research-program/ci-attestation/wp11-v1.3.0/"
       ],
       "head_sha": null,
       "merge_sha": null,
@@ -2603,7 +2740,7 @@
       "evidence_directory": "verification/research-program/pr-085/",
       "github_pr_url": null,
       "blockers": [
-        "Full npm test retained CI v1.3 stale subject; reviewed CI v1.4 continuation must implement exact historical/current boundaries and pass the combined gate."
+        "A separately reviewed exact WP11v1.3 current-attestation correction is ready for the same PR085 owner. Current technical evidence is pending authorization; no historical approval may transfer. Final combined gate also requires the independently delegated PR003 fixture-context correction."
       ],
       "planned_atomic_commits": 3,
       "prerequisites_satisfied": true,
@@ -2612,8 +2749,8 @@
       "independent_plan_review": "verification/research-program/bootstrap/ci-attestation-plan-independent-review.json",
       "dispatch_preparation": "Started in a verified fresh local-exact-SHA worktree; final implementation and independent acceptance are pending.",
       "provider": "OpenAI Codex",
-      "selected_model": "Luna Max",
-      "actual_model": "Luna Max",
+      "selected_model": "gpt-5.6-luna",
+      "actual_model": null,
       "selected_reasoning": "max",
       "run_id": "ushso-pr085-ci-attestation-20260910",
       "base_sha": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
@@ -2621,24 +2758,81 @@
       "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
       "branch": "codex/ushso-pr085-ci-attestation-20260910",
       "dispatch_evidence": "verification/research-program/bootstrap/pr085-native-dispatch.json",
-      "last_producer_head_sha": "620ed231bd9565e13af76c6647e85f3eae067126",
-      "last_producer_tree_sha": "cfc34edf071e35d8709620c72d0436b9ba943c15",
-      "review_state": "changes_requested",
+      "last_producer_head_sha": "4f90157108a92ce9541c340d5536eac31f24a1d8",
+      "last_producer_tree_sha": "ba468220ab24bb560d2f8fb6bac83aa94ee61070",
+      "review_state": "reviewed_wp11_correction_ready",
       "continuation": {
         "scope": "Reviewed CI v1.4 inventory/attestation correction under the same PR085 task branch/worktree with serialized writer ownership.",
         "plan_evidence": "verification/research-program/bootstrap/ci-v14-plan-amendment.json",
         "independent_review": "verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
         "prior_component_head": "620ed231bd9565e13af76c6647e85f3eae067126",
-        "status": "authorized_pending_same_task_resume",
+        "status": "completed_component_verified_followup_scope_diagnosis",
         "prohibited_changes": [
           "root package.json",
           "all prior CI versions and approvals",
           "scientific thresholds",
           "frozen inputs"
-        ]
+        ],
+        "agent": "/root/pr002_c1_corrections",
+        "interface": "collaboration.followup_task",
+        "head_sha": "4ad67220df54334f70d891fd26d1778f83328d54",
+        "tree_sha": "02544973bf065b3825c8b189f186a598da99a223",
+        "evidence": "verification/research-program/bootstrap/pr085-ci-v14-continuation-4ad6722.json",
+        "writer_scope": "Same bootstrap task, branch and worktree; root merge lease released before implementer resume."
       },
       "ci_diagnostic": "verification/research-program/bootstrap/ci-v13-diagnosis-7cfbb96.json",
-      "independent_component_checks": "verification/research-program/bootstrap/pr085-c2-independent-checks-86b7f7e.json"
+      "independent_component_checks": "verification/research-program/bootstrap/pr085-c3-independent-checks-620ed23.json",
+      "model_identity_note": "Luna Max is the requested role; native controller dispatch selects gpt-5.6-luna/max, while this interface does not independently attest the serving backend. Historical producer labels are retained in their receipts.",
+      "current_ci_component": {
+        "head_sha": "6ed7fb4cb24199977034cf86bb3f0b4a928513be",
+        "tree_sha": "959cdb237f1b733af839bd72747761d837e8ba04",
+        "status": "passed_independent_component_review",
+        "independent_review": "verification/research-program/bootstrap/pr085-ci-v14-atomic-pair-checks-6ed7fb4.json",
+        "previous_review": "verification/research-program/bootstrap/pr085-ci-v14-independent-review-d182635.json",
+        "semantic_cases": 12,
+        "focused_tests": 10,
+        "current_approval": null,
+        "release_gate_pass": false,
+        "disposition": "Complete original and reviewed input pairs pass; either partial transition rejects. Direct pending CLI exit 2 preserved. Final handoff/evidence and combined gate pending.",
+        "final_head_sha": "4f90157108a92ce9541c340d5536eac31f24a1d8",
+        "final_tree_sha": "ba468220ab24bb560d2f8fb6bac83aa94ee61070",
+        "final_packet_evidence": "verification/research-program/bootstrap/pr085-final-packet-review-4f90157.json",
+        "reference_count": 41
+      },
+      "independent_final_packet_review": "verification/research-program/bootstrap/pr085-final-packet-review-4f90157.json",
+      "wp11_diagnosis": {
+        "producer_evidence": "verification/research-program/bootstrap/pr085-wp11-producer-diagnosis-9c8cba9.json",
+        "independent_evidence": "verification/research-program/bootstrap/wp11-current-subject-independent-diagnosis-4f90157.json",
+        "approved_subject_sha256": "294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98",
+        "current_subject_sha256": "8d3409bc360d9b295c5c21f9b1a2d6ad91f42ff5c946a14aff92cd4b7d97c259",
+        "current_approval": null,
+        "release_gate_pass": false,
+        "all_selected_package_audit": {
+          "status": "static_audit_received_bounded_accounting_corrections_requested",
+          "agent": "/root/pr_001_release_baseline",
+          "scope": "Read-only20selected-package inventory and prospective PR003/PR004 input overlay; no implementation, approval or fullgate.",
+          "provisional_receipt_sha256": "f59706bcbaf7f6a8f64013b2c421c822b8ca9d0d93632fc85ce1a239dec2395b",
+          "correction": "Correct a mistyped PR003 commit lookup and distinguish both supported complete CI input pairs. No new source-package failure was executed by the static audit."
+        }
+      },
+      "wp11_continuation": {
+        "status": "reviewed_ready_for_same_owner",
+        "component_base_head": "4f90157108a92ce9541c340d5536eac31f24a1d8",
+        "plan_evidence": "verification/research-program/bootstrap/wp11-plan-amendment.json",
+        "independent_review": "verification/research-program/bootstrap/wp11-plan-independent-review.json",
+        "new_owned_paths": [
+          "scripts/verify-wp11-attestation.mjs",
+          "tests/wp11-attestation.test.mjs",
+          "verification/research-program/ci-attestation/wp11-v1.3.0/"
+        ],
+        "no_workspace_or_dependency_change": true
+      },
+      "publication": {
+        "url": "https://github.com/ajhcs/ushso/pull/17",
+        "head_sha": "4f90157108a92ce9541c340d5536eac31f24a1d8",
+        "draft": true,
+        "evidence": "verification/research-program/bootstrap/pr085-draft-publication-4f90157.json"
+      }
     }
   ],
   "external_inputs": [
@@ -2833,6 +3027,27 @@
       "evidence": "verification/research-program/bootstrap/ci-v14-plan-amendment.json",
       "independent_review": "verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
       "independent_review_state": "accepted"
+    },
+    {
+      "reason": "Independently reproduced WP11 stale subject requires one exact current technical adapter while preserving historical approval and direct strict validation.",
+      "previous_plan_sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15",
+      "plan_sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
+      "changed_prs": [
+        "PR-085"
+      ],
+      "initial_scope": {
+        "prs": 84,
+        "commits": 252
+      },
+      "current_scope": {
+        "prs": 85,
+        "commits": 255
+      },
+      "requirements_and_frozen_inputs_unchanged": true,
+      "dependencies_unchanged": true,
+      "evidence": "verification/research-program/bootstrap/wp11-plan-amendment.json",
+      "independent_review": "verification/research-program/bootstrap/wp11-plan-independent-review.json",
+      "independent_review_state": "accepted_with_implementation_conditions"
     }
   ]
 }

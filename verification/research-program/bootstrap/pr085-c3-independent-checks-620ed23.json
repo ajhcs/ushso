@@ -1,0 +1,57 @@
+{
+  "format": "ushso.pr085.c3-independent-checks.v1",
+  "reviewer": "root Astra",
+  "head_sha": "620ed231bd9565e13af76c6647e85f3eae067126",
+  "tree_sha": "cfc34edf071e35d8709620c72d0436b9ba943c15",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-controller-review-20260911",
+  "source_sha256": {
+    "scripts/run-contract-suites.mjs": "854e4e5fbc5e52004d28f06d81ee2b745bae729fe68d3f54f8e82b02250f6bc0",
+    "scripts/verify-wp0-attestation.mjs": "04c39620d29104b3a096b976f7cb23c420300ee61cf565ff6c605e619afac3cd",
+    "tests/wp0-attestation.test.mjs": "e76f72f8765fc8164d5b6ed77c40fb94195e72c8e1aff6af521acbb4cf5719b8"
+  },
+  "commands": [
+    {
+      "label": "focused-real-child-tests",
+      "argv": [
+        "node",
+        "--test",
+        "tests/wp0-attestation.test.mjs"
+      ],
+      "started_at": "2026-09-11T01:44:45.830725+00:00",
+      "completed_at": "2026-09-11T01:45:29.720970+00:00",
+      "exit_code": 0,
+      "reported_test_count": 10,
+      "stdout_sha256": "0cb4b60d5ff9450363bfc8a77036b29f166582ba5650637e47f2b90e8ea4c3f6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "label": "direct-wp0-validate",
+      "argv": [
+        "node",
+        "verification/wp0/v1.4.0/tools/verify.mjs",
+        "--validate"
+      ],
+      "started_at": "2026-09-11T01:45:29.721047+00:00",
+      "completed_at": "2026-09-11T01:45:51.159627+00:00",
+      "exit_code": 1,
+      "reported_test_count": null,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d502e360fc5fc85324c4191cc532f53c4dbad7cf15fce822207d8eae08098b5d",
+      "passed": true
+    }
+  ],
+  "status": "passed",
+  "verified_behaviors": [
+    "Actual runner retains successful test execution and positive counts before current WP0 validation.",
+    "Actual future-version child exit 17 remains failed and does not receive the special current route.",
+    "Actual zero-test child remains failed.",
+    "Actual injected current-attestation child exit 23 remains failed.",
+    "Direct WP0 validation still rejects the current unapproved subject."
+  ],
+  "limitations": [
+    "This is the immutable WP0 component at 620ed23; subsequent CI v1.4 implementation remains unverified.",
+    "No full combined npm test/build/CF dry-run or release acceptance.",
+    "Current technical success does not confer historical or current release approval."
+  ]
+}

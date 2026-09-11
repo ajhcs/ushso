@@ -1,0 +1,281 @@
+{
+  "affected_inputs": {
+    "approved_technical_evidence_file_count": 154,
+    "changed_approved_inputs": [
+      {
+        "approved": {
+          "bytes": 134190,
+          "path": "package-lock.json",
+          "sha256": "af2070ae111bc67c397b07e33b44c1fbd15bba31b63210990068943998e1bc28"
+        },
+        "current": {
+          "bytes": 134511,
+          "path": "package-lock.json",
+          "sha256": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c"
+        },
+        "path": "package-lock.json"
+      }
+    ],
+    "historical_approval": {
+      "bytes": 674,
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "kind": "approval",
+      "path": "verification/wp11/v1.3.0/approvals/approval.json",
+      "sha256": "c571ce5183f7a384db60d7f23dd605bcd51545e7ac38347a7b0766c67372e3d1"
+    },
+    "historical_approved_receipt": {
+      "bytes": 32419,
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "kind": "approved_receipt",
+      "path": "verification/wp11/v1.3.0/receipts/approved.json",
+      "sha256": "e596e1b18a0251f611990c9752e1d12fb36cd05dab16bf55cf96e8d1fc431f9d"
+    },
+    "historical_evidence": {
+      "bytes": 764,
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "kind": "evidence",
+      "path": "verification/wp11/v1.3.0/approvals/evidence.txt",
+      "sha256": "b77cf81e309d88b52bd1ed9502f39459697c0dffa16d0c87d2889c5d5ae59422"
+    },
+    "package": "verification/wp11/v1.3.0",
+    "package_lock_delta_from_base": {
+      "added_line_samples": [
+        "    \"node_modules/@ushso/ci-verification-successor-v1-4\": {",
+        "      \"resolved\": \"verification/testing/ci/v1.4.0\",",
+        "      \"link\": true",
+        "    },",
+        "    \"verification/testing/ci/v1.4.0\": {",
+        "      \"name\": \"@ushso/ci-verification-successor-v1-4\",",
+        "      \"version\": \"1.4.0\",",
+        "      \"engines\": {",
+        "        \"node\": \">=22.15.0\"",
+        "      }",
+        "    },"
+      ],
+      "added_lines": 11,
+      "base_bytes": 134190,
+      "base_commit": "4ad67220df54334f70d891fd26d1778f83328d54",
+      "base_sha256": "af2070ae111bc67c397b07e33b44c1fbd15bba31b63210990068943998e1bc28",
+      "current_bytes": 134511,
+      "current_sha256": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c",
+      "reason": "additive npm workspace link for verification/testing/ci/v1.4.0; no deletion",
+      "removed_lines": 0
+    },
+    "unchanged_relevant_inputs": [
+      {
+        "approved_sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
+        "bytes": 3555,
+        "path": "package.json",
+        "sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c"
+      },
+      {
+        "approved_sha256": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c",
+        "bytes": 7191,
+        "path": "verification/successor-support.mjs",
+        "sha256": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c"
+      }
+    ]
+  },
+  "final_pr085_artifacts": {
+    "current_ci_v14_replay": {
+      "bytes": 11054,
+      "path": "verification/research-program/ci-attestation/current-ci-v1.4-replay.json",
+      "sha256": "8449f912452cfc828cbee1b72605634f298304220c0600adbb8359b906987cf4"
+    },
+    "evidence_index": {
+      "bytes": 19395,
+      "path": "verification/research-program/pr-085/evidence-index.json",
+      "sha256": "5e312cfd25fe254523c43a2b04d53a9ea8bec5ca691f1347b1a3f3a9a3fd6590"
+    },
+    "handoff": {
+      "bytes": 55086,
+      "path": "docs/research-program/handoffs/PR-085.json",
+      "sha256": "4c092ea1b1ac1df420edb38cc061d00d56fec4ef2fd0222151070e17338149f1"
+    }
+  },
+  "finding": {
+    "approval_subject_sha256": "294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98",
+    "command": "npm test",
+    "command_id": "cmd-0022-aa4a557b",
+    "completed_at": "2026-09-11T02:09:54.560Z",
+    "current_draft_subject_sha256": "8d3409bc360d9b295c5c21f9b1a2d6ad91f42ff5c946a14aff92cd4b7d97c259",
+    "error": "SUCCESSOR_APPROVAL_STALE_SUBJECT",
+    "exit_code": 1,
+    "id": "PR085-WP11-STALE-SUBJECT",
+    "meaning": "The shared successor validator compares the immutable approval subject with a freshly built current draft. The current draft includes current technical-evidence file pins, so an unchanged historical approval is correctly rejected after the package-lock input changed.",
+    "severity": "gate_blocking",
+    "stage": "verification/wp11/v1.3.0:validate",
+    "started_at": "2026-09-11T02:04:05.057Z",
+    "stderr_log": {
+      "bytes": 259,
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085-v14/agentctl-state/tasks/ushso-pr085-ci-attestation-v14-20260910/logs/cmd-0022-aa4a557b/stderr.log",
+      "sha256": "a68e7527aaf915307bdba5bde9a67c150ef044dd810d270432d6e79377e3bb92"
+    },
+    "stdout_context": "WP11 test completed 4/4 immediately before validate; validate emitted no PASS output; fail-fast stopped the chain before WP12.",
+    "stdout_log": {
+      "bytes": 215642,
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085-v14/agentctl-state/tasks/ushso-pr085-ci-attestation-v14-20260910/logs/cmd-0022-aa4a557b/stdout.log",
+      "sha256": "bd7d7b42daf4f196c0a3b86c45402ad86b11850604a3d726c82559598e49c603"
+    }
+  },
+  "format": "ushso.pr085-wp11-diagnosis.v1",
+  "limitations": [
+    "Read-only diagnosis; no full-chain rerun and no approvals, proof bytes, repository files, providers, network or private evaluator inputs were changed.",
+    "The retained npm test is fail-fast, so WP12 and later suites were not observed in this command. Static route review covered the selected WP0 v1.4, WP11 v1.3, CI v1.4 and superseded CI v1.3 validators only.",
+    "The diagnosis identifies package-lock as the only changed file in the approved WP11 technical-evidence file set; it does not assert that all future PR changes are safe without a separately reviewed transition binding."
+  ],
+  "pin": {
+    "base_used_for_lock_delta": "4ad67220df54334f70d891fd26d1778f83328d54",
+    "commit": "9c8cba903d296238e145d331512f2a63583278bf",
+    "repository": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-ci-attestation-20260910",
+    "tree": "3b1378e7c9981f92f501edead1e4501f244b4703"
+  },
+  "review_type": "bounded_read_only_diagnostic",
+  "reviewer": {
+    "actor": "luna-max",
+    "model": "Luna Max",
+    "role": "diagnosis only; no PR acceptance"
+  },
+  "selected_successor_review": [
+    {
+      "alias": "wp0",
+      "historical_subject_sha256": "0098ee424bc58120f48167c580b7db19b556d0aee42929d1da56664f78993cb5",
+      "path": "verification/wp0/v1.4.0",
+      "route": "exact reviewed current-attestation adapter",
+      "source": {
+        "bytes": 9396,
+        "path": "scripts/verify-wp0-attestation.mjs",
+        "sha256": "04c39620d29104b3a096b976f7cb23c420300ee61cf565ff6c605e619afac3cd"
+      },
+      "status": "handled by scripts/verify-wp0-attestation.mjs; current draft remains pending and direct package semantics remain strict",
+      "validate_command": "node tools/verify.mjs --validate",
+      "version": "1.4.0"
+    },
+    {
+      "alias": "wp11",
+      "path": "verification/wp11/v1.3.0",
+      "route": "generic runSuccessorCli",
+      "source": {
+        "bytes": 560,
+        "path": "verification/wp11/v1.3.0/tools/verify.mjs",
+        "sha256": "442b6cc6e69fae121b25a5c4f44e7b8eb3a96d2a102d115d9d206806ac9085c4"
+      },
+      "status": "observed blocker: historical approval subject is coupled to current technical evidence; no WP11 current adapter exists",
+      "validate_command": "node tools/verify.mjs --validate",
+      "version": "1.3.0"
+    },
+    {
+      "alias": "ci-verification",
+      "path": "verification/testing/ci/v1.4.0",
+      "route": "exact reviewed current-attestation adapter",
+      "source": {
+        "bytes": 22582,
+        "path": "scripts/verify-ci-attestation.mjs",
+        "sha256": "914ad3b3b0d65ff8ba901669d0081f099758442ddfcd328e71aa0d0222fc2b75"
+      },
+      "status": "handled by scripts/verify-ci-attestation.mjs; current draft remains pending_authorized_review",
+      "validate_command": "node tools/validate-package.mjs --validate",
+      "version": "1.4.0"
+    },
+    {
+      "alias": "ci-verification",
+      "approved_subject_sha256": "11b8c7269bf293e67690d713a9e9748b977fb3197f039cb9966e5647d05d2ccb",
+      "path": "verification/testing/ci/v1.3.0",
+      "route": "superseded predecessor; not selected by latest-version discovery",
+      "source": {
+        "bytes": 3086,
+        "path": "verification/testing/ci/v1.3.0/tools/validate-package.mjs",
+        "sha256": "be0db8c467717488d2312360535650cdecf3700b1e671d42f9a1b88e6a03f581"
+      },
+      "status": "historical proof retained; no claim that predecessor current validation passes after current lock transition",
+      "validate_command": "node tools/validate-package.mjs --validate",
+      "version": "1.3.0"
+    }
+  ],
+  "smallest_bounded_scope": {
+    "alternative_governance_path": "If current authorization is intentionally issued instead of adding a versioned adapter, issue a new approval/receipt for the exact current subject without mutating historical files; that is an authorization/publication decision, not a validator bypass.",
+    "forbidden_shortcuts": [
+      "Do not rewrite or repin old WP11 approval/evidence/receipt",
+      "Do not broaden generic runSuccessorCli drift allowances or waive SUCCESSOR_APPROVAL_STALE_SUBJECT",
+      "Do not treat a current draft as approved or infer release eligibility",
+      "Do not claim later suites passed because fail-fast stopped at WP11"
+    ],
+    "preserve": [
+      "WP11 v1.3 test stage and all original aggregate ordering",
+      "verification/wp11/v1.3.0 approval/evidence/approved receipt bytes as historical proof",
+      "generic direct WP11 v1.3 --validate strict subject and approval checks",
+      "current approval and release boundaries"
+    ],
+    "recommendation": "Add a separately versioned WP11 current-attestation adapter/validator and exact aggregate route, analogous to the already reviewed WP0 and CI v1.4 adapters. It must build a fresh subject from current WP11 evidence, report pending_authorized_review with null approval and all release flags false, and be selected only for the exact reviewed WP11 descriptor.",
+    "required_evidence": [
+      "hash-bound current input set including package-lock 37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c and any separately reviewed future input transitions",
+      "focused route and negative tests proving no generic bypass, child failure propagation and pending current status",
+      "external binding of the new current descriptor/version and exact source hashes"
+    ]
+  },
+  "source_bindings": [
+    {
+      "bytes": 7191,
+      "lines": "12-17,22-33,66-111",
+      "path": "verification/successor-support.mjs",
+      "role": "shared draft/approval validator; strict subject equality",
+      "sha256": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c"
+    },
+    {
+      "bytes": 19967,
+      "lines": "266-285",
+      "path": "verification/wp11/v1.3.0/tools/technical-evidence.mjs",
+      "role": "WP11 current evidence builder reads package.json/package-lock.json",
+      "sha256": "a49f9b19868ccadfc4bca5b748513ffdaf2f873b77c2da7e3609f7d7fe5b3838"
+    },
+    {
+      "bytes": 560,
+      "lines": "3-8",
+      "path": "verification/wp11/v1.3.0/tools/verify.mjs",
+      "role": "WP11 generic successor CLI entrypoint",
+      "sha256": "442b6cc6e69fae121b25a5c4f44e7b8eb3a96d2a102d115d9d206806ac9085c4"
+    },
+    {
+      "bytes": 376,
+      "lines": "1-14",
+      "path": "verification/wp11/v1.3.0/package.json",
+      "role": "WP11 v1.3 package descriptor",
+      "sha256": "c46b28a1866897693ced4518d46568f707bd824b086801ce485ea00afffb482d"
+    },
+    {
+      "bytes": 26687,
+      "lines": "265-280,305-311,384-426,458-500",
+      "path": "scripts/run-contract-suites.mjs",
+      "role": "latest-suite selection and exact WP0/CI v1.4 current routes",
+      "sha256": "9cc9efb8f29bf6a9ba93fe619e7fd1d0e519fce5cb0f37bf8747f199611cb647"
+    },
+    {
+      "bytes": 9396,
+      "lines": "entrypoint",
+      "path": "scripts/verify-wp0-attestation.mjs",
+      "role": "WP0 current-attestation adapter",
+      "sha256": "04c39620d29104b3a096b976f7cb23c420300ee61cf565ff6c605e619afac3cd"
+    },
+    {
+      "bytes": 22582,
+      "lines": "entrypoint",
+      "path": "scripts/verify-ci-attestation.mjs",
+      "role": "CI v1.4 current-attestation adapter",
+      "sha256": "914ad3b3b0d65ff8ba901669d0081f099758442ddfcd328e71aa0d0222fc2b75"
+    },
+    {
+      "bytes": 3172,
+      "lines": "entrypoint",
+      "path": "verification/testing/ci/v1.4.0/tools/validate-package.mjs",
+      "role": "CI v1.4 strict direct validator/current evidence builder",
+      "sha256": "0413b0a140ec4e339199be1494d9146a7191e7e5d689b2cbeb5de68a8500bc41"
+    },
+    {
+      "bytes": 3086,
+      "lines": "entrypoint",
+      "path": "verification/testing/ci/v1.3.0/tools/validate-package.mjs",
+      "role": "CI v1.3 superseded predecessor validator",
+      "sha256": "be0db8c467717488d2312360535650cdecf3700b1e671d42f9a1b88e6a03f581"
+    }
+  ]
+}
