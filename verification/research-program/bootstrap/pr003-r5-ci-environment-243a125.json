@@ -1,0 +1,31 @@
+{
+  "format": "ushso.pr003.r5-ci-environment-diagnosis.v1",
+  "reviewer": "root Astra",
+  "head_sha": "243a12510eb8ed3c7646d8a4d5d151a46b3cf28a",
+  "tree_sha": "e55c6413693acb39661c1457fcfee109603b6cc9",
+  "argv": [
+    "node",
+    "--test",
+    "--test-name-pattern=the observed combined-head ledger base",
+    "tests/research-program/handoff.test.mjs"
+  ],
+  "started_at": "2026-09-11T04:19:04.399025+00:00",
+  "completed_at": "2026-09-11T04:19:04.521469+00:00",
+  "environment_delta": {
+    "TMPDIR": "absent",
+    "RUNNER_TEMP": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-controller-review/243a125-ci-environment",
+    "CI": "1"
+  },
+  "exit_code": 1,
+  "stdout_sha256": "c94fd18b81e35c93ff93275f7193daff389a7414c498f5813919fd2f9b5b5568",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "demonstrated_failure": true,
+  "workflow_sha256": "7f8a7cadc6d6b4b974cf3014a3df68fd3a18671304244cb31a08f87200e330fc",
+  "test_sha256": "c94169ffa752025f659f1e375a792bc1fecee79214e197a35e6849e9409f4899",
+  "finding": "R5 makes TMPDIR mandatory. The unchanged CI workflow does not set it. With RUNNER_TEMP available and TMPDIR absent, the actual selected regression test fails before its assertions.",
+  "limits": [
+    "This is a local replay of the missing-TMPDIR condition, not a hosted CI result.",
+    "The ordinary wrapper-supplied TMPDIR registered suite passed 49 tests in the separate retained receipt.",
+    "No broad release gate or whole PR acceptance is established."
+  ]
+}
