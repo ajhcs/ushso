@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T07:25:11.105137Z",
+  "updated_at": "2026-09-11T13:07:29.829778Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -49,18 +49,23 @@
       }
     },
     "latest_integration": {
-      "pr_id": "PR-002",
-      "merge_sha": "5647e81457b606bb36456e75c48f990ce21e9c6c",
-      "reviewed_producer_head": "2ff1695e9d3dd79deeffa775f78202311874fcf1",
-      "github_pr_url": "https://github.com/ajhcs/ushso/pull/14",
-      "evidence": "verification/research-program/bootstrap/pr002-acceptance-2ff1695.json"
+      "pr_ids": [
+        "PR-003",
+        "PR-004",
+        "PR-085"
+      ],
+      "merge_sha": "548edf64c20f474d6832996ce5ac29e0ff25be0b",
+      "tree_sha": "906a465404ce2ba167041f36a8474bcdd2a0f40a",
+      "github_pr_url": "https://github.com/ajhcs/ushso/pull/18",
+      "evidence": "verification/research-program/bootstrap/components-463f092/index.json"
     },
     "latest_ci": {
-      "candidate_head": "61ca92638d1aa87573f4d55be0f5c896f4b0818e",
-      "status": "failed",
-      "evidence": "verification/research-program/bootstrap/ci-failure-61ca926.json",
-      "required_correction": "PR-085",
-      "release_approval": "Both current WP0 and CI subjects require their own approval; technical checks never transfer historical approval."
+      "candidate_head": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+      "actual_checkout_head": "18ec956a31976e737b9b217f51a20016bf155983",
+      "actual_checkout_tree": "906a465404ce2ba167041f36a8474bcdd2a0f40a",
+      "status": "passed",
+      "evidence": "verification/research-program/bootstrap/components-463f092/hosted-ci/receipt.json",
+      "current_successor_approval": "pending PR082; not transferred by successful CI"
     },
     "ledger_fact_corrections": "verification/research-program/bootstrap/ledger-fact-corrections-487f06a.json",
     "latest_component_composition": {
@@ -139,7 +144,7 @@
       }
     ],
     "latest_packaging_review": {
-      "status": "independently_verified_pending_combined_gate",
+      "status": "independently_verified_and_integrated",
       "head_sha": "78d164e816049c45193b17c2267f64c8fb783399",
       "tree_sha": "618d3e8bf4e9e147b8e523e813de3648b3742b11",
       "functional_head_sha": "af642ce8e3cc3fe2ee2a3da2a4fc5e1e30be9aa9",
@@ -161,13 +166,13 @@
       "findings": []
     },
     "next_component_candidate": {
-      "pr003_head": "4a47dde1676cdb6e4063ba166a2ce3e9e6f47e6e",
-      "pr004_head": "78d164e816049c45193b17c2267f64c8fb783399",
-      "pr085_head": "70c7a4c3231041f22a1c7475e70c6186a1aa7d6c",
-      "status": "reviewed_components_ready_for_changed_composition",
-      "full_gate_pending": true,
-      "combined_hosted_ci_pending": true,
-      "accepted": false
+      "status": "accepted_and_integrated",
+      "head_sha": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+      "tree_sha": "906a465404ce2ba167041f36a8474bcdd2a0f40a",
+      "merge_sha": "548edf64c20f474d6832996ce5ac29e0ff25be0b",
+      "full_gate_pending": false,
+      "combined_hosted_ci_pending": false,
+      "accepted": true
     }
   },
   "providers": [
@@ -610,8 +615,8 @@
     },
     {
       "pr_id": "PR-003",
-      "status": "independent_review",
-      "owner": "ce-ushso-pr003-grok-r7-2026-grok-r7-finalize-606127415ace-2aec4b10",
+      "status": "integrated",
+      "owner": null,
       "dependencies": [
         "PR-001",
         "PR-002"
@@ -629,13 +634,11 @@
         "tests/contract-package-inventory.test.mjs"
       ],
       "head_sha": "4a47dde1676cdb6e4063ba166a2ce3e9e6f47e6e",
-      "merge_sha": null,
+      "merge_sha": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
       "handoff": "docs/research-program/handoffs/PR-003.json",
       "evidence_directory": "verification/research-program/pr-003/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/15",
-      "blockers": [
-        "PR004 packaging is independently verified. Changed combined full gate and fresh combined hosted CI precede component acceptance."
-      ],
+      "blockers": [],
       "dispatch_preparation": "Three native DeepSeek slices completed; clean terminal lifecycle and producer final head are recorded.",
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
@@ -835,12 +838,17 @@
         "current_index_artifacts": 19,
         "preserved_prior_receipts_indexes": 44,
         "transport_receipt": "verification/research-program/bootstrap/pr003-r4-composition-d1c42ea.json"
-      }
+      },
+      "integration_merge_sha": "548edf64c20f474d6832996ce5ac29e0ff25be0b",
+      "controller_handoff": "verification/research-program/bootstrap/components-463f092/pr-003-integration-handoff.json",
+      "artifact_manifest": "verification/research-program/bootstrap/components-463f092/pr-003-artifact-manifest.json",
+      "independent_acceptance": "verification/research-program/bootstrap/components-463f092/acceptance.json",
+      "integration_evidence": "verification/research-program/bootstrap/components-463f092/index.json"
     },
     {
       "pr_id": "PR-004",
-      "status": "independent_review",
-      "owner": "ce-ushso-pr004-packaging-r2-grok-packaging-r2-01a0f666097f-0f55e924",
+      "status": "integrated",
+      "owner": null,
       "dependencies": [
         "PR-002"
       ],
@@ -854,13 +862,11 @@
         "tests/research-program/field-states.test.mjs"
       ],
       "head_sha": "78d164e816049c45193b17c2267f64c8fb783399",
-      "merge_sha": null,
+      "merge_sha": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
       "handoff": "docs/research-program/handoffs/PR-004.json",
       "evidence_directory": "verification/research-program/pr-004/",
-      "github_pr_url": null,
-      "blockers": [
-        "Corrected lossless packaging and the final current handoff are independently verified. A changed complete component gate and fresh combined hosted CI precede acceptance and PR005/007 dispatch."
-      ],
+      "github_pr_url": "https://github.com/ajhcs/ushso/pull/16",
+      "blockers": [],
       "dispatch_preparation": "Workspace ready and dispatch initiated; actual model/preflight and execution receipts will establish provider usage.",
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
@@ -1068,16 +1074,23 @@
           "negative_case_expected_exit": 1,
           "handoff_finished": false
         }
-      ]
+      ],
+      "integration_merge_sha": "548edf64c20f474d6832996ce5ac29e0ff25be0b",
+      "controller_handoff": "verification/research-program/bootstrap/components-463f092/pr-004-integration-handoff.json",
+      "artifact_manifest": "verification/research-program/bootstrap/components-463f092/pr-004-artifact-manifest.json",
+      "independent_acceptance": "verification/research-program/bootstrap/components-463f092/acceptance.json",
+      "integration_evidence": "verification/research-program/bootstrap/components-463f092/index.json"
     },
     {
       "pr_id": "PR-005",
-      "status": "planned",
+      "status": "ready",
       "owner": null,
       "dependencies": [
         "PR-004"
       ],
-      "dependency_merge_shas": {},
+      "dependency_merge_shas": {
+        "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce"
+      },
       "owned_paths": [
         "packages/retrieval/tools/retrieval-core-v1.2.mjs",
         "worker/public-query-service.mjs",
@@ -1100,7 +1113,12 @@
       "handoff": "docs/research-program/handoffs/PR-005.json",
       "evidence_directory": "verification/research-program/pr-005/",
       "github_pr_url": null,
-      "blockers": []
+      "blockers": [],
+      "prerequisites_satisfied": true,
+      "dependency_handoffs": {
+        "PR-004": "verification/research-program/bootstrap/components-463f092/pr-004-integration-handoff.json"
+      },
+      "dispatch_preparation": "PR004 is independently accepted and merged; consume its exact integration handoff and manifest. PR003 validation and PR085 technical attestation boundaries are present in the integration base."
     },
     {
       "pr_id": "PR-006",
@@ -1126,12 +1144,14 @@
     },
     {
       "pr_id": "PR-007",
-      "status": "planned",
+      "status": "ready",
       "owner": null,
       "dependencies": [
         "PR-004"
       ],
-      "dependency_merge_shas": {},
+      "dependency_merge_shas": {
+        "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce"
+      },
       "owned_paths": [
         "packages/identity/src/",
         "packages/identity/schemas/",
@@ -1143,7 +1163,12 @@
       "handoff": "docs/research-program/handoffs/PR-007.json",
       "evidence_directory": "verification/research-program/pr-007/",
       "github_pr_url": null,
-      "blockers": []
+      "blockers": [],
+      "prerequisites_satisfied": true,
+      "dependency_handoffs": {
+        "PR-004": "verification/research-program/bootstrap/components-463f092/pr-004-integration-handoff.json"
+      },
+      "dispatch_preparation": "PR004 is independently accepted and merged; consume its exact integration handoff and manifest. PR003 validation and PR085 technical attestation boundaries are present in the integration base."
     },
     {
       "pr_id": "PR-008",
@@ -2999,8 +3024,8 @@
     },
     {
       "pr_id": "PR-085",
-      "status": "independent_review",
-      "owner": "ce-ushso-pr085-wp11-grok-20-grok-wp11-29992045ca68-40d94a09",
+      "status": "integrated",
+      "owner": null,
       "dependencies": [
         "PR-001"
       ],
@@ -3022,14 +3047,11 @@
         "verification/research-program/ci-attestation/wp11-v1.3.0/"
       ],
       "head_sha": "70c7a4c3231041f22a1c7475e70c6186a1aa7d6c",
-      "merge_sha": null,
+      "merge_sha": "34ca9dd1d68896a091fe18116bcff8abf8bed33b",
       "handoff": "docs/research-program/handoffs/PR-085.json",
       "evidence_directory": "verification/research-program/pr-085/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/17",
-      "blockers": [
-        "PR004 packaging is independently verified. Changed combined full gate and fresh combined hosted CI precede component acceptance.",
-        "Current WP0/CI/WP11 approvals remain pending PR082 review."
-      ],
+      "blockers": [],
       "planned_atomic_commits": 3,
       "prerequisites_satisfied": true,
       "parent_pr": "PR-001",
@@ -3204,7 +3226,12 @@
         "status": "completed",
         "conclusion": "success",
         "limitation": "Component status observation only; actual final combined checkout and tree still require fresh hosted CI."
-      }
+      },
+      "integration_merge_sha": "548edf64c20f474d6832996ce5ac29e0ff25be0b",
+      "controller_handoff": "verification/research-program/bootstrap/components-463f092/pr-085-integration-handoff.json",
+      "artifact_manifest": "verification/research-program/bootstrap/components-463f092/pr-085-artifact-manifest.json",
+      "independent_acceptance": "verification/research-program/bootstrap/components-463f092/acceptance.json",
+      "integration_evidence": "verification/research-program/bootstrap/components-463f092/index.json"
     }
   ],
   "external_inputs": [
@@ -3253,7 +3280,10 @@
     "pr002_url": "https://github.com/ajhcs/ushso/pull/14",
     "pr002_state": "merged",
     "pr002_merge_sha": "5647e81457b606bb36456e75c48f990ce21e9c6c",
-    "pr003_draft_url": "https://github.com/ajhcs/ushso/pull/15"
+    "pr003_draft_url": "https://github.com/ajhcs/ushso/pull/15",
+    "combined_components_pr_url": "https://github.com/ajhcs/ushso/pull/18",
+    "combined_components_state": "MERGED",
+    "combined_components_merge_sha": "548edf64c20f474d6832996ce5ac29e0ff25be0b"
   },
   "prepared_inputs": [
     {
