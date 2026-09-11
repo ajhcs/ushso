@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T05:11:59.674646Z",
+  "updated_at": "2026-09-11T06:09:36.999777Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -64,20 +64,36 @@
     },
     "ledger_fact_corrections": "verification/research-program/bootstrap/ledger-fact-corrections-487f06a.json",
     "latest_component_composition": {
-      "head_sha": "37457bb8f4e67089fd9bb8f1470185487832f641",
-      "tree_sha": "43b28d68138c7fd7519d016f32303a1e3e5827ba",
-      "status": "WP11_focused_registered_adapter_and_current_handoff_pass",
-      "evidence": "verification/research-program/bootstrap/component-composition-wp11-37457bb.json",
-      "accepted": false,
-      "passing_checks": [
-        "Nine WP11 focused tests on the actual combined manifest",
-        "Four real registered WP11 tests and current adapter",
-        "Current PR085 handoff with original package Git-snapshot provenance"
+      "head_sha": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
+      "tree_sha": "57400b8b500d00d036332a57cddad561886c562a",
+      "status": "full_gate_failed_two_CI_test_context_assumptions",
+      "research_tests_passed": 66,
+      "current_handoffs_passed": [
+        "PR-003",
+        "PR-004",
+        "PR-085"
       ],
+      "preflight_evidence": "verification/research-program/bootstrap/component-composition-preflight-c70b079.json",
+      "failed_gate": "verification/research-program/bootstrap/component-gate-failed-c70b079.json",
+      "failed_gate_run_id": "20260911T053646Z-6f05088050e8",
+      "worker_tests": {
+        "total": 345,
+        "passed": 343,
+        "failed": 2
+      },
+      "unreached": [
+        "build",
+        "local-e2e",
+        "release-audit",
+        "cloudflare-dry-run",
+        "retain-deployable-artifacts"
+      ],
+      "correction_head_sha": "70c7a4c3231041f22a1c7475e70c6186a1aa7d6c",
       "remaining": [
-        "PR003 R7 cleanup-control and final handoff correction",
-        "Exact final combined release gate and hosted CI"
-      ]
+        "New full gate on changed combined candidate",
+        "Fresh actual combined hosted CI"
+      ],
+      "accepted": false
     },
     "legacy_program_raw_pin_findings": {
       "status": "unresolved",
@@ -107,12 +123,11 @@
       "model_reported_by_reviewer": "Grok 4.6",
       "model_identity_note": "The active managed interface records grok-4. The retained Grok 4.6 self-report belongs only to the earlier read-only boundary review and is not asserted for later implementation runs.",
       "latest_run": {
-        "run_id": "ushso-pr003-grok-r7-20260911",
-        "task_id": "ce-ushso-pr003-grok-r7-2026-grok-r7-finalize-606127415ace-2aec4b10",
+        "run_id": "ushso-pr085-ci-tests-review-20260911",
         "actual_model": "grok-4",
-        "status": "running",
-        "evidence": "verification/research-program/bootstrap/pr003-grok-r7-dispatch.json",
-        "head_sha": "a8cec211a2d93988e53ee2f85c31c2cac470b4eb"
+        "status": "completed_review",
+        "evidence": "verification/research-program/bootstrap/pr085-ci-test-context-independent-review.json",
+        "reviewed_candidate_receipt_sha256": "7c5b9de4756bd651d4fcef1290516b115f7a138dc798e34376b4ecd4ae03e22e"
       },
       "latest_review_receipt": "verification/research-program/provider-reviews/grok-boundary-receipt.json",
       "controller_disposition": "verification/research-program/provider-reviews/grok-boundary-disposition.json",
@@ -132,9 +147,7 @@
           "cleanup": "normal/inactive_empty/unlocked"
         }
       ],
-      "active_runs": [
-        "ushso-pr003-grok-r7-20260911"
-      ],
+      "active_runs": [],
       "latest_completed_wp11_run": {
         "run_id": "ushso-pr085-wp11-grok-20260911",
         "head": "574f15f8b5d137560f371e1ef81e415f267b1959",
@@ -532,7 +545,7 @@
     },
     {
       "pr_id": "PR-003",
-      "status": "in_progress",
+      "status": "independent_review",
       "owner": "ce-ushso-pr003-grok-r7-2026-grok-r7-finalize-606127415ace-2aec4b10",
       "dependencies": [
         "PR-001",
@@ -550,14 +563,13 @@
         ".github/pull_request_template.md",
         "tests/contract-package-inventory.test.mjs"
       ],
-      "head_sha": null,
+      "head_sha": "4a47dde1676cdb6e4063ba166a2ce3e9e6f47e6e",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-003.json",
       "evidence_directory": "verification/research-program/pr-003/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/15",
       "blockers": [
-        "R7 finishes the retained R6 handoff and corrects the independently demonstrated fixed-name cleanup-control deletion. The runtime checker is held byte-identical.",
-        "Final environment checks, combined handoffs and release gate remain required before PR003/004 acceptance and downstream implementation."
+        "A changed actual combined candidate must pass the full release gate and fresh hosted CI before component acceptance and downstream dispatch."
       ],
       "dispatch_preparation": "Three native DeepSeek slices completed; clean terminal lifecycle and producer final head are recorded.",
       "prerequisites_satisfied": true,
@@ -574,7 +586,7 @@
       "dispatch_evidence": "verification/research-program/bootstrap/pr003-grok-r7-dispatch.json",
       "shared_file_reservation": "PR003 owns package.json, PR guidance, handoff schema/validator and PR003 evidence. PR004 owns its field-state/coverage paths plus its own PR004 handoff/evidence.",
       "producer_completion": "verification/research-program/bootstrap/pr003-native-completion-f62ce35.json",
-      "independent_review": "verification/research-program/bootstrap/pr003-r6-interruption-review-d6578da.json",
+      "independent_review": "verification/research-program/bootstrap/pr003-r7-final-checks-4a47dde.json",
       "run_history": [
         {
           "run_id": "ushso-pr003-deepseek-20260910t220020z",
@@ -638,12 +650,21 @@
           "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
           "tree_sha": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
           "evidence": "verification/research-program/bootstrap/pr003-r4-final-checks-d1c42ea.json"
+        },
+        {
+          "run_id": "ushso-pr003-grok-r7-20260911",
+          "provider": "Grok Co-Engineer",
+          "actual_model": "grok-4",
+          "head_sha": "4a47dde1676cdb6e4063ba166a2ce3e9e6f47e6e",
+          "tree_sha": "9349e42242063a4e9e96e0fb3c6439b1089b2ad4",
+          "status": "completed_component_verified_pending_combined_gate",
+          "independent_review": "verification/research-program/bootstrap/pr003-r7-final-checks-4a47dde.json"
         }
       ],
-      "review_state": "changes_requested",
+      "review_state": "component_verified_pending_combined_gate",
       "original_integration_base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
       "provider_task_id": "ce-ushso-pr003-grok-r7-2026-grok-r7-finalize-606127415ace-2aec4b10",
-      "last_producer_head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
+      "last_producer_head_sha": "4a47dde1676cdb6e4063ba166a2ce3e9e6f47e6e",
       "publication_branch": "codex/ushso-pr003-deepseek-20260910t220020z",
       "supplemental_review_evidence": "verification/research-program/bootstrap/pr003-independent-review-93793bf.json",
       "ci_failure_evidence": "verification/research-program/bootstrap/pr003-ci-failure-f62ce35.json",
@@ -671,12 +692,10 @@
         "independent_combined_review": "verification/research-program/bootstrap/pr003-composed-checks-bf46d92.json"
       },
       "reviewer_identity_note": "The native review was controller-dispatched with gpt-5.6-luna/max. Its retained inability to inspect a serving backend is not evidence that the endpoint was unavailable; the historical raw receipt is preserved without modification.",
-      "last_producer_tree_sha": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
-      "latest_completion": "verification/research-program/bootstrap/pr003-grok-r3-completion-0b28d03.json",
-      "independent_registered_checks": "verification/research-program/bootstrap/pr003-r4-final-checks-d1c42ea.json",
-      "remaining_semantic_checks": [
-        "verification/research-program/bootstrap/pr003-r6-interruption-review-d6578da.json"
-      ],
+      "last_producer_tree_sha": "9349e42242063a4e9e96e0fb3c6439b1089b2ad4",
+      "latest_completion": "verification/research-program/bootstrap/pr003-grok-r7-terminal.json",
+      "independent_registered_checks": "verification/research-program/bootstrap/pr003-r7-final-checks-4a47dde.json",
+      "remaining_semantic_checks": [],
       "separate_final_review": {
         "status": "completed_changes_requested",
         "agent": "/root/pr003_final_contract_review",
@@ -685,26 +704,29 @@
         "receipt": "verification/research-program/bootstrap/pr003-grok-r2-independent-review-5115170.json"
       },
       "base_tree": "2a0d1321a908cbb0832252da12460bfe5aca7219",
-      "published_head_sha": "5115170093512b06b21c01725bb982e457797efe",
-      "model_identity_note": "Grok R6 uses supported Co-Engineer with interface-attested grok-4; durable project/provider grant reused.",
+      "published_head_sha": "4a47dde1676cdb6e4063ba166a2ce3e9e6f47e6e",
+      "model_identity_note": "Final R7 used the supported Grok interface labeled grok-4; no renewed login was required.",
       "current_component": {
-        "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
-        "tree_sha": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
-        "status": "passed_independent_component_review",
-        "functional_head": "b41c27db36b58b4bda16ded02bde3211ca02fb9d",
-        "registered_handoff_tests": 42,
-        "inventory_tests": 9,
-        "independent_composite_path_cases": 15,
-        "current_handoff_artifacts": 66,
-        "current_index_artifacts": 19,
-        "preserved_prior_receipts_indexes": 44,
-        "transport_receipt": "verification/research-program/bootstrap/pr003-r4-composition-d1c42ea.json"
+        "head_sha": "4a47dde1676cdb6e4063ba166a2ce3e9e6f47e6e",
+        "tree_sha": "9349e42242063a4e9e96e0fb3c6439b1089b2ad4",
+        "status": "passed_independent_component_review_pending_combined_gate",
+        "functional_head": "220912e4ad14bf2098b24c797d2e91b7b7bf75a2",
+        "registered_tests_each_context": 51,
+        "actual_test_contexts": [
+          "normal TMPDIR",
+          "TMPDIR absent, RUNNER_TEMP configured, CI=1"
+        ],
+        "current_handoff_artifacts": 104,
+        "current_source_identities": 42,
+        "preserved_prior_receipts_indexes": 71,
+        "review": "verification/research-program/bootstrap/pr003-r7-final-checks-4a47dde.json",
+        "metadata_reconciliation": "Terminal MCP dirty boolean conflicted with its branch-only Git status. Independent Git readback verified the source clean and writer released; the original terminal receipt remains unchanged."
       },
       "publication": {
         "url": "https://github.com/ajhcs/ushso/pull/15",
-        "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
+        "head_sha": "4a47dde1676cdb6e4063ba166a2ce3e9e6f47e6e",
         "draft": true,
-        "evidence": "verification/research-program/bootstrap/pr003-r4-draft-publication-d1c42ea.json"
+        "evidence": "verification/research-program/bootstrap/pr003-r7-draft-publication-4a47dde.json"
       },
       "r5_review": {
         "head_sha": "243a12510eb8ed3c7646d8a4d5d151a46b3cf28a",
@@ -735,6 +757,19 @@
         "historical_pre_r6_receipts_and_indexes_unchanged": 62,
         "cleanup_control_finding": "Existing fixed-name cleanup test passes after removing a controller-precreated sentinel. R7 must use a unique control and finally cleanup.",
         "prior_partial_evidence_preserved": true
+      },
+      "prior_current_component": {
+        "head_sha": "d1c42eab33e1c21edf805036464f2b64667a489a",
+        "tree_sha": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1",
+        "status": "passed_independent_component_review",
+        "functional_head": "b41c27db36b58b4bda16ded02bde3211ca02fb9d",
+        "registered_handoff_tests": 42,
+        "inventory_tests": 9,
+        "independent_composite_path_cases": 15,
+        "current_handoff_artifacts": 66,
+        "current_index_artifacts": 19,
+        "preserved_prior_receipts_indexes": 44,
+        "transport_receipt": "verification/research-program/bootstrap/pr003-r4-composition-d1c42ea.json"
       }
     },
     {
@@ -2787,14 +2822,14 @@
         "tests/wp11-attestation.test.mjs",
         "verification/research-program/ci-attestation/wp11-v1.3.0/"
       ],
-      "head_sha": null,
+      "head_sha": "70c7a4c3231041f22a1c7475e70c6186a1aa7d6c",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-085.json",
       "evidence_directory": "verification/research-program/pr-085/",
-      "github_pr_url": null,
+      "github_pr_url": "https://github.com/ajhcs/ushso/pull/17",
       "blockers": [
-        "Final combined release gate and current PR003 handoff correction remain pending.",
-        "Current WP0/CI/WP11 subjects remain pending; PR082 must resolve current-subject authorization."
+        "Changed combined PR003/004/085 candidate full gate and hosted CI remain required.",
+        "Current WP0/CI/WP11 subject approvals remain PR082 work; component checks do not issue them."
       ],
       "planned_atomic_commits": 3,
       "prerequisites_satisfied": true,
@@ -2812,9 +2847,9 @@
       "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr085-ci-attestation-20260910-worktrees/ce-ushso-pr085-wp11-grok-20-grok-wp11-29992045ca68-40d94a09",
       "branch": "codex/ce-ushso-pr085-wp11-grok-20-grok-wp11-29992045ca68-40d94a09",
       "dispatch_evidence": "verification/research-program/bootstrap/pr085-native-dispatch.json",
-      "last_producer_head_sha": "4f90157108a92ce9541c340d5536eac31f24a1d8",
-      "last_producer_tree_sha": "ba468220ab24bb560d2f8fb6bac83aa94ee61070",
-      "review_state": "independent_review",
+      "last_producer_head_sha": "70c7a4c3231041f22a1c7475e70c6186a1aa7d6c",
+      "last_producer_tree_sha": "d14f782dac37f74ae9ccfdc2c15c28e58420e6b1",
+      "review_state": "reviewed_correction_pending_changed_combined_gate",
       "continuation": {
         "scope": "Reviewed CI v1.4 inventory/attestation correction under the same PR085 task branch/worktree with serialized writer ownership.",
         "plan_evidence": "verification/research-program/bootstrap/ci-v14-plan-amendment.json",
@@ -2875,7 +2910,7 @@
         }
       },
       "wp11_continuation": {
-        "status": "running",
+        "status": "completed",
         "component_base_head": "4f90157108a92ce9541c340d5536eac31f24a1d8",
         "plan_evidence": "verification/research-program/bootstrap/wp11-plan-amendment.json",
         "independent_review": "verification/research-program/bootstrap/wp11-plan-independent-review.json",
@@ -2894,13 +2929,15 @@
         "actual_provider": "grok",
         "actual_model": "grok-4",
         "dispatch_evidence": "verification/research-program/bootstrap/pr085-wp11-grok-dispatch.json",
-        "administrative_transfer": "Previous native followup failed with agent thread limit reached; only root was listed active. Existing PR085 branch is parked. Supported managed Grok successor is the sole implementation writer, with unchanged bounded technical scope."
+        "administrative_transfer": "Previous native followup failed with agent thread limit reached; only root was listed active. Existing PR085 branch is parked. Supported managed Grok successor is the sole implementation writer, with unchanged bounded technical scope.",
+        "final_head_sha": "574f15f8b5d137560f371e1ef81e415f267b1959"
       },
       "publication": {
         "url": "https://github.com/ajhcs/ushso/pull/17",
-        "head_sha": "4f90157108a92ce9541c340d5536eac31f24a1d8",
+        "head_sha": "01467fe31335b359443902eee4e6740b091d5cec",
         "draft": true,
-        "evidence": "verification/research-program/bootstrap/pr085-draft-publication-4f90157.json"
+        "evidence": "verification/research-program/bootstrap/pr085-wp11-draft-publication-01467fe.json",
+        "new_ci_test_correction_publication_pending": true
       },
       "prior_wp11_owner_dispatch": {
         "owner": "ushso-pr085-ci-attestation-20260910",
@@ -2940,7 +2977,28 @@
         "current_subject_approval": null,
         "accepted": false
       },
-      "independent_review": "verification/research-program/bootstrap/pr085-wp11-test-context-applied-01467fe.json"
+      "independent_review": "verification/research-program/bootstrap/pr085-ci-test-context-applied.json",
+      "wp11_hosted_ci": {
+        "evidence": "verification/research-program/bootstrap/pr085-wp11-hosted-ci-01467fe.json",
+        "status": "passed",
+        "reported_head_sha": "01467fe31335b359443902eee4e6740b091d5cec",
+        "actual_checkout_sha": "7a1000be3493383aa6589f930bd6fd51e5c862e1",
+        "actual_checkout_tree": "f2cd8437ab2888e96ea906611d85e9826f94a7fb",
+        "scope": "ROOT183305f plus PR08501467fe only; not final PR003/004/085 combined CI."
+      },
+      "ci_test_context_correction": {
+        "author": "root Astra",
+        "separate_reviewer": "Grok/grok-4",
+        "head_sha": "70c7a4c3231041f22a1c7475e70c6186a1aa7d6c",
+        "tree_sha": "d14f782dac37f74ae9ccfdc2c15c28e58420e6b1",
+        "functional_head_sha": "0a10a7b2b8d218ba01f9a48e7af0460e9069e6b5",
+        "independent_review": "verification/research-program/bootstrap/pr085-ci-test-context-independent-review.json",
+        "applied_evidence": "verification/research-program/bootstrap/pr085-ci-test-context-applied.json",
+        "focused_tests": 15,
+        "current_handoff_passed": true,
+        "current_approval": null,
+        "accepted": false
+      }
     }
   ],
   "external_inputs": [
