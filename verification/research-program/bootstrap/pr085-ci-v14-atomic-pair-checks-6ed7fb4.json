@@ -1,0 +1,88 @@
+{
+  "format": "ushso.pr085.atomic-pair-independent-review.v1",
+  "reviewer": "root Astra",
+  "head_sha": "6ed7fb4cb24199977034cf86bb3f0b4a928513be",
+  "tree_sha": "959cdb237f1b733af839bd72747761d837e8ba04",
+  "source_sha256": {
+    "scripts/verify-ci-attestation.mjs": "914ad3b3b0d65ff8ba901669d0081f099758442ddfcd328e71aa0d0222fc2b75",
+    "tests/ci-attestation.test.mjs": "26e4e7f0187bbbccc4fd6c4d821a288403788278609cc337f401955f018a6f88",
+    "scripts/run-contract-suites.mjs": "9cc9efb8f29bf6a9ba93fe619e7fd1d0e519fce5cb0f37bf8747f199611cb647",
+    "verification/testing/ci/v1.4.0/tools/ci-inventory.mjs": "4e51bd9273e2febf8009c868ed8a41f34c9ff3cc3998141b6d8cca493f2bc8dd",
+    "verification/testing/ci/v1.4.0/tools/validate-package.mjs": "0413b0a140ec4e339199be1494d9146a7191e7e5d689b2cbeb5de68a8500bc41",
+    "verification/successor-support.mjs": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c",
+    "package-lock.json": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c",
+    "package.json": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c"
+  },
+  "reviewed_diff": "Two files only from d182635: track each reviewed input state; require both present and one uniform historical/current state; add both partial-pair negative controls. Other reviewed component code and lock bytes unchanged.",
+  "commands": [
+    {
+      "label": "atomic-pair-semantic-cases",
+      "argv": [
+        "node",
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085-controller-review/ci-v14-6ed7fb4/semantic-cases.mjs"
+      ],
+      "started_at": "2026-09-11T02:40:10.633891+00:00",
+      "completed_at": "2026-09-11T02:40:10.760507+00:00",
+      "exit_code": 0,
+      "case_or_test_count": 12,
+      "passed": true,
+      "stdout_sha256": "853993e8c368b71aab590420c45b96574b21268617b5041f8c3a7fff972f6efa",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "ci-attestation-focused",
+      "argv": [
+        "node",
+        "--test",
+        "tests/ci-attestation.test.mjs"
+      ],
+      "started_at": "2026-09-11T02:40:10.760562+00:00",
+      "completed_at": "2026-09-11T02:40:12.787242+00:00",
+      "exit_code": 0,
+      "case_or_test_count": 10,
+      "passed": true,
+      "stdout_sha256": "c6ae08bd3f0bd1856e92cb70aa3a44f81e69385e302e89aa0d73d55408d6c9e7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "current-ci-attestation",
+      "argv": [
+        "node",
+        "scripts/verify-ci-attestation.mjs"
+      ],
+      "started_at": "2026-09-11T02:40:12.787315+00:00",
+      "completed_at": "2026-09-11T02:40:12.893493+00:00",
+      "exit_code": 0,
+      "case_or_test_count": null,
+      "passed": true,
+      "stdout_sha256": "8449f912452cfc828cbee1b72605634f298304220c0600adbb8359b906987cf4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "direct-ci-v14-validate",
+      "argv": [
+        "node",
+        "verification/testing/ci/v1.4.0/tools/validate-package.mjs",
+        "--validate"
+      ],
+      "started_at": "2026-09-11T02:40:12.893587+00:00",
+      "completed_at": "2026-09-11T02:40:12.980338+00:00",
+      "exit_code": 2,
+      "case_or_test_count": null,
+      "passed": true,
+      "stdout_sha256": "a20c54fa595fc4cb58515dda35edb5942fa4b8b4c2a3438701aba2ccb90b72ed",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "previous_review": {
+    "receipt": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr085-ci-v14-independent-review/receipt.json",
+    "sha256": "6dbba09826121ef1c777179306331e7ade661e3d4c59236cd98f12fd4aae561f",
+    "finding": "PR085-CI-F1"
+  },
+  "status": "passed_component_review",
+  "limitations": [
+    "Producer final handoff/evidence and combined candidate release gate remain pending.",
+    "No approval issued or historical release authority transferred.",
+    "Focused checks ran using unchanged owned locked dependencies from d182635; no redundant reinstall was performed."
+  ]
+}
