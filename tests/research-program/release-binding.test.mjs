@@ -5,22 +5,30 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
 import {
+  CURRENT_LIVE_GENERATION,
+  CURRENT_LIVE_MANIFEST_SHA256,
   bindCapturedCatalogRecord,
   compareReplacementIdentities,
+  createGenerationIdentityMap,
+  live20260903GenerationMap,
+  lookupProductContext,
   mintDistributionIdentity,
   mintReleaseIdentity,
 } from "../../packages/identity/src/index.mjs";
 import { createStaticPublicationReadContext } from "../../packages/registry/publication-read-context.mjs";
+import { lookupMappedProductContext } from "../../packages/registry/generation-identity.mjs";
 import { resolveReleaseDistributions } from "../../packages/registry/release-catalog.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const OBSERVED_AT = "2026-09-03T22:22:33.908Z";
 const STABLE_ASSET_ID = "obs:asset:cms-data-catalog:hcris-hospital-cost-report";
 const schema = JSON.parse(await fs.readFile(path.join(ROOT, "packages/identity/schemas/release-identity.schema.json"), "utf8"));
+const generationSchema = JSON.parse(await fs.readFile(path.join(ROOT, "packages/identity/schemas/generation-identity.schema.json"), "utf8"));
 const ajv = new Ajv2020({ strict: true, allErrors: true });
 ajv.addFormat("date-time", (value) => typeof value === "string" && Number.isFinite(Date.parse(value)));
 ajv.addFormat("date", (value) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value));
 const validateSchema = ajv.compile(schema);
+const validateGenerationSchema = ajv.compile(generationSchema);
 
 function evidence(id = "evidence:release-identity.fixture") {
   return [id];
@@ -438,4 +446,116 @@ test("C-007-2 rolling catalog resources stay rolling and keep the existing asset
   assert.equal(binding.asset_id, captures.cdc_record.record_id);
   assert.deepEqual(binding.releases, []);
   assert.ok(binding.reason_codes.includes("rolling_endpoint_not_exact"));
+});
+
+test("C-007-3 human-to-machine source lookup returns the same product context", () => {
+  const map = live20260903GenerationMap();
+  assert.equal(validateGenerationSchema(map), true, JSON.stringify(validateGenerationSchema.errors, null, 2));
+  assert.equal(map.human_manifest.value, CURRENT_LIVE_MANIFEST_SHA256);
+  assert.equal(map.machine_generation.value, CURRENT_LIVE_GENERATION);
+  assert.equal(map.record_count, 3434);
+  assert.equal(map.searchable_count, 3430);
+  assert.equal(map.isolated_count, 4);
+  assert.equal(map.dictionary_source_revision.scientific_approval, false);
+  assert.equal(map.dictionary_source_revision.applicability_state, "unresolved");
+  const binding = bindCapturedCatalogRecord({
+    record: captures.cms_record,
+    catalogCapture: captures.cms_catalog,
+    observedAt: captures.observed_at,
+  });
+  const human = lookupProductContext({ map, pin: CURRENT_LIVE_MANIFEST_SHA256, pin_kind: "corpus_manifest_sha256", record: captures.cms_record, binding });
+  const machine = lookupProductContext({ map, pin: CURRENT_LIVE_GENERATION, pin_kind: "publication_generation_label", record: captures.cms_record, binding });
+  assert.equal(human.restart_required, false);
+  assert.equal(machine.restart_required, false);
+  assert.equal(human.product_context_fingerprint, machine.product_context_fingerprint);
+  assert.equal(human.asset_id, captures.cms_record.record_id);
+  assert.equal(human.generation, CURRENT_LIVE_GENERATION);
+  const publication = createStaticPublicationReadContext({
+    corpus_id: "ushso-live-catalog-2026-09-03",
+    corpus_version: "1.2.0",
+    manifest_sha256: CURRENT_LIVE_MANIFEST_SHA256,
+  });
+  const mapped = lookupMappedProductContext({
+    publication,
+    map,
+    record: captures.cms_record,
+    binding,
+  });
+  assert.equal(mapped.lookup.restart_required, false);
+  assert.equal(mapped.lookup.product_context_fingerprint, human.product_context_fingerprint);
+});
+
+test("C-007-3 stale or mismatched pins yield typed restart guidance", () => {
+  const map = live20260903GenerationMap();
+  const staleHuman = lookupProductContext({
+    map,
+    pin: "23f704ce3e421a6eb26c2b3677d616a1ae6b4f45226233257b9a1ff676caba2b",
+    pin_kind: "corpus_manifest_sha256",
+    record: captures.cms_record,
+  });
+  assert.equal(staleHuman.restart_required, true);
+  assert.equal(staleHuman.code, "manifest_mismatch");
+  assert.equal(staleHuman.next_action.includes("Restart"), true);
+
+  const staleMachine = lookupProductContext({
+    map,
+    pin: "live-2026-08-01-deadbeef",
+    pin_kind: "publication_generation_label",
+    record: captures.cms_record,
+  });
+  assert.equal(staleMachine.restart_required, true);
+  assert.equal(staleMachine.code, "generation_unavailable");
+
+  const mismatched = lookupProductContext({
+    map,
+    record: captures.cms_record,
+    pins: {
+      human_manifest: CURRENT_LIVE_MANIFEST_SHA256,
+      machine_generation: "legacy-static:1.1.0",
+    },
+  });
+  assert.equal(mismatched.restart_required, true);
+  assert.equal(mismatched.code, "cross_generation_reference");
+
+  const dictionary = lookupProductContext({
+    map,
+    record: captures.cms_record,
+    pins: { dictionary_source_revision: "dictionary-revision-from-another-generation" },
+  });
+  assert.equal(dictionary.restart_required, true);
+  assert.equal(dictionary.code, "dictionary_revision_mismatch");
+
+  assert.throws(
+    () => createGenerationIdentityMap({
+      ...map,
+      dictionary_source_revision: {
+        ...map.dictionary_source_revision,
+        generation: "live-other",
+      },
+    }),
+    { code: "cross_generation_reference" },
+  );
+  assert.throws(
+    () => createGenerationIdentityMap({
+      ...map,
+      dictionary_source_revision: {
+        ...map.dictionary_source_revision,
+        scientific_approval: true,
+      },
+    }),
+    { code: "scientific_approval_forbidden" },
+  );
+
+  const publication = createStaticPublicationReadContext({
+    corpus_id: "ushso-pr007-release-binding-fixture",
+    corpus_version: "test",
+    manifest_sha256: "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  });
+  const mapped = lookupMappedProductContext({
+    publication,
+    map,
+    record: captures.cms_record,
+  });
+  assert.equal(mapped.restart_required, true);
+  assert.equal(mapped.code, "manifest_mismatch");
 });

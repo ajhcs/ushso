@@ -3,6 +3,7 @@ export * from "./candidate-generator.mjs";
 export * from "./common.mjs";
 export * from "./exact-identifier-policy.mjs";
 export * from "./family-graph.mjs";
+export * from "./generation-identity.mjs";
 export * from "./join-routes.mjs";
 export * from "./projection-rebuilder.mjs";
 export * from "./release-binding.mjs";

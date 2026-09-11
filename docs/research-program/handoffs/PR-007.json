@@ -1,0 +1,449 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-007",
+  "status": "producer_checked",
+  "owner": "Grok",
+  "reviewer": "Astra",
+  "base_sha": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+  "head_sha": null,
+  "dependency_merge_shas": {
+    "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce"
+  },
+  "branch": "codex/ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/identity/src/index.mjs",
+    "packages/identity/src/release-identity.mjs",
+    "packages/identity/src/release-binding.mjs",
+    "packages/identity/src/generation-identity.mjs",
+    "packages/identity/schemas/release-identity.schema.json",
+    "packages/identity/schemas/generation-identity.schema.json",
+    "packages/registry/index.mjs",
+    "packages/registry/release-catalog.mjs",
+    "packages/registry/generation-identity.mjs",
+    "tests/research-program/release-binding.test.mjs",
+    "docs/research-program/handoffs/PR-007.json",
+    "verification/research-program/pr-007/task-binding.json",
+    "verification/research-program/pr-007/evidence-index.json",
+    "verification/research-program/pr-007/verify.mjs",
+    "verification/research-program/pr-007/fixtures/catalog-resources.captures.json",
+    "verification/research-program/pr-007/evidence/c007-1/before-change.json",
+    "verification/research-program/pr-007/evidence/c007-1/after-change.json",
+    "verification/research-program/pr-007/evidence/c007-2/before-change.json",
+    "verification/research-program/pr-007/evidence/c007-2/after-change.json",
+    "verification/research-program/pr-007/evidence/c007-3/before-change.json",
+    "verification/research-program/pr-007/evidence/c007-3/after-change.json",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-1-before-import.stderr",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-1-before-test.stderr",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-1-focused.json",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-1-focused.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-1-identity-package.json",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-1-identity-package.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-2-before-import.stderr",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-2-focused.json",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-2-focused.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-3-before-import.stderr",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-3-focused.json",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-3-focused.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-3-identity-package.json",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-3-identity-package.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-3-verify.json",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-3-verify.stdout",
+    "verification/research-program/pr-007/command-receipts/cmd-c007-3-check-handoff.stdout"
+  ],
+  "problem": "Source-native release and distribution identities were not bound. Rolling endpoints, replacement files, one-to-many distributions and conflicting date roles could be collapsed, and human manifest hashes did not map to machine generation labels.",
+  "resulting_behavior": "PR-007 reuses existing identity and registry contracts to mint release/distribution IDs from publisher identifiers, locators, typed date roles and hash-scoped content when no stable release ID exists. Captured catalog/resources records bind deterministically with evidence pointers; ambiguous URLs and rolling resources never fabricate exact releases. One explicit human-manifest/machine-generation/dictionary-source-revision map returns the same product context, and stale or mismatched pins yield typed restart guidance. Existing observatory asset IDs are unchanged. Dictionary applicability remains unresolved and is not scientific approval. Execution.provider grok, dispatch model grok-4; this interface is Grok 4.6 and is not a serving-model attestation.",
+  "commits": [
+    {
+      "id": "C-007-1",
+      "subject": "Define release and distribution identity rules",
+      "sha": "2d064cb021c5088ed7a002b892410c630ad151c0"
+    },
+    {
+      "id": "C-007-2",
+      "subject": "Resolve exact source relationships",
+      "sha": "28adea899459c42d4568baeab3e5b031a2649585"
+    },
+    {
+      "id": "C-007-3",
+      "subject": "Add generation identity mapping",
+      "sha": null
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "integration-base",
+      "id": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+      "location": "external",
+      "version": "tree c46c95ad838b78d4a26c86454be82f3835c49e51"
+    },
+    {
+      "kind": "accepted-PR004-dependency-merge",
+      "id": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+      "location": "external"
+    },
+    {
+      "kind": "accepted-PR004-producer-head",
+      "id": "78d164e816049c45193b17c2267f64c8fb783399",
+      "location": "external",
+      "version": "not the dependency merge; merge remains 463f092f71c0ed1ef2aa5baa29b186e5697d04ce"
+    },
+    {
+      "kind": "accepted-PR004-integration-handoff",
+      "id": "verification/research-program/bootstrap/components-463f092/pr-004-integration-handoff.json",
+      "location": "local",
+      "sha256": "cd45618d9b533f76b987e6ced3466fbff427db43b4de4502f3d99347f884590b"
+    },
+    {
+      "kind": "pr-packet",
+      "id": "docs/master-plan/2026-09-10/prs/PR-007.md",
+      "location": "external",
+      "sha256": "34199e373d9023f104b5465f35cdf9aa25512045e1b2b8efa321075d52308281",
+      "git_commit": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+      "git_path": "docs/master-plan/2026-09-10/prs/PR-007.md"
+    },
+    {
+      "kind": "execution-contract",
+      "id": "docs/master-plan/2026-09-10/EXECUTION.md",
+      "location": "external",
+      "sha256": "4118d4f46a7ebec45749676881c753529593842792a439cfb5e53e50bc1fdfc3",
+      "git_commit": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+      "git_path": "docs/master-plan/2026-09-10/EXECUTION.md"
+    },
+    {
+      "kind": "live-corpus-json",
+      "id": "packages/retrieval/versions/v1.2.0/corpus/corpus.json",
+      "location": "external",
+      "sha256": "56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633",
+      "git_commit": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+      "git_path": "packages/retrieval/versions/v1.2.0/corpus/corpus.json"
+    },
+    {
+      "kind": "tracked PR-007 source",
+      "id": "packages/identity/src/release-identity.mjs",
+      "location": "local",
+      "sha256": "7015c552097cb31773d358be9040a47139f0a3578753de0c2fb95e6c6b097aa8"
+    },
+    {
+      "kind": "tracked PR-007 source",
+      "id": "packages/identity/src/release-binding.mjs",
+      "location": "local",
+      "sha256": "9d60f1b3dd63018e27ae6298d48960cfb07438328a7ef2a718d06c081d1b959b"
+    },
+    {
+      "kind": "tracked PR-007 source",
+      "id": "packages/identity/src/generation-identity.mjs",
+      "location": "local",
+      "sha256": "d96165d51aaa7522eb4d940aa16185d39dc987207c4393cfb2eafe305a57ca69"
+    },
+    {
+      "kind": "tracked PR-007 source",
+      "id": "tests/research-program/release-binding.test.mjs",
+      "location": "local",
+      "sha256": "b9752b65e5f8e0dfaf49c4fe13e231fd28fc1ed70a0a4b92a6f5824b460bd136"
+    },
+    {
+      "kind": "current task binding",
+      "id": "verification/research-program/pr-007/task-binding.json",
+      "location": "local",
+      "sha256": "7654773c17d767766c97d9ff20179f6ba286e797d68e8494c257883f5e7873d9"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c007-1-before-import",
+      "command": "node --input-type=module -e 'await import(\"./packages/identity/src/release-identity.mjs\")'",
+      "started_at": "2026-09-11T13:24:18.502Z",
+      "completed_at": "2026-09-11T13:24:18.550Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "result": "Genuine before-change absence of the C-007-1 module.",
+      "expected": "exit 1 ERR_MODULE_NOT_FOUND",
+      "actual": "exit 1 ERR_MODULE_NOT_FOUND for packages/identity/src/release-identity.mjs",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 1 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 1 },
+      "event_source": {
+        "id": "receipt-cmd-c007-1-before-import",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-c007-1-before-import.stderr",
+        "sha256": "4f1be5419378dd82b8aad6357eaa1a1a1ab3c7aa452e0d918bf1a0f4db7dcf94",
+        "bytes": 1584
+      }
+    },
+    {
+      "id": "cmd-c007-1-focused",
+      "command": "node --test tests/research-program/release-binding.test.mjs",
+      "started_at": "2026-09-11T13:28:03.178Z",
+      "completed_at": "2026-09-11T13:28:03.477Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "C-007-1 focused suite passed: 7 tests.",
+      "expected": "exit 0 with rolling, replacement, multi-distribution and conflicting-date fixtures passing",
+      "actual": "exit 0; tests 7 pass 7 fail 0 skipped 0",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "event_source": {
+        "id": "receipt-cmd-c007-1-focused",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-c007-1-focused.stdout",
+        "sha256": "93e62ce7031f2078d4f74f31853a05a45d8f99ebb7eaf64234fa3a04069bf9c4",
+        "bytes": 957
+      }
+    },
+    {
+      "id": "cmd-c007-2-focused",
+      "command": "node --test tests/research-program/release-binding.test.mjs",
+      "started_at": "2026-09-11T13:32:44.880Z",
+      "completed_at": "2026-09-11T13:32:45.165Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "C-007-1 and C-007-2 focused suite passed: 10 tests.",
+      "expected": "exit 0 with one-to-many distributions distinct and ambiguous URLs not exact",
+      "actual": "exit 0; tests 10 pass 10 fail 0 skipped 0",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "event_source": {
+        "id": "receipt-cmd-c007-2-focused",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-c007-2-focused.stdout",
+        "sha256": "9d4400343e0cc7eb280b3b71de538aabaf0bcb6d03a987932104b0ac85882f70",
+        "bytes": 1276
+      }
+    },
+    {
+      "id": "cmd-c007-3-focused",
+      "command": "node --test tests/research-program/release-binding.test.mjs",
+      "started_at": "2026-09-11T13:37:21.617Z",
+      "completed_at": "2026-09-11T13:37:21.911Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "C-007-1 through C-007-3 focused suite passed: 12 tests.",
+      "expected": "exit 0 with human/machine product context agreement and typed restart guidance",
+      "actual": "exit 0; tests 12 pass 12 fail 0 skipped 0 duration_ms 236.218593",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "event_source": {
+        "id": "receipt-cmd-c007-3-focused",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-c007-3-focused.stdout",
+        "sha256": "27d9c66e8e477babe5202ca7bd2ab58dabfdbd18c89a77deca33cb3dbd5df556",
+        "bytes": 1486
+      }
+    },
+    {
+      "id": "cmd-c007-3-verify",
+      "command": "node verification/research-program/pr-007/verify.mjs",
+      "started_at": "2026-09-11T13:37:21.933Z",
+      "completed_at": "2026-09-11T13:37:22.008Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Verifier confirmed rolling is not exact, one-to-many distributions remain distinct, URL-only input is unresolved, human/machine context agrees, and a stale manifest pin restarts.",
+      "expected": "exit 0 JSON report with ok true and scientific_approval false",
+      "actual": "exit 0; binding_state one_to_many; distinct_distribution_ids 5; stale_restart_code manifest_mismatch; scientific_approval false",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "event_source": {
+        "id": "receipt-cmd-c007-3-verify",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-c007-3-verify.stdout",
+        "sha256": "30b37554801ec31271a027a9bba74ed9dc5fc3bc5f90f04b489b39148065ad52",
+        "bytes": 470
+      }
+    },
+    {
+      "id": "cmd-c007-3-identity-package",
+      "command": "npm test --prefix packages/identity",
+      "started_at": "2026-09-11T13:37:49.288Z",
+      "completed_at": "2026-09-11T13:37:49.551Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Existing identity package tests passed: 20 tests.",
+      "expected": "exit 0 with existing identity suites unchanged",
+      "actual": "exit 0; tests 20 pass 20 fail 0 skipped 0",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "event_source": {
+        "id": "receipt-cmd-c007-3-identity-package",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-c007-3-identity-package.stdout",
+        "sha256": "1c353eda821d6d21168b31938e4446d8c34959c1e285fb1ee20257b9539d8e4d",
+        "bytes": 2654
+      }
+    },
+    {
+      "id": "cmd-c007-3-check-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-007.json",
+      "started_at": "2026-09-11T13:41:24.187Z",
+      "completed_at": "2026-09-11T13:41:24.487Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "PR-003 checker accepted the producer packet with zero findings; head_sha pending is typed. The recorded stdout is the packet immediately before this command row was appended.",
+      "expected": "exit 0 with outcome accepted and findings []",
+      "actual": "exit 0; ok true; outcome accepted; findings []; head_sha_pending true; packet sha256 6eb2ef2b50afb6a03e0eab2a34aa1300167c1ad1f5765ba52c144a9ac0dd4e7b",
+      "expected_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "observed_outcome": { "kind": "observed_exit", "exit_code": 0 },
+      "event_source": {
+        "id": "receipt-cmd-c007-3-check-handoff",
+        "path": "verification/research-program/pr-007/command-receipts/cmd-c007-3-check-handoff.stdout",
+        "sha256": "c48f755edc2903a91685d356aa85a6e61180cfbd0d75b09601a20b3ec1a0176f",
+        "bytes": 6235
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-release-identity-src",
+      "path": "packages/identity/src/release-identity.mjs",
+      "sha256": "7015c552097cb31773d358be9040a47139f0a3578753de0c2fb95e6c6b097aa8",
+      "bytes": 17432
+    },
+    {
+      "id": "artifact-release-binding-src",
+      "path": "packages/identity/src/release-binding.mjs",
+      "sha256": "9d60f1b3dd63018e27ae6298d48960cfb07438328a7ef2a718d06c081d1b959b",
+      "bytes": 17909
+    },
+    {
+      "id": "artifact-generation-identity-src",
+      "path": "packages/identity/src/generation-identity.mjs",
+      "sha256": "d96165d51aaa7522eb4d940aa16185d39dc987207c4393cfb2eafe305a57ca69",
+      "bytes": 9121
+    },
+    {
+      "id": "artifact-release-identity-schema",
+      "path": "packages/identity/schemas/release-identity.schema.json",
+      "sha256": "2c23967ffcf0d26dce4baf769f965580bdde8aa164b67037c201de72f2426be9",
+      "bytes": 10233
+    },
+    {
+      "id": "artifact-generation-identity-schema",
+      "path": "packages/identity/schemas/generation-identity.schema.json",
+      "sha256": "94bf06bdea2bf901e44e40ff04e9b0ede841aae593a963ee167cd0ec4c7f6794",
+      "bytes": 3121
+    },
+    {
+      "id": "artifact-release-catalog",
+      "path": "packages/registry/release-catalog.mjs",
+      "sha256": "755487585797503a4b3187cc9f5d9266c7f3a46f167499b1a5da7c12699a391d",
+      "bytes": 1826
+    },
+    {
+      "id": "artifact-registry-generation",
+      "path": "packages/registry/generation-identity.mjs",
+      "sha256": "2c617069124b9dfba1671d7d9cc2e87964da251b50eb2335571cb1d5112a6759",
+      "bytes": 1897
+    },
+    {
+      "id": "artifact-focused-test",
+      "path": "tests/research-program/release-binding.test.mjs",
+      "sha256": "b9752b65e5f8e0dfaf49c4fe13e231fd28fc1ed70a0a4b92a6f5824b460bd136",
+      "bytes": 22593
+    },
+    {
+      "id": "artifact-verify",
+      "path": "verification/research-program/pr-007/verify.mjs",
+      "sha256": "dd57f70a23dc4841312322e54509b5930101e09add553e10d86a86194737a01d",
+      "bytes": 3600
+    },
+    {
+      "id": "artifact-task-binding",
+      "path": "verification/research-program/pr-007/task-binding.json",
+      "sha256": "7654773c17d767766c97d9ff20179f6ba286e797d68e8494c257883f5e7873d9",
+      "bytes": 3097
+    },
+    {
+      "id": "artifact-evidence-index",
+      "path": "verification/research-program/pr-007/evidence-index.json",
+      "sha256": "4314d257de129b3d62a2af0674b57c1fb7a2dc4eda376a14edfe854a317c0f45",
+      "bytes": 1695
+    },
+    {
+      "id": "artifact-fixtures",
+      "path": "verification/research-program/pr-007/fixtures/catalog-resources.captures.json",
+      "sha256": "6cd70aac157dcb6a71f3d48c2b201017e8cd8cc0e59124edf36253d4389ce679",
+      "bytes": 5751
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-007-1",
+      "status": "passed",
+      "result": "Rolling endpoints, replacement files, multiple distributions and conflicting date roles remain unmerged; hash-scoped identity is used when no stable release ID exists; existing asset IDs are unchanged.",
+      "command_ids": ["cmd-c007-1-before-import", "cmd-c007-1-focused"],
+      "artifact_ids": ["artifact-release-identity-src", "artifact-release-identity-schema", "artifact-focused-test"]
+    },
+    {
+      "id": "C-007-2",
+      "status": "passed",
+      "result": "Captured catalog/resources records bind deterministically; one-to-many distributions stay distinct; an ambiguous URL never fabricates an exact binding.",
+      "command_ids": ["cmd-c007-2-focused"],
+      "artifact_ids": ["artifact-release-binding-src", "artifact-release-catalog", "artifact-fixtures"]
+    },
+    {
+      "id": "C-007-3",
+      "status": "passed",
+      "result": "Human manifest SHA-256 85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e and machine generation live-2026-09-03-85b50522b420 return the same product context; stale or mismatched pins yield typed restart guidance. Dictionary applicability remains unresolved and is not approval.",
+      "command_ids": ["cmd-c007-3-focused", "cmd-c007-3-verify"],
+      "artifact_ids": ["artifact-generation-identity-src", "artifact-generation-identity-schema", "artifact-verify", "artifact-task-binding"]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "full-release-gate",
+      "status": "skipped",
+      "detail": "Full npm test/build/cf:dry-run is an integration/release gate and was not run by this bounded producer task.",
+      "next_action": "Controller/release gate runs the full suite on the reviewed candidate."
+    },
+    {
+      "id": "identity-package-seal",
+      "status": "skipped",
+      "detail": "packages/identity/manifests/package-manifest.json and validation/validation-receipt.json are outside write_scope. Adding src/schema files changes the artifact seal.",
+      "next_action": "Controller or identity-seal owner refreshes file_count, payload_bytes, package_payload_digest_sha256 and the validation receipt after reviewing this candidate."
+    },
+    {
+      "id": "github-draft-pr",
+      "status": "skipped",
+      "detail": "Producer authorization excludes push, opening PRs, merge and deploy.",
+      "next_action": "Controller publishes a reviewed draft PR from the bound head."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "head-sha-pending-controller-commit",
+      "status": "pending",
+      "detail": "head_sha and C-007-3 sha remain null so this packet cannot contain its own future hash. A controller-authored external receipt must bind the exact final commit and tree.",
+      "next_action": "Controller records the final C-007-3 commit SHA/tree after commit."
+    },
+    {
+      "id": "independent-review-not-started",
+      "status": "unresolved",
+      "detail": "Producer checks are not independent verification or scientific approval.",
+      "next_action": "Astra independently inspects the diff and replays node --test tests/research-program/release-binding.test.mjs and node verification/research-program/pr-007/verify.mjs."
+    },
+    {
+      "id": "dictionary-schema-applicability",
+      "status": "unresolved",
+      "detail": "F11 remains: dictionary/schema applicability is unresolved. The generation map records applicability_state unresolved and scientific_approval false.",
+      "next_action": "Later PRs bind dictionary/schema applicability; do not treat this map as approval."
+    }
+  ],
+  "risks": [
+    {
+      "id": "identity-artifact-seal-stale",
+      "status": "risk",
+      "detail": "npm run validate --prefix packages/identity will fail until the out-of-scope package-manifest and validation-receipt are refreshed to include the new src/schema files.",
+      "next_action": "Apply the proposed seal delta after independent review, or accept it as a follow-on owned-path correction."
+    }
+  ],
+  "next_consumer": "Astra independent review of the exact committed PR-007 head",
+  "next_action": "Controller binds the final C-007-3 SHA/tree, reviews the diff, replays the decisive checks, and publishes a draft PR. Do not merge or deploy from this producer packet.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [
+      "node --test tests/research-program/release-binding.test.mjs",
+      "node verification/research-program/pr-007/verify.mjs",
+      "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-007.json"
+    ],
+    "limitations": [
+      "Producer-side checks only; no independent acceptance or scientific claim.",
+      "Full root npm/build/Cloudflare gates remain separately owned.",
+      "The precommit packet uses a typed pending head claim; a controller receipt must bind the exact final commit after commit.",
+      "Identity package seal files were not rewritten because they are outside write_scope."
+    ]
+  }
+}

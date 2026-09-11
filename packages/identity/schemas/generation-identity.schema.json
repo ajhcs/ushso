@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/identity/v1.0.0/generation-identity.schema.json",
+  "title": "Human, machine, and dictionary/source generation identity map",
+  "description": "One explicit map between human manifest identity, machine generation labels, and dictionary/source revision. Mismatched or stale pins yield typed restart guidance. Unresolved dictionary/schema applicability is not scientific approval.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "human_manifest",
+    "machine_generation",
+    "dictionary_source_revision",
+    "corpus_id",
+    "corpus_version",
+    "record_count",
+    "searchable_count",
+    "isolated_count",
+    "boundaries"
+  ],
+  "properties": {
+    "schema_version": { "const": "identity.generation-identity-map.v1.0.0" },
+    "human_manifest": { "$ref": "#/$defs/identityPin" },
+    "machine_generation": { "$ref": "#/$defs/identityPin" },
+    "dictionary_source_revision": { "$ref": "#/$defs/revisionPin" },
+    "corpus_id": { "type": "string", "minLength": 3 },
+    "corpus_version": { "type": "string", "minLength": 1 },
+    "record_count": { "type": "integer", "minimum": 0 },
+    "searchable_count": { "type": "integer", "minimum": 0 },
+    "isolated_count": { "type": "integer", "minimum": 0 },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "evidence_ids": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catalog_membership_is_payload_access",
+        "unresolved_dictionary_applicability_is_approval",
+        "scientific_fitness_claimed",
+        "silent_cross_generation_substitution"
+      ],
+      "properties": {
+        "catalog_membership_is_payload_access": { "const": false },
+        "unresolved_dictionary_applicability_is_approval": { "const": false },
+        "scientific_fitness_claimed": { "const": false },
+        "silent_cross_generation_substitution": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "identityPin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {
+          "enum": ["corpus_manifest_sha256", "publication_generation_label"]
+        },
+        "value": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "revisionPin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value", "generation", "applicability_state", "scientific_approval"],
+      "properties": {
+        "kind": { "enum": ["dictionary_or_source_revision", "source_revision", "unresolved"] },
+        "value": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "generation": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "applicability_state": { "enum": ["unresolved", "documented", "observed", "conflicted", "not_applicable"] },
+        "scientific_approval": { "const": false }
+      }
+    }
+  }
+}
