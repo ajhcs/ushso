@@ -1,0 +1,45 @@
+{
+  "format": "ushso.pr003.c003-3.command-receipt.v1",
+  "id": "cmd-c003-3-verify-pr-guidance",
+  "kind": "pr_guidance_and_test_discovery_check",
+  "command": "node verification/research-program/pr-003/verify-pr-guidance.mjs",
+  "cwd": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-deepseek-20260910t220020z",
+  "started_at": "2026-09-10T22:18:34.830Z",
+  "completed_at": "2026-09-10T22:18:34.860Z",
+  "exit_code": 0,
+  "expected": "exit 0 with ok=true: the PR template carries every required body field, all EXECUTION.md review states and the draft/no-auto-merge guidance; the filled example body resolves every placeholder; package.json registers test:research-program, preserves the existing scripts and selects handoff.test.mjs from the root test chain",
+  "actual": "exit 0 with ok=true and zero failures; 14/14 body fields, 9/9 guidance anchors and 12/12 review states present in the template; 14/14 fields and no placeholder tokens in the example body; test:research-program equals `node --test tests/research-program/*.test.mjs`; the root test chain contains `npm run test:research-program`; 6/6 preserved scripts unchanged; the glob selects handoff.test.mjs",
+  "observed": {
+    "ok": true,
+    "checks": {
+      "template_fields": true,
+      "example_body_resolved": true,
+      "package_registration": true,
+      "test_glob_selection": true
+    },
+    "template_fields_present": 14,
+    "template_fields_total": 14,
+    "template_guidance_present": 9,
+    "template_guidance_total": 9,
+    "template_review_states_present": 12,
+    "template_review_states_total": 12,
+    "example_fields_present": 14,
+    "example_fields_total": 14,
+    "example_placeholder_rules_hit": [],
+    "test_research_program": "node --test tests/research-program/*.test.mjs",
+    "root_test_chain": [
+      "npm run test:retrieval",
+      "npm run test:web",
+      "npm run test:worker",
+      "npm run test:research-program",
+      "npm run test:evaluation",
+      "npm run validate:evaluation",
+      "npm run verify:research-navigator"
+    ],
+    "preserved_scripts_ok": 6,
+    "preserved_scripts_total": 6,
+    "selected_test_files": ["handoff.test.mjs"]
+  },
+  "sanitized": true,
+  "raw_log_retained_in_git": false
+}

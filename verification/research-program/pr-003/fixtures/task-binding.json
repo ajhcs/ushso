@@ -1,0 +1,67 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr003-integrity-recovery-20260910",
+  "slice_id": "C-003-1-R1",
+  "pr_id": "PR-003",
+  "title": "Recover PR-003 handoff evidence integrity",
+  "owner": "Luna Max (gpt-5.6-luna-max, reasoning high)",
+  "reviewer": "Astra",
+  "branch": "codex/ushso-pr003-integrity-recovery-20260910",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-integrity-recovery-20260910",
+  "objective": "Correct PR-003 handoff schema, validator and fixtures so structured outcomes, exact local roots, Git/task bindings and typed precommit head evidence cannot be omitted or contradicted.",
+  "outcome": "Every corrected PR-003 producer packet has independently auditable shape and truthful evidence references while historical producer receipts remain immutable.",
+  "dependencies": [
+    "PR-001",
+    "PR-002"
+  ],
+  "owned_paths": [
+    "docs/research-program/handoffs/schema/**",
+    "docs/research-program/handoffs/PR-003.json",
+    "scripts/research-program/check-handoff.mjs",
+    "tests/research-program/handoff.test.mjs",
+    "verification/research-program/pr-003/**"
+  ],
+  "commits": [
+    {
+      "id": "C-003-1-R1",
+      "subject": "Enforce structured PR-003 handoff evidence",
+      "instructions": "Require complete structured expected/observed command outcomes, explicit source locations and status-specific evidence in the handoff schema/checker.",
+      "verification": "Schema and checker fixtures reject missing, contradictory, duplicate and incomplete command/source/evidence records while accepting truthful expected-negative and unavailable outcomes."
+    },
+    {
+      "id": "C-003-2-R1",
+      "subject": "Bind PR-003 evidence to exact local roots",
+      "instructions": "Verify task-binding, ledger, artifact, source, changed-file and Git paths against repoRoot with realpath containment and preserve a typed pending-head precommit convention.",
+      "verification": "Focused tests reject stale/unbound/cross-root/symlink references and invalid heads while accepting the exact f62 base binding."
+    }
+  ],
+  "check_commands": [
+    "node verification/research-program/pr-003/verify-schema-contract.mjs",
+    "node --test tests/research-program/handoff.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-003/",
+  "binding": {
+    "base_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+    "base_tree": "548d34311909ab3c4bb36c126896c7787d9b3dab",
+    "dependency_merge_shas": {
+      "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
+      "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "in_progress"
+}

@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/schemas/research-program/task.v1.schema.json",
+  "title": "ushso research-program task and dispatch contract",
+  "description": "Machine-checkable contract for one bounded implementer task: who owns it, which worktree/branch it runs in, the concrete integration base and dependency bindings it must preserve, the paths it may touch, the atomic commits and exact checks it owes, and the review states it moves through. Derived from docs/master-plan/2026-09-10/EXECUTION.md and the PR-003 packet.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "task_id",
+    "pr_id",
+    "title",
+    "owner",
+    "reviewer",
+    "branch",
+    "objective",
+    "outcome",
+    "dependencies",
+    "owned_paths",
+    "commits",
+    "check_commands",
+    "evidence_directory",
+    "binding",
+    "review_states",
+    "status"
+  ],
+  "properties": {
+    "format": { "const": "ushso.research-program.task.v1" },
+    "task_id": { "type": "string", "minLength": 1, "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "slice_id": { "type": "string", "pattern": "^C-[0-9]{3}-[0-9]+(?:-R[0-9]+)?$" },
+    "pr_id": { "$ref": "#/$defs/prId" },
+    "title": { "type": "string", "minLength": 1 },
+    "owner": { "type": "string", "minLength": 1 },
+    "reviewer": { "type": "string", "minLength": 1 },
+    "branch": { "type": "string", "pattern": "^codex/[A-Za-z0-9._/-]+$" },
+    "worktree": { "type": "string", "minLength": 1 },
+    "objective": { "type": "string", "minLength": 1 },
+    "outcome": { "type": "string", "minLength": 1 },
+    "dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/prId" }
+    },
+    "owned_paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "commits": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/commit" }
+    },
+    "check_commands": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "evidence_directory": { "type": "string", "pattern": "^verification/" },
+    "binding": { "$ref": "#/$defs/binding" },
+    "review_states": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/reviewState" }
+    },
+    "status": { "$ref": "#/$defs/reviewState" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "gitSha": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "prId": { "type": "string", "pattern": "^PR-[0-9]{3}$" },
+    "reviewState": {
+      "description": "Explicit task states from EXECUTION.md. A task may only be advertised as a terminal state after the evidence named by this contract exists.",
+      "enum": [
+        "planned",
+        "ready",
+        "in_progress",
+        "producer_checked",
+        "draft_pr",
+        "independent_review",
+        "changes_requested",
+        "independently_verified",
+        "merged",
+        "integrated",
+        "qualified",
+        "blocked"
+      ]
+    },
+    "commit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "subject", "instructions", "verification"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^C-[0-9]{3}-[0-9]+(?:-R[0-9]+)?$" },
+        "subject": { "type": "string", "minLength": 1 },
+        "instructions": { "type": "string", "minLength": 1 },
+        "verification": { "type": "string", "minLength": 1 }
+      }
+    },
+    "binding": {
+      "description": "Concrete launch values the task must not silently drift from: the eligible integration base, the accepted dependency merge SHAs, and, when the dispatch is recorded, the dispatch prompt/bootstrap receipt hashes.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_sha", "dependency_merge_shas"],
+      "properties": {
+        "base_sha": { "$ref": "#/$defs/gitSha" },
+        "base_tree": { "$ref": "#/$defs/gitSha" },
+        "dependency_merge_shas": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "$ref": "#/$defs/prId" },
+          "additionalProperties": { "$ref": "#/$defs/gitSha" }
+        },
+        "prompt_sha256": { "$ref": "#/$defs/sha256" },
+        "bootstrap_receipt_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

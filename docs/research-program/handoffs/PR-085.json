@@ -1,0 +1,1856 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-085",
+  "status": "producer_checked",
+  "owner": "Grok (xAI; grok-4; assignment grok-wp11). Original native owner remains Luna Max; this is a managed continuation after the native thread became unavailable. Root Astra authored only the separately reviewed C-085-2-R6 test-context correction and C-085-3-R2 evidence. Root Astra also authored the separately Grok-reviewed C-085-2-R7 CI test-context correction and C-085-3-R3 evidence.",
+  "reviewer": "Root Astra independently reviews provider implementation; separate Grok reviews approved the root-authored WP11 and CI test-context candidates.",
+  "base_sha": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+  "head_sha": null,
+  "dependency_merge_shas": {
+    "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8"
+  },
+  "branch": "codex/ushso-pr085-ci-attestation-20260910",
+  "github_pr_url": null,
+  "changed_files": [
+    "scripts/verify-wp0-attestation.mjs",
+    "scripts/run-contract-suites.mjs",
+    "scripts/verify-ci-attestation.mjs",
+    "tests/wp0-attestation.test.mjs",
+    "tests/ci-attestation.test.mjs",
+    "verification/testing/ci/v1.4.0/",
+    "verification/research-program/ci-attestation/command-receipts.json",
+    "verification/research-program/ci-attestation/current-wp0-replay.json",
+    "verification/research-program/ci-attestation/historical-wp0-v1.4-pins.json",
+    "verification/research-program/ci-attestation/runner-negative-fixtures.json",
+    "verification/research-program/ci-attestation/current-ci-v1.4-replay.json",
+    "verification/research-program/ci-attestation/historical-ci-v1.3-pins.json",
+    "verification/research-program/ci-attestation/v1.4-runner-negative-fixtures.json",
+    "verification/research-program/ci-attestation/v1.4-input-transition-negatives.json",
+    "verification/research-program/ci-attestation/v1.4-lock-install.json",
+    "verification/research-program/ci-attestation/v1.4-command-receipts.json",
+    "verification/research-program/pr-085/evidence-index.json",
+    "verification/research-program/pr-085/task-binding.json",
+    "docs/research-program/ci-attestations.md",
+    "docs/research-program/handoffs/PR-085.json",
+    "package-lock.json",
+    "scripts/verify-wp11-attestation.mjs",
+    "tests/wp11-attestation.test.mjs",
+    "verification/research-program/ci-attestation/wp11-v1.3.0/",
+    "verification/research-program/pr-085/wp11-continuation-evidence-index.json",
+    "verification/research-program/pr-085/wp11-test-context/",
+    "verification/research-program/pr-085/wp11-test-context-evidence-index.json",
+    "verification/research-program/pr-085/ci-test-context/",
+    "verification/research-program/pr-085/ci-test-context-evidence-index.json"
+  ],
+  "problem": "The original PR-085 task dispatch is bound to 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0 (tree 8707c8fc92f35742f58508a83a57a3c4d9b7baf4). The reviewed CI v1.4 continuation was applied from 4ad67220df54334f70d891fd26d1778f83328d54 (tree 02544973bf065b3825c8b189f186a598da99a223) under plan f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15 with independent review d3c9c26c7566c74de2e5cec42c24c388a54e3cbe402f9ccf472ea05294f02b8f; that continuation provenance is retained while the historical CI v1.3 approval remains valid only for its original subject. Current runner/input bytes require a versioned read-only inventory. PR-003 also introduces a reviewed root test stage, so the current package and inventory-test inputs need a bounded transition binding without weakening historical proof. Full npm test later failed WP11 v1.3 validation with SUCCESSOR_APPROVAL_STALE_SUBJECT. The native owner could not resume; this Grok continuation implements the reviewed WP11 current-attestation adapter from prepared source 30dc908c27269710763241887dcd5b6215196668 (tree 1db855220a66bf973d290426eab74047cbd5433f) under plan 176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d. PR085 also recorded original package.json as a local source while PR003 supplies a different reviewed manifest; the original bytes must remain an explicit Git snapshot. The actual combined candidate then exposed two WP11 focused assertions that assumed only the original PR085 package manifest. The first full combined gate also found two original-root-chain assumptions in existing CI tests.",
+  "resulting_behavior": "Historical WP0, CI and WP11 approval proofs remain bound to their original subjects. Exact reviewed aggregate descriptors run current technical verifiers, keep current approval null and release/production flags false, and retain real package tests and strict child failure behavior. CI accepts only the complete original or exact reviewed PR003 manifest/inventory pair. WP11 separately identifies the original PR085 package Git snapshot and reviewed PR003 current manifest. Two independently reviewed root test adjustments check the exact manifest present and inject original Git bytes for the historical positive control. The current standalone WP11 technical draft and wrapper are recorded in verification/research-program/pr-085/wp11-test-context/current-replay.json; earlier Grok command receipts and indexes remain unchanged evidence of earlier wrapper bytes. Full combined release qualification and R01-R16 acceptance remain pending. A separate Grok review approved two root-authored CI test-body corrections: explicit original Git bytes for the historical control and exact actual manifest assertions for the current inventory. The new committed 15-test replay and current CI subject are recorded under verification/research-program/pr-085/ci-test-context/; prior failed gate evidence and historical proof remain unchanged. No combined gate success is inferred.",
+  "commits": [
+    {
+      "id": "C-085-1",
+      "subject": "docs(research): bound current WP0 CI attestation (PR-085 C-085-1)",
+      "sha": "0d82cb98dc7ea1791f84bb471d5c8d2800d96715"
+    },
+    {
+      "id": "C-085-2",
+      "subject": "test(research): route WP0 current CI checks (PR-085 C-085-2)",
+      "sha": "86b7f7e6c875e877653dc6ff13e3850f7afa2743"
+    },
+    {
+      "id": "C-085-2-R1",
+      "subject": "test(research): cover runner failure paths",
+      "sha": "7cfbb96096d5eba46c37fb5b1885f116aa82ab80"
+    },
+    {
+      "id": "C-085-2-R2",
+      "subject": "feat(research): add versioned CI v1.4 inventory route",
+      "sha": "3c884d3edcab1c75249508236693f9e82ded5dc3"
+    },
+    {
+      "id": "C-085-2-R3",
+      "subject": "fix(ci): bind reviewed PR003 input transition",
+      "sha": "d1826358b0b1e5f8db97b787b5bf74de5e50926b"
+    },
+    {
+      "id": "C-085-2-R4",
+      "subject": "fix(ci): require atomic reviewed PR003 inputs",
+      "sha": "6ed7fb4cb24199977034cf86bb3f0b4a928513be"
+    },
+    {
+      "id": "C-085-2-R5",
+      "subject": "feat(research): add WP11 current-attestation adapter (PR-085 C-085-2-R5)",
+      "sha": "778b968f50e7b7e2e93c503274ca3a590bf63e39"
+    },
+    {
+      "id": "C-085-3",
+      "subject": "docs(research): publish versioned CI attestation evidence (PR-085 C-085-3)",
+      "sha": null
+    },
+    {
+      "id": "C-085-3-R1",
+      "subject": "docs(research): record WP11 current-attestation evidence (PR-085 C-085-3-R1)",
+      "sha": null
+    },
+    {
+      "id": "C-085-2-R6",
+      "subject": "Verify WP11 across reviewed manifest contexts",
+      "sha": "344a56c63c624132bce4d3db4d72d6ce81944309"
+    },
+    {
+      "id": "C-085-3-R2",
+      "subject": "Record separately reviewed WP11 test-context evidence",
+      "sha": null
+    },
+    {
+      "id": "C-085-2-R7",
+      "subject": "Verify CI across both reviewed root test contexts",
+      "sha": "0a10a7b2b8d218ba01f9a48e7af0460e9069e6b5"
+    },
+    {
+      "id": "C-085-3-R3",
+      "subject": "Record separately reviewed CI test-context evidence",
+      "sha": null
+    }
+  ],
+  "source_identities": [
+    {
+      "location": "local",
+      "kind": "unchanged-wp0-verifier",
+      "id": "scripts/verify-wp0-attestation.mjs",
+      "version": "unchanged from prior WP0 implementation",
+      "sha256": "04c39620d29104b3a096b976f7cb23c420300ee61cf565ff6c605e619afac3cd"
+    },
+    {
+      "location": "local",
+      "kind": "implementation-runner",
+      "id": "scripts/run-contract-suites.mjs",
+      "version": "CI v1.4 exact route, WP11 v1.3 exact route, and preserved strict child execution",
+      "sha256": "3a13c51986e1cd90b530465d4e8fc30cc3763a86189d06930c4dbf6f65c5e261"
+    },
+    {
+      "location": "local",
+      "kind": "implementation-wp11-adapter",
+      "id": "scripts/verify-wp11-attestation.mjs",
+      "version": "WP11 v1.3 historical proof/current draft/wrapper verifier",
+      "sha256": "fa711977fa6898210cc93b6fef30b0ab5e2db67797fc30d3a4eec4472c2790bc"
+    },
+    {
+      "location": "local",
+      "kind": "focused-wp11-subprocess-tests",
+      "id": "tests/wp11-attestation.test.mjs",
+      "version": "nine-test WP11 route, provenance and failure suite; separately reviewed root test-context correction",
+      "sha256": "15eaeb96ff4ec7d61b1aedd040edd1b19441e755d0e0fc26a24720ab9232aade"
+    },
+    {
+      "location": "local",
+      "kind": "wp11-current-attestation-policy",
+      "id": "verification/research-program/ci-attestation/wp11-v1.3.0/policy.json",
+      "version": "versioned WP11 v1.3 current-attestation policy",
+      "sha256": "88c3adf21064984d9f77c2304bca3ce558d9a2db63e4fe2d84fbbfbb11048703"
+    },
+    {
+      "location": "local",
+      "kind": "implementation-verifier",
+      "id": "scripts/verify-ci-attestation.mjs",
+      "version": "CI v1.4 historical proof/current draft verifier",
+      "sha256": "914ad3b3b0d65ff8ba901669d0081f099758442ddfcd328e71aa0d0222fc2b75"
+    },
+    {
+      "location": "local",
+      "kind": "focused-subprocess-tests",
+      "id": "tests/ci-attestation.test.mjs",
+      "version": "ten-test CI v1.4 route, transition, atomic-pair and failure suite; separately reviewed root CI test-context correction",
+      "sha256": "3f3a76d0d0b3df3750466a52b4ab14b0ac92ed9f5f48b3e88cc0aef7d4f16878"
+    },
+    {
+      "location": "local",
+      "kind": "unchanged-wp0-validator",
+      "id": "verification/wp0/v1.4.0/tools/verify.mjs",
+      "version": "unchanged prior WP0 validator",
+      "sha256": "fe6b6937e8c0abd22cfecd44e1483620ce6cf4585de01e9edf0d6d97bfcb99ec"
+    },
+    {
+      "location": "local",
+      "kind": "unchanged-successor-support",
+      "id": "verification/successor-support.mjs",
+      "version": "unchanged successor helper",
+      "sha256": "233d1008a823bbde17b1e0e415e34e630be133f2cd7d83040407e7e56ac5356c"
+    },
+    {
+      "location": "local",
+      "kind": "versioned-ci-v14-readme",
+      "id": "verification/testing/ci/v1.4.0/README.md",
+      "version": "versioned CI v1.4 contract",
+      "sha256": "3a504432bb8b91a29cdf00ca61ff56ba5dffbcaeecc45b94cd0504b150cea065"
+    },
+    {
+      "location": "local",
+      "kind": "versioned-ci-v14-package",
+      "id": "verification/testing/ci/v1.4.0/package.json",
+      "version": "versioned CI v1.4 descriptor",
+      "sha256": "f9fe5b00b2b471e6e60a48d8ed89af9d30c09cbe7ed5bc150e98fe0cec184bf7"
+    },
+    {
+      "location": "local",
+      "kind": "versioned-ci-v14-tests",
+      "id": "verification/testing/ci/v1.4.0/tests/ci-integration.test.mjs",
+      "version": "five-test v1.4 integration suite; separately reviewed root CI test-context correction",
+      "sha256": "0e110c2fc1527c8c3d7ad58a72e60f694a3a3a384bfaa3341654a940a706fd43"
+    },
+    {
+      "location": "local",
+      "kind": "versioned-ci-v14-inventory",
+      "id": "verification/testing/ci/v1.4.0/tools/ci-inventory.mjs",
+      "version": "root-chain/workspace structural inventory",
+      "sha256": "4e51bd9273e2febf8009c868ed8a41f34c9ff3cc3998141b6d8cca493f2bc8dd"
+    },
+    {
+      "location": "local",
+      "kind": "versioned-ci-v14-validator",
+      "id": "verification/testing/ci/v1.4.0/tools/validate-package.mjs",
+      "version": "strict direct v1.4 validator and evidence builder",
+      "sha256": "0413b0a140ec4e339199be1494d9146a7191e7e5d689b2cbeb5de68a8500bc41"
+    },
+    {
+      "location": "local",
+      "kind": "atomic-transition-negative-evidence",
+      "id": "verification/research-program/ci-attestation/v1.4-input-transition-negatives.json",
+      "version": "two actual mixed reviewed/historical PR003 input-pair negatives",
+      "sha256": "6fefb7b4d2947c6faa9c9cc5da90f0f48b0a604728e6a2a30b3ec41588a966b5"
+    },
+    {
+      "kind": "original-pr085-package-manifest",
+      "id": "4f90157108a92ce9541c340d5536eac31f24a1d8:package.json",
+      "location": "external",
+      "git_commit": "4f90157108a92ce9541c340d5536eac31f24a1d8",
+      "git_path": "package.json",
+      "sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
+      "version": "original PR085 producer Git snapshot; not the combined PR003 manifest"
+    },
+    {
+      "location": "local",
+      "kind": "package-lock",
+      "id": "package-lock.json",
+      "version": "npm 11.19.1 lock with additive v1.4 link",
+      "sha256": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c"
+    },
+    {
+      "location": "local",
+      "kind": "published-ci-doc",
+      "id": "docs/research-program/ci-attestations.md",
+      "version": "current v1.4 evidence documentation plus WP11 continuation; separately reviewed root test-context correction; separately reviewed root CI test-context correction",
+      "sha256": "0bde3cdb3768f57917eb660496fed6fcc6b11cc92703eb1f34a1e94dbe187e6e"
+    },
+    {
+      "location": "local",
+      "kind": "published-evidence-index",
+      "id": "verification/research-program/pr-085/evidence-index.json",
+      "version": "published evidence index with original dispatch base and explicit CI v1.4 continuation provenance",
+      "sha256": "ec0722290556a0dddf7305ecb983ae2633b5d6d436d39abc4da184999023e3b9"
+    },
+    {
+      "location": "local",
+      "kind": "per-pr-task-binding",
+      "id": "verification/research-program/pr-085/task-binding.json",
+      "version": "dispatch task binding restored to original base; reviewed CI v1.4 continuation and Grok WP11 continuation recorded separately; separately reviewed root test-context correction; separately reviewed root CI test-context correction",
+      "sha256": "6597fe693f9c2a26ae1da3a44b6255286302180708c16c71ee6ec16c5be514a2"
+    },
+    {
+      "kind": "continuation-plan-input",
+      "id": "4ad67220df54334f70d891fd26d1778f83328d54:docs/master-plan/2026-09-10/plan.json",
+      "location": "external",
+      "git_commit": "4ad67220df54334f70d891fd26d1778f83328d54",
+      "git_path": "docs/master-plan/2026-09-10/plan.json",
+      "sha256": "f1b70e63ba9add91c8aa2f70d89b5c398167aa891566eddec68624b32e9b1f15",
+      "version": "Explicit continuation provenance from 4ad67220df54334f70d891fd26d1778f83328d54 tree 02544973bf065b3825c8b189f186a598da99a223; original dispatch base is 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0 tree 8707c8fc92f35742f58508a83a57a3c4d9b7baf4"
+    },
+    {
+      "kind": "continuation-plan-review",
+      "id": "4ad67220df54334f70d891fd26d1778f83328d54:verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
+      "location": "external",
+      "git_commit": "4ad67220df54334f70d891fd26d1778f83328d54",
+      "git_path": "verification/research-program/bootstrap/ci-v14-plan-independent-review.json",
+      "sha256": "d3c9c26c7566c74de2e5cec42c24c388a54e3cbe402f9ccf472ea05294f02b8f",
+      "version": "Accepted continuation review for 4ad67220df54334f70d891fd26d1778f83328d54 tree 02544973bf065b3825c8b189f186a598da99a223; original dispatch base is 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0 tree 8707c8fc92f35742f58508a83a57a3c4d9b7baf4"
+    },
+    {
+      "kind": "wp11-continuation-plan-input",
+      "id": "30dc908c27269710763241887dcd5b6215196668:docs/master-plan/2026-09-10/plan.json",
+      "location": "external",
+      "git_commit": "30dc908c27269710763241887dcd5b6215196668",
+      "git_path": "docs/master-plan/2026-09-10/plan.json",
+      "sha256": "176fe62ddb6ed9e574e84d7f8d0cf7d06344ec40e3ba13a2cd41d3711f17a49d",
+      "version": "WP11 continuation plan; original dispatch base remains 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0"
+    },
+    {
+      "kind": "wp11-continuation-plan-review",
+      "id": "30dc908c27269710763241887dcd5b6215196668:verification/research-program/bootstrap/wp11-plan-independent-review.json",
+      "location": "external",
+      "git_commit": "30dc908c27269710763241887dcd5b6215196668",
+      "git_path": "verification/research-program/bootstrap/wp11-plan-independent-review.json",
+      "sha256": "03ebb668ccdc75becb8818d67d3169e40d1f2d660c1f769e1df424cf20c9fe48",
+      "version": "Accepted WP11 continuation review; original dispatch base remains 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0"
+    },
+    {
+      "kind": "reviewed-pr003-root-package",
+      "id": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2:package.json",
+      "location": "external",
+      "git_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "git_path": "package.json",
+      "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e"
+    },
+    {
+      "kind": "reviewed-pr003-inventory-test",
+      "id": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2:tests/contract-package-inventory.test.mjs",
+      "location": "external",
+      "git_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "git_path": "tests/contract-package-inventory.test.mjs",
+      "sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b"
+    },
+    {
+      "kind": "historical-ci-v13-approval",
+      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/testing/ci/v1.3.0/approvals/approval.json",
+      "location": "external",
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "git_path": "verification/testing/ci/v1.3.0/approvals/approval.json",
+      "sha256": "315d0aa83399238b8e127ca3affae9e4d409fb7834e6c3d3aba6434b41b07ae0"
+    },
+    {
+      "kind": "historical-ci-v13-evidence",
+      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/testing/ci/v1.3.0/approvals/evidence.txt",
+      "location": "external",
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "git_path": "verification/testing/ci/v1.3.0/approvals/evidence.txt",
+      "sha256": "a66da67cfee5c1dc4515aef9464afc222938ce27d3bc169da4393c211e8faa5e"
+    },
+    {
+      "kind": "historical-ci-v13-receipt",
+      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/testing/ci/v1.3.0/receipts/approved.json",
+      "location": "external",
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "git_path": "verification/testing/ci/v1.3.0/receipts/approved.json",
+      "sha256": "8013e0b4700d781a365540e046cd6ac15c8eb1999aca956b30c73591ad648d4b"
+    },
+    {
+      "kind": "historical-ci-v10-predecessor",
+      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/testing/ci/v1.0.0/receipts/ci-integration.json",
+      "location": "external",
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "git_path": "verification/testing/ci/v1.0.0/receipts/ci-integration.json",
+      "sha256": "6e27725cf531e1ced3d546503176af8ae4157366e97594c49ca5c9d2c18215cd"
+    },
+    {
+      "kind": "historical-ci-v12-successor",
+      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/testing/ci/v1.2.0/receipts/approved.json",
+      "location": "external",
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "git_path": "verification/testing/ci/v1.2.0/receipts/approved.json",
+      "sha256": "d5f7b2d29cb6790a4b390f62a988746d8a9de6b36642c9d793179178f7d938e2"
+    },
+    {
+      "kind": "historical-ci-failure",
+      "id": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0:verification/research-program/bootstrap/ci-failure-487f06a.json",
+      "location": "external",
+      "git_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "git_path": "verification/research-program/bootstrap/ci-failure-487f06a.json",
+      "sha256": "95a3a3f84078a4200142d0b912f31c799bc9f15c7335f67595c79b3dacbbf5bb"
+    },
+    {
+      "kind": "dispatch-prompt",
+      "id": "native-pr085-dispatch-prompt.md",
+      "location": "external",
+      "sha256": "1951d641b5d191eac6848d3a1641e528a907382db14df540e0207c695a4e57af"
+    },
+    {
+      "kind": "accepted-dependency-merge",
+      "id": "035465f3f16d15f02467679d96451d4440a36ca8",
+      "location": "external",
+      "version": "PR-001 accepted merge commit"
+    },
+    {
+      "kind": "dependency-producer",
+      "id": "8fc2fbbbaf1016da4c3951ccd238918ce645f4fe",
+      "location": "external",
+      "version": "PR-001 producer head"
+    },
+    {
+      "location": "local",
+      "kind": "wp11-current-replay",
+      "id": "verification/research-program/ci-attestation/wp11-v1.3.0/current-replay.json",
+      "sha256": "aa168ac43a178b465d806766d53106c54d23715ebc4b002b2485c09223ea7e18"
+    },
+    {
+      "location": "local",
+      "kind": "wp11-historical-pins",
+      "id": "verification/research-program/ci-attestation/wp11-v1.3.0/historical-pins.json",
+      "sha256": "d55ddb4602f36557981f151243a8a4532ec7883b78cf2b9c3958aca7a6bc1a06"
+    },
+    {
+      "location": "local",
+      "kind": "wp11-runner-negative-fixtures",
+      "id": "verification/research-program/ci-attestation/wp11-v1.3.0/runner-negative-fixtures.json",
+      "sha256": "10afabc4e3576a6101c4a1d66d8ed7a5f0427e31feb8d26ca63fc8d6d968e0cf"
+    },
+    {
+      "location": "local",
+      "kind": "wp11-command-receipts",
+      "id": "verification/research-program/ci-attestation/wp11-v1.3.0/command-receipts.json",
+      "sha256": "1a0dbe7b8b4cec7f6d62c3b499135fc916805186f0e220d36ccbca1228f0e10b"
+    },
+    {
+      "location": "local",
+      "kind": "wp11-continuation-evidence-index",
+      "id": "verification/research-program/pr-085/wp11-continuation-evidence-index.json",
+      "sha256": "2c421a12d63c7dba0371367e82941bc887deed977d95e7f36f5ec8b63b16b879"
+    },
+    {
+      "kind": "controller-wp11-test-context-evidence",
+      "id": "verification/research-program/pr-085/wp11-test-context/independent-review.json",
+      "location": "local",
+      "version": "Additive root-authored correction evidence after independent Grok review; earlier producer evidence remains historical",
+      "sha256": "e86fc7c60f5881b5d91235b9ce243a5e84db6b65acb812f5f2d3affec851ca25"
+    },
+    {
+      "kind": "controller-wp11-test-context-evidence",
+      "id": "verification/research-program/pr-085/wp11-test-context/command-receipts.json",
+      "location": "local",
+      "version": "Additive root-authored correction evidence after independent Grok review; earlier producer evidence remains historical",
+      "sha256": "0a623ebd6caa69af70905229576938570d0fa0a8eb6d476b6dd60a070e9906d7"
+    },
+    {
+      "kind": "controller-wp11-test-context-evidence",
+      "id": "verification/research-program/pr-085/wp11-test-context/current-replay.json",
+      "location": "local",
+      "version": "Additive root-authored correction evidence after independent Grok review; earlier producer evidence remains historical",
+      "sha256": "8524fc4d9e48cffef60fd8dd407a8dacced005af1fe710b88f3b9d92b2b4f53f"
+    },
+    {
+      "kind": "controller-wp11-test-context-evidence",
+      "id": "verification/research-program/pr-085/wp11-test-context/correction.json",
+      "location": "local",
+      "version": "Additive root-authored correction evidence after independent Grok review; earlier producer evidence remains historical",
+      "sha256": "17b41a5be03a4c3a21c23b8a9eab55cad1c90958805696bd8c3d4877e715701b"
+    },
+    {
+      "kind": "controller-wp11-test-context-evidence",
+      "id": "verification/research-program/pr-085/wp11-test-context-evidence-index.json",
+      "location": "local",
+      "version": "Additive root-authored correction evidence after independent Grok review; earlier producer evidence remains historical",
+      "sha256": "c190eecb1d0a7a99b9825e751036ffee6fb07e7c30afb32966a450da73ab796e"
+    },
+    {
+      "location": "local",
+      "kind": "controller-ci-test-context-evidence",
+      "id": "verification/research-program/pr-085/ci-test-context/independent-review.json",
+      "version": "Additive evidence for the separately reviewed root CI test correction",
+      "sha256": "c9007f03b7f00b34f56bd6f493347e7c6cac835476133e29a903da54aa095938"
+    },
+    {
+      "location": "local",
+      "kind": "controller-ci-test-context-evidence",
+      "id": "verification/research-program/pr-085/ci-test-context/candidate.json",
+      "version": "Additive evidence for the separately reviewed root CI test correction",
+      "sha256": "7c5b9de4756bd651d4fcef1290516b115f7a138dc798e34376b4ecd4ae03e22e"
+    },
+    {
+      "location": "local",
+      "kind": "controller-ci-test-context-evidence",
+      "id": "verification/research-program/pr-085/ci-test-context/command-receipts.json",
+      "version": "Additive evidence for the separately reviewed root CI test correction",
+      "sha256": "0feea91cfc59446d00ff26ae65cb6682f0449943991c137b83abbbff8940bc8c"
+    },
+    {
+      "location": "local",
+      "kind": "controller-ci-test-context-evidence",
+      "id": "verification/research-program/pr-085/ci-test-context/current-replay.json",
+      "version": "Additive evidence for the separately reviewed root CI test correction",
+      "sha256": "37155175a604a9c24c3b90cd1db980e3ac4491a84d8cac46586769ae7d4e4134"
+    },
+    {
+      "location": "local",
+      "kind": "controller-ci-test-context-evidence",
+      "id": "verification/research-program/pr-085/ci-test-context/correction.json",
+      "version": "Additive evidence for the separately reviewed root CI test correction",
+      "sha256": "e9c59ab5e966b5534cc7b26e2b21757387fb150fb14b688afb9fe2132e7f0c63"
+    },
+    {
+      "location": "local",
+      "kind": "controller-ci-test-context-evidence",
+      "id": "verification/research-program/pr-085/ci-test-context-evidence-index.json",
+      "version": "Additive evidence for the separately reviewed root CI test correction",
+      "sha256": "a6b774df11a90f60855a005ebb251b5ddea45d3a0e04aeb2c97885cda7421a97"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-0001-d2cb68ac",
+      "command": "node scripts/verify-wp0-attestation.mjs",
+      "started_at": "2026-09-11T00:13:34.872Z",
+      "completed_at": "2026-09-11T00:13:54.770Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "result": "Sandboxed nested replay was blocked by EPERM/empty output; the attempted child exited 1 and was not treated as a pass.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 1; environment_blocked.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      }
+    },
+    {
+      "id": "cmd-0002-6b609290",
+      "command": "node --test --test-reporter=tap tests/product-boundary.test.mjs",
+      "started_at": "2026-09-11T00:14:05.816Z",
+      "completed_at": "2026-09-11T00:14:06.112Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Direct boundary test passed.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 0; passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0003-125f0176",
+      "command": "node --input-type=module -e 'import {execFile} from '\"'\"'node:child_process'\"'\"'; import {promisify} from '\"'\"'node:util'\"'\"'; const execute=promisify(execFile); const env={...process.env}; delete env.NODE_TEST_CONTEXT; const {stdout,stderr}=await execute(process.execPath,['\"'\"'--test'\"'\"','\"'\"'--test-reporter=tap'\"'\"','\"'\"'tests/product-boundary.test.mjs'\"'\"'],{cwd:process.cwd(),env,maxBuffer:8*1024*1024}); console.log(JSON.stringify({stdout,stderr,tests:stdout.match(/^# tests (\\d+)$/m)?.[1]}));'",
+      "started_at": "2026-09-11T00:14:16.587Z",
+      "completed_at": "2026-09-11T00:14:16.887Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Escalated execFile boundary replay passed.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 0; passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0004-96aa21f7",
+      "command": "node --input-type=module -e 'import {spawnSync} from '\"'\"'node:child_process'\"'\"'; const x=spawnSync(process.execPath,['\"'\"'--test'\"'\"','\"'\"'--test-reporter=tap'\"'\"','\"'\"'tests/product-boundary.test.mjs'\"'\"'],{cwd:process.cwd(),encoding:'\"'\"'utf8'\"'\"'}); console.log(JSON.stringify({status:x.status,signal:x.signal,error:x.error?.message,stdoutLength:x.stdout?.length,stderrLength:x.stderr?.length,stdout:x.stdout,stderr:x.stderr}));'",
+      "started_at": "2026-09-11T00:14:29.232Z",
+      "completed_at": "2026-09-11T00:14:29.531Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Escalated spawn boundary replay passed.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 0; passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0005-71f199f9",
+      "command": "node scripts/verify-wp0-attestation.mjs",
+      "started_at": "2026-09-11T00:14:45.481Z",
+      "completed_at": "2026-09-11T00:15:07.459Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "C1 current-attestation replay passed.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 0; passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0006-3af88de0",
+      "command": "node scripts/run-contract-suites.mjs --suite wp0",
+      "started_at": "2026-09-11T00:17:47.624Z",
+      "completed_at": "2026-09-11T00:18:30.120Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Actual WP0 runner route replay passed.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 0; passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0007-8421748d",
+      "command": "node --test tests/wp0-attestation.test.mjs",
+      "started_at": "2026-09-11T00:21:41.047Z",
+      "completed_at": "2026-09-11T00:22:24.607Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Focused suite replay passed before the later bounded correction.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 0; passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0008-45ee34d1",
+      "command": "node scripts/verify-wp0-attestation.mjs",
+      "started_at": "2026-09-11T00:24:58.118Z",
+      "completed_at": "2026-09-11T00:25:19.805Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "C2 current-attestation replay passed before the later bounded correction.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 0; passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0009-042f6d83",
+      "command": "env PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin /mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm test",
+      "started_at": "2026-09-11T00:26:05.275Z",
+      "completed_at": "2026-09-11T00:31:50.182Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "result": "Earlier full npm test stopped at the known successor stale-subject gate.",
+      "expected": "Expected child exit 1; expected-negative stale-subject checks intentionally expect exit 1.",
+      "actual": "Observed exit 1; failed_expected_historical_subject_gate.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      }
+    },
+    {
+      "id": "cmd-0010-33ffc3c1",
+      "command": "env PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin /mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/node --test tests/wp0-attestation.test.mjs",
+      "started_at": "2026-09-11T00:38:09.225Z",
+      "completed_at": "2026-09-11T00:38:09.226Z",
+      "exit_code": 127,
+      "completion_status": "observed_exit_127",
+      "result": "Operator retry named a nonexistent pinned node binary and exited 127; repository code did not execute.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 127; operator_error.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 127
+      }
+    },
+    {
+      "id": "cmd-0011-39a503ef",
+      "command": "env PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin node --test tests/wp0-attestation.test.mjs",
+      "started_at": "2026-09-11T00:38:20.967Z",
+      "completed_at": "2026-09-11T00:39:04.608Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "result": "Initial zero fixture was invalid because Node counted an empty file; fixture was corrected.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 1; fixture_error.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      }
+    },
+    {
+      "id": "cmd-0012-1fd89193",
+      "command": "env PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin node --test tests/wp0-attestation.test.mjs",
+      "started_at": "2026-09-11T00:39:50.513Z",
+      "completed_at": "2026-09-11T00:40:35.340Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Final bounded subprocess fixture suite passed all 10 tests.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 0; passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0013-376ca93b",
+      "command": "env PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin node scripts/verify-wp0-attestation.mjs",
+      "started_at": "2026-09-11T00:43:00.433Z",
+      "completed_at": "2026-09-11T00:43:21.447Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Final current WP0 attestation replay passed after the runner correction.",
+      "expected": "Expected exit 0 for the recorded replay.",
+      "actual": "Observed exit 0; passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0014-9cb38845",
+      "command": "env PATH=/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.nvm/versions/node/v24.14.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex-path:/home/plumbob/.codex/tmp/arg0/codex-arg0G8kC0e:/home/plumbob/.local/bin:/home/plumbob/.local/bin:/home/plumbob/bin:/home/plumbob/.grok/bin:/home/plumbob/bin:/home/plumbob/.smux/bin:/home/plumbob/.opencode/bin:/home/plumbob/.deno/bin:/home/plumbob/.local/bin:/home/plumbob/.bun/bin:/home/plumbob/.cargo/bin:/home/plumbob/.nvm/versions/node/v24.14.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin /mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm test",
+      "started_at": "2026-09-11T00:45:20.258Z",
+      "completed_at": "2026-09-11T00:51:17.709Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "result": "Full npm test on the completed candidate retained the unchanged successor stale-subject failure.",
+      "expected": "Expected child exit 1; expected-negative stale-subject checks intentionally expect exit 1.",
+      "actual": "Observed exit 1; failed_expected_historical_subject_gate.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      }
+    },
+    {
+      "id": "cmd-0021-fd1a369a",
+      "command": "node --test tests/ci-attestation.test.mjs",
+      "result": "Real git-show PR003 transition proof, legacy control and one-byte tamper negative passed.",
+      "started_at": "2026-09-11T02:03:24.562Z",
+      "completed_at": "2026-09-11T02:03:26.524Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0022-aa4a557b",
+      "command": "npm test",
+      "result": "Full npm test retained verification/wp11/v1.3.0:validate SUCCESSOR_APPROVAL_STALE_SUBJECT.",
+      "started_at": "2026-09-11T02:04:05.057Z",
+      "completed_at": "2026-09-11T02:09:54.560Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "expected": "Expected observed exit 1 for this bounded command.",
+      "actual": "Observed exit 1.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      }
+    },
+    {
+      "id": "cmd-0023-f00f3acb",
+      "command": "npm run build",
+      "result": "Producer build passed.",
+      "started_at": "2026-09-11T02:10:21.576Z",
+      "completed_at": "2026-09-11T02:11:08.245Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0024-911db093",
+      "command": "npm run cf:dry-run",
+      "result": "Producer build and artifact-only Wrangler dry-run passed.",
+      "started_at": "2026-09-11T02:11:35.610Z",
+      "completed_at": "2026-09-11T02:12:39.493Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0025-1bb26230",
+      "command": "npm run --prefix verification/testing/ci/v1.4.0 test",
+      "result": "All five CI v1.4 package integration tests passed.",
+      "started_at": "2026-09-11T02:13:14.424Z",
+      "completed_at": "2026-09-11T02:13:14.737Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0026-246ee7e0",
+      "command": "node --test tests/ci-attestation.test.mjs",
+      "result": "All nine focused CI v1.4 runner tests passed, including real PR003 input transition and failure cases.",
+      "started_at": "2026-09-11T02:13:14.888Z",
+      "completed_at": "2026-09-11T02:13:16.920Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0027-ca1dd0f1",
+      "command": "node scripts/verify-ci-attestation.mjs",
+      "result": "Historical CI v1.3 proof and pending CI v1.4 draft replay passed.",
+      "started_at": "2026-09-11T02:13:17.070Z",
+      "completed_at": "2026-09-11T02:13:17.165Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0029-77c01c6b",
+      "command": "write current-ci-v1.4-replay.json using verifyCiAttestation()",
+      "result": "Current CI v1.4 replay artifact written.",
+      "started_at": "2026-09-11T02:13:44.008Z",
+      "completed_at": "2026-09-11T02:13:44.097Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0030-670cc197",
+      "command": "write historical-ci-v1.3-pins.json",
+      "result": "Historical pins and reviewed PR003 input artifact written.",
+      "started_at": "2026-09-11T02:14:50.839Z",
+      "completed_at": "2026-09-11T02:14:50.893Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0031-8420d755",
+      "command": "write v1.4-runner-negative-fixtures.json",
+      "result": "Runner negative-fixture artifact written.",
+      "started_at": "2026-09-11T02:14:51.057Z",
+      "completed_at": "2026-09-11T02:14:51.088Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0032-26c45fcf",
+      "command": "write v1.4-lock-install.json",
+      "result": "Lock/install artifact written.",
+      "started_at": "2026-09-11T02:14:51.238Z",
+      "completed_at": "2026-09-11T02:14:51.274Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0034-c42c701c",
+      "command": "write v1.4-command-receipts.json",
+      "result": "Superseded sanitized command metadata artifact written.",
+      "started_at": "2026-09-11T02:18:02.005Z",
+      "completed_at": "2026-09-11T02:18:02.044Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0035-f4523662",
+      "command": "update verification/research-program/pr-085/task-binding.json",
+      "result": "Continuation task binding written.",
+      "started_at": "2026-09-11T02:18:49.359Z",
+      "completed_at": "2026-09-11T02:18:49.386Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0039-f2390da5",
+      "command": "node tests/ci-attestation.test.mjs",
+      "result": "All ten focused CI v1.4 tests passed, including both actual mixed-pair transition negatives.",
+      "started_at": "2026-09-11T02:31:23.466Z",
+      "completed_at": "2026-09-11T02:31:25.421Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0041-14adb64d",
+      "command": "write current-ci-v1.4-replay.json using verifyCiAttestation()",
+      "result": "Current CI v1.4 replay artifact rewritten after atomic transition correction.",
+      "started_at": "2026-09-11T02:33:22.400Z",
+      "completed_at": "2026-09-11T02:33:22.504Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0042-1ed26f79",
+      "command": "write v1.4-input-transition-negatives.json",
+      "result": "Atomic mixed-pair negative artifact written.",
+      "started_at": "2026-09-11T02:33:33.513Z",
+      "completed_at": "2026-09-11T02:33:33.573Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0044-9aab8058",
+      "command": "node scripts/verify-ci-attestation.mjs",
+      "result": "Historical proof and pending current v1.4 draft replay passed with atomic transition enforcement.",
+      "started_at": "2026-09-11T02:34:17.124Z",
+      "completed_at": "2026-09-11T02:34:17.232Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0045-59836680",
+      "command": "write v1.4-command-receipts.json",
+      "result": "Final sanitized command metadata artifact written.",
+      "started_at": "2026-09-11T02:34:33.059Z",
+      "completed_at": "2026-09-11T02:34:33.092Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0101-wp11-focused",
+      "command": "node --test tests/wp11-attestation.test.mjs",
+      "result": "All nine focused WP11 adapter tests passed, including historical proof, original Git-snapshot provenance, exact four-test routing, descriptor negatives and sealed-file checks.",
+      "started_at": "2026-09-11T04:33:51.798Z",
+      "completed_at": "2026-09-11T04:33:55.129Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0103-wp11-suite",
+      "command": "node scripts/run-contract-suites.mjs --suite wp11",
+      "result": "Exact WP11 aggregate executed the real four-test suite then the current-attestation adapter.",
+      "started_at": "2026-09-11T04:33:55.129Z",
+      "completed_at": "2026-09-11T04:33:55.930Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0104-ci-focused",
+      "command": "node --test tests/ci-attestation.test.mjs",
+      "result": "All ten existing CI v1.4 focused tests still passed after the WP11 runner extension.",
+      "started_at": "2026-09-11T04:33:55.930Z",
+      "completed_at": "2026-09-11T04:33:58.300Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0105-ci-verify",
+      "command": "node scripts/verify-ci-attestation.mjs",
+      "result": "Historical CI v1.3 proof still passed; current v1.4 draft remains pending after additive runner routing.",
+      "started_at": "2026-09-11T04:33:58.301Z",
+      "completed_at": "2026-09-11T04:33:58.412Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0106-wp0-focused",
+      "command": "node --test tests/wp0-attestation.test.mjs",
+      "result": "All ten existing WP0 focused tests still passed after the WP11 runner extension.",
+      "started_at": "2026-09-11T04:33:58.412Z",
+      "completed_at": "2026-09-11T04:34:43.357Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0107-wp0-verify",
+      "command": "node scripts/verify-wp0-attestation.mjs",
+      "result": "Historical WP0 proof still passed; current WP0 draft remains pending.",
+      "started_at": "2026-09-11T04:34:43.357Z",
+      "completed_at": "2026-09-11T04:35:05.211Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-0108-wp11-direct-validate",
+      "command": "node verification/wp11/v1.3.0/tools/verify.mjs --validate",
+      "result": "Direct WP11 successor validation retained SUCCESSOR_APPROVAL_STALE_SUBJECT and wrote no approval artifact.",
+      "started_at": "2026-09-11T04:35:05.211Z",
+      "completed_at": "2026-09-11T04:35:05.310Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "expected": "Expected child exit 1; expected-negative stale-subject checks intentionally expect exit 1.",
+      "actual": "Observed exit 1.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      }
+    },
+    {
+      "id": "cmd-0109-wp11-reverify",
+      "command": "node scripts/verify-wp11-attestation.mjs",
+      "result": "Replayed WP11 current attestation; current technical and wrapper subjects reproduced.",
+      "started_at": "2026-09-11T04:35:05.310Z",
+      "completed_at": "2026-09-11T04:35:05.509Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Expected observed exit 0 for this bounded command.",
+      "actual": "Observed exit 0.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-controller-wp11-context-focused-tests",
+      "command": "node --test tests/wp11-attestation.test.mjs",
+      "result": "Observed exit 0 at immutable functional 344a56c63c624132bce4d3db4d72d6ce81944309; nine tests passed.",
+      "started_at": "2026-09-11T05:06:43.148507Z",
+      "completed_at": "2026-09-11T05:06:46.568175Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Focused nine-test context suite or current verifier passes with current approval null and release flags false.",
+      "actual": "Observed exit 0 at functional 344a56c63c624132bce4d3db4d72d6ce81944309; nine tests passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-cmd-controller-wp11-context-focused-tests",
+        "path": "verification/research-program/pr-085/wp11-test-context/command-receipts.json",
+        "bytes": 1595,
+        "sha256": "0a623ebd6caa69af70905229576938570d0fa0a8eb6d476b6dd60a070e9906d7"
+      }
+    },
+    {
+      "id": "cmd-controller-wp11-context-current-verifier",
+      "command": "node scripts/verify-wp11-attestation.mjs",
+      "result": "Observed exit 0 at immutable functional 344a56c63c624132bce4d3db4d72d6ce81944309; current technical and wrapper evidence remain pending.",
+      "started_at": "2026-09-11T05:06:46.568218Z",
+      "completed_at": "2026-09-11T05:06:46.712592Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Focused nine-test context suite or current verifier passes with current approval null and release flags false.",
+      "actual": "Observed exit 0 at functional 344a56c63c624132bce4d3db4d72d6ce81944309; current technical and wrapper evidence remain pending.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-cmd-controller-wp11-context-current-verifier",
+        "path": "verification/research-program/pr-085/wp11-test-context/command-receipts.json",
+        "bytes": 1595,
+        "sha256": "0a623ebd6caa69af70905229576938570d0fa0a8eb6d476b6dd60a070e9906d7"
+      }
+    },
+    {
+      "id": "cmd-controller-ci-context-focused-tests",
+      "command": "node --test tests/ci-attestation.test.mjs verification/testing/ci/v1.4.0/tests/ci-integration.test.mjs",
+      "result": "Observed exit 0 at functional 0a10a7b2b8d218ba01f9a48e7af0460e9069e6b5; 15 tests passed.",
+      "started_at": "2026-09-11T06:09:07.721537Z",
+      "completed_at": "2026-09-11T06:09:09.902139Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Focused context checks and current verifier pass without approval or release changes.",
+      "actual": "Observed exit 0 at functional 0a10a7b2b8d218ba01f9a48e7af0460e9069e6b5; 15 tests passed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-cmd-controller-ci-context-focused-tests",
+        "path": "verification/research-program/pr-085/ci-test-context/command-receipts.json",
+        "bytes": 1525,
+        "sha256": "0feea91cfc59446d00ff26ae65cb6682f0449943991c137b83abbbff8940bc8c"
+      }
+    },
+    {
+      "id": "cmd-controller-ci-context-current-verifier",
+      "command": "node scripts/verify-ci-attestation.mjs",
+      "result": "Observed exit 0 at functional 0a10a7b2b8d218ba01f9a48e7af0460e9069e6b5; current CI approval remains null, pending review.",
+      "started_at": "2026-09-11T06:09:09.902212Z",
+      "completed_at": "2026-09-11T06:09:10.011656Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "Focused context checks and current verifier pass without approval or release changes.",
+      "actual": "Observed exit 0 at functional 0a10a7b2b8d218ba01f9a48e7af0460e9069e6b5; current CI approval remains null, pending review.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-cmd-controller-ci-context-current-verifier",
+        "path": "verification/research-program/pr-085/ci-test-context/command-receipts.json",
+        "bytes": 1525,
+        "sha256": "0feea91cfc59446d00ff26ae65cb6682f0449943991c137b83abbbff8940bc8c"
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-historical-pins",
+      "path": "verification/research-program/ci-attestation/historical-wp0-v1.4-pins.json",
+      "sha256": "e33c961f82a14098a463517c0871f0e345fdc3335efdcb94a58afeebe5b1f8d1",
+      "bytes": 1890
+    },
+    {
+      "id": "artifact-current-replay",
+      "path": "verification/research-program/ci-attestation/current-wp0-replay.json",
+      "sha256": "2d801361c7658b96aadb7421866653373b04b9c5ba979b92781d6b21b326147b",
+      "bytes": 1873
+    },
+    {
+      "id": "artifact-negative-fixtures",
+      "path": "verification/research-program/ci-attestation/runner-negative-fixtures.json",
+      "sha256": "495bc35821fa52b04c0f2cae88f9ace8ebc00c1360bc6d37fdef6935dd4e5598",
+      "bytes": 3218
+    },
+    {
+      "id": "artifact-command-receipts",
+      "path": "verification/research-program/ci-attestation/command-receipts.json",
+      "sha256": "72adc40cfc2fbdb9e235e05804ae8d67ad0d43a58cafc426d8ef390da7e3ec62",
+      "bytes": 29805
+    },
+    {
+      "id": "artifact-evidence-index",
+      "path": "verification/research-program/pr-085/evidence-index.json",
+      "bytes": 19861,
+      "sha256": "ec0722290556a0dddf7305ecb983ae2633b5d6d436d39abc4da184999023e3b9"
+    },
+    {
+      "id": "artifact-ci-attestations-doc",
+      "path": "docs/research-program/ci-attestations.md",
+      "bytes": 14679,
+      "sha256": "0bde3cdb3768f57917eb660496fed6fcc6b11cc92703eb1f34a1e94dbe187e6e"
+    },
+    {
+      "id": "artifact-task-binding",
+      "path": "verification/research-program/pr-085/task-binding.json",
+      "bytes": 10792,
+      "sha256": "6597fe693f9c2a26ae1da3a44b6255286302180708c16c71ee6ec16c5be514a2"
+    },
+    {
+      "id": "artifact-prior-ci-failure",
+      "path": "verification/research-program/bootstrap/ci-failure-487f06a.json",
+      "sha256": "95a3a3f84078a4200142d0b912f31c799bc9f15c7335f67595c79b3dacbbf5bb",
+      "bytes": 2769
+    },
+    {
+      "id": "artifact-ci-v14-current-replay",
+      "path": "verification/research-program/ci-attestation/current-ci-v1.4-replay.json",
+      "bytes": 11054,
+      "sha256": "8449f912452cfc828cbee1b72605634f298304220c0600adbb8359b906987cf4"
+    },
+    {
+      "id": "artifact-ci-v13-historical-pins",
+      "path": "verification/research-program/ci-attestation/historical-ci-v1.3-pins.json",
+      "bytes": 6914,
+      "sha256": "ed68d531b75e96173d1754c0d22caae976f3b65e80e760cc0940e3cd84440d9b"
+    },
+    {
+      "id": "artifact-ci-v14-negative-fixtures",
+      "path": "verification/research-program/ci-attestation/v1.4-runner-negative-fixtures.json",
+      "bytes": 2266,
+      "sha256": "ce48082de26c4bd619163b74e9ac1200c392d3c212ad984e507f1d74a993a75e"
+    },
+    {
+      "id": "artifact-ci-v14-lock-install",
+      "path": "verification/research-program/ci-attestation/v1.4-lock-install.json",
+      "bytes": 1227,
+      "sha256": "a55a59017b89f15cf06ce41f52c946c429bc88a6519c2da45bef1dcf1cdbea55"
+    },
+    {
+      "id": "artifact-ci-v14-command-receipts",
+      "path": "verification/research-program/ci-attestation/v1.4-command-receipts.json",
+      "bytes": 22872,
+      "sha256": "fb8c51c68fea8b2d6c3eeedec0d29eed85a658e5afd456c659c5b40227ff82ce"
+    },
+    {
+      "id": "artifact-ci-v14-transition-negative-fixtures",
+      "path": "verification/research-program/ci-attestation/v1.4-input-transition-negatives.json",
+      "bytes": 2385,
+      "sha256": "6fefb7b4d2947c6faa9c9cc5da90f0f48b0a604728e6a2a30b3ec41588a966b5"
+    },
+    {
+      "id": "artifact-wp11-policy",
+      "path": "verification/research-program/ci-attestation/wp11-v1.3.0/policy.json",
+      "bytes": 3319,
+      "sha256": "88c3adf21064984d9f77c2304bca3ce558d9a2db63e4fe2d84fbbfbb11048703"
+    },
+    {
+      "id": "artifact-wp11-current-replay",
+      "path": "verification/research-program/ci-attestation/wp11-v1.3.0/current-replay.json",
+      "bytes": 5820,
+      "sha256": "aa168ac43a178b465d806766d53106c54d23715ebc4b002b2485c09223ea7e18"
+    },
+    {
+      "id": "artifact-wp11-historical-pins",
+      "path": "verification/research-program/ci-attestation/wp11-v1.3.0/historical-pins.json",
+      "bytes": 3261,
+      "sha256": "d55ddb4602f36557981f151243a8a4532ec7883b78cf2b9c3958aca7a6bc1a06"
+    },
+    {
+      "id": "artifact-wp11-negative-fixtures",
+      "path": "verification/research-program/ci-attestation/wp11-v1.3.0/runner-negative-fixtures.json",
+      "bytes": 2356,
+      "sha256": "10afabc4e3576a6101c4a1d66d8ed7a5f0427e31feb8d26ca63fc8d6d968e0cf"
+    },
+    {
+      "id": "artifact-wp11-command-receipts",
+      "path": "verification/research-program/ci-attestation/wp11-v1.3.0/command-receipts.json",
+      "bytes": 6498,
+      "sha256": "1a0dbe7b8b4cec7f6d62c3b499135fc916805186f0e220d36ccbca1228f0e10b"
+    },
+    {
+      "id": "artifact-wp11-continuation-index",
+      "path": "verification/research-program/pr-085/wp11-continuation-evidence-index.json",
+      "bytes": 6308,
+      "sha256": "2c421a12d63c7dba0371367e82941bc887deed977d95e7f36f5ec8b63b16b879"
+    },
+    {
+      "id": "artifact-controller-wp11-context-independent-review",
+      "path": "verification/research-program/pr-085/wp11-test-context/independent-review.json",
+      "bytes": 8315,
+      "sha256": "e86fc7c60f5881b5d91235b9ce243a5e84db6b65acb812f5f2d3affec851ca25"
+    },
+    {
+      "id": "artifact-controller-wp11-context-command-receipts",
+      "path": "verification/research-program/pr-085/wp11-test-context/command-receipts.json",
+      "bytes": 1595,
+      "sha256": "0a623ebd6caa69af70905229576938570d0fa0a8eb6d476b6dd60a070e9906d7"
+    },
+    {
+      "id": "artifact-controller-wp11-context-current-replay",
+      "path": "verification/research-program/pr-085/wp11-test-context/current-replay.json",
+      "bytes": 5820,
+      "sha256": "8524fc4d9e48cffef60fd8dd407a8dacced005af1fe710b88f3b9d92b2b4f53f"
+    },
+    {
+      "id": "artifact-controller-wp11-context-correction",
+      "path": "verification/research-program/pr-085/wp11-test-context/correction.json",
+      "bytes": 5981,
+      "sha256": "17b41a5be03a4c3a21c23b8a9eab55cad1c90958805696bd8c3d4877e715701b"
+    },
+    {
+      "id": "artifact-controller-wp11-context-wp11-test-context-evidence-index",
+      "path": "verification/research-program/pr-085/wp11-test-context-evidence-index.json",
+      "bytes": 4644,
+      "sha256": "c190eecb1d0a7a99b9825e751036ffee6fb07e7c30afb32966a450da73ab796e"
+    },
+    {
+      "id": "artifact-controller-ci-context-independent-review",
+      "path": "verification/research-program/pr-085/ci-test-context/independent-review.json",
+      "bytes": 10262,
+      "sha256": "c9007f03b7f00b34f56bd6f493347e7c6cac835476133e29a903da54aa095938"
+    },
+    {
+      "id": "artifact-controller-ci-context-candidate",
+      "path": "verification/research-program/pr-085/ci-test-context/candidate.json",
+      "bytes": 1718,
+      "sha256": "7c5b9de4756bd651d4fcef1290516b115f7a138dc798e34376b4ecd4ae03e22e"
+    },
+    {
+      "id": "artifact-controller-ci-context-command-receipts",
+      "path": "verification/research-program/pr-085/ci-test-context/command-receipts.json",
+      "bytes": 1525,
+      "sha256": "0feea91cfc59446d00ff26ae65cb6682f0449943991c137b83abbbff8940bc8c"
+    },
+    {
+      "id": "artifact-controller-ci-context-current-replay",
+      "path": "verification/research-program/pr-085/ci-test-context/current-replay.json",
+      "bytes": 11054,
+      "sha256": "37155175a604a9c24c3b90cd1db980e3ac4491a84d8cac46586769ae7d4e4134"
+    },
+    {
+      "id": "artifact-controller-ci-context-correction",
+      "path": "verification/research-program/pr-085/ci-test-context/correction.json",
+      "bytes": 5026,
+      "sha256": "e9c59ab5e966b5534cc7b26e2b21757387fb150fb14b688afb9fe2132e7f0c63"
+    },
+    {
+      "id": "artifact-controller-ci-context-ci-test-context-evidence-index",
+      "path": "verification/research-program/pr-085/ci-test-context-evidence-index.json",
+      "bytes": 4010,
+      "sha256": "a6b774df11a90f60855a005ebb251b5ddea45d3a0e04aeb2c97885cda7421a97"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "c085-1-historical-proof",
+      "status": "passed",
+      "result": "Historical CI v1.3 approval, evidence, approved receipt and predecessor-chain bytes passed the final v1.4 proof replay without rewriting any receipt.",
+      "command_ids": [
+        "cmd-0027-ca1dd0f1"
+      ],
+      "artifact_ids": [
+        "artifact-ci-v13-historical-pins",
+        "artifact-ci-v14-current-replay"
+      ]
+    },
+    {
+      "id": "c085-1-current-draft",
+      "status": "passed",
+      "result": "The fresh CI v1.4 technical draft is pending_authorized_review with approval absent and release/production eligibility false.",
+      "command_ids": [
+        "cmd-0027-ca1dd0f1"
+      ],
+      "artifact_ids": [
+        "artifact-ci-v14-current-replay"
+      ]
+    },
+    {
+      "id": "c085-2-runner-route",
+      "status": "passed",
+      "result": "The actual WP0 runner route completed successfully and retained the reviewed descriptor boundary.",
+      "command_ids": [
+        "cmd-0006-3af88de0"
+      ],
+      "artifact_ids": [
+        "artifact-command-receipts"
+      ]
+    },
+    {
+      "id": "c085-2-subprocess-failure-cases",
+      "status": "passed",
+      "result": "Real subprocess fixtures preserve future-version strict failure, current child error/timeout, nonzero results and zero-test rejection.",
+      "command_ids": [
+        "cmd-0026-246ee7e0"
+      ],
+      "artifact_ids": [
+        "artifact-ci-v14-negative-fixtures"
+      ]
+    },
+    {
+      "id": "c085-3-evidence-package",
+      "status": "producer_checked",
+      "result": "Hash-bound CI v1.4 evidence, docs and per-PR task binding are prepared for root exact-head binding and independent review.",
+      "command_ids": [
+        "cmd-0027-ca1dd0f1",
+        "cmd-0029-77c01c6b",
+        "cmd-0030-670cc197",
+        "cmd-0031-8420d755",
+        "cmd-0032-26c45fcf",
+        "cmd-0039-f2390da5",
+        "cmd-0041-14adb64d",
+        "cmd-0042-1ed26f79",
+        "cmd-0044-9aab8058",
+        "cmd-0045-59836680",
+        "cmd-0034-c42c701c",
+        "cmd-0035-f4523662"
+      ],
+      "artifact_ids": [
+        "artifact-ci-v14-current-replay",
+        "artifact-ci-v13-historical-pins",
+        "artifact-ci-v14-command-receipts",
+        "artifact-ci-v14-transition-negative-fixtures",
+        "artifact-evidence-index",
+        "artifact-ci-attestations-doc",
+        "artifact-task-binding"
+      ]
+    },
+    {
+      "id": "full-npm-test",
+      "status": "failed",
+      "result": "The full npm test exited 1 at verification/wp11/v1.3.0:validate with SUCCESSOR_APPROVAL_STALE_SUBJECT; the failure remains a release block.",
+      "command_ids": [
+        "cmd-0022-aa4a557b"
+      ],
+      "artifact_ids": [
+        "artifact-ci-v14-command-receipts"
+      ]
+    },
+    {
+      "id": "release-qualification",
+      "status": "pending",
+      "result": "Root must bind the final head, obtain exact current-subject authorization for PR-082 and run the applicable combined release gate.",
+      "command_ids": [],
+      "artifact_ids": [
+        "artifact-ci-v14-current-replay"
+      ]
+    },
+    {
+      "id": "c085-2-r2-v14-inventory",
+      "status": "passed",
+      "result": "The versioned CI v1.4 inventory preserves lock, workflow, offline, child-output, route and both root-chain invariants.",
+      "command_ids": [
+        "cmd-0025-1bb26230",
+        "cmd-0026-246ee7e0"
+      ],
+      "artifact_ids": [
+        "artifact-ci-v14-command-receipts",
+        "artifact-ci-v14-lock-install"
+      ]
+    },
+    {
+      "id": "c085-2-r3-pr003-transition",
+      "status": "passed",
+      "result": "Historical package/test pins remain exact while only the reviewed PR003 bytes pass the bounded semantic transition.",
+      "command_ids": [
+        "cmd-0021-fd1a369a",
+        "cmd-0026-246ee7e0"
+      ],
+      "artifact_ids": [
+        "artifact-ci-v13-historical-pins"
+      ]
+    },
+    {
+      "id": "producer-build",
+      "status": "passed",
+      "result": "Direct producer build passed.",
+      "command_ids": [
+        "cmd-0023-f00f3acb"
+      ],
+      "artifact_ids": []
+    },
+    {
+      "id": "producer-cf-dry-run",
+      "status": "passed",
+      "result": "Direct producer build plus artifact-only Wrangler dry-run passed.",
+      "command_ids": [
+        "cmd-0024-911db093"
+      ],
+      "artifact_ids": []
+    },
+    {
+      "id": "c085-2-r4-atomic-transition",
+      "status": "passed",
+      "result": "The reviewed PR003 package and inventory-test inputs are an atomic pair: both historical or both exact reviewed bytes pass, while both actual mixed states fail closed.",
+      "command_ids": [
+        "cmd-0039-f2390da5",
+        "cmd-0044-9aab8058"
+      ],
+      "artifact_ids": [
+        "artifact-ci-v14-transition-negative-fixtures"
+      ]
+    },
+    {
+      "id": "c085-2-r5-wp11-adapter",
+      "status": "passed",
+      "result": "The WP11 adapter pins historical proof, keeps the current technical draft and wrapper subject pending, routes only the exact v1.3 validate descriptor, and retains descriptor/failure negatives.",
+      "command_ids": [
+        "cmd-0101-wp11-focused",
+        "cmd-0103-wp11-suite",
+        "cmd-0108-wp11-direct-validate",
+        "cmd-0109-wp11-reverify"
+      ],
+      "artifact_ids": [
+        "artifact-wp11-current-replay",
+        "artifact-wp11-historical-pins",
+        "artifact-wp11-negative-fixtures"
+      ]
+    },
+    {
+      "id": "c085-3-r1-wp11-evidence",
+      "status": "producer_checked",
+      "result": "WP11 continuation evidence, original PR085 package Git-snapshot provenance and a new continuation index are prepared without rewriting prior receipts or the historical evidence index.",
+      "command_ids": [
+        "cmd-0101-wp11-focused",
+        "cmd-0103-wp11-suite",
+        "cmd-0104-ci-focused",
+        "cmd-0106-wp0-focused",
+        "cmd-0109-wp11-reverify"
+      ],
+      "artifact_ids": [
+        "artifact-wp11-command-receipts",
+        "artifact-wp11-continuation-index"
+      ]
+    },
+    {
+      "id": "c085-2-r6-test-context",
+      "status": "passed",
+      "result": "The separately reviewed root candidate checks both recognized manifest contexts; nine tests and the current verifier pass on the committed standalone correction. Full combined qualification remains pending.",
+      "command_ids": [
+        "cmd-controller-wp11-context-focused-tests",
+        "cmd-controller-wp11-context-current-verifier"
+      ],
+      "artifact_ids": [
+        "artifact-controller-wp11-context-independent-review",
+        "artifact-controller-wp11-context-command-receipts",
+        "artifact-controller-wp11-context-current-replay"
+      ]
+    },
+    {
+      "id": "c085-2-r7-ci-test-context",
+      "status": "passed",
+      "result": "The separately reviewed two-test correction passes 15 focused tests and current CI validation; both actual manifest contexts were checked before application. The changed full combined gate and hosted CI remain pending.",
+      "command_ids": [
+        "cmd-controller-ci-context-focused-tests",
+        "cmd-controller-ci-context-current-verifier"
+      ],
+      "artifact_ids": [
+        "artifact-controller-ci-context-independent-review",
+        "artifact-controller-ci-context-command-receipts",
+        "artifact-controller-ci-context-current-replay"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "full-chain-stale-subject",
+      "status": "failed",
+      "detail": "The retained full npm test cmd-0022-aa4a557b exited 1 at verification/wp11/v1.3.0:validate with SUCCESSOR_APPROVAL_STALE_SUBJECT; original stream hashes are recorded in the v1.4 command artifact.",
+      "next_action": "Keep current-subject approval and combined release qualification blocked."
+    },
+    {
+      "id": "historical-controller-stale-subject",
+      "status": "failed",
+      "detail": "Controller-provided run 34544925837 on published head 61ca92638d1aa87573f4d55be0f5c896f4b0818e failed verification/wp0/v1.4.0:validate with SUCCESSOR_APPROVAL_STALE_SUBJECT; failed-log SHA-256 91c573054a4337df19f834aa9f64c449bafab862a2415fcdc3721404fd170f4c.",
+      "next_action": "Retain the controller failure as historical evidence; do not repin approval."
+    },
+    {
+      "id": "initial-sandbox-replay",
+      "status": "unavailable",
+      "detail": "The initial sandbox nested replay encountered EPERM/empty output; later bounded escalated replays supplied usable evidence.",
+      "next_action": "Use the retained escalated command receipts."
+    },
+    {
+      "id": "operator-path-retry",
+      "status": "failed",
+      "detail": "An earlier operator retry named a nonexistent pinned node binary and exited 127; no repository code executed.",
+      "next_action": "Use the corrected pinned npm toolchain."
+    },
+    {
+      "id": "initial-zero-fixture",
+      "status": "failed",
+      "detail": "An initial empty fixture was counted as one test by Node; the fixture was corrected before the final negative replay.",
+      "next_action": "Use the final real zero-test fixture result."
+    },
+    {
+      "id": "producer-full-chain-blocked",
+      "status": "skipped",
+      "detail": "The direct producer build and artifact-only CF dry-run passed, but the full npm chain stopped at the stale v1.3 WP11 subject gate before reaching those stages.",
+      "next_action": "Root must rerun the combined exact-candidate chain after binding all dependencies."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "pending-head-sha",
+      "status": "pending",
+      "detail": "head_sha is null because a producer handoff cannot self-embed the SHA of its future C3 documentation commit; root must bind the exact committed head/tree externally.",
+      "next_action": "Bind the final exact head and tree after this handoff commit."
+    },
+    {
+      "id": "current-subject-authorization",
+      "status": "pending",
+      "detail": "The fresh CI v1.4 subject and the WP11 technical/wrapper subjects are technical evidence only. No current-subject successor approval was issued or inferred from historical approval.",
+      "next_action": "PR-082 resolves current-subject approval for WP0, CI and WP11."
+    },
+    {
+      "id": "combined-release-gate",
+      "status": "pending",
+      "detail": "Independent review and the combined PR-003/PR-085 exact-candidate release gate remain root-owned.",
+      "next_action": "Run the pinned handoff checker and combined tests after final PR003 binding."
+    },
+    {
+      "id": "requirements-r01-r16",
+      "status": "pending",
+      "detail": "R01-R16 remain unaccepted and not_yet_evaluated; this PR-085 packet does not claim scientific or product outcomes.",
+      "next_action": "Leave these predicates to their owners and final release process."
+    }
+  ],
+  "risks": [
+    {
+      "id": "historical-subject-boundary",
+      "status": "risk",
+      "detail": "The historical CI v1.3 approval is bound to its original subject and exact proof bytes; the current CI v1.4 subject is distinct and requires current authorization.",
+      "next_action": "Do not transfer or repin the historical approval."
+    },
+    {
+      "id": "reviewed-pr003-transition",
+      "status": "risk",
+      "detail": "The package/test transition is limited to exact bytes from reviewed commit bf46d92b0e4fc91457bd3eb78aa1742ae84038f2; arbitrary current input drift and either mixed historical/reviewed pair fail closed.",
+      "next_action": "Recheck exact source hashes and atomic pair state during combined review."
+    },
+    {
+      "id": "full-gate-stale-subject",
+      "status": "risk",
+      "detail": "Producer focused checks pass and the WP11 aggregate adapter route passes, but full npm test/build/CF/hosted CI remain root's combined gate after active corrections land.",
+      "next_action": "Retain the historical cmd-0022 failure and resolve current authorization through PR-082/release gate."
+    },
+    {
+      "id": "test-only-verifier-override",
+      "status": "risk",
+      "detail": "The test API permits a scratch verifier path for isolated subprocess fixtures; CLI and production runner defaults remain pinned to the repository verifier.",
+      "next_action": "Keep overrides confined to test-owned temporary fixtures."
+    }
+  ],
+  "next_consumer": "Root/controller independent reviewer, PR-082 current-subject authorization workflow and combined release gate",
+  "next_action": "Compose this exact corrected PR085 head with reviewed PR003/004 and the root execution checkpoint. Validate current handoffs, then run a new full gate on the changed candidate and fresh combined hosted CI. PR082 retains current-subject approval responsibility.",
+  "independent_review": {
+    "status": "in_review",
+    "reviewed_head_sha": null,
+    "decisive_checks": [
+      "Exact C-085-2-R2/C-085-2-R3/C-085-2-R4 commits and changed-path review through 6ed7fb4cb24199977034cf86bb3f0b4a928513be",
+      "Historical CI v1.3 proof bytes and reviewed PR-003 current package/test transition",
+      "Current CI v1.4 draft has pending_authorized_review and no current approval",
+      "Ten-test direct CI v1.4 suite rejects both actual partial PR003 input pairs while retaining legacy and full reviewed-pair passes",
+      "Exact C-085-2-R5 functional head 778b968f50e7b7e2e93c503274ca3a590bf63e39 tree ff6d1a4059265b7071e6c4a8a2182e6c6042ba41",
+      "WP11 historical proof remains 294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98; current technical draft 8d3409bc360d9b295c5c21f9b1a2d6ad91f42ff5c946a14aff92cd4b7d97c259 and wrapper 0e55f850f52b292b1172223abc7eb9980eb1c10a739af806a3bf55571415957c stay pending",
+      "Original PR085 package.json is an external Git snapshot at 4f90157108a92ce9541c340d5536eac31f24a1d8; PR003 transition remains separately named",
+      "Direct WP11 --validate retains SUCCESSOR_APPROVAL_STALE_SUBJECT; nine focused WP11 tests and exact four-test aggregate routing pass",
+      "Pinned dc7267bf1c872f1457fa927e2d0403051575f474 handoff checker/schema and combined PR003 review remain root-owned"
+    ],
+    "limitations": [
+      "This is a producer handoff, not independent acceptance or scientific qualification.",
+      "head_sha remains pending until the controller commits C-085-3 and records the exact resulting SHA/tree.",
+      "No current-subject approval, release qualification, production authorization or R01-R16 acceptance is claimed.",
+      "No provider/network call or private evaluator input was used."
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "format": "ushso.pr003.c003-r1.command-receipt.v1",
+  "id": "cmd-c003-r1-sealed-portable-input-retry",
+  "kind": "portable_input_probe",
+  "command": "node --input-type=module -e 'import { REPO_ROOT, resolveContainedPath } from \"./scripts/research-program/check-handoff.mjs\"; const rejected=[\"../escape.json\",\"/etc/passwd\",\"verification/research-program/../../../outside.json\"].map(path => ({path,ok:resolveContainedPath(REPO_ROOT,path).ok})); const accepted=resolveContainedPath(REPO_ROOT,\"verification/research-program/pr-003/fixtures/handoff.valid.json\").ok; if (rejected.some(item => item.ok) || accepted !== true) process.exit(1); console.log(JSON.stringify({accepted,rejected}));'",
+  "cwd": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-integrity-recovery-20260910",
+  "started_at": "2026-09-11T00:23:29.256Z",
+  "completed_at": "2026-09-11T00:23:29.291Z",
+  "exit_code": 0,
+  "expected": "exit 0 with one accepted in-root path and three rejected escapes",
+  "actual": "exit 0; one valid repository-relative path was accepted and all three absolute/parent escape probes were rejected.",
+  "observed": {
+    "agentctl_run_id": "cmd-0020-eb5e19c5",
+    "duration_ms": 35,
+    "exit_code": 0,
+    "stdout_sha256": "7e5e4f24a876cac51cc421700554435301470348e559d4ff9a4678462643e792",
+    "stdout_bytes": 176,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_bytes": 0,
+    "timed_out": false,
+    "interrupted": false
+  },
+  "sanitized": true,
+  "raw_log_retained_in_git": false
+}

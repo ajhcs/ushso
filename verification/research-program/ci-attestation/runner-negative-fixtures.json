@@ -1,0 +1,85 @@
+{
+  "schema_version": "ushso.pr085.runner-negative-fixtures.v1",
+  "scope": "Bounded scratch packages and child scripts; fixture directories were removed in finally blocks.",
+  "runner": {
+    "path": "scripts/run-contract-suites.mjs",
+    "sha256": "854e4e5fbc5e52004d28f06d81ee2b745bae729fe68d3f54f8e82b02250f6bc0",
+    "default_current_verifier_path": "scripts/verify-wp0-attestation.mjs",
+    "default_path_is_used_by_cli": true,
+    "test_only_override": "runPackageSuites currentAttestationVerifierPath; omitted by the CLI"
+  },
+  "focused_test": {
+    "path": "tests/wp0-attestation.test.mjs",
+    "sha256": "e76f72f8765fc8164d5b6ed77c40fb94195e72c8e1aff6af521acbb4cf5719b8",
+    "command_id": "cmd-0012-1fd89193",
+    "exit_code": 0,
+    "started_at": "2026-09-11T00:39:50.513Z",
+    "ended_at": "2026-09-11T00:40:35.340Z",
+    "duration_ms": 44828,
+    "tests": 10,
+    "stdout_sha256": "6c6d688f262a93b2839c6a7f33c494059365e9a86d0485d96e0d299a130b1279",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "cases": [
+    {
+      "id": "future-wp0-version-normal-path",
+      "descriptor": {
+        "alias": "wp0",
+        "version": "1.5.0",
+        "path": "task scratch fixture",
+        "validate_script": "node -e \"process.exit(17)\""
+      },
+      "route_selected": "strict executePackageScript path",
+      "observed_test_child_exit_code": 0,
+      "observed_parsed_test_count": 1,
+      "observed_validate_child_exit_code": 17,
+      "observed_validate_status": "FAIL",
+      "observed_result_ok": false,
+      "asserted": [
+        "future version does not select the reviewed current-attestation route",
+        "test stage still executes and reports a positive count",
+        "nonzero validation is retained as a failed execution and result.ok is false"
+      ]
+    },
+    {
+      "id": "current-attestation-child-nonzero",
+      "descriptor": {
+        "alias": "wp0",
+        "version": "1.4.0",
+        "path": "verification/wp0/v1.4.0",
+        "validate_script": "node tools/verify.mjs --validate"
+      },
+      "scratch_child_exit_code": 23,
+      "observed_execution_status": "FAIL",
+      "observed_result_ok": false,
+      "asserted": [
+        "exact reviewed descriptor still selects the current route",
+        "real child nonzero exit is retained as a failed execution",
+        "no PASS verification object is returned and result.ok remains false"
+      ]
+    },
+    {
+      "id": "zero-test-child",
+      "descriptor": {
+        "alias": "zero-test",
+        "version": "1.0.0",
+        "path": "task scratch fixture",
+        "test_script": "node --test"
+      },
+      "observed_child_exit_code": 0,
+      "observed_parsed_test_count": 0,
+      "observed_execution_status": "FAIL",
+      "observed_result_ok": false,
+      "asserted": [
+        "real npm subprocess emits a zero-test summary",
+        "runner rejects zero parsed tests even with child exit 0"
+      ]
+    }
+  ],
+  "fixture_storage": {
+    "root_policy": "verificationTempRoot under /mnt/d/tmp/plumbob",
+    "repository_files_copied": false,
+    "network_or_provider_calls": false,
+    "cleanup": "all temporary fixture roots removed after each bounded replay"
+  }
+}

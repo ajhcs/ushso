@@ -1,0 +1,184 @@
+{
+  "format": "ushso.pr003.c003-2.evidence-index.v1",
+  "task_id": "ushso-pr003-deepseek-20260910t220020z",
+  "slice_id": "C-003-2",
+  "pr_id": "PR-003",
+  "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+  "head_sha_at_validation": "601072e92a76623438313cdaa20f8bc1c66e929c",
+  "pr002_merge_sha": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+  "validator": {
+    "path": "scripts/research-program/check-handoff.mjs",
+    "sha256": "c81fad1430d314e99587cf27e6f1b07384317b1394fc45350b3176025f2eebe0",
+    "bytes": 29837,
+    "usage": "node scripts/research-program/check-handoff.mjs <handoff.json>",
+    "exit_codes": { "accepted": 0, "rejected": 1, "usage_or_operational_error": 2 }
+  },
+  "test_suite": {
+    "path": "tests/research-program/handoff.test.mjs",
+    "sha256": "15ada6681a08690b3420a2f76c92260ab2063ccc11a1e6fc65380a58d8deb835",
+    "bytes": 6764,
+    "command": "node --test tests/research-program/handoff.test.mjs",
+    "exit_code": 0,
+    "tests": 9,
+    "pass": 9,
+    "fail": 0,
+    "discovery_note": "Run explicitly; root npm test discovery is intentionally unchanged and is C-003-3 scope."
+  },
+  "packets_validated": [
+    {
+      "role": "valid",
+      "path": "verification/research-program/pr-003/fixtures/handoff.valid.json",
+      "sha256": "01e3cbb09f3a5deee8b1bf5ed7bc575ae68c21a8d8093624ec4ae8d9a15eee60",
+      "exit_code": 0,
+      "result": "accepted"
+    },
+    {
+      "role": "incomplete-missing-command-result",
+      "path": "verification/research-program/pr-003/fixtures/handoff.reject-claimed-pass-without-command.json",
+      "sha256": "8192b7b5b4a181eb96007c31788969123144944132e36feab42bdb47316257e8",
+      "exit_code": 1,
+      "rule": "claimed_pass_without_command_result"
+    },
+    {
+      "role": "incomplete-missing-artifact",
+      "path": "verification/research-program/pr-003/fixtures/handoff.reject-missing-artifact.json",
+      "sha256": "6cd239292acc49307a4f21c6df4dd1b0d2448cfc31db871968eda5c90fecb221",
+      "exit_code": 1,
+      "rule": "missing_artifact"
+    },
+    {
+      "role": "incomplete-stale-dependency-sha",
+      "path": "verification/research-program/pr-003/fixtures/handoff.reject-stale-dependency-sha.json",
+      "sha256": "06108132f49a9e75b89874aede2a6a4ae0a335b2288d04062a4c777356ca6104",
+      "exit_code": 1,
+      "rule": "stale_dependency_sha"
+    },
+    {
+      "role": "extra-artifact-hash-mismatch",
+      "path": "verification/research-program/pr-003/fixtures/handoff.reject-artifact-hash-mismatch.json",
+      "sha256": "a8c60d97aef26e936a26f7a3062a8d8eb28249342843d083192bb72600b54e80",
+      "exit_code": 1,
+      "rule": "artifact_hash_mismatch"
+    }
+  ],
+  "authorities_used": [
+    {
+      "role": "task-binding",
+      "path": "verification/research-program/pr-003/fixtures/task-binding.json",
+      "sha256": "19c586b77ccfb0cf3c901f482ffeaaf08ca7c5435d4d36ed69e21493dbf5472c"
+    },
+    {
+      "role": "execution-ledger",
+      "path": "docs/research-program/execution-ledger.json",
+      "sha256": "f4fa4adc39add96954ad6d32e03d54658331e90e6f3f57fb31e50eb85d9b7198"
+    }
+  ],
+  "command_receipts": [
+    {
+      "id": "cmd-c003-2-focused-suite",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-2-focused-suite.json",
+      "sha256": "a9c42bdf2000e0721a75b745a7486e4722fe0ac3490656c67cbf6330e3b8c7c5",
+      "exit_code": 0
+    },
+    {
+      "id": "cmd-c003-2-valid",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-2-valid.json",
+      "sha256": "d821cb703bcb5e48b36b6b6d1cee004e2116053a31e10bd4c54f37f00b8005a4",
+      "exit_code": 0
+    },
+    {
+      "id": "cmd-c003-2-reject-claimed-pass-without-command",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-2-reject-claimed-pass-without-command.json",
+      "sha256": "a14cabcff783e6a5225db0747986e7f706efd8acd7844f8a048b67d039ccda04",
+      "exit_code": 1
+    },
+    {
+      "id": "cmd-c003-2-reject-missing-artifact",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-2-reject-missing-artifact.json",
+      "sha256": "a5eca1175159c090e14f7962d23934322b11888da3a369700974fc3570f2546b",
+      "exit_code": 1
+    },
+    {
+      "id": "cmd-c003-2-reject-stale-dependency-sha",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-2-reject-stale-dependency-sha.json",
+      "sha256": "d8fde9612d4de3910ca5a2233206dffd65df72b4900617c414e14ebe95e2b90c",
+      "exit_code": 1
+    },
+    {
+      "id": "cmd-c003-2-artifact-hash-verify",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-2-artifact-hash-verify.json",
+      "sha256": "41a8e5c62404171977063bd67a0ff4487fdf5983b65c37e0f5346f2f7ea8fc1f",
+      "exit_code": 0
+    },
+    {
+      "id": "cmd-c003-2-git-binding",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-2-git-binding.json",
+      "sha256": "35bc484cbc7d69f028ed690cef838cfeb27975f24b9659ef6e6786ba0c6d285d",
+      "exit_code": 0
+    }
+  ],
+  "artifacts": [
+    {
+      "role": "validator",
+      "path": "scripts/research-program/check-handoff.mjs",
+      "sha256": "c81fad1430d314e99587cf27e6f1b07384317b1394fc45350b3176025f2eebe0",
+      "bytes": 29837
+    },
+    {
+      "role": "test-suite",
+      "path": "tests/research-program/handoff.test.mjs",
+      "sha256": "15ada6681a08690b3420a2f76c92260ab2063ccc11a1e6fc65380a58d8deb835",
+      "bytes": 6764
+    },
+    {
+      "role": "fixture-reject-artifact-hash-mismatch",
+      "path": "verification/research-program/pr-003/fixtures/handoff.reject-artifact-hash-mismatch.json",
+      "sha256": "a8c60d97aef26e936a26f7a3062a8d8eb28249342843d083192bb72600b54e80",
+      "bytes": 6191
+    },
+    {
+      "role": "notes",
+      "path": "verification/research-program/pr-003/c003-2-notes.md",
+      "sha256": "92bfb7f53cae0536371142399ee871f9b2222f327b5cc16226d657e16e0049ce",
+      "bytes": 4266
+    }
+  ],
+  "valid_packet_binding": {
+    "artifact_hashes_checked": 5,
+    "artifact_mismatches": 0,
+    "repository_source_hashes_checked": 5,
+    "source_mismatches": 0,
+    "external_source_identities": ["native-pr003-prompts.v3.md"],
+    "dependency_shas_matched": {
+      "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
+      "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
+    },
+    "base_sha_local_commit": true,
+    "dependency_ancestry_of_base": true
+  },
+  "preserved_typed_outcomes": {
+    "non_pass_acceptance_results": [],
+    "declared_unresolved_claims": [
+      "head-sha-pending-controller-commit",
+      "independent-review-not-started"
+    ],
+    "head_sha_pending": true
+  },
+  "external_source_identity_unverifiable": [
+    {
+      "id": "native-pr003-prompts.v3.md",
+      "reason": "dispatch prompt lives outside the worktree; only its recorded SHA-256 is referenced"
+    }
+  ],
+  "independent_review": {
+    "status": "not_claimed",
+    "detail": "Producer validation and evidence only; Astra must independently replay the decisive check on the reviewed head."
+  },
+  "self": {
+    "path": "verification/research-program/pr-003/c003-2-evidence-index.json",
+    "sha256": null,
+    "note": "This index cannot embed its own final SHA-256; the controller records the external digest after writing."
+  },
+  "sanitized": true,
+  "raw_logs_in_git": false
+}
