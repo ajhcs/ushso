@@ -17,7 +17,58 @@ const CORE_CONTRACTS = Object.freeze({
   attempt: 'observatory-core.accessObservation'
 });
 
-const ISO_DATE_TIME = value => typeof value === 'string' && Number.isFinite(Date.parse(value));
+const RFC3339_DATE_TIME = /^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})[Tt](?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})(?:\.(?<fraction>\d+))?(?<zone>[Zz]|[+-]\d{2}:\d{2})$/u;
+
+function parseRfc3339(value) {
+  if (typeof value !== 'string') return null;
+  const match = RFC3339_DATE_TIME.exec(value);
+  if (!match) return null;
+  const { year, month, day, hour, minute, second, fraction = '', zone } = match.groups;
+  const yearNumber = Number(year);
+  const monthNumber = Number(month);
+  const dayNumber = Number(day);
+  const hourNumber = Number(hour);
+  const minuteNumber = Number(minute);
+  const secondNumber = Number(second);
+  const leapYear = yearNumber % 4 === 0 && (yearNumber % 100 !== 0 || yearNumber % 400 === 0);
+  const daysInMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (monthNumber < 1 || monthNumber > 12 || dayNumber < 1 || dayNumber > daysInMonth[monthNumber - 1]
+      || hourNumber > 23 || minuteNumber > 59 || secondNumber > 59) return null;
+  let offsetSeconds = 0;
+  if (zone !== 'Z' && zone !== 'z') {
+    const offsetHours = Number(zone.slice(1, 3));
+    const offsetMinutes = Number(zone.slice(4, 6));
+    if (offsetHours > 23 || offsetMinutes > 59) return null;
+    offsetSeconds = (offsetHours * 60 + offsetMinutes) * 60 * (zone[0] === '+' ? 1 : -1);
+  }
+  const utc = new Date(0);
+  utc.setUTCFullYear(yearNumber, monthNumber - 1, dayNumber);
+  utc.setUTCHours(hourNumber, minuteNumber, secondNumber, 0);
+  const time = utc.getTime();
+  if (!Number.isFinite(time)) return null;
+  return {
+    epochSeconds: BigInt(Math.trunc(time / 1000)) - BigInt(offsetSeconds),
+    fraction: fraction.replace(/0+$/u, '')
+  };
+}
+
+export function isRfc3339DateTime(value) {
+  return parseRfc3339(value) !== null;
+}
+
+export function compareRfc3339(left, right) {
+  const leftParsed = parseRfc3339(left);
+  const rightParsed = parseRfc3339(right);
+  if (!leftParsed || !rightParsed) throw new TypeError('RFC3339_TIMESTAMP_REQUIRED');
+  if (leftParsed.epochSeconds < rightParsed.epochSeconds) return -1;
+  if (leftParsed.epochSeconds > rightParsed.epochSeconds) return 1;
+  const width = Math.max(leftParsed.fraction.length, rightParsed.fraction.length);
+  const leftFraction = leftParsed.fraction.padEnd(width, '0');
+  const rightFraction = rightParsed.fraction.padEnd(width, '0');
+  return leftFraction < rightFraction ? -1 : leftFraction > rightFraction ? 1 : 0;
+}
+
+const ISO_DATE_TIME = isRfc3339DateTime;
 const nullableIso = value => value === null || ISO_DATE_TIME(value);
 
 function validCalendarDate(value) {
@@ -110,7 +161,7 @@ function validateEndpointScope(value, path = '/endpoint_scope') {
 
 
 function orderError(errors, later, earlier, code, message, path) {
-  if (ISO_DATE_TIME(later) && ISO_DATE_TIME(earlier) && Date.parse(later) > Date.parse(earlier)) errors.push(error(code, message, path));
+  if (ISO_DATE_TIME(later) && ISO_DATE_TIME(earlier) && compareRfc3339(later, earlier) > 0) errors.push(error(code, message, path));
 }
 
 function validateEvidenceTimes(refs, maximum, path, errors) {
@@ -445,34 +496,54 @@ export function appendFieldObservationRevision(previous, next) {
   return createFieldObservation({ ...clone(next), history });
 }
 
-function dateMillis(value) {
-  return Date.parse(value);
-}
-
 function sortNewest(left, right) {
-  return dateMillis(right.observed_at) - dateMillis(left.observed_at)
-    || dateMillis(right.recorded_at) - dateMillis(left.recorded_at)
+  return compareRfc3339(right.observed_at, left.observed_at)
+    || compareRfc3339(right.recorded_at, left.recorded_at)
     || String(right.observation_id).localeCompare(String(left.observation_id));
 }
 
+function compareOptionalNewest(left, right) {
+  if (!left && !right) return 0;
+  if (!left) return -1;
+  if (!right) return 1;
+  return compareRfc3339(right, left);
+}
+
 function sortNewestAttempt(left, right) {
-  const leftAttempt = left.attempted_at ? dateMillis(left.attempted_at) : Number.NEGATIVE_INFINITY;
-  const rightAttempt = right.attempted_at ? dateMillis(right.attempted_at) : Number.NEGATIVE_INFINITY;
-  return rightAttempt - leftAttempt
+  return compareOptionalNewest(left.attempted_at, right.attempted_at)
     || sortNewest(left, right);
 }
 
+function revisionIdentity(item, revisionId = item.observation_id) {
+  return `${item.record_id}\u0000${item.source_id}\u0000${item.field_id}\u0000${revisionId}`;
+}
+
+function revisionConflict(identity) {
+  const issue = new TypeError(`FIELD_OBSERVATION_REVISION_CONFLICT:${identity}`);
+  issue.code = 'field_observation_revision_conflict';
+  throw issue;
+}
+
 function expandObservationHistory(observations) {
-  const byId = new Map();
+  const byIdentity = new Map();
+  const add = candidate => {
+    const identity = revisionIdentity(candidate);
+    const existing = byIdentity.get(identity);
+    if (existing) {
+      if (canonicalJson(existing) !== canonicalJson(candidate)) revisionConflict(identity);
+      return;
+    }
+    byIdentity.set(identity, candidate);
+  };
   for (const raw of observations) {
     const current = assertFieldObservation(raw);
-    if (!byId.has(current.observation_id)) byId.set(current.observation_id, current);
+    add(current);
     for (const item of current.history) {
       const historical = observationFromHistory(item);
-      if (!byId.has(historical.observation_id)) byId.set(historical.observation_id, historical);
+      add(historical);
     }
   }
-  return [...byId.values()];
+  return [...byIdentity.values()];
 }
 
 function observationFromHistory(item) {
@@ -503,11 +574,10 @@ function observationFromHistory(item) {
 }
 
 function eligibleAtAsOf(item, asOf) {
-  const cutoff = dateMillis(asOf);
-  return dateMillis(item.observed_at) <= cutoff
-    && dateMillis(item.recorded_at) <= cutoff
-    && (!item.source_observed_at || dateMillis(item.source_observed_at) <= cutoff)
-    && (!item.attempted_at || dateMillis(item.attempted_at) <= cutoff);
+  return compareRfc3339(item.observed_at, asOf) <= 0
+    && compareRfc3339(item.recorded_at, asOf) <= 0
+    && (!item.source_observed_at || compareRfc3339(item.source_observed_at, asOf) <= 0)
+    && (!item.attempted_at || compareRfc3339(item.attempted_at, asOf) <= 0);
 }
 
 export function deriveFieldObservation({ recordId, sourceId, fieldId, observations, asOf }) {
@@ -521,13 +591,27 @@ export function deriveFieldObservation({ recordId, sourceId, fieldId, observatio
     .sort(sortNewest);
   const latestOriginal = candidates[0] ?? null;
   const historicalSuccess = candidates.filter(item => item.attempt_state === 'succeeded').sort(sortNewest)[0] ?? null;
-  let latest = latestOriginal;
-  if (latestOriginal?.stale_at && dateMillis(latestOriginal.stale_at) <= dateMillis(asOf)) {
+  let latest = latestOriginal ? clone(latestOriginal) : null;
+  if (latestOriginal?.stale_at && compareRfc3339(latestOriginal.stale_at, asOf) <= 0) {
     latest = {
-      ...clone(latestOriginal),
+      ...latest,
       attempt_state: 'stale',
       reason_codes: [...new Set([...latestOriginal.reason_codes, 'observation_expired'])].sort()
     };
+  }
+  if (latest) {
+    const historyByIdentity = new Map(latest.history.map(item => [revisionIdentity(item, item.revision_id), item]));
+    for (const candidate of candidates) {
+      const identity = revisionIdentity(candidate);
+      if (identity === revisionIdentity(latestOriginal)) continue;
+      if (!historyByIdentity.has(identity)) historyByIdentity.set(identity, historySnapshot(candidate));
+    }
+    latest.history = [...historyByIdentity.values()].sort((left, right) => {
+      return compareRfc3339(left.observed_at, right.observed_at)
+        || compareRfc3339(left.recorded_at, right.recorded_at)
+        || String(left.revision_id).localeCompare(String(right.revision_id));
+    });
+    latest = assertFieldObservation(latest);
   }
   return deepFreeze({
     schema_version: FIELD_OBSERVATION_VERSION,
@@ -576,8 +660,8 @@ function mergeEvidence(refs) {
 function latestFacts(observations, key, asOf) {
   return observations
     .map(item => ({ item, facts: item.access_facts[key] }))
-    .filter(({ facts }) => facts && dateMillis(facts.observed_at) <= dateMillis(asOf))
-    .sort((left, right) => dateMillis(right.facts.observed_at) - dateMillis(left.facts.observed_at) || right.item.observation_id.localeCompare(left.item.observation_id));
+    .filter(({ facts }) => facts && compareRfc3339(facts.observed_at, asOf) <= 0)
+    .sort((left, right) => compareRfc3339(right.facts.observed_at, left.facts.observed_at) || right.item.observation_id.localeCompare(left.item.observation_id));
 }
 
 function documentedCost(observations, asOf) {
@@ -597,14 +681,14 @@ function documentedUsageLimit(observations, asOf) {
 }
 
 function compareRequirementRows(left, right) {
-  return dateMillis(right.observed_at) - dateMillis(left.observed_at)
+  return compareRfc3339(right.observed_at, left.observed_at)
     || String(right._observation_id).localeCompare(String(left._observation_id))
     || String(right.requirement_id).localeCompare(String(left.requirement_id));
 }
 
 function documentedCredentials(observations, asOf) {
   const rows = observations.flatMap(item => item.access_facts.credential_requirements
-    .filter(requirement => dateMillis(requirement.observed_at) <= dateMillis(asOf))
+    .filter(requirement => compareRfc3339(requirement.observed_at, asOf) <= 0)
     .map(requirement => ({ ...clone(requirement), _observation_id: item.observation_id })));
   const grouped = new Map();
   for (const row of rows) {
@@ -672,7 +756,7 @@ export function buildAccessSummary({ observations, asOf, compact = false }) {
     const sorted = [...rows].sort(sortNewest);
     const attempts = sorted.filter(item => item.attempt_state !== 'not_attempted').sort(sortNewestAttempt);
     const successes = attempts.filter(item => item.attempt_state === 'succeeded').sort(sortNewestAttempt);
-    const browser = rows.flatMap(item => item.browser_observations.filter(value => dateMillis(value.observed_at) <= dateMillis(asOf)).map(value => ({ ...clone(value), observation_id: item.observation_id })));
+    const browser = rows.flatMap(item => item.browser_observations.filter(value => compareRfc3339(value.observed_at, asOf) <= 0).map(value => ({ ...clone(value), observation_id: item.observation_id })));
     return {
       endpoint_scope: clone(sorted[0].endpoint_scope),
       documented: {
@@ -680,12 +764,12 @@ export function buildAccessSummary({ observations, asOf, compact = false }) {
         cost: documentedCost(rows, asOf),
         usage_limit: documentedUsageLimit(rows, asOf),
         evidence_refs: mergeEvidence(rows.flatMap(item => item.access_facts.evidence_refs)),
-        observed_at: [...rows].sort((left, right) => dateMillis(right.access_facts.observed_at) - dateMillis(left.access_facts.observed_at))[0].access_facts.observed_at
+        observed_at: [...rows].sort((left, right) => compareRfc3339(right.access_facts.observed_at, left.access_facts.observed_at))[0].access_facts.observed_at
       },
       latest_successful_check: successes[0] ? checkSummary(successes[0]) : null,
       latest_attempt: attempts[0] ? checkSummary(attempts[0]) : null,
       revision_history: attempts.map(checkSummary),
-      browser_observations: browser.sort((left, right) => dateMillis(right.observed_at) - dateMillis(left.observed_at)),
+      browser_observations: browser.sort((left, right) => compareRfc3339(right.observed_at, left.observed_at)),
       boundaries: {
         metadata_reachability_is_not_payload_access: true,
         server_success_does_not_imply_browser_usability: true,

@@ -6,8 +6,10 @@ import {
   VALUE_STATES,
   assertFieldObservation,
   buildAccessSummary,
+  compareRfc3339,
   createFieldObservation,
-  deriveFieldObservation
+  deriveFieldObservation,
+  isRfc3339DateTime
 } from '../../../../normalization/src/field-observation.mjs';
 
 export const COMPLETENESS_VIEW_VERSION = 'ushso.completeness-view.v1.0.0';
@@ -49,7 +51,7 @@ function assert(condition, code, message = code) {
 }
 
 function iso(value, label) {
-  assert(typeof value === 'string' && Number.isFinite(Date.parse(value)), `${label}_invalid`, `${label} must be an ISO timestamp`);
+  assert(isRfc3339DateTime(value), `${label}_invalid`, `${label} must be a strict RFC3339 timestamp`);
   return value;
 }
 
@@ -395,8 +397,9 @@ function unsignedView({ cohort, generation, asOf, generatedAt, inputDigest, rows
   const observationIds = new Set();
   for (const observation of observations) {
     const checked = assertFieldObservation(observation);
-    assert(!observationIds.has(checked.observation_id), 'observation_duplicate_id', checked.observation_id);
-    observationIds.add(checked.observation_id);
+    const identity = `${checked.record_id}\u0000${checked.source_id}\u0000${checked.field_id}\u0000${checked.observation_id}`;
+    assert(!observationIds.has(identity), 'observation_duplicate_identity', identity);
+    observationIds.add(identity);
     const key = observationKey(checked.record_id, checked.source_id, checked.field_id);
     assert(rows.some(row => observationKey(row.record_id, row.source_id, 'membership') === observationKey(checked.record_id, checked.source_id, 'membership')), 'observation_outside_membership', key);
     if (!observationMap.has(key)) observationMap.set(key, []);
@@ -489,7 +492,7 @@ export function buildCompletenessView({ membership, observations = [], fieldDefi
   const expectedAccessSummary = accessSummary === null
     ? null
     : buildAccessSummary({ observations, asOf, compact: vectorEncoding === 'compact-v1' });
-  if (accessSummary !== null) assert(digestJson(accessSummary) === digestJson(expectedAccessSummary), 'access_summary_not_bound');
+  if (accessSummary !== null) assert(digestJson(accessSummaryProjection(accessSummary)) === digestJson(accessSummaryProjection(expectedAccessSummary)), 'access_summary_not_bound');
   const view = unsignedView({ cohort, generation, asOf, generatedAt, inputDigest, rows, definitions, observations, denominatorStatus, vectorEncoding, accessSummary: expectedAccessSummary });
   const digest = digestUnsigned(view);
   const result = {
@@ -667,7 +670,7 @@ function assertEvidenceCatalog({ catalog, membership, observations, asOf }) {
     assert(!catalogById.has(item.evidence_id), 'completeness_evidence_catalog_duplicate');
     assert(['unknown', 'candidate', 'ambiguous', 'documented', 'observed', 'executed', 'proven', 'disputed'].includes(item.evidence_state), 'completeness_evidence_catalog_state');
     iso(item.observed_at, 'completeness_evidence_catalog_time');
-    assert(Date.parse(item.observed_at) <= Date.parse(asOf), 'completeness_evidence_catalog_future');
+    assert(compareRfc3339(item.observed_at, asOf) <= 0, 'completeness_evidence_catalog_future');
     assert(item.source_locator === null || typeof item.source_locator === 'string', 'completeness_evidence_catalog_locator');
     assert(Array.isArray(item.claim_paths) && item.claim_paths.length > 0 && unique(item.claim_paths), 'completeness_evidence_catalog_claims');
     assert(['current', 'stale', 'unknown', 'not_applicable'].includes(item.staleness_state), 'completeness_evidence_catalog_staleness');
@@ -707,8 +710,8 @@ function assertEvidenceCatalog({ catalog, membership, observations, asOf }) {
 
 function assertNestedClock(value, asOf, code) {
   if (value === null || value === undefined) return;
-  assert(typeof value === 'string' && Number.isFinite(Date.parse(value)), `${code}_invalid`);
-  assert(Date.parse(value) <= Date.parse(asOf), code);
+  assert(isRfc3339DateTime(value), `${code}_invalid`);
+  assert(compareRfc3339(value, asOf) <= 0, code);
 }
 
 function assertObservationClocks(observation, asOf) {
@@ -752,48 +755,46 @@ function scopeKeyForAccess(scope) {
   return JSON.stringify([scope.endpoint_id ?? null, scope.resource ?? null, scope.operation]);
 }
 
-function checkProjection(check) {
-  if (check === null || check === undefined) return null;
-  return {
-    revision_id: check.revision_id,
-    observation_id: check.observation_id,
-    record_id: check.record_id,
-    source_id: check.source_id,
-    field_id: check.field_id,
-    attempt_state: check.attempt_state,
-    attempted_at: check.attempted_at,
-    observed_at: check.observed_at,
-    source_observed_at: check.source_observed_at,
-    recorded_at: check.recorded_at,
-    endpoint_scope: clone(check.endpoint_scope),
-    evidence_state: check.evidence_state,
-    evidence_ids: evidenceIdsOf(check),
-    reason_codes: [...(check.reason_codes ?? [])]
-  };
-}
-
-function browserProjection(browser) {
-  return {
-    state: browser.state,
-    endpoint_scope: clone(browser.endpoint_scope),
-    observed_at: browser.observed_at,
-    evidence_ids: evidenceIdsOf(browser),
-    reason_codes: [...(browser.reason_codes ?? [])]
-  };
+function normalizeAccessEvidenceShape(value) {
+  if (Array.isArray(value)) return value.map(normalizeAccessEvidenceShape);
+  if (!value || typeof value !== 'object') return value;
+  const output = {};
+  let hasEvidence = false;
+  for (const [key, child] of Object.entries(value)) {
+    if (key === 'evidence_refs' || key === 'evidence_ids') {
+      hasEvidence = true;
+      continue;
+    }
+    output[key] = normalizeAccessEvidenceShape(child);
+  }
+  if (hasEvidence) {
+    const ids = [
+      ...(Array.isArray(value.evidence_ids) ? value.evidence_ids : []),
+      ...(Array.isArray(value.evidence_refs) ? value.evidence_refs.map(ref => ref.evidence_id) : [])
+    ];
+    output.evidence_ids = [...new Set(ids)].sort();
+  }
+  return output;
 }
 
 function accessSummaryProjection(summary) {
-  return {
+  const normalized = {
     schema_version: summary.schema_version,
     as_of: summary.as_of,
-    endpoint_scopes: [...summary.endpoint_scopes].sort((left, right) => scopeKeyForAccess(left.endpoint_scope).localeCompare(scopeKeyForAccess(right.endpoint_scope))).map(scope => ({
-      endpoint_scope: clone(scope.endpoint_scope),
-      latest_successful_check: checkProjection(scope.latest_successful_check),
-      latest_attempt: checkProjection(scope.latest_attempt),
-      revision_history: [...(scope.revision_history ?? [])].sort((left, right) => String(right.attempted_at).localeCompare(String(left.attempted_at)) || String(right.recorded_at).localeCompare(String(left.recorded_at)) || String(right.revision_id).localeCompare(String(left.revision_id))).map(checkProjection),
-      browser_observations: [...(scope.browser_observations ?? [])].sort((left, right) => String(left.observed_at).localeCompare(String(right.observed_at)) || scopeKeyForAccess(left.endpoint_scope).localeCompare(scopeKeyForAccess(right.endpoint_scope))).map(browserProjection)
-    }))
+    boundaries: clone(summary.boundaries),
+    endpoint_scopes: [...summary.endpoint_scopes]
+      .sort((left, right) => scopeKeyForAccess(left.endpoint_scope).localeCompare(scopeKeyForAccess(right.endpoint_scope)))
+      .map(scope => ({
+        ...clone(scope),
+        documented: {
+          ...clone(scope.documented),
+          credential_requirements: [...(scope.documented?.credential_requirements ?? [])].sort((left, right) => String(left.requirement_id).localeCompare(String(right.requirement_id)) || digestJson(left).localeCompare(digestJson(right)))
+        },
+        revision_history: [...(scope.revision_history ?? [])].sort((left, right) => compareRfc3339(right.attempted_at, left.attempted_at) || compareRfc3339(right.recorded_at, left.recorded_at) || String(right.revision_id).localeCompare(String(left.revision_id))),
+        browser_observations: [...(scope.browser_observations ?? [])].sort((left, right) => compareRfc3339(left.observed_at, right.observed_at) || scopeKeyForAccess(left.endpoint_scope).localeCompare(scopeKeyForAccess(right.endpoint_scope)))
+      }))
   };
+  return normalizeAccessEvidenceShape(normalized);
 }
 
 function assertAccessSummary(summary, asOf, availableEvidenceIds) {
@@ -801,34 +802,59 @@ function assertAccessSummary(summary, asOf, availableEvidenceIds) {
   assert(summary.schema_version === 'ushso.access-summary.v1.0.0', 'access_summary_version');
   assert(summary.as_of === asOf, 'access_summary_as_of');
   assert(Array.isArray(summary.endpoint_scopes), 'access_summary_scopes');
+  for (const key of ['documented_requirements_are_separate_from_observations', 'unknown_cost_is_not_free', 'unknown_usage_limit_is_not_unlimited', 'payload_access_requires_endpoint_scoped_attempt_evidence']) {
+    assert(summary.boundaries?.[key] === true, 'access_summary_boundary:' + key);
+  }
   const seenScopes = new Set();
-  const evidencePresent = value => evidenceIdsOf(value).every(evidenceId => availableEvidenceIds.has(evidenceId));
-  const timestampAtOrBefore = value => typeof value === 'string' && Number.isFinite(Date.parse(value)) && Date.parse(value) <= Date.parse(asOf);
+  const evidencePresent = (value, code) => {
+    const refs = Array.isArray(value?.evidence_refs) ? value.evidence_refs : [];
+    const ids = Array.isArray(value?.evidence_ids) ? value.evidence_ids : [];
+    const refIds = refs.map(ref => ref.evidence_id);
+    assert(refIds.length > 0 || ids.length > 0, code + '_missing');
+    assert(unique(refIds) && unique(ids), code + '_duplicate');
+    if (refs.length > 0 && ids.length > 0) assert(digestJson([...new Set(refIds)].sort()) === digestJson([...new Set(ids)].sort()), code + '_representation_mismatch');
+    const allIds = [...new Set([...refIds, ...ids])];
+    return allIds.every(evidenceId => availableEvidenceIds.has(evidenceId));
+  };
+  const timestampAtOrBefore = value => isRfc3339DateTime(value) && compareRfc3339(value, asOf) <= 0;
   for (const scope of summary.endpoint_scopes) {
     assert(scope && typeof scope === 'object' && scope.endpoint_scope && typeof scope.endpoint_scope === 'object', 'access_summary_scope_shape');
     const scopeKey = scopeKeyForAccess(scope.endpoint_scope);
     assert(!seenScopes.has(scopeKey), 'access_summary_scope_duplicate');
     seenScopes.add(scopeKey);
     assert(['metadata_read', 'payload_read', 'schema_read', 'browser_read', 'other'].includes(scope.endpoint_scope.operation), 'access_summary_operation');
+    for (const key of ['metadata_reachability_is_not_payload_access', 'server_success_does_not_imply_browser_usability', 'browser_observations_are_contextual']) {
+      assert(scope.boundaries?.[key] === true, 'access_summary_scope_boundary:' + key);
+    }
     assert(scope.documented && typeof scope.documented === 'object', 'access_summary_documented');
     assert(Array.isArray(scope.documented.credential_requirements), 'access_summary_credentials');
     assert(timestampAtOrBefore(scope.documented.observed_at), 'access_summary_documented_time');
-    assert(evidencePresent(scope.documented), 'access_summary_documented_evidence');
+    assert(evidencePresent(scope.documented, 'access_summary_documented_evidence'), 'access_summary_documented_evidence');
     for (const requirement of scope.documented.credential_requirements) {
       assert(requirement && typeof requirement === 'object', 'access_summary_requirement_shape');
-      assert(typeof requirement.requirement_id === 'string' && typeof requirement.name === 'string', 'access_summary_requirement_identity');
+      assert(typeof requirement.requirement_id === 'string' && typeof requirement.kind === 'string' && typeof requirement.name === 'string', 'access_summary_requirement_identity');
       assert(['required', 'not_required', 'unknown', 'conflicting'].includes(requirement.state), 'access_summary_requirement_state');
       assert(timestampAtOrBefore(requirement.observed_at), 'access_summary_requirement_time');
-      assert(evidencePresent(requirement), 'access_summary_requirement_evidence');
+      assert(evidencePresent(requirement, 'access_summary_requirement_evidence'), 'access_summary_requirement_evidence');
     }
     for (const key of ['cost', 'usage_limit']) {
       const facts = scope.documented[key];
       assert(facts === null || typeof facts === 'object', 'access_summary_fact_shape');
       if (facts) {
         assert(timestampAtOrBefore(facts.observed_at), 'access_summary_fact_time');
-        assert(evidencePresent(facts), 'access_summary_fact_evidence');
-        if (key === 'cost' && ['unknown', 'conflicting'].includes(facts.state)) assert(facts.amount === null, 'access_summary_unknown_cost');
-        if (key === 'usage_limit' && ['unknown', 'conflicting', 'not_applicable'].includes(facts.state)) assert(facts.limit === null, 'access_summary_unknown_usage');
+        assert(evidencePresent(facts, 'access_summary_fact_evidence'), 'access_summary_fact_evidence');
+        if (key === 'cost') {
+          assert(['documented_free', 'payment_required', 'unknown', 'conflicting'].includes(facts.state), 'access_summary_cost_state');
+          assert(facts.amount === null || typeof facts.amount === 'number' && Number.isFinite(facts.amount) && facts.amount >= 0, 'access_summary_cost_amount');
+          assert(facts.currency === null || typeof facts.currency === 'string' && /^[A-Z]{3}$/u.test(facts.currency), 'access_summary_cost_currency');
+          if (['unknown', 'conflicting'].includes(facts.state)) assert(facts.amount === null, 'access_summary_unknown_cost');
+          if (facts.state === 'documented_free') assert(facts.amount === null || facts.amount === 0, 'access_summary_free_cost');
+        } else {
+          assert(['documented', 'unknown', 'conflicting', 'not_applicable'].includes(facts.state), 'access_summary_usage_state');
+          assert(facts.limit === null || Number.isSafeInteger(facts.limit) && facts.limit >= 0, 'access_summary_usage_limit');
+          assert(facts.unit === null || typeof facts.unit === 'string' && facts.unit.length > 0, 'access_summary_usage_unit');
+          if (['unknown', 'conflicting', 'not_applicable'].includes(facts.state)) assert(facts.limit === null, 'access_summary_unknown_usage');
+        }
       }
     }
     for (const [key, expectedState] of [['latest_attempt', null], ['latest_successful_check', 'succeeded']]) {
@@ -840,7 +866,7 @@ function assertAccessSummary(summary, asOf, availableEvidenceIds) {
       assert(typeof check.observation_id === 'string' && typeof check.record_id === 'string' && typeof check.source_id === 'string' && typeof check.field_id === 'string' && check.attempt_state !== 'not_attempted', 'access_summary_check_identity');
       assert(timestampAtOrBefore(check.observed_at) && timestampAtOrBefore(check.attempted_at) && timestampAtOrBefore(check.recorded_at) && (check.source_observed_at === null || timestampAtOrBefore(check.source_observed_at)), 'access_summary_check_time');
       assert(check.endpoint_scope && scopeKeyForAccess(check.endpoint_scope) === scopeKey, 'access_summary_check_scope');
-      assert(evidencePresent(check), 'access_summary_check_evidence');
+      assert(evidencePresent(check, 'access_summary_check_evidence'), 'access_summary_check_evidence');
     }
     assert(Array.isArray(scope.revision_history), 'access_summary_revision_history');
     for (const check of scope.revision_history) {
@@ -850,13 +876,13 @@ function assertAccessSummary(summary, asOf, availableEvidenceIds) {
       assert(check.attempt_state !== 'not_attempted', 'access_summary_revision_attempt');
       assert(timestampAtOrBefore(check.observed_at) && timestampAtOrBefore(check.attempted_at) && timestampAtOrBefore(check.recorded_at) && (check.source_observed_at === null || timestampAtOrBefore(check.source_observed_at)), 'access_summary_revision_time');
       assert(check.endpoint_scope && scopeKeyForAccess(check.endpoint_scope) === scopeKey, 'access_summary_revision_scope');
-      assert(evidencePresent(check), 'access_summary_revision_evidence');
+      assert(evidencePresent(check, 'access_summary_revision_evidence'), 'access_summary_revision_evidence');
     }
     assert(Array.isArray(scope.browser_observations), 'access_summary_browser');
     for (const browser of scope.browser_observations) {
       assert(browser && browser.endpoint_scope && browser.endpoint_scope.operation === 'browser_read', 'access_summary_browser_scope');
       assert(timestampAtOrBefore(browser.observed_at), 'access_summary_browser_time');
-      assert(evidencePresent(browser), 'access_summary_browser_evidence');
+      assert(evidencePresent(browser, 'access_summary_browser_evidence'), 'access_summary_browser_evidence');
     }
   }
   return true;

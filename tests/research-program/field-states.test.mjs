@@ -8,8 +8,10 @@ import {
   ACCESS_SUMMARY_VERSION,
   appendFieldObservationRevision,
   buildAccessSummary,
+  compareRfc3339,
   createFieldObservation,
   deriveFieldObservation,
+  isRfc3339DateTime,
   validateFieldObservation
 } from '../../packages/normalization/src/index.mjs';
 import { assertCompletenessView, buildCompletenessView, createOfflineCompletenessConsumer } from '../../packages/coverage/index.mjs';
@@ -21,7 +23,7 @@ const INPUT_DIGEST = 'sha256:' + 'a'.repeat(64);
 const schema = JSON.parse(await fs.readFile(path.join(ROOT, 'packages/normalization/schemas/field-observation.schema.json'), 'utf8'));
 const completenessSchema = JSON.parse(await fs.readFile(path.join(ROOT, 'packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json'), 'utf8'));
 const ajv = new Ajv2020({ strict: true, strictSchema: true, strictTypes: true, allErrors: true });
-ajv.addFormat('date-time', value => typeof value === 'string' && Number.isFinite(Date.parse(value)));
+ajv.addFormat('date-time', isRfc3339DateTime);
 const validateSchema = ajv.compile(schema);
 const validateCompletenessSchema = ajv.compile(completenessSchema);
 
@@ -348,6 +350,99 @@ test('access history is order invariant, attempts use attempt time, and dates ar
   }), { code: 'field_observation_invalid' });
 });
 
+test('flat observation ledgers retain prior revisions and scope local revision identities', () => {
+  const oldAt = '2026-09-01T00:00:00.1238Z';
+  const currentAt = '2026-09-02T00:00:00.1239Z';
+  const asOf = '2026-09-10T00:00:00.000Z';
+  const old = field({
+    observation_id: 'revision:local-success',
+    record_id: 'record:flat-history',
+    source_id: 'source:flat-history',
+    observed_at: oldAt,
+    recorded_at: oldAt,
+    attempted_at: oldAt,
+    source_observed_at: oldAt,
+    evidence_refs: [evidence('evidence:flat-history-old', oldAt)],
+    reason_codes: ['flat_history_success']
+  });
+  const current = field({
+    observation_id: 'revision:flat-failure',
+    record_id: old.record_id,
+    source_id: old.source_id,
+    observed_at: currentAt,
+    recorded_at: currentAt,
+    attempted_at: currentAt,
+    source_observed_at: currentAt,
+    evidence_refs: [evidence('evidence:flat-history-current', currentAt)],
+    value: { kind: 'unknown', value: null },
+    value_state: 'unknown',
+    attempt_state: 'failed',
+    reason_codes: ['flat_history_failure']
+  });
+  const derived = deriveFieldObservation({ recordId: old.record_id, sourceId: old.source_id, fieldId: old.field_id, observations: [old, current], asOf });
+  assert.equal(derived.current_state, 'failed');
+  assert.deepEqual(derived.current_observation.history.map(item => item.revision_id), [old.observation_id]);
+  const summary = buildAccessSummary({ observations: [old, current], asOf });
+  assert.deepEqual(summary.endpoint_scopes[0].revision_history.map(item => item.revision_id), [current.observation_id, old.observation_id]);
+  const view = buildCompletenessView({
+    membership: [{ record_id: old.record_id, source_id: old.source_id, isolated: false, evidence_ids: ['evidence:flat-history-membership'], source_observed_at: currentAt }],
+    observations: [old, current],
+    fieldDefinitions: [{ field_id: old.field_id, field_role: old.field_role, unit: old.unit, description: 'Flat history fixture.' }],
+    cohort: 'flat history fixture',
+    generation: 'flat-history-generation',
+    asOf,
+    generatedAt: asOf,
+    accessSummary: summary
+  });
+  assertCompletenessView(view);
+  const vectorObservation = view.records[0].source_vectors[0].fields[0].observation;
+  assert.deepEqual(vectorObservation.history.map(item => item.revision_id), [old.observation_id]);
+  assert.equal(view.evidence_catalog.find(item => item.evidence_id === 'evidence:flat-history-old').bindings.some(binding => binding.location === 'history' && binding.revision_id === old.observation_id), true);
+
+  const otherOld = field({
+    observation_id: old.observation_id,
+    record_id: 'record:flat-history-other',
+    source_id: 'source:flat-history-other',
+    observed_at: oldAt,
+    recorded_at: oldAt,
+    attempted_at: oldAt,
+    source_observed_at: oldAt,
+    evidence_refs: [evidence('evidence:flat-history-other-old', oldAt)],
+    reason_codes: ['other_flat_history_success']
+  });
+  const otherCurrent = field({
+    observation_id: 'revision:flat-failure-other',
+    record_id: otherOld.record_id,
+    source_id: otherOld.source_id,
+    observed_at: currentAt,
+    recorded_at: currentAt,
+    attempted_at: currentAt,
+    source_observed_at: currentAt,
+    evidence_refs: [evidence('evidence:flat-history-other-current', currentAt)],
+    value: { kind: 'unknown', value: null },
+    value_state: 'unknown',
+    attempt_state: 'failed',
+    reason_codes: ['other_flat_history_failure']
+  });
+  const scopedSummary = buildAccessSummary({ observations: [current, otherCurrent, old, otherOld], asOf });
+  const historicalIds = scopedSummary.endpoint_scopes.flatMap(scope => scope.revision_history).filter(item => item.attempt_state === 'succeeded').map(item => `${item.record_id}:${item.revision_id}`);
+  assert.equal(historicalIds.length, 2);
+  assert.equal(new Set(historicalIds).size, 2);
+  assert.throws(() => buildAccessSummary({ observations: [old, { ...old, value: { kind: 'integer', value: 99 } }], asOf }), { code: 'field_observation_revision_conflict' });
+});
+
+test('strict RFC3339 validation rejects normalized dates and preserves sub-millisecond ordering', () => {
+  assert.equal(isRfc3339DateTime('2026-02-31T00:00:00.000Z'), false);
+  assert.equal(isRfc3339DateTime('09/01/2026'), false);
+  assert.equal(compareRfc3339('2026-09-01T00:00:00.1239Z', '2026-09-01T00:00:00.1238Z') > 0, true);
+  assert.throws(() => field({ observed_at: '2026-02-31T00:00:00.000Z' }), /FIELD_OBSERVATION_OBSERVED_AT_REQUIRED/u);
+  assert.throws(() => field({ observed_at: '09/01/2026' }), /FIELD_OBSERVATION_OBSERVED_AT_REQUIRED/u);
+  const malformed = structuredClone(field());
+  malformed.observed_at = '2026-02-31T00:00:00.000Z';
+  assert.equal(validateSchema(malformed), false);
+  assert.match(JSON.stringify(validateSchema.errors), /date-time/u);
+});
+
 test('completeness binds access summaries to the vector in full and compact views', () => {
   const membership = [{
     record_id: 'record:access-binding',
@@ -412,8 +507,25 @@ test('completeness binds access summaries to the vector in full and compact view
     accessSummary: buildAccessSummary({ observations: [unattempted], asOf: input.asOf })
   });
   assertCompletenessView(honest);
+  const compactWithFullSummary = buildCompletenessView({
+    ...input,
+    vectorEncoding: 'compact-v1',
+    accessSummary: buildAccessSummary({ observations: [unattempted], asOf: input.asOf })
+  });
+  assertCompletenessView(compactWithFullSummary);
   const tampered = rehashView({ ...honest, access_summary: fullSuccessSummary });
   assert.throws(() => assertCompletenessView(tampered), { code: 'completeness_access_summary_mismatch' });
+  const forgedFacts = structuredClone(honest);
+  forgedFacts.access_summary.endpoint_scopes[0].documented.cost = {
+    ...forgedFacts.access_summary.endpoint_scopes[0].documented.cost,
+    state: 'documented_free',
+    amount: 0,
+    currency: 'USD'
+  };
+  assert.throws(() => assertCompletenessView(rehashView(forgedFacts)), { code: 'completeness_access_summary_mismatch' });
+  const forgedBoundary = structuredClone(honest);
+  forgedBoundary.access_summary.boundaries.unknown_cost_is_not_free = false;
+  assert.throws(() => assertCompletenessView(rehashView(forgedBoundary)), { code: 'access_summary_boundary:unknown_cost_is_not_free' });
 });
 
 test('offline views reject future nested clocks and forged evidence bindings', () => {

@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { assertCompletenessView, createOfflineCompletenessConsumer, membershipHash } from '../../../packages/coverage/research-program/v1.0.0/src/completeness.mjs';
+import { isRfc3339DateTime } from '../../../packages/normalization/src/field-observation.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const artifactPath = path.join(ROOT, 'verification/research-program/pr-004/completeness-view.json');
@@ -28,7 +29,7 @@ const [artifactBytes, artifact, baseline, cohorts, schema, fieldSchema] = await 
 const cohortsBytes = await fs.readFile(cohortsPath);
 const expectedInputDigest = `sha256:${crypto.createHash('sha256').update(cohortsBytes).digest('hex')}`;
 const ajv = new Ajv2020({ strict: true, strictSchema: true, strictTypes: true, allErrors: true });
-ajv.addFormat('date-time', value => typeof value === 'string' && Number.isFinite(Date.parse(value)));
+ajv.addFormat('date-time', isRfc3339DateTime);
 ajv.compile(fieldSchema);
 const validate = ajv.compile(schema);
 assert(validate(artifact), `SCHEMA_INVALID:${JSON.stringify(validate.errors)}`);
