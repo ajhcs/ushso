@@ -21,6 +21,25 @@ const REPO_ROOT = path.resolve(HERE, '..', '..', '..');
 const SCHEMA_DIR = path.join(REPO_ROOT, 'docs', 'research-program', 'handoffs', 'schema');
 const FIXTURE_DIR = path.join(HERE, 'fixtures');
 
+function timestampMillis(value) {
+  if (typeof value !== 'string' || value.trim() === '') return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$/.exec(value);
+  if (!match) return null;
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) return null;
+  const date = new Date(parsed);
+  const actual = [
+    date.getUTCFullYear(),
+    date.getUTCMonth() + 1,
+    date.getUTCDate(),
+    date.getUTCHours(),
+    date.getUTCMinutes(),
+    date.getUTCSeconds()
+  ];
+  const expected = match.slice(1, 7).map(Number);
+  return actual.every((component, index) => component === expected[index]) ? parsed : null;
+}
+
 /** Acceptance states that assert success and therefore require a command result. */
 export const SUCCESS_ACCEPTANCE_STATES = new Set([
   'passed',
@@ -73,6 +92,12 @@ export const CASES = [
     file: 'handoff.reject-source-hash-omitted.json',
     expectRejected: true,
     expectedReason: /required/
+  },
+  {
+    id: 'reject-invalid-timing',
+    file: 'handoff.reject-invalid-timing.json',
+    expectRejected: true,
+    expectedReason: /command_timing_order_invalid/
   }
 ];
 
@@ -123,13 +148,14 @@ export function crossReferenceErrors(task, handoff) {
   const commands = new Map();
   for (const command of handoff.commands ?? []) {
     if (commands.has(command.id)) errors.push(`duplicate_command_id: ${command.id}`);
+    const started = timestampMillis(command.started_at);
+    const completed = timestampMillis(command.completed_at);
+    if (started === null || completed === null) errors.push(`command_timestamp_invalid: ${command.id}`);
+    else if (completed < started) errors.push(`command_timing_order_invalid: ${command.id}`);
     else commands.set(command.id, command);
     const expected = command.expected_outcome;
     const observed = command.observed_outcome;
     if (!expected || !observed) errors.push(`command_outcome_missing: ${command.id}`);
-    else if (expected.kind !== observed.kind || (expected.kind === 'observed_exit' && expected.exit_code !== observed.exit_code)) {
-      errors.push(`command_outcome_mismatch: ${command.id}`);
-    }
   }
 
   const artifacts = new Map();

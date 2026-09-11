@@ -180,6 +180,32 @@ test('local source identity must carry its hash', async () => {
   assert.ok(rulesOf(report).includes('source_identity_hash_omitted'));
 });
 
+test('immutable Git source snapshots reject wrong bytes and commit bindings', async () => {
+  const handoff = await readJson('handoff.valid.json');
+  const runtime = await writeRuntimeHandoff('git-snapshot-mutation.json', handoff);
+  const source = handoff.source_identities.find(identity =>
+    identity.id === 'docs/master-plan/2026-09-10/EXECUTION.md'
+  );
+  assert.equal(source.location, 'external');
+  assert.equal(source.git_commit, 'f62ce35481cc572e9aad054049c700aac6378f58');
+  try {
+    source.sha256 = '0'.repeat(64);
+    await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+    const wrongBytes = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(wrongBytes.ok, false);
+    assert.ok(rulesOf(wrongBytes).includes('source_git_snapshot_hash_mismatch'));
+
+    source.sha256 = '4118d4f46a7ebec45749676881c753529593842792a439cfb5e53e50bc1fdfc3';
+    source.git_commit = '0'.repeat(40);
+    await writeFile(runtime.file, `${JSON.stringify(handoff, null, 2)}\n`);
+    const wrongCommit = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(wrongCommit.ok, false);
+    assert.ok(rulesOf(wrongCommit).includes('source_git_commit_not_local'));
+  } finally {
+    await rm(runtime.dir, { recursive: true, force: true });
+  }
+});
+
 test('nested event source is subject to existence, containment and hash binding', async () => {
   const report = await checkHandoff(fixture('handoff.reject-missing-event-source.json'), {
     repoRoot: REPO_ROOT
@@ -202,6 +228,25 @@ test('nonexistent all-zero head is rejected while the pending null convention is
     const terminalReport = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
     assert.equal(terminalReport.ok, false);
     assert.ok(rulesOf(terminalReport).includes('head_sha_required_for_terminal_state'));
+  } finally {
+    await rm(runtime.dir, { recursive: true, force: true });
+  }
+});
+
+test('command timing must be valid RFC3339 UTC and end no earlier than start', async () => {
+  const report = await checkHandoff(fixture('handoff.reject-invalid-timing.json'), {
+    repoRoot: REPO_ROOT
+  });
+  assert.equal(report.ok, false);
+  assert.ok(rulesOf(report).includes('command_timing_order_invalid'));
+
+  const malformed = await readJson('handoff.valid.json');
+  malformed.commands[0].started_at = 'not-a-timestamp';
+  const runtime = await writeRuntimeHandoff('malformed-timestamp.json', malformed);
+  try {
+    const malformedReport = await checkHandoff(runtime.file, { repoRoot: REPO_ROOT });
+    assert.equal(malformedReport.ok, false);
+    assert.ok(rulesOf(malformedReport).includes('command_timestamp_invalid'));
   } finally {
     await rm(runtime.dir, { recursive: true, force: true });
   }
@@ -298,7 +343,8 @@ test('CLI exits 0 for accepted packets and 1 for rejected packets', () => {
     'handoff.reject-source-hash-omitted.json',
     'handoff.reject-missing-event-source.json',
     'handoff.reject-invalid-head.json',
-    'handoff.reject-stale-base-sha.json'
+    'handoff.reject-stale-base-sha.json',
+    'handoff.reject-invalid-timing.json'
   ]) {
     const result = runCli(fixture(name));
     assert.equal(result.status, 1, `${name}: ${result.stderr}`);

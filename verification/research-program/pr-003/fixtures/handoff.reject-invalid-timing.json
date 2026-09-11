@@ -5,7 +5,7 @@
   "owner": "Luna Max (gpt-5.6-luna-max, reasoning high)",
   "reviewer": "Astra",
   "base_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
-  "head_sha": "0000000000000000000000000000000000000000",
+  "head_sha": null,
   "dependency_merge_shas": {
     "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
     "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
@@ -142,15 +142,15 @@
   ],
   "commands": [
     {
-      "id": "cmd-c003-1-verify-schema-contract",
+      "id": "cmd-c003-r1-invalid-timing",
       "command": "node verification/research-program/pr-003/verify-schema-contract.mjs",
-      "started_at": "2026-09-10T23:30:00.000Z",
-      "completed_at": "2026-09-10T23:30:00.300Z",
+      "started_at": "2026-09-11T00:00:01Z",
+      "completed_at": "2026-09-11T00:00:00Z",
       "exit_code": 0,
       "completion_status": "observed_exit_0",
       "expected": "exit 0 with the valid, expected-negative and unavailable fixtures accepted and each negative fixture rejected for its declared reason",
       "actual": "exit 0 with all declared fixture outcomes and structured outcome checks satisfied",
-      "result": "The schema-contract check exercises explicit expected/observed outcomes, expected-negative nonzero exits, typed unavailability, duplicate IDs, empty evidence, source hashes and outcome mismatch rejection.",
+      "result": "Deliberate timing-order mutation for the negative fixture.",
       "expected_outcome": {
         "kind": "observed_exit",
         "exit_code": 0
@@ -219,11 +219,11 @@
   ],
   "acceptance_results": [
     {
-      "id": "C-003-1-R1/C-003-2-R1",
+      "id": "invalid-timing-correction-check",
       "status": "producer_checked",
       "result": "Producer-side correction checks exercise complete structured evidence and reject incomplete, contradictory, duplicate, unbound or escaping records.",
       "command_ids": [
-        "cmd-c003-1-verify-schema-contract"
+        "cmd-c003-r1-invalid-timing"
       ],
       "artifact_ids": [
         "artifact-task-schema",

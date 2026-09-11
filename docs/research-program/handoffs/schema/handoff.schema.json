@@ -290,7 +290,7 @@
       }
     },
     "sourceIdentity": {
-      "description": "Declared source identity. location=local is a repository-relative file and requires sha256 plus resolved containment. location=external is not locally hashed (a recorded digest is optional and not proof of on-disk bytes). Do not infer locality from path punctuation.",
+      "description": "Declared source identity. location=local is a repository-relative current file and requires sha256 plus resolved containment. location=external may name a non-local identity; when git_commit and git_path are present, sha256 is verified against immutable git show bytes at that commit. Do not infer locality from path punctuation.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -319,6 +319,13 @@
         },
         "sha256": {
           "$ref": "#/$defs/sha256"
+        },
+        "git_commit": {
+          "$ref": "#/$defs/gitSha"
+        },
+        "git_path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
         }
       },
       "allOf": [
@@ -338,6 +345,51 @@
               "sha256"
             ],
             "properties": {
+              "sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "anyOf": [
+              {
+                "properties": {
+                  "git_commit": {}
+                },
+                "required": [
+                  "git_commit"
+                ]
+              },
+              {
+                "properties": {
+                  "git_path": {}
+                },
+                "required": [
+                  "git_path"
+                ]
+              }
+            ]
+          },
+          "then": {
+            "required": [
+              "location",
+              "git_commit",
+              "git_path",
+              "sha256"
+            ],
+            "properties": {
+              "location": {
+                "const": "external"
+              },
+              "git_commit": {
+                "$ref": "#/$defs/gitSha"
+              },
+              "git_path": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+              },
               "sha256": {
                 "$ref": "#/$defs/sha256"
               }
@@ -425,7 +477,7 @@
       ]
     },
     "command": {
-      "description": "One recorded command with structured expected and observed outcomes. Every command carries non-empty start/end timestamps and explicit outcomes. kind=observed_exit records the numeric exit that actually occurred; nonzero is legitimate when it is the explicit expected-negative outcome. Typed unavailable, blocked, failed and unresolved outcomes require a detail describing the limitation or failure. Narrative expected/actual strings remain commentary.",
+      "description": "One recorded command with structured expected and observed outcomes. Every command carries RFC3339 UTC start/end timestamps (end at or after start) and explicit outcomes. kind=observed_exit records the numeric exit that actually occurred; nonzero is legitimate when it is the explicit expected-negative outcome. Typed unavailable, blocked, failed and unresolved outcomes require a detail describing the limitation or failure. Narrative expected/actual strings remain commentary.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -447,12 +499,10 @@
           "minLength": 1
         },
         "started_at": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/timestamp"
         },
         "completed_at": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/timestamp"
         },
         "exit_code": {
           "oneOf": [
@@ -657,6 +707,11 @@
           }
         }
       }
+    },
+    "timestamp": {
+      "description": "RFC3339 UTC command timestamp; checker also enforces completed_at >= started_at.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
     }
   }
 }

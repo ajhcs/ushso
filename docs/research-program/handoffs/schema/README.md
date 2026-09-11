@@ -54,8 +54,8 @@ parsed. The contract is:
   expected outcome, and the two must match.
 - Missing `exit_code` / `completion_status` / `actual` with no structured
   observed outcome is not a captured execution result.
-- Completed `observed_exit` records require non-null `started_at` and
-  `completed_at`.
+- Completed `observed_exit` records require RFC3339 UTC `started_at` and
+  `completed_at` timestamps, with `completed_at` at or after `started_at`.
 - `commands[].event_source`, when present, is an artifact and is checked with
   the same existence, containment and SHA-256 rules as `artifacts[]`.
 
@@ -66,9 +66,18 @@ Each `source_identities[]` entry must declare `location`:
 | `location` | Meaning | Hash rule |
 | --- | --- | --- |
 | `local` | Repository-relative file (`id` is the path) | `sha256` required; resolved containment (lexical and symlink) and on-disk digest must match |
-| `external` | Not a locally hashed repository file (dispatch prompt outside the worktree, git object identity, etc.) | Digest may be recorded; it is not proof of on-disk bytes |
+| `external` | Not a locally hashed current repository file (dispatch prompt outside the worktree, or an immutable Git snapshot) | Plain external digest is descriptive; a `git_commit` + `git_path` + `sha256` triple is verified against `git show` bytes at that commit |
 
 Locality is **not** inferred from `/` or a leading `.` in `id`.
+
+An immutable Git snapshot source supplies `location: "external"`, the exact
+40-character `git_commit`, repository-relative `git_path`, and the SHA-256 of
+that commit/path's bytes. The checker verifies the commit exists in the
+configured `repoRoot`, rejects absolute or traversal paths, and hashes the
+`git show` bytes. It does not silently substitute the current working-tree
+file. This distinction lets mutable controller documents such as the execution
+ledger remain bound to their historical input bytes while current correction
+artifacts continue to be checked on disk.
 
 ## Status-specific evidence
 
@@ -155,6 +164,18 @@ or unresolved head claim. That transport state is accepted for
 actual commit in an external receipt after committing. It cannot advertise
 `independently_verified`, `merged`, `integrated` or `qualified` with a null
 head, and an untyped null is never treated as a commit.
+
+## Downstream handoff migration
+
+Active PR-004 and PR-085 packets should use this contract at their boundary:
+record RFC3339 UTC `started_at`/`completed_at` values with end at or after
+start, structured `expected_outcome` and `observed_outcome`, and a typed
+pending head until a controller binds the committed SHA/tree. Hash current
+local artifacts on disk and bind historical inputs with an exact Git
+commit/path/hash triple; do not repin a mutable current file as historical
+bytes. Completed statuses carry the required status-specific evidence.
+PR-001 and PR-002 remain byte-identical legacy packets under the explicit
+migration boundary below.
 
 ## Disposition of existing packets (format migration boundary)
 

@@ -321,8 +321,25 @@ function completionStatusOutcome(value) {
   return null;
 }
 
-function hasNonEmptyTiming(value) {
-  return typeof value === 'string' && value.trim() !== '';
+function timestampMillis(value) {
+  if (typeof value !== 'string' || value.trim() === '') return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$/.exec(value);
+  if (!match) return null;
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) return null;
+  const date = new Date(parsed);
+  const components = [
+    date.getUTCFullYear(),
+    date.getUTCMonth() + 1,
+    date.getUTCDate(),
+    date.getUTCHours(),
+    date.getUTCMinutes(),
+    date.getUTCSeconds()
+  ];
+  const expected = match.slice(1, 7).map(Number);
+  return components.every((component, index) => component === expected[index])
+    ? parsed
+    : null;
 }
 
 function collectDeclaredArtifacts(handoff) {
@@ -625,9 +642,88 @@ async function evaluateArtifacts(declaredArtifacts, repoRoot, realRoot, reporter
 async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter) {
   const { fail, markCheck, note } = reporter;
   let sourceOk = true;
-  let checked = 0;
+  let localChecked = 0;
+  let gitChecked = 0;
 
   for (const identity of handoff.source_identities ?? []) {
+    const hasGitBinding = identity.git_commit !== undefined || identity.git_path !== undefined;
+    if (hasGitBinding) {
+      gitChecked += 1;
+      if (identity.location !== 'external') {
+        fail(
+          'source_identity_binding',
+          'source_git_snapshot_external_only',
+          `${identity.id}: immutable git snapshot bindings require location=external`
+        );
+        sourceOk = false;
+      }
+      if (
+        typeof identity.git_commit !== 'string' ||
+        typeof identity.git_path !== 'string' ||
+        typeof identity.sha256 !== 'string'
+      ) {
+        fail(
+          'source_identity_binding',
+          'source_git_binding_missing',
+          `${identity.id}: git_commit, git_path and sha256 are required for a git snapshot binding`
+        );
+        sourceOk = false;
+        continue;
+      }
+      const contained = resolveContainedPath(repoRoot, identity.git_path);
+      if (!contained.ok) {
+        fail(
+          'source_identity_binding',
+          'source_git_path_not_contained',
+          `${identity.id}: ${contained.detail}`
+        );
+        sourceOk = false;
+        continue;
+      }
+      const commit = gitCommitExists(identity.git_commit, repoRoot);
+      if (commit.unavailable) {
+        fail(
+          'source_identity_binding',
+          'git_unavailable',
+          `${identity.id}: git executable is not available for immutable snapshot verification`
+        );
+        sourceOk = false;
+        continue;
+      }
+      if (!commit.ok) {
+        fail(
+          'source_identity_binding',
+          'source_git_commit_not_local',
+          `${identity.id}: ${commit.detail}`
+        );
+        sourceOk = false;
+        continue;
+      }
+      try {
+        const bytes = execFileSync(
+          'git',
+          ['show', `${identity.git_commit}:${identity.git_path}`],
+          { cwd: repoRoot }
+        );
+        const digest = sha256Buffer(bytes);
+        if (digest !== identity.sha256) {
+          fail(
+            'source_identity_binding',
+            'source_git_snapshot_hash_mismatch',
+            `${identity.id} at ${identity.git_commit}:${identity.git_path} expected ${identity.sha256} got ${digest}`
+          );
+          sourceOk = false;
+        }
+      } catch (error) {
+        fail(
+          'source_identity_binding',
+          'source_git_path_missing_at_commit',
+          `${identity.id}: ${identity.git_commit}:${identity.git_path} cannot be read from the local Git object (${error.status ?? error.code ?? error.message})`
+        );
+        sourceOk = false;
+      }
+      continue;
+    }
     if (identity.location === 'external') {
       note('external_source_identity', 'external', `source identity ${identity.id} is external; any SHA-256 is recorded but not locally verified`);
       continue;
@@ -642,7 +738,7 @@ async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter) {
       sourceOk = false;
       continue;
     }
-    checked += 1;
+    localChecked += 1;
     const contained = resolveContainedPath(repoRoot, identity.id);
     if (!contained.ok) {
       fail('source_identity_binding', 'source_identity_path_not_contained', `${identity.id}: ${contained.detail}`);
@@ -670,7 +766,12 @@ async function evaluateSourceIdentities(handoff, repoRoot, realRoot, reporter) {
   }
 
   if (sourceOk) {
-    markCheck('source_identity_binding', checked > 0 ? 'passed' : 'not_applicable', checked > 0 ? `${checked} local source identity hash(es) match on-disk bytes with resolved containment` : 'no local source identity declared');
+    const verified = localChecked + gitChecked;
+    const detail = [
+      localChecked ? `${localChecked} current local source hash(es) match on-disk bytes with resolved containment` : null,
+      gitChecked ? `${gitChecked} immutable Git source snapshot hash(es) match git show bytes at their bound commit/path` : null
+    ].filter(Boolean).join('; ');
+    markCheck('source_identity_binding', verified > 0 ? 'passed' : 'not_applicable', detail || 'no locally verifiable source identity declared');
   }
 }
 
@@ -823,8 +924,13 @@ function evaluateCommandOutcomeConsistency(command, reporter) {
     reporter.fail('command_result_resolution', 'command_observed_outcome_missing', `command ${command.id} has no structured observed_outcome`);
     ok = false;
   }
-  if (!hasNonEmptyTiming(command.started_at) || !hasNonEmptyTiming(command.completed_at)) {
-    reporter.fail('command_result_resolution', 'command_timing_missing', `command ${command.id} requires non-empty started_at and completed_at timestamps`);
+  const startedMillis = timestampMillis(command.started_at);
+  const completedMillis = timestampMillis(command.completed_at);
+  if (startedMillis === null || completedMillis === null) {
+    reporter.fail('command_result_resolution', 'command_timestamp_invalid', `command ${command.id} requires RFC3339 UTC started_at and completed_at timestamps`);
+    ok = false;
+  } else if (completedMillis < startedMillis) {
+    reporter.fail('command_result_resolution', 'command_timing_order_invalid', `command ${command.id} completed_at precedes started_at`);
     ok = false;
   }
   if (observed?.kind === 'observed_exit') {
