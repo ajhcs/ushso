@@ -1,7 +1,7 @@
 # ADR 0008: Operating bounds and evidence receipts
 
 - **Status:** Proposed
-- **Implementation state:** `not_started`
+- **Implementation state:** `in_progress`
 - **Decision date:** 2026-09-12
 - **Decision owners:** Platform, Data, Operations, Security, Architecture
 - **Accountable approver role:** Platform architecture owner

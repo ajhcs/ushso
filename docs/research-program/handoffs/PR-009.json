@@ -32,6 +32,8 @@
     "verification/research-program/pr-009/command-receipts/cmd-c009-3-operating-bounds.stdout",
     "verification/research-program/pr-009/command-receipts/cmd-c009-3-r1-operating-bounds.json",
     "verification/research-program/pr-009/command-receipts/cmd-c009-3-r1-operating-bounds.stdout",
+    "verification/research-program/pr-009/command-receipts/cmd-c009-3-r2-operating-bounds.json",
+    "verification/research-program/pr-009/command-receipts/cmd-c009-3-r2-operating-bounds.stdout",
     "docs/research-program/handoffs/PR-009.json"
   ],
   "problem": "Collection, retention, and control-plane topology bounds were unspecified, so later jobs could invent cheapest providers, arbitrary URLs, or unnamed descriptor hashes. PR-008 is present on this candidate but not accepted into integration.",
@@ -55,6 +57,11 @@
     {
       "id": "C-009-3-R1",
       "subject": "fix(research): omit Census historical query from the receipt fixture (PR-009 C-009-3-R1)",
+      "sha": "796c90413ee0b13430589a11a77b9e81e3685c03"
+    },
+    {
+      "id": "C-009-3-R2",
+      "subject": "fix(research): name descriptor hash basis on matched receipts (PR-009 C-009-3-R2)",
       "sha": null
     }
   ],
@@ -63,7 +70,7 @@
       "kind": "adr",
       "id": "docs/adr/0008-operating-bounds-and-evidence-receipts.md",
       "location": "local",
-      "sha256": "63aa50e3036fe7bc1ba9b4d471dcb303b7275b38e31e78f67f629a8838c73402"
+      "sha256": "06c17ca0fe891d7ddf55710996b1afcaec43efbdaebe33353ab9aafbbdbabacd"
     },
     {
       "kind": "policy",
@@ -179,13 +186,38 @@
         "sha256": "8c70fc2e8e63832ce237aa20ca98d71d296cf5198d45b50530df3380df51a6ee",
         "bytes": 662
       }
+    },
+    {
+      "id": "cmd-c009-3-r2-operating-bounds",
+      "command": "node --test tests/research-program/operating-bounds.test.mjs",
+      "started_at": "2026-09-12T02:48:07Z",
+      "completed_at": "2026-09-12T02:48:07Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Matched receipts require named ushso-canonical-json.v1 hashes; exact published bytes remain unresolved; ADR 0008 is Proposed and in_progress.",
+      "expected": "9 tests pass",
+      "actual": "9 passed, 0 failed",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c009-3-r2-operating-bounds-receipt",
+        "path": "verification/research-program/pr-009/command-receipts/cmd-c009-3-r2-operating-bounds.json",
+        "sha256": "80ad1976138e3836a78606013ef1bd89fd489e6da41d34a4fcbc36ec1e70d8b9",
+        "bytes": 662
+      }
     }
   ],
   "artifacts": [
     {
       "id": "docs__adr__0008-operating-bounds-and-evidence-receipts.md",
       "path": "docs/adr/0008-operating-bounds-and-evidence-receipts.md",
-      "sha256": "63aa50e3036fe7bc1ba9b4d471dcb303b7275b38e31e78f67f629a8838c73402",
+      "sha256": "06c17ca0fe891d7ddf55710996b1afcaec43efbdaebe33353ab9aafbbdbabacd",
       "bytes": 14003
     },
     {
@@ -197,8 +229,8 @@
     {
       "id": "scripts__research-program__operating-bounds.mjs",
       "path": "scripts/research-program/operating-bounds.mjs",
-      "sha256": "24c58484e8f1de36aedb7bb39a9e1c3c572881c8dc20ab356a352cdea3bad915",
-      "bytes": 28806
+      "sha256": "612261d10112591cfa2ff6ba95671a4b38add841919dfb3de20d6d0532aa501c",
+      "bytes": 29560
     },
     {
       "id": "scripts__research-program__receipts__v1.0.0__evidence-receipt.schema.json",
@@ -215,8 +247,8 @@
     {
       "id": "tests__research-program__operating-bounds.test.mjs",
       "path": "tests/research-program/operating-bounds.test.mjs",
-      "sha256": "9e2036bd6462f29e1eefefe01975f73f70fd898854d8c602161f6fd481516878",
-      "bytes": 21690
+      "sha256": "ce461133178f97abb6e019836b288ab34ba03f429d2e5f6407a1ab61d564132a",
+      "bytes": 24528
     },
     {
       "id": "tests__research-program__fixtures__pr009-census-negative__manifest.json",
@@ -245,8 +277,8 @@
     {
       "id": "verification__research-program__pr-009__task-binding.json",
       "path": "verification/research-program/pr-009/task-binding.json",
-      "sha256": "317603c885d69dafcbda7844430708bda8f603a0457a42dd8f63b6bd826f7b0b",
-      "bytes": 4472
+      "sha256": "fb8b15e44c5ae23901f67a8c8014fcffe0c76ceea2343b1be8af35e33d2914b9",
+      "bytes": 4891
     },
     {
       "id": "verification__research-program__pr-009__command-receipts__cmd-c009-1-adr-audit.json",
@@ -285,19 +317,32 @@
       "bytes": 791
     },
     {
+      "id": "verification__research-program__pr-009__command-receipts__cmd-c009-3-r2-operating-bounds.json",
+      "path": "verification/research-program/pr-009/command-receipts/cmd-c009-3-r2-operating-bounds.json",
+      "sha256": "80ad1976138e3836a78606013ef1bd89fd489e6da41d34a4fcbc36ec1e70d8b9",
+      "bytes": 662
+    },
+    {
+      "id": "verification__research-program__pr-009__command-receipts__cmd-c009-3-r2-operating-bounds.stdout",
+      "path": "verification/research-program/pr-009/command-receipts/cmd-c009-3-r2-operating-bounds.stdout",
+      "sha256": "23f9fc2b53434f61d12910a919db1578db13ba6293d6b37619cc1d15c7bae646",
+      "bytes": 982
+    },
+    {
       "id": "verification__research-program__pr-009__evidence-index.json",
       "path": "verification/research-program/pr-009/evidence-index.json",
-      "sha256": "f922cdec732b6f54312beafc6cdc7eabf14d8a91859e450106e8af2a37f85a4f",
-      "bytes": 5774
+      "sha256": "d72cd297f7cd502e36364cf99f1fd118f16e7e3ec18297745366f3b8750367fa",
+      "bytes": 6504
     }
   ],
   "acceptance_results": [
     {
       "id": "C-009-1-topology-unmeasured",
       "status": "producer_checked",
-      "result": "ADR 0008 is Proposed, cheapest topology remains null, and WP0 accepted ADR bytes are unchanged.",
+      "result": "ADR 0008 is Proposed and in_progress; cheapest topology remains null; WP0 accepted ADR bytes are unchanged.",
       "command_ids": [
-        "cmd-c009-1-adr-audit"
+        "cmd-c009-1-adr-audit",
+        "cmd-c009-3-r2-operating-bounds"
       ],
       "artifact_ids": [
         "docs__adr__0008-operating-bounds-and-evidence-receipts.md"

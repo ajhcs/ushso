@@ -424,6 +424,19 @@ export async function validateEvidenceReceipt(receipt, options = {}) {
   await validateUnderlyingRecord('metadata-fetch.schema.json', fetchRecord, options, issues, '/underlying_records/metadata_fetch');
   await validateUnderlyingRecord('capture-reference.schema.json', captureRecord, options, issues, '/underlying_records/capture_reference');
 
+  if (receipt.route_match === 'matched_descriptor_route') {
+    const hash = receipt.descriptor_hash;
+    if (!hash || hash.hash_basis !== 'ushso-canonical-json.v1' || hash.hash_version !== 'ushso-canonical-json.v1') {
+      issues.push(issue('DESCRIPTOR_HASH_BASIS_UNNAMED', '/descriptor_hash', 'matched routes must name ushso-canonical-json.v1'));
+    }
+    if (hash?.hash_basis === 'exact_published_bytes') {
+      issues.push(issue('EXACT_PUBLISHED_BYTES_UNRESOLVED', '/descriptor_hash/hash_basis', 'exact published descriptor bytes remain a distinct unresolved claim'));
+    }
+    if (hash?.sha256 && !SHA256_PATTERN.test(hash.sha256)) {
+      issues.push(issue('DESCRIPTOR_HASH_INVALID', '/descriptor_hash/sha256', 'lowercase 64-hex'));
+    }
+  }
+
   if (receipt.request_type === 'historical_observation') {
     if (receipt.route_match !== 'unmatched_historical_observation') {
       issues.push(issue('HISTORICAL_ROUTE_MATCH_INVALID', '/route_match', 'unmatched_historical_observation'));

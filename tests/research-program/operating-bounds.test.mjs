@@ -498,3 +498,65 @@ test('version strings do not substitute for injected schema validation', async (
   assert.equal(unnamedResult.valid, false);
   assert.ok(codes(unnamedResult).includes('DESCRIPTOR_HASH_BASIS_UNNAMED'));
 });
+
+test('matched receipts reject unnamed or exact-published-byte descriptor hashes', async () => {
+  const records = await validRecords();
+  const context = await receiptContext();
+  const captured = await composeEvidenceReceipt({
+    receipt_id: 'receipt_capture_cms_page_001',
+    request_type: 'catalog_metadata',
+    source_id: 'source_cms_catalog',
+    descriptor_id: 'descriptor_cms_catalog_v1',
+    endpoint_id: 'endpoint_cms_catalog',
+    template_id: 'route_cms_catalog_page',
+    configuration_revision: 1,
+    descriptor_hash: {
+      algorithm: 'sha256',
+      hash_basis: 'ushso-canonical-json.v1',
+      hash_version: 'ushso-canonical-json.v1',
+      sha256: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    },
+    purpose: 'catalog_metadata',
+    expected_content_classes: ['catalog_collection', 'catalog_item_record'],
+    safe_final_host: 'data.cms.gov',
+    safe_final_path: '/data-api/v1/dataset/page-1',
+    redirect_count: 0,
+    observed_status: 200,
+    observed_media_type: 'application/json',
+    observed_bytes: 512,
+    truncated: false,
+    metadata_fetch: records.valid_fetch_captured,
+    capture_reference: records.valid_capture_reference,
+    parser_state: 'not_run',
+    connector_name: 'dcat-catalog',
+    connector_version: '1.0.0',
+    attempt_outcome: 'captured',
+    schema_validated: true,
+    next_action: 'none',
+    observed_at: '2026-08-30T00:01:03.000Z',
+  }, context);
+  assert.equal(captured.valid, true, JSON.stringify(captured.issues, null, 2));
+
+  const unnamed = clone(captured.receipt);
+  unnamed.descriptor_hash = null;
+  const unnamedResult = await validateEvidenceReceipt(unnamed, context);
+  assert.equal(unnamedResult.valid, false);
+  assert.ok(codes(unnamedResult).includes('DESCRIPTOR_HASH_BASIS_UNNAMED'));
+
+  const exactBytes = clone(captured.receipt);
+  exactBytes.descriptor_hash.hash_basis = 'exact_published_bytes';
+  exactBytes.descriptor_hash.hash_version = 'exact_published_bytes';
+  const exactResult = await validateEvidenceReceipt(exactBytes, context);
+  assert.equal(exactResult.valid, false);
+  assert.ok(codes(exactResult).includes('DESCRIPTOR_HASH_BASIS_UNNAMED') || codes(exactResult).includes('EXACT_PUBLISHED_BYTES_UNRESOLVED'));
+});
+
+test('Proposed ADR 0008 reports implementation in progress without claiming acceptance', async () => {
+  const text = await readFile(path.join(ROOT, 'docs/adr/0008-operating-bounds-and-evidence-receipts.md'), 'utf8');
+  assert.match(text, /\*\*Status:\*\* Proposed/);
+  assert.match(text, /\*\*Implementation state:\*\* `in_progress`/);
+  assert.match(text, /measured_cheapest_new_topology/);
+  assert.match(text, /ushso-canonical-json\.v1/);
+  const readme = await readFile(path.join(ROOT, 'docs/adr/README.md'), 'utf8');
+  assert.doesNotMatch(readme, /0008-operating-bounds-and-evidence-receipts/);
+});
