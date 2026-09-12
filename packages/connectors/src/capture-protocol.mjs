@@ -30,6 +30,17 @@ function safeHeaders(headers) {
   };
 }
 
+// Public capture references expose no query or credential-bearing locator fields.
+// Request coherence and observation identity still use the full redacted locator.
+function publicCaptureLocator(urlInput) {
+  const url = new URL(urlInput);
+  url.username = '';
+  url.password = '';
+  url.search = '';
+  url.hash = '';
+  return url.toString();
+}
+
 function captureClassification(purpose) {
   if (purpose === 'catalog_metadata') return 'catalog_metadata';
   if (purpose === 'schema') return 'schema_metadata';
@@ -179,7 +190,7 @@ export class R2CaptureProtocol {
         template_id: compiledRequest.route.template_id,
         final_host: new URL(finalUrl).hostname,
         final_path_class: compiledRequest.targetClass,
-        redacted_locator: redactedLocator(finalUrl),
+        redacted_locator: publicCaptureLocator(finalUrl),
       },
       safe_response_headers: retainedHeaders,
       media_type: mediaType,
