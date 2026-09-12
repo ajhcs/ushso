@@ -215,11 +215,21 @@ function fieldWireName(entry, kind) {
   if (Object.hasOwn(entry, 'wire_name')) return entry.wire_name;
   if (kind === 'cdc') return entry.fieldName ?? null;
   if (kind === 'census') return entry.__wire_name ?? null;
-  return entry.name ?? entry.variable_name ?? entry.fieldName ?? null;
+  // CMS parser names are documented layout names, not independently verified payload wire names.
+  // An exact or reviewed-alias CMS mapping requires separately supplied wire-name evidence
+  // (an explicit wire_name field together with an explicit mapping). Until then wire stays null.
+  return null;
 }
 
-function fieldDocumentedName(entry, wireName) {
-  return entry.documented_name ?? wireName ?? entry.label ?? entry.term_name ?? null;
+function fieldDocumentedName(entry, wireName, kind) {
+  if (entry.documented_name !== undefined && entry.documented_name !== null) return entry.documented_name;
+  // Preserve CMS parser names as documented names even though they are not wire names.
+  // CDC/Census keep their native-key behavior: documented falls back to the wire name first.
+  if (kind === 'cms') {
+    const cmsDocumented = entry.name ?? entry.variable_name;
+    if (typeof cmsDocumented === 'string' && cmsDocumented.length > 0) return cmsDocumented;
+  }
+  return wireName ?? entry.label ?? entry.term_name ?? null;
 }
 
 function fieldLabel(entry) {
@@ -271,9 +281,32 @@ function fieldLimitations(entry, kind, source) {
   return limitations;
 }
 
+function cmsSuppliedMapping(entry, options, index, wireName) {
+  const supplied = typeof options.mappingFor === 'function' ? options.mappingFor(entry, index, wireName) : entry.mapping;
+  return supplied ?? null;
+}
+
+function cmsMappingEvidenceIds(supplied) {
+  if (!supplied || !Array.isArray(supplied.evidence_ids)) return [];
+  return supplied.evidence_ids.filter((id) => typeof id === 'string' && id.length > 0);
+}
+
 function variableIdentityFromEntry(entry, kind, index, pointer, capture, options, evidenceIds) {
-  const wireName = fieldWireName(entry, kind);
-  const documentedName = fieldDocumentedName(entry, wireName);
+  let wireName = fieldWireName(entry, kind);
+  const documentedName = fieldDocumentedName(entry, wireName, kind);
+  let mapping = fieldMapping(entry, options, index, wireName, documentedName);
+  // CMS exact/reviewed-alias mappings require an explicit mapping object with
+  // non-empty mapping evidence plus an explicit wire_name field. Wire spelling
+  // alone (derived exact with empty evidence) stays unresolved.
+  if (kind === 'cms' && (mapping.state === 'exact' || mapping.state === 'reviewed_alias')) {
+    const supplied = cmsSuppliedMapping(entry, options, index, wireName);
+    const hasExplicitWire = Object.hasOwn(entry, 'wire_name') && typeof entry.wire_name === 'string' && entry.wire_name.length > 0;
+    const hasEvidence = cmsMappingEvidenceIds(supplied).length > 0 && cmsMappingEvidenceIds(mapping).length > 0;
+    if (supplied === null || !hasExplicitWire || !hasEvidence) {
+      wireName = null;
+      mapping = { state: 'unmatched', documented_name: documentedName, wire_name: null, candidate_wire_names: [], evidence_ids: [] };
+    }
+  }
   if ((typeof wireName !== 'string' || wireName.length === 0) && (typeof documentedName !== 'string' || documentedName.length === 0)) throw Error('VERSIONED_VARIABLE_NAME_MISSING');
   const transformation = VERSIONED_VARIABLE_TRANSFORMATIONS[kind];
   const rawEntry = kind === 'census' ? Object.fromEntries(Object.entries(entry).filter(([key]) => key !== '__wire_name')) : entry;
@@ -281,7 +314,6 @@ function variableIdentityFromEntry(entry, kind, index, pointer, capture, options
   const sourceType = sourceTypeValue ? { state: 'documented', value: sourceTypeValue, evidence_ids: evidenceIds } : { state: 'unknown', value: null, evidence_ids: [] };
   const observedType = fieldObservedType(entry, options, index, evidenceIds);
   const context = fieldContext(options, entry, index);
-  const mapping = fieldMapping(entry, options, index, wireName, documentedName);
   const publisherConcept = entry.concept ?? entry.publisher_concept ?? null;
   const definition = fieldDefinition(entry);
   const provenance = createVariableProvenance({
