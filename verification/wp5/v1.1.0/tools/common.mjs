@@ -141,6 +141,14 @@ export function inspectDependency(root, file, lock, limits) {
   requireCondition(file.startsWith('node_modules/'), 'DEPENDENCY_OUTSIDE_NODE_MODULES');
   const parts = file.split('/');
   const boundaries = [];
+  // Every node_modules segment crosses a separately installed package root.
+  // An outer package can never supply a nested package's missing identity.
+  for(let i=0;i<parts.length;i++) if(parts[i]==='node_modules') {
+    const end=i+(parts[i+1]?.startsWith('@')?3:2), packagePath=parts.slice(0,end).join('/');
+    requireCondition(end<parts.length && Object.hasOwn(lock.packages??{},packagePath) &&
+      fs.existsSync(path.join(root,packagePath,'package.json')),'UNEXPLAINED_PACKAGE_BOUNDARY');
+    regularFile(root,packagePath+'/package.json',limits.maximum_module_file_bytes);
+  }
   for (let i = 1; i < parts.length; i++) {
     const rel = parts.slice(0, i).join('/') + '/package.json';
     if (fs.existsSync(path.join(root, rel))) {
@@ -307,7 +315,7 @@ export function parseNativeTap(text, required = []) {
   requireCondition(totals.get('tests')===tests.length && totals.get('suites')===records.length-tests.length && totals.get('pass')===tests.length &&
     ['fail','cancelled','skipped','todo'].every(k=>totals.get(k)===0),'TAP_TERMINAL_COUNTERS');
   requireCondition(leaves.every(r=>!/(?:^|\/)[^ ]*\.test\.(?:mjs|cjs|js)$/.test(r.name)),'TAP_WRAPPER_ONLY');
-  requireCondition(required.every(n=>names.includes(n)),'TAP_MANDATORY_CASE_MISSING');
+  requireCondition(required.every(n=>leaves.some(r=>r.name===n)),'TAP_MANDATORY_CASE_MISSING');
   return { names, count:tests.length, leaf_count:leaves.length, leaf_names:leaves.map(r=>r.name), suites:records.length-tests.length };
 }
 export function assertUnapproved(result) {

@@ -174,6 +174,7 @@ test('newly discovered native nested test leaves remain mandatory and accounted'
   const f=fixture(t);f.put('app/nested.mjs',`import test,{describe,it} from 'node:test';import assert from 'node:assert/strict';test('required',()=>assert.equal(1,1));test('new parent',async t=>{await t.test('child one',()=>{});await t.test('child two',()=>{});});describe('new suite',()=>{it('suite leaf',()=>{});});`);
   const native=await runBoundedChild(['--test-reporter=tap',path.join(f.root,'app/nested.mjs')],childOptions(f.root));assert.equal(native.code,0,native.stderr);
   const parsed=parseNativeTap(native.stdout,['required']);assert.equal(parsed.count,5);assert.equal(parsed.leaf_count,4);assert.equal(parsed.suites,1);assert.ok(parsed.names.includes('child one'));assert.ok(parsed.names.includes('child two'));
+  assert.throws(()=>parseNativeTap(native.stdout,['new parent']),/TAP_MANDATORY_CASE_MISSING/);
 });
 test('historical content, pin edits, restamped PASS and origin changes are rejected',(t)=>{
   const f=fixture(t),pkg=path.join(f.root,'verification/wp5/v1.1.0');
@@ -206,4 +207,20 @@ test('deadline terminates task-owned descendants and drains inherited pipes with
   // remain an executing process or keep an output pipe open.
   try { const status=fs.readFileSync(`/proc/${pid}/stat`,'utf8');assert.equal(status.slice(status.lastIndexOf(')')+2).split(' ')[0],'Z'); }
   catch(error){if(error.code!=='ENOENT')throw error;}
+});
+
+test('each nested installed package has its own metadata and matching lock, while anonymous format scopes remain supported',(t)=>{
+  const f=fixture(t),spec=dep(f),nested='node_modules/dep/node_modules/ghost';f.put(nested+'/index.cjs','module.exports=7;');
+  for(const withLock of [false,true]) {
+    if(withLock)spec.lock.packages[nested]={version:'1.0.0'};
+    const guard=createModuleGuard(spec);
+    assert.throws(()=>load(guard,f.root,nested+'/index.cjs',{format:'commonjs',context:'commonjs'}),/UNEXPLAINED_PACKAGE_BOUNDARY/);
+  }
+  f.put(nested+'/package.json','{"name":"ghost","version":"1.0.0"}');
+  const guard=createModuleGuard(spec);load(guard,f.root,nested+'/index.cjs',{format:'commonjs',context:'commonjs'});
+  assert.deepEqual(guard.finish().packages.map(r=>r.name).sort(),['dep','ghost']);
+  f.put('node_modules/dep/anonymous/package.json','{"type":"commonjs"}');f.put('node_modules/dep/anonymous/value.js','module.exports=8;');
+  const scoped=createModuleGuard(spec);load(scoped,f.root,'node_modules/dep/anonymous/value.js',{format:'commonjs',context:'commonjs'});
+  const boundary=scoped.finish().packages.find(r=>r.path==='node_modules/dep/anonymous/package.json');
+  assert.equal(boundary.name,null);assert.equal(boundary.lock_entry,null);assert.equal(boundary.sha256,sha256(fs.readFileSync(path.join(f.root,boundary.path))));
 });
