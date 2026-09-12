@@ -1,0 +1,355 @@
+{
+  "format": "ushso.minimum-runtime-feasibility-and-environment-disposition.v1",
+  "recorded_at": "2026-09-12T17:44:12.948771+00:00",
+  "verdict": "minimum_node_22_15_feasibility_passed_sandbox_subprocess_limitation_confirmed",
+  "scope": "Minimum-runtime feasibility and unchanged PR010 fixture compatibility; not PR087 implementation, component merge, joint gate, hosted CI or production acceptance.",
+  "source_head": "1318cda5c76cd3262c7668fb7f56fab842876c6f",
+  "transport_source_inventory_basis": "1e5342f4b0671c2e67f22bcf202bbb2c33b8ee0f",
+  "observed_controller_head_before_and_after": "0d3e5e18f721ef99003dd6b183b43f2f261f0ad1",
+  "binary": {
+    "path": "binary-receipt.json",
+    "sha256": "3bc82143b82f6ddd38ec3454591588176629c00349a036cf3df611a4a2025798",
+    "bytes": 2081
+  },
+  "source_dependency_inventory": {
+    "path": "policy.json",
+    "sha256": "9f8980ac48c282fde5dba246c9d5e5c678c6d8816a0af30c98cb4e1a01f46518",
+    "bytes": 153679
+  },
+  "source_pin_count": 274,
+  "dependency_file_pin_count": 537,
+  "dependency_package_count": 5,
+  "immutable_transport_source_pins_verified": true,
+  "working_source_dependency_pins_verified_unchanged": true,
+  "dependency_ownership_receipts": [
+    {
+      "path": "ownership-before.json",
+      "sha256": "a861fa7ff604c926c9920323bd902715267d866c3cb8da6466d4712a582e86f4",
+      "bytes": 535
+    },
+    {
+      "path": "ownership-after.json",
+      "sha256": "d36718a3c1ac73b2b238633848fb2af133fdab87e154f25a325e2a80a782f03e",
+      "bytes": 535
+    }
+  ],
+  "guard": {
+    "path": "guard.mjs",
+    "sha256": "2a4ce7d0ae0a6401221bca79a2d4f945a8f135e1aa8c872c33878ddab8fa5810",
+    "bytes": 4708
+  },
+  "module_feasibility": {
+    "positive_receipt": {
+      "path": "positive-controls.json",
+      "sha256": "10f22b4d333323e7560078fd9612137d89a6be274456abccc3955819babd8115",
+      "bytes": 12820
+    },
+    "connector_tests_passed": 48,
+    "connector_tests_failed": 0,
+    "validator_assertions": 145,
+    "actual_loaded_unique_files": 140,
+    "actual_loaded_repository_files": 52,
+    "actual_loaded_dependency_files": 88,
+    "returned_format_counts": {
+      "module": 52,
+      "commonjs": 79,
+      "json": 9
+    },
+    "all_loaded_modules_returned_matching_source_bytes": true,
+    "negative_receipt": {
+      "path": "negative-controls/receipt.json",
+      "sha256": "acfda7e6a0c2e64bba20f1c5a30460ec428779153934ea92adc5c70d8cc234b3",
+      "bytes": 4168
+    },
+    "synthetic_controls": 9,
+    "real_omitted_cjs_and_json_controls": 2,
+    "ephemeral_symlink_and_native_fixture_removed": true,
+    "external_requests": 0
+  },
+  "lifecycle": {
+    "failed_sandbox_receipt": {
+      "path": "lifecycle-node22/receipt.json",
+      "sha256": "8500a53f269685b5acde4d71f2fcb18a72b46a8fc47468fb88ab7127a551482d",
+      "bytes": 5801
+    },
+    "passing_escalated_receipt": {
+      "path": "lifecycle-node22-escalated/receipt.json",
+      "sha256": "dee61367ea555e15bd582323cf76562de1566640a4e212afd67dbc74444d2f9f",
+      "bytes": 6331
+    },
+    "unchanged_test_count": 41,
+    "pass": 41,
+    "fail": 0,
+    "same_exact_argv_and_named_assertions": true,
+    "module_preload_guard_used": false,
+    "environment_names_removed": [
+      "NODE_OPTIONS",
+      "NODE_PATH",
+      "NODE_TEST_CONTEXT",
+      "WP5_PROBE_POLICY"
+    ],
+    "path_change": "Exact Node22 binary directory prefixed only for child command resolution in both lifecycle runs.",
+    "temporary_directory_change": "Each run receives its own empty task-owned TMPDIR; no repository fixture files or remaining temporary entries.",
+    "git_clean_before_after": true
+  },
+  "environment_diagnosis": {
+    "conclusion": "Sandbox-local subprocess stream-output suppression and spawnSync EPERM reproduced using only Node builtins in both22 and24; exact probe passes for both versions outside sandbox. NODE_TEST_CONTEXT and exit-versus-close alone cannot explain this reproduction.",
+    "not_claimed": "Specific operating-system syscall cause is not diagnosed. No test helper race is proven or source correction inferred.",
+    "test_context_probe": {
+      "path": "subprocess-probe-receipt.json",
+      "sha256": "7548e27960ebf4eef1557e071aa1f953c24d892490512e02d9e53c066ade6d7b",
+      "bytes": 617
+    },
+    "plain_probe": {
+      "path": "plain-subprocess-probe.mjs",
+      "sha256": "d9fcda7103952101ec1d18c436ea09f51064218fdfdc2944ee8c409215a61a83",
+      "bytes": 2224
+    },
+    "plain_probe_environment_names_removed": [
+      "NODE_TEST_CONTEXT",
+      "NODE_OPTIONS",
+      "NODE_PATH"
+    ],
+    "plain_probe_matrix": [
+      {
+        "receipt": {
+          "path": "plain-parent-node22-escalated/receipt.json",
+          "sha256": "7ea766502d657e21cecf48e40762a51273080ca6d1f344e125df088ce861f0e5",
+          "bytes": 2624
+        },
+        "parent_runtime": "v22.15.0",
+        "parent_exec_path": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node",
+        "parent_binary_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+        "executions": [
+          {
+            "child_runtime": "v22.15.0",
+            "child_exec_path": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node",
+            "child_binary_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+            "mode": "spawn",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": true,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          },
+          {
+            "child_runtime": "v22.15.0",
+            "child_exec_path": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node",
+            "child_binary_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+            "mode": "spawnSync",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": true,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          },
+          {
+            "child_runtime": "v24.14.0",
+            "child_exec_path": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+            "child_binary_sha256": "e237a2839d0cbdc9a9a2adda1a184afc0f5b20306ffbe923af5686550472d8a8",
+            "mode": "spawn",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": true,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          },
+          {
+            "child_runtime": "v24.14.0",
+            "child_exec_path": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+            "child_binary_sha256": "e237a2839d0cbdc9a9a2adda1a184afc0f5b20306ffbe923af5686550472d8a8",
+            "mode": "spawnSync",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": true,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          }
+        ]
+      },
+      {
+        "receipt": {
+          "path": "plain-parent-node22-sandbox/receipt.json",
+          "sha256": "4bd2753cff78a696577b0ceb6d8a9596fe51a3f0ea7c739575ccab10d3755612",
+          "bytes": 2643
+        },
+        "parent_runtime": "v22.15.0",
+        "parent_exec_path": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node",
+        "parent_binary_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+        "executions": [
+          {
+            "child_runtime": "v22.15.0",
+            "child_exec_path": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node",
+            "child_binary_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+            "mode": "spawn",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": false,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          },
+          {
+            "child_runtime": "v22.15.0",
+            "child_exec_path": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node",
+            "child_binary_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+            "mode": "spawnSync",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": false,
+            "sync_write_observed": true,
+            "spawn_sync_error": "spawnSync /mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node EPERM"
+          },
+          {
+            "child_runtime": "v24.14.0",
+            "child_exec_path": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+            "child_binary_sha256": "e237a2839d0cbdc9a9a2adda1a184afc0f5b20306ffbe923af5686550472d8a8",
+            "mode": "spawn",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": false,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          },
+          {
+            "child_runtime": "v24.14.0",
+            "child_exec_path": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+            "child_binary_sha256": "e237a2839d0cbdc9a9a2adda1a184afc0f5b20306ffbe923af5686550472d8a8",
+            "mode": "spawnSync",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": false,
+            "sync_write_observed": true,
+            "spawn_sync_error": "spawnSync /home/plumbob/.nvm/versions/node/v24.14.0/bin/node EPERM"
+          }
+        ]
+      },
+      {
+        "receipt": {
+          "path": "plain-parent-node24-escalated/receipt.json",
+          "sha256": "d20d1e09a46296aca09d5b2bb573a68ed8c8a0d88ba5d79097d801a185db8503",
+          "bytes": 2530
+        },
+        "parent_runtime": "v24.14.0",
+        "parent_exec_path": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+        "parent_binary_sha256": "e237a2839d0cbdc9a9a2adda1a184afc0f5b20306ffbe923af5686550472d8a8",
+        "executions": [
+          {
+            "child_runtime": "v22.15.0",
+            "child_exec_path": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node",
+            "child_binary_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+            "mode": "spawn",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": true,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          },
+          {
+            "child_runtime": "v22.15.0",
+            "child_exec_path": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node",
+            "child_binary_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+            "mode": "spawnSync",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": true,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          },
+          {
+            "child_runtime": "v24.14.0",
+            "child_exec_path": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+            "child_binary_sha256": "e237a2839d0cbdc9a9a2adda1a184afc0f5b20306ffbe923af5686550472d8a8",
+            "mode": "spawn",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": true,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          },
+          {
+            "child_runtime": "v24.14.0",
+            "child_exec_path": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+            "child_binary_sha256": "e237a2839d0cbdc9a9a2adda1a184afc0f5b20306ffbe923af5686550472d8a8",
+            "mode": "spawnSync",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": true,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          }
+        ]
+      },
+      {
+        "receipt": {
+          "path": "plain-parent-node24-sandbox/receipt.json",
+          "sha256": "3e46e34a219977dbd3804a6f211a5072bab4e87c5d95adf2886bc0b4e282a80f",
+          "bytes": 2549
+        },
+        "parent_runtime": "v24.14.0",
+        "parent_exec_path": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+        "parent_binary_sha256": "e237a2839d0cbdc9a9a2adda1a184afc0f5b20306ffbe923af5686550472d8a8",
+        "executions": [
+          {
+            "child_runtime": "v22.15.0",
+            "child_exec_path": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node",
+            "child_binary_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+            "mode": "spawn",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": false,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          },
+          {
+            "child_runtime": "v22.15.0",
+            "child_exec_path": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node",
+            "child_binary_sha256": "c43f3f73f6917481d2364daf7b7bf8c4fc4a7643580b4626f13f003131ec8716",
+            "mode": "spawnSync",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": false,
+            "sync_write_observed": true,
+            "spawn_sync_error": "spawnSync /mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node EPERM"
+          },
+          {
+            "child_runtime": "v24.14.0",
+            "child_exec_path": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+            "child_binary_sha256": "e237a2839d0cbdc9a9a2adda1a184afc0f5b20306ffbe923af5686550472d8a8",
+            "mode": "spawn",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": false,
+            "sync_write_observed": true,
+            "spawn_sync_error": null
+          },
+          {
+            "child_runtime": "v24.14.0",
+            "child_exec_path": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+            "child_binary_sha256": "e237a2839d0cbdc9a9a2adda1a184afc0f5b20306ffbe923af5686550472d8a8",
+            "mode": "spawnSync",
+            "exit_code": 0,
+            "marker_created": true,
+            "stream_write_observed": false,
+            "sync_write_observed": true,
+            "spawn_sync_error": "spawnSync /home/plumbob/.nvm/versions/node/v24.14.0/bin/node EPERM"
+          }
+        ]
+      }
+    ],
+    "positive_escalated_combinations": 8,
+    "retained_sandbox_combinations": 8,
+    "source_or_assertion_changes": false,
+    "host_node_defaults_or_global_configuration_changed": false,
+    "network_during_runtime_probes": false
+  },
+  "limitations": [
+    "This guard is input-accounting instrumentation, not a security sandbox.",
+    "Node22 guard observation used current immutable source and owned installed dependencies; prior Node24 prototype evidence is preserved separately.",
+    "Frozen WP5 historical acceptance does not transfer to the changed connector subject. PR087 source implementation and exact PR086 lock continuation remain required for the later joint gate.",
+    "Initial sandbox failures remain retained and must not be represented as passing runs."
+  ],
+  "repository_writes": false,
+  "source_copies_or_installs": false,
+  "full_gate_build_or_publication": false,
+  "all_activation_false": true
+}
