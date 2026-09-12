@@ -53,8 +53,9 @@ Resumable jobs with bounded transport, quotas and useful failures.
 | PR | Outcome | Dependencies |
 |---|---|---|
 | [PR-010: Connect durable collection jobs to existing ingestion ports](prs/PR-010.md) | Bounded collection jobs resume safely and have durable outcomes. | PR-009 |
-| [PR-011: Validate HTTP content and source access outcomes](prs/PR-011.md) | Normal source failures are correctly typed and do not contaminate metadata. | PR-009, PR-010 |
+| [PR-011: Validate HTTP content and source access outcomes](prs/PR-011.md) | Normal source failures are correctly typed and do not contaminate metadata. | PR-009, PR-010, PR-087 |
 | [PR-012: Enforce source quotas, retries and resumable scheduling](prs/PR-012.md) | Thousands of checks respect publisher limits and survive retries. | PR-010, PR-011 |
+| [PR-087: Add complete WP5 current technical verification with preserved historical evidence](prs/PR-087.md) | Current connector controls execute against an explicit bounded semantic subject without inheriting historical approval. | PR-010 |
 
 ### 2B — Source adapters
 
@@ -328,7 +329,7 @@ Exact artifact qualification, authorized rollout and sustained verification.
 
 | PR | Outcome | Dependencies |
 |---|---|---|
-| [PR-082: Build and qualify the exact release candidate](prs/PR-082.md) | The final release artifact is reproducible, independently gated and ready for a concrete decision. | PR-001 through PR-081 plus PR-085, PR-086 (all required work before release) |
+| [PR-082: Build and qualify the exact release candidate](prs/PR-082.md) | The final release artifact is reproducible, independently gated and ready for a concrete decision. | PR-001 through PR-081 plus PR-085, PR-086, PR-087 (all required work before release) |
 | [PR-083: Roll out the reviewed release and verify production](prs/PR-083.md) | The authorized production release serves the bytes and data that were reviewed. | PR-082 |
 | [PR-084: Verify sustained operation and publish the completion report](prs/PR-084.md) | The program closes only after the product stays useful and honest under actual refresh. | PR-083 |
 

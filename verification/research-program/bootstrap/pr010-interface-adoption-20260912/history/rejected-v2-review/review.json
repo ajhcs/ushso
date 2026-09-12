@@ -1,0 +1,413 @@
+{
+  "format": "ushso.pr010-corrected-proposal-independent-review.v1",
+  "recorded_at": "2026-09-12T14:06:07.584923Z",
+  "reviewer": "native subagent /root/production_path_review",
+  "verdict": "changes_required_before_controller_adoption",
+  "review_scope": "Static interface/source and retained-pin review; no runtime probes or implementation acceptance",
+  "inputs": [
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/corrected-proposal/PROPOSAL.md",
+      "sha256": "bdc54405fe6f501137bc254b2e4511e4634402f1e79ec5e151f18d4c8d70f578",
+      "bytes": 10308
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/corrected-proposal/proposal.json",
+      "sha256": "c3cd6f374e82042b355fb4139f4e975882fa4fee5d31041b665c0bd49b954082",
+      "bytes": 54078
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/corrected-proposal/scope-amendment.json",
+      "sha256": "1bb0b34a5f30bdc286eea2f50fc5ca1c29cb2d6ba36673cae8bc53e90b2e0553",
+      "bytes": 2943
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/corrected-proposal/source-pins.json",
+      "sha256": "7f47dd412d5dc80337f432115c340300e103868a65792501644eef6c542b3e44",
+      "bytes": 15303
+    }
+  ],
+  "source_head": "27d0b0d7c31d8825b91d899dc280cd843af21465",
+  "source_tree": "aef0428057d73645fab00f4d3aecb3418296f79b",
+  "findings": [
+    {
+      "id": "PR010-LOCATOR-01",
+      "priority": 2,
+      "title": "Selected synthetic collector locator is rejected by the frozen connector allowlist",
+      "proposal_location": "proposal.json /contracts/research_collector/fixture_locator and /contracts/fixture_scope/execution_descriptor; PROPOSAL.md:24",
+      "evidence": [
+        {
+          "path": "packages/connectors/src/source-route-allowlist.mjs",
+          "lines": [
+            1,
+            5,
+            276,
+            284,
+            307,
+            315
+          ]
+        },
+        {
+          "path": "packages/connectors/src/route-manifest.mjs",
+          "lines": [
+            248
+          ]
+        },
+        {
+          "path": "scripts/research/refresh.mjs",
+          "lines": [
+            11,
+            28
+          ]
+        }
+      ],
+      "reason": "The only admitted fixture source is source_fixture_catalog. Its frozen host/route tuples use catalog.example.gov or mirror.example.gov and existing paths such as /data.json. Unknown source_fixture_* IDs have no positive allowlist. Therefore data.cdc.gov/__ushso_fixture__/catalog.json is rejected before the unchanged strict client can deliver the proposed actual collector bridge. This blocks A1/C1 and bounded C0102 under the stated preserved connector scope.",
+      "original_finding_preserved": true,
+      "remedy_status": "Root-suggested remedy assessed separately; not implemented or adopted by this review"
+    }
+  ],
+  "remedy_assessment": {
+    "viable_with_narrow_amendment": true,
+    "exact_fixture_identity": "source_fixture_catalog",
+    "exact_compiled_fixture_locator": "https://catalog.example.gov/data.json with only the selected approved cursor parameter",
+    "capture_seam": "Add an explicit optional locator policy alongside the clock port within refresh.capture; default remains the exact existing metadataUrl function. The fixture composition supplies only an exact precompiled-locator guard and its injected fixture fetch bridge. Preserve the global legacy hostname allowlist and all frozen connector bytes.",
+    "pairing": "A non-default locator policy requires an explicitly supplied own callable fetchImpl; omitted, undefined or invalid fetch is rejected before any fetch. It must not fall through to global fetch. The fixed fixture composition is independently tested for zero live ports; explicit injection alone is not proof a port is fixture-only.",
+    "guard": "Validate guard result against the exact compiled locator and allowed cursor; both the capture guard and bridge reject foreign host/path/parameter/method and unadmitted descriptor identity. Do not introduce a CLI locator-policy or arbitrary URL option.",
+    "authority": "Update both proposal and scope-amendment authority limits to cover only the capture locator-policy/clock seam and paired-port checks; the currently clock-only limit is insufficient.",
+    "required_tests": [
+      "Default capture calls and existing metadataUrl restrictions are unchanged.",
+      "Custom policy without explicit callable fetch is rejected and cannot reach global fetch.",
+      "Exact fixture compiled locator executes the actual capture function and consumes its returned result.",
+      "Wrong locator, cursor, extra parameter or bridge identity blocks before transport.",
+      "All original 29 proposed groups remain retained, with meaningful negative checks for the new guard."
+    ]
+  },
+  "positive_assessments": [
+    "Actual collector invocation and result consumption are now explicit; unused import or fabricated collector success is rejected.",
+    "Both observed_at and recorded_at are captured before delivery and replayed, matching R2CaptureProtocol capture-reference identity.",
+    "Whole scheduler transaction records preserve rollback; ambiguous after-memory-commit failures poison every adapter client and transport.",
+    "Parent scheduling identity, child collection identity and child execution namespace are distinct; recovery explicitly locates committed parent/outbox instead of inferring absence from zero due runs.",
+    "Tagged codec preserves array-versus-Map beginRun output, ordered entries and bounded byte references; raw JSON Map loss is prohibited.",
+    "Disk journal and referenced objects are the persistence authority; memory stores are reducers and managed durability is unqualified.",
+    "Fixed one-attempt settlement, unknown-intent no-redelivery, actual wrapper re-invocation from cached bytes and final checkpoint/intent commits are coherent at design level.",
+    "PR009 receipt validator accepts coherent schema-valid synthetic records without activating its real-source policy; descriptor approval/digest resolution remains separately required."
+  ],
+  "implementation_conditions": [
+    {
+      "id": "IMPL-1",
+      "condition": "Apply one explicitly pinned fixture clock to MemoryOriginGovernor as well as runner/client/capture ports; its default Date.now and private per-origin state are not durable journal state. Durable request/byte reservations remain the governing cross-restart fixture bounds; do not claim restored managed pacing/circuit history.",
+      "source": "packages/connectors/src/origin-governor.mjs:9"
+    },
+    {
+      "id": "IMPL-2",
+      "condition": "The unchanged capture timer aborts its fetch signal, while BoundedHttpClient passes timeoutMs to transport. Fixture bridge/transport must honor bounded cancellation or settle a typed timeout without late success; a signal-ignoring hanging port is not bounded merely because its timer fires. No live timeout qualification is implied.",
+      "source": "scripts/research/refresh.mjs:29; packages/connectors/src/bounded-http-client.mjs:236"
+    },
+    {
+      "id": "IMPL-3",
+      "condition": "Distinct execution IDs isolate run/pages/conditionals, but MemoryRunRepository memberships/checkpoints are keyed by sourceId. Make this sharing explicit as full synthetic source membership or partition reducer instances by child; retain child-specific checkpoint/result evidence and do not treat a source-level latest checkpoint as a child checkpoint.",
+      "source": "packages/connectors/src/testing/memory-ports.mjs:90,204,259"
+    },
+    {
+      "id": "IMPL-4",
+      "condition": "Represent empty 304 bridge response with a null body and safe content type, preserve actual legacy http_failed/304 result, and reuse only verified prior capture/page with original provenance.",
+      "source": "scripts/research/refresh.mjs:33,38"
+    },
+    {
+      "id": "IMPL-5",
+      "condition": "Regenerate final semantic source/import/schema/fixture/policy/runtime/lockfile pins after implementing the seam. Baseline closure hash agreement does not qualify the future implementation.",
+      "source": "corrected-proposal/source-pins.json closure_limit"
+    }
+  ],
+  "verification": {
+    "source_pins_passed": 52,
+    "static_relative_closure_count": 28,
+    "static_relative_closure_matches": true,
+    "builtin_imports": {
+      "scripts/research-program/operating-bounds.mjs": [
+        "node:path",
+        "node:url"
+      ],
+      "scripts/research/refresh.mjs": [
+        "node:fs/promises",
+        "node:path",
+        "node:url",
+        "node:crypto",
+        "node:child_process",
+        "node:util"
+      ],
+      "packages/connectors/src/canonical.mjs": [
+        "node:crypto"
+      ]
+    },
+    "dynamic_import_syntax_found": false,
+    "refresh_main_provider_import_effects": "No call to main or muse on the intended importing CLI path; main is protected by exact argv[1] module path comparison. node:child_process import alone does not spawn a provider.",
+    "test_plan_groups": 29
+  },
+  "source_pins": [
+    {
+      "path": "db/migrations/0001_registry_sources_endpoints_scopes.sql",
+      "sha256": "7cd5d8cf2fbdb5a87d9344ad5218329c3d793b093ba674ffd00c4660c491a1f6",
+      "bytes": 12151
+    },
+    {
+      "path": "db/migrations/0002_ingest_runs_jobs_captures.sql",
+      "sha256": "d503c3c2283d4c1edc34ae8688a8586197ca55af950575fdc0f49c6b83c26c97",
+      "bytes": 79189
+    },
+    {
+      "path": "docs/adr/0008-operating-bounds-and-evidence-receipts.md",
+      "sha256": "e9e7b1f2dabf409046f9df94f523a474666a451ed091e707d614b8a33a6b2b8d",
+      "bytes": 16023
+    },
+    {
+      "path": "docs/master-plan/2026-09-10/MASTER-PLAN.md",
+      "sha256": "4049f3bceafd6ac62787819cee38ebfa0228e19bd76328af0d8160f808824f02",
+      "bytes": 30439
+    },
+    {
+      "path": "docs/master-plan/2026-09-10/prs/PR-010.md",
+      "sha256": "888097f9a760ad1cd1834b10dc8bf2d1c544e491265d1577e6a5b9d6095f108f",
+      "bytes": 5078
+    },
+    {
+      "path": "docs/master-plan/2026-09-10/prs/PR-011.md",
+      "sha256": "d7a68918daacbe5063d6b1c3c158792cbe2b715dbcf17c7029a8e32b8ffa482c",
+      "bytes": 4747
+    },
+    {
+      "path": "docs/master-plan/2026-09-10/prs/PR-012.md",
+      "sha256": "8db98c58a031d7ca6801142c4a6ad9ac6d936e70b9341ac150feb8c218bb8761",
+      "bytes": 4014
+    },
+    {
+      "path": "packages/connectors/package.json",
+      "sha256": "0a8a1f416280705e85e80e5da2f6d816834c08f5bf23f9762dfd0c48ef932f6c",
+      "bytes": 390
+    },
+    {
+      "path": "packages/connectors/src/adapters/base.mjs",
+      "sha256": "ee7f8423da5b62f331d832882e1a9259e08cbf53a71064e86a02d2de17a74a51",
+      "bytes": 7800
+    },
+    {
+      "path": "packages/connectors/src/adapters/dcat-data-json.mjs",
+      "sha256": "1d3135c98a047d963fa2465a5c1050fabc40974ce1c7994723504f6af1b0b861",
+      "bytes": 2604
+    },
+    {
+      "path": "packages/connectors/src/bounded-http-client.mjs",
+      "sha256": "552d95a9b490ececde7fb77517b0991dc388b7a014359d9f755f2b29256b3eb4",
+      "bytes": 30820
+    },
+    {
+      "path": "packages/connectors/src/canonical.mjs",
+      "sha256": "ba524d6baa275bc5ca05e4b3cc9dac9dda02cda0992a2b8f8cf2ec762da9cb48",
+      "bytes": 1799
+    },
+    {
+      "path": "packages/connectors/src/capture-protocol.mjs",
+      "sha256": "8431a9f82f3d307c2f31cd64427eba1597a8df00e7f885b6392dc7c70344536d",
+      "bytes": 10212
+    },
+    {
+      "path": "packages/connectors/src/content-classifier.mjs",
+      "sha256": "d8090a7eb1889cdaa8af3d0a3b5d7b23ef1de6d60e5d4dc029fca4a5306979c9",
+      "bytes": 14314
+    },
+    {
+      "path": "packages/connectors/src/deletion-policy.mjs",
+      "sha256": "2740268f9b479c40ac8f192e71177340818f69b0ef516e7419e4e0e6fce67a9f",
+      "bytes": 1655
+    },
+    {
+      "path": "packages/connectors/src/errors.mjs",
+      "sha256": "ace5e4d07cd58cea6c18cfe09ed366b429cb03fc97b8c80c2c3abf04d2c794c6",
+      "bytes": 1415
+    },
+    {
+      "path": "packages/connectors/src/network-policy.mjs",
+      "sha256": "a648c6d73377a053a9b09839ccef371365765d2bd87dde55b9db417f729288ad",
+      "bytes": 4277
+    },
+    {
+      "path": "packages/connectors/src/origin-governor.mjs",
+      "sha256": "302f092e5f76c73266f89a5dbade411f528ae1347e6cee37bf4ede99c33cce52",
+      "bytes": 2894
+    },
+    {
+      "path": "packages/connectors/src/pinned-streaming-transport.mjs",
+      "sha256": "f4b8cfdfce55fcfdd7e853d17c4992c474e16e2f646226e90c5ddebabb72ca08",
+      "bytes": 2314
+    },
+    {
+      "path": "packages/connectors/src/route-manifest.mjs",
+      "sha256": "be3787542b8c27ed3d7f294ae88789c9530717f2741cfd862ee5a24f46197bfc",
+      "bytes": 30103
+    },
+    {
+      "path": "packages/connectors/src/runner.mjs",
+      "sha256": "50af43de5732a562fc506cae854c634998ca43b6d283b270d542d7891c171bf6",
+      "bytes": 7629
+    },
+    {
+      "path": "packages/connectors/src/source-route-allowlist.mjs",
+      "sha256": "15eb8c87e94722e83aa006540ce96fccbc3c1cccf664df76157499943a64fe16",
+      "bytes": 8810
+    },
+    {
+      "path": "packages/connectors/src/testing/fixtures.mjs",
+      "sha256": "a97fb601b72c507ba33309e3cca45e18e595b814566e855814214ab76ce62668",
+      "bytes": 7355
+    },
+    {
+      "path": "packages/connectors/src/testing/index.mjs",
+      "sha256": "6d67b24df5c165714a72a39086c585ca2169d4870176e1834be90303758e8cbe",
+      "bytes": 187
+    },
+    {
+      "path": "packages/connectors/src/testing/memory-ports.mjs",
+      "sha256": "33843172e8f9e0d2fb5258b2d5a13167b3794ee73c713f721cf4d00928f7ad93",
+      "bytes": 12790
+    },
+    {
+      "path": "packages/ingestion/README.md",
+      "sha256": "33d2dc33e5a124114655a327153a9cff35137c78d0674788820e2ebd2a62bc98",
+      "bytes": 4471
+    },
+    {
+      "path": "packages/ingestion/package.json",
+      "sha256": "52f6f2d8cd754575b098933b98bc253adfb8602bfe2cb61997d70db620802501",
+      "bytes": 416
+    },
+    {
+      "path": "packages/ingestion/src/audit-principal.mjs",
+      "sha256": "a06495cfcf473ccde6b91552a7cd49768ba9104eba96e1bce194f19aebee75e8",
+      "bytes": 1600
+    },
+    {
+      "path": "packages/ingestion/src/common.mjs",
+      "sha256": "b9d881927621a993557e791490d316b688cdbfadb5961ff3ba2a8f06555b8b51",
+      "bytes": 2476
+    },
+    {
+      "path": "packages/ingestion/src/failure-policy.mjs",
+      "sha256": "0dd6bb7afe0eeef6c3aaa422054f71b26b9954dac5a4cf766209cb1d6a741e85",
+      "bytes": 5115
+    },
+    {
+      "path": "packages/ingestion/src/in-memory-control-plane.mjs",
+      "sha256": "bbdb163c998411b4c518d69e086a091925f2836ff32446cd0a06751b9a20d9dd",
+      "bytes": 103628
+    },
+    {
+      "path": "packages/ingestion/src/ports.mjs",
+      "sha256": "3f832c244528602ac5dbfa7769b5906ff72610859ecd2ab5ca440c5b9739394c",
+      "bytes": 2313
+    },
+    {
+      "path": "packages/ingestion/src/postgres-control-store.mjs",
+      "sha256": "00cd03bf6e1b81ceb1eb15073370fa6c7cff022cca2bbfc306483a7b8c5918c1",
+      "bytes": 136532
+    },
+    {
+      "path": "packages/ingestion/src/queue-consumer.mjs",
+      "sha256": "edeb6e052bf5dd0de181c24e108a96272f6ca7cf5da3dda05ec5c83ab9b2711d",
+      "bytes": 16231
+    },
+    {
+      "path": "packages/ingestion/src/redaction.mjs",
+      "sha256": "0d42af1a5c7d912c93284ae7e74dc9bf568ffa110fe7a0b2b9d05db76eee8ebc",
+      "bytes": 1885
+    },
+    {
+      "path": "packages/ingestion/src/scheduler.mjs",
+      "sha256": "62155eefa91e4678477839c309b084afb9557f273bfe5281236fbc0b9c44dbeb",
+      "bytes": 6677
+    },
+    {
+      "path": "packages/retrieval/tools/catalog-contract.mjs",
+      "sha256": "bbba437c0ba61a774fe02d8a2f3436900756ae4715ad05c0cc36894ee70df160",
+      "bytes": 18832
+    },
+    {
+      "path": "packages/retrieval/tools/external-url-policy.mjs",
+      "sha256": "79105a2fb2e76108bbaa3423dc2e02281264e3d8cd653ef4ab83d1dfb4446ba0",
+      "bytes": 2494
+    },
+    {
+      "path": "packages/retrieval/tools/record-semantics.mjs",
+      "sha256": "32f4b1a2f8ae94e99ffb2f353cab01cf0e4bb157ded6405c2d1b1fe15b89047b",
+      "bytes": 2404
+    },
+    {
+      "path": "scripts/research-program/operating-bounds.mjs",
+      "sha256": "f9da46ab59d2ab2a9bc6c173d7698426a8558c3742e68105b0150dcfc4f36eaa",
+      "bytes": 34119
+    },
+    {
+      "path": "scripts/research-program/policy.json",
+      "sha256": "6230fe7b10aa5da20d9426cf4fcce39f0565e306ec512cbc791428544088fbda",
+      "bytes": 28532
+    },
+    {
+      "path": "scripts/research-program/receipts/v1.0.0/README.md",
+      "sha256": "8a37d54a7f591ad1bc420c23d8c84ef20f2f245ed5e68b82c335b9a3843d359e",
+      "bytes": 2807
+    },
+    {
+      "path": "scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json",
+      "sha256": "b0785f439b2ba525ad3b72ef7832adeb9eb6eccc5454a6eedaabdfbc746375eb",
+      "bytes": 7262
+    },
+    {
+      "path": "scripts/research/refresh.mjs",
+      "sha256": "7ab7a36ac28b20c4e56351e32c0812eb24dc362b6d9a5e0cf9c682b5d190cd3b",
+      "bytes": 12411
+    },
+    {
+      "path": "scripts/research/source-extractors.mjs",
+      "sha256": "c9d519a79074a8a8235d15c6d6e9ac5a51c80c33245c10f9ebf569dddbed04cc",
+      "bytes": 29676
+    },
+    {
+      "path": "scripts/research/update-cycle.mjs",
+      "sha256": "9f3e946ce6eedbf51b1699c28db254817906290ba5594ea36ba08c8474ecf863",
+      "bytes": 14986
+    },
+    {
+      "path": "services/harvest-worker/index.mjs",
+      "sha256": "38222bcd96419731f94ab7b48200c003c41fb0a49cced965cfaedf070e8435cf",
+      "bytes": 4453
+    },
+    {
+      "path": "services/harvest-worker/worker.mjs",
+      "sha256": "d1764dd656f4780263b93e9d827cdbeb5c02d9ab55caae3c7d4f1f808255209a",
+      "bytes": 1274
+    },
+    {
+      "path": "services/scheduler-worker/index.mjs",
+      "sha256": "ae445ee6be8366c13d701394968739c4c1ab4b267ee9eb6fd488b61da7a2586b",
+      "bytes": 3451
+    },
+    {
+      "path": "services/scheduler-worker/worker.mjs",
+      "sha256": "2aea3088068da001995da070ec987da6d606a5cb51d02702e512430611a780df",
+      "bytes": 562
+    },
+    {
+      "path": "tests/research-automation.test.mjs",
+      "sha256": "54f99173c6013692a2c9a0f59f415e088c73e7070e74d9cfcd0c2fad98c2ecc0",
+      "bytes": 10003
+    },
+    {
+      "path": "tests/update-cycle.test.mjs",
+      "sha256": "4c268379d03616d19bb8cda7dd7b226bae56439b542d2c2c6938575fc2c9ef33",
+      "bytes": 8569
+    }
+  ],
+  "requirements_accepted": [],
+  "implementation_performed": false,
+  "repository_edits": false,
+  "tests_executed": false,
+  "dispatch_performed": false
+}

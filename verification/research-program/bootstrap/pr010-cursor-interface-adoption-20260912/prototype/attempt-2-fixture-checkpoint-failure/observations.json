@@ -1,0 +1,112 @@
+{
+  "format": "ushso.capture-public-locator-prototype-observations.v1",
+  "external_fetch_calls": 0,
+  "cases": {
+    "original_failure": {
+      "run_outcome": "partial_unpublished",
+      "checkpoint_committed": false,
+      "reference": {
+        "contract_version": "ingestion.v1.0.0",
+        "capture_ref_id": "capture_ae0bae7dfa891093f19b7126416cf5a4",
+        "source_id": "source_fixture_catalog",
+        "run_id": "run_original_two_page",
+        "classification": "catalog_metadata",
+        "source_locator": {
+          "endpoint_id": "endpoint_fixture_catalog",
+          "template_id": "route_fixture_catalog",
+          "final_host": "catalog.example.gov",
+          "final_path_class": "pagination_cursor",
+          "redacted_locator": "https://catalog.example.gov/data.json?cursor=page-2"
+        },
+        "safe_response_headers": {
+          "etag": "\"fixture-page-2\"",
+          "last_modified": null,
+          "content_type": "application/json",
+          "content_length": 60,
+          "cache_control": null
+        },
+        "media_type": "application/json",
+        "compressed_bytes": 60,
+        "decompressed_bytes": 60,
+        "raw_sha256": "f2074643c6ce3d230cb18e2ad5a36e769913c08e8400e845228022892d86f925",
+        "semantic_sha256": "f2074643c6ce3d230cb18e2ad5a36e769913c08e8400e845228022892d86f925",
+        "r2_key": "captures/sha256/f2/f2074643c6ce3d230cb18e2ad5a36e769913c08e8400e845228022892d86f925",
+        "r2_conditional_write_confirmed": true,
+        "connector_version": "1.0.0",
+        "evidence_ref_id": "evidence_3bcfa72cb8cce7b5d6a0c9d49225ad58",
+        "clocks": {
+          "data_coverage": {
+            "state": "unknown",
+            "start": null,
+            "end": null,
+            "semantics": "unknown"
+          },
+          "publisher_time": {
+            "state": "unknown",
+            "released_at": null,
+            "modified_at": null
+          },
+          "observed_at": "2026-09-12T12:00:00.000Z",
+          "recorded_at": "2026-09-12T12:00:00.000Z",
+          "superseded_at": null
+        },
+        "captured_at": "2026-09-12T12:00:00.000Z"
+      },
+      "validation": {
+        "valid": false,
+        "issues": [
+          {
+            "code": "CAPTURE_LOCATOR_SECRET_RISK",
+            "pointer": "/source_locator/redacted_locator",
+            "detail": "query/userinfo must be redacted"
+          }
+        ]
+      },
+      "fixture_deliveries": 2
+    },
+    "query_identity": {
+      "capture_ids": [
+        "capture_09f6988222e703a5bed883b58fdf9442",
+        "capture_8d9cd9b349185899d2656bcaa03deeb7"
+      ],
+      "baseline_capture_ids": [
+        "capture_09f6988222e703a5bed883b58fdf9442",
+        "capture_8d9cd9b349185899d2656bcaa03deeb7"
+      ],
+      "request_ids": [
+        "request_7d27d70fec3410ae146c076c4d623743",
+        "request_59a2524f2dc8cf60541cf6ba40da73ee"
+      ],
+      "one_body_object": 1,
+      "public_locators": [
+        "https://catalog.example.gov/data.json",
+        "https://catalog.example.gov/data.json"
+      ]
+    },
+    "wrong_final_query": {
+      "baseline_and_prototype": "CAPTURE_FINAL_URL_MISMATCH",
+      "writes": 0
+    },
+    "no_query": {
+      "reference_equal": true,
+      "fetch_equal": true,
+      "ledger_equal": true,
+      "capture_id": "capture_f212d1fe1ec41e0da1584552d26d2d19"
+    },
+    "public_projection": {
+      "locator": "https://catalog.example.gov/data.json",
+      "strict_valid": true,
+      "scope": "direct protocol projection with synthetic strings; no transport"
+    },
+    "tampered_public_query": {
+      "valid": false,
+      "issues": [
+        {
+          "code": "CAPTURE_LOCATOR_SECRET_RISK",
+          "pointer": "/source_locator/redacted_locator",
+          "detail": "query/userinfo must be redacted"
+        }
+      ]
+    }
+  }
+}

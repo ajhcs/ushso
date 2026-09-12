@@ -2,7 +2,7 @@
   "format": "ushso.research-program-execution.v1",
   "updated_at": "2026-09-12T05:20:21.170133Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
-  "plan_sha256": "084a78812bdb1b816436062a16354d3ac20556411ef05facbb1f4d3bc85a2ab0",
+  "plan_sha256": "dac28833f472624d09f6ec678d49ad9e9c4884c68662806d17a11655693cb85d",
   "integration_branch": "codex/research-program-integration-20260910",
   "verified_remote_main_sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
   "controller": {
@@ -755,6 +755,49 @@
       "merge_sha": "80996a8d3c00792d8abb8946a67a69e0400f621a",
       "qualified": false,
       "PR010_dispatch_ready": false
+    },
+    "current_pr010_interface_adoption": {
+      "recorded_at": "2026-09-12T14:40:00.330356+00:00",
+      "status": "scope_adopted_task_bound_implementation_pending",
+      "scope_capsule": {
+        "path": "verification/research-program/bootstrap/pr010-interface-adoption-20260912/index.json",
+        "sha256": "c3a261af3ca488d25891f0481718ff5492438db1fcf2528909af9669accb47a5",
+        "bytes": 29854
+      },
+      "dispatch": {
+        "path": "verification/research-program/pr-010/dispatch.json",
+        "sha256": "d6443a31a7fe832364b89a1ae4feb71e984effb37389e83fe05be6d6700df520",
+        "bytes": 3203
+      },
+      "base_sha": "50a844d218600f95c13e64c2db64ab4d8562ae0d",
+      "PR009_component_merge_sha": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+      "PR009_integration_merge_sha": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+      "C0091_qualification": "unresolved",
+      "source_dispatched": false,
+      "implementation_accepted": false,
+      "requirements_accepted": [],
+      "production_qualification": false,
+      "supersession_scope": "PR010 pending interface choice and dependency binding only. Previous PR009/controller acceptance records remain verbatim historical evidence; no general readiness is granted."
+    },
+    "current_wp5_successor_scope": {
+      "decision": {
+        "path": "verification/research-program/bootstrap/pr087-current-technical-adoption-20260912/decision.json",
+        "sha256": "9de67d906c5277daa5bb49904cc9f00e027d08d6eacc62069a1d917c485ce645",
+        "bytes": 1739
+      },
+      "registered_pr": "PR-087",
+      "current_assignments": 87,
+      "current_planned_commits": 261,
+      "PR086_registration_row_unchanged": true,
+      "PR010_registration_row_unchanged": true,
+      "pending_lock_continuation": {
+        "path": "verification/research-program/bootstrap/pr087-current-technical-adoption-20260912/pr086-lock-continuation.json",
+        "sha256": "7a29aff7ddd4575de23f84cd8857058e93b3544e4f68709339a841ac87018313",
+        "bytes": 2846
+      },
+      "all_future_merge_identities_pending": true,
+      "prior_controller_fields_preserved": true,
+      "no_source_or_R_acceptance": true
     }
   },
   "providers": [
@@ -2141,24 +2184,58 @@
     },
     {
       "pr_id": "PR-010",
-      "status": "planned",
-      "owner": null,
+      "status": "in_progress",
+      "owner": "/root/pr010_contract_review",
       "dependencies": [
         "PR-009"
       ],
-      "dependency_merge_shas": {},
+      "dependency_merge_shas": {
+        "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a"
+      },
       "owned_paths": [
-        "packages/ingestion/",
-        "services/scheduler-worker/",
-        "services/harvest-worker/",
-        "tests/research-program/job-lifecycle.test.mjs"
+        "packages/ingestion/src/collection-job.mjs",
+        "packages/ingestion/src/local-collection-store.mjs",
+        "packages/ingestion/src/local-collector-adapter.mjs",
+        "packages/ingestion/src/local-job-cli.mjs",
+        "packages/ingestion/src/local-fixture-catalog.mjs",
+        "packages/ingestion/package.json",
+        "packages/ingestion/README.md",
+        "tests/research-program/job-lifecycle.test.mjs",
+        "scripts/research/refresh.mjs",
+        "tests/research-automation.test.mjs",
+        "verification/research-program/pr-010/",
+        "docs/research-program/handoffs/PR-010.json",
+        "packages/connectors/src/capture-protocol.mjs",
+        "packages/connectors/tests/contracts.test.mjs"
       ],
       "head_sha": null,
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-010.json",
       "evidence_directory": "verification/research-program/pr-010/",
       "github_pr_url": null,
-      "blockers": []
+      "blockers": [],
+      "branch": "codex/ushso-pr010-local-jobs-20260912",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr010-local-jobs-20260912",
+      "base_sha": "50a844d218600f95c13e64c2db64ab4d8562ae0d",
+      "base_tree": "25cdcff0358a49a7611f0d55cd7c90d93e6882ea",
+      "scope_adoption": {
+        "path": "verification/research-program/bootstrap/pr010-interface-adoption-20260912/controller/root-interface-adoption.json",
+        "sha256": "9183061f258adf222b5d75c734de7b1525fd63bdc4fcd96a6cbf1ef77c098a53",
+        "bytes": 1762
+      },
+      "dispatch": {
+        "path": "verification/research-program/pr-010/dispatch.json",
+        "sha256": "e5e10ca6b28eb8403525e838424c72c750c655ca4a12b5bfec76f4a2227f5494",
+        "bytes": 4191
+      },
+      "next_action": "Finish corrected PR010 source and decisive focused review; retain known frozen WP5 rejection and wait for exact successor/lock-correction adoption before any component merge or joint integration.",
+      "scope_amendments": [
+        {
+          "path": "verification/research-program/bootstrap/pr010-cursor-interface-adoption-20260912/decision.json",
+          "sha256": "7045b549b3cadce7243a7ec9644aadc2aa7ac168fd53eae8ec320b56fe5597c4",
+          "bytes": 4268
+        }
+      ]
     },
     {
       "pr_id": "PR-011",
@@ -2166,13 +2243,18 @@
       "owner": null,
       "dependencies": [
         "PR-009",
-        "PR-010"
+        "PR-010",
+        "PR-087"
       ],
       "dependency_merge_shas": {},
       "owned_paths": [
-        "packages/connectors/src/",
+        "packages/connectors/src/content-classifier.mjs",
+        "packages/connectors/src/bounded-http-client.mjs",
+        "packages/connectors/src/pinned-streaming-transport.mjs",
         "scripts/research/document-integrity.mjs",
-        "tests/research-program/http-outcomes.test.mjs"
+        "tests/research-program/http-outcomes.test.mjs",
+        "verification/research-program/pr-011/",
+        "docs/research-program/handoffs/PR-011.json"
       ],
       "head_sha": null,
       "merge_sha": null,
@@ -2181,15 +2263,33 @@
       "github_pr_url": null,
       "blockers": [
         {
-          "id": "PR011-WP5-SUCCESSOR-SCOPE",
-          "kind": "verification_scope",
-          "detail": "Before connector changes, bind an additive WP5 successor with owned package/tests/validator/fingerprint/receipts. Preserve v1.0.0 bytes; native scope proposal in progress."
+          "id": "PR011-ACCEPTED-CURRENT-GROUP",
+          "kind": "dependency",
+          "detail": "Actual accepted PR010 and PR087 group identities remain pending; component-only M010 is insufficient."
+        },
+        {
+          "id": "PR011-DURABLE-ATTEMPT-INTERFACE",
+          "kind": "interface_scope",
+          "detail": "Require actual accepted PR010/PR087 group identities and independent review of exact durable failed-attempt interfaces. The five named behavior/test files are the current proposal; any necessary ingestion path/API needs a separate narrow ownership amendment before editing. Do not guess exports, add a second journal or claim memory durability."
         }
       ],
       "scope_proposals": {
         "index": "verification/research-program/bootstrap/pr011-wp5-scope-proposals-20260911/index.json",
         "disposition": "provisional_not_adopted",
         "remaining_decision": "Bind an acyclic local component-composition input to the successor; no shared integration or public component merge while the joint gate is failing."
+      },
+      "scope_history": [
+        {
+          "recorded_at": "2026-09-12T17:17:22.407773+00:00",
+          "prior_row_commit": "1e5342f4b0671c2e67f22bcf202bbb2c33b8ee0f",
+          "prior_row_path": "verification/research-program/bootstrap/pr087-current-technical-adoption-20260912/history/pr011-ledger-row.json",
+          "reason": "Current successor moves before PR011; original provisional sequence remains historical."
+        }
+      ],
+      "current_scope_adoption": {
+        "path": "verification/research-program/bootstrap/pr087-current-technical-adoption-20260912/decision.json",
+        "sha256": "9de67d906c5277daa5bb49904cc9f00e027d08d6eacc62069a1d917c485ce645",
+        "bytes": 1739
       }
     },
     {
@@ -3906,7 +4006,8 @@
         "PR-080",
         "PR-081",
         "PR-085",
-        "PR-086"
+        "PR-086",
+        "PR-087"
       ],
       "dependency_merge_shas": {},
       "owned_paths": [
@@ -4248,6 +4349,54 @@
           "prior_ledger_commit": "d872c1569b0f6534d84164109d0db0cd748220dc"
         }
       ]
+    },
+    {
+      "pr_id": "PR-087",
+      "status": "planned",
+      "owner": null,
+      "dependencies": [
+        "PR-010"
+      ],
+      "dependency_merge_shas": {},
+      "owned_paths": [
+        "verification/wp5/v1.1.0/README.md",
+        "verification/wp5/v1.1.0/evidence-ledger.json",
+        "verification/wp5/v1.1.0/package.json",
+        "verification/wp5/v1.1.0/receipts/activation-status.json",
+        "verification/wp5/v1.1.0/receipts/delivery-wave-fixtures.json",
+        "verification/wp5/v1.1.0/receipts/fixture-matrix.json",
+        "verification/wp5/v1.1.0/receipts/legacy-lane-parity.json",
+        "verification/wp5/v1.1.0/receipts/r2-capture-protocol.json",
+        "verification/wp5/v1.1.0/receipts/request-capture-reconciliation.json",
+        "verification/wp5/v1.1.0/receipts/zero-payload-proof.json",
+        "verification/wp5/v1.1.0/tests/wp5-verification.test.mjs",
+        "verification/wp5/v1.1.0/tools/common.mjs",
+        "verification/wp5/v1.1.0/tools/validate-wp5.mjs",
+        "verification/wp5/v1.1.0/receipts/v1.0-package-pins.json",
+        "verification/wp5/v1.1.0/receipts/current-subject-policy.json",
+        "verification/wp5/v1.1.0/tests/current-technical.test.mjs",
+        "package-lock.json",
+        "verification/research-program/pr-087/",
+        "docs/research-program/handoffs/PR-087.json"
+      ],
+      "head_sha": null,
+      "merge_sha": null,
+      "handoff": "docs/research-program/handoffs/PR-087.json",
+      "evidence_directory": "verification/research-program/pr-087/",
+      "github_pr_url": null,
+      "blockers": [
+        {
+          "id": "PR087-ACTUAL-M010",
+          "kind": "dependency",
+          "detail": "Await root independently reviewed final PR010 source, exact adopted component exception and actual M010 parents/tree/source/fixture binding."
+        }
+      ],
+      "scope_adoption": {
+        "path": "verification/research-program/bootstrap/pr087-current-technical-adoption-20260912/decision.json",
+        "sha256": "9de67d906c5277daa5bb49904cc9f00e027d08d6eacc62069a1d917c485ce645",
+        "bytes": 1739
+      },
+      "next_action": "Bind actual M010 and current source/fixture pins, assign one producer, then implement the complete current technical package. H087 and exact lock review enable only the separately scoped PR086 correction."
     }
   ],
   "external_inputs": [
@@ -4572,6 +4721,38 @@
         "sha256": "e4849d1239855e985f15e5f684300c580cda460f3bc5f7c6a8f71aa873adb36f",
         "bytes": 8877
       }
+    },
+    {
+      "recorded_at": "2026-09-12T15:58:18.452572+00:00",
+      "previous_plan_sha256": "9c54f8c17a58650418953302402768b82dba36a66eedcbb403f253af2480b116",
+      "plan_sha256": "9521307b64ef554ec9179baa0b1c89f7e84dbb80606a9f34235dde126390d5b1",
+      "changed_prs": [
+        "PR-010"
+      ],
+      "dependencies_and_thresholds_unchanged": true,
+      "scope_counts": {
+        "prs": 86,
+        "commits": 258
+      },
+      "evidence": "verification/research-program/bootstrap/pr010-cursor-interface-adoption-20260912/decision.json",
+      "scope": "Exactly two-file public cursor-reference serializer correction; complete verifier successor pending separate adoption."
+    },
+    {
+      "recorded_at": "2026-09-12T17:17:22.407773+00:00",
+      "previous_plan_sha256": "9521307b64ef554ec9179baa0b1c89f7e84dbb80606a9f34235dde126390d5b1",
+      "plan_sha256": "dac28833f472624d09f6ec678d49ad9e9c4884c68662806d17a11655693cb85d",
+      "changed_prs": [
+        "PR-011",
+        "PR-082",
+        "PR-087"
+      ],
+      "scope_counts": {
+        "prs": 87,
+        "commits": 261
+      },
+      "original_PR010_PR086_and_thresholds_unchanged": true,
+      "evidence": "verification/research-program/bootstrap/pr087-current-technical-adoption-20260912/decision.json",
+      "scope": "Register bounded current WP5 successor before PR011; retain exact separately owned future PR086 lock correction and conditional isolated M010 sequence."
     }
   ]
 }

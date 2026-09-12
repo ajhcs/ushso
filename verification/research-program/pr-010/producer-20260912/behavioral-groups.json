@@ -1,0 +1,565 @@
+{
+  "format": "ushso.pr010.behavioral-groups.v1",
+  "source_head_sha": "1318cda5c76cd3262c7668fb7f56fab842876c6f",
+  "planned_groups": 36,
+  "producer_checked_groups": 36,
+  "independently_accepted_groups": 0,
+  "groups": [
+    {
+      "id": "A1",
+      "required_behavior": "Actual resolver accepts one pinned fixture descriptor and compiles its selected route; strict schema, canonical hash and registered hash all agree.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "A1/L1 approved exact fixture descriptor and route produce a strict collection job"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "A2",
+      "required_behavior": "Missing registry item, wrong source/descriptor/revision/scope/endpoint/template, unapproved context, malformed descriptor or extra/unsupported request field blocks before scheduler/transport/writes.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "A2 invalid identity, route, scope, extra fields and unapproved context block admission"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "A2 correction: sparse selected arrays and hidden or accessor JSON fields never admit"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "A3",
+      "required_behavior": "Canonical object key ordering yields same digest; changed descriptor content with old expected digest is rejected. Same source/revision with changed digest conflicts; valid new revision yields distinct job and parent run.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "A3 canonical key ordering preserves identity; stale hashes block; approved revision changes identity"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "A4",
+      "required_behavior": "Real paused descriptors stay paused and cannot execute through synthetic fixture lane; active clone of a real descriptor is rejected despite schema validity.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "A4 real, paused and activated foreign descriptors cannot enter the fixture lane"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "A5",
+      "required_behavior": "Duplicate schedule delivery uses actual unchanged createScheduler/ensureRunAndWorkflowOutbox and durable journal; one parent run/outbox and one logical collection job/reservation survive fresh process reload.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "A5 repeated actual scheduler slots converge on one run and workflow outbox"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D1 actual collector composes two durable pages, strict receipts and selected fixture completion"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C6 parent actual process death resumes one attempt without duplicate fixture delivery"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C6 lease actual process death resumes one attempt without duplicate fixture delivery"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "A6",
+      "required_behavior": "Selected IDs are sorted/deduplicated or duplicates explicitly rejected; changed selection, capture class or immutable reservation yields separate child job without relabeling parent revision key. Reject unbounded/looser limits.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "A6 selections and reservations give child identities while rejecting duplicates and loose limits"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "D1",
+      "required_behavior": "Two-page fixture produces selected/running/partial/complete_fixture observations; validate PR009 receipts and released fetch/capture/checkpoint records; retain exact source/descriptor/selected IDs and source bytes hashes.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D1 actual collector composes two durable pages, strict receipts and selected fixture completion"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D1/B1 CLI displays selected, running, partial and complete fixture checkpoints"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "D2",
+      "required_behavior": "Use subprocess death at runner after_fetch_before_page_commit after durable wrapper outcome, then new process/ports on same directory. Fixture transport delivery counter does not repeat first request; same captured ref retained; final coverage cannot skip page two.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D2/C3 actual process death resumes one attempt without duplicate fixture delivery"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "D3",
+      "required_behavior": "Kill after_page_commit_before_resume, then new process. Existing committed page drives resume; no duplicate fixture delivery, page, capture or downstream intent.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D3 actual process death resumes one attempt without duplicate fixture delivery"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "D4",
+      "required_behavior": "Kill after bounded fixture response was durably recorded and inside capture protocol after object write/before reference commit. Resume from recorded response with original clock; no fixture delivery and no manufactured prior successful capture.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D4 response actual process death resumes one attempt without duplicate fixture delivery"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D4 object actual process death resumes one attempt without duplicate fixture delivery"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "D5",
+      "required_behavior": "Pending request intent with no verified response after process death returns partial/unresolved with retained references, no automatic refetch and no success. Do not overclaim exactly-once external requests.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D5/C9/L5 unknown delivery is charged and terminal unresolved across fresh processes"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D5/C9 CLI preserves terminal unresolved status and gives a nonzero execution result"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "D6",
+      "required_behavior": "Kill after seal/before membership-checkpoint commit and after final atomic commit; only complete verified chain may advance checkpoint; retry final commit is idempotent.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D6 seal actual process death resumes one attempt without duplicate fixture delivery"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D6 final actual process death resumes one attempt without duplicate fixture delivery"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "D7",
+      "required_behavior": "Missing/tampered body, metadata/receipt, descriptor or fixture/reducer pin, wrong source/request capture ref, broken sequence/previous hash and conflicting duplicate page produce typed blocked/partial; do not reset or silently discard records.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D7/D8 replay rejects noncanonical records, wrong pins, missing objects and malformed value tags"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D7/L7 canonically rehashed capture, wrapper, child and terminal tampering fails semantic replay"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "D8",
+      "required_behavior": "Interrupted temporary artifact or failed file/directory sync does not acknowledge success; fresh reader sees only verified committed prefix or blocks. No false completion from memory state.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D8 object writes serialize accounting and close retains authority until in-flight sync finishes"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D7/D8 replay rejects noncanonical records, wrong pins, missing objects and malformed value tags"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C7/D8 scheduler disk failure blocks its fresh failure handler and all delivery"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D8 failed file/directory sync leaves only a verified prefix and poisons the writer"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "D9",
+      "required_behavior": "Two actual competing writer processes: exactly one obtains lock; second returns writer_busy. SIGKILL releases kernel lock and new process resumes without lock-file deletion.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D9 two writer processes exclude one another; SIGKILL releases the actual writer lock"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "D10",
+      "required_behavior": "304 reuse keeps original capture run/connector provenance, zero new response bytes and exact reusable captured-page hash; typed/access/truncated outcomes never qualify complete enumeration.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D10/C10 actual collector 304 retains legacy limitation and prior capture provenance"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C1/D10 invalid UTF8, oversized response and missing selected evidence cannot commit a checkpoint"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "B1",
+      "required_behavior": "Dry-run creates zero files and sends zero requests; unknown fixture, arbitrary URL/source/path escape/symlink or unsupported mode fails closed.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "B1 store rejects path escapes and symlinks; unknown fixture fails before storage"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "B1 CLI preview creates no files or requests and rejects unknown sources, routes and modes"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D1/B1 CLI displays selected, running, partial and complete fixture checkpoints"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "B2",
+      "required_behavior": "Instrument real composition to prove every DB-shaped transaction/client closes before fixture delivery; no network/platform send inside transaction. Public worker, scheduler-worker and harvest-worker default disabled behavior unchanged.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D1 actual collector composes two durable pages, strict receipts and selected fixture completion"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "B2 public and ingestion worker compositions remain disabled"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "B3",
+      "required_behavior": "Receipt/journal serialization rejects secret/body fields and stores only bounded synthetic bodies separately; verify zero real DNS/fetch/socket/DB/queue/Workflow/R2/provider calls. Exact frozen WP5/contracts/SQL/source policy bytes unchanged.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D2/C3 actual process death resumes one attempt without duplicate fixture delivery"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D3 actual process death resumes one attempt without duplicate fixture delivery"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D4 response actual process death resumes one attempt without duplicate fixture delivery"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C4 reference actual process death resumes one attempt without duplicate fixture delivery"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "B3 journal rejects secret and inline-body fields and read-only status never observes an active writer"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "C1",
+      "required_behavior": "Actual collector integration: execute refresh.capture in the production-shaped local adapter call chain; assert its returned URL/status/decoded body hash and clock are consumed. An oversized/invalid-UTF8 legacy result or deliberately mismatched bridge bytes cannot become complete_fixture.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C1/D10 invalid UTF8, oversized response and missing selected evidence cannot commit a checkpoint"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C1 actual collector rejects bridge bytes that differ from the committed strict capture"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "C2",
+      "required_behavior": "Existing capture clock regressions: deterministic captured_at for success, blocked locator, oversized body, unsupported content type/encoding and failed transport; pre-existing host/secret/redirect/body limits and default calls stay compatible. No second recorded_at field is added to the legacy return. Add custom locator policy guards only under the explicit new scope; no global hostname or default live behavior change.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-research-update",
+          "test": "C2 capture injected clock covers every legacy outcome and leaves default policy intact"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "C3",
+      "required_behavior": "Kill after real collector wrapper outcome is fsynced before runner commit, restart fresh and retain both collector and strict capture references with no additional fixture delivery.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D2/C3 actual process death resumes one attempt without duplicate fixture delivery"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "C4",
+      "required_behavior": "Kill after capture reference commit but before strict/wrapper outcome commit; resume from the durable response with both original clocks and exact capture ID. Repeat the earlier before-reference window. Do not invent a prior wrapper success.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C4 reference actual process death resumes one attempt without duplicate fixture delivery"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "C5",
+      "required_behavior": "Execute two allowed nonempty selected-ID subsets for the same parent key; prove distinct child/execution IDs, independent page/outcome state, correct selected dispositions, one parent run/outbox and no duplicate reservation.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C5/L7 independent child repositories share one durable parent and keep selected outcomes separate"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "C6",
+      "required_behavior": "Kill after whole scheduler-source disk commit before child association; a fresh scheduler may return zero due runs, yet recovery binds the actual already committed parent and retains exactly one child/reservation. Also cover lease committed with no parent without reseeding/bypassing the lease.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C6 parent actual process death resumes one attempt without duplicate fixture delivery"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C6 lease actual process death resumes one attempt without duplicate fixture delivery"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "C7",
+      "required_behavior": "Fail inside a multi-call buffered scheduler transaction and verify no partial record; fail journal sync after memory commit and verify all existing/new clients plus the scheduler failure-handler transaction and fixture transport refuse work with local_store_poisoned. Fresh replay uses only disk commits.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C7 aborted multi-call scheduler transaction has no journal record and poisons every client"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C7/D8 scheduler disk failure blocks its fresh failure handler and all delivery"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "C8",
+      "required_behavior": "Persist/replay existing-run beginRun results after committed pages, including Map shape and entry order; tampered/missing byte references and wrong tagged result types fail. Raw Map-to-empty-object loss cannot compare equal.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C8 codec retains Maps, undefined and referenced bytes; unsupported types fail"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C8 actual existing-run Map survives fresh replay; rehashed Map-to-object tampering blocks"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "C9",
+      "required_behavior": "Attempt settlement is idempotent: repeated completion/resume preserves one terminal outcome, failed/partial_unresolved attempts cannot be silently retried, and a recoverable process interruption retains the same logical attempt and original evidence.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D1 actual collector composes two durable pages, strict receipts and selected fixture completion"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D5/C9/L5 unknown delivery is charged and terminal unresolved across fresh processes"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D5/C9 CLI preserves terminal unresolved status and gives a nonzero execution result"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "C10",
+      "required_behavior": "304 through the actual collector preserves its exact legacy http_failed/304 limitation and zero bytes while the strict receipt retains prior capture provenance. No new capture, false legacy captured status or automatically refetched unknown intent is created. The Response constructor must use a null body for status 304.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D10/C10 actual collector 304 retains legacy limitation and prior capture provenance"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "L1",
+      "required_behavior": "Run actual validateDescriptor and compileManifestRequest with the selected exact source_fixture_catalog descriptor and both first/cursor routes; defaults and positive frozen allowlist must remain compatible. The retained preparation probe passes 15 existing-module checks, but final producer must validate its own exact descriptor bytes.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "A1/L1 approved exact fixture descriptor and route produce a strict collection job"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "L2",
+      "required_behavior": "A custom policy with omitted, explicit undefined, inherited-only, null or non-callable fetchImpl returns typed blocked before policy/transport/global-fetch calls. Explicit callable paired bridge may admit the fixture; default metadataUrl behavior and ordinary default calls remain unchanged.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-research-update",
+          "test": "L2 custom locator policies require the same explicitly supplied callable fetch value"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "L3",
+      "required_behavior": "Exact custom policy admits only its canonical compiled locator including cursor. Wrong path, wrong cursor, extra query, fragment/credential/noncanonical spelling, rewritten output, boolean/object/URL/Promise output or throwing policy blocks without transport.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-research-update",
+          "test": "L3 custom policy rejects rewritten, noncanonical and fragment locators before transport"
+        },
+        {
+          "command_id": "cmd-pr010-final-research-update",
+          "test": "L3 native process rejected asynchronous policies settle as typed blocks without unhandled rejection"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "L4",
+      "required_behavior": "Instrument capture guard and bridge guard separately: a permissive/wrong policy cannot make the bridge execute another locator/cursor, and a correct bridge cannot override a capture guard rejection. No arbitrary route/policy option exists on the CLI.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "L4 bridge and capture guards independently enforce the exact compiled locator"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "L5",
+      "required_behavior": "Inject fixture clock into origin governor; crash/restart and recreate it repeatedly while checking journal reservations and actual delivery counters never exceed per-child or aggregate bounds. An unknown delivery retains its charge and stays unresolved.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D5/C9/L5 unknown delivery is charged and terminal unresolved across fresh processes"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "L5 durable reservation exhaustion retains its capture and never obtains another delivery on restart"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D5/C9 CLI preserves terminal unresolved status and gives a nonzero execution result"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "L6",
+      "required_behavior": "Timeout/cancel a deliberately signal-ignoring delayed fixture response. Bridge returns bounded typed outcome; release the delayed promise later and show no late success, capture promotion or page/checkpoint change. Test pre-aborted signal before effects and null-body 304 response construction.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "L6 bridge cancellation fences a signal-ignoring completion and constructs null-body 304"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "L6 actual fixture collector deadline is terminal and rejects a late transport success"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    },
+    {
+      "id": "L7",
+      "required_behavior": "Run/reload two child repositories with the same fixture source and shared parent scheduling key. Their membership/checkpoint maps remain independent; tampered cross-child reads/records/attempt outcomes are rejected despite matching source IDs.",
+      "status": "producer_checked",
+      "observed_tests": [
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "C5/L7 independent child repositories share one durable parent and keep selected outcomes separate"
+        },
+        {
+          "command_id": "cmd-pr010-final-lifecycle",
+          "test": "D7/L7 canonically rehashed capture, wrapper, child and terminal tampering fails semantic replay"
+        }
+      ],
+      "limitations": "Fixture-local engineering evidence only; source/released-contract pins are in source-identity.json and runtime-pins.json."
+    }
+  ]
+}

@@ -24,20 +24,128 @@ export function inspectRecord(record,generation){
  return {record_id:record.record_id,generation,source_id:record.identity?.source?.source_id,source_native_id:nativeId,title:record.title,missing,
    metadata_urls:[...new Set(raw.map(metadataUrl).filter(Boolean))],status:'pending_source_evidence'};
 }
-export async function capture(url,{fetchImpl=fetch,maxBytes=2*1024*1024,timeoutMs=20000}={}){
- if(!metadataUrl(url))return {url,status:'blocked_locator',captured_at:new Date().toISOString()};
- const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);let response;
- try{
-  response=await fetchImpl(url,{redirect:'manual',signal:controller.signal,headers:{accept:'application/json,text/html,text/plain','user-agent':'USHSO-MetadataReview/1.0 (+https://ushso.org/contact)'}});
-  const contentType=response.headers.get('content-type')??'';
-  if(!/json|text\/html|text\/plain/.test(contentType)){await response.body?.cancel();return {url,status:'unsupported_content_type',http_status:response.status,content_type:contentType,captured_at:new Date().toISOString()};}
-  const reader=response.body?.getReader();let size=0;const chunks=[];
-  if(reader)try{while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>maxBytes){await reader.cancel();return {url,status:'response_too_large',http_status:response.status,captured_at:new Date().toISOString()};}chunks.push(value)}}finally{reader.releaseLock()}
-  const bytes=Buffer.concat(chunks),text=bytes.toString('utf8');
-  if(!Buffer.from(text).equals(bytes))return {url,status:'unsupported_text_encoding',http_status:response.status,captured_at:new Date().toISOString()};
-  return {url,status:response.ok?'captured':'http_failed',http_status:response.status,content_type:contentType,bytes:bytes.length,sha256:hash(bytes),captured_at:new Date().toISOString(),text};
- }catch(error){return {url,status:controller.signal.aborted?'timed_out':'fetch_failed',error:error.name,captured_at:new Date().toISOString()}}
- finally{clearTimeout(timer)}
+export async function capture(url, options = {}) {
+  const {
+    fetchImpl: providedFetch,
+    maxBytes = 2 * 1024 * 1024,
+    timeoutMs = 20000,
+    clock = () => new Date(),
+    locatorPolicy = metadataUrl
+  } = options;
+  const fetchImpl = providedFetch === undefined ? fetch : providedFetch;
+  const blocked = (code) => ({
+    url,
+    status: 'blocked_locator',
+    captured_at: clock().toISOString(),
+    safe_detail_code: code
+  });
+  if (locatorPolicy !== metadataUrl) {
+    if (!Object.hasOwn(options, 'fetchImpl') || typeof providedFetch !== 'function')
+      return blocked('LOCATOR_POLICY_REQUIRES_INJECTED_FETCH');
+    if (typeof locatorPolicy !== 'function') return blocked('LOCATOR_POLICY_INVALID');
+    try {
+      const accepted = locatorPolicy(url);
+      if (accepted instanceof Promise) {
+        Promise.prototype.then.call(
+          accepted,
+          () => {},
+          () => {}
+        );
+        return blocked('LOCATOR_POLICY_REJECTED');
+      }
+      const parsed = typeof accepted === 'string' ? new URL(accepted) : null;
+      if (
+        typeof url !== 'string' ||
+        !parsed ||
+        accepted !== url ||
+        parsed.href !== accepted ||
+        parsed.protocol !== 'https:' ||
+        parsed.username ||
+        parsed.password ||
+        accepted.includes('#') ||
+        accepted.length > 2000
+      )
+        return blocked('LOCATOR_POLICY_REJECTED');
+    } catch {
+      return blocked('LOCATOR_POLICY_REJECTED');
+    }
+  } else if (!metadataUrl(url))
+    return { url, status: 'blocked_locator', captured_at: clock().toISOString() };
+  const controller = new AbortController(),
+    timer = setTimeout(() => controller.abort(), timeoutMs);
+  let response;
+  try {
+    response = await fetchImpl(url, {
+      redirect: 'manual',
+      signal: controller.signal,
+      headers: {
+        accept: 'application/json,text/html,text/plain',
+        'user-agent': 'USHSO-MetadataReview/1.0 (+https://ushso.org/contact)'
+      }
+    });
+    const contentType = response.headers.get('content-type') ?? '';
+    if (!/json|text\/html|text\/plain/.test(contentType)) {
+      await response.body?.cancel();
+      return {
+        url,
+        status: 'unsupported_content_type',
+        http_status: response.status,
+        content_type: contentType,
+        captured_at: clock().toISOString()
+      };
+    }
+    const reader = response.body?.getReader();
+    let size = 0;
+    const chunks = [];
+    if (reader)
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          size += value.length;
+          if (size > maxBytes) {
+            await reader.cancel();
+            return {
+              url,
+              status: 'response_too_large',
+              http_status: response.status,
+              captured_at: clock().toISOString()
+            };
+          }
+          chunks.push(value);
+        }
+      } finally {
+        reader.releaseLock();
+      }
+    const bytes = Buffer.concat(chunks),
+      text = bytes.toString('utf8');
+    if (!Buffer.from(text).equals(bytes))
+      return {
+        url,
+        status: 'unsupported_text_encoding',
+        http_status: response.status,
+        captured_at: clock().toISOString()
+      };
+    return {
+      url,
+      status: response.ok ? 'captured' : 'http_failed',
+      http_status: response.status,
+      content_type: contentType,
+      bytes: bytes.length,
+      sha256: hash(bytes),
+      captured_at: clock().toISOString(),
+      text
+    };
+  } catch (error) {
+    return {
+      url,
+      status: controller.signal.aborted ? 'timed_out' : 'fetch_failed',
+      error: error.name,
+      captured_at: clock().toISOString()
+    };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 export function validateProposals(value,observations,queue){
  const accepted=[],rejected=[];const fields=new Set(['observation_grain','geography_detail','observation_period','publisher_release_date','cost','dictionary','access_requirements','limitations']);

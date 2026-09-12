@@ -62,6 +62,7 @@ for p in prs:
     if p['id'] in ['PR-007','PR-008']:p['check_commands'].extend(['npm test --prefix packages/identity','npm run validate --prefix packages/identity'])
     if p['id']=='PR-008':p['check_commands'].extend(['npm run validate --prefix contracts/machine-toolkit/v1.2.0','npm run test:contracts','node --test tests/contract-package-inventory.test.mjs'])
     if p['id']=='PR-086':p['check_commands'].extend(['node scripts/verify-wp11-attestation.mjs','node scripts/run-contract-suites.mjs --suite wp11'])
+    if p['id']=='PR-087':p['check_commands'].extend(['npm test --prefix verification/wp5/v1.1.0','npm run validate --prefix verification/wp5/v1.1.0','node scripts/run-contract-suites.mjs --suite wp5'])
 model=dict(format='ushso.research-master-plan.v1',date='2026-09-10',status='proposed_not_implemented',
  mission='Help humans and AI find, understand and obtain tested routes to US health-systems data.',
  source_sha256=hashlib.sha256((ROOT/'plan-source.py').read_bytes()).hexdigest(),
@@ -84,6 +85,7 @@ for phase in phases:
 for p in prs:
     deps=', '.join(p['dependencies']) or 'None; start here.'
     base_instruction=('Resolve the current release subject and prepare its isolated worktree before writing or committing; PR-001 establishes the integration base.' if p['id']=='PR-001' else 'Start from the merged integration SHA selected in PR-001, not the stale original workspace.')
+    if p['id']=='PR-087':base_instruction='Start only from the actual independently reviewed isolated PR010 component merge M010 selected by the controller under the exact adopted exception; a producer/transport head is insufficient and research integration remains pending.'
     content=[f"# {p['id']} — {p['title']}",'',f"Phase **{p['phase']}**, sub-phase **{p['subphase']}**. Status: planned.",'',p['outcome'],'',
       f"**Dependencies:** {deps}",'',f"**Implementer:** {p['owner_role']}. **Reviewer:** {p['reviewer_role']}.",'',
       f"**Acceptance requirements:** {', '.join(p['requirements'])}. **Audit findings:** {', '.join(p['findings'])}.",'',
