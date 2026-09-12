@@ -1,0 +1,69 @@
+{
+  "format": "ushso.astra-correction-producer-finalization.v1",
+  "pr_id": "PR-008",
+  "recorded_at": "2026-09-12T03:49:15.453369+00:00",
+  "finalization_author": "Astra/root following user authorization in this task",
+  "source_corrections": "Producer-supplied corrections, independently reviewed before these commits; no source changes made during finalization",
+  "producer_code_head": "2909aa8b7b6bae674cc257968c8d3f58c30717c5",
+  "producer_code_tree": "7721193ce9ab6def23fe5a487aa98d43a6535b60",
+  "source_files": {
+    "scripts/research/source-extractors.mjs": {
+      "bytes": 29676,
+      "sha256": "c9d519a79074a8a8235d15c6d6e9ac5a51c80c33245c10f9ebf569dddbed04cc"
+    },
+    "tests/cms-layout.test.mjs": {
+      "bytes": 6153,
+      "sha256": "b83eb7c32b04637a78f0c757baa5171a0aba4e903ab2cdc7b6f2587819971c05"
+    }
+  },
+  "independent_source_review": {
+    "verdict": "corrections_verified_pending_immutable_candidate",
+    "source_report_sha256": "ed5094bd19aa23253b14cf6bfd7601aa8de0a5af6581bf2659ee8ca24ba97d74",
+    "source_receipt_sha256": "4c61e4fc53c309f74818256dcbd5b85a8f1e9efea8b1062017786e532ae84d27",
+    "reviewed_patch_sha256": "925de6172894e875072d27c0fbc733bcb91b4fc2b4ee74d78cf4c96a224c14b4",
+    "combined_patch_base": "e3af8dda1720efd5d29fd1a65683d0f18a412e94",
+    "resolved_findings": [
+      {
+        "id": "ASTRA-R2-008-01",
+        "state": "resolved_on_reviewed_patch"
+      }
+    ],
+    "limits": "Source review is bound to the exact reviewed patch; this newly authored metadata and the final combined identity require independent review."
+  },
+  "resulting_behavior": "CMS parser-only names remain documented names. Exact/reviewed-alias CMS wire mappings require an explicit wire_name and an explicit mapping with evidence; unsupported cases retain unmatched mappings and null wire names. Evidence-bearing exact/alias controls and CDC/Census native keys remain supported; unresolved context carries null IDs and disabled publication/promotion.",
+  "checks": [
+    {
+      "id": "cmd-pr-008-astra-correction-cms-extractors-identity",
+      "command": [
+        "node",
+        "--test",
+        "tests/cms-layout.test.mjs",
+        "tests/research-extractors.test.mjs",
+        "tests/research-program/variable-identity.test.mjs"
+      ],
+      "cwd": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr008-variable-identity-20260911",
+      "candidate_head": "2909aa8b7b6bae674cc257968c8d3f58c30717c5",
+      "started_at": "2026-09-12T03:49:15.028951+00:00",
+      "completed_at": "2026-09-12T03:49:15.432039+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 3986,
+        "sha256": "7f515f8a6f70cb20a3a668bdd5220aa33de33040ef7d137ac34f71c8809b30b5"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "historical_handoff": {
+    "path": "verification/research-program/pr-008/astra-correction-20260912/prior-handoff.json.gz",
+    "uncompressed_sha256": "a4e95054c6c3b0a3bebd220b91af8878a023c6f674ad0080aff195d6182a0f83"
+  },
+  "old_gate_applicable": false,
+  "accepted": false,
+  "integrated": false,
+  "published": false,
+  "requirements_accepted": [],
+  "next_action": "Validate and bind the final immutable candidate, obtain independent review and applicable local/hosted checks, then integrate only after acceptance."
+}
