@@ -11,10 +11,16 @@ Generate portable cURL/Python examples from the same tested recipe and retain cr
 The owner proposed four additional candidates for documentation-first review:
 
 - [USAspending](https://api.usaspending.gov/) for healthcare-related federal awards. Healthcare relevance and award-to-organization linkage still require qualification.
-- [Federal Register](https://www.federalregister.gov/reader-aids/developer-resources/rest-api) for policy documents and reporting-change dates. Document dates alone do not establish an effect on a dataset; the current review encountered an access-check page.
+- [Federal Register](https://www.federalregister.gov/reader-aids/developer-resources/rest-api) for policy documents and reporting-change dates. Document dates alone do not establish an effect on a dataset; the initial documentation review encountered an access-check page; a later bounded observation is recorded below.
 - [FRED/ALFRED](https://fred.stlouisfed.org/docs/api/fred/) for economic context and historical vintages. Releases, revisions and geographic applicability must remain explicit.
 - [EPA AQS](https://aqs.epa.gov/aqsweb/documents/data_api.html) for environmental context, with separately qualified spatial/temporal linkage and monitor/aggregation semantics.
 
 These are supplemental candidates, not additions to PR002. Their payload access, schemas, joins and scientific suitability are unverified. CMS, Census, NPPES and Socrata overlap with existing planned work and must be reconciled rather than double-counted. No candidate is selected, ingested, promoted or published by this document. Any implementation beyond existing assignment scope requires a bounded follow-up assignment with explicit dependencies and its own evidence.
 
 The frozen 100-product cohort, 3,434-record baseline, forty opaque tasks, 25-hospital/ten-payer selection, twelve required families and all R01-R16 denominators remain unchanged. This supplemental register cannot satisfy a frozen-cohort target by substituting an easier source.
+
+## Follow-up observations on September 11, 2026
+
+The [retained bounded-access review](../../verification/research-program/bootstrap/corrected-components-e3af8dd/supplemental-access/qualification-review.json.gz) records one server-side request per API. USAspending returned 111 reference-agency records including HHS. Federal Register returned 20 document-metadata records despite `per_page=1`; the request therefore remains unsuitable as a bounded recipe until that behavior is explained. The checks sent no credentials, cookies or browser Origin header. JSON access does not establish the proposed healthcare use, complete schemas, joins or scientific fitness.
+
+The [EPA observation](../../verification/research-program/bootstrap/corrected-components-e3af8dd/epa-destination/observation.json.gz) retains the single 301 redirect and complete 200 HTML response at the Widgets page. This advances the dated evidence available to PR011/076; it does not implement their validator or an actionable API recipe. The initial directory review and all frozen cohorts remain preserved.

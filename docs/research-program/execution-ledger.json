@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-11T21:32:36.741294+00:00",
+  "updated_at": "2026-09-12T03:53:42.868001Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "a30e035fc1cf883e7e789487cb3ec0aebde1ddb58177556b9b16f9811d271ef8",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -180,22 +180,28 @@
       "findings": []
     },
     "next_component_candidate": {
-      "status": "local_composition_source_metadata_corrected_gate_and_peer_review_pending",
+      "status": "corrected_source_committed_producer_evidence_and_new_gate_pending",
+      "head": null,
+      "head_state": "pending_final_composition_commit",
+      "source_patch_head": "abf4110826389a1f01c374a983f397878ee4d952",
+      "accepted_integration_parent": "7c7ad7f9577507fc294438025ec8c60145e8cb33",
+      "branch": "codex/ushso-pr006-pr008-combined-20260911",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr006-pr008-combined-20260911",
       "components": {
-        "PR-006": "8a9b921fa4be059624606116ed5ad33c238bb9ab",
-        "PR-008": "911aff5588ea59b12b81b58f1d5e07ce09a987d3",
+        "PR-006": "073a09da002df395e30c7394e256525035f1db61",
+        "PR-008": "09e312c9fb8767656ba6f6dcb0f996510098842d",
         "PR-086": "8cc74ed2ffbaab5b6b009770930dbf0e6fef0f3d"
       },
-      "isolated_composition_head": "2cc96cce652842ba41bcb52298b923a3edfc4952",
       "full_gate_pending": true,
       "combined_hosted_ci_pending": true,
       "peer_metadata_review_pending": true,
       "accepted": false,
-      "prior_preflight_failure": "verification/research-program/bootstrap/pr008-source-capture-correction-20260911/failed-preflight/receipt.json.gz",
-      "source_metadata_correction": "verification/research-program/bootstrap/pr008-source-capture-correction-20260911/metadata-correction.json"
+      "root_code_integrated": false,
+      "old_e3af8dd_gate_applies_to_corrected_bytes": false,
+      "evidence": "verification/research-program/bootstrap/astra-takeover-20260912/merge-resolution.json"
     },
     "active_assignments": [],
-    "current_review": "verification/research-program/bootstrap/pr008-review-a50f5fa/index.json",
+    "current_review": "verification/research-program/bootstrap/astra-takeover-20260912/merge-resolution.json",
     "wp11_input_design_review": {
       "run_id": "ushso-wp11-design-review-grok-20260911",
       "status": "completed",
@@ -223,16 +229,34 @@
       "PR-008": "verification/research-program/bootstrap/corrected-components-8a9b921-911aff5/pr-008/receipt.json"
     },
     "provider_dispatch_boundary": {
-      "observed_at": "2026-09-11T16:43:08.834411Z",
-      "grok_scope_run": "ushso-pr008-scope-review-grok-20260911",
-      "state": "failed_pre_prompt",
+      "observed_at": "2026-09-11 21:07:30 UTC",
+      "state": "automatic_disclosure_review_rejected_before_dispatch",
       "prompt_dispatched": false,
-      "error": "runtime_install_incomplete",
-      "connected_version": "3.4.2",
-      "installed_skill_version": "3.4.3",
-      "evidence": "verification/research-program/bootstrap/components-e6da2e2/scope-preparation/pr008-failed-dispatch.json",
-      "configuration_mutated": false,
-      "alternative": "Native Luna Max scope reviews completed; PR006 and PR008 implementations are now assigned independently through the user-authorized native collaboration interface. The failed external PR008 scope prompt was not sent."
+      "provider_started": false,
+      "readiness": {
+        "version": "3.4.3",
+        "healthy": true,
+        "active": 0,
+        "grok": {
+          "installed": true,
+          "ready": true,
+          "transport": "acp"
+        },
+        "dsh": {
+          "installed": true,
+          "ready": true,
+          "transport": "acpx",
+          "default_model": "meta/muse-spark-1.3-contributor",
+          "model_options": [
+            "meta/muse-spark-1.3-contributor",
+            "stealth/ox-alpha"
+          ]
+        },
+        "provider_started": false,
+        "configuration_changed_by_this_check": false
+      },
+      "evidence": "verification/research-program/bootstrap/corrected-components-e3af8dd/controller/pr010-grok-scope-auto-review-rejection.json.gz",
+      "next_action": "Await the pending explicit Grok payload-disclosure authorization before any retry. The earlier 3.4.2 runtime failure is historical."
     },
     "latest_scope_refinement": {
       "pr_ids": [
@@ -361,7 +385,17 @@
       }
     ],
     "latest_final_component_evidence": "verification/research-program/bootstrap/corrected-components-8a9b921-911aff5/index.json",
-    "current_active_corrections": [],
+    "current_active_corrections": [
+      {
+        "pr_id": "PR-006",
+        "owner": "Grok Co-Engineer",
+        "run_id": "ushso-pr006-finalization-20260912",
+        "assignment_id": "pr006-evidence-finalization",
+        "status": "producer_evidence_finalization_running",
+        "source_head": "073a09da002df395e30c7394e256525035f1db61",
+        "authorization": "User explicitly approved the scoped source/plan/test/handoff and named review artifacts for Grok finalization."
+      }
+    ],
     "correction_composition_metadata": {
       "source_root_head": "1b343b98173949480bd52929b9207725f6ca8f8c",
       "previous_combined_head": "a30cd7730de04200f7cd3ffb75ca83378c9e9a1d",
@@ -408,9 +442,9 @@
       }
     ],
     "current_correction_review": {
-      "PR-006": "independently_verified_final8a9b921",
-      "PR-008": "independently_verified_final911aff5",
-      "PR-086": "behavior_passed; controller metadata correction awaits separate review"
+      "PR-006": "source_corrections_verified_on_patch; producer_evidence_finalization_running",
+      "PR-008": "source_corrections_verified_on_patch; finalization_metadata_committed_pending_independent_review",
+      "PR-086": "prior_behavior_and_metadata_evidence_retained; new_combined_gate_pending"
     },
     "provider_readiness_observation": {
       "version": "3.4.3",
@@ -419,7 +453,180 @@
       "provider_prompt_dispatched": false,
       "current_disclosure_block": "automatic_review_rejected; specific user authorization question pending",
       "evidence": "verification/research-program/bootstrap/pr086-current-input-review-20260911/provider-and-downstream/pr010-grok-scope-auto-review-rejection.json.gz"
-    }
+    },
+    "provider_dispatch_boundary_history": [
+      {
+        "observed_at": "2026-09-11T16:43:08.834411Z",
+        "grok_scope_run": "ushso-pr008-scope-review-grok-20260911",
+        "state": "failed_pre_prompt",
+        "prompt_dispatched": false,
+        "error": "runtime_install_incomplete",
+        "connected_version": "3.4.2",
+        "installed_skill_version": "3.4.3",
+        "evidence": "verification/research-program/bootstrap/components-e6da2e2/scope-preparation/pr008-failed-dispatch.json",
+        "configuration_mutated": false,
+        "alternative": "Native Luna Max scope reviews completed; PR006 and PR008 implementations are now assigned independently through the user-authorized native collaboration interface. The failed external PR008 scope prompt was not sent."
+      }
+    ],
+    "latest_publication_preparation": {
+      "candidate": "e3af8dda1720efd5d29fd1a65683d0f18a412e94",
+      "status": "local_payload_scans_complete_publication_blocked_by_automatic_review",
+      "credential_findings_after_disposition": 0,
+      "provider_or_publisher_started": false,
+      "next_action": "Await the existing explicit public ajhcs/ushso payload-and-destination authorization before publishing any prepared branch or draft update."
+    },
+    "previous_active_assignment_observation": [
+      {
+        "pr_id": "PR-006",
+        "owner": "/root/pr006_facet_contract_decision",
+        "provider": "native Codex collaboration",
+        "model": "gpt-5.6-luna",
+        "reasoning": "max",
+        "status": "changes_requested",
+        "task_id": "ushso-pr006-facets-isolation-20260911",
+        "branch": "codex/ushso-pr006-facets-isolation-20260911",
+        "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr006-facets-isolation-20260911",
+        "base_sha": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+        "base_tree": "caab4b676bbeed085e087d63523317edccdd69ac",
+        "dispatch_packet": "verification/research-program/bootstrap/pr006-scope-20260911/dispatch-packet.json",
+        "dispatch_packet_sha256": "416e75a5fcccd8d63b7d494ba50915c207b9f06763fbc876d36214ab84367c89",
+        "reviewed_head": "5d8a8dd6d2e9d60d5b18fa1f69a09533c7e0d9e9",
+        "corrections_dispatched": true
+      },
+      {
+        "pr_id": "PR-008",
+        "owner": "/root/pr008_variable_scope_review",
+        "provider": "native Codex collaboration",
+        "model": "gpt-5.6-luna",
+        "reasoning": "max",
+        "status": "changes_requested",
+        "task_id": "ushso-pr008-variable-identity-20260911",
+        "branch": "codex/ushso-pr008-variable-identity-20260911",
+        "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr008-variable-identity-20260911",
+        "base_sha": "a00630c712e3a4e64354a77d268cb168fa3f528a",
+        "base_tree": "08452bc996152f3a034833038b5fcc8373ecc5a8",
+        "dispatch_packet": "verification/research-program/bootstrap/pr008-scope-20260911/dispatch-packet.json",
+        "dispatch_packet_sha256": "59a44a1a19d616365eb0ab8a38bb035a8a5d89ef95b886477b101561b0e7381f",
+        "reviewed_head": "a50f5fae017f894d8bc46be001e6c5d12853db01",
+        "corrections_dispatched": true
+      }
+    ],
+    "latest_corrected_component_gate": {
+      "format": "ushso.corrected-components-gate-summary.v1",
+      "recorded_at": "2026-09-11T22:13:16.745809+00:00",
+      "head": "e3af8dda1720efd5d29fd1a65683d0f18a412e94",
+      "tree": "2e4fce44b99f4838df69b13752e663f3eed856df",
+      "run_id": "20260911T215948Z-029a1b4bf406",
+      "classification": null,
+      "verdict": "passed",
+      "outcome": "passed",
+      "duration_seconds": 489.152,
+      "gate_receipt_sha256": "5b5dbfe312e54b837508f02ba7ee3c997d9320c856d9fc2f465edca0a8fd9190",
+      "stages": [
+        {
+          "name": "preflight",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "name": "bootstrap",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "name": "dependency-tree",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "name": "tests",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "name": "build",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "name": "local-e2e",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "name": "release-audit",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "name": "cloudflare-dry-run",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "name": "retain-deployable-artifacts",
+          "status": "passed",
+          "attempts": 1
+        },
+        {
+          "name": "receipt",
+          "status": "passed",
+          "attempts": 1
+        }
+      ],
+      "build_attempts": 1,
+      "first_pass_failures": [],
+      "peer_metadata_review_pending": true,
+      "hosted_ci_pending": true,
+      "publication_pending": true,
+      "root_integration_unchanged": true,
+      "accepted": false,
+      "requirements_accepted": []
+    },
+    "pending_controller_metadata_reviews": {
+      "candidate": "e3af8dda1720efd5d29fd1a65683d0f18a412e94",
+      "commits": [
+        "fdeed22bc052dbc88544001a2270fe79df32ddc9",
+        "980895daec306d15181de7291ed28a4330d57b6a",
+        "e3af8dda1720efd5d29fd1a65683d0f18a412e94"
+      ],
+      "status": "blocked_by_native_agent_limit_and_pending_grok_disclosure_authorization",
+      "request": "verification/research-program/bootstrap/corrected-components-e3af8dd/controller/controller-metadata-peer-review-e3af8dd.json.gz"
+    },
+    "component_candidate_history": [
+      {
+        "status": "local_composition_source_metadata_corrected_gate_and_peer_review_pending",
+        "components": {
+          "PR-006": "8a9b921fa4be059624606116ed5ad33c238bb9ab",
+          "PR-008": "911aff5588ea59b12b81b58f1d5e07ce09a987d3",
+          "PR-086": "8cc74ed2ffbaab5b6b009770930dbf0e6fef0f3d"
+        },
+        "isolated_composition_head": "2cc96cce652842ba41bcb52298b923a3edfc4952",
+        "full_gate_pending": true,
+        "combined_hosted_ci_pending": true,
+        "peer_metadata_review_pending": true,
+        "accepted": false,
+        "prior_preflight_failure": "verification/research-program/bootstrap/pr008-source-capture-correction-20260911/failed-preflight/receipt.json.gz",
+        "source_metadata_correction": "verification/research-program/bootstrap/pr008-source-capture-correction-20260911/metadata-correction.json"
+      },
+      {
+        "head": "e3af8dda1720efd5d29fd1a65683d0f18a412e94",
+        "tree": "2e4fce44b99f4838df69b13752e663f3eed856df",
+        "branch": "codex/ushso-pr006-pr008-combined-20260911",
+        "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr006-pr008-combined-20260911",
+        "components": {
+          "PR-006": "8a9b921fa4be059624606116ed5ad33c238bb9ab",
+          "PR-008": "911aff5588ea59b12b81b58f1d5e07ce09a987d3",
+          "PR-086": "8cc74ed2ffbaab5b6b009770930dbf0e6fef0f3d"
+        },
+        "status": "local_gate_passed_peer_review_and_hosted_ci_pending",
+        "evidence": "verification/research-program/bootstrap/corrected-components-e3af8dd/index.json",
+        "gate": "verification/research-program/bootstrap/corrected-components-e3af8dd/gate-summary.json",
+        "peer_review_request": "verification/research-program/bootstrap/corrected-components-e3af8dd/controller/controller-metadata-peer-review-e3af8dd.json.gz",
+        "accepted": false,
+        "root_code_integrated": false
+      }
+    ]
   },
   "providers": [
     {
@@ -1408,7 +1615,7 @@
     },
     {
       "pr_id": "PR-006",
-      "status": "independently_verified",
+      "status": "independent_review",
       "owner": "/root/pr006_facet_contract_decision",
       "dependencies": [
         "PR-004",
@@ -1436,21 +1643,21 @@
         "apps/web/src/providers/discoveryProvider.test.ts",
         "tests/subject-shortcircuit.test.mjs"
       ],
-      "head_sha": "8a9b921fa4be059624606116ed5ad33c238bb9ab",
+      "head_sha": "073a09da002df395e30c7394e256525035f1db61",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-006.json",
       "evidence_directory": "verification/research-program/pr-006/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/23",
       "blockers": [
         {
-          "id": "JOINT-GATE-PENDING",
+          "id": "CORRECTED-CANDIDATE-GATE-PENDING",
           "kind": "independent_integration_check",
-          "detail": "Focused final-head checks pass; WP11 continuation and exact combined gate/hosted CI remain pending."
+          "detail": "The three P2 corrections are verified on the working patch. Current metadata, final combined identity and full local/hosted gates remain pending; the old e3af8dd gate is historical."
         },
         {
-          "id": "PUBLICATION-AUTO-REVIEW",
-          "kind": "tool_approval_rejection",
-          "detail": "Public branch/draft updates did not start; automatic reviewer requested explicit payload-and-destination wording. The current approval prompt remains pending."
+          "id": "PUBLICATION-PENDING",
+          "kind": "publication_preparation",
+          "detail": "Prepare the corrected public ajhcs/ushso payload and apply the current authorization before publishing and obtaining hosted CI."
         }
       ],
       "prerequisites_satisfied": true,
@@ -1472,16 +1679,38 @@
       "dispatch_packet": "verification/research-program/bootstrap/pr006-scope-20260911/dispatch-packet.json",
       "dispatch_packet_sha256": "416e75a5fcccd8d63b7d494ba50915c207b9f06763fbc876d36214ab84367c89",
       "dispatch_recorded_at": "2026-09-11T17:14:23.621321+00:00",
-      "producer_state": "final_correction_checked",
-      "next_action": "Compose with independently reviewed PR086 continuation, run the new exact combined gate and hosted CI, then integrate under existing authorization.",
+      "producer_state": "corrected_source_verified_metadata_finalization_pending",
+      "next_action": "Finish current producer metadata, independently review the immutable combined candidate and run its applicable gate/hosted CI before acceptance or integration.",
       "independent_review_history": [
         "verification/research-program/bootstrap/pr006-review-5d8a8dd/decision.json",
         "verification/research-program/bootstrap/pr006-review-7e58195/decision.json"
       ],
-      "independent_review": "verification/research-program/bootstrap/corrected-components-8a9b921-911aff5/pr-006/receipt.json",
-      "reviewed_tree": "bce0e5b5542e76690f48226eff023a7b4ac55fd3",
+      "independent_review": "verification/research-program/bootstrap/astra-takeover-20260912/merge-resolution.json",
+      "reviewed_tree": null,
       "scope_amendment": "verification/research-program/bootstrap/pr006-pr008-gate-corrections-20260911/decision.json",
-      "current_correction_dispatch": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr006-integration-correction-dispatch.json"
+      "current_correction_dispatch": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr006-integration-correction-dispatch.json",
+      "latest_joint_candidate": "e3af8dda1720efd5d29fd1a65683d0f18a412e94",
+      "latest_joint_gate": "verification/research-program/bootstrap/corrected-components-e3af8dd/gate-summary.json",
+      "prior_correction_states": [
+        {
+          "status": "independently_verified",
+          "head_sha": "8a9b921fa4be059624606116ed5ad33c238bb9ab",
+          "reviewed_tree": "bce0e5b5542e76690f48226eff023a7b4ac55fd3",
+          "blockers": [
+            {
+              "id": "JOINT-INTEGRATION-PENDING",
+              "kind": "independent_integration_check",
+              "detail": "Exact candidate local gate passed; separate controller-metadata review and actual hosted CI remain pending."
+            },
+            {
+              "id": "PUBLICATION-AUTO-REVIEW",
+              "kind": "tool_approval_rejection",
+              "detail": "Public branch/draft updates did not start; automatic reviewer requested explicit payload-and-destination wording. The current approval prompt remains pending."
+            }
+          ],
+          "independent_review": "verification/research-program/bootstrap/corrected-components-8a9b921-911aff5/pr-006/receipt.json"
+        }
+      ]
     },
     {
       "pr_id": "PR-007",
@@ -1577,26 +1806,21 @@
         "contracts/machine-toolkit/v1.2.0/tests/variable-identity.test.mjs",
         "package-lock.json"
       ],
-      "head_sha": "911aff5588ea59b12b81b58f1d5e07ce09a987d3",
+      "head_sha": "09e312c9fb8767656ba6f6dcb0f996510098842d",
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-008.json",
       "evidence_directory": "verification/research-program/pr-008/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/24",
       "blockers": [
         {
-          "id": "JOINT-GATE-PENDING",
+          "id": "CORRECTED-CANDIDATE-GATE-PENDING",
           "kind": "independent_integration_check",
-          "detail": "Focused final-head checks pass; WP11 continuation and exact combined gate/hosted CI remain pending."
+          "detail": "The three P2 corrections are verified on the working patch. Current metadata, final combined identity and full local/hosted gates remain pending; the old e3af8dd gate is historical."
         },
         {
-          "id": "PUBLICATION-AUTO-REVIEW",
-          "kind": "tool_approval_rejection",
-          "detail": "Public branch/draft updates did not start; automatic reviewer requested explicit payload-and-destination wording. The current approval prompt remains pending."
-        },
-        {
-          "id": "CONTROLLER-SOURCE-METADATA-REVIEW",
-          "kind": "independent_review",
-          "detail": "Exact original/amended assignment snapshots correct the stale live-source locator; separate review remains pending."
+          "id": "PUBLICATION-PENDING",
+          "kind": "publication_preparation",
+          "detail": "Prepare the corrected public ajhcs/ushso payload and apply the current authorization before publishing and obtaining hosted CI."
         }
       ],
       "prerequisites_satisfied": true,
@@ -1617,10 +1841,10 @@
       "dispatch_packet": "verification/research-program/bootstrap/pr008-scope-20260911/dispatch-packet.json",
       "dispatch_packet_sha256": "59a44a1a19d616365eb0ab8a38bb035a8a5d89ef95b886477b101561b0e7381f",
       "dispatch_recorded_at": "2026-09-11T16:56:56.612999+00:00",
-      "producer_state": "final_correction_checked",
-      "next_action": "Compose with independently reviewed PR086 continuation, run the new exact combined gate and hosted CI, then integrate under existing authorization.",
-      "independent_review": "verification/research-program/bootstrap/corrected-components-8a9b921-911aff5/pr-008/receipt.json",
-      "reviewed_tree": "382ed8b6ed5536531ccf620379f9ceb8252c3f78",
+      "producer_state": "corrected_source_verified_metadata_independent_review_pending",
+      "next_action": "Finish current producer metadata, independently review the immutable combined candidate and run its applicable gate/hosted CI before acceptance or integration.",
+      "independent_review": "verification/research-program/bootstrap/astra-takeover-20260912/merge-resolution.json",
+      "reviewed_tree": null,
       "independent_review_history": [
         "verification/research-program/bootstrap/pr008-review-e433eff/decision.json",
         "verification/research-program/bootstrap/pr008-review-a50f5fa/decision.json",
@@ -1628,7 +1852,39 @@
       ],
       "scope_amendment": "verification/research-program/bootstrap/pr006-pr008-gate-corrections-20260911/decision.json",
       "current_correction_dispatch": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr008-integration-correction-dispatch.json",
-      "controller_metadata_correction": "verification/research-program/bootstrap/pr008-source-capture-correction-20260911/metadata-correction.json"
+      "controller_metadata_correction": "verification/research-program/bootstrap/pr008-source-capture-correction-20260911/metadata-correction.json",
+      "latest_joint_candidate": "e3af8dda1720efd5d29fd1a65683d0f18a412e94",
+      "latest_joint_gate": "verification/research-program/bootstrap/corrected-components-e3af8dd/gate-summary.json",
+      "prior_correction_states": [
+        {
+          "status": "independent_review",
+          "head_sha": "911aff5588ea59b12b81b58f1d5e07ce09a987d3",
+          "reviewed_tree": "382ed8b6ed5536531ccf620379f9ceb8252c3f78",
+          "blockers": [
+            {
+              "id": "JOINT-INTEGRATION-PENDING",
+              "kind": "independent_integration_check",
+              "detail": "Exact candidate local gate passed; separate controller-metadata review and actual hosted CI remain pending."
+            },
+            {
+              "id": "PUBLICATION-AUTO-REVIEW",
+              "kind": "tool_approval_rejection",
+              "detail": "Public branch/draft updates did not start; automatic reviewer requested explicit payload-and-destination wording. The current approval prompt remains pending."
+            },
+            {
+              "id": "JOINT-GATE-PENDING",
+              "kind": "independent_integration_check",
+              "detail": "Focused final-head checks pass; WP11 continuation and exact combined gate/hosted CI remain pending."
+            },
+            {
+              "id": "CONTROLLER-SOURCE-METADATA-REVIEW",
+              "kind": "independent_review",
+              "detail": "Exact original/amended assignment snapshots correct the stale live-source locator; separate review remains pending."
+            }
+          ],
+          "independent_review": "verification/research-program/bootstrap/corrected-components-8a9b921-911aff5/pr-008/receipt.json"
+        }
+      ]
     },
     {
       "pr_id": "PR-009",
@@ -3760,12 +4016,19 @@
       },
       "current_input_correction": {
         "correction_id": "PR086-CURRENT-INPUT-20260911",
-        "status": "behavior_independently_verified_metadata_review_pending",
+        "status": "behavior_verified_pending_metadata_peer_review_and_hosted_ci",
         "decision": "verification/research-program/bootstrap/pr086-current-inventory-scope-20260911/decision.json",
         "dispatch": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr086-current-input-correction-dispatch.json",
         "reviewed_lock_input": "verification/research-program/bootstrap/pr008-lock-review-072241e/review.json",
         "implementation_review": "verification/research-program/bootstrap/pr086-current-input-review-20260911/index.json",
-        "controller_metadata_correction": "verification/research-program/bootstrap/pr086-current-input-review-20260911/metadata-correction.json"
+        "controller_metadata_correction": "verification/research-program/bootstrap/pr086-current-input-review-20260911/metadata-correction.json",
+        "next_action": "Complete the prepared separate metadata review and hosted CI before integrating the continuation. Original accepted PR086 base/head/binding remain unchanged in this root checkout.",
+        "producer_final_head": "8cc74ed2ffbaab5b6b009770930dbf0e6fef0f3d",
+        "candidate": "e3af8dda1720efd5d29fd1a65683d0f18a412e94",
+        "evidence": "verification/research-program/bootstrap/corrected-components-e3af8dd/index.json",
+        "local_gate_classification": null,
+        "local_gate_verdict": "passed",
+        "separate_metadata_review_pending": true
       },
       "blockers": [
         "Separate review of controller authority-source and live-ledger metadata correction; combined gate and actual hosted CI pending."
