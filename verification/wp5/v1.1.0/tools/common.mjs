@@ -29,17 +29,18 @@ export function relativePath(value) {
     !path.posix.isAbsolute(value) && value.split('/').every((p) => p && p !== '.' && p !== '..'), 'INVALID_RELATIVE_PATH');
   return value;
 }
+function rejectSymlinkComponents(absolute) {
+  let current=absolute;
+  while (true) {
+    requireCondition(!fs.lstatSync(current).isSymbolicLink(),'SYMLINK_FORBIDDEN');
+    if(current===path.dirname(current)) break;current=path.dirname(current);
+  }
+}
 export function regularFile(root, relative, maximumBytes = 16777216) {
   relativePath(relative);
   const absolute = path.resolve(root, relative);
   requireCondition(within(absolute, path.resolve(root)), 'FILE_OUTSIDE_ROOT');
-  let current = absolute;
-  while (true) {
-    const st = fs.lstatSync(current);
-    requireCondition(!st.isSymbolicLink(), 'SYMLINK_FORBIDDEN');
-    if (current === path.dirname(current)) break;
-    current = path.dirname(current);
-  }
+  rejectSymlinkComponents(absolute);
   const st = fs.statSync(absolute);
   requireCondition(st.isFile(), 'REGULAR_FILE_REQUIRED');
   requireCondition(st.size <= maximumBytes, 'FILE_BYTE_LIMIT');
@@ -68,7 +69,7 @@ export function inventory(root, spec) {
   function walk(rel, depth) {
     relativePath(rel);
     requireCondition(depth <= limits.maximum_depth, 'INVENTORY_DEPTH_LIMIT');
-    const absolute = path.join(root, rel), st = fs.lstatSync(absolute);
+    const absolute = path.join(root, rel);rejectSymlinkComponents(absolute);const st = fs.lstatSync(absolute);
     requireCondition(!st.isSymbolicLink(), 'SYMLINK_FORBIDDEN');
     requireCondition(st.isDirectory(), 'DIRECTORY_REQUIRED');
     for (const entry of fs.readdirSync(absolute, { withFileTypes: true }).sort((a,b) => compare(a.name,b.name))) {
@@ -123,7 +124,8 @@ export function verifyHistorical(root = repositoryRoot, pkg = verificationRoot) 
   const policy = jsonFile(pkg, 'receipts/current-subject-policy.json');
   requireCondition(policy.origin.component_merge_sha === 'e268652c5e92876a3540809595636c4795ebec6f' &&
     policy.origin.component_merge_tree === '0ffb5e5e2ad336f5f67695adc3398dc67c503037', 'HISTORICAL_ORIGIN_INVALID');
-  requireCondition(policy.origin_hash === digest(policy.origin) && policy.origin_input_pins_hash === digest(policy.origin_input_pins), 'HISTORICAL_ORIGIN_HASH');
+  requireCondition(policy.origin_hash === '13b949613a0110c4279f180834ce0a8284659a0fe95f16600da6bf2ef34b8f57' && policy.origin_input_pins_hash === '302a4335ab01179e36089a889c689eeb0f6ff4f5c9d521783607849cd93648e4' &&
+    policy.origin_hash === digest(policy.origin) && policy.origin_input_pins_hash === digest(policy.origin_input_pins), 'HISTORICAL_ORIGIN_HASH');
   requireCondition(policy.origin.current_approval_issued === false && policy.origin.historical_approval_transferred === false, 'ORIGIN_APPROVAL_FORBIDDEN');
   for (const rel of ['evidence-ledger.json', ...['activation-status','delivery-wave-fixtures','fixture-matrix','legacy-lane-parity','r2-capture-protocol','request-capture-reconciliation','zero-payload-proof'].map((x) => 'receipts/'+x+'.json')]) {
     const ref = jsonFile(pkg, rel);
@@ -150,7 +152,9 @@ export function inspectDependency(root, file, lock, limits) {
         const last = packagePath.slice(packagePath.lastIndexOf('node_modules/') + 13);
         requireCondition(metadata.name === last && metadata.version === locked.version && (!locked.name || locked.name === metadata.name), 'PACKAGE_LOCK_MISMATCH');
       } else {
-        requireCondition(boundaries.some((b) => b.lock_entry), 'UNEXPLAINED_PACKAGE_BOUNDARY');
+        const parent = boundaries.findLast((b) => b.lock_entry);
+        requireCondition(parent && !packagePath.slice(parent.lock_path.length).includes('/node_modules/') &&
+          metadata.name === undefined && metadata.version === undefined, 'UNEXPLAINED_PACKAGE_BOUNDARY');
       }
       boundaries.push({ ...record, name: metadata.name ?? null, version: metadata.version ?? null, lock_path: locked ? packagePath : null, lock_entry: locked ?? null });
     }
@@ -159,12 +163,14 @@ export function inspectDependency(root, file, lock, limits) {
   return boundaries;
 }
 export function createModuleGuard(spec) {
+  const limits = {...spec.module_limits};
+  for(const key of ['maximum_packages','maximum_module_files','maximum_total_module_bytes','maximum_module_file_bytes','maximum_package_depth'])
+    requireCondition(Number.isSafeInteger(limits[key]) && limits[key]>0,'MODULE_LIMIT_INVALID');
   const root = path.resolve(spec.root); assertManifest(spec.files);
   const expected = new Map(spec.files.map((r) => [r.path,r]));
   const modules = new Map(), packages = new Map(), builtins = new Set(), denied = [];
   const preload = regularFile(root, 'verification/wp5/v1.1.0/tools/common.mjs');
   requireCondition(expected.get(preload.path)?.sha256 === preload.sha256, 'PRELOAD_NOT_PINNED');
-  const limits = spec.module_limits;
   let total = 0;
   function fail(code) { denied.push(code); requireCondition(false, code); }
   function check(url) {
@@ -203,6 +209,23 @@ export function createModuleGuard(spec) {
           while (within(cur,root)) { if (fs.existsSync(cur) && fs.lstatSync(cur).isSymbolicLink()) fail('MODULE_SYMLINK'); if (cur===root) break; cur=path.dirname(cur); }
         }
       }
+      if (!/^(?:file:|\.?\.?\/|\/)/.test(specifier) && !specifier.includes(':')) {
+        // Native resolution follows package symlinks. Inspect each possible
+        // node_modules spelling first, including scoped names, while still
+        // preserving the native resolver's result and package export rules.
+        const name = specifier.startsWith('@') ? specifier.split('/').slice(0,2).join('/') : specifier.split('/')[0];
+        let directory = context.parentURL?.startsWith('file:') ? path.dirname(fileURLToPath(context.parentURL)) : root;
+        while (within(directory, root)) {
+          const candidate = path.join(directory,'node_modules',name);
+          let current = candidate;
+          while (within(current,root)) {
+            try { if (fs.lstatSync(current).isSymbolicLink()) fail('MODULE_SYMLINK'); }
+            catch(error) { if (error.code!=='ENOENT' && error.code!=='ENOTDIR') throw error; }
+            if (current===root) break; current=path.dirname(current);
+          }
+          if (directory===root) break; directory=path.dirname(directory);
+        }
+      }
       const result = nextResolve(specifier,context);
       if (!isBuiltin(result.url)) check(result.url);
       return result;
@@ -211,6 +234,8 @@ export function createModuleGuard(spec) {
       if (isBuiltin(url)) { builtins.add(url.replace(/^node:/,'')); return nextLoad(url,context); }
       const { actual, absolute, boundaries } = check(url), before = fs.readFileSync(absolute);
       const result = nextLoad(url,context);
+      if (![undefined,null,'module','commonjs','json'].includes(result.format) ||
+        ![undefined,null,'module','commonjs','json'].includes(context.format)) fail('MODULE_FORMAT_UNSUPPORTED');
       if (!(typeof result.source === 'string' || result.source instanceof ArrayBuffer || ArrayBuffer.isView(result.source))) fail('MODULE_SOURCE_UNSUPPORTED');
       const source = typeof result.source === 'string' ? Buffer.from(result.source) : result.source instanceof ArrayBuffer
         ? Buffer.from(result.source) : Buffer.from(result.source.buffer,result.source.byteOffset,result.source.byteLength);
@@ -235,23 +260,55 @@ export function createModuleGuard(spec) {
 
 export function parseNativeTap(text, required = []) {
   requireCondition(typeof text === 'string' && text.startsWith('TAP version 13\n') && text.endsWith('\n'), 'TAP_ENVELOPE_INVALID');
-  requireCondition(!/^(?:\s*not ok\b|Bail out!)/m.test(text) && !/\b#\s*(?:SKIP|TODO)\b/i.test(text), 'TAP_NONPASS');
-  const names = [], totals = new Map(); let plan;
-  for (const line of text.split('\n')) {
-    const ok = /^ok ([1-9][0-9]*) - (.+)$/.exec(line);
-    if (ok) { requireCondition(Number(ok[1]) === names.length+1,'TAP_SEQUENCE'); names.push(ok[2]); }
-    const p = /^1\.\.([0-9]+)$/.exec(line);
-    if (p) { requireCondition(plan===undefined,'TAP_DUPLICATE_PLAN'); plan=Number(p[1]); }
-    const count = /^# (tests|suites|pass|fail|cancelled|skipped|todo) ([0-9]+)$/.exec(line);
-    if (count) { requireCondition(!totals.has(count[1]),'TAP_DUPLICATE_COUNTER'); totals.set(count[1],Number(count[2])); }
+  requireCondition(!/^(?:\s*not ok\b|Bail out!)/m.test(text) && !/^\s*ok [^\n]*#\s*(?:SKIP|TODO)\b/im.test(text), 'TAP_NONPASS');
+  const root={depth:0,completed:[],pending:null,plan:null}, scopes=new Map([[0,root]]), records=[], totals=new Map();
+  let diagnostic=null, last=null, ended=false;
+  for (const line of text.split('\n').slice(1,-1)) {
+    if (line==='') continue;
+    requireCondition(!ended,'TAP_MALFORMED');
+    if (diagnostic) {
+      if (line===' '.repeat(diagnostic.indent)+'...') { diagnostic=null;continue; }
+      const field=new RegExp('^ {'+diagnostic.indent+"}(duration_ms|type): (.+)$").exec(line);
+      requireCondition(field && !diagnostic.fields.has(field[1]),'TAP_MALFORMED');diagnostic.fields.add(field[1]);
+      if(field[1]==='type') { requireCondition(["'test'","'suite'"].includes(field[2]),'TAP_MALFORMED');diagnostic.record.type=field[2].slice(1,-1); }
+      else requireCondition(/^[0-9]+(?:\.[0-9]+)?$/.test(field[2]),'TAP_MALFORMED');
+      continue;
+    }
+    const diag=/^( *)---$/.exec(line);
+    if(diag) { requireCondition(last && diag[1].length===last.depth*4+2 && !last.diagnostic,'TAP_MALFORMED');last.diagnostic=true;diagnostic={record:last,indent:diag[1].length,fields:new Set()};continue; }
+    const counter=/^# (tests|suites|pass|fail|cancelled|skipped|todo) ([0-9]+)$/.exec(line);
+    if(counter) { requireCondition(root.plan!==null,'TAP_CASE_INVENTORY');requireCondition(!totals.has(counter[1]),'TAP_DUPLICATE_COUNTER');totals.set(counter[1],Number(counter[2]));continue; }
+    if(/^# duration_ms [0-9]+(?:\.[0-9]+)?$/.test(line)) { requireCondition(root.plan!==null,'TAP_MALFORMED');ended=true;continue; }
+    const item=/^( *)(?:# Subtest: (.+)|ok ([1-9][0-9]*) - (.+)|1\.\.([0-9]+))$/.exec(line);
+    requireCondition(item && item[1].length%4===0,'TAP_MALFORMED');
+    const depth=item[1].length/4;
+    let scope=scopes.get(depth);
+    if(!scope) {
+      const parent=scopes.get(depth-1)?.pending;
+      requireCondition(parent && item[2]!==undefined,'TAP_MALFORMED');
+      scope={depth,completed:[],pending:null,plan:null,parent};scopes.set(depth,scope);parent.children=scope;
+    }
+    if(item[2]!==undefined) {
+      requireCondition(scope.plan===null && scope.pending===null,'TAP_MALFORMED');
+      scope.pending={name:item[2],depth,type:'test',children:null};
+    } else if(item[3]!==undefined) {
+      requireCondition(scope.pending && Number(item[3])===scope.completed.length+1 && scope.pending.name===item[4],'TAP_SEQUENCE');
+      const record=scope.pending;
+      if(record.children) { requireCondition(record.children.plan===record.children.completed.length && record.children.pending===null,'TAP_CASE_INVENTORY');scopes.delete(depth+1); }
+      scope.completed.push(record);records.push(record);scope.pending=null;last=record;
+    } else {
+      requireCondition(scope.pending===null && scope.plan===null,'TAP_DUPLICATE_PLAN');scope.plan=Number(item[5]);
+      requireCondition(scope.plan===scope.completed.length,'TAP_CASE_INVENTORY');
+    }
   }
-  requireCondition(names.length > 0 && new Set(names).size===names.length && plan===names.length,'TAP_CASE_INVENTORY');
-  requireCondition(totals.get('tests')===names.length && totals.get('pass')===names.length &&
-    ['fail','cancelled','skipped','todo'].every((k)=>totals.get(k)===0), 'TAP_TERMINAL_COUNTERS');
-  requireCondition(names.every((n)=>!/(?:^|\/)\w[^ ]*\.test\.(?:mjs|cjs|js)$/.test(n)), 'TAP_WRAPPER_ONLY');
-  requireCondition(required.every((n)=>names.includes(n)), 'TAP_MANDATORY_CASE_MISSING');
-  requireCondition(text.split('\n').filter((l)=>l.startsWith('# Subtest: ')).length===names.length,'TAP_SUBTEST_COUNT');
-  return { names, count:names.length };
+  const tests=records.filter(r=>r.type==='test'), leaves=tests.filter(r=>!r.children), names=tests.map(r=>r.name);
+  requireCondition(!diagnostic && ended && root.plan===root.completed.length && root.plan>0 && leaves.length>0 &&
+    new Set(names).size===names.length,'TAP_CASE_INVENTORY');
+  requireCondition(totals.get('tests')===tests.length && totals.get('suites')===records.length-tests.length && totals.get('pass')===tests.length &&
+    ['fail','cancelled','skipped','todo'].every(k=>totals.get(k)===0),'TAP_TERMINAL_COUNTERS');
+  requireCondition(leaves.every(r=>!/(?:^|\/)[^ ]*\.test\.(?:mjs|cjs|js)$/.test(r.name)),'TAP_WRAPPER_ONLY');
+  requireCondition(required.every(n=>names.includes(n)),'TAP_MANDATORY_CASE_MISSING');
+  return { names, count:tests.length, leaf_count:leaves.length, leaf_names:leaves.map(r=>r.name), suites:records.length-tests.length };
 }
 export function assertUnapproved(result) {
   requireCondition(result.evidence_kind==='current_technical_only' && result.approval===null &&
@@ -269,21 +326,48 @@ export function assertSubject(receipt, subject) {
 
 export async function runBoundedChild(argv, { cwd, env, maximumMilliseconds, maximumOutputBytes }) {
   requireCondition(Number.isSafeInteger(maximumMilliseconds) && maximumMilliseconds>0 && Number.isSafeInteger(maximumOutputBytes) && maximumOutputBytes>0,'CHILD_LIMIT_INVALID');
+  requireCondition(process.platform!=='win32','POSIX_PROCESS_GROUP_REQUIRED');
   return new Promise((resolve,reject) => {
-    const child=spawn(process.execPath,argv,{cwd,env,stdio:['ignore','pipe','pipe']});
-    const chunks={stdout:[],stderr:[]};let bytes=0,reason=null;
-    const stop=(code)=>{reason??=code;child.kill('SIGKILL');};
+    // A fresh POSIX group keeps ordinary child helpers within this command's
+    // lifetime. This is cleanup/accounting, not confinement of hostile code.
+    const child=spawn(process.execPath,argv,{cwd,env,detached:true,stdio:['ignore','pipe','pipe']});
+    const chunks={stdout:[],stderr:[]};let bytes=0,reason=null,settled=false,cleanupTimer;
+    let exitCode=null,exitSignal=null;
+    const terminateGroup=()=>{
+      if(!child.pid) return;
+      try { process.kill(-child.pid,'SIGKILL'); }
+      catch(error) { if(error.code!=='ESRCH') reason??='CHILD_GROUP_CLEANUP_FAILED'; }
+    };
+    const finish=(code,signal)=>{
+      if(settled)return;settled=true;clearTimeout(timer);clearTimeout(cleanupTimer);
+      resolve({argv,pid:child.pid,code,signal,reason,stdout:Buffer.concat(chunks.stdout).toString('utf8'),stderr:Buffer.concat(chunks.stderr).toString('utf8'),bytes});
+    };
+    const stop=(code)=>{
+      reason??=code;terminateGroup();
+      // Even an unsupported escaped pipe owner cannot make receipt settlement
+      // unbounded. Such a result remains a failure with partial output.
+      cleanupTimer??=setTimeout(()=>{
+        reason='CHILD_CLEANUP_TIMEOUT';child.stdout.destroy();child.stderr.destroy();child.unref();
+        finish(exitCode,exitSignal);
+      },250);
+    };
     const timer=setTimeout(()=>stop('CHILD_DEADLINE'),maximumMilliseconds);
     for(const stream of ['stdout','stderr']) child[stream].on('data',(chunk)=>{
       bytes+=chunk.length;
       if(bytes>maximumOutputBytes) stop('CHILD_OUTPUT_LIMIT');
       else chunks[stream].push(chunk);
     });
-    child.once('error',(error)=>{clearTimeout(timer);reject(error);});
-    child.once('close',(code,signal)=>{
-      clearTimeout(timer);
-      resolve({argv,code,signal,reason,stdout:Buffer.concat(chunks.stdout).toString('utf8'),stderr:Buffer.concat(chunks.stderr).toString('utf8'),bytes});
+    child.once('error',(error)=>{
+      if(settled)return;settled=true;clearTimeout(timer);clearTimeout(cleanupTimer);terminateGroup();
+      child.stdout.destroy();child.stderr.destroy();reject(error);
     });
+    child.once('exit',(code,signal)=>{
+      exitCode=code;exitSignal=signal;
+      // An otherwise successful parent must not leave its helpers alive.
+      try { process.kill(-child.pid,0);stop('CHILD_DESCENDANTS_REMAIN'); }
+      catch(error) { if(error.code!=='ESRCH') stop('CHILD_GROUP_CLEANUP_FAILED'); }
+    });
+    child.once('close',(code,signal)=>finish(code,signal));
   });
 }
 
@@ -370,7 +454,7 @@ export async function verifyCurrent() {
           assert.equal(controls.implementation_fingerprint,connectorFingerprint(files));
         } else assert.equal(controls.external_actions,0);
       }
-      executed.push({file:command.file,kind:command.kind,argv:result.argv,exit_code:result.code,signal:result.signal,
+      executed.push({file:command.file,kind:command.kind,argv:result.argv,pid:result.pid,exit_code:result.code,signal:result.signal,
         stdout_sha256:sha256(result.stdout),stderr_sha256:sha256(result.stderr),output_bytes:result.bytes,controls,observation_sha256:digest(observation)});
     }
     assert.deepEqual(inventory(repositoryRoot,design.repository_inventory),files);
@@ -379,7 +463,7 @@ export async function verifyCurrent() {
     const subject=semanticSubject({policy,files,modules:[...modules.values()].sort((a,b)=>compare(a.path,b.path)),packages:[...packages.values()].sort((a,b)=>compare(a.path,b.path)),
       runtime:{node:process.version,versions:{...process.versions},platform:process.platform,arch:process.arch},fingerprint:connectorFingerprint(files),configuredPackageManager:jsonFile(repositoryRoot,'package.json').packageManager??null});
     const result={status:'PASS',work_package:'WP5',...design.output_boundaries,subject,historical_origin:historical.origin.component_merge_sha,
-      execution:{commands:executed,started_at:new Date(started).toISOString(),duration_ms:Date.now()-started,actual_npm_execution:'unobserved',output_bytes:outputBytes},
+      execution:{pid:process.pid,commands:executed,started_at:new Date(started).toISOString(),duration_ms:Date.now()-started,actual_npm_execution:'unobserved',output_bytes:outputBytes},
       limitation:'Current fixture technical evidence only; module input accounting is not a sandbox or source/production approval.'};
     assertUnapproved(result);fs.rmSync(scratch,{recursive:true,force:true});return result;
   } catch(error) {
