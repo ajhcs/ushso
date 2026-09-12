@@ -1,0 +1,79 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr009-operating-bounds-20260912",
+  "pr_id": "PR-009",
+  "title": "Set evidence storage and verification operating bounds",
+  "owner": "Grok",
+  "reviewer": "Astra",
+  "branch": "codex/pr-009-operating-bounds-20260912",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr009-operating-bounds-20260912",
+  "objective": "Record a measured topology ADR with unresolved cost facts, a fixture-only operating-bounds policy, and a standalone evidence-receipt contract without activating collection or editing connectors.",
+  "outcome": "Proposed ADR 0008 leaves cheapest topology null. Policy activation remains false. Evidence receipts distinguish capture, 304, access-only, pre-egress, typed failure, truncation, and the unmatched Census historical HTML negative. Descriptor hash_basis is ushso-canonical-json.v1. PR-008 has no integration merge SHA.",
+  "dependencies": [
+    "PR-003",
+    "PR-004",
+    "PR-007",
+    "PR-008"
+  ],
+  "owned_paths": [
+    "docs/adr/0008-operating-bounds-and-evidence-receipts.md",
+    "scripts/research-program/policy.json",
+    "scripts/research-program/operating-bounds.mjs",
+    "scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json",
+    "scripts/research-program/receipts/v1.0.0/README.md",
+    "tests/research-program/operating-bounds.test.mjs",
+    "tests/research-program/fixtures/pr009-census-negative/",
+    "verification/research-program/pr-009/",
+    "docs/research-program/handoffs/PR-009.json"
+  ],
+  "commits": [
+    {
+      "id": "C-009-1",
+      "subject": "docs(research): record operating-bounds topology decision (PR-009 C-009-1)",
+      "instructions": "Write Proposed ADR 0008 comparing retained publication measurements and public prices. Leave cheapest topology null. Do not edit the WP0-pinned ADR index or create paid resources.",
+      "verification": "WP0 adr-documentation audit still pins accepted ADRs 0000-0006; ADR 0008 exists and states unresolved cost facts."
+    },
+    {
+      "id": "C-009-2",
+      "subject": "feat(research): add fixture-only operating-bounds policy (PR-009 C-009-2)",
+      "instructions": "Add policy.json and a pure validator/composer using connector and ingestion exports read-only. Keep activation false. Name descriptor hash_basis ushso-canonical-json.v1.",
+      "verification": "Default policy accepts; foreign IDs, URLs, activation, unbounded limits, and unauthorized retention fail."
+    },
+    {
+      "id": "C-009-3",
+      "subject": "feat(research): add evidence-receipt contract and Census negative (PR-009 C-009-3)",
+      "instructions": "Add the standalone receipt schema, Census fixture with gzip and decoded hashes, registered tests, and a truthful pre-merge handoff.",
+      "verification": "node --test tests/research-program/operating-bounds.test.mjs; Census 200 HTML is typed failure with null redirect_count."
+    }
+  ],
+  "check_commands": [
+    "node --test verification/wp0/v1.0.0/tests/adr-documentation.test.mjs",
+    "node --test tests/research-program/operating-bounds.test.mjs",
+    "node scripts/research-program/check-handoff.mjs --context verification/research-program/pr-009 docs/research-program/handoffs/PR-009.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-009/",
+  "binding": {
+    "base_sha": "e3af8dda1720efd5d29fd1a65683d0f18a412e94",
+    "base_tree": "2e4fce44b99f4838df69b13752e663f3eed856df",
+    "dependency_merge_shas": {
+      "PR-003": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
+      "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+      "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "producer_checked"
+}
