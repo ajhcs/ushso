@@ -1,0 +1,89 @@
+{
+  "format": "ushso.pr009-publication-payload-disposition.v1",
+  "recorded_at": "2026-09-12T13:22:12.008085+00:00",
+  "candidate_head": "27d0b0d7c31d8825b91d899dc280cd843af21465",
+  "candidate_tree": "aef0428057d73645fab00f4d3aecb3418296f79b",
+  "published_base": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+  "reviewer": "/root/publication_readiness",
+  "verdict": "no_actionable_publication_payload_findings",
+  "confirmed_secret_or_private_data_findings": [],
+  "false_positives": [
+    {
+      "object_id": "286bd14f7d508e847d8818caca6429c714f15052",
+      "paths": [
+        "verification/research-program/bootstrap/components-954a237/local-gate.json.gz"
+      ],
+      "rule_id": "generic-api-key",
+      "line": 251223,
+      "field": "/candidate/candidate_key",
+      "disposition": "false_positive_nonsecret_evidence_digest",
+      "reason": "The decoded gate receipt equals the previously reviewed canonical gate bytes. The installed release_gate.py computes this field as SHA-256 of head, tree, authority and plan fingerprint. It is not an authentication credential; no value is reproduced."
+    }
+  ],
+  "image_review": [
+    {
+      "object_id": "a1f7eb31eb770f7d13edc51342837e971a9357a8",
+      "path": "verification/research-program/bootstrap/components-954a237/evidence/final-browser-review/run-1/api-sources.png",
+      "sha256": "619f8c745f96e80e755116ea1f3d70a669af64614b0d0ad336894358e7f69b02",
+      "matches_prior_reviewed_image": true,
+      "fresh_visual_review": "Public USHSO source-inventory UI with federal catalog counts; no credentials, private account screen or patient records visible."
+    },
+    {
+      "object_id": "9ec49ae627d5897afb319607c001e88ec3c279ca",
+      "path": "verification/research-program/bootstrap/components-954a237/evidence/final-browser-review/run-1/fixture-sources.png",
+      "sha256": "f77db39724dcac345efd7e89a408d4a3ee40d32a7ae2e4e85925a91c6c30a7a3",
+      "matches_prior_reviewed_image": true,
+      "fresh_visual_review": "Public USHSO source-inventory UI with federal catalog counts; no credentials, private account screen or patient records visible."
+    }
+  ],
+  "local_path_disposition": {
+    "objects_with_host_paths": 97,
+    "disposition": "retained_task_provenance",
+    "reason": "Host/worktree/scratch paths, task identifiers and public GitHub actors occur as original research-program execution provenance and script path literals. They are task-related evidence already within the reviewed publication scope; no private account-file contents or credentials were identified. Static PAUSE_REQUESTED path references do not include usage/session telemetry."
+  },
+  "integrity": {
+    "expected_new_commit_and_blob_objects": 233,
+    "objects_rehashed_against_git": 233,
+    "raw_and_decoded_sha256_and_lengths_match": true,
+    "scanner_inputs_equal_exact_decoded_git_objects": true,
+    "decompression_errors": [],
+    "candidate_clean_before_and_after": true
+  },
+  "scan": {
+    "objects": 233,
+    "commits": 12,
+    "blobs": 221,
+    "raw_bytes": 7406122,
+    "decoded_bytes": 27797273,
+    "gitleaks_exit": 1,
+    "raw_alerts": 1,
+    "confirmed_findings": 0
+  },
+  "evidence": [
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-publication/audit-27d0b0d/payload-manifest.json",
+      "sha256": "4a2533d498344c48ce7505c96397bc6675e9503e5d27b7f2b8a40f8736ffd2fa",
+      "bytes": 207302
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-publication/audit-27d0b0d/summary.json",
+      "sha256": "97b72727cec4bb1dc3856149b1a7757d6084a4928ec64f8c2f8deb4818f9a34b",
+      "bytes": 1981
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-publication/audit-27d0b0d/gitleaks-redacted.json",
+      "sha256": "879a37d2b01384a7ad9db1d86603e36182548d1d50053df5c9ce55441cbc9dc2",
+      "bytes": 788
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-publication/audit-27d0b0d/findings-index.json",
+      "sha256": "60f3cb27c808420455a7126142dc737b48a9ebe393801e92626c0ea1fe92dc67",
+      "bytes": 444
+    }
+  ],
+  "limits": [
+    "Bounded publication-payload audit only; not a guarantee against every possible sensitive string.",
+    "Scanner working copies and reports remain local scratch; no new repository writes or publication performed.",
+    "Source correctness, independent engineering acceptance and release gate judgment remain controller-owned."
+  ]
+}
