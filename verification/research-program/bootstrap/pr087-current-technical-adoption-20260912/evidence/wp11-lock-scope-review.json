@@ -1,0 +1,177 @@
+{
+  "format": "ushso.pr011-wp5-successor-wp11-lock-readiness-review.v1",
+  "recorded_at": "2026-09-12T14:25:09.469088+00:00",
+  "reviewer": "/root/publication_readiness",
+  "reviewed_head": "50a844d218600f95c13e64c2db64ab4d8562ae0d",
+  "verdict": "additional_current_input_scope_required_before_joint_gate",
+  "method": "Static exact-source/policy/test/runner review only. No proposed lock was generated, no validator/test/gate was executed, and no repository or plan changes were made.",
+  "input_pins": [
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr011-scope-readiness/SCOPE.md",
+      "sha256": "8c88edcbaf28352f34ec27c54695418b040ffe8ac8a868239f9dd83ddd25d962",
+      "bytes": 7632
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr011-scope-readiness/scope-proposal.json",
+      "sha256": "3ce0253533a2663e058b71c913ee57f2daef7b5ce68683a35a5f2f4aafc9fa01",
+      "bytes": 21319
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr011-scope-readiness/source-pins.json",
+      "sha256": "c0548a08c5db5bd75918f549faba71f6415649b08c0e0a866bbf03d9d12fa597",
+      "bytes": 15053
+    },
+    {
+      "path": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910/scripts/verify-wp11-attestation.mjs",
+      "sha256": "8e8622fadb81c17ae545d5034f549ebe56a2bd4845144c1961412d4fe94220d6",
+      "bytes": 44237
+    },
+    {
+      "path": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910/tests/wp11-attestation.test.mjs",
+      "sha256": "8ea1b498beab7ab24689eebfdca3c89d01c2f1df1c8108e8003d10b4c7d6a549",
+      "bytes": 49118
+    },
+    {
+      "path": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910/verification/research-program/ci-attestation/wp11-v1.3.0/policy.json",
+      "sha256": "7b73f8638b47b91089ac0e97dc525bbde9406551499e85b2ce126fbb490c0f17",
+      "bytes": 7871
+    },
+    {
+      "path": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910/scripts/run-contract-suites.mjs",
+      "sha256": "3a13c51986e1cd90b530465d4e8fc30cc3763a86189d06930c4dbf6f65c5e261",
+      "bytes": 29025
+    },
+    {
+      "path": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910/package.json",
+      "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e",
+      "bytes": 3666
+    },
+    {
+      "path": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910/package-lock.json",
+      "sha256": "f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8",
+      "bytes": 134907
+    },
+    {
+      "path": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910/verification/research-program/pr-086/source/authority-decision.json",
+      "sha256": "e9fef00c7ba814c5e540bcddb5036ba249f8645a716f117a7339708ee9a8e374",
+      "bytes": 3942
+    },
+    {
+      "path": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910/verification/research-program/pr-086/pr008-lock-review-072241e/review.json",
+      "sha256": "a4d52b75b44f7d3340e8a91ad0dc4716ce4d513b84d18edf8b4ebca656e94b3a",
+      "bytes": 9360
+    }
+  ],
+  "finding": {
+    "id": "PR087-WP11-LOCK-P2",
+    "priority": "P2",
+    "title": "WP5 successor lock requires an explicitly reviewed WP11 current-input transition",
+    "trigger": "The proposed PR087 package-lock.json addition of the two new local workspace/link entries changes the entire-file hash/byte count from the currently approved technical transition.",
+    "current_lock": {
+      "path": "package-lock.json",
+      "sha256": "f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8",
+      "bytes": 134907,
+      "package_entries": 356
+    },
+    "proposed_added_entries": {
+      "verification/wp5/v1.1.0": {
+        "name": "@ushso/verification-wp5-v1-1",
+        "version": "1.1.0",
+        "engines": {
+          "node": ">=22"
+        }
+      },
+      "node_modules/@ushso/verification-wp5-v1-1": {
+        "resolved": "verification/wp5/v1.1.0",
+        "link": true
+      }
+    },
+    "future_lock_sha256": null,
+    "static_rejection_chain": [
+      {
+        "path": "scripts/verify-wp11-attestation.mjs",
+        "line": 231,
+        "fact": "lockStateFor admits only exact hash AND byte count for historical, PR085 CI v1.4, and PR008 reviewed current lock; otherwise throws WP11_CURRENT_LOCK_UNREVIEWED_DRIFT."
+      },
+      {
+        "path": "scripts/verify-wp11-attestation.mjs",
+        "line": 361,
+        "fact": "currentInputRole converts an unknown lock failure into unreviewed_package_lock."
+      },
+      {
+        "path": "scripts/verify-wp11-attestation.mjs",
+        "line": 412,
+        "fact": "reportCurrentVersusHistoricalInputs then throws WP11_CURRENT_INPUT_UNREVIEWED_DRIFT:package-lock.json for that role."
+      },
+      {
+        "path": "scripts/verify-wp11-attestation.mjs",
+        "line": 781,
+        "fact": "Current attestation execution invokes the complete current-versus-historical comparison."
+      },
+      {
+        "path": "scripts/run-contract-suites.mjs",
+        "line": 448,
+        "fact": "The existing current WP11 validation route runs this adapter, so latest WP5 discovery does not remove the separate WP11 failure."
+      },
+      {
+        "path": "tests/wp11-attestation.test.mjs",
+        "line": 218,
+        "fact": "The independent complete-diff oracle recognizes only PR085 and PR008 reviewed current lock roles; a policy-only addition cannot qualify a new role."
+      }
+    ],
+    "scope_gap": "The provisional PR087 file inventory owns package-lock.json and WP5 successor/evidence files, but none of the existing WP11 current-input behavior paths. The old PR086 authority explicitly names only independently reviewed PR008 lock bytes and is not authorization for a new hash or workspace."
+  },
+  "minimal_additional_scope": {
+    "recommended_ownership": "Append a newly reviewed, bounded PR086 current-input continuation with one named owner, limited to this PR087 workspace transition. Preserve the already accepted PR086 row/receipt/history as prior acceptance. If root intentionally places the correction under PR087 instead, explicitly reserve the same paths and add an independent exact-lock review boundary before implementation; current PR087 scope alone is insufficient.",
+    "behavior_paths": [
+      {
+        "path": "scripts/verify-wp11-attestation.mjs",
+        "change": "Add one exact reviewed current-lock state and role with source commit/tree, hash/bytes, prior lock and independent receipt pins; bind the new receipt in wrapper implementation and validate its narrowly allowed two-entry delta. Preserve existing branches unchanged and reject all other locks."
+      },
+      {
+        "path": "verification/research-program/ci-attestation/wp11-v1.3.0/policy.json",
+        "change": "Append the named new reviewed_current_transitions entry and new receipt to wrapper_implementation_files. Preserve every existing transition, historical reader/snapshot pin and false approval/activation boundary."
+      },
+      {
+        "path": "tests/wp11-attestation.test.mjs",
+        "change": "Retain the complete independent current-input oracle and all old regression fixtures. Add only the new exact role plus positive/tampered/stale/missing-review/wrong-delta controls for this transition."
+      }
+    ],
+    "additive_evidence": "A new uniquely named PR086 continuation evidence directory and controller adoption/dispatch/review/acceptance pointer. Do not replace pr008-lock-review-072241e or its history. Use actual immutable PR087 component lock bytes once independently reviewed; current future pins stay null.",
+    "no_required_edits": [
+      "verification/wp11/v1.0.0/** through verification/wp11/v1.3.0/**",
+      "historical-preimage-reader.mjs",
+      "historical-preimage-snapshot/**",
+      "named-pre-pr005-fixture/**",
+      "scripts/run-contract-suites.mjs",
+      "package.json",
+      "old PR085/PR086 approvals or receipts"
+    ]
+  },
+  "review_and_order": {
+    "before_enablement": [
+      "Create the complete WP5 successor and the exact two lock entries at an immutable PR087 source commit.",
+      "Independently review source commit/tree and parsed lock delta: all existing entries/top-level fields unchanged; only the new WP5 package and link added. At the current baseline this means 356 unchanged and 358 resulting entries; bind actual predecessor at dispatch rather than assume intervening changes cannot occur.",
+      "Retain focused WP5/package checks and the original expected WP11 rejection before enabling the new current transition.",
+      "Bind that concrete independent lock receipt into the bounded current-input correction; metadata/source hash updates invalidate prior current/wrapper subjects."
+    ],
+    "acyclic_rule": "The current-input correction needs independently reviewed immutable PR087 lock bytes and focused package evidence; it must not require a fully passing joint gate or fully integrated PR087 beforehand. Root separately records actual PR011, PR087, correction and joint composition identities. Explicitly adopt any component-first exception; do not infer a standing failed-gate waiver from the old PR008 precedent.",
+    "final_validation_planned": [
+      "Original WP11 historical/named fixtures and direct historical approval rejection on current bytes remain intact.",
+      "Complete current-input diff independently recomputed; exact new lock accepted only with pinned source/review evidence; changed byte, stale proof, missing link, extra dependency, replaced prior entry and unrelated lock rejected.",
+      "Current technical/wrapper approval remains null; historical approval remains bound to original subject; all activation/release/combined-acceptance flags remain false within the adapter.",
+      "One final exact composition gate and hosted CI after all components are present."
+    ],
+    "new_tests_executed": false
+  },
+  "preserved_qualification": {
+    "historical_approval_transferred": false,
+    "current_approval_issued": false,
+    "release_qualified": false,
+    "requirements_accepted": [],
+    "PR011_or_PR087_acceptance_claimed": false
+  },
+  "repository_edits": false,
+  "plan_edits": false,
+  "tests_or_scans_executed": false
+}

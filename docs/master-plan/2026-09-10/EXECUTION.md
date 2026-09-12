@@ -92,3 +92,10 @@ For the model evaluation, record confidence intervals alongside point precision 
 PR-082 consumes all prior implementation/acceptance work. The owner receives a concrete exact-candidate release packet, including costs, operational changes and rollback, before any required final authorization. No file in this planning package authorizes new production infrastructure or a paid provider call.
 
 PR-084 requires real sustained observation; it cannot pass on day zero. If empirical targets fail, add bounded remediation work and update the dependency model. A stakeholder can explicitly amend a requirement with reasons and visible impact, but an implementer cannot lower a threshold to obtain a green gate. Completion means current evidence satisfies the accepted requirement set, not that the initial list of 84 PRs has been exhausted.
+
+
+## Narrow PR010 component sequence for current WP5 verification
+
+After independent root review of the final exact PR010 source and controller adoption of this graph/policy, root may create one real no-ff PR010 component merge M010 on an isolated assembly branch. Retain focused tests, live handoff and the exact expected frozen-WP5 stale-fingerprint result. This exception covers only that known verifier mismatch; it does not waive unrelated failures, count research integration, enable PR011 dispatch or issue release/R acceptance. PR087 consumes actual M010; its reviewed H087 lock enables only the separate PR086 correction. The final exact PR010+PR087+PR086 composition must pass independent review, full local gate and hosted CI before research integration and actual acceptance identities are recorded.
+
+This exact exception becomes effective only through independently reviewed controller application. It is not a standing failed-gate waiver. See [the scoped decision](../../../verification/research-program/bootstrap/pr087-current-technical-adoption-20260912/decision.json).
