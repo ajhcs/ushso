@@ -1,0 +1,128 @@
+{
+  "format": "ushso.independent-final-controller-packet-review.v1",
+  "reviewer": "native Codex subagent /root/publication_readiness",
+  "reviewed_at": "2026-09-12T04:22:20.517600Z",
+  "subject": {
+    "head": "954a237a8984d06f5ea0ab15f83c71ce210bf09a",
+    "tree": "a781e9801224af92b51389fb898f0b67ab261982"
+  },
+  "verdict": "no_actionable_findings_on_final_local_packet",
+  "findings": [],
+  "resolved_initial_findings": [
+    {
+      "id": "PUB-P2-1",
+      "title": "Final packet artifact index retained pre-gate hashes",
+      "initial_observation": "Four hashes mismatched the three updated draft bodies and active payload manifest.",
+      "resolution": "Root preserved the original index as packet-artifact-manifest.before-gate.json and refreshed all seven current hashes. The pre-gate narrative is preserved separately and the current narrative reports the passed local gate.",
+      "verified": true
+    },
+    {
+      "id": "PUB-P2-2",
+      "title": "Draft creation lacked a pre-mutation combined-head binding",
+      "initial_helper_sha256": "3321eebc168bd50be3d35189099c6f574dddc71c94a48968defb4e785eae8ae7",
+      "initial_observation": "The helper accepted a publication receipt on exit status alone and did not check the fresh combined ref until after creating the draft.",
+      "resolution": "Root now checks receipt head/tree, exact active manifest SHA, all three remote-after source refs and unchanged integration base, then checks the fresh combined Git ref equals the reviewed head before public mutations.",
+      "verified": true
+    }
+  ],
+  "checks": {
+    "packet_artifact_hashes": "7/7 match",
+    "active_body_hashes": "4/4 match; helper selects three bodies",
+    "closure_review_receipt_hashes": "4/4 match plus exact gate receipt hash",
+    "local_gate": {
+      "run_id": "20260912T040526Z-9d0ca8f43f35",
+      "verdict": "passed",
+      "first_pass_stages": 10,
+      "build_count": 1,
+      "first_pass_failures": [],
+      "head": "954a237a8984d06f5ea0ab15f83c71ce210bf09a",
+      "tree": "a781e9801224af92b51389fb898f0b67ab261982"
+    },
+    "helper_syntax": "Both helpers parsed with ast.parse; neither was imported or executed.",
+    "push_selection": "Exact current manifest selects the three authorized task/combined refs with atomic ordinary non-force push; no integration/main ref.",
+    "push_preconditions": "Correct worktree/writer ownership, clean exact head/tree, exact SSH origin, passed independent local gate/review, expected published refs and integration base, and fast-forward producer ancestry.",
+    "draft_selection": "Exactly one combined draft create and #23/#24 body updates. #12 action is present only as an unused optional manifest action and is excluded by the helper selection.",
+    "draft_preconditions": "Successful source publication receipt bound to current manifest/head/tree/ref readback, all body hashes, fresh integration and combined refs, correct open draft producer heads, and no existing combined PR.",
+    "claim_consistency": "Final gate timing/count/build claims, head/tree, 23 custom probes, 12 Chrome cases and separate metadata review match retained receipts. Hosted CI, public publication, acceptance, merge, R01-R16 and production remain unclaimed.",
+    "audit_scope": "Application Git payload remains the previously scanned 954a237/tree a781 candidate. The reviewed final body changes add only accurate local gate status/run identity and pending hosted/publication state."
+  },
+  "reviewed_inputs": [
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publish-reviewed-branches.py",
+      "bytes": 3426,
+      "sha256": "fd7c61488aff1fa333cb51a45b230b883b7a7b4872fb877c815737e5798dc342"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/create-reviewed-drafts.py",
+      "bytes": 3395,
+      "sha256": "83cc5821af6a3330472d76b127fa67ee38a88467625efa28dfee002468562a33"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/local-correction-closure-review.json",
+      "bytes": 1930,
+      "sha256": "b16a27a59e5dae23b6460443649d60895f0bf98852bd82119733ed5236b49a89"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/final-gate-receipt.json",
+      "bytes": 22040539,
+      "sha256": "2c2beae2f565174c96435ef469ed2236d09e16511b1ca6f5f51c17c06cc6cf28"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/final-gate-command.json",
+      "bytes": 780,
+      "sha256": "0f1af0e31097724bd2846cc389ad4baca21d57adf4f16463e688e5a9a7eb8e94"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/independent-metadata-review/final-metadata-review.json",
+      "bytes": 13988,
+      "sha256": "b3513bc9b929dfe1fe5ec21ccc58fd718a2743b40ba7dd54c35d64a4702e05a3"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/final-decisive-review/review.json",
+      "bytes": 4492,
+      "sha256": "4dc54fbdd838913a3f1ba7998136f9cca02c23f69f1f15ba126bcb5edad0cc29"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/final-browser-review/command-receipt.json",
+      "bytes": 2243,
+      "sha256": "410476aafbcbc37b3628f010a4d08a94e1e3bbd987845951a598addcd8acd54f"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publication-readiness/payload-destination-manifest.json",
+      "bytes": 24370,
+      "sha256": "47b7d5b7008eb55d4239e11b3d75647fc30c7ddb5994b6fc0eb9193950b287e6"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publication-readiness/packet-artifact-manifest.json",
+      "bytes": 1985,
+      "sha256": "ed78489f7eda5cff3c203324c30a97733cd062ac4f702627285a39f026aaef5a"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publication-readiness/combined-draft-body.md",
+      "bytes": 3467,
+      "sha256": "b1f28c5693149c8d3875d1f7beb233df250d3b32c2ceebd3e6f647ab08934485"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publication-readiness/pr-23-body.md",
+      "bytes": 2576,
+      "sha256": "ca684fefec3a9b3b6277e0b36fafc98cf8873665981c27a3596cac61288baa4b"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publication-readiness/pr-24-body.md",
+      "bytes": 2571,
+      "sha256": "b2aac3535bfc41b251e1487f08cd8638b3a2af15745b443fef1c4227aa41b58d"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publication-readiness/publication-readiness.md",
+      "bytes": 7186,
+      "sha256": "7ac112b8fa071f82612fcba5481a0ee461d31ba54ef674a512bdd8d62feda7ae"
+    }
+  ],
+  "limits": [
+    "This is a bounded static/local receipt review. No helper, push, draft update, tests, build, release gate, network call or Git mutation was executed.",
+    "The review covers the exact helper/manifest/body hashes recorded here. Any changed input invalidates this packet-level verdict until the changed scope is checked.",
+    "Explicit public-payload/destination approval is still pending after the original push was rejected by automatic review. This finding-free local review is not authorization to retry.",
+    "No post-publication or hosted-CI result can be inferred; those checks must observe the real remote state."
+  ],
+  "output_only_mutation": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publication-readiness/final-controller-packet-review.json"
+}

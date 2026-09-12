@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-12T04:58:03.871049Z",
+  "updated_at": "2026-09-12T04:02:45.932261Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "a30e035fc1cf883e7e789487cb3ec0aebde1ddb58177556b9b16f9811d271ef8",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -653,57 +653,6 @@
       "implementation": "native Codex subagents",
       "judgment": "Astra with separate review of Astra-authored changes",
       "basis": "User requested completion using subagents; completed Grok work is retained."
-    },
-    "current_component_acceptance": {
-      "recorded_at": "2026-09-12T04:58:03.871038Z",
-      "pr_ids": [
-        "PR-006",
-        "PR-008"
-      ],
-      "status": "integrated",
-      "accepted": true,
-      "candidate_head": "954a237a8984d06f5ea0ab15f83c71ce210bf09a",
-      "candidate_tree": "a781e9801224af92b51389fb898f0b67ab261982",
-      "integration_merge_sha": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
-      "integration_tree": "a781e9801224af92b51389fb898f0b67ab261982",
-      "component_dependency_merge_basis": "accepted_tested_bundle_merge_pr25; not an assertion that each individual GitHub PR merged",
-      "evidence_index": {
-        "path": "verification/research-program/bootstrap/components-954a237/index.json",
-        "sha256": "f3ce5b6b30b1c36caa34ef98c09bb93be967ea44bbbac882af25d8472fa45af4",
-        "bytes": 71773
-      },
-      "independent_acceptance": "verification/research-program/bootstrap/components-954a237/acceptance.json",
-      "local_full_gate": {
-        "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/final-gate-receipt.json",
-        "sha256": "2c2beae2f565174c96435ef469ed2236d09e16511b1ca6f5f51c17c06cc6cf28",
-        "bytes": 22040539,
-        "status": "passed",
-        "run_id": "20260912T040526Z-9d0ca8f43f35"
-      },
-      "hosted_combined_ci": {
-        "path": "verification/research-program/bootstrap/components-954a237/evidence/hosted-ci-954a237/hosted-ci-receipt.json",
-        "sha256": "00f7ebba326178cd2a433c34acf0ca7cd1b2e02185f4fe2d01a5406de8fa0c19",
-        "bytes": 13273,
-        "status": "passed",
-        "run_id": 34673332274,
-        "run_attempt": 1,
-        "actual_checkout": "fc2f66fd7dc905957bbf0c230f9a9e439fa3a23c"
-      },
-      "supersedes_current_status_fields": [
-        "controller.next_component_candidate",
-        "controller.current_review",
-        "controller.latest_corrected_component_reviews",
-        "controller.latest_final_component_evidence",
-        "controller.current_active_corrections",
-        "controller.correction_composition_metadata",
-        "controller.current_correction_review",
-        "controller.latest_publication_preparation",
-        "controller.latest_corrected_component_gate",
-        "controller.pending_controller_metadata_reviews",
-        "controller.publication_continuation"
-      ],
-      "supersession_scope": "Current PR006/008 correction, metadata-review, gate and publication status only. Prior fields/observations remain verbatim historical evidence for their original subjects.",
-      "later_acceptance_metadata_tree_full_gate_qualified": false
     }
   },
   "providers": [
@@ -1693,7 +1642,7 @@
     },
     {
       "pr_id": "PR-006",
-      "status": "integrated",
+      "status": "independent_review",
       "owner": "/root/pr006_facet_contract_decision",
       "dependencies": [
         "PR-004",
@@ -1722,11 +1671,22 @@
         "tests/subject-shortcircuit.test.mjs"
       ],
       "head_sha": "a153a3d5e734fee17d9016b8d36b0f94006f24fe",
-      "merge_sha": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+      "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-006.json",
       "evidence_directory": "verification/research-program/pr-006/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/23",
-      "blockers": [],
+      "blockers": [
+        {
+          "id": "CORRECTED-CANDIDATE-GATE-PENDING",
+          "kind": "independent_integration_check",
+          "detail": "Corrected source and producer handoffs are committed. Separate final metadata review and full local/hosted gates remain pending; e3af8dd qualifies only historical bytes."
+        },
+        {
+          "id": "PUBLICATION-PENDING",
+          "kind": "publication_preparation",
+          "detail": "Prepare the corrected public ajhcs/ushso payload and apply the current authorization before publishing and obtaining hosted CI."
+        }
+      ],
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-004": "verification/research-program/bootstrap/components-463f092/pr-004-integration-handoff.json",
@@ -1746,18 +1706,18 @@
       "dispatch_packet": "verification/research-program/bootstrap/pr006-scope-20260911/dispatch-packet.json",
       "dispatch_packet_sha256": "416e75a5fcccd8d63b7d494ba50915c207b9f06763fbc876d36214ab84367c89",
       "dispatch_recorded_at": "2026-09-11T17:14:23.621321+00:00",
-      "producer_state": "corrected_final_producer_accepted_through_tested_bundle",
-      "next_action": "Consume the accepted bundle dependency handoff; retain individual GitHub PR state separately. Downstream dispatch and qualification remain explicit controller work.",
+      "producer_state": "corrected_source_and_producer_metadata_committed",
+      "next_action": "Independently review the final combined metadata and exact candidate, run the applicable local gate, then publish and obtain current hosted CI before acceptance and integration.",
       "independent_review_history": [
         "verification/research-program/bootstrap/pr006-review-5d8a8dd/decision.json",
         "verification/research-program/bootstrap/pr006-review-7e58195/decision.json"
       ],
       "independent_review": "verification/research-program/bootstrap/astra-takeover-20260912/final-composition/composition.json",
-      "reviewed_tree": "a781e9801224af92b51389fb898f0b67ab261982",
+      "reviewed_tree": null,
       "scope_amendment": "verification/research-program/bootstrap/pr006-pr008-gate-corrections-20260911/decision.json",
       "current_correction_dispatch": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr006-integration-correction-dispatch.json",
-      "latest_joint_candidate": "954a237a8984d06f5ea0ab15f83c71ce210bf09a",
-      "latest_joint_gate": "verification/research-program/bootstrap/components-954a237/local-gate-summary.json",
+      "latest_joint_candidate": null,
+      "latest_joint_gate": null,
       "prior_correction_states": [
         {
           "status": "independently_verified",
@@ -1786,25 +1746,7 @@
           "latest_joint_gate": "verification/research-program/bootstrap/corrected-components-e3af8dd/gate-summary.json"
         }
       ],
-      "joint_candidate_state": "accepted_tested_bundle_integrated",
-      "integration_acceptance_history": [
-        {
-          "recorded_at": "2026-09-12T04:58:03.867417Z",
-          "prior_row": "verification/research-program/bootstrap/components-954a237/prior/pr-006-ledger-row.json",
-          "prior_ledger": "verification/research-program/bootstrap/components-954a237/prior/execution-ledger.before.json",
-          "accepted_merge_sha": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
-          "basis": "accepted_tested_bundle_merge_pr25; not an assertion that each individual GitHub PR merged"
-        }
-      ],
-      "integration_merge_sha": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
-      "integration_tree": "a781e9801224af92b51389fb898f0b67ab261982",
-      "component_dependency_merge_basis": "accepted_tested_bundle_merge_pr25; not an assertion that each individual GitHub PR merged",
-      "github_observed_merge_sha": null,
-      "github_component_observation": "verification/research-program/bootstrap/components-954a237/github-component-observations.json",
-      "controller_handoff": "verification/research-program/bootstrap/components-954a237/pr-006-integration-handoff.json",
-      "artifact_manifest": "verification/research-program/bootstrap/components-954a237/pr-006-artifact-manifest.json",
-      "independent_acceptance": "verification/research-program/bootstrap/components-954a237/acceptance.json",
-      "integration_evidence": "verification/research-program/bootstrap/components-954a237/index.json"
+      "joint_candidate_state": "pending_final_composition_commit_and_new_gate"
     },
     {
       "pr_id": "PR-007",
@@ -1873,7 +1815,7 @@
     },
     {
       "pr_id": "PR-008",
-      "status": "integrated",
+      "status": "independent_review",
       "owner": "/root/pr008_variable_scope_review",
       "dependencies": [
         "PR-007"
@@ -1901,11 +1843,22 @@
         "package-lock.json"
       ],
       "head_sha": "09e312c9fb8767656ba6f6dcb0f996510098842d",
-      "merge_sha": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+      "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-008.json",
       "evidence_directory": "verification/research-program/pr-008/",
       "github_pr_url": "https://github.com/ajhcs/ushso/pull/24",
-      "blockers": [],
+      "blockers": [
+        {
+          "id": "CORRECTED-CANDIDATE-GATE-PENDING",
+          "kind": "independent_integration_check",
+          "detail": "Corrected source and producer handoffs are committed. Separate final metadata review and full local/hosted gates remain pending; e3af8dd qualifies only historical bytes."
+        },
+        {
+          "id": "PUBLICATION-PENDING",
+          "kind": "publication_preparation",
+          "detail": "Prepare the corrected public ajhcs/ushso payload and apply the current authorization before publishing and obtaining hosted CI."
+        }
+      ],
       "prerequisites_satisfied": true,
       "dependency_handoffs": {
         "PR-007": "verification/research-program/bootstrap/components-e6da2e2/pr-007-integration-handoff.json"
@@ -1924,10 +1877,10 @@
       "dispatch_packet": "verification/research-program/bootstrap/pr008-scope-20260911/dispatch-packet.json",
       "dispatch_packet_sha256": "59a44a1a19d616365eb0ab8a38bb035a8a5d89ef95b886477b101561b0e7381f",
       "dispatch_recorded_at": "2026-09-11T16:56:56.612999+00:00",
-      "producer_state": "corrected_final_producer_accepted_through_tested_bundle",
-      "next_action": "Consume the accepted bundle dependency handoff; retain individual GitHub PR state separately. Downstream dispatch and qualification remain explicit controller work.",
+      "producer_state": "corrected_source_and_producer_metadata_committed",
+      "next_action": "Independently review the final combined metadata and exact candidate, run the applicable local gate, then publish and obtain current hosted CI before acceptance and integration.",
       "independent_review": "verification/research-program/bootstrap/astra-takeover-20260912/final-composition/composition.json",
-      "reviewed_tree": "a781e9801224af92b51389fb898f0b67ab261982",
+      "reviewed_tree": null,
       "independent_review_history": [
         "verification/research-program/bootstrap/pr008-review-e433eff/decision.json",
         "verification/research-program/bootstrap/pr008-review-a50f5fa/decision.json",
@@ -1936,8 +1889,8 @@
       "scope_amendment": "verification/research-program/bootstrap/pr006-pr008-gate-corrections-20260911/decision.json",
       "current_correction_dispatch": "verification/research-program/bootstrap/current-correction-dispatches-20260911/pr008-integration-correction-dispatch.json",
       "controller_metadata_correction": "verification/research-program/bootstrap/pr008-source-capture-correction-20260911/metadata-correction.json",
-      "latest_joint_candidate": "954a237a8984d06f5ea0ab15f83c71ce210bf09a",
-      "latest_joint_gate": "verification/research-program/bootstrap/components-954a237/local-gate-summary.json",
+      "latest_joint_candidate": null,
+      "latest_joint_gate": null,
       "prior_correction_states": [
         {
           "status": "independent_review",
@@ -1976,25 +1929,7 @@
           "latest_joint_gate": "verification/research-program/bootstrap/corrected-components-e3af8dd/gate-summary.json"
         }
       ],
-      "joint_candidate_state": "accepted_tested_bundle_integrated",
-      "integration_acceptance_history": [
-        {
-          "recorded_at": "2026-09-12T04:58:03.871014Z",
-          "prior_row": "verification/research-program/bootstrap/components-954a237/prior/pr-008-ledger-row.json",
-          "prior_ledger": "verification/research-program/bootstrap/components-954a237/prior/execution-ledger.before.json",
-          "accepted_merge_sha": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
-          "basis": "accepted_tested_bundle_merge_pr25; not an assertion that each individual GitHub PR merged"
-        }
-      ],
-      "integration_merge_sha": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
-      "integration_tree": "a781e9801224af92b51389fb898f0b67ab261982",
-      "component_dependency_merge_basis": "accepted_tested_bundle_merge_pr25; not an assertion that each individual GitHub PR merged",
-      "github_observed_merge_sha": "db71bfb1cee4557d4eb7640f78c97fd60da5e119",
-      "github_component_observation": "verification/research-program/bootstrap/components-954a237/github-component-observations.json",
-      "controller_handoff": "verification/research-program/bootstrap/components-954a237/pr-008-integration-handoff.json",
-      "artifact_manifest": "verification/research-program/bootstrap/components-954a237/pr-008-artifact-manifest.json",
-      "independent_acceptance": "verification/research-program/bootstrap/components-954a237/acceptance.json",
-      "integration_evidence": "verification/research-program/bootstrap/components-954a237/index.json"
+      "joint_candidate_state": "pending_final_composition_commit_and_new_gate"
     },
     {
       "pr_id": "PR-009",
@@ -2024,9 +1959,9 @@
       "github_pr_url": null,
       "blockers": [
         {
-          "id": "PR009-SUCCESSOR-BINDING",
-          "kind": "controller_binding",
-          "detail": "PR008 is accepted through tested bundle 8f2914e345b30809be4e1ad97cdccc39b809cc95. Preserve original80f781d, adopt the controller scope and bind an accepted-base successor before native producer work; no dispatch or PR009 verdict is recorded here."
+          "id": "PR009-PR008-ACCEPTANCE",
+          "kind": "dependency",
+          "detail": "PR008 corrections remain in progress; no implementation has been assigned."
         }
       ],
       "prerequisites_satisfied": false,
@@ -2036,7 +1971,7 @@
         "verification/research-program/bootstrap/pr009-scope-20260911/operating-inputs.json",
         "verification/research-program/bootstrap/pr009-scope-20260911/census-negative/manifest.json"
       ],
-      "next_action": "Controller must adopt successor scope, preserve the original five PR009 commits and bind actual accepted merge/handoff identities. Numeric-budget/cost qualification is owner-deferred; preserve null measured topology, ushso-canonical-json.v1 and activation false.",
+      "next_action": "After accepted PR008, bind its actual merge/handoff and assign this narrowed three-commit packet. Preserve the measured topology decision and unresolved external facts.",
       "scope_independent_review": "verification/research-program/bootstrap/pr009-scope-independent-review-12e8876/index.json",
       "dispatch_input_actions": [
         "Bind exact target Census fixture filenames, gzip and decoded hashes."
