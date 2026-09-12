@@ -1,0 +1,522 @@
+{"event":"independent_review_subject","root":"/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr009-successor-20260912","head":"35c27d66b521563c54535587b1be8a3698d15d80","tree":"67bb9746a7c3961281c1649f368fbdc368bf1f91","status":"","hashes":{"scripts/research-program/operating-bounds.mjs":"612261d10112591cfa2ff6ba95671a4b38add841919dfb3de20d6d0532aa501c","scripts/research-program/policy.json":"6230fe7b10aa5da20d9426cf4fcce39f0565e306ec512cbc791428544088fbda","scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json":"b0785f439b2ba525ad3b72ef7832adeb9eb6eccc5454a6eedaabdfbc746375eb","tests/research-program/operating-bounds.test.mjs":"ce461133178f97abb6e019836b288ab34ba03f429d2e5f6407a1ab61d564132a","verification/research-program/pr-009/task-binding.json":"e95d52807ba27997793896c3f61ffdfeeceeda6b65e09f8351e1bc715788a434","docs/research-program/handoffs/PR-009.json":"a0f5cf886a1c0707a37d11de61ffdb0ce903f5c6d3783606565dfe22b0415264","docs/research-program/execution-ledger.json":"b3cf57383aba462a60cd72a947903d7ecc8bfabd8c7ff8f242a5e4055281ab2c","packages/connectors/src/descriptors.mjs":"7c8ce9c616cdecc9fa3c2bc7b8f344426bb71b9ad2edc95c99abbf4ff92a1e5d","packages/connectors/src/route-manifest.mjs":"be3787542b8c27ed3d7f294ae88789c9530717f2741cfd862ee5a24f46197bfc","packages/connectors/src/canonical.mjs":"ba524d6baa275bc5ca05e4b3cc9dac9dda02cda0992a2b8f8cf2ec762da9cb48","contracts/ingestion/v1.0.0/fixtures/valid-fixtures.json":"f558231315f7f57de06a6cc10fb95a175ddef4da30d310b98d581464452b5038","contracts/ingestion/v1.0.0/schemas/metadata-fetch.schema.json":"5981d9bdb78f5233aed1bca98afe760a68ec773c9966c53e69f41ed50287a456","contracts/ingestion/v1.0.0/schemas/capture-reference.schema.json":"8b38c9bd5c5291121010fad275d562248d1778f0fa9bc4ce284935daf20ae285","contracts/ingestion/v1.0.0/tools/schema.mjs":"23d310fc92819bef85995632457e98f6e1252af57ffd5689750a414e1341f459","contracts/ingestion/v1.0.0/tools/semantics.mjs":"26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639","package-lock.json":"f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8"},"scope":"PR009 boundary probes; no component acceptance or cost qualification"}
+▶ R009-I1: known source, descriptor, revision and route cannot be mixed
+  ✔ registered descriptor from a different source (5.427467ms)
+  ✔ unbound configuration revision (4.000315ms)
+  ✔ foreign registered endpoint/template pair (4.029944ms)
+  ✔ omitted approved route (4.124671ms)
+✔ R009-I1: known source, descriptor, revision and route cannot be mixed (25.859641ms)
+▶ R009-I2: each per-source request limit is specified and meaningful
+  ✖ missing source timeout (4.513328ms)
+  ✖ zero source timeout (4.085567ms)
+  ✖ negative redirect allowance (4.290584ms)
+  ✖ missing concurrency allowance (3.984308ms)
+  ✖ fractional concurrency allowance (4.054937ms)
+  ✖ negative request rate (4.369036ms)
+✖ R009-I2: each per-source request limit is specified and meaningful (30.380556ms)
+▶ R009-I3: evidence-bearing retention overrides permit shorter/longer days, not undefined durations
+  ✔ explicit supported 14-day override (4.181243ms)
+  ✔ explicit supported 120-day override (4.065647ms)
+  ✖ invalid evidenced duration 0 (4.150078ms)
+  ✖ invalid evidenced duration -1 (4.307938ms)
+  ✖ invalid evidenced duration 1.5 (4.375268ms)
+  ✖ invalid evidenced duration null (5.422446ms)
+  ✖ missing evidenced duration (5.26175ms)
+  ✔ shortened security/audit protection (3.576239ms)
+  ✔ removed dependency lineage protection (2.688238ms)
+✖ R009-I3: evidence-bearing retention overrides permit shorter/longer days, not undefined durations (39.152644ms)
+▶ R009-I4: malformed strict ingestion records fail despite intact version labels
+  ✔ extra fetch property (6.367225ms)
+  ✔ missing capture content address (0.896093ms)
+  ✔ invalid fetch timestamp (0.593401ms)
+✔ R009-I4: malformed strict ingestion records fail despite intact version labels (8.236195ms)
+▶ R009-I5: schema-valid capture/fetch/receipt identities must describe the same observation
+  ✖ receipt source differs from capture source (0.638599ms)
+  ✖ receipt endpoint differs from fetch endpoint (0.527631ms)
+  ✖ receipt capture ID differs from cited capture (0.315872ms)
+  ✖ individually valid fetch and capture belong to different runs (0.542538ms)
+  ✖ individually valid fetch points to a different capture ID (0.542833ms)
+  ✔ canonical basis cannot disguise a different hash version (0.243914ms)
+✖ R009-I5: schema-valid capture/fetch/receipt identities must describe the same observation (3.753163ms)
+▶ R009-I6: accepted capture byte/hash projections remain bound to the cited record
+  ✖ capture projection compressed byte drift (0.243472ms)
+  ✖ capture projection expanded byte drift (0.321478ms)
+  ✔ capture projection hash drift (0.257694ms)
+  ✖ receipt status contradicts captured fetch (0.339284ms)
+  ✔ truncated bytes cannot be an accepted complete capture (0.273909ms)
+✖ R009-I6: accepted capture byte/hash projections remain bound to the cited record (2.106312ms)
+▶ R009-I7: 304 reuse cannot invent new response bytes or different cached hashes
+  ✖ 304 receipt invents response bytes (0.25277ms)
+  ✖ 304 receipt claims a different HTTP status (0.248172ms)
+  ✖ 304 receipt changes retained capture hash (0.29317ms)
+✖ R009-I7: 304 reuse cannot invent new response bytes or different cached hashes (1.926374ms)
+{"event":"independent_review_subject_after","unchanged":true,"head":"35c27d66b521563c54535587b1be8a3698d15d80","tree":"67bb9746a7c3961281c1649f368fbdc368bf1f91","status":"","hashes":{"scripts/research-program/operating-bounds.mjs":"612261d10112591cfa2ff6ba95671a4b38add841919dfb3de20d6d0532aa501c","scripts/research-program/policy.json":"6230fe7b10aa5da20d9426cf4fcce39f0565e306ec512cbc791428544088fbda","scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json":"b0785f439b2ba525ad3b72ef7832adeb9eb6eccc5454a6eedaabdfbc746375eb","tests/research-program/operating-bounds.test.mjs":"ce461133178f97abb6e019836b288ab34ba03f429d2e5f6407a1ab61d564132a","verification/research-program/pr-009/task-binding.json":"e95d52807ba27997793896c3f61ffdfeeceeda6b65e09f8351e1bc715788a434","docs/research-program/handoffs/PR-009.json":"a0f5cf886a1c0707a37d11de61ffdb0ce903f5c6d3783606565dfe22b0415264","docs/research-program/execution-ledger.json":"b3cf57383aba462a60cd72a947903d7ecc8bfabd8c7ff8f242a5e4055281ab2c","packages/connectors/src/descriptors.mjs":"7c8ce9c616cdecc9fa3c2bc7b8f344426bb71b9ad2edc95c99abbf4ff92a1e5d","packages/connectors/src/route-manifest.mjs":"be3787542b8c27ed3d7f294ae88789c9530717f2741cfd862ee5a24f46197bfc","packages/connectors/src/canonical.mjs":"ba524d6baa275bc5ca05e4b3cc9dac9dda02cda0992a2b8f8cf2ec762da9cb48","contracts/ingestion/v1.0.0/fixtures/valid-fixtures.json":"f558231315f7f57de06a6cc10fb95a175ddef4da30d310b98d581464452b5038","contracts/ingestion/v1.0.0/schemas/metadata-fetch.schema.json":"5981d9bdb78f5233aed1bca98afe760a68ec773c9966c53e69f41ed50287a456","contracts/ingestion/v1.0.0/schemas/capture-reference.schema.json":"8b38c9bd5c5291121010fad275d562248d1778f0fa9bc4ce284935daf20ae285","contracts/ingestion/v1.0.0/tools/schema.mjs":"23d310fc92819bef85995632457e98f6e1252af57ffd5689750a414e1341f459","contracts/ingestion/v1.0.0/tools/semantics.mjs":"26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639","package-lock.json":"f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8"}}
+ℹ tests 43
+ℹ suites 0
+ℹ pass 16
+ℹ fail 27
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 565.148679
+
+✖ failing tests:
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:11
+✖ missing source timeout (4.513328ms)
+  AssertionError [ERR_ASSERTION]: missing source timeout must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:171:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativePolicy (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:197:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:11
+✖ zero source timeout (4.085567ms)
+  AssertionError [ERR_ASSERTION]: zero source timeout must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:171:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativePolicy (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:198:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:11
+✖ negative redirect allowance (4.290584ms)
+  AssertionError [ERR_ASSERTION]: negative redirect allowance must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:171:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativePolicy (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:199:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:11
+✖ missing concurrency allowance (3.984308ms)
+  AssertionError [ERR_ASSERTION]: missing concurrency allowance must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:171:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativePolicy (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:200:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:11
+✖ fractional concurrency allowance (4.054937ms)
+  AssertionError [ERR_ASSERTION]: fractional concurrency allowance must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:171:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativePolicy (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:201:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:11
+✖ negative request rate (4.369036ms)
+  AssertionError [ERR_ASSERTION]: negative request rate must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:171:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativePolicy (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:202:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:11
+✖ invalid evidenced duration 0 (4.150078ms)
+  AssertionError [ERR_ASSERTION]: invalid evidenced duration 0 must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:171:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativePolicy (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:220:42)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:11
+✖ invalid evidenced duration -1 (4.307938ms)
+  AssertionError [ERR_ASSERTION]: invalid evidenced duration -1 must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:171:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativePolicy (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:220:42)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:11
+✖ invalid evidenced duration 1.5 (4.375268ms)
+  AssertionError [ERR_ASSERTION]: invalid evidenced duration 1.5 must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:171:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativePolicy (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:220:42)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:11
+✖ invalid evidenced duration null (5.422446ms)
+  AssertionError [ERR_ASSERTION]: invalid evidenced duration null must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:171:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativePolicy (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:220:42)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:11
+✖ missing evidenced duration (5.26175ms)
+  AssertionError [ERR_ASSERTION]: missing evidenced duration must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:171:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativePolicy (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:169:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:223:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:11
+✖ receipt source differs from capture source (0.638599ms)
+  AssertionError [ERR_ASSERTION]: receipt source differs from capture source must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:178:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativeReceipt (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:243:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:11
+✖ receipt endpoint differs from fetch endpoint (0.527631ms)
+  AssertionError [ERR_ASSERTION]: receipt endpoint differs from fetch endpoint must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:178:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativeReceipt (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:244:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:11
+✖ receipt capture ID differs from cited capture (0.315872ms)
+  AssertionError [ERR_ASSERTION]: receipt capture ID differs from cited capture must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:178:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativeReceipt (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:245:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:246:11
+✖ individually valid fetch and capture belong to different runs (0.542538ms)
+  AssertionError [ERR_ASSERTION]: mixed observation runs must be rejected: {"valid":true,"receipt":{"contract_version":"ushso.research-program.evidence-receipt.v1.0.0","receipt_id":"receipt_pr009_independent_captured","request_type":"catalog_metadata","route_match":"matched_descriptor_route","observation_label":null,"source_id":"source_data_cms_catalog","descriptor_id":"descriptor_data_cms_data_json_fixture_v1","endpoint_id":"endpoint_data_cms_data_json","template_id":"route_data_cms_data_json","configuration_revision":1,"descriptor_hash":{"algorithm":"sha256","hash_basis":"ushso-canonical-json.v1","hash_version":"ushso-canonical-json.v1","sha256":"1afce4134cf1fe877786ee484ec6f9f09eee396780934d5f12ac77e866272445"},"purpose":"catalog_metadata","expected_content_classes":["catalog_collection","catalog_item_record"],"safe_final_locator":{"host":"data.cms.gov","path":"/data.json"},"redirect_count":0,"observed_status":200,"observed_media_type":"application/json","observed_bytes":512,"truncated":false,"observed_rejected_body_sha256":null,"capture":{"capture_ref_id":"capture_cms_page_001","raw_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","semantic_sha256":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","compressed_bytes":512,"decompressed_bytes":512,"classification":"catalog_metadata"},"underlying_records":{"metadata_fetch":{"contract_version":"ingestion.v1.0.0","fetch_id":"fetch_cms_page_001","run_id":"run_cms_20260830","job_id":"job_cms_page_001","endpoint_id":"endpoint_data_cms_data_json","template_id":"route_data_cms_data_json","purpose":"catalog_metadata","target_class":"catalog_root","request_validators":{"etag":"\"catalog-v156\"","last_modified":"Fri, 28 Aug 2026 12:00:00 GMT"},"response_status":200,"outcome":"captured","capture_ref_id":"capture_cms_page_001","reused_capture_ref_id":null,"failure":null,"response_bytes":512,"decompressed_bytes":512,"redirect_count":0,"observed_at":"2026-08-30T00:01:03.000Z"},"capture_reference":{"contract_version":"ingestion.v1.0.0","capture_ref_id":"capture_cms_page_001","source_id":"source_data_cms_catalog","run_id":"run_pr009_other","classification":"catalog_metadata","source_locator":{"endpoint_id":"endpoint_data_cms_data_json","template_id":"route_data_cms_data_json","final_host":"data.cms.gov","final_path_class":"catalog_root","redacted_locator":"https://data.cms.gov/data.json"},"safe_response_headers":{"etag":"\"catalog-v157\"","last_modified":"Sat, 29 Aug 2026 12:00:00 GMT","content_type":"application/json","content_length":512,"cache_control":"public, max-age=300"},"media_type":"application/json","compressed_bytes":512,"decompressed_bytes":512,"raw_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","semantic_sha256":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","r2_key":"captures/sha256/aa/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","r2_conditional_write_confirmed":true,"connector_version":"1.0.0","evidence_ref_id":"evidence_capture_cms_001","clocks":{"data_coverage":{"state":"known","start":"2025-01-01","end":"2025-12-31","semantics":"calendar"},"publisher_time":{"state":"known","released_at":"2026-08-28T00:00:00.000Z","modified_at":"2026-08-29T12:00:00.000Z"},"observed_at":"2026-08-30T00:01:03.000Z","recorded_at":"2026-08-30T00:01:04.000Z","superseded_at":null},"captured_at":"2026-08-30T00:01:03.000Z"}},"parser":{"state":"not_run","identity":null},"connector_identity":{"connector_name":"dcat-data-json","connector_version":"1.0.0"},"attempt_outcome":"captured","payload_access_verified":false,"schema_validated":true,"next_action":"none","observed_at":"2026-08-30T00:01:03.000Z","truth_boundaries":{"http_status_is_not_content_success":true,"catalog_membership_is_not_payload_access":true,"truncated_bytes_do_not_imply_schema_success":true}},"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:250:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:246:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:252:11
+✖ individually valid fetch points to a different capture ID (0.542833ms)
+  AssertionError [ERR_ASSERTION]: fetch/capture reference disagreement must be rejected: {"valid":true,"receipt":{"contract_version":"ushso.research-program.evidence-receipt.v1.0.0","receipt_id":"receipt_pr009_independent_captured","request_type":"catalog_metadata","route_match":"matched_descriptor_route","observation_label":null,"source_id":"source_data_cms_catalog","descriptor_id":"descriptor_data_cms_data_json_fixture_v1","endpoint_id":"endpoint_data_cms_data_json","template_id":"route_data_cms_data_json","configuration_revision":1,"descriptor_hash":{"algorithm":"sha256","hash_basis":"ushso-canonical-json.v1","hash_version":"ushso-canonical-json.v1","sha256":"1afce4134cf1fe877786ee484ec6f9f09eee396780934d5f12ac77e866272445"},"purpose":"catalog_metadata","expected_content_classes":["catalog_collection","catalog_item_record"],"safe_final_locator":{"host":"data.cms.gov","path":"/data.json"},"redirect_count":0,"observed_status":200,"observed_media_type":"application/json","observed_bytes":512,"truncated":false,"observed_rejected_body_sha256":null,"capture":{"capture_ref_id":"capture_cms_page_001","raw_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","semantic_sha256":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","compressed_bytes":512,"decompressed_bytes":512,"classification":"catalog_metadata"},"underlying_records":{"metadata_fetch":{"contract_version":"ingestion.v1.0.0","fetch_id":"fetch_cms_page_001","run_id":"run_cms_20260830","job_id":"job_cms_page_001","endpoint_id":"endpoint_data_cms_data_json","template_id":"route_data_cms_data_json","purpose":"catalog_metadata","target_class":"catalog_root","request_validators":{"etag":"\"catalog-v156\"","last_modified":"Fri, 28 Aug 2026 12:00:00 GMT"},"response_status":200,"outcome":"captured","capture_ref_id":"capture_pr009_other","reused_capture_ref_id":null,"failure":null,"response_bytes":512,"decompressed_bytes":512,"redirect_count":0,"observed_at":"2026-08-30T00:01:03.000Z"},"capture_reference":{"contract_version":"ingestion.v1.0.0","capture_ref_id":"capture_cms_page_001","source_id":"source_data_cms_catalog","run_id":"run_cms_20260830","classification":"catalog_metadata","source_locator":{"endpoint_id":"endpoint_data_cms_data_json","template_id":"route_data_cms_data_json","final_host":"data.cms.gov","final_path_class":"catalog_root","redacted_locator":"https://data.cms.gov/data.json"},"safe_response_headers":{"etag":"\"catalog-v157\"","last_modified":"Sat, 29 Aug 2026 12:00:00 GMT","content_type":"application/json","content_length":512,"cache_control":"public, max-age=300"},"media_type":"application/json","compressed_bytes":512,"decompressed_bytes":512,"raw_sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","semantic_sha256":"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff","r2_key":"captures/sha256/aa/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","r2_conditional_write_confirmed":true,"connector_version":"1.0.0","evidence_ref_id":"evidence_capture_cms_001","clocks":{"data_coverage":{"state":"known","start":"2025-01-01","end":"2025-12-31","semantics":"calendar"},"publisher_time":{"state":"known","released_at":"2026-08-28T00:00:00.000Z","modified_at":"2026-08-29T12:00:00.000Z"},"observed_at":"2026-08-30T00:01:03.000Z","recorded_at":"2026-08-30T00:01:04.000Z","superseded_at":null},"captured_at":"2026-08-30T00:01:03.000Z"}},"parser":{"state":"not_run","identity":null},"connector_identity":{"connector_name":"dcat-data-json","connector_version":"1.0.0"},"attempt_outcome":"captured","payload_access_verified":false,"schema_validated":true,"next_action":"none","observed_at":"2026-08-30T00:01:03.000Z","truth_boundaries":{"http_status_is_not_content_success":true,"catalog_membership_is_not_payload_access":true,"truncated_bytes_do_not_imply_schema_success":true}},"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:255:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:252:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:11
+✖ capture projection compressed byte drift (0.243472ms)
+  AssertionError [ERR_ASSERTION]: capture projection compressed byte drift must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:178:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativeReceipt (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:262:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:11
+✖ capture projection expanded byte drift (0.321478ms)
+  AssertionError [ERR_ASSERTION]: capture projection expanded byte drift must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:178:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativeReceipt (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:263:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:11
+✖ receipt status contradicts captured fetch (0.339284ms)
+  AssertionError [ERR_ASSERTION]: receipt status contradicts captured fetch must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:178:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativeReceipt (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:265:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:11
+✖ 304 receipt invents response bytes (0.25277ms)
+  AssertionError [ERR_ASSERTION]: 304 receipt invents response bytes must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:178:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativeReceipt (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:272:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:11
+✖ 304 receipt claims a different HTTP status (0.248172ms)
+  AssertionError [ERR_ASSERTION]: 304 receipt claims a different HTTP status must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:178:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativeReceipt (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:273:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:11
+✖ 304 receipt changes retained capture hash (0.29317ms)
+  AssertionError [ERR_ASSERTION]: 304 receipt changes retained capture hash must be rejected: {"valid":true,"issues":[]}
+  
+  true !== false
+  
+      at rejected (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:130:10)
+      at TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:178:5)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async negativeReceipt (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:175:3)
+      at async TestContext.<anonymous> (file:///mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-independent-boundaries.test.mjs:274:3)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

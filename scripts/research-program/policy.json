@@ -1,0 +1,916 @@
+{
+  "policy_version": "ushso.research-program.operating-bounds.v1.0.0",
+  "lifecycle": "fixture_only",
+  "external_authorization_gate": "AUTH-04",
+  "activation": {
+    "live_network": false,
+    "receipt_writes": false,
+    "database_writes": false,
+    "queue_activation": false,
+    "workflow_activation": false,
+    "deletion_activation": false,
+    "source_egress": false,
+    "activation_authorized": false
+  },
+  "descriptor_identity": {
+    "hash_algorithm": "sha256",
+    "hash_basis": "ushso-canonical-json.v1",
+    "hash_version": "ushso-canonical-json.v1",
+    "encoding": "utf-8",
+    "object_key_order": "recursively_sorted",
+    "array_order": "preserved",
+    "distinct_from_exact_published_bytes": true,
+    "registry_source_revisions_descriptor_sha256": "unresolved_no_insertion_invariant",
+    "job_identity_rule": "Carry a registered lowercase 64-hex digest unchanged only when its named hash_basis is ushso-canonical-json.v1. Never derive a digest from configuration_revision or a source/endpoint/revision tuple."
+  },
+  "forbidden_operation_classes": [
+    "source_data_payload",
+    "query_execution",
+    "data_download",
+    "archive_member",
+    "form_submission",
+    "login",
+    "payment",
+    "authorization_workflow",
+    "arbitrary_url",
+    "secret_in_policy_or_receipt",
+    "unbounded_file",
+    "unapproved_redirect"
+  ],
+  "global_bounds": {
+    "timeout_seconds": 30,
+    "maximum_redirects": 1,
+    "structural_response_limits": {
+      "maximum_response_depth": 32,
+      "maximum_response_nodes": 20000,
+      "maximum_records": 1000,
+      "maximum_links": 1000,
+      "maximum_observations": 1000
+    },
+    "retry": {
+      "stage": "harvest_page",
+      "maximum_delivery_attempts": 6,
+      "transport_max_retries": 5,
+      "minimum_delay_seconds": 5,
+      "maximum_delay_seconds": 900,
+      "exhausted_outcome": "durable_dlq_and_partial_unpublished"
+    },
+    "dlq": {
+      "policy_version": "dlq-sink.v1",
+      "maximum_delivery_attempts": 6,
+      "transport_max_retries": 5,
+      "maximum_batch_size": 1,
+      "minimum_delay_seconds": 30,
+      "maximum_delay_seconds": 300,
+      "second_dead_letter_queue_allowed": false
+    },
+    "retention": {
+      "raw_metadata_documentation_active_days": 90,
+      "security_and_audit_receipt_days": 365,
+      "queue_transport_days": 4,
+      "hashes_and_lineage_outlive_raw": true
+    },
+    "aggregate_sample_store": "disabled_pending_rights_and_privacy_review"
+  },
+  "sources": [
+    {
+      "source_id": "source_data_gov_v4",
+      "descriptor_id": "descriptor_data_gov_v4_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_data_gov_v4_search",
+          "template_id": "route_data_gov_v4_inventory",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/technology/datagov/v4/search",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_data_cms_catalog",
+      "descriptor_id": "descriptor_data_cms_data_json_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_data_cms_data_json",
+          "template_id": "route_data_cms_data_json",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "catalog_root",
+          "path_template": "/data.json",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        },
+        {
+          "endpoint_id": "endpoint_data_cms_docs",
+          "template_id": "route_data_cms_docs",
+          "purpose": "documentation",
+          "method": "GET",
+          "target_class": "documentation",
+          "path_template": "/resources/{slug}",
+          "expected_content_classes": [
+            "documentation_page"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_cms_provider_data",
+      "descriptor_id": "descriptor_cms_provider_data_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_cms_provider_metastore",
+          "template_id": "route_cms_provider_dataset_items",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/provider-data/api/1/metastore/schemas/dataset/items",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        },
+        {
+          "endpoint_id": "endpoint_cms_provider_item",
+          "template_id": "route_cms_provider_dataset_item",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "exact_item",
+          "path_template": "/provider-data/api/1/metastore/schemas/dataset/items/{id}",
+          "expected_content_classes": [
+            "catalog_item_record"
+          ]
+        },
+        {
+          "endpoint_id": "endpoint_cms_provider_docs",
+          "template_id": "route_cms_provider_docs",
+          "purpose": "documentation",
+          "method": "GET",
+          "target_class": "documentation",
+          "path_template": "/provider-data/docs",
+          "expected_content_classes": [
+            "documentation_page"
+          ]
+        },
+        {
+          "endpoint_id": "endpoint_cms_provider_access",
+          "template_id": "route_cms_provider_access_probe",
+          "purpose": "access_probe",
+          "method": "HEAD",
+          "target_class": "exact_distribution",
+          "path_template": "/provider-data/sites/default/files/{distribution}",
+          "expected_content_classes": [
+            "access_status_headers"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_cdc_socrata",
+      "descriptor_id": "descriptor_cdc_socrata_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_cdc_socrata_metadata",
+          "template_id": "route_cdc_socrata_inventory",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/api/views/metadata/v1",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        },
+        {
+          "endpoint_id": "endpoint_cdc_socrata_schema",
+          "template_id": "route_cdc_socrata_view_schema",
+          "purpose": "schema",
+          "method": "GET",
+          "target_class": "exact_item",
+          "path_template": "/api/views/{id}",
+          "expected_content_classes": [
+            "schema_description",
+            "data_dictionary"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_cdc_non_socrata",
+      "descriptor_id": "descriptor_cdc_non_socrata_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_cdc_non_socrata_inventory",
+          "template_id": "route_cdc_non_socrata_data_json",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "catalog_root",
+          "path_template": "/data.json",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        },
+        {
+          "endpoint_id": "endpoint_cdc_non_socrata_docs",
+          "template_id": "route_cdc_non_socrata_docs",
+          "purpose": "documentation",
+          "method": "GET",
+          "target_class": "documentation",
+          "path_template": "/{program}/data-and-statistics/{slug}.html",
+          "expected_content_classes": [
+            "documentation_page"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_census_metadata",
+      "descriptor_id": "descriptor_census_metadata_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_census_metadata",
+          "template_id": "route_census_dataset_inventory",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/data.json",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        },
+        {
+          "endpoint_id": "endpoint_census_variables",
+          "template_id": "route_census_variables_metadata",
+          "purpose": "schema",
+          "method": "GET",
+          "target_class": "exact_item",
+          "path_template": "/data/{year}/{dataset_family}/{dataset}/variables.json",
+          "expected_content_classes": [
+            "schema_description",
+            "data_dictionary"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_hrsa_inventory",
+      "descriptor_id": "descriptor_hrsa_inventory_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_hrsa_data_json",
+          "template_id": "route_hrsa_data_json",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "catalog_root",
+          "path_template": "/data.json",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        },
+        {
+          "endpoint_id": "endpoint_hrsa_inventory_docs",
+          "template_id": "route_hrsa_inventory_docs",
+          "purpose": "documentation",
+          "method": "GET",
+          "target_class": "documentation",
+          "path_template": "/topics/health-workforce/",
+          "expected_content_classes": [
+            "documentation_page"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_ahrq_family_inventory",
+      "descriptor_id": "descriptor_ahrq_family_inventory_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_ahrq_family_inventory",
+          "template_id": "route_ahrq_family_inventory",
+          "purpose": "documentation",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/data/data-resources/index.html",
+          "expected_content_classes": [
+            "documentation_page"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_irs_teos_eobmf",
+      "descriptor_id": "descriptor_irs_teos_eobmf_inventory_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_irs_teos_inventory",
+          "template_id": "route_irs_teos_inventory",
+          "purpose": "documentation",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/charities-non-profits/tax-exempt-organization-search-bulk-data-downloads",
+          "expected_content_classes": [
+            "documentation_page"
+          ]
+        },
+        {
+          "endpoint_id": "endpoint_irs_eobmf_inventory",
+          "template_id": "route_irs_eobmf_inventory",
+          "purpose": "documentation",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf",
+          "expected_content_classes": [
+            "documentation_page"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_irs_form990_manifest",
+      "descriptor_id": "descriptor_irs_form990_manifest_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_irs_form990_index",
+          "template_id": "route_irs_form990_index",
+          "purpose": "documentation",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/pub/epostcard/990/xml/2026/",
+          "expected_content_classes": [
+            "documentation_page"
+          ]
+        },
+        {
+          "endpoint_id": "endpoint_irs_form990_xsd",
+          "template_id": "route_irs_form990_xsd",
+          "purpose": "schema",
+          "method": "GET",
+          "target_class": "exact_item",
+          "path_template": "/pub/epostcard/990/xml/2026/{schema_name}.xsd",
+          "expected_content_classes": [
+            "schema_description"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_irs_soi_inventory",
+      "descriptor_id": "descriptor_irs_soi_inventory_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_irs_soi_inventory",
+          "template_id": "route_irs_soi_inventory",
+          "purpose": "documentation",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/statistics/soi-tax-stats-statistical-data-files",
+          "expected_content_classes": [
+            "documentation_page"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_pa_socrata",
+      "descriptor_id": "descriptor_pa_socrata_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_pa_socrata_inventory",
+          "template_id": "route_pa_socrata_inventory",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/api/views/metadata/v1",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        },
+        {
+          "endpoint_id": "endpoint_pa_socrata_schema",
+          "template_id": "route_pa_socrata_schema",
+          "purpose": "schema",
+          "method": "GET",
+          "target_class": "exact_item",
+          "path_template": "/api/views/{id}",
+          "expected_content_classes": [
+            "schema_description",
+            "data_dictionary"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_ca_ckan_canary",
+      "descriptor_id": "descriptor_ca_ckan_canary_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_ca_ckan_search",
+          "template_id": "route_ca_ckan_search",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/api/3/action/package_search",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_pa_arcgis_canary",
+      "descriptor_id": "descriptor_pa_arcgis_canary_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_pa_arcgis_search",
+          "template_id": "route_pa_arcgis_search",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/sharing/rest/search",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_pa_static_canary",
+      "descriptor_id": "descriptor_pa_static_canary_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_pa_static_inventory",
+          "template_id": "route_pa_static_inventory",
+          "purpose": "documentation",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/agencies/health/facilities/hospitals.html",
+          "expected_content_classes": [
+            "documentation_page"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_harvard_dataverse",
+      "descriptor_id": "descriptor_harvard_dataverse_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_harvard_dataverse_search",
+          "template_id": "route_harvard_dataverse_search",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/api/search",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_datacite",
+      "descriptor_id": "descriptor_datacite_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_datacite_dois",
+          "template_id": "route_datacite_dois",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/dois",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "source_cdc_stacks_oai",
+      "descriptor_id": "descriptor_cdc_stacks_oai_fixture_v1",
+      "configuration_revision": 1,
+      "source_state": "paused",
+      "bounds": {
+        "timeout_seconds": 30,
+        "maximum_pages": 1000,
+        "maximum_response_bytes": 5242880,
+        "maximum_decompressed_bytes": 10485760,
+        "maximum_run_seconds": 7200,
+        "maximum_redirects": 1
+      },
+      "origin_policy": {
+        "maximum_concurrency": 2,
+        "requests_per_second": 1,
+        "burst": 2,
+        "minimum_retry_delay_seconds": 5,
+        "maximum_retry_delay_seconds": 900
+      },
+      "retention": {
+        "class": "raw_metadata_documentation",
+        "active_days": 90,
+        "override": null
+      },
+      "routes": [
+        {
+          "endpoint_id": "endpoint_cdc_stacks_oai",
+          "template_id": "route_cdc_stacks_oai",
+          "purpose": "catalog_metadata",
+          "method": "GET",
+          "target_class": "collection",
+          "path_template": "/oai",
+          "expected_content_classes": [
+            "catalog_collection",
+            "catalog_item_record"
+          ]
+        }
+      ]
+    }
+  ]
+}

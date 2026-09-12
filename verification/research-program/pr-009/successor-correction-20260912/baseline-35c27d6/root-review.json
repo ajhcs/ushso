@@ -1,0 +1,102 @@
+{
+  "format": "ushso.pr009-independent-baseline-review.v1",
+  "reviewer": "Astra/root",
+  "recorded_at": "2026-09-12T05:24:23.051658+00:00",
+  "verdict": "changes_requested",
+  "subject": {
+    "head": "35c27d66b521563c54535587b1be8a3698d15d80",
+    "tree": "67bb9746a7c3961281c1649f368fbdc368bf1f91",
+    "repo": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr009-successor-20260912"
+  },
+  "harness_sha256": "5dd21893ec8fbc7a983dc8300108256bcf423c259b605b7148e0a55c2b23015a",
+  "leaf_cases": {
+    "total": 36,
+    "passed": 14,
+    "failed": 22
+  },
+  "node_report_including_seven_parent_tests": {
+    "total": 43,
+    "passed": 16,
+    "failed": 27
+  },
+  "original_producer_tests": {
+    "passed": 9,
+    "failed": 0
+  },
+  "default_live_handoff_passed": true,
+  "adr_audit_passed": true,
+  "findings": [
+    {
+      "id": "PR009-REVIEW-LIMITS",
+      "cases": 6,
+      "detail": "Missing, nonpositive or fractional per-source limits can pass validation."
+    },
+    {
+      "id": "PR009-REVIEW-RETENTION",
+      "cases": 5,
+      "detail": "Evidence presence can authorize absent, nonpositive or fractional duration."
+    },
+    {
+      "id": "PR009-REVIEW-IDENTITIES",
+      "cases": 5,
+      "detail": "Individually schema-valid fetch, capture and receipt identities can refer to different observations."
+    },
+    {
+      "id": "PR009-REVIEW-CAPTURE-PROJECTION",
+      "cases": 3,
+      "detail": "Captured byte counts and observed status can disagree with the cited source records."
+    },
+    {
+      "id": "PR009-REVIEW-304-PROJECTION",
+      "cases": 3,
+      "detail": "A304receipt can claim new response bytes, wrong status or altered cached hashes."
+    }
+  ],
+  "failed_leaf_names": [
+    "missing source timeout",
+    "zero source timeout",
+    "negative redirect allowance",
+    "missing concurrency allowance",
+    "fractional concurrency allowance",
+    "negative request rate",
+    "invalid evidenced duration 0",
+    "invalid evidenced duration -1",
+    "invalid evidenced duration 1.5",
+    "invalid evidenced duration null",
+    "missing evidenced duration",
+    "receipt source differs from capture source",
+    "receipt endpoint differs from fetch endpoint",
+    "receipt capture ID differs from cited capture",
+    "individually valid fetch and capture belong to different runs",
+    "individually valid fetch points to a different capture ID",
+    "capture projection compressed byte drift",
+    "capture projection expanded byte drift",
+    "receipt status contradicts captured fetch",
+    "304 receipt invents response bytes",
+    "304 receipt claims a different HTTP status",
+    "304 receipt changes retained capture hash"
+  ],
+  "valid_controls": "Real released strict schemas and positive controls passed; retained 14/120-day evidenced overrides remain valid. These are actual first implementation failures, not expected-negative successes.",
+  "unchanged_after_checks": true,
+  "source_hashes": {
+    "scripts/research-program/operating-bounds.mjs": "612261d10112591cfa2ff6ba95671a4b38add841919dfb3de20d6d0532aa501c",
+    "scripts/research-program/policy.json": "6230fe7b10aa5da20d9426cf4fcce39f0565e306ec512cbc791428544088fbda",
+    "scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json": "b0785f439b2ba525ad3b72ef7832adeb9eb6eccc5454a6eedaabdfbc746375eb",
+    "tests/research-program/operating-bounds.test.mjs": "ce461133178f97abb6e019836b288ab34ba03f429d2e5f6407a1ab61d564132a",
+    "verification/research-program/pr-009/task-binding.json": "e95d52807ba27997793896c3f61ffdfeeceeda6b65e09f8351e1bc715788a434",
+    "docs/research-program/handoffs/PR-009.json": "a0f5cf886a1c0707a37d11de61ffdb0ce903f5c6d3783606565dfe22b0415264",
+    "docs/research-program/execution-ledger.json": "b3cf57383aba462a60cd72a947903d7ecc8bfabd8c7ff8f242a5e4055281ab2c",
+    "packages/connectors/src/descriptors.mjs": "7c8ce9c616cdecc9fa3c2bc7b8f344426bb71b9ad2edc95c99abbf4ff92a1e5d",
+    "packages/connectors/src/route-manifest.mjs": "be3787542b8c27ed3d7f294ae88789c9530717f2741cfd862ee5a24f46197bfc",
+    "packages/connectors/src/canonical.mjs": "ba524d6baa275bc5ca05e4b3cc9dac9dda02cda0992a2b8f8cf2ec762da9cb48",
+    "contracts/ingestion/v1.0.0/fixtures/valid-fixtures.json": "f558231315f7f57de06a6cc10fb95a175ddef4da30d310b98d581464452b5038",
+    "contracts/ingestion/v1.0.0/schemas/metadata-fetch.schema.json": "5981d9bdb78f5233aed1bca98afe760a68ec773c9966c53e69f41ed50287a456",
+    "contracts/ingestion/v1.0.0/schemas/capture-reference.schema.json": "8b38c9bd5c5291121010fad275d562248d1778f0fa9bc4ce284935daf20ae285",
+    "contracts/ingestion/v1.0.0/tools/schema.mjs": "23d310fc92819bef85995632457e98f6e1252af57ffd5689750a414e1341f459",
+    "contracts/ingestion/v1.0.0/tools/semantics.mjs": "26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639",
+    "package-lock.json": "f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8"
+  },
+  "engineering_accepted": false,
+  "qualification": "unresolved",
+  "production_changed": false
+}

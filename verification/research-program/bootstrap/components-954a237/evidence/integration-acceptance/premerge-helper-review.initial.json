@@ -1,0 +1,50 @@
+{
+  "format": "ushso.independent-premerge-helper-review.v1",
+  "recorded_at": "2026-09-12T04:39:21.381109Z",
+  "reviewer": "native Codex subagent /root/publication_readiness",
+  "subject": {
+    "helper": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/merge-reviewed-combined.py",
+    "sha256": "20df473be34aa38526816d99c16f0c5295f765f50ae9e3b72ddbcf35ab614df0",
+    "preserved_bytes": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/integration-acceptance/merge-helper.initial-reviewed.py",
+    "candidate_head": "954a237a8984d06f5ea0ab15f83c71ce210bf09a",
+    "candidate_tree": "a781e9801224af92b51389fb898f0b67ab261982"
+  },
+  "verdict": "local_helper_changes_requested",
+  "findings": [
+    {
+      "id": "MERGE-P2-1",
+      "priority": 2,
+      "file": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/merge-reviewed-combined.py",
+      "line": 43,
+      "title": "Fresh CI check reads a historical attempt without checking the current run",
+      "body": "A later rerun can leave attempt 1 successful while the current run is pending or failed. Query actions/runs/RUN as well and require the current run_attempt to be 1, completed and successful before using the attempt-1 job evidence."
+    },
+    {
+      "id": "MERGE-P2-2",
+      "priority": 2,
+      "file": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/merge-reviewed-combined.py",
+      "line": 26,
+      "title": "Pause is not checked before each new subprocess/API read",
+      "body": "A reset during the preflight/read sequence permits further network reads and evidence writes until the next coarse pause_guard. Put a pause check in command/API wrappers and keep any exception explicit and limited to finishing the already-issued atomic merge readback."
+    },
+    {
+      "id": "MERGE-P2-3",
+      "priority": 2,
+      "file": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/merge-reviewed-combined.py",
+      "line": 96,
+      "title": "Applied merges lose canonical receipt when the command reports a transport failure",
+      "body": "The helper reads back the PR but then requires a zero CLI exit even if merged=true. A server-applied merge followed by a command error is an ambiguous transport outcome that must retain the error and finish merge-object/receipt readback from confirmed GitHub state, without issuing another merge."
+    }
+  ],
+  "checks_without_findings": [
+    "Exact head/tree/base/repository/worktree identity checks and writer lock verification are present.",
+    "Explicit normal merge uses --match-head-commit for954; no auto/admin/squash/rebase/delete flags or main/#12 mutation.",
+    "The helper records mark-ready and merge-command outcomes before subsequent work, and checks actual merge tree/parents."
+  ],
+  "limits": [
+    "Static review only; helper not executed and no merge decision produced.",
+    "Hosted CI was still running and the controller-premerge-decision file did not yet exist; their completed bindings require review before execution.",
+    "Normal GitHub merge protects the head, while the base is checked immediately around preflight and validated after merge. Controller ownership must preserve the integration base during the operation."
+  ],
+  "public_mutations_performed_by_this_review": 0
+}
