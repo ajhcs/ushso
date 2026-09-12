@@ -161,7 +161,10 @@ export async function validateOperatingBoundsPolicy(policy, options = {}) {
     issues.push(issue('DESCRIPTOR_HASH_CLAIMS_COLLAPSED', '/descriptor_identity/distinct_from_exact_published_bytes', 'exact published bytes remain a distinct unresolved claim'));
   }
 
-  const forbidden = new Set(policy.forbidden_operation_classes ?? []);
+  if (!Array.isArray(policy.forbidden_operation_classes)) {
+    issues.push(issue('FORBIDDEN_CLASSES_NOT_ARRAY', '/forbidden_operation_classes', 'forbidden operation classes must be an array'));
+  }
+  const forbidden = new Set(Array.isArray(policy.forbidden_operation_classes) ? policy.forbidden_operation_classes : []);
   for (const required of REQUIRED_FORBIDDEN_CLASSES) {
     if (!forbidden.has(required)) {
       issues.push(issue('FORBIDDEN_CLASS_MISSING', '/forbidden_operation_classes', required));
@@ -254,11 +257,16 @@ export async function validateOperatingBoundsPolicy(policy, options = {}) {
   const sources = policy.sources ?? [];
   if (!Array.isArray(sources) || sources.length === 0) {
     issues.push(issue('SOURCES_MISSING', '/sources', 'policy must enumerate paused descriptor sources'));
+    return { valid: false, issues };
   }
 
   const seenSources = new Set();
   for (const [index, source] of sources.entries()) {
     const pointer = `/sources/${index}`;
+    if (!source || typeof source !== 'object' || Array.isArray(source)) {
+      issues.push(issue('SOURCE_NOT_OBJECT', pointer, 'each policy source must be an object'));
+      continue;
+    }
     if (seenSources.has(source.source_id)) {
       issues.push(issue('SOURCE_DUPLICATE', `${pointer}/source_id`, source.source_id));
     }
@@ -279,52 +287,64 @@ export async function validateOperatingBoundsPolicy(policy, options = {}) {
     }
 
     const bounds = source.bounds ?? {};
-    if (bounds.timeout_seconds > global.timeout_seconds) {
-      issues.push(issue('SOURCE_TIMEOUT_LOOSER', `${pointer}/bounds/timeout_seconds`, 'source timeout cannot exceed global timeout'));
+    if (!Number.isSafeInteger(bounds.timeout_seconds) || bounds.timeout_seconds < 1 || bounds.timeout_seconds > global.timeout_seconds) {
+      issues.push(issue('SOURCE_TIMEOUT_INVALID', pointer + '/bounds/timeout_seconds', 'source timeout must be a positive integer no greater than the global timeout'));
     }
-    if (bounds.maximum_redirects > descriptor.bounds.maximum_redirects || bounds.maximum_redirects > global.maximum_redirects) {
-      issues.push(issue('SOURCE_REDIRECTS_LOOSER', `${pointer}/bounds/maximum_redirects`, 'source redirects cannot exceed descriptor or global limits'));
+    if (!Number.isSafeInteger(bounds.maximum_redirects) || bounds.maximum_redirects < 0
+      || bounds.maximum_redirects > descriptor.bounds.maximum_redirects || bounds.maximum_redirects > global.maximum_redirects) {
+      issues.push(issue('SOURCE_REDIRECTS_INVALID', pointer + '/bounds/maximum_redirects', 'redirect allowance must be a nonnegative integer within descriptor and global limits'));
     }
     for (const key of ['maximum_pages', 'maximum_response_bytes', 'maximum_decompressed_bytes', 'maximum_run_seconds']) {
-      if (!Number.isInteger(bounds[key]) || bounds[key] > descriptor.bounds[key] || bounds[key] < 1) {
-        issues.push(issue('SOURCE_BOUND_LOOSER', `${pointer}/bounds/${key}`, `must be a positive integer no looser than descriptor ${descriptor.bounds[key]}`));
+      if (!Number.isSafeInteger(bounds[key]) || bounds[key] > descriptor.bounds[key] || bounds[key] < 1) {
+        issues.push(issue('SOURCE_BOUND_LOOSER', pointer + '/bounds/' + key, 'must be a positive integer no looser than the descriptor bound'));
       }
     }
 
     const origin = source.origin_policy ?? {};
-    if (origin.maximum_concurrency > descriptor.origin_policy.maximum_concurrency) {
-      issues.push(issue('SOURCE_CONCURRENCY_LOOSER', `${pointer}/origin_policy/maximum_concurrency`, 'concurrency cannot exceed the descriptor'));
+    for (const key of ['maximum_concurrency', 'burst']) {
+      if (!Number.isSafeInteger(origin[key]) || origin[key] < 1 || origin[key] > descriptor.origin_policy[key]) {
+        issues.push(issue('SOURCE_ORIGIN_BOUND_INVALID', pointer + '/origin_policy/' + key, 'must be a positive integer within the descriptor bound'));
+      }
     }
-    if (origin.requests_per_second > descriptor.origin_policy.requests_per_second) {
-      issues.push(issue('SOURCE_RATE_LOOSER', `${pointer}/origin_policy/requests_per_second`, 'rate cannot exceed the descriptor'));
-    }
-    if (origin.burst > descriptor.origin_policy.burst) {
-      issues.push(issue('SOURCE_BURST_LOOSER', `${pointer}/origin_policy/burst`, 'burst cannot exceed the descriptor'));
+    if (!Number.isFinite(origin.requests_per_second) || origin.requests_per_second <= 0
+      || origin.requests_per_second > descriptor.origin_policy.requests_per_second) {
+      issues.push(issue('SOURCE_RATE_INVALID', pointer + '/origin_policy/requests_per_second', 'request rate must be positive, finite and within the descriptor bound'));
     }
 
     const sourceRetention = source.retention ?? {};
     if (sourceRetention.class !== 'raw_metadata_documentation') {
-      issues.push(issue('UNAUTHORIZED_RETENTION_CLASS', `${pointer}/retention/class`, 'raw_metadata_documentation'));
+      issues.push(issue('UNAUTHORIZED_RETENTION_CLASS', pointer + '/retention/class', 'raw_metadata_documentation'));
+    }
+    if (!Number.isSafeInteger(sourceRetention.active_days) || sourceRetention.active_days < 1) {
+      issues.push(issue('RETENTION_DURATION_INVALID', pointer + '/retention/active_days', 'retention duration must be an explicit positive integer, including evidenced overrides'));
     }
     if (sourceRetention.active_days === 90) {
       if (sourceRetention.override !== null) {
-        issues.push(issue('DEFAULT_RETENTION_HAS_OVERRIDE', `${pointer}/retention/override`, 'default 90-day retention has no override object'));
+        issues.push(issue('DEFAULT_RETENTION_HAS_OVERRIDE', pointer + '/retention/override', 'default 90-day retention has no override object'));
       }
     } else {
       const override = sourceRetention.override ?? {};
       for (const field of ['owner', 'rationale', 'review_at', 'audit_event_id', 'legal_rights_recovery_evidence']) {
-        if (typeof override[field] !== 'string' || override[field].length === 0) {
-          issues.push(issue('RETENTION_OVERRIDE_INCOMPLETE', `${pointer}/retention/override/${field}`, 'non-default retention requires owner, rationale, review date, audit event, and rights/recovery evidence'));
+        if (typeof override[field] !== 'string' || override[field].trim().length === 0) {
+          issues.push(issue('RETENTION_OVERRIDE_INCOMPLETE', pointer + '/retention/override/' + field, 'non-default retention requires owner, rationale, review date, audit event, and rights/recovery evidence'));
         }
       }
     }
 
     const inventory = options.routeManifestInventory(descriptor);
     const policyRoutes = source.routes ?? [];
+    if (!Array.isArray(policyRoutes)) {
+      issues.push(issue('ROUTES_NOT_ARRAY', pointer + '/routes', 'policy routes must be an array'));
+      continue;
+    }
     const inventoryKeys = new Set(inventory.map((route) => `${route.endpoint_id}:${route.template_id}`));
     const policyKeys = new Set();
     for (const [routeIndex, route] of policyRoutes.entries()) {
       const routePointer = `${pointer}/routes/${routeIndex}`;
+      if (!route || typeof route !== 'object' || Array.isArray(route)) {
+        issues.push(issue('ROUTE_NOT_OBJECT', routePointer, 'each policy route must be an object'));
+        continue;
+      }
       const key = `${route.endpoint_id}:${route.template_id}`;
       policyKeys.add(key);
       const expected = inventory.find((candidate) => candidate.endpoint_id === route.endpoint_id && candidate.template_id === route.template_id);
@@ -423,6 +443,54 @@ export async function validateEvidenceReceipt(receipt, options = {}) {
   const captureRecord = receipt.underlying_records?.capture_reference ?? null;
   await validateUnderlyingRecord('metadata-fetch.schema.json', fetchRecord, options, issues, '/underlying_records/metadata_fetch');
   await validateUnderlyingRecord('capture-reference.schema.json', captureRecord, options, issues, '/underlying_records/capture_reference');
+
+  // Valid records must also agree with each other and with their receipt projection.
+  // These comparisons do not resolve an approved descriptor or verify its digest.
+  if (fetchRecord) {
+    for (const key of ['endpoint_id', 'template_id', 'purpose']) {
+      if (receipt[key] !== fetchRecord[key]) {
+        issues.push(issue('FETCH_RECEIPT_IDENTITY_MISMATCH', '/' + key, 'receipt identity must match the metadata-fetch record'));
+      }
+    }
+    for (const [field, source] of [['observed_status', 'response_status'], ['observed_bytes', 'response_bytes'], ['redirect_count', 'redirect_count'], ['observed_at', 'observed_at']]) {
+      if (receipt[field] !== fetchRecord[source]) {
+        issues.push(issue('FETCH_OBSERVATION_MISMATCH', '/' + field, 'receipt observation must copy the metadata-fetch record'));
+      }
+    }
+  }
+  if (captureRecord) {
+    for (const key of ['capture_ref_id', 'raw_sha256', 'semantic_sha256', 'compressed_bytes', 'decompressed_bytes', 'classification']) {
+      if (capture[key] !== captureRecord[key]) {
+        issues.push(issue('CAPTURE_PROJECTION_MISMATCH', '/capture/' + key, 'capture projection must copy the cited capture reference'));
+      }
+    }
+    if (receipt.source_id !== captureRecord.source_id) {
+      issues.push(issue('CAPTURE_SOURCE_MISMATCH', '/source_id', 'receipt and capture must identify the same source'));
+    }
+    for (const key of ['endpoint_id', 'template_id']) {
+      if (receipt[key] !== captureRecord.source_locator?.[key]) {
+        issues.push(issue('CAPTURE_ROUTE_MISMATCH', '/' + key, 'receipt and capture must identify the same route'));
+      }
+    }
+    if (receipt.attempt_outcome === 'captured' && receipt.observed_media_type !== captureRecord.media_type) {
+      issues.push(issue('CAPTURE_MEDIA_TYPE_MISMATCH', '/observed_media_type', 'new capture media type must copy the cited capture record'));
+    }
+    if (receipt.attempt_outcome === 'captured' && receipt.connector_identity.connector_version !== captureRecord.connector_version) {
+      issues.push(issue('CAPTURE_CONNECTOR_MISMATCH', '/connector_identity/connector_version', 'receipt must preserve the capture connector version'));
+    }
+  }
+  if (fetchRecord && captureRecord && receipt.attempt_outcome === 'captured') {
+    if (fetchRecord.run_id !== captureRecord.run_id || fetchRecord.capture_ref_id !== captureRecord.capture_ref_id) {
+      issues.push(issue('CAPTURE_FETCH_IDENTITY_MISMATCH', '/underlying_records', 'newly captured fetch and capture records must share the run and capture reference'));
+    }
+    if (fetchRecord.response_bytes !== captureRecord.compressed_bytes || fetchRecord.decompressed_bytes !== captureRecord.decompressed_bytes) {
+      issues.push(issue('CAPTURE_FETCH_BYTES_MISMATCH', '/underlying_records', 'newly captured fetch byte counts must match the cited capture'));
+    }
+  }
+  // A 304 response may reuse a capture from a prior run; its original run is retained.
+  if (receipt.attempt_outcome === 'not_modified' && !captureRecord) {
+    issues.push(issue('NOT_MODIFIED_CAPTURE_MISSING', '/underlying_records/capture_reference', '304 reuse requires its cited capture record'));
+  }
 
   if (receipt.route_match === 'matched_descriptor_route') {
     const hash = receipt.descriptor_hash;

@@ -36,3 +36,21 @@ When present, `descriptor_hash.hash_basis` is named. This assignment selects
 `ushso-canonical-json.v1`. Exact published descriptor bytes remain a distinct
 unresolved claim. A 64-hex registry field without a named basis is not
 sufficient for PR-010.
+
+## Cross-record consistency and limits
+
+Receipt source, route, capture pointer, hashes, and byte projections must agree
+with the cited validated ingestion records. Fetch status, response bytes,
+redirect count, and observation time are copied from the metadata-fetch record.
+For a newly captured outcome, the records must describe the same run and
+capture, including the capture connector version, media type, and byte counts.
+A `not_modified` response may reuse a capture from an earlier run and older
+connector version; the cached capture retains its original provenance.
+
+`matched_descriptor_route` records a supplied route claim. The validator checks
+the named hash format and record consistency, but has no approved-descriptor
+resolver and does not independently prove registry approval or compare the
+descriptor bytes with that hash. Before admission, PR-010 must resolve and
+validate the actual approved descriptor and route, recompute the
+`ushso-canonical-json.v1` digest, and verify it against the registered digest.
+The resolver contract remains pending PR-010; this receipt module adds none.

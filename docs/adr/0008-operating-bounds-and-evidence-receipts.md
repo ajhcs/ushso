@@ -102,7 +102,12 @@ Conditional arithmetic from those rates cannot establish total operating cost
 or incremental account spend. Missing actual account plan, usage, invoice,
 workload, capacity, recovery, residency, and source-rights facts remain
 unresolved. **`measured_cheapest_new_topology` is null.** A policy/receipt
-implementation does not satisfy this topology decision.
+implementation does not satisfy this topology decision. The owner has deferred
+a numeric operating budget: `numeric_monthly_budget` remains null with
+`numeric_budget_state=owner_deferred`. Minimize incremental cost and prefer existing
+infrastructure. This is neither a zero-dollar cap nor authorization for paid
+resources. The missing numeric budget does not block the bounded local policy
+and receipt work; C0091 measured topology qualification remains unresolved.
 
 ### 3. Request, retry, and activation bounds
 
@@ -117,14 +122,20 @@ Request bounds are no looser than the matching paused descriptor. Structural
 response limits equal `DEFAULT_RESPONSE_LIMITS`. Origin concurrency, rate, and
 burst are equal to or stricter than the descriptor. Harvest retry and DLQ
 transport values are the existing ingestion exports, not a second retry
-engine. Arbitrary user URLs and unauthorized operation classes are rejected.
+engine. Per-source timeout, page/byte/run bounds, concurrency, and burst are
+positive safe integers. Redirect allowance is a nonnegative safe integer;
+request rate is a finite positive number and may be fractional. Malformed
+source, route, or operation-class containers produce typed invalid results.
+Arbitrary user URLs and unauthorized operation classes are rejected.
 
 ### 4. Retention classes
 
 Ninety days is the active raw metadata/documentation **default**, not an
 unconditional legal floor. A versioned source-policy class may choose a
 shorter or longer period only with owner, rationale, review date, audit
-event, and explicit legal/rights/dependency/recovery evidence. Capture hashes,
+event, and explicit legal/rights/dependency/recovery evidence. Every active
+retention duration, including an evidenced override, must be an explicit
+positive whole number of days. Capture hashes,
 safe provenance, and evidence-lineage references outlive raw retention while
 dependencies remain. Security and audit receipts remain at least 365 days.
 Existing GC all-zero dependency proof, archive/restore, backup/PITR, replay,
@@ -143,7 +154,13 @@ Capture raw/semantic hashes are populated only from a validated capture
 reference. A hash of a retained rejected body is labeled
 `observed_rejected_body_sha256` and never proves capture or schema validity.
 Truncated bytes never imply complete schema validation. HTTP 200 is not
-content or payload success.
+content or payload success. Receipt projections must agree with the validated
+metadata-fetch and capture-reference records: source/route identities, capture
+pointers, hashes, sizes, and fetch observation fields cannot contradict their
+cited records. A newly captured observation also shares the fetch run and
+capture connector version and media type. A 304 may reuse a capture from an
+earlier run and older connector version; its original capture provenance is
+preserved rather than rewritten as the current observation.
 
 The retained Census `sample-census-acs` observation is an unmatched historical
 negative: HTTP 200 `text/html` Missing Key page, safe final locator
@@ -168,13 +185,23 @@ append-only 64-hex field with no insertion invariant recomputing it from
 either byte basis. JSONB storage is not evidence of original published bytes.
 Fixture `lpad(to_hex(n), 64, '0')` values are not computed descriptor hashes.
 
-PR-010 must:
+The current receipt validator checks the named digest format and consistency
+of supplied records. `matched_descriptor_route` does not independently prove
+registry approval, resolve an approved descriptor, or compare its canonical
+bytes with the digest. Its injected context has no approved-descriptor
+resolver. The resolver contract remains a PR-010 decision after acceptance of
+these interfaces.
 
-- look up `descriptor_sha256` by exact `(source_id, revision_number)`;
-- carry that registered value **unchanged** only when the named basis is
-  `ushso-canonical-json.v1`;
-- fail closed on a missing value, invalid digest, source/revision mismatch, or
-  unnamed/other basis;
+Before collection admission, PR-010 must:
+
+- resolve the actual approved descriptor for exact `(source_id, revision_number)`
+  and validate the requested endpoint/route against it;
+- look up the corresponding registered `descriptor_sha256`, require the named
+  `ushso-canonical-json.v1` basis, and verify that recomputing the digest from
+  the resolved descriptor with that basis matches the registered value;
+- carry the verified registered value **unchanged** and fail closed on a
+  missing/unapproved descriptor, invalid or mismatched digest, source/revision
+  mismatch, or unnamed/other basis;
 - never hash `configuration_revision` or a source/endpoint/revision tuple and
   call the result an exact descriptor hash.
 

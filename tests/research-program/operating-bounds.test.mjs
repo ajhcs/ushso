@@ -560,3 +560,141 @@ test('Proposed ADR 0008 reports implementation in progress without claiming acce
   const readme = await readFile(path.join(ROOT, 'docs/adr/README.md'), 'utf8');
   assert.doesNotMatch(readme, /0008-operating-bounds-and-evidence-receipts/);
 });
+
+
+// Successor regressions use released ingestion fixtures; they grant no registry approval.
+async function coherentReceiptInput(outcome = 'captured') {
+  const records = await validRecords();
+  const capture = clone(records.valid_capture_reference);
+  const fetchRecord = clone(outcome === 'not_modified' ? records.valid_fetch_not_modified : records.valid_fetch_captured);
+  return {
+    receipt_id: 'receipt_successor_' + outcome,
+    request_type: 'catalog_metadata', source_id: capture.source_id,
+    descriptor_id: 'descriptor_cms_catalog_v1', endpoint_id: fetchRecord.endpoint_id,
+    template_id: fetchRecord.template_id, configuration_revision: 1,
+    descriptor_hash: { algorithm: 'sha256', hash_basis: 'ushso-canonical-json.v1', hash_version: 'ushso-canonical-json.v1', sha256: 'a'.repeat(64) },
+    purpose: fetchRecord.purpose, expected_content_classes: ['catalog_collection', 'catalog_item_record'],
+    safe_final_host: capture.source_locator.final_host,
+    safe_final_path: new URL(capture.source_locator.redacted_locator).pathname,
+    redirect_count: fetchRecord.redirect_count, observed_status: fetchRecord.response_status,
+    observed_media_type: outcome === 'not_modified' ? null : capture.media_type,
+    observed_bytes: fetchRecord.response_bytes, truncated: false,
+    metadata_fetch: fetchRecord, capture_reference: capture,
+    parser_state: 'not_run', connector_name: 'dcat-catalog', connector_version: capture.connector_version,
+    attempt_outcome: outcome, schema_validated: outcome === 'captured',
+    next_action: outcome === 'not_modified' ? 'reuse_capture' : 'none', observed_at: fetchRecord.observed_at,
+  };
+}
+
+test('source request limits reject missing and invalid numbers while allowing tighter limits', async (t) => {
+  const policy = await readJson(POLICY_PATH);
+  const context = await policyContext();
+  const tighter = clone(policy);
+  Object.assign(tighter.sources[0].bounds, { timeout_seconds: 1, maximum_redirects: 0 });
+  Object.assign(tighter.sources[0].origin_policy, { maximum_concurrency: 1, burst: 1, requests_per_second: policy.sources[0].origin_policy.requests_per_second / 2 });
+  assert.equal((await validateOperatingBoundsPolicy(tighter, context)).valid, true);
+  for (const [section, field, invalid] of [
+    ['bounds', 'timeout_seconds', [undefined, 0, -1, 1.5, '1', null, Infinity]],
+    ['bounds', 'maximum_redirects', [undefined, -1, 0.5, '0', null, Infinity]],
+    ['origin_policy', 'maximum_concurrency', [undefined, 0, -1, 0.5, '1', null, Infinity]],
+    ['origin_policy', 'requests_per_second', [undefined, 0, -1, '0.5', null, Infinity, NaN]],
+    ['origin_policy', 'burst', [undefined, 0, -1, 0.5, '1', null, Infinity]],
+  ]) for (const value of invalid) await t.test(field + ' rejects ' + String(value), async () => {
+    const candidate = clone(policy);
+    if (value === undefined) delete candidate.sources[0][section][field];
+    else candidate.sources[0][section][field] = value;
+    const result = await validateOperatingBoundsPolicy(candidate, context);
+    assert.equal(result.valid, false, field + ' must be an explicit bounded value');
+    assert(result.issues.length > 0);
+  });
+});
+
+test('evidenced retention overrides still require an explicit positive whole-day duration', async (t) => {
+  const policy = await readJson(POLICY_PATH);
+  const context = await policyContext();
+  const override = { owner: 'fixture_policy_owner', rationale: 'Synthetic retention-policy test; no real rights granted.',
+    review_at: '2026-12-01T00:00:00.000Z', audit_event_id: 'event_retention_fixture', legal_rights_recovery_evidence: 'evidence_retention_fixture' };
+  for (const days of [14, 120]) await t.test('supports evidenced ' + days + '-day retention', async () => {
+    const candidate = clone(policy);
+    candidate.sources[0].retention = { class: 'raw_metadata_documentation', active_days: days, override: clone(override) };
+    assert.equal((await validateOperatingBoundsPolicy(candidate, context)).valid, true);
+    assert.equal(candidate.global_bounds.retention.security_and_audit_receipt_days, 365);
+    assert.equal(candidate.global_bounds.retention.hashes_and_lineage_outlive_raw, true);
+  });
+  for (const days of [undefined, null, 0, -1, 1.5, '14', Infinity, NaN]) await t.test('rejects evidenced duration ' + String(days), async () => {
+    const candidate = clone(policy);
+    candidate.sources[0].retention = { class: 'raw_metadata_documentation', override: clone(override) };
+    if (days !== undefined) candidate.sources[0].retention.active_days = days;
+    const result = await validateOperatingBoundsPolicy(candidate, context);
+    assert.equal(result.valid, false);
+    assert(codes(result).includes('RETENTION_DURATION_INVALID'));
+  });
+});
+
+test('malformed policy containers return typed invalid results without throwing', async (t) => {
+  const policy = await readJson(POLICY_PATH);
+  const context = await policyContext();
+  for (const [label, mutate, expected] of [
+    ['sources object', (p) => { p.sources = {}; }, 'SOURCES_MISSING'],
+    ['null source entry', (p) => { p.sources[0] = null; }, 'SOURCE_NOT_OBJECT'],
+    ['routes object', (p) => { p.sources[0].routes = {}; }, 'ROUTES_NOT_ARRAY'],
+    ['forbidden classes object', (p) => { p.forbidden_operation_classes = {}; }, 'FORBIDDEN_CLASSES_NOT_ARRAY'],
+    ['null route entry', (p) => { p.sources[0].routes[0] = null; }, 'ROUTE_NOT_OBJECT'],
+  ]) await t.test(label, async () => {
+    const candidate = clone(policy); mutate(candidate);
+    const result = await validateOperatingBoundsPolicy(candidate, context);
+    assert.equal(result.valid, false);
+    assert(codes(result).includes(expected));
+  });
+});
+
+test('schema-valid captured records must agree on identity and copied observations', async (t) => {
+  const context = await receiptContext();
+  const positive = await composeEvidenceReceipt(await coherentReceiptInput(), context);
+  assert.equal(positive.valid, true, JSON.stringify(positive.issues));
+  for (const [label, mutate] of [
+    ['source identity', (r) => { r.source_id = 'source_other_fixture'; }],
+    ['endpoint identity', (r) => { r.endpoint_id = 'endpoint_other_fixture'; }],
+    ['template identity', (r) => { r.template_id = 'route_other_fixture'; }],
+    ['capture pointer projection', (r) => { r.capture.capture_ref_id = 'capture_other_fixture'; }],
+    ['capture run identity', (r) => { r.underlying_records.capture_reference.run_id = 'run_other_fixture'; }],
+    ['fetch capture pointer', (r) => { r.underlying_records.metadata_fetch.capture_ref_id = 'capture_other_fixture'; }],
+    ['compressed byte projection', (r) => { r.capture.compressed_bytes += 1; }],
+    ['expanded byte projection', (r) => { r.capture.decompressed_bytes += 1; }],
+    ['HTTP status projection', (r) => { r.observed_status = 404; }],
+    ['captured media type projection', (r) => { r.observed_media_type = 'text/html'; }],
+    ['response byte projection', (r) => { r.observed_bytes += 1; }],
+    ['redirect projection', (r) => { r.redirect_count += 1; }],
+    ['fetch/capture expanded bytes', (r) => { r.underlying_records.metadata_fetch.decompressed_bytes += 1; }],
+  ]) await t.test(label, async () => {
+    const candidate = clone(positive.receipt); mutate(candidate);
+    assert.equal(context.validateReceiptSchema(candidate).valid, true, 'negative envelope remains schema-valid');
+    for (const [kind, record] of [['metadata-fetch.schema.json', candidate.underlying_records.metadata_fetch], ['capture-reference.schema.json', candidate.underlying_records.capture_reference]]) {
+      const checked = await validateIngestionRecord(kind, record);
+      assert.equal(checked.valid, true, label + ': strict underlying record remains valid: ' + JSON.stringify(checked.issues));
+    }
+    assert.equal((await validateEvidenceReceipt(candidate, context)).valid, false, label);
+  });
+});
+
+test('304 reuse preserves the earlier capture run and rejects contradictory response or capture projections', async (t) => {
+  const context = await receiptContext();
+  const input = await coherentReceiptInput('not_modified');
+  input.metadata_fetch.run_id = 'run_cms_later_refresh';
+  input.capture_reference.connector_version = '0.9.0';
+  const positive = await composeEvidenceReceipt(input, context);
+  assert.equal(positive.valid, true, JSON.stringify(positive.issues));
+  assert.notEqual(positive.receipt.underlying_records.metadata_fetch.run_id, positive.receipt.underlying_records.capture_reference.run_id);
+  assert.equal(positive.receipt.underlying_records.capture_reference.connector_version, '0.9.0');
+  for (const [label, mutate] of [
+    ['invented response bytes', (r) => { r.observed_bytes = 1; }],
+    ['wrong response status', (r) => { r.observed_status = 200; }],
+    ['different cached hash', (r) => { r.capture.raw_sha256 = '0'.repeat(64); }],
+    ['different cached size', (r) => { r.capture.compressed_bytes += 1; }],
+    ['different reused pointer', (r) => { r.underlying_records.metadata_fetch.reused_capture_ref_id = 'capture_other_fixture'; }],
+  ]) await t.test(label, async () => {
+    const candidate = clone(positive.receipt); mutate(candidate);
+    assert.equal(context.validateReceiptSchema(candidate).valid, true);
+    assert.equal((await validateEvidenceReceipt(candidate, context)).valid, false, label);
+  });
+});
