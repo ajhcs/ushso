@@ -1,0 +1,79 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr010-local-jobs-20260912",
+  "pr_id": "PR-010",
+  "title": "Connect durable collection jobs to existing ingestion ports",
+  "owner": "/root/pr010_contract_review",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr010-local-jobs-20260912",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr010-local-jobs-20260912",
+  "objective": "Implement the exact adopted v3 bounded fixture collection job, durable local recovery and actual research capture contracts.",
+  "outcome": "Bounded collection jobs resume safely and have durable outcomes.",
+  "dependencies": [
+    "PR-009"
+  ],
+  "owned_paths": [
+    "packages/ingestion/src/collection-job.mjs",
+    "packages/ingestion/src/local-collection-store.mjs",
+    "packages/ingestion/src/local-collector-adapter.mjs",
+    "packages/ingestion/src/local-job-cli.mjs",
+    "packages/ingestion/src/local-fixture-catalog.mjs",
+    "packages/ingestion/package.json",
+    "packages/ingestion/README.md",
+    "tests/research-program/job-lifecycle.test.mjs",
+    "scripts/research/refresh.mjs",
+    "tests/research-automation.test.mjs",
+    "verification/research-program/pr-010/",
+    "docs/research-program/handoffs/PR-010.json"
+  ],
+  "commits": [
+    {
+      "id": "C-010-1",
+      "subject": "Add a collection job specification",
+      "instructions": "Reuse ingestion run/outbox/lease primitives and add source ID, exact configuration hash, selected record IDs, capture class and budget reservation. Keep scheduling separate from execution. Adopt the exact v3 resolver and separate child-job identity contracts in verification/research-program/bootstrap/pr010-interface-adoption-20260912/proposal-v3/proposal.json (SHA256 0a6184f9da889e019439562c2de94850bf97ca85e7b8b3c85e0ab2b49a126409). Verify approved source/revision/route and ushso-canonical-json.v1 descriptor digest before admission or effects; reuse existing scheduler identity unchanged, with one connector repository per child. The ten named implementation/test paths replace the former broad directories; task evidence and handoff remain owned.",
+      "verification": "Duplicate schedule deliveries create one logical job; changing configuration produces a distinct job identity."
+    },
+    {
+      "id": "C-010-2",
+      "subject": "Implement the collector port adapter",
+      "instructions": "Connect existing research collector entry points through injected storage/network/clock ports. Checkpoint after bounded units and close database work between steps. Adopt the same v3 actual refresh.capture integration, durable whole-transaction journal and strict result/Map/byte codec; keep shared poison, child/parent recovery, durable intent/reservation/response ordering, unknown-intent partial_unresolved, cancellation/deadline fences and fresh-process replay. Add only the capture clock and paired locatorPolicy/explicit own callable fetchImpl seam, defaulting to unchanged metadataUrl. Use exactly source_fixture_catalog, catalog.example.gov and /data.json with its bounded cursor; preserve actual 304 null-body handling. Keep observation/recorded/governor clocks separate and in-memory governor state explicitly non-durable.",
+      "verification": "Interrupt after a successful capture and resume without duplicate source requests or losing the capture reference."
+    },
+    {
+      "id": "C-010-3",
+      "subject": "Expose dry-run and local execution commands",
+      "instructions": "Add a CLI that lists selected jobs and estimated limits before running. Emit terminal statuses and resumable checkpoint locations. Adopt the exact fixed-fixture preview/run/resume/status CLI and package-local job:preview/job:fixture scripts from the v3 proposal. Preview performs no file writes; mutating fixture execution requires the OS-held lock. Preserve frozen connectors/WP5, ingestion contracts, SQL/grants, root package/lockfile, all service compositions and disabled live/managed/paid/production boundaries. Retain all 36 planned implementation test groups; the earlier 15/15 compatibility probe is not implementation acceptance.",
+      "verification": "An intern can run a fixture job through selected, running, partial and complete states; production composition stays disabled."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/job-lifecycle.test.mjs",
+    "node --test tests/research-automation.test.mjs tests/update-cycle.test.mjs",
+    "npm test --prefix packages/ingestion",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-010.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-010/",
+  "binding": {
+    "base_sha": "50a844d218600f95c13e64c2db64ab4d8562ae0d",
+    "base_tree": "25cdcff0358a49a7611f0d55cd7c90d93e6882ea",
+    "dependency_merge_shas": {
+      "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a"
+    },
+    "bootstrap_receipt_sha256": "65a452e72116eff66b7a98a8afd89f6cfe25cc5bdbe92d65df00be774a92badf"
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "in_progress"
+}

@@ -2,7 +2,7 @@
   "format": "ushso.research-program-execution.v1",
   "updated_at": "2026-09-12T05:20:21.170133Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
-  "plan_sha256": "084a78812bdb1b816436062a16354d3ac20556411ef05facbb1f4d3bc85a2ab0",
+  "plan_sha256": "9c54f8c17a58650418953302402768b82dba36a66eedcbb403f253af2480b116",
   "integration_branch": "codex/research-program-integration-20260910",
   "verified_remote_main_sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
   "controller": {
@@ -755,6 +755,29 @@
       "merge_sha": "80996a8d3c00792d8abb8946a67a69e0400f621a",
       "qualified": false,
       "PR010_dispatch_ready": false
+    },
+    "current_pr010_interface_adoption": {
+      "recorded_at": "2026-09-12T14:40:00.330356+00:00",
+      "status": "scope_adopted_task_bound_implementation_pending",
+      "scope_capsule": {
+        "path": "verification/research-program/bootstrap/pr010-interface-adoption-20260912/index.json",
+        "sha256": "c3a261af3ca488d25891f0481718ff5492438db1fcf2528909af9669accb47a5",
+        "bytes": 29854
+      },
+      "dispatch": {
+        "path": "verification/research-program/pr-010/dispatch.json",
+        "sha256": "d6443a31a7fe832364b89a1ae4feb71e984effb37389e83fe05be6d6700df520",
+        "bytes": 3203
+      },
+      "base_sha": "50a844d218600f95c13e64c2db64ab4d8562ae0d",
+      "PR009_component_merge_sha": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+      "PR009_integration_merge_sha": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+      "C0091_qualification": "unresolved",
+      "source_dispatched": false,
+      "implementation_accepted": false,
+      "requirements_accepted": [],
+      "production_qualification": false,
+      "supersession_scope": "PR010 pending interface choice and dependency binding only. Previous PR009/controller acceptance records remain verbatim historical evidence; no general readiness is granted."
     }
   },
   "providers": [
@@ -2141,24 +2164,49 @@
     },
     {
       "pr_id": "PR-010",
-      "status": "planned",
-      "owner": null,
+      "status": "in_progress",
+      "owner": "/root/pr010_contract_review",
       "dependencies": [
         "PR-009"
       ],
-      "dependency_merge_shas": {},
+      "dependency_merge_shas": {
+        "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a"
+      },
       "owned_paths": [
-        "packages/ingestion/",
-        "services/scheduler-worker/",
-        "services/harvest-worker/",
-        "tests/research-program/job-lifecycle.test.mjs"
+        "packages/ingestion/src/collection-job.mjs",
+        "packages/ingestion/src/local-collection-store.mjs",
+        "packages/ingestion/src/local-collector-adapter.mjs",
+        "packages/ingestion/src/local-job-cli.mjs",
+        "packages/ingestion/src/local-fixture-catalog.mjs",
+        "packages/ingestion/package.json",
+        "packages/ingestion/README.md",
+        "tests/research-program/job-lifecycle.test.mjs",
+        "scripts/research/refresh.mjs",
+        "tests/research-automation.test.mjs",
+        "verification/research-program/pr-010/",
+        "docs/research-program/handoffs/PR-010.json"
       ],
       "head_sha": null,
       "merge_sha": null,
       "handoff": "docs/research-program/handoffs/PR-010.json",
       "evidence_directory": "verification/research-program/pr-010/",
       "github_pr_url": null,
-      "blockers": []
+      "blockers": [],
+      "branch": "codex/ushso-pr010-local-jobs-20260912",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr010-local-jobs-20260912",
+      "base_sha": "50a844d218600f95c13e64c2db64ab4d8562ae0d",
+      "base_tree": "25cdcff0358a49a7611f0d55cd7c90d93e6882ea",
+      "scope_adoption": {
+        "path": "verification/research-program/bootstrap/pr010-interface-adoption-20260912/controller/root-interface-adoption.json",
+        "sha256": "9183061f258adf222b5d75c734de7b1525fd63bdc4fcd96a6cbf1ef77c098a53",
+        "bytes": 1762
+      },
+      "dispatch": {
+        "path": "verification/research-program/pr-010/dispatch.json",
+        "sha256": "d6443a31a7fe832364b89a1ae4feb71e984effb37389e83fe05be6d6700df520",
+        "bytes": 3203
+      },
+      "next_action": "Implement adopted v3 fixture-local scope only after exact controller application and live-ledger task validation. Source tests and independent acceptance remain pending."
     },
     {
       "pr_id": "PR-011",
