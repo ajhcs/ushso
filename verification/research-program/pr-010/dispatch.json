@@ -28,8 +28,8 @@
   },
   "task_binding": {
     "path": "verification/research-program/pr-010/task-binding.json",
-    "sha256": "076135b1b52f9bf92ed586313b6ecbece7300c7ea63a6380cf2404e9c7f290e1",
-    "bytes": 5316
+    "sha256": "45f7b423c4219f190dbd55fc021cc71b26df04b3d0e597e505a6fcc544e574c2",
+    "bytes": 6171
   },
   "owned_paths": [
     "packages/ingestion/src/collection-job.mjs",
@@ -43,19 +43,23 @@
     "scripts/research/refresh.mjs",
     "tests/research-automation.test.mjs",
     "verification/research-program/pr-010/",
-    "docs/research-program/handoffs/PR-010.json"
+    "docs/research-program/handoffs/PR-010.json",
+    "packages/connectors/src/capture-protocol.mjs",
+    "packages/connectors/tests/contracts.test.mjs"
   ],
   "controller_owned_exclusions": [
     "docs/master-plan/2026-09-10/",
     "docs/research-program/execution-ledger.json",
     "verification/research-program/bootstrap/pr010-interface-adoption-20260912/",
     "verification/research-program/pr-010/task-binding.json",
-    "verification/research-program/pr-010/dispatch.json"
+    "verification/research-program/pr-010/dispatch.json",
+    "verification/research-program/bootstrap/pr010-cursor-interface-adoption-20260912/"
   ],
   "planned_check_commands": [
     "node --test tests/research-program/job-lifecycle.test.mjs",
     "node --test tests/research-automation.test.mjs tests/update-cycle.test.mjs",
     "npm test --prefix packages/ingestion",
+    "npm test --prefix packages/connectors",
     "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-010.json"
   ],
   "source_head_sha": null,
@@ -65,5 +69,12 @@
   "requirements_accepted": [],
   "C0091_qualification": "unresolved",
   "production_qualification": false,
-  "full_gate": "Pending exact final candidate after implementation and independent checks; no earlier gate qualifies new bytes."
+  "full_gate": "The cursor amendment supersedes only the two-file connector exclusion. Frozen WP5 v1.0 remains unchanged and its expected stale fingerprint failure is retained. Complete focused source review first; an isolated component merge remains conditional on exact adoption of the provisional earlier PR087 current-technical successor and separately reviewed PR086 lock continuation. No research integration, PR011 readiness, R acceptance or release qualification before the exact combined candidate passes independent review, full local gate and hosted CI. All future merge identities remain null until observed.",
+  "scope_amendments": [
+    {
+      "path": "verification/research-program/bootstrap/pr010-cursor-interface-adoption-20260912/decision.json",
+      "sha256": "7045b549b3cadce7243a7ec9644aadc2aa7ac168fd53eae8ec320b56fe5597c4",
+      "bytes": 4268
+    }
+  ]
 }

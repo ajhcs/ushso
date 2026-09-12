@@ -1,0 +1,63 @@
+{
+  "format": "ushso.pr010-cursor-interface-adoption.v1",
+  "recorded_at": "2026-09-12T15:58:18.452572+00:00",
+  "controller": "Astra/root",
+  "status": "adopted_scope_pending_exact_controller_application_and_peer_metadata_review",
+  "source_head_before": "6e2898d5c8e9755036cc2cec75c8a45aa2fe013e",
+  "scope": {
+    "owned_paths_required": [
+      "packages/connectors/src/capture-protocol.mjs",
+      "packages/connectors/tests/contracts.test.mjs"
+    ],
+    "implementation": "Private publicCaptureLocator serializes the final URL with username, password, search and hash cleared; use it only for reference.source_locator.redacted_locator.",
+    "global_effect": "Public capture-reference serialization changes for approved query-bearing captures using R2CaptureProtocol. This is an explicit connector behavior change, not an adapter-only projection.",
+    "preserved": [
+      "Existing query-sensitive compiled/final coherence check",
+      "Existing deterministic capture ID derivation using full redacted locator, body and clocks",
+      "Existing fetch/request IDs and connectorRequestKey",
+      "Global redactedLocator and route allowlist",
+      "Released ingestion v1.0/v1.1 schemas and semantics, contract dispatcher",
+      "Object content hashes and conditional-write/reference confirmation",
+      "Existing runner and 304 handling",
+      "All no-query control output, activation restrictions and historical evidence"
+    ]
+  },
+  "prototype_review": {
+    "path": "verification/research-program/bootstrap/pr010-cursor-interface-adoption-20260912/prototype/review.json",
+    "sha256": "825d85003eaa6ba8fa86215640e089dbab648818c4b13ff8654e25602b8b246b",
+    "bytes": 6285
+  },
+  "preserved_v3_proposal_sha256": "0a6184f9da889e019439562c2de94850bf97ca85e7b8b3c85e0ab2b49a126409",
+  "superseded_limit": "Only the prior PR010 connector-file exclusion for these two named files; every other v3 interface, 36 planned groups, frozen WP5/ingestion bytes and disabled feature boundary remains.",
+  "required_controls": [
+    "original_failure",
+    "prototype_two_page",
+    "query_identity",
+    "wrong_final_query",
+    "no_query",
+    "public_projection",
+    "tampered_public_query",
+    "reuse_304"
+  ],
+  "304_limits": [
+    "The public locator is a query-free disclosure field and cannot distinguish cursor pages alone; existing request key, capture ID and native pointer lineage remain necessary.",
+    "Existing old query-bearing capture references already violate the frozen validator. This candidate does not rewrite/migrate them or authorize their 304 reuse.",
+    "Same capture identity and old different public-reference bytes would trigger the existing idempotency conflict if replayed against that older stored record; preserve the record and report typed conflict rather than overwrite. The current strict first-run blocker rejects the query-bearing reference before its commit."
+  ],
+  "verification_order": {
+    "known_stale_wp5": "Retain the expected strict original v1.0 connector-fingerprint failure; never restamp frozen evidence.",
+    "successor": "Provisional PR087 complete current-technical WP5 successor immediately after focused PR010; design/registration and exact current semantic inventory still under independent review.",
+    "lock_correction": "Separately reviewed exact PR086 new-lock continuation after immutable PR087 source/lock; no generic future lock approval.",
+    "component_exception": "Conditional only: actual focused component merge on an isolated assembly branch may occur after independent final source review and exact PR087/086 graph/design adoption. This scope amendment alone does not authorize counting PR010 integrated or passing its final gate.",
+    "integration": "One exact PR010+PR087+PR086 candidate must pass independent review, full local gate and hosted CI before research integration/acceptance; PR011 consumes actual accepted identities.",
+    "current_registration_count": 86,
+    "future_component_merge": null,
+    "future_integration_merge": null
+  },
+  "implementation_authorized_after_application": true,
+  "implementation_accepted": false,
+  "requirements_accepted": [],
+  "C0091": "unresolved",
+  "budget": "owner_deferred_minimize_incremental_cost",
+  "production_changed": false
+}
