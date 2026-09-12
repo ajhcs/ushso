@@ -293,6 +293,11 @@ test('D1 actual collector composes two durable pages, strict receipts and select
   const admitted = await app.admit();
   assert.equal(admitted.kind, 'admitted');
   assert.equal(app.status(admitted.job.collection_job_id).status, 'selected');
+  await app.schedule(admitted.job);
+  await app.schedule(admitted.job);
+  assert.equal(app.inspect().scheduler.runs.size, 1);
+  assert.equal(app.inspect().scheduler.outbox.size, 1);
+  assert.equal(app.inspect().children.size, 1);
   const outcome = await app.execute(admitted.job.collection_job_id);
   assert.equal(outcome.status, 'complete_fixture', JSON.stringify(outcome));
   assert.equal(deliveries.length, 2);
@@ -1184,6 +1189,118 @@ test('C1 actual collector rejects bridge bytes that differ from the committed st
   });
   t.after(() => replay.close());
   assert.equal((await replay.execute(job.collection_job_id)).status, 'typed_failure');
+});
+
+async function cliProcess(args, environment = {}) {
+  const cli = new URL('../../packages/ingestion/src/local-job-cli.mjs', import.meta.url);
+  const child = spawn(process.execPath, [cli.pathname, ...args], {
+    env: { ...process.env, ...environment },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  let stdout = '',
+    stderr = '';
+  child.stdout.on('data', (bytes) => {
+    stdout += bytes;
+  });
+  child.stderr.on('data', (bytes) => {
+    stderr += bytes;
+  });
+  const timer = setTimeout(() => child.kill('SIGKILL'), 15000);
+  await exited(child);
+  clearTimeout(timer);
+  return {
+    code: child.exitCode,
+    signal: child.signalCode,
+    stdout,
+    stderr,
+    result: stdout.trim() ? JSON.parse(stdout.trim()) : null
+  };
+}
+test('B1 CLI preview creates no files or requests and rejects unknown sources, routes and modes', async (t) => {
+  const directory = await stateDir(t),
+    before = await fs.readdir(directory);
+  const preview = await cliProcess(['preview', '--fixture', 'catalog-two-page-v1'], {
+    TMPDIR: directory
+  });
+  assert.equal(preview.code, 0, preview.stderr);
+  assert.equal(preview.result.status, 'selected');
+  assert.equal(preview.result.job.activation.live_network, false);
+  assert.equal(preview.result.estimated_limits.maximum_requests, 2);
+  assert.deepEqual(await fs.readdir(directory), before);
+  for (const args of [
+    ['preview', '--fixture', 'unknown'],
+    ['preview', '--url', 'https://example.com/secret'],
+    ['run-live'],
+    ['run-fixture'],
+    ['resume', '--state-dir', directory, '--fixture', 'catalog-two-page-v1'],
+    ['preview', '--state-dir', directory]
+  ]) {
+    const result = await cliProcess(args);
+    assert.equal(result.code, 2, JSON.stringify(result));
+    assert.equal(result.result.status, 'blocked');
+    assert.ok(!result.stdout.includes('https://example.com/secret'));
+    assert.deepEqual(await fs.readdir(directory), before);
+  }
+});
+test('D1/B1 CLI displays selected, running, partial and complete fixture checkpoints', async (t) => {
+  const selectedDirectory = await stateDir(t),
+    app = await createLocalCollector({ stateDir: selectedDirectory });
+  await app.admit();
+  await app.close();
+  const selected = await cliProcess(['status', '--state-dir', selectedDirectory]);
+  assert.equal(selected.code, 0, JSON.stringify(selected));
+  assert.equal(selected.result.status, 'selected');
+  const runningDirectory = await stateDir(t);
+  assert.equal(
+    (await jobProcess(runningDirectory, { point: 'runner.before_page_fetch' })).signal,
+    'SIGKILL'
+  );
+  const running = await cliProcess(['status', '--state-dir', runningDirectory]);
+  assert.equal(running.result.status, 'running');
+  const partialDirectory = await stateDir(t);
+  assert.equal(
+    (await jobProcess(partialDirectory, { point: 'runner.after_page_commit_before_resume' }))
+      .signal,
+    'SIGKILL'
+  );
+  const beforeFiles = (await fs.readdir(path.join(partialDirectory, 'journal'))).sort();
+  const partial = await cliProcess(['status', '--state-dir', partialDirectory]);
+  assert.equal(partial.code, 0, JSON.stringify(partial));
+  assert.equal(partial.result.status, 'partial');
+  assert.deepEqual((await fs.readdir(path.join(partialDirectory, 'journal'))).sort(), beforeFiles);
+  const complete = await cliProcess(['resume', '--state-dir', partialDirectory]);
+  assert.equal(complete.code, 0, JSON.stringify(complete));
+  assert.equal(complete.result.status, 'complete_fixture');
+  assert.equal(complete.result.jobs[0].checkpoint.state, 'committed');
+  assert.equal(complete.result.production_composition, false);
+  assert.equal(complete.result.journal_directory, path.join(partialDirectory, 'journal'));
+  const repeated = await cliProcess(['resume', '--state-dir', partialDirectory]);
+  assert.equal(repeated.code, 0, JSON.stringify(repeated));
+  assert.deepEqual(repeated.result.jobs, complete.result.jobs);
+  const direct = await cliProcess([
+    'run-fixture',
+    '--fixture',
+    'catalog-two-page-v1',
+    '--state-dir',
+    selectedDirectory
+  ]);
+  assert.equal(direct.code, 0, JSON.stringify(direct));
+  assert.equal(direct.result.status, 'complete_fixture');
+});
+test('D5/C9 CLI preserves terminal unresolved status and gives a nonzero execution result', async (t) => {
+  const directory = await stateDir(t);
+  assert.equal(
+    (await jobProcess(directory, { point: 'after_fixture_delivery' })).signal,
+    'SIGKILL'
+  );
+  const resumed = await cliProcess(['resume', '--state-dir', directory]);
+  assert.equal(resumed.code, 2, JSON.stringify(resumed));
+  assert.equal(resumed.result.status, 'partial_unresolved');
+  assert.equal(resumed.result.jobs[0].code, 'DELIVERY_UNRESOLVED');
+  const status = await cliProcess(['status', '--state-dir', directory]);
+  assert.equal(status.code, 0, JSON.stringify(status));
+  assert.equal(status.result.status, 'partial_unresolved');
+  assert.equal((await deliveriesAt(directory)).length, 1);
 });
 
 if (workerOptions) {

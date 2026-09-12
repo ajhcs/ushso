@@ -85,3 +85,32 @@ These commands are offline. They create no server, network request, database,
 Queue, Workflow, R2 object, secret, deployment, or paid resource. The receipt in
 `verification/wp4/v1.0.0` labels managed Cloudflare/PostgreSQL integration as
 pending external authorization.
+
+
+## Durable local collection fixture
+
+The fixed `catalog-two-page-v1` fixture connects the existing scheduler, connector runner, and actual research `capture` entry point through injected local ports. It exercises synthetic catalog metadata only. It does not activate the public workers, live collection, managed persistence, paid inference, payload acquisition, publication, or production composition. The broader research update-cycle and PDF orchestration remain separate and unintegrated.
+
+Preview the selected records, immutable descriptor digest and maximum reservation without writing files or requesting a source:
+
+```bash
+npm run job:preview --prefix packages/ingestion
+```
+
+On the Plumbob host, run commands through `/home/plumbob/bin/with-dev-storage`. Choose a new task-owned absolute directory beneath the configured `TMPDIR` (normally `/mnt/d/tmp/plumbob`). CI may use `RUNNER_TEMP`. The store rejects path escapes and symlink components.
+
+```bash
+/home/plumbob/bin/with-dev-storage npm run job:fixture --prefix packages/ingestion -- --fixture catalog-two-page-v1 --state-dir /mnt/d/tmp/plumbob/ushso-local-fixture-example
+/home/plumbob/bin/with-dev-storage node packages/ingestion/src/local-job-cli.mjs status --state-dir /mnt/d/tmp/plumbob/ushso-local-fixture-example
+/home/plumbob/bin/with-dev-storage node packages/ingestion/src/local-job-cli.mjs resume --state-dir /mnt/d/tmp/plumbob/ushso-local-fixture-example
+```
+
+Commands emit JSON. Lifecycle states include `selected`, `running`, `partial`, `complete_fixture`, `typed_failure`, and `partial_unresolved`; blocked input emits a safe code and exits with status 2. `complete_fixture` means that this synthetic enumeration and its selected dispositions were durably committed. It does not establish coverage or scientific suitability for any real source. Status and preview do not mutate local state. Mutating commands use an OS-held writer lock; another writer receives `WRITER_BUSY`. The lock is released by close or process death without deleting a PID/lock file.
+
+The journal commits one complete scheduler transaction, page-and-cursor operation, or membership/checkpoint/downstream-intent operation at a time. Synthetic bodies are content-addressed separately; journal values use a strict tagged codec for Maps, undefined values and byte references. Files and containing directories are synced before an operation is acknowledged. After any persistence ambiguity, all store clients are poisoned and the process must close and reopen from a verified disk prefix. In-memory reducers do not constitute durable evidence.
+
+Request intent and its budget charge precede fixture delivery. The response, strict capture, actual collector result and PR009 receipt precede page success. Restart reuses a verified response and its original observation and recording clocks. A delivery intent with no verified response or strict failure remains charged and settles as `partial_unresolved`; it is never automatically delivered again. This is an explicit unresolved-delivery boundary, not an exactly-once request guarantee.
+
+One scheduler parent may own multiple separately identified collection children. Each child has its own connector repository, one logical attempt, and an immutable terminal outcome. Observation time is the child's scheduled slot plus the journal-wide zero-based request-intent ordinal times 1,000 ms; capture recording time is observation plus 1 ms. These are pinned synthetic clocks, including the origin-governor clock. Journal reservations enforce restart bounds; the governor's private in-memory token state is not durable or production pacing evidence.
+
+A state directory is bound to the exact runtime import closure, released schemas, lockfile, fixture, approved descriptor, policy and clock derivation. Changed pins or tampered/missing evidence block replay. Keep the entire directory for a pending review; remove a task-owned fixture directory only after all writers are closed and its evidence is no longer required. No automatic retention, managed-storage migration or source retry service is installed.
