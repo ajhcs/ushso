@@ -254,10 +254,16 @@
     "verification/research-program/pr-008/evidence/correction-package-072241e/v1.2-package-validate.stdout.log",
     "verification/research-program/pr-008/evidence/correction-package-072241e/contracts.stdout.log",
     "verification/research-program/pr-008/evidence/correction-package-072241e/contract-package-inventory.stdout.log",
-    "verification/research-program/pr-008/evidence/correction-package-072241e/handoff-check.stdout.log"
+    "verification/research-program/pr-008/evidence/correction-package-072241e/handoff-check.stdout.log",
+    "verification/research-program/pr-008/astra-correction-20260912/cms-extractors-identity.json",
+    "verification/research-program/pr-008/astra-correction-20260912/cms-extractors-identity.stderr.log.gz",
+    "verification/research-program/pr-008/astra-correction-20260912/cms-extractors-identity.stdout.log.gz",
+    "verification/research-program/pr-008/astra-correction-20260912/finalization.json",
+    "verification/research-program/pr-008/astra-correction-20260912/prior-handoff.json.gz",
+    "verification/research-program/pr-008/astra-correction-20260912/initial-handoff-validation.json.gz"
   ],
   "problem": "Publisher dictionaries and payload names can differ while historical extraction currently combines or replays fields through legacy shapes. PR-008 needs an additive identity boundary that preserves exact names, semantics and provenance without treating counts or punctuation as proof of equivalence.",
-  "resulting_behavior": "The v1.2 variable identity schema and package functions preserve literal wire names, labels, concepts, definitions, source and observed type assertions, units/applicability, literal code values, missingness, explicit mapping states and capture pointers. CDC/Census/CMS versioned adapters are replayable from capture hashes and JSON pointers. Existing cdc_columns/census_variables transformations and frozen machine contracts remain unchanged. Publication and promotion remain false; unresolved context and HCRIS discrepancies cannot mint or select a resolved identity. Resolved replay now requires an independently supplied exact context and capture-backed evidence; failed or byte-less captures cannot verify. Variable contexts require source/asset relationship facts or accepted PR-007 binding evidence when released core snapshots omit those parent fields, while the frozen endpoint shape remains unchanged. Measurement units in unknown or omitted states keep completeness unknown. Registered immutable snapshot source and asset parent facts remain consistency constraints even when independent relationship evidence is supplied, so foreign caller parents cannot override the registered snapshot. The existing machine-toolkit v1.2 variable schema now has a private package descriptor, local README, strict offline Ajv2020 validator and independent positive/negative tests. The workspace lock adds only that descriptor and its node_modules link; no route, release, publication or scientific authority is added.",
+  "resulting_behavior": "The v1.2 variable identity schema and package functions preserve literal wire names, labels, concepts, definitions, source and observed type assertions, units/applicability, literal code values, missingness, explicit mapping states and capture pointers. CDC/Census/CMS versioned adapters are replayable from capture hashes and JSON pointers. Existing cdc_columns/census_variables transformations and frozen machine contracts remain unchanged. Publication and promotion remain false; unresolved context and HCRIS discrepancies cannot mint or select a resolved identity. Resolved replay now requires an independently supplied exact context and capture-backed evidence; failed or byte-less captures cannot verify. Variable contexts require source/asset relationship facts or accepted PR-007 binding evidence when released core snapshots omit those parent fields, while the frozen endpoint shape remains unchanged. Measurement units in unknown or omitted states keep completeness unknown. Registered immutable snapshot source and asset parent facts remain consistency constraints even when independent relationship evidence is supplied, so foreign caller parents cannot override the registered snapshot. The existing machine-toolkit v1.2 variable schema now has a private package descriptor, local README, strict offline Ajv2020 validator and independent positive/negative tests. The workspace lock adds only that descriptor and its node_modules link; no route, release, publication or scientific authority is added. September 12 reviewed correction: CMS parser-only names remain documented names. Exact/reviewed-alias CMS wire mappings require an explicit wire_name and an explicit mapping with evidence; unsupported cases retain unmatched mappings and null wire names. Evidence-bearing exact/alias controls and CDC/Census native keys remain supported; unresolved context carries null IDs and disabled publication/promotion.",
   "commits": [
     {
       "id": "C-008-1",
@@ -313,6 +319,11 @@
       "id": "C-008-11",
       "subject": "Complete the private v1.2 variable identity contract package",
       "sha": "072241ed12f2c0b04deb833eee857ca43920b9d3"
+    },
+    {
+      "id": "C-008-12",
+      "subject": "Require explicit evidence for CMS wire mappings",
+      "sha": "2909aa8b7b6bae674cc257968c8d3f58c30717c5"
     }
   ],
   "source_identities": [
@@ -1273,6 +1284,23 @@
         "bytes": 6278,
         "sha256": "1cc89a8b91d3360b2f19980981f56990b007da17eb1f57e28a53e88e1ad7d798"
       }
+    },
+    {
+      "id": "cmd-pr-008-astra-correction-cms-extractors-identity",
+      "command": "node --test tests/cms-layout.test.mjs tests/research-extractors.test.mjs tests/research-program/variable-identity.test.mjs",
+      "started_at": "2026-09-12T03:49:15.028951Z",
+      "completed_at": "2026-09-12T03:49:15.432039Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Focused correction regressions passed on committed producer 2909aa8b7b6bae674cc257968c8d3f58c30717c5. Exact command context and compressed output are retained in verification/research-program/pr-008/astra-correction-20260912.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
     }
   ],
   "artifacts": [
@@ -1315,14 +1343,14 @@
     {
       "id": "artifact-scripts-research-source-extractors-mjs",
       "path": "scripts/research/source-extractors.mjs",
-      "sha256": "4c20f533a935de08530ab4ec533e93f8373bb8f1086f81354e27b5ff9518ce9f",
-      "bytes": 27704
+      "sha256": "c9d519a79074a8a8235d15c6d6e9ac5a51c80c33245c10f9ebf569dddbed04cc",
+      "bytes": 29676
     },
     {
       "id": "artifact-tests-cms-layout-test-mjs",
       "path": "tests/cms-layout.test.mjs",
-      "sha256": "0acc2cb9a260291a51e3829a4257eadae086830268c2419b5368b7c3640e88eb",
-      "bytes": 3770
+      "sha256": "b83eb7c32b04637a78f0c757baa5171a0aba4e903ab2cdc7b6f2587819971c05",
+      "bytes": 6153
     },
     {
       "id": "artifact-tests-dictionary-review-test-mjs",
@@ -2687,6 +2715,42 @@
       "bytes": 8765
     },
     {
+      "id": "artifact-pr-008-astra-correction-cms-extractors-identity-json",
+      "path": "verification/research-program/pr-008/astra-correction-20260912/cms-extractors-identity.json",
+      "bytes": 785,
+      "sha256": "f42c92de7dd2df2c15a455cfc6eb0028b68917188d5ce6cf06a36a442fc61d6d"
+    },
+    {
+      "id": "artifact-pr-008-astra-correction-cms-extractors-identity-stderr-log-gz",
+      "path": "verification/research-program/pr-008/astra-correction-20260912/cms-extractors-identity.stderr.log.gz",
+      "bytes": 20,
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec"
+    },
+    {
+      "id": "artifact-pr-008-astra-correction-cms-extractors-identity-stdout-log-gz",
+      "path": "verification/research-program/pr-008/astra-correction-20260912/cms-extractors-identity.stdout.log.gz",
+      "bytes": 1773,
+      "sha256": "d682411c7edff058606af8f72f68448eab8a890e251f4f0dbad945cbd44252ea"
+    },
+    {
+      "id": "artifact-pr-008-astra-correction-finalization-json",
+      "path": "verification/research-program/pr-008/astra-correction-20260912/finalization.json",
+      "bytes": 3406,
+      "sha256": "f813f31f03e44d40a4ae8d9a90b60ac6be7a9c0c3bc27f837efa63e6c54acb04"
+    },
+    {
+      "id": "artifact-pr-008-astra-correction-prior-handoff-json-gz",
+      "path": "verification/research-program/pr-008/astra-correction-20260912/prior-handoff.json.gz",
+      "bytes": 19879,
+      "sha256": "219cf725f716bf84946790067a0e1bdef73a5ead298ba967c34d9537968b8b5d"
+    },
+    {
+      "id": "artifact-pr008-finalization-initial-timestamp-failure",
+      "path": "verification/research-program/pr-008/astra-correction-20260912/initial-handoff-validation.json.gz",
+      "bytes": 1978,
+      "sha256": "40d6e0d69907d97f747985b23c7e0cb020253d28ac5f96a30b5807166aad8364"
+    },
+    {
       "id": "controller-pr008-original-assignment-md",
       "path": "verification/research-program/bootstrap/pr008-source-capture-correction-20260911/original-assignment.md",
       "bytes": 6467,
@@ -2923,6 +2987,21 @@
         "artifact-correction-package-072241e-prior-handoff-PR-008-json",
         "artifact-correction-package-072241e-package-completion-receipt-json"
       ]
+    },
+    {
+      "id": "pr-008-astra-correction-regressions",
+      "status": "producer_checked",
+      "result": "CMS parser-only names remain documented names. Exact/reviewed-alias CMS wire mappings require an explicit wire_name and an explicit mapping with evidence; unsupported cases retain unmatched mappings and null wire names. Evidence-bearing exact/alias controls and CDC/Census native keys remain supported; unresolved context carries null IDs and disabled publication/promotion. Focused checks passed on the committed producer code; final metadata and combined-gate acceptance remain pending.",
+      "command_ids": [
+        "cmd-pr-008-astra-correction-cms-extractors-identity"
+      ],
+      "artifact_ids": [
+        "artifact-pr-008-astra-correction-cms-extractors-identity-json",
+        "artifact-pr-008-astra-correction-cms-extractors-identity-stderr-log-gz",
+        "artifact-pr-008-astra-correction-cms-extractors-identity-stdout-log-gz",
+        "artifact-pr-008-astra-correction-finalization-json",
+        "artifact-pr-008-astra-correction-prior-handoff-json-gz"
+      ]
     }
   ],
   "failures_and_skipped_checks": [
@@ -2954,13 +3033,25 @@
       "status": "skipped",
       "detail": "The WP11 current-input oracle is expected to reject the newly introduced workspace lock until PR086 independently reviews that transition. No wrapper, allowlist, historical edit or waiver is claimed by PR-008.",
       "next_action": "Keep WP11 current-lock review under its separately authorized scope."
+    },
+    {
+      "id": "pr-008-old-gate-superseded-by-correction",
+      "status": "skipped",
+      "detail": "The e3af8dd gate covers earlier bytes. The source corrections were reviewed as a working patch; this finalization does not claim a new combined gate, hosted CI or acceptance. Prior handoff and all historical failure evidence are preserved.",
+      "next_action": "Independent review of final committed metadata and the applicable combined gate."
+    },
+    {
+      "id": "pr008-finalization-initial-timestamp-format",
+      "status": "failed",
+      "detail": "The first new handoff validation rejected the two new command timestamps because its contract requires UTC Z rather than the equivalent +00:00 spelling. The raw command receipt and first rejection are retained; only handoff timestamp spelling was corrected.",
+      "next_action": "Validate this corrected metadata; no source change or repeated product test was needed."
     }
   ],
   "unresolved_claims": [
     {
       "id": "head-sha-pending",
       "status": "pending",
-      "detail": "The producer handoff cannot include its own eventual C-008-10 commit hash; root must bind the final committed head and tree during review transport.",
+      "detail": "The producer handoff cannot include its own eventual C-008-10 commit hash; root must bind the final committed head and tree during review transport. Latest independently reviewed source correction is 2909aa8b7b6bae674cc257968c8d3f58c30717c5; this new metadata commit still needs final controller head/tree transport.",
       "next_action": "Record the final branch HEAD and tree after independent review."
     },
     {
@@ -3010,10 +3101,10 @@
     }
   ],
   "next_consumer": "Astra/root independent reviewer and integration controller",
-  "next_action": "Root/PR086 independently review the package and exact current lock transition, then bind the final transported head/tree before combined integration.",
+  "next_action": "Astra must bind the final committed handoff and combined tree, independently review current metadata, run the applicable full gate and hosted CI, then accept/integrate with actual merge identities. Preserve all prior failed evidence; e3af8dd does not qualify the corrected bytes.",
   "independent_review": {
     "status": "in_review",
-    "reviewed_head_sha": "f58057a3233bb8e7dd3ce7f5a3c15f968cebdcd1",
+    "reviewed_head_sha": "2909aa8b7b6bae674cc257968c8d3f58c30717c5",
     "decisive_checks": [
       "strict v1.2 schema validation",
       "legacy transformation replay",
@@ -3036,7 +3127,8 @@
       "No scientific or production acceptance is claimed.",
       "Original independent e433eff review failures remain retained for audit; the a50f5fa parent-chain failures remain retained as pre-correction evidence.",
       "Root owns final independent acceptance and final transported head/tree.",
-      "The package completion commit is producer-checked only; PR086 owns independent current-lock review and root owns final combined-gate acceptance."
+      "The package completion commit is producer-checked only; PR086 owns independent current-lock review and root owns final combined-gate acceptance.",
+      "The reviewed correction source hashes equal this producer code commit. September 12 finalization metadata and the eventual combined candidate are not independently accepted by this handoff."
     ]
   }
 }
