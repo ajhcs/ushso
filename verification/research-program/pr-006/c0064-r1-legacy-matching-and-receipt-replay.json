@@ -1,0 +1,129 @@
+{
+  "format": "ushso.pr006.c0064-r1-legacy-matching-and-receipt-replay.v1",
+  "status": "producer_checked",
+  "continuation": {
+    "assignment_id": "pr006-evidence-finalization",
+    "run_id": "ushso-pr006-finalization-20260912",
+    "provider": "grok",
+    "model": "grok-4",
+    "role": "implement",
+    "kind": "metadata-only bounded continuation",
+    "does_not_replace": "Original producer identity remains gpt-5.6-luna/max with the Codex, GPT-6 self-label as historical prose only. This continuation authored only the evidence/handoff refresh.",
+    "managed_worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr006-facets-isolation-20260911-worktrees/ce-ushso-pr006-finalization-pr006-evidence-finalizat-d8c33a3f3d71-780b6234",
+    "source_head_at_start": "073a09da002df395e30c7394e256525035f1db61",
+    "source_tree_at_start": "a50ec2987da10892645b361efa4f0862cf2a03aa",
+    "node_version": "v24.14.0",
+    "git_identity": "Cole Lyons <clyons@ajhcs.org>",
+    "task_binding_unchanged": "verification/research-program/pr-006/task-binding.json sha256 aee1250f789e3b4796f4ccceadf2a94d1fccdec02a83a6e23c1325d961b30195"
+  },
+  "correction_commit": {
+    "id": "C-006-4-R1",
+    "sha": "073a09da002df395e30c7394e256525035f1db61",
+    "subject": "Preserve legacy facet matching and canonical receipt replay",
+    "files": [
+      "apps/web/src/providers/discoveryProvider.ts",
+      "apps/web/src/providers/discoveryProvider.test.ts"
+    ]
+  },
+  "reviewed_bytes": {
+    "astra_patch_sha256": "925de6172894e875072d27c0fbc733bcb91b4fc2b4ee74d78cf4c96a224c14b4",
+    "astra_review_base_head": "e3af8dda1720efd5d29fd1a65683d0f18a412e94",
+    "producer_head_when_reviewed": "8a9b921fa4be059624606116ed5ad33c238bb9ab",
+    "committed_provider_bytes_equal_reviewed_patch": true,
+    "files": {
+      "apps/web/src/providers/discoveryProvider.ts": {
+        "bytes": 31942,
+        "sha256": "895eb442d5dc83a078cc22f6a1c7be8af74aedccaedea89fed7fdfa349591eca"
+      },
+      "apps/web/src/providers/discoveryProvider.test.ts": {
+        "bytes": 21006,
+        "sha256": "dff0175c1c6e237f2011836a91380c1c20ee0d4928f24d6b73220b6100e4898b"
+      }
+    }
+  },
+  "behavior": {
+    "legacy_sections": "Raw data-category and reporting-unit tokens are preserved through fixture matching so the legacy matcher still selects value normalization from the original section.",
+    "canonical_queries": "Canonical query values compare exact wire IDs for source, geography, access_status, unit_of_analysis and capability, including invalid near-miss zero-result cases.",
+    "filter_combination": "Same-dimension values OR; cross-dimension values AND.",
+    "replayable_receipts": "Query and embedded receipt facet_filters record effective canonical wire IDs (pennsylvania -> US-PA, catalog-metadata-only -> public_catalog, and capability/unit aliases to matching exact wire IDs) that replay against the retrieval engine."
+  },
+  "astra_followup": {
+    "review_json": "/mnt/d/tmp/plumbob/ushso-astra-correction-followup-20260912/review.json",
+    "review_json_sha256": "4c61e4fc53c309f74818256dcbd5b85a8f1e9efea8b1062017786e532ae84d27",
+    "astra_review_md_sha256": "ed5094bd19aa23253b14cf6bfd7601aa8de0a5af6581bf2659ee8ca24ba97d74",
+    "candidate_before_sha256": "02ded3f1ab3b308a6a0932f9d18df3885fe004cc9200d81c4ae0942ecd175922",
+    "verdict": "corrections_verified_pending_immutable_candidate",
+    "resolved_findings": [
+      "ASTRA-R2-006-01",
+      "ASTRA-R2-006-02"
+    ],
+    "first_extra_web_command": {
+      "name": "web-regressions-and-probes",
+      "exit_code": 1,
+      "started_at": "2026-09-12T03:35:16.838280Z",
+      "completed_at": "2026-09-12T03:35:20.111314Z",
+      "existing_and_prior_cases_passed": 46,
+      "additional_cases_failed_before_assertions": 5,
+      "cause": "Invalid synthetic restricted-access record retained machine_actionable and public retrieval metadata; the provider rejected the inconsistent fixture.",
+      "relabeled_as_passing": false,
+      "stdout_sha256": "8c76b0f0fcb3ce4b689350044ea19d2b17b8deab71db3526833746085ad823eb",
+      "stderr_sha256": "4de18928ebcfb32aeed96feae2a6e930bf62899e7536b4ae37a629202ad7706d"
+    },
+    "corrected_five_case_rerun": {
+      "name": "web-extra-corrected-fixture",
+      "exit_code": 0,
+      "started_at": "2026-09-12T03:36:04.888780Z",
+      "completed_at": "2026-09-12T03:36:05.809400Z",
+      "scope": "Only the five added web cases after changing the contrasting access status to public_direct",
+      "product_code_changed": false,
+      "stdout_sha256": "244ea16cc49a99b85165656e0a43cc16c96bfa25432085d691444a3e8ce82912"
+    }
+  },
+  "checks": {
+    "this_continuation": [
+      {
+        "id": "cmd-finalization-provider-facets",
+        "path": "verification/research-program/pr-006/finalization-receipts/cmd-finalization-provider-facets.json",
+        "command": "npm run typecheck --workspace @ushso/observatory-web && npm test --workspace @ushso/observatory-web -- src/providers/discoveryProvider.test.ts src/data/facets.test.ts",
+        "started_at": "2026-09-12T03:53:44.653301Z",
+        "completed_at": "2026-09-12T03:53:46.749583Z",
+        "exit_code": 0,
+        "actual": "Typecheck passed; 2 test files and 29 tests passed."
+      }
+    ],
+    "reused_deeper_review": [
+      "cmd-correction-lexical-r2",
+      "cmd-correction-direct-base-r2",
+      "cmd-correction-isolation-r2",
+      "cmd-correction-web-full-r2",
+      "cmd-correction-retrieval-full-r2",
+      "cmd-subject-shortcircuit"
+    ],
+    "full_gate_rerun": false,
+    "handoff_validation": "cmd-finalization-handoff after evidence binding"
+  },
+  "scope": {
+    "allowed_writes": [
+      "docs/research-program/handoffs/PR-006.json",
+      "verification/research-program/pr-006/**"
+    ],
+    "source_or_test_edits": false,
+    "task_binding_edits": false,
+    "root_ledger_edits": false,
+    "publication_or_merge": false
+  },
+  "frozen_unchanged": [
+    "original base_sha c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+    "accepted PR-004 463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+    "accepted PR-005 4fa2e0b5c8ee210cff9750a59e69df4b4a527fdc",
+    "owner /root/pr006_facet_contract_decision",
+    "branch codex/ushso-pr006-facets-isolation-20260911",
+    "historical commands, failures and original producer identity",
+    "frozen discovery-result schema, browser types and both reference engines"
+  ],
+  "limitations": [
+    "head_sha remains typed pending-head transport; the controller binds the final metadata commit separately.",
+    "Astra verified the provider patch bytes, not this evidence packet. Existing focused results can inform independent review but do not qualify a different final candidate.",
+    "No full gate, hosted CI, browser harness, publication, merge, acceptance or PR-009/010 work was performed in this continuation."
+  ]
+}

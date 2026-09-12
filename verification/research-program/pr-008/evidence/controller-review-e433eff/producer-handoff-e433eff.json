@@ -1,0 +1,565 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-008",
+  "status": "producer_checked",
+  "owner": "gpt-5.6-luna/max",
+  "reviewer": "Astra",
+  "base_sha": "a00630c712e3a4e64354a77d268cb168fa3f528a",
+  "head_sha": null,
+  "dependency_merge_shas": {
+    "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd"
+  },
+  "branch": "codex/ushso-pr008-variable-identity-20260911",
+  "github_pr_url": null,
+  "changed_files": [
+    "contracts/machine-toolkit/v1.2.0/schemas/variable-identity.schema.json",
+    "docs/research-program/handoffs/PR-008.json",
+    "packages/identity/manifests/package-manifest.json",
+    "packages/identity/src/index.mjs",
+    "packages/identity/src/schema-catalog.mjs",
+    "packages/identity/src/variable-identity.mjs",
+    "packages/identity/validation/validation-receipt.json",
+    "scripts/research/source-extractors.mjs",
+    "tests/cms-layout.test.mjs",
+    "tests/research-extractors.test.mjs",
+    "tests/research-program/variable-identity.test.mjs",
+    "verification/research-program/pr-008/task-binding.json",
+    "verification/research-program/pr-008/evidence-index.json",
+    "verification/research-program/pr-008/evidence/c008-1-semantics.json",
+    "verification/research-program/pr-008/evidence/c008-2-extraction.json",
+    "verification/research-program/pr-008/evidence/c008-3-mapping-audit.json",
+    "verification/research-program/pr-008/command-receipts/cmd-c008-1-variable-identity.json",
+    "verification/research-program/pr-008/command-receipts/cmd-c008-2-extractors.json",
+    "verification/research-program/pr-008/command-receipts/cmd-c008-2-cms-layout.json",
+    "verification/research-program/pr-008/command-receipts/cmd-c008-2-dictionary-review.json",
+    "verification/research-program/pr-008/command-receipts/cmd-c008-2-update-cycle.json",
+    "verification/research-program/pr-008/command-receipts/cmd-c008-identity-package-test.json",
+    "verification/research-program/pr-008/command-receipts/cmd-c008-identity-seal.json",
+    "verification/research-program/pr-008/command-receipts/cmd-c008-frozen-machine-contracts.json",
+    "verification/research-program/pr-008/command-receipts/cmd-c008-3-audit.json",
+    "verification/research-program/pr-008/command-receipts/cmd-c008-3-check-handoff.json"
+  ],
+  "problem": "Publisher dictionaries and payload names can differ while historical extraction currently combines or replays fields through legacy shapes. PR-008 needs an additive identity boundary that preserves exact names, semantics and provenance without treating counts or punctuation as proof of equivalence.",
+  "resulting_behavior": "The v1.2 variable identity schema and package functions preserve literal wire names, labels, concepts, definitions, source and observed type assertions, units/applicability, literal code values, missingness, explicit mapping states and capture pointers. CDC/Census/CMS versioned adapters are replayable from capture hashes and JSON pointers. Existing cdc_columns/census_variables transformations and frozen machine contracts remain unchanged. Publication and promotion remain false; unresolved context and HCRIS discrepancies cannot mint or select a resolved identity.",
+  "commits": [
+    {
+      "id": "C-008-1",
+      "subject": "Add scoped variable identity semantics",
+      "sha": "2115157c51069197529a504ed5d2235db764eda3"
+    },
+    {
+      "id": "C-008-2",
+      "subject": "Add replayable variable identity extraction",
+      "sha": "2f3016c4a926301f10f3f15d3716cdae22ea32f8"
+    },
+    {
+      "id": "C-008-3",
+      "subject": "Record unresolved variable mapping evidence",
+      "sha": null
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "integration-base",
+      "id": "a00630c712e3a4e64354a77d268cb168fa3f528a",
+      "location": "external",
+      "version": "tree 08452bc996152f3a034833038b5fcc8373ecc5a8"
+    },
+    {
+      "kind": "accepted-PR007-integration-merge",
+      "id": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+      "location": "external",
+      "version": "accepted merge; integration merge 0d730aaf07b89bb16fb66fc224841a2d66c80d49"
+    },
+    {
+      "kind": "local-sample-shape-comparison.json",
+      "id": "verification/research-program/bootstrap/pr008-scope-20260911/sample-shape-comparison.json",
+      "location": "local",
+      "sha256": "12e2ecc060301665e4cae5c0f90899bc7f4609b31249fa3e0b9aeb969156ae61"
+    },
+    {
+      "kind": "local-decision.json",
+      "id": "verification/research-program/bootstrap/pr008-scope-20260911/decision.json",
+      "location": "local",
+      "sha256": "9dd7da730e52355dab411bf7df3ee892b1147bb15a82751d3d9a9bdd065aee10"
+    },
+    {
+      "kind": "local-PR-008.md",
+      "id": "docs/master-plan/2026-09-10/prs/PR-008.md",
+      "location": "local",
+      "sha256": "3cbe2a930913f90734294ffe3c9b1e76fad03d55795dd833c10e59b0cf8627d1"
+    },
+    {
+      "kind": "local-pr-007-integration-handoff.json",
+      "id": "verification/research-program/bootstrap/components-e6da2e2/pr-007-integration-handoff.json",
+      "location": "local",
+      "sha256": "f4344f1b730acf2c7dd3fc80d67b6569ca2637fdc099e3c2296c948dc42d8d08"
+    },
+    {
+      "kind": "local-cms-hha.json",
+      "id": "tests/fixtures/research-layouts/cms-hha.json",
+      "location": "local",
+      "sha256": "12cca35acf75c8a1a7933c86cb1675dac3bf404e173821d1857187731032d898"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c008-1-variable-identity",
+      "command": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node --test tests/research-program/variable-identity.test.mjs",
+      "result": "exit 0; tests 9, pass 9, fail 0",
+      "started_at": "2026-09-11T17:53:57.733Z",
+      "completed_at": "2026-09-11T17:53:58.091Z",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c008-2-extractors",
+      "command": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node --test tests/research-extractors.test.mjs",
+      "result": "exit 0; tests 17, pass 17, fail 0",
+      "started_at": "2026-09-11T17:53:58.092Z",
+      "completed_at": "2026-09-11T17:53:58.272Z",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c008-2-cms-layout",
+      "command": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node --test tests/cms-layout.test.mjs",
+      "result": "exit 0; tests 5, pass 5, fail 0",
+      "started_at": "2026-09-11T17:53:58.273Z",
+      "completed_at": "2026-09-11T17:53:58.467Z",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c008-2-dictionary-review",
+      "command": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node --test tests/dictionary-review.test.mjs",
+      "result": "exit 0; tests 6, pass 6, fail 0",
+      "started_at": "2026-09-11T17:53:58.467Z",
+      "completed_at": "2026-09-11T17:53:58.827Z",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c008-2-update-cycle",
+      "command": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node --test tests/update-cycle.test.mjs",
+      "result": "exit 0; tests 3, pass 3, fail 0",
+      "started_at": "2026-09-11T17:53:58.827Z",
+      "completed_at": "2026-09-11T17:53:59.080Z",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c008-identity-package-test",
+      "command": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm test --prefix packages/identity",
+      "result": "exit 0; tests 20, pass 20, fail 0",
+      "started_at": "2026-09-11T17:53:59.080Z",
+      "completed_at": "2026-09-11T17:53:59.398Z",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c008-identity-seal",
+      "command": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm run validate --prefix packages/identity",
+      "result": "exit 0; }",
+      "started_at": "2026-09-11T17:53:59.398Z",
+      "completed_at": "2026-09-11T17:53:59.564Z",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c008-frozen-machine-contracts",
+      "command": "git diff a00630c712e3a4e64354a77d268cb168fa3f528a --exit-code -- contracts/machine-toolkit/v1.0.0 contracts/machine-toolkit/v1.1.0",
+      "result": "exit 0; no stdout",
+      "started_at": "2026-09-11T17:53:59.564Z",
+      "completed_at": "2026-09-11T17:53:59.569Z",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c008-3-audit",
+      "command": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node --test tests/research-program/variable-identity.test.mjs",
+      "result": "exit 0; tests 9, pass 9, fail 0",
+      "started_at": "2026-09-11T17:53:59.569Z",
+      "completed_at": "2026-09-11T17:53:59.896Z",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c008-3-check-handoff",
+      "command": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-008.json",
+      "result": "exit 0; }",
+      "started_at": "2026-09-11T17:53:59.906Z",
+      "completed_at": "2026-09-11T17:54:00.136Z",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-packages-identity-src-index-mjs",
+      "path": "packages/identity/src/index.mjs",
+      "sha256": "ad4771f1d027f5c5e8e40a358d2beefde0a7645c1943242f417d1a030418022e",
+      "bytes": 628
+    },
+    {
+      "id": "artifact-packages-identity-src-schema-catalog-mjs",
+      "path": "packages/identity/src/schema-catalog.mjs",
+      "sha256": "fdc1f8e3c0fd6878a919945f56f487e70adcd48f05f473d5f34e8ffc829425dd",
+      "bytes": 6065
+    },
+    {
+      "id": "artifact-packages-identity-src-variable-identity-mjs",
+      "path": "packages/identity/src/variable-identity.mjs",
+      "sha256": "384e604435726dc392fd237eed8f4da5120408c06925924ac6fd88100e40e29a",
+      "bytes": 20173
+    },
+    {
+      "id": "artifact-scripts-research-source-extractors-mjs",
+      "path": "scripts/research/source-extractors.mjs",
+      "sha256": "91f00117babcc5fe4c441024e6f28e37de82e90cdb8ad4093c86f95e5a528cc0",
+      "bytes": 26235
+    },
+    {
+      "id": "artifact-tests-research-program-variable-identity-test-mjs",
+      "path": "tests/research-program/variable-identity.test.mjs",
+      "sha256": "aff09192a7ce78f0b5dbe2bd5f7f373d6345adc6414ffe0d5e91efb2bc617aaa",
+      "bytes": 10834
+    },
+    {
+      "id": "artifact-tests-research-extractors-test-mjs",
+      "path": "tests/research-extractors.test.mjs",
+      "sha256": "0d40e89a74ddd59a14e918f91ca8cccc5e75bd8a526db9417f99c849af3e322b",
+      "bytes": 12523
+    },
+    {
+      "id": "artifact-tests-dictionary-review-test-mjs",
+      "path": "tests/dictionary-review.test.mjs",
+      "sha256": "a8109aa958180cf71362f006d83058286cdfcf10a7cae4c059d4198289be22e7",
+      "bytes": 11443
+    },
+    {
+      "id": "artifact-tests-update-cycle-test-mjs",
+      "path": "tests/update-cycle.test.mjs",
+      "sha256": "4c268379d03616d19bb8cda7dd7b226bae56439b542d2c2c6938575fc2c9ef33",
+      "bytes": 8569
+    },
+    {
+      "id": "artifact-tests-cms-layout-test-mjs",
+      "path": "tests/cms-layout.test.mjs",
+      "sha256": "0acc2cb9a260291a51e3829a4257eadae086830268c2419b5368b7c3640e88eb",
+      "bytes": 3770
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-task-binding-json",
+      "path": "verification/research-program/pr-008/task-binding.json",
+      "sha256": "4391d00e0330f0dad5fda6248f74612a701bb30da624af0c78a7d683f8b18d57",
+      "bytes": 3747
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-evidence-index-json",
+      "path": "verification/research-program/pr-008/evidence-index.json",
+      "sha256": "9ffdc4c977e7991b464c7498bbcae49449db4a478fa9f0437ce7f0c924a5720c",
+      "bytes": 2686
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-evidence-c008-1-semantics-json",
+      "path": "verification/research-program/pr-008/evidence/c008-1-semantics.json",
+      "sha256": "771859b5bf46a6056909457b678edc7c7880a9747a711c760cb3b4de6db59d71",
+      "bytes": 829
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-evidence-c008-2-extraction-json",
+      "path": "verification/research-program/pr-008/evidence/c008-2-extraction.json",
+      "sha256": "175210fe2fd4218245b24f5105748af527530e462572d100934cff8a3d8bdfb6",
+      "bytes": 930
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-evidence-c008-3-mapping-audit-json",
+      "path": "verification/research-program/pr-008/evidence/c008-3-mapping-audit.json",
+      "sha256": "d0e5465f0f1c0eb9ab5585830dbbcd880a58e31d47679e7fd6984f3437bbf3dd",
+      "bytes": 1751
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-1-variable-identity-json",
+      "path": "verification/research-program/pr-008/command-receipts/cmd-c008-1-variable-identity.json",
+      "sha256": "7263993be825e302730d303a653130b996fe728884942d555987f5705877ce08",
+      "bytes": 973
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-2-extractors-json",
+      "path": "verification/research-program/pr-008/command-receipts/cmd-c008-2-extractors.json",
+      "sha256": "d3b0413ec00e5adb7eb219a3b64a97309cbd437ef12692bd3c88325a57761ffa",
+      "bytes": 954
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-2-cms-layout-json",
+      "path": "verification/research-program/pr-008/command-receipts/cmd-c008-2-cms-layout.json",
+      "sha256": "728c7bc2c07a8f68a77b598054b44a1f17496878531721cc5b9eaf04885ed53f",
+      "bytes": 942
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-2-dictionary-review-json",
+      "path": "verification/research-program/pr-008/command-receipts/cmd-c008-2-dictionary-review.json",
+      "sha256": "c820d93a61758e866d8e950ad90a91e10145c76242271612e0e63d3f91f19b13",
+      "bytes": 956
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-2-update-cycle-json",
+      "path": "verification/research-program/pr-008/command-receipts/cmd-c008-2-update-cycle.json",
+      "sha256": "14d2ce98822f6d9c5f2f443b65547fd2c754e15890ece15820343b00ff50a7ad",
+      "bytes": 946
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-identity-package-test-json",
+      "path": "verification/research-program/pr-008/command-receipts/cmd-c008-identity-package-test.json",
+      "sha256": "f9a0de59c40721fb0a6bf5c80c70630981b661129b7f3c5e5c6376ce740c4462",
+      "bytes": 983
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-identity-seal-json",
+      "path": "verification/research-program/pr-008/command-receipts/cmd-c008-identity-seal.json",
+      "sha256": "0f0fbf95f8bdace6cb5ef39b0c823748c6a5ac4ce1402199041c74c045defd34",
+      "bytes": 958
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-frozen-machine-contracts-json",
+      "path": "verification/research-program/pr-008/command-receipts/cmd-c008-frozen-machine-contracts.json",
+      "sha256": "950b0507c54d19f8cc35ab0f05f27902345ae71459bb6e9c26c58b397cb6322b",
+      "bytes": 985
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-3-audit-json",
+      "path": "verification/research-program/pr-008/command-receipts/cmd-c008-3-audit.json",
+      "sha256": "e0a6868b47911ccc04a226d68417ef35c3ce098cfb82ad23bdef67eec12f71e8",
+      "bytes": 961
+    },
+    {
+      "id": "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-3-check-handoff-json",
+      "path": "verification/research-program/pr-008/command-receipts/cmd-c008-3-check-handoff.json",
+      "sha256": "d9d28b510d62f86ed7401a0d14a5ef9aba3bb88376302eec5a1758be3ac5fecb",
+      "bytes": 977
+    },
+    {
+      "id": "artifact-packages-identity-manifests-package-manifest-json",
+      "path": "packages/identity/manifests/package-manifest.json",
+      "sha256": "eafe69ea94139acef28a6514fa61957f9f555ddf3d3ea7abf65410f292df4418",
+      "bytes": 1581
+    },
+    {
+      "id": "artifact-packages-identity-validation-validation-receipt-json",
+      "path": "packages/identity/validation/validation-receipt.json",
+      "sha256": "70167a0eb8c392f4c518af003ba7fd318ff5f2217216e0ab086a71931774b920",
+      "bytes": 929
+    },
+    {
+      "id": "artifact-contracts-machine-toolkit-v1-2-0-schemas-variable-identity-schema-json",
+      "path": "contracts/machine-toolkit/v1.2.0/schemas/variable-identity.schema.json",
+      "sha256": "e8b98d8c3e0a5b57bd86b060b7627cce8fdb210ea904c6e58a603f0294fc1618",
+      "bytes": 20795
+    },
+    {
+      "id": "artifact-verification-research-program-bootstrap-pr008-scope-20260911-sample-shape-comparison-json",
+      "path": "verification/research-program/bootstrap/pr008-scope-20260911/sample-shape-comparison.json",
+      "sha256": "12e2ecc060301665e4cae5c0f90899bc7f4609b31249fa3e0b9aeb969156ae61",
+      "bytes": 1832
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "c008-1-semantics",
+      "status": "producer_checked",
+      "result": "Scoped IDs, strict schema, unit applicability and unresolved context checks passed.",
+      "command_ids": [
+        "cmd-c008-1-variable-identity",
+        "cmd-c008-identity-package-test",
+        "cmd-c008-identity-seal"
+      ],
+      "artifact_ids": [
+        "artifact-verification-research-program-pr-008-evidence-c008-1-semantics-json",
+        "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-1-variable-identity-json",
+        "artifact-packages-identity-manifests-package-manifest-json",
+        "artifact-packages-identity-validation-validation-receipt-json",
+        "artifact-contracts-machine-toolkit-v1-2-0-schemas-variable-identity-schema-json"
+      ]
+    },
+    {
+      "id": "c008-2-extraction",
+      "status": "producer_checked",
+      "result": "Versioned CDC/Census/CMS extraction and exact replay passed while legacy tests remained green.",
+      "command_ids": [
+        "cmd-c008-2-extractors",
+        "cmd-c008-2-cms-layout",
+        "cmd-c008-2-dictionary-review",
+        "cmd-c008-2-update-cycle"
+      ],
+      "artifact_ids": [
+        "artifact-scripts-research-source-extractors-mjs",
+        "artifact-tests-research-extractors-test-mjs",
+        "artifact-tests-cms-layout-test-mjs",
+        "artifact-verification-research-program-pr-008-evidence-c008-2-extraction-json",
+        "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-2-extractors-json",
+        "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-2-cms-layout-json",
+        "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-2-dictionary-review-json",
+        "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-2-update-cycle-json"
+      ]
+    },
+    {
+      "id": "c008-compatibility",
+      "status": "producer_checked",
+      "result": "Frozen machine toolkit v1.0/v1.1 contract directories remained byte-identical from the exact base.",
+      "command_ids": [
+        "cmd-c008-frozen-machine-contracts"
+      ],
+      "artifact_ids": [
+        "artifact-verification-research-program-pr-008-evidence-c008-2-extraction-json",
+        "artifact-contracts-machine-toolkit-v1-2-0-schemas-variable-identity-schema-json"
+      ]
+    },
+    {
+      "id": "c008-3-mappings",
+      "status": "producer_checked",
+      "result": "The retained HCRIS summary records 117/117 fields and eleven supplied literal discrepancies as unresolved ambiguous mappings.",
+      "command_ids": [
+        "cmd-c008-3-audit"
+      ],
+      "artifact_ids": [
+        "artifact-verification-research-program-pr-008-evidence-c008-3-mapping-audit-json",
+        "artifact-verification-research-program-bootstrap-pr008-scope-20260911-sample-shape-comparison-json"
+      ]
+    },
+    {
+      "id": "c008-handoff",
+      "status": "producer_checked",
+      "result": "The sanitized handoff packet passed the repository handoff validator; final head remains pending controller transport.",
+      "command_ids": [
+        "cmd-c008-3-check-handoff"
+      ],
+      "artifact_ids": [
+        "artifact-verification-research-program-pr-008-task-binding-json",
+        "artifact-verification-research-program-pr-008-evidence-index-json",
+        "artifact-verification-research-program-pr-008-command-receipts-cmd-c008-3-check-handoff-json"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "scientific-acceptance-root-owned",
+      "status": "skipped",
+      "detail": "Scientific qualification, payload completeness and requirement acceptance remain outside this bounded producer task."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "head-sha-pending",
+      "status": "pending",
+      "detail": "The producer handoff cannot include its own eventual commit hash; root must bind the committed C-008-3 head during review transport.",
+      "next_action": "Record the final branch HEAD and tree after independent review."
+    },
+    {
+      "id": "hcris-name-mappings",
+      "status": "unresolved",
+      "detail": "All eleven literal HCRIS payload/dictionary name pairs remain ambiguous; no punctuation normalization or count equality selected a wire name.",
+      "next_action": "Require additional payload/document context for each mapping before any alias review."
+    },
+    {
+      "id": "payload-and-release-qualification",
+      "status": "unresolved",
+      "detail": "Dictionary captures and retained discrepancy summaries do not establish payload schema, release continuity, measurement units, completeness, joins or scientific fitness.",
+      "next_action": "Root-owned follow-up must bind qualified source evidence before promotion."
+    }
+  ],
+  "risks": [
+    {
+      "id": "legacy-replay-boundary",
+      "status": "accepted",
+      "detail": "Legacy cdc_columns/census_variables functions and historical proposal replay remain unchanged; future changes require a new transformation name/version."
+    },
+    {
+      "id": "catalog-invariant-boundary",
+      "status": "accepted",
+      "detail": "Context-scoped helper delegates to existing immutable registration and exact endpoint revision checks; it does not register or fabricate fields."
+    },
+    {
+      "id": "independent-review-pending",
+      "status": "risk",
+      "detail": "Root/Astra still owns independent diff review, publication and integration."
+    }
+  ],
+  "next_consumer": "Astra/root independent reviewer and integration controller",
+  "next_action": "Review C-008-1/C-008-2/C-008-3 on the task branch, bind the pending final head SHA/tree, then decide publication and integration.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [
+      "strict v1.2 schema validation",
+      "legacy transformation replay",
+      "literal mapping audit preservation",
+      "handoff validator"
+    ],
+    "limitations": [
+      "No private holdouts or live collection were accessed.",
+      "No scientific or production acceptance is claimed.",
+      "Final C-008-3 commit SHA is pending self-referential handoff transport."
+    ]
+  }
+}

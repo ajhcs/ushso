@@ -1,0 +1,1278 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-006",
+  "status": "producer_checked",
+  "owner": "/root/pr006_facet_contract_decision",
+  "reviewer": "Astra/root",
+  "base_sha": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+  "head_sha": null,
+  "dependency_merge_shas": {
+    "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+    "PR-005": "4fa2e0b5c8ee210cff9750a59e69df4b4a527fdc"
+  },
+  "branch": "codex/ushso-pr006-facets-isolation-20260911",
+  "github_pr_url": null,
+  "changed_files": [
+    "docs/research-program/handoffs/PR-006.json",
+    "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+    "packages/retrieval/tests/lexical-index.test.mjs",
+    "tests/direct-base-regression.test.mjs",
+    "tests/research-program/isolation-and-facets.test.mjs",
+    "apps/web/src/data/facets.ts",
+    "apps/web/src/data/facets.test.ts",
+    "apps/web/src/pages/SearchResultsPage.tsx",
+    "apps/web/src/pages/SearchResultsPage.test.tsx",
+    "apps/web/src/pages/SourcesPage.tsx",
+    "apps/web/src/pages/SourcesPage.test.tsx",
+    "apps/web/src/components/FacetSidebar.tsx",
+    "apps/web/src/components/FacetSidebar.test.tsx",
+    "apps/web/src/types/catalog.ts",
+    "apps/web/src/providers/discoveryProvider.ts",
+    "apps/web/src/providers/discoveryProvider.test.ts",
+    "verification/research-program/pr-006/c0061-isolation.json",
+    "verification/research-program/pr-006/c0062-facets-ui.json",
+    "verification/research-program/pr-006/c0063-labels-parity.json",
+    "verification/research-program/pr-006/command-receipts/cmd-c0061-c0062-c0063.json",
+    "verification/research-program/pr-006/command-receipts/cmd-direct-base-parity.json",
+    "verification/research-program/pr-006/command-receipts/cmd-lexical-parity.json",
+    "verification/research-program/pr-006/command-receipts/cmd-retrieval-full.json",
+    "verification/research-program/pr-006/command-receipts/cmd-web-focused.json",
+    "verification/research-program/pr-006/command-receipts/cmd-web-full.json",
+    "verification/research-program/pr-006/command-receipts/cmd-handoff-check.json",
+    "verification/research-program/pr-006/c0064-canonical-wire-and-sidebar-correction.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-web-focused.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-lexical-parity.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-direct-base-parity.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-isolation.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-web-full.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-retrieval-full.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-handoff.json",
+    "tests/subject-shortcircuit.test.mjs",
+    "verification/research-program/pr-006/task-binding.json",
+    "verification/research-program/pr-006/correction-authority/revised-assignment.md",
+    "verification/research-program/pr-006/correction-authority/authority-decision.json",
+    "verification/research-program/pr-006/correction-receipts/prior-task-binding.json",
+    "verification/research-program/pr-006/correction-receipts/prior-handoff.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-subject-shortcircuit.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-lexical-r2.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-direct-base-r2.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-isolation-r2.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-web-full-r2.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-retrieval-full-r2.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-handoff-r2.json",
+    "verification/research-program/pr-006/c0064-r1-legacy-matching-and-receipt-replay.json",
+    "verification/research-program/pr-006/finalization-receipts/prior-handoff.json",
+    "verification/research-program/pr-006/finalization-receipts/cmd-finalization-provider-facets.json",
+    "verification/research-program/pr-006/finalization-receipts/cmd-finalization-handoff.json"
+  ],
+  "problem": "The bounded facet work had two remaining cross-provider/UI contract defects at the reviewed head: canonical capability and unit IDs were normalized into near-match aliases, and duplicate hidden desktop/mobile sidebars reused the same availability description IDs. The frozen discovery-result v1.0.0 schema still forbids response-field additions. The combined gate then recorded four subject-shortcircuit fixture failures because intentional facet option label strings differed from the raw-label frozen control; this correction keeps that historical failure and the frozen reference engines intact. Independent Astra follow-up then identified two remaining provider defects on the working patch later committed as 073a09da002df395e30c7394e256525035f1db61: raw legacy data-category and reporting-unit sections must reach the legacy matcher, and recorded query/embedded-receipt filters must replay as exact canonical wire IDs. This metadata continuation does not rewrite those historical failures or the original producer identity.",
+  "resulting_behavior": "Canonical source, geography, access_status, unit_of_analysis and capability request values now compare exact wire IDs across the shared adapter and retrieval engine. An explicit fixture/browser compatibility boundary preserves only the existing legacy section aliases plus geography:pennsylvania -> US-PA and access/catalog-metadata-only -> public_catalog; canonical API parsing and the frozen response shape remain unchanged. FixtureDiscoveryProvider applies same-dimension OR and cross-dimension AND filters, recomputes counts in its bounded fixture scope and keeps response metadata consistent. Unknown geography/access controls remain count-free when absent, selected values survive narrowed and empty responses and remain removable with scoped availability reasons. Retrieval-core continues to change only existing facet option labels, resolving complete-match captured names without inventing scientific meaning. FacetSidebar derives per-instance availability reason IDs with React useId so each input references the paragraph in its own desktop or mobile instance. The additive subject-shortcircuit correction isolates only facets.sections[*].options[*].label differences across all 16 fixture/sort comparisons, asserts the independent public label map and rejects a representative pagination.total_matches mutation. Frozen schemas, types, reference engines, manifests, fingerprints and source bytes are unchanged. After C-006-4-R1, FixtureDiscoveryProvider preserves raw legacy section tokens through matching so data-category and reporting-unit aliases still select the legacy value normalizer; canonical query values remain exact wire IDs; same-dimension values OR and cross-dimension values AND; query and embedded receipt facet_filters record effective canonical wire IDs that replay against the retrieval engine.",
+  "commits": [
+    {
+      "id": "C-006-1",
+      "subject": "Preserve isolated catalog record accounting",
+      "sha": "4a7da7c2f2cc4cc027033e8138e4dd9fcfc51fb1"
+    },
+    {
+      "id": "C-006-2",
+      "subject": "Bound facet availability to current results",
+      "sha": "78c27bb7130bb74e0fa84659a03149074fe9b40a"
+    },
+    {
+      "id": "C-006-3",
+      "subject": "Add facet labels and fixture roundtrip evidence",
+      "sha": "5d8a8dd6d2e9d60d5b18fa1f69a09533c7e0d9e9"
+    },
+    {
+      "id": "C-006-4",
+      "subject": "Preserve exact canonical facet IDs",
+      "sha": "ee0a4c14a00e3cd155381a85ab26a1d35ea44d7d"
+    },
+    {
+      "id": "C-006-5",
+      "subject": "Isolate facet availability descriptions",
+      "sha": "6b2c3d6716d7cf5867f361bafa09ae6d055517aa"
+    },
+    {
+      "id": "C-006-3-R1",
+      "subject": "Isolate subject facet label parity",
+      "sha": "d7a7d514f40d629f5132872e926deea3f6f52ec7"
+    },
+    {
+      "id": "C-006-4-R1",
+      "subject": "Preserve legacy facet matching and canonical receipt replay",
+      "sha": "073a09da002df395e30c7394e256525035f1db61"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "PR006 current source",
+      "id": "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+      "location": "local",
+      "sha256": "b42ef12b6efda9e10c02f8b8ef4589fb7c2bcfd1f77e38c321b15081c220d23a"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "packages/retrieval/tests/lexical-index.test.mjs",
+      "location": "local",
+      "sha256": "39ce5950da9a6e23ec3c6f1fe2b0f13fbd9df1795cfaa5cdfa2a4e3c1a0f36de"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "tests/direct-base-regression.test.mjs",
+      "location": "local",
+      "sha256": "50955a0efb0e5c33cfa2e463f05df54943c5756d47e1b977fb48a482b8444ba8"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "tests/research-program/isolation-and-facets.test.mjs",
+      "location": "local",
+      "sha256": "c21da856a6219760a7ddf400e22e370751d0018cf6a867fc63f6f6bcb2795d85"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/data/facets.ts",
+      "location": "local",
+      "sha256": "b17367807d2a108c0370ce588c90b558aba2cf9c948fe0940d72afb91aaf127f"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/data/facets.test.ts",
+      "location": "local",
+      "sha256": "136191e4959fcd0a286baf1b8e8cf6f3f61bf0e2128705c5fa0f4fb636d9e5b8"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/components/FacetSidebar.tsx",
+      "location": "local",
+      "sha256": "840d3fb29a13a2bb7535b3fded97e20be5a305e97edd89014ac57c58da7da3b3"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/components/FacetSidebar.test.tsx",
+      "location": "local",
+      "sha256": "ae40956749a8efa9f00a783e40ccb91d10103d2a63f79545cfd240963b59286b"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/providers/discoveryProvider.ts",
+      "location": "local",
+      "sha256": "895eb442d5dc83a078cc22f6a1c7be8af74aedccaedea89fed7fdfa349591eca"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "apps/web/src/providers/discoveryProvider.test.ts",
+      "location": "local",
+      "sha256": "dff0175c1c6e237f2011836a91380c1c20ee0d4928f24d6b73220b6100e4898b"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "verification/research-program/pr-006/task-binding.json",
+      "location": "local",
+      "sha256": "aee1250f789e3b4796f4ccceadf2a94d1fccdec02a83a6e23c1325d961b30195"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "evaluation/research-program/cohorts.json",
+      "location": "local",
+      "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "verification/research-program/pr-004/evidence.json",
+      "location": "local",
+      "sha256": "21c8191004eca6f58b8f05fb8a404548ad8f686af0cd951b4a1df09b6a447e73"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "packages/retrieval/versions/v1.2.0/corpus/corpus.json",
+      "location": "local",
+      "sha256": "56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "verification/research-program/bootstrap/pr006-scope-20260911/decision.json",
+      "location": "local",
+      "sha256": "aa1b3a40d35054278d529210ff74767fd36ce2d586a1374b5d36fd8071c86015"
+    },
+    {
+      "kind": "frozen discovery-result schema",
+      "id": "packages/retrieval/schemas/discovery-result.schema.json@c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "location": "external",
+      "git_commit": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "git_path": "packages/retrieval/schemas/discovery-result.schema.json",
+      "sha256": "4fbd6832e1c7bf0495eb692f39395891af9b6d5229a9b6203c4e919886c928eb"
+    },
+    {
+      "kind": "frozen browser discovery types",
+      "id": "apps/web/src/types/discovery.ts@c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "location": "external",
+      "git_commit": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "git_path": "apps/web/src/types/discovery.ts",
+      "sha256": "3d56804e6dc368a7688216e46c3309cadf9546a48e3e44e3098e12f682c2b01a"
+    },
+    {
+      "kind": "frozen direct-base reference engine",
+      "id": "tests/fixtures/direct-base-control.mjs@c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "location": "external",
+      "git_commit": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "git_path": "tests/fixtures/direct-base-control.mjs",
+      "sha256": "9d672c8b8fb9602e820ffafe731db2dfadd9ffb9abb581b8f01a688b8705f14d"
+    },
+    {
+      "kind": "frozen retrieval-core reference bytes",
+      "id": "packages/retrieval/fixtures/retrieval-core-before-lexical-index.txt@c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "location": "external",
+      "git_commit": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+      "git_path": "packages/retrieval/fixtures/retrieval-core-before-lexical-index.txt",
+      "sha256": "6aa9d8f0ea943fc3a3278eb2aade82f544c8fe810fad52a0ad908a4aea5efd5f"
+    },
+    {
+      "kind": "dispatch packet",
+      "id": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr006-native-dispatch-packet.json",
+      "location": "external",
+      "version": "ushso.native-implementation-dispatch.v1; plan_sha256 5115ef87c2b5b1c432d807ab25bf48852c76e23a1a0fe7f323fce9be6dce5cb4",
+      "sha256": "416e75a5fcccd8d63b7d494ba50915c207b9f06763fbc876d36214ab84367c89"
+    },
+    {
+      "kind": "prior native contract decision",
+      "id": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr006-native-contract-decision.md",
+      "location": "external",
+      "version": "read-only bounded contract review; decoded SHA 4f94915f439b663f1d3da138c8a3bf7e52a6307fac041dcd816432ca54be8900",
+      "sha256": "4f94915f439b663f1d3da138c8a3bf7e52a6307fac041dcd816432ca54be8900"
+    },
+    {
+      "kind": "accepted integration dependency",
+      "id": "0d730aaf07b89bb16fb66fc224841a2d66c80d49",
+      "location": "external",
+      "version": "accepted PR005/007/086 integration tree used to create base"
+    },
+    {
+      "kind": "accepted dependency merge",
+      "id": "PR-004@463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+      "location": "external"
+    },
+    {
+      "kind": "accepted dependency merge",
+      "id": "PR-005@4fa2e0b5c8ee210cff9750a59e69df4b4a527fdc",
+      "location": "external"
+    },
+    {
+      "kind": "execution interface selection",
+      "id": "gpt-5.6-luna/max",
+      "location": "external",
+      "version": "native Codex collaboration; configured model gpt-5.6-luna, reasoning max"
+    },
+    {
+      "kind": "producer self-label boundary",
+      "id": "Codex, GPT-6",
+      "location": "external",
+      "version": "self-label retained only as prose; not a serving-model attestation"
+    },
+    {
+      "kind": "PR006 current source",
+      "id": "tests/subject-shortcircuit.test.mjs",
+      "location": "local",
+      "sha256": "55cd46a404e345670a97894f0539622e27fedb5b13764196acb494400c4eb987"
+    },
+    {
+      "kind": "PR006 revised assignment authority",
+      "id": "PR-006 assignment@72a3cf405f299af660bc7ac743659e6000415057",
+      "location": "external",
+      "version": "authority commit 72a3cf405f299af660bc7ac743659e6000415057; additive subject parity correction",
+      "git_commit": "72a3cf405f299af660bc7ac743659e6000415057",
+      "git_path": "docs/master-plan/2026-09-10/prs/PR-006.md",
+      "sha256": "db62769d6f79f0d4488bbe00f60ec9114be82f61f8796beba3c0d89662c92ed8"
+    },
+    {
+      "kind": "PR006 correction decision authority",
+      "id": "pr006-pr008-gate-corrections@72a3cf405f299af660bc7ac743659e6000415057",
+      "location": "external",
+      "version": "authority decision",
+      "git_commit": "72a3cf405f299af660bc7ac743659e6000415057",
+      "git_path": "verification/research-program/bootstrap/pr006-pr008-gate-corrections-20260911/decision.json",
+      "sha256": "0b157866211d2a8c839ce0c49127dee9ab7344c92020da2314ba9f8eaf428136"
+    },
+    {
+      "kind": "PR006 integration correction dispatch",
+      "id": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr006-integration-correction-dispatch.json",
+      "location": "external",
+      "version": "ushso.native-correction-dispatch.v1",
+      "sha256": "55dfc62981a96ba0000942ce293632ca24380f72a11059121175c2bac6905f60"
+    },
+    {
+      "kind": "PR006 structural subject label diff report",
+      "id": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/S/pr006-subject-shortcircuit-label-diff-report.md",
+      "location": "external",
+      "version": "read-only immutable a30cd7730de04200f7cd3ffb75ca83378c9e9a1d structural replay",
+      "sha256": "fada6f0f470156c8c1957715e5e9f1977bf03247b793f5b1411af24d793fcc10"
+    },
+    {
+      "kind": "PR006 corrected provider bytes at C-006-4-R1",
+      "id": "apps/web/src/providers/discoveryProvider.ts@073a09da002df395e30c7394e256525035f1db61",
+      "location": "external",
+      "git_commit": "073a09da002df395e30c7394e256525035f1db61",
+      "git_path": "apps/web/src/providers/discoveryProvider.ts",
+      "sha256": "895eb442d5dc83a078cc22f6a1c7be8af74aedccaedea89fed7fdfa349591eca"
+    },
+    {
+      "kind": "PR006 corrected provider-test bytes at C-006-4-R1",
+      "id": "apps/web/src/providers/discoveryProvider.test.ts@073a09da002df395e30c7394e256525035f1db61",
+      "location": "external",
+      "git_commit": "073a09da002df395e30c7394e256525035f1db61",
+      "git_path": "apps/web/src/providers/discoveryProvider.test.ts",
+      "sha256": "dff0175c1c6e237f2011836a91380c1c20ee0d4928f24d6b73220b6100e4898b"
+    },
+    {
+      "kind": "PR006 evidence-finalization continuation authorship",
+      "id": "grok-4/ushso-pr006-finalization-20260912",
+      "location": "external",
+      "version": "execution.provider grok; execution.model grok-4; assignment pr006-evidence-finalization; metadata-only continuation. Does not replace original gpt-5.6-luna/max producer identity or Codex, GPT-6 self-label."
+    },
+    {
+      "kind": "PR006 evidence-finalization managed check context",
+      "id": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr006-facets-isolation-20260911-worktrees/ce-ushso-pr006-finalization-pr006-evidence-finalizat-d8c33a3f3d71-780b6234",
+      "location": "external",
+      "version": "source HEAD 073a09da002df395e30c7394e256525035f1db61; tree a50ec2987da10892645b361efa4f0862cf2a03aa at start of metadata continuation; Node v24.14.0"
+    },
+    {
+      "kind": "Astra correction follow-up review",
+      "id": "/mnt/d/tmp/plumbob/ushso-astra-correction-followup-20260912/review.json",
+      "location": "external",
+      "version": "ushso.astra-correction-followup-review.v1; verdict corrections_verified_pending_immutable_candidate; patch_sha256 925de6172894e875072d27c0fbc733bcb91b4fc2b4ee74d78cf4c96a224c14b4",
+      "sha256": "4c61e4fc53c309f74818256dcbd5b85a8f1e9efea8b1062017786e532ae84d27"
+    },
+    {
+      "kind": "Astra correction follow-up narrative",
+      "id": "/mnt/d/tmp/plumbob/ushso-astra-correction-followup-20260912/ASTRA-REVIEW.md",
+      "location": "external",
+      "version": "independent follow-up; ASTRA-R2-006-01 and ASTRA-R2-006-02 resolved on reviewed patch; first extra web command exit 1 retained",
+      "sha256": "ed5094bd19aa23253b14cf6bfd7601aa8de0a5af6581bf2659ee8ca24ba97d74"
+    },
+    {
+      "kind": "Astra reviewed candidate hashes",
+      "id": "/mnt/d/tmp/plumbob/ushso-astra-correction-followup-20260912/candidate-before.json",
+      "location": "external",
+      "version": "uncommitted four-file patch hashes; PR-006 provider files match committed C-006-4-R1 bytes",
+      "sha256": "02ded3f1ab3b308a6a0932f9d18df3885fe004cc9200d81c4ae0942ecd175922"
+    },
+    {
+      "kind": "Astra independently reviewed correction patch",
+      "id": "/mnt/d/tmp/plumbob/ushso-astra-correction-followup-20260912/correction.patch",
+      "location": "external",
+      "version": "patch_sha256 925de6172894e875072d27c0fbc733bcb91b4fc2b4ee74d78cf4c96a224c14b4 over e3af8dda1720efd5d29fd1a65683d0f18a412e94",
+      "sha256": "925de6172894e875072d27c0fbc733bcb91b4fc2b4ee74d78cf4c96a224c14b4"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-lexical-parity",
+      "command": "node --test packages/retrieval/tests/lexical-index.test.mjs",
+      "started_at": "2026-09-11T18:18:20.785Z",
+      "completed_at": "2026-09-11T18:18:21.343Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Lexical projected and on-demand parity checks passed.",
+      "expected": "Expected exit 0.",
+      "actual": "2 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-lexical-parity.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-direct-base-parity",
+      "command": "node --test tests/direct-base-regression.test.mjs",
+      "started_at": "2026-09-11T18:18:21.345Z",
+      "completed_at": "2026-09-11T18:18:21.563Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Direct-base response parity and input immutability checks passed.",
+      "expected": "Expected exit 0.",
+      "actual": "9 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-direct-base-parity.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-c0061-c0062-c0063",
+      "command": "node --test tests/research-program/isolation-and-facets.test.mjs",
+      "started_at": "2026-09-11T18:18:21.564Z",
+      "completed_at": "2026-09-11T18:18:23.284Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Isolation, current-scope facets, OR/AND filters and complete-match label checks passed.",
+      "expected": "Expected exit 0.",
+      "actual": "3 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-c0061-c0062-c0063.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-web-focused",
+      "command": "npm run typecheck --workspace @ushso/observatory-web; npm run test:web -- --run src/data/facets.test.ts src/providers/discoveryProvider.test.ts src/components/FacetSidebar.test.tsx src/pages/SearchResultsPage.test.tsx src/pages/SourcesPage.test.tsx",
+      "started_at": "2026-09-11T18:18:23.284Z",
+      "completed_at": "2026-09-11T18:18:25.758Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Focused web typecheck and facet/provider/sidebar/page checks passed.",
+      "expected": "Expected exit 0.",
+      "actual": "Typecheck passed; 32 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-web-focused.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-web-full",
+      "command": "npm run test:web",
+      "started_at": "2026-09-11T18:18:25.759Z",
+      "completed_at": "2026-09-11T18:18:28.548Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Full observatory web suite passed.",
+      "expected": "Expected exit 0.",
+      "actual": "31 test files and 173 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-web-full.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-retrieval-full",
+      "command": "npm run test:retrieval",
+      "started_at": "2026-09-11T18:18:28.548Z",
+      "completed_at": "2026-09-11T18:18:32.886Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Full retrieval suite passed.",
+      "expected": "Expected exit 0.",
+      "actual": "105 tests passed. exit 0. Full stdout/stderr retained at verification/research-program/pr-006/command-receipts/cmd-retrieval-full.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-handoff-check",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-006.json",
+      "started_at": "2026-09-11T18:20:05.229Z",
+      "completed_at": "2026-09-11T18:20:05.502Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "PR-006 handoff validator passed after receipt binding; task scope, source identities, artifacts and pending-head transport are valid.",
+      "expected": "Expected exit 0.",
+      "actual": "Validator replay passed with exit 0. Full stdout/stderr are retained at verification/research-program/pr-006/command-receipts/cmd-handoff-check.json.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-web-focused",
+      "command": "npm run typecheck --workspace @ushso/observatory-web && npm run test:web -- --run src/data/facets.test.ts src/providers/discoveryProvider.test.ts src/components/FacetSidebar.test.tsx src/pages/SearchResultsPage.test.tsx src/pages/SourcesPage.test.tsx",
+      "started_at": "2026-09-11T18:54:16.754Z",
+      "completed_at": "2026-09-11T18:54:18.703Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Focused web typecheck and canonical facet/provider/sidebar/page checks passed.",
+      "expected": "Expected exit 0.",
+      "actual": "Typecheck passed; 5 test files and 35 tests passed; exit 0. Full stdout/stderr are retained in the correction receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-lexical-parity",
+      "command": "node --test packages/retrieval/tests/lexical-index.test.mjs",
+      "started_at": "2026-09-11T18:54:18.705Z",
+      "completed_at": "2026-09-11T18:54:19.198Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Lexical projected and on-demand parity checks passed after the bounded correction.",
+      "expected": "Expected exit 0.",
+      "actual": "2 tests passed; exit 0. Full stdout/stderr are retained in the correction receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-direct-base-parity",
+      "command": "node --test tests/direct-base-regression.test.mjs",
+      "started_at": "2026-09-11T18:54:19.199Z",
+      "completed_at": "2026-09-11T18:54:19.411Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Direct-base response parity and input immutability checks passed after the bounded correction.",
+      "expected": "Expected exit 0.",
+      "actual": "9 tests passed; exit 0. Full stdout/stderr are retained in the correction receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-isolation",
+      "command": "node --test tests/research-program/isolation-and-facets.test.mjs",
+      "started_at": "2026-09-11T18:54:19.412Z",
+      "completed_at": "2026-09-11T18:54:20.999Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Isolation, current-scope facets, OR/AND filters and complete-match label checks passed after the bounded correction.",
+      "expected": "Expected exit 0.",
+      "actual": "3 tests passed; exit 0. Full stdout/stderr are retained in the correction receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-web-full",
+      "command": "npm run test:web",
+      "started_at": "2026-09-11T18:54:21.000Z",
+      "completed_at": "2026-09-11T18:54:23.641Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Full observatory web suite passed after the bounded correction.",
+      "expected": "Expected exit 0.",
+      "actual": "31 test files and 176 tests passed; exit 0. Full stdout/stderr are retained in the correction receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-retrieval-full",
+      "command": "npm run test:retrieval",
+      "started_at": "2026-09-11T18:54:23.642Z",
+      "completed_at": "2026-09-11T18:54:27.795Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Full retrieval suite passed after the bounded correction.",
+      "expected": "Expected exit 0.",
+      "actual": "105 tests passed; exit 0. Full stdout/stderr are retained in the correction receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-006.json",
+      "started_at": "2026-09-11T18:59:00.677Z",
+      "completed_at": "2026-09-11T18:59:00.959Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Final PR-006 handoff validator replay after correction evidence binding.",
+      "expected": "Expected exit 0.",
+      "actual": "Observed exit 0; full sanitized stdout/stderr are retained in this receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-subject-shortcircuit",
+      "command": "node --test tests/subject-shortcircuit.test.mjs",
+      "started_at": "2026-09-11T20:29:26.655Z",
+      "completed_at": "2026-09-11T20:29:26.889Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Subject short-circuit parity preserves exact non-label response bytes across four fixtures and four sorts, asserts public labels independently and rejects a representative non-label mutation.",
+      "expected": "Expected exit 0.",
+      "actual": "Observed exit 0; full stdout/stderr are retained in this receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-lexical-r2",
+      "command": "node --test packages/retrieval/tests/lexical-index.test.mjs",
+      "started_at": "2026-09-11T20:30:45.449Z",
+      "completed_at": "2026-09-11T20:30:45.938Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Required PR-006 correction check passed after the subject-parity amendment.",
+      "expected": "Expected exit 0.",
+      "actual": "Observed exit 0; full stdout/stderr are retained in this receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-direct-base-r2",
+      "command": "node --test tests/direct-base-regression.test.mjs",
+      "started_at": "2026-09-11T20:30:46.163Z",
+      "completed_at": "2026-09-11T20:30:46.353Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Required PR-006 correction check passed after the subject-parity amendment.",
+      "expected": "Expected exit 0.",
+      "actual": "Observed exit 0; full stdout/stderr are retained in this receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-isolation-r2",
+      "command": "node --test tests/research-program/isolation-and-facets.test.mjs",
+      "started_at": "2026-09-11T20:30:46.588Z",
+      "completed_at": "2026-09-11T20:30:48.232Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Required PR-006 correction check passed after the subject-parity amendment.",
+      "expected": "Expected exit 0.",
+      "actual": "Observed exit 0; full stdout/stderr are retained in this receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-web-full-r2",
+      "command": "npm run test:web",
+      "started_at": "2026-09-11T20:30:48.464Z",
+      "completed_at": "2026-09-11T20:30:51.515Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Required PR-006 correction check passed after the subject-parity amendment.",
+      "expected": "Expected exit 0.",
+      "actual": "Observed exit 0; full stdout/stderr are retained in this receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-retrieval-full-r2",
+      "command": "npm run test:retrieval",
+      "started_at": "2026-09-11T20:30:51.792Z",
+      "completed_at": "2026-09-11T20:30:56.099Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Required PR-006 correction check passed after the subject-parity amendment.",
+      "expected": "Expected exit 0.",
+      "actual": "Observed exit 0; full stdout/stderr are retained in this receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-correction-handoff-r2",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-006.json",
+      "started_at": "2026-09-11T20:40:28.745Z",
+      "completed_at": "2026-09-11T20:40:29.031Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Final PR-006 handoff validator replay after subject-parity correction evidence binding.",
+      "expected": "Expected exit 0.",
+      "actual": "Observed exit 0; full sanitized stdout/stderr are retained in this receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-finalization-provider-facets",
+      "command": "npm run typecheck --workspace @ushso/observatory-web && npm test --workspace @ushso/observatory-web -- src/providers/discoveryProvider.test.ts src/data/facets.test.ts",
+      "started_at": "2026-09-12T03:53:44.653301Z",
+      "completed_at": "2026-09-12T03:53:46.749583Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Focused web typecheck plus provider and facets tests passed on the managed finalization worktree after C-006-4-R1.",
+      "expected": "Expected exit 0.",
+      "actual": "Typecheck passed; 2 test files and 29 tests passed; exit 0. Full sanitized stdout/stderr are retained in this receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    },
+    {
+      "id": "cmd-finalization-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-006.json",
+      "started_at": "2026-09-12T03:56:51.523631Z",
+      "completed_at": "2026-09-12T03:56:51.870746Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "PR-006 handoff validator replay after C-006-4-R1 evidence binding on the managed finalization worktree.",
+      "expected": "Expected exit 0.",
+      "actual": "Observed exit 0; full sanitized stdout/stderr are retained in this receipt.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-c0061-isolation",
+      "path": "verification/research-program/pr-006/c0061-isolation.json",
+      "sha256": "96a9e3dfdb53c6a5be45a8d08d55326d327064a6de7fe12f41d0693e22b19e5d",
+      "bytes": 1602
+    },
+    {
+      "id": "artifact-c0062-facets-ui",
+      "path": "verification/research-program/pr-006/c0062-facets-ui.json",
+      "sha256": "b572879c51c34bccac37bd476db5c1f67b8d65b2d0b6e0a10888d174ced5d1e3",
+      "bytes": 2497
+    },
+    {
+      "id": "artifact-c0063-labels-parity",
+      "path": "verification/research-program/pr-006/c0063-labels-parity.json",
+      "sha256": "8c985d0e1eefac9c88aafc8af22a1f6d8d1f388c040a4b501bb79de0bae6a4f2",
+      "bytes": 4123
+    },
+    {
+      "id": "artifact-cmd-c0061-c0062-c0063",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-c0061-c0062-c0063.json",
+      "sha256": "d691b3a921240fd7a89049c60f0e170268496d63e3af2e7dd5fa3bf76e6aa1e5",
+      "bytes": 971
+    },
+    {
+      "id": "artifact-cmd-direct-base-parity",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-direct-base-parity.json",
+      "sha256": "1dac642b63a05eee9b55675ea9093eabf84c1ff228b454e50f0dc8720cccd2bd",
+      "bytes": 1324
+    },
+    {
+      "id": "artifact-cmd-lexical-parity",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-lexical-parity.json",
+      "sha256": "3f3d02fab63d8904b65b0e5890ca382fcf51682cf9212fb2ee0ec14642be6794",
+      "bytes": 801
+    },
+    {
+      "id": "artifact-cmd-retrieval-full",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-retrieval-full.json",
+      "sha256": "1739847c98caee7237c03247da4959742a1175d2d2dc20a08b41b555815398eb",
+      "bytes": 9734
+    },
+    {
+      "id": "artifact-cmd-web-focused",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-web-focused.json",
+      "sha256": "9c03caa058f2d872ff99ae2ac45ed17c938c0e147458239c6953aadce7503527",
+      "bytes": 1782
+    },
+    {
+      "id": "artifact-cmd-web-full",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-web-full.json",
+      "sha256": "5b9898391766d2111e7e89a6ccf4b90f9679e1c2d06137d1901a993cd6d3568c",
+      "bytes": 918
+    },
+    {
+      "id": "artifact-cmd-handoff-check",
+      "path": "verification/research-program/pr-006/command-receipts/cmd-handoff-check.json",
+      "sha256": "652d2dfbf087bd16985001edce7272fc46ba3dbffabdaf17df7ee6e5ddd49d2b",
+      "bytes": 16940
+    },
+    {
+      "id": "artifact-c0064-canonical-wire-and-sidebar-correction",
+      "path": "verification/research-program/pr-006/c0064-canonical-wire-and-sidebar-correction.json",
+      "sha256": "f65bfd971b0f230f11d1fb23d4fc0453af9470cc770b5943f505b96411e60922",
+      "bytes": 9045
+    },
+    {
+      "id": "artifact-cmd-correction-web-focused",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-web-focused.json",
+      "sha256": "2d9b82189e3ec89f548674683d09325911b50169bfba517c63db435932ef1fd8",
+      "bytes": 1888
+    },
+    {
+      "id": "artifact-cmd-correction-lexical-parity",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-lexical-parity.json",
+      "sha256": "cd463d2589e15aff7af8348c80bd0b1e37cb3e01c1c564a66199f1284d734993",
+      "bytes": 942
+    },
+    {
+      "id": "artifact-cmd-correction-direct-base-parity",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-direct-base-parity.json",
+      "sha256": "bfe688b817e3d21ed9667924a0b926282b7155823fdf83cdce26f223c9552485",
+      "bytes": 1468
+    },
+    {
+      "id": "artifact-cmd-correction-isolation",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-isolation.json",
+      "sha256": "3babc4c21a01941a895aa51feab870305649cee0b952894657a8b76c665348c1",
+      "bytes": 1106
+    },
+    {
+      "id": "artifact-cmd-correction-web-full",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-web-full.json",
+      "sha256": "6950a524b0d16bdbf2bc71bd2933641dfcf939c91d9b91f52b2dc0b5ba5e97fb",
+      "bytes": 1040
+    },
+    {
+      "id": "artifact-cmd-correction-retrieval-full",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-retrieval-full.json",
+      "sha256": "246f57d5b8a229b4b9f417932f7b6cc3529cab0a9bf846c102bd434a296f766c",
+      "bytes": 9878
+    },
+    {
+      "id": "artifact-cmd-correction-handoff",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-handoff.json",
+      "sha256": "766287345332caaed07a8abe6d54f831927bcabf9bba2931374552f4617ef92c",
+      "bytes": 8925
+    },
+    {
+      "id": "artifact-cmd-subject-shortcircuit",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-subject-shortcircuit.json",
+      "sha256": "0cd64880c959da4534622cd2d6a9da956956513175036e7d232852ebbaba4556",
+      "bytes": 1900
+    },
+    {
+      "id": "artifact-cmd-correction-lexical-r2",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-lexical-r2.json",
+      "sha256": "09ec735e5c537921bb0058c5208622032da5ad4464481be154344ba43aefead4",
+      "bytes": 1141
+    },
+    {
+      "id": "artifact-cmd-correction-direct-base-r2",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-direct-base-r2.json",
+      "sha256": "f92d3a37f58dfcf5c8b92e1f0ae55b98d308cb6cbf8827009cb6b6396e3b025c",
+      "bytes": 1653
+    },
+    {
+      "id": "artifact-cmd-correction-isolation-r2",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-isolation-r2.json",
+      "sha256": "96ca0ed3a8a73895ae7056bf7e73aa66b4249b0813439870362bf551c0faa09f",
+      "bytes": 1275
+    },
+    {
+      "id": "artifact-cmd-correction-web-full-r2",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-web-full-r2.json",
+      "sha256": "1981cdb3f372193ae5184f111bc95df97bd339736ed7fe8378ad74055f511c6c",
+      "bytes": 1263
+    },
+    {
+      "id": "artifact-cmd-correction-retrieval-full-r2",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-retrieval-full-r2.json",
+      "sha256": "710aef9872675aed642e3b47a9c36a4b69680c168f337e96f17fda75b4c58471",
+      "bytes": 10118
+    },
+    {
+      "id": "artifact-correction-authority-assignment",
+      "path": "verification/research-program/pr-006/correction-authority/revised-assignment.md",
+      "sha256": "db62769d6f79f0d4488bbe00f60ec9114be82f61f8796beba3c0d89662c92ed8",
+      "bytes": 7779
+    },
+    {
+      "id": "artifact-correction-authority-decision",
+      "path": "verification/research-program/pr-006/correction-authority/authority-decision.json",
+      "sha256": "0b157866211d2a8c839ce0c49127dee9ab7344c92020da2314ba9f8eaf428136",
+      "bytes": 5669
+    },
+    {
+      "id": "artifact-prior-task-binding",
+      "path": "verification/research-program/pr-006/correction-receipts/prior-task-binding.json",
+      "sha256": "77cec5221ef0d6bf1ae69712fc0d451b968bfc557edf5d608dff57f5e2d626a6",
+      "bytes": 4457
+    },
+    {
+      "id": "artifact-prior-handoff",
+      "path": "verification/research-program/pr-006/correction-receipts/prior-handoff.json",
+      "sha256": "b1620b4e1d58e2eebe089b72af653fe1f92cdf08c25a0587bae5b7702c7f1b36",
+      "bytes": 38011
+    },
+    {
+      "id": "artifact-correction-task-binding",
+      "path": "verification/research-program/pr-006/task-binding.json",
+      "sha256": "aee1250f789e3b4796f4ccceadf2a94d1fccdec02a83a6e23c1325d961b30195",
+      "bytes": 5215
+    },
+    {
+      "id": "artifact-cmd-correction-handoff-r2",
+      "path": "verification/research-program/pr-006/correction-receipts/cmd-correction-handoff-r2.json",
+      "sha256": "2d74d45749b6bf7d6dafc7b79649e28a2b9b15d98f2ef615e1ede1d6f8fe023d",
+      "bytes": 9851
+    },
+    {
+      "id": "artifact-c0064-r1-legacy-matching-and-receipt-replay",
+      "path": "verification/research-program/pr-006/c0064-r1-legacy-matching-and-receipt-replay.json",
+      "sha256": "883932643a7d6fd5fe25bcf5a143c16e6848d067ff75cf66a766bf8cc5a6267d",
+      "bytes": 6852
+    },
+    {
+      "id": "artifact-prior-handoff-c0063-r1",
+      "path": "verification/research-program/pr-006/finalization-receipts/prior-handoff.json",
+      "sha256": "8eda59a2284d022e220ff4f5a77640c145e39c9e726eb4833292bbad8c9201b2",
+      "bytes": 52559
+    },
+    {
+      "id": "artifact-cmd-finalization-provider-facets",
+      "path": "verification/research-program/pr-006/finalization-receipts/cmd-finalization-provider-facets.json",
+      "sha256": "78f5e1667ef7c9a3c74873f9454375f647a7e9ee438ad7546c707cb2111b1924",
+      "bytes": 1670
+    },
+    {
+      "id": "artifact-cmd-finalization-handoff",
+      "path": "verification/research-program/pr-006/finalization-receipts/cmd-finalization-handoff.json",
+      "sha256": "be16598a89a283790861e32efe3ba733e8ba345cc9a0b42b95734545dacafc80",
+      "bytes": 11678
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C0061-isolation",
+      "status": "producer_checked",
+      "result": "The accepted denominator remains 3434 records, 3430 searchable records and exactly four CDC records with typed nonempty-description failures; the response retains partial_results without exposing invalid records.",
+      "command_ids": [
+        "cmd-c0061-c0062-c0063"
+      ],
+      "artifact_ids": [
+        "artifact-c0061-isolation",
+        "artifact-cmd-c0061-c0062-c0063"
+      ]
+    },
+    {
+      "id": "C0062-facets-ui",
+      "status": "producer_checked",
+      "result": "The browser facet adapter preserves unresolved controls and selected removal, supplies scoped availability reasons and does not add fields to the frozen API response. Fixture filter behavior and current-scope counts are covered by the final isolation test.",
+      "command_ids": [
+        "cmd-web-focused",
+        "cmd-c0061-c0062-c0063"
+      ],
+      "artifact_ids": [
+        "artifact-c0062-facets-ui",
+        "artifact-cmd-web-focused",
+        "artifact-cmd-c0061-c0062-c0063"
+      ]
+    },
+    {
+      "id": "C0063-labels-parity",
+      "status": "producer_checked",
+      "result": "Live label-only projection resolves complete-match captured labels; both frozen comparison paths isolate only option.label differences and assert all other response fields exactly.",
+      "command_ids": [
+        "cmd-lexical-parity",
+        "cmd-direct-base-parity",
+        "cmd-c0061-c0062-c0063",
+        "cmd-web-full",
+        "cmd-retrieval-full"
+      ],
+      "artifact_ids": [
+        "artifact-c0063-labels-parity",
+        "artifact-cmd-lexical-parity",
+        "artifact-cmd-direct-base-parity",
+        "artifact-cmd-c0061-c0062-c0063",
+        "artifact-cmd-web-full",
+        "artifact-cmd-retrieval-full"
+      ]
+    },
+    {
+      "id": "PR006-handoff-validation",
+      "status": "producer_checked",
+      "result": "Original, correction, subject-parity and C-006-4-R1 metadata-finalization handoff-validator replays passed with full structured outcomes, artifact hashes, source bindings, task scope and pending-head transport.",
+      "command_ids": [
+        "cmd-handoff-check",
+        "cmd-correction-handoff",
+        "cmd-correction-handoff-r2",
+        "cmd-finalization-handoff"
+      ],
+      "artifact_ids": [
+        "artifact-cmd-handoff-check",
+        "artifact-cmd-correction-handoff",
+        "artifact-cmd-correction-handoff-r2",
+        "artifact-cmd-finalization-handoff"
+      ]
+    },
+    {
+      "id": "C0064-canonical-wire-matching",
+      "status": "producer_checked",
+      "result": "Exact canonical matching and explicit legacy adaptation are covered against actual FixtureDiscoveryProvider and retrieval-core responses for all five canonical dimensions, including invalid near IDs and recomputed current fixture-scope counts.",
+      "command_ids": [
+        "cmd-correction-web-focused",
+        "cmd-correction-isolation",
+        "cmd-correction-web-full",
+        "cmd-correction-retrieval-full"
+      ],
+      "artifact_ids": [
+        "artifact-c0064-canonical-wire-and-sidebar-correction",
+        "artifact-cmd-correction-web-focused",
+        "artifact-cmd-correction-isolation",
+        "artifact-cmd-correction-web-full",
+        "artifact-cmd-correction-retrieval-full"
+      ]
+    },
+    {
+      "id": "C0065-sidebar-instance-descriptions",
+      "status": "producer_checked",
+      "result": "Per-instance availability description IDs and input relationships are covered by server-rendered tests while preserving displayed labels and the frozen discovery response schema.",
+      "command_ids": [
+        "cmd-correction-web-focused",
+        "cmd-correction-web-full"
+      ],
+      "artifact_ids": [
+        "artifact-c0064-canonical-wire-and-sidebar-correction",
+        "artifact-cmd-correction-web-focused",
+        "artifact-cmd-correction-web-full"
+      ]
+    },
+    {
+      "id": "C0063-R1-subject-label-parity",
+      "status": "producer_checked",
+      "result": "The amended subject-shortcircuit differential preserves exact non-label response bytes and order across four fixtures and four sorts, asserts public labels independently, and rejects a representative non-label mutation.",
+      "command_ids": [
+        "cmd-subject-shortcircuit",
+        "cmd-correction-lexical-r2",
+        "cmd-correction-direct-base-r2",
+        "cmd-correction-isolation-r2",
+        "cmd-correction-web-full-r2",
+        "cmd-correction-retrieval-full-r2"
+      ],
+      "artifact_ids": [
+        "artifact-cmd-subject-shortcircuit",
+        "artifact-cmd-correction-lexical-r2",
+        "artifact-cmd-correction-direct-base-r2",
+        "artifact-cmd-correction-isolation-r2",
+        "artifact-cmd-correction-web-full-r2",
+        "artifact-cmd-correction-retrieval-full-r2"
+      ]
+    },
+    {
+      "id": "C0064-R1-legacy-matching-and-receipt-replay",
+      "status": "producer_checked",
+      "result": "C-006-4-R1 preserves raw legacy section information for matching, exact canonical queries, OR within a dimension/AND across dimensions, and replayable query/embedded-receipt canonical wire IDs. Focused provider/facets checks passed in the managed finalization worktree; Astra independently verified the same provider bytes. The first extra web-fixture command remains failed.",
+      "command_ids": [
+        "cmd-finalization-provider-facets",
+        "cmd-correction-isolation-r2",
+        "cmd-correction-web-full-r2"
+      ],
+      "artifact_ids": [
+        "artifact-c0064-r1-legacy-matching-and-receipt-replay",
+        "artifact-cmd-finalization-provider-facets",
+        "artifact-prior-handoff-c0063-r1"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "H-PR006-HEAD",
+      "status": "pending",
+      "detail": "C-006-4, C-006-5, C-006-3-R1 and C-006-4-R1 are bound to their committed Git objects, while the final metadata handoff update is part of the current head; head_sha remains typed pending-head transport for root binding.",
+      "next_action": "Root binds the final head and tree during independent acceptance/publication."
+    },
+    {
+      "id": "H-PR006-BROWSER",
+      "status": "pending",
+      "detail": "The controller owns the corrected real-Chrome API and FixtureDiscoveryProvider interaction replay; the producer makes no browser or participant qualification claim.",
+      "next_action": "Root replays the browser harness against the final committed head."
+    },
+    {
+      "id": "H-PR006-SETUP",
+      "status": "failed",
+      "detail": "One attempted full-web bootstrap wrapper used a mistyped nested worktree path and exited before running tests. The lock released normally and the corrected invocation passed the full 170-test suite.",
+      "next_action": "Retain as harness history; use the corrected command receipt for acceptance."
+    },
+    {
+      "id": "H-PR006-SCIENCE",
+      "status": "unresolved",
+      "detail": "R01-R16 and scientific, participant and production acceptance remain outside this implementation handoff.",
+      "next_action": "Resolve only through the program acceptance process."
+    },
+    {
+      "id": "H-PR006-NETWORK",
+      "status": "skipped",
+      "detail": "No live collection, private holdout access, server binding, publisher payload request or deployment was performed.",
+      "next_action": "None for this bounded packet."
+    },
+    {
+      "id": "H-PR006-REVIEW-CANONICAL",
+      "status": "failed",
+      "detail": "Independent review of prior head 5d8a8dd6d2e9d60d5b18fa1f69a09533c7e0d9e9 found two canonical near-match failures: topic:claims matched topic-claims and facility_period matched facility-period. The retained UI receipt is /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr006-controller-review-5d8a8dd/ui/receipt.json with SHA-256 44caa37ba7063ad8835d45a04fbc3afd180dc880c242bd20f25002f53c4b2ba6; C-006-4 addresses the finding.",
+      "next_action": "Root replays the controller engine/UI harness against the final head and retains this historical failure receipt."
+    },
+    {
+      "id": "H-PR006-REVIEW-MOBILE-IDS",
+      "status": "failed",
+      "detail": "The retained extended Chrome receipt for prior head 5d8a8dd6d2e9d60d5b18fa1f69a09533c7e0d9e9 found duplicate availability description IDs in API and fixture mobile 390px/320px sidebars. Receipt: /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr006-controller-browser-extended-5d8a8dd/receipt.json, SHA-256 53e38039fadf20ebe73752da439dd669ee03390aebb2d1680d4b25a1cc16af72; C-006-5 addresses the finding.",
+      "next_action": "Root replays the corrected v5 Chrome harness against the final head; no producer browser qualification claim is made."
+    },
+    {
+      "id": "H-PR006-SUBJECT-LABEL-PARITY",
+      "status": "failed",
+      "detail": "The combined gate on a30cd7730de04200f7cd3ffb75ca83378c9e9a1d reported four subject-shortcircuit case failures across four sorts (16 comparisons) at $.facets.sections[0].options[0].label (cdc-socrata expected versus Centers for Disease Control and Prevention Data Catalog actual), $.facets.sections[1].options[0].label (unknown versus Geography unresolved), $.facets.sections[2].options[0].label (public_catalog versus Public catalog metadata; payload access unresolved), and $.facets.sections[3].options[0].label (unknown versus Observation unit unresolved); contextual and identity cases also differ at $.facets.sections[4].options[0].label, while multiple differs there and at $.facets.sections[4].options[1].label. The retained structural replay report shows all non-label JSON paths, key order and control fingerprints equal. This additive correction isolates only option labels and retains the failed gate/packet.",
+      "next_action": "Root independently replays the six required checks and subject amendment against the final head; no scientific or full-gate acceptance is claimed by the producer."
+    },
+    {
+      "id": "H-PR006-ASTRA-EXTRA-FIXTURE",
+      "status": "failed",
+      "detail": "Astra follow-up command web-regressions-and-probes at /mnt/d/tmp/plumbob/ushso-astra-correction-followup-20260912 exited 1. Existing 37 frontend tests and nine prior reviewer cases passed; the five added cases hit an invalid synthetic restricted-access record that retained machine_actionable/public retrieval metadata. Original fixture web-extra.test.ts.initial-fixture and failed logs are retained. The reviewer then corrected the fixture to public_direct and reran only those five cases as web-extra-corrected-fixture with exit 0. This first extra web command is not relabeled as passing. No product code was changed to resolve the fixture error.",
+      "next_action": "Retain the failed extra-web command and successful five-case rerun as independent-review history; do not convert the first command into a pass."
+    },
+    {
+      "id": "H-PR006-FULL-GATE",
+      "status": "pending",
+      "detail": "This metadata-only continuation did not rerun the full npm test/build/cf:dry-run gate or hosted CI. Astra follow-up also did not rerun the full gate; the old e3af8dd gate applies to uncorrected bytes.",
+      "next_action": "Root independently reviews this metadata packet and runs the applicable full gate against the final bound head."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "U-PR006-HEAD-SHA",
+      "status": "pending",
+      "detail": "The final head includes original C-006-1/C-006-2/C-006-3 plus append-only C-006-4 ee0a4c14a00e3cd155381a85ab26a1d35ea44d7d, C-006-5 6b2c3d6716d7cf5867f361bafa09ae6d055517aa, additive C-006-3-R1 d7a7d514f40d629f5132872e926deea3f6f52ec7 and C-006-4-R1 073a09da002df395e30c7394e256525035f1db61; this metadata continuation cannot embed its own final object ID, so root binding remains pending."
+    },
+    {
+      "id": "U-PR006-BROWSER",
+      "status": "pending",
+      "detail": "Corrected real-Chrome API and FixtureDiscoveryProvider interaction replay, including v5 mobile per-instance description checks, remains pending independent controller review of the final head."
+    },
+    {
+      "id": "U-PR006-LIVE-PAYLOAD",
+      "status": "unresolved",
+      "detail": "Facet availability describes the current response/catalog scope and does not establish publisher payload access or authorization."
+    },
+    {
+      "id": "U-PR006-SCIENTIFIC",
+      "status": "unresolved",
+      "detail": "No R01-R16 scientific claim or participant qualification is asserted."
+    }
+  ],
+  "risks": [
+    {
+      "id": "R-PR006-FINGERPRINT",
+      "status": "risk",
+      "detail": "The historical v1.2.0 corpus algorithm fingerprint and reference pins remain unchanged while retrieval-core facet labels change. Differential tests normalize only option.label and compare all other response fields exactly; the amended subject-shortcircuit test additionally asserts the independent public label map and rejects a pagination.total_matches mutation. Publication must preserve that historical boundary.",
+      "next_action": "Root independently checks the label-only diff against publication policy."
+    },
+    {
+      "id": "R-PR006-FIXTURE-SCOPE",
+      "status": "risk",
+      "detail": "Fixture filtering is bounded to accepted response records and its recomputed counts are explicitly marked as fixture response scope, not live catalog totals.",
+      "next_action": "Keep fixture provider unpromoted for unrestricted queries."
+    },
+    {
+      "id": "R-PR006-LABEL-CONFLICT",
+      "status": "risk",
+      "detail": "When captured source/capability labels conflict or are absent, the projection retains a static or raw bounded label and does not infer scientific meaning from an ID.",
+      "next_action": "Review any newly observed label vocabulary in a successor contract if it requires new fields."
+    },
+    {
+      "id": "R-PR006-CANONICAL-COMPATIBILITY",
+      "status": "risk",
+      "detail": "Legacy browser/fixture tokens are adapted in an explicit helper while canonical request matching remains exact. A future public compatibility guarantee would require a named successor contract rather than broad normalization or a frozen API edit.",
+      "next_action": "Keep API requests on canonical five-dimension wire IDs and retain the legacy adapter only at the bounded fixture/browser boundary."
+    }
+  ],
+  "next_consumer": "Astra/root",
+  "next_action": "Independently review this metadata packet against the frozen historical evidence and C-006-4-R1 provider bytes, bind the pending HEAD/tree, then run the applicable full gate. Existing focused Astra results can inform that review but do not qualify a different final candidate. Replay the corrected Chrome API/fixture harness only after the bound head exists. Publication, hosted CI and merge retain their authorization boundaries.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [
+      "non-label parity against both frozen reference engines",
+      "C0061 denominator and exact CDC isolation",
+      "C0062 current-scope availability/roundtrip semantics",
+      "C0063 complete-match labels absent from the current page",
+      "full web and retrieval suites",
+      "corrected real-Chrome API and FixtureDiscoveryProvider replay",
+      "16 subject/sort comparisons with option-label-only normalization and representative non-label negative control",
+      "legacy data-category/reporting-unit sections reach the legacy matcher",
+      "query and embedded-receipt facet_filters replay as exact canonical wire IDs"
+    ],
+    "limitations": [
+      "Producer checks are offline and local; no private holdouts, live publisher payload, participant study, deployment or scientific acceptance was performed.",
+      "head_sha remains pending because the final metadata commit cannot contain its own object ID.",
+      "Astra verified the uncommitted/committed provider patch bytes; that review does not qualify this evidence packet or a later bound head.",
+      "The first Astra extra web-fixture command exited 1 and is retained as failed; only the corrected five-case rerun passed."
+    ]
+  }
+}

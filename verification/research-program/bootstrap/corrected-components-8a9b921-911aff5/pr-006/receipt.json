@@ -1,0 +1,166 @@
+{
+  "format": "ushso.pr006-parity-independent-review.v1",
+  "recorded_at": "2026-09-11T20:45:17.099622+00:00",
+  "reviewer": "Astra/root",
+  "implementation_author": "native /root/pr006_facet_contract_decision",
+  "head": "8a9b921fa4be059624606116ed5ad33c238bb9ab",
+  "tree": "bce0e5b5542e76690f48226eff023a7b4ac55fd3",
+  "original_base": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+  "prior_independently_reviewed_head": "7e5819515b2f625d63de82efdd13571af096fbf6",
+  "scope_packet_sha256": "55dfc62981a96ba0000942ce293632ca24380f72a11059121175c2bac6905f60",
+  "correction_paths": [
+    "docs/research-program/handoffs/PR-006.json",
+    "tests/subject-shortcircuit.test.mjs",
+    "verification/research-program/pr-006/correction-authority/authority-decision.json",
+    "verification/research-program/pr-006/correction-authority/revised-assignment.md",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-direct-base-r2.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-handoff-r2.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-isolation-r2.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-lexical-r2.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-retrieval-full-r2.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-correction-web-full-r2.json",
+    "verification/research-program/pr-006/correction-receipts/cmd-subject-shortcircuit.json",
+    "verification/research-program/pr-006/correction-receipts/prior-handoff.json",
+    "verification/research-program/pr-006/correction-receipts/prior-task-binding.json",
+    "verification/research-program/pr-006/task-binding.json"
+  ],
+  "handoff_sha256": "8eda59a2284d022e220ff4f5a77640c145e39c9e726eb4833292bbad8c9201b2",
+  "artifact_bindings_checked": 30,
+  "artifact_errors": [],
+  "source_review": [
+    "The helper clones each response and deletes only facets.sections[*].options[*].label before complete JSON.stringify equality. It preserves all other array/object ordering and values.",
+    "All four fixture scenarios and all four sorts remain. Public labels are literal independent maps; missing labels cannot pass. A changed pagination.total_matches remains unequal after normalization.",
+    "No product code or frontend bytes changed since the previous independent Chrome/UI/engine review at 7e58195; those prior results are retained as prior-head evidence. This execution newly replays the engine and corrected comparisons on the final head."
+  ],
+  "frozen_paths_unchanged": [
+    "tests/fixtures/direct-base-control.mjs",
+    "tests/fixtures/direct-base-input.json",
+    "packages/retrieval/schemas/discovery-result.schema.json",
+    "packages/retrieval/fixtures/retrieval-core-before-lexical-index.txt",
+    "evaluation/research-program/cohorts.json",
+    "evaluation/research-program/tasks.json",
+    "docs/research-program/acceptance.md"
+  ],
+  "commands": [
+    {
+      "label": "subject-shortcircuit",
+      "argv": [
+        "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+        "--test",
+        "tests/subject-shortcircuit.test.mjs"
+      ],
+      "started_at": "2026-09-11T20:45:15.611282+00:00",
+      "duration_seconds": 0.21203758288174868,
+      "exit_code": 0,
+      "streams": {
+        "stdout": {
+          "path": "subject-shortcircuit.stdout.log",
+          "bytes": 681,
+          "sha256": "808269b9b35d54e17e587773f28389a5cba8c995d0c497e33584157d2db3c120"
+        },
+        "stderr": {
+          "path": "subject-shortcircuit.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "direct-base",
+      "argv": [
+        "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+        "--test",
+        "tests/direct-base-regression.test.mjs"
+      ],
+      "started_at": "2026-09-11T20:45:15.823363+00:00",
+      "duration_seconds": 0.21263236086815596,
+      "exit_code": 0,
+      "streams": {
+        "stdout": {
+          "path": "direct-base.stdout.log",
+          "bytes": 781,
+          "sha256": "d4a0dd73ef29bb7a5e30f44566574a8d748a72a791663a75edb5bfefcba19596"
+        },
+        "stderr": {
+          "path": "direct-base.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "lexical",
+      "argv": [
+        "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+        "--test",
+        "packages/retrieval/tests/lexical-index.test.mjs"
+      ],
+      "started_at": "2026-09-11T20:45:16.036038+00:00",
+      "duration_seconds": 0.48510718531906605,
+      "exit_code": 0,
+      "streams": {
+        "stdout": {
+          "path": "lexical.stdout.log",
+          "bytes": 271,
+          "sha256": "27878b5d843a64474cdceb7206803d0735f7f431734d8818b01b8b4cde37541d"
+        },
+        "stderr": {
+          "path": "lexical.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "controller-engine",
+      "argv": [
+        "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr006-controller-facet-cases.mjs",
+        "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr006-parity-review-20260911"
+      ],
+      "started_at": "2026-09-11T20:45:16.521178+00:00",
+      "duration_seconds": 0.26000585313886404,
+      "exit_code": 0,
+      "streams": {
+        "stdout": {
+          "path": "controller-engine.stdout.log",
+          "bytes": 1763,
+          "sha256": "4bdb5db9b8afd4e8b12224fc92899bc763251b3fc3aa722038136e79fc9a4289"
+        },
+        "stderr": {
+          "path": "controller-engine.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "label": "handoff",
+      "argv": [
+        "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node",
+        "scripts/research-program/check-handoff.mjs",
+        "docs/research-program/handoffs/PR-006.json"
+      ],
+      "started_at": "2026-09-11T20:45:16.781221+00:00",
+      "duration_seconds": 0.3044499671086669,
+      "exit_code": 0,
+      "streams": {
+        "stdout": {
+          "path": "handoff.stdout.log",
+          "bytes": 8164,
+          "sha256": "8d46b4f36adaa72679fb76c1f2c815b025fab1fa89299e7da16aee630794843d"
+        },
+        "stderr": {
+          "path": "handoff.stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "status": "PASS",
+  "independent_integration_acceptance": "pending combined gate and hosted CI",
+  "current_approval_issued": false,
+  "requirements_accepted": [],
+  "worktree_clean": true
+}

@@ -6,7 +6,7 @@ import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { Pagination } from '../components/Pagination'
 import { ResultCard } from '../components/ResultCard'
-import { buildFacetSections } from '../data/facets'
+import { buildCanonicalFacetSections, normalizeDiscoveryFacetSections } from '../data/facets'
 import { adaptDiscoveryResponse } from '../lib/catalogAdapter'
 import { searchDocumentTitle, setDocumentTitle } from '../lib/documentTitle'
 import { createSearchReturnContext, datasetDetailsHref, parseReturnContext, serializeReturnContext, resultAnchorId } from '../lib/returnContext'
@@ -48,6 +48,13 @@ function interpretationLines(result: NonNullable<ReturnType<typeof adaptDiscover
 
 export function displayedRecordIds(records: DatasetRecord[]) {
   return records.map((record) => record.canonicalResult.record_id)
+}
+
+export function buildSearchFacetSections(result: DiscoveryResult, records: DatasetRecord[], selected: string[]) {
+  const totalMatches = result.pagination?.total_matches ?? result.total_matches ?? records.length
+  return result.facets
+    ? normalizeDiscoveryFacetSections(result.facets.sections, records, totalMatches, selected)
+    : buildCanonicalFacetSections(records, records.length, selected)
 }
 
 export function SearchIdentityNote({ result }: { result: DiscoveryResult }) {
@@ -149,11 +156,11 @@ export function SearchResultsPage() {
 
   const records = catalog?.records ?? []
   const displayedIds = displayedRecordIds(records)
-  const facets: FacetSectionConfig[] = discovery.status === 'ready' && discovery.result.facets
-    ? discovery.result.facets.sections.map((section) => ({ ...section, expandable: section.options.length > 5 }))
-    : buildFacetSections(records)
   const pagination = discovery.status === 'ready' ? discovery.result.pagination : null
   const totalMatches = pagination?.total_matches ?? (discovery.status === 'ready' ? discovery.result.total_matches ?? records.length : 0)
+  const facets: FacetSectionConfig[] = discovery.status === 'ready'
+    ? buildSearchFacetSections(discovery.result, records, state.filters)
+    : []
   const pageCount = Math.max(1, Math.ceil(totalMatches / (pagination?.page_size ?? PAGE_SIZE)))
 
   const detailsHref = (record: DatasetRecord) => datasetDetailsHref(record.id, createSearchReturnContext({ pathname: location.pathname, search: location.search }, record.id, typeof window === 'undefined' ? 0 : window.scrollY))

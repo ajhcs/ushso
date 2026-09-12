@@ -3,7 +3,7 @@
   "date": "2026-09-10",
   "status": "proposed_not_implemented",
   "mission": "Help humans and AI find, understand and obtain tested routes to US health-systems data.",
-  "source_sha256": "d65327e2035d8067d2ad9226c4cdfc79f41faa7e67661475c24901664627ab47",
+  "source_sha256": "ce02e3a24ff6dd3cbae0c641a1293c28f09e193bcfd279424b0b0bf07f897bd2",
   "requirements": [
     {
       "id": "R01",
@@ -837,7 +837,8 @@
         "apps/web/src/components/FacetSidebar.test.tsx",
         "apps/web/src/types/catalog.ts",
         "apps/web/src/providers/discoveryProvider.ts",
-        "apps/web/src/providers/discoveryProvider.test.ts"
+        "apps/web/src/providers/discoveryProvider.test.ts",
+        "tests/subject-shortcircuit.test.mjs"
       ],
       "outcome": "Source defects are visible without making missing values useful filters.",
       "commits": [
@@ -856,8 +857,8 @@
         {
           "id": "C-006-3",
           "subject": "Use public labels for facet values",
-          "instructions": "Map source/capability values to captured readable labels and controlled enums to public labels while preserving canonical URL/API values. The live engine may change only existing facet label strings; use complete pre-pagination matches so a label need not depend on the current page. The shared web adapter derives the five canonical dimensions from canonical records and does not expose fallback aliases such as other-states or open-data-api as live filters. Preserve both frozen differential reference engines. In their current comparison tests, isolate only intentional label differences and assert the entire remaining response unchanged, with independent expected-label cases. Do not rewrite frozen fixtures, source artifacts or historical fingerprints.",
-          "verification": "Filter selections retain canonical values and identical record IDs/counts across pagination, live responses and fixture fallback. A facet value absent from the current page still has the correct captured label. Accessible names, checked state and described unavailability remain meaningful; controls without counts render no fabricated count. Differential tests preserve exact parity for every non-label field."
+          "instructions": "Map source/capability values to captured readable labels and controlled enums to public labels while preserving canonical URL/API values. The live engine may change only existing facet label strings; use complete pre-pagination matches so a label need not depend on the current page. The shared web adapter derives the five canonical dimensions from canonical records and does not expose fallback aliases such as other-states or open-data-api as live filters. Preserve both frozen differential reference engines. In their current comparison tests, isolate only intentional label differences and assert the entire remaining response unchanged, with independent expected-label cases. Do not rewrite frozen fixtures, source artifacts or historical fingerprints. The full combined gate additionally identifies tests/subject-shortcircuit.test.mjs as a frozen-control comparison. Own that current test solely to isolate facets.sections[*].options[*].label differences. Preserve exact JSON byte/order comparison for every other field, all four subject fixtures and four sort modes, frozen engines, corpus input and algorithm fingerprint. Assert the captured public labels independently and prove a non-label mutation still fails parity. Record this as an additive correction, retaining the original failed gate and dispatch packet.",
+          "verification": "Filter selections retain canonical values and identical record IDs/counts across pagination, live responses and fixture fallback. A facet value absent from the current page still has the correct captured label. Accessible names, checked state and described unavailability remain meaningful; controls without counts render no fabricated count. Differential tests preserve exact parity for every non-label field. All 16 subject/sort comparisons pass with only option-label normalization; counts, values, ordering, scores, reasons and result fields remain checked. The separately asserted expected label map and a non-label negative control pass."
         }
       ],
       "acceptance": [
@@ -873,6 +874,7 @@
         "node --test packages/retrieval/tests/lexical-index.test.mjs",
         "node --test tests/direct-base-regression.test.mjs",
         "node --test tests/research-program/isolation-and-facets.test.mjs",
+        "node --test tests/subject-shortcircuit.test.mjs",
         "npm run test:web",
         "npm run test:retrieval"
       ]
@@ -970,15 +972,20 @@
         "tests/research-extractors.test.mjs",
         "tests/dictionary-review.test.mjs",
         "tests/update-cycle.test.mjs",
-        "tests/cms-layout.test.mjs"
+        "tests/cms-layout.test.mjs",
+        "contracts/machine-toolkit/v1.2.0/package.json",
+        "contracts/machine-toolkit/v1.2.0/README.md",
+        "contracts/machine-toolkit/v1.2.0/tools/verify.mjs",
+        "contracts/machine-toolkit/v1.2.0/tests/variable-identity.test.mjs",
+        "package-lock.json"
       ],
       "outcome": "Dictionary information can coexist with exact API keys without false schema claims.",
       "commits": [
         {
           "id": "C-008-1",
           "subject": "Define variable identity and semantics",
-          "instructions": "Add the strict additive contracts/machine-toolkit/v1.2.0/schemas/variable-identity.schema.json with wire_name, publisher_label, definition, publisher_concept, source_type, observed_type, unit/applicability, code values, missingness and exact source/asset/release/distribution/schema/field-revision context. Preserve frozen v1.0/v1.1 schemas and machine routes. Unresolved context carries nulls and a reason and cannot mint a resolved variable ID. Use context-scoped IDs without weakening existing immutable schema-catalog or join-endpoint contracts; update the current identity package seal through its existing tooling.",
-          "verification": "An identifier field accepts a reasoned not-applicable unit; a measurement missing units remains incomplete. Identical wire names in distinct release/distribution/schema contexts have distinct IDs. Invalid or foreign context cannot become resolved. The current identity package seal and frozen machine compatibility checks pass."
+          "instructions": "Add the strict additive contracts/machine-toolkit/v1.2.0/schemas/variable-identity.schema.json with wire_name, publisher_label, definition, publisher_concept, source_type, observed_type, unit/applicability, code values, missingness and exact source/asset/release/distribution/schema/field-revision context. Preserve frozen v1.0/v1.1 schemas and machine routes. Unresolved context carries nulls and a reason and cannot mint a resolved variable ID. Use context-scoped IDs without weakening existing immutable schema-catalog or join-endpoint contracts; update the current identity package seal through its existing tooling. Complete the existing v1.2.0 variable schema as a private bounded contract package with its own package.json, README, offline strict Ajv2020 validator and meaningful positive/negative tests. Preserve the schema bytes reviewed at a90071e, all v1.0/v1.1 contracts and the existing all-version contract runner. This package grants no route activation, release approval or scientific authority. Use the committed Node/npm versions and existing Ajv 8.20.0 resolution. Root package.json is unchanged; package-lock.json may change only the v1.2 workspace descriptor and its local node_modules link. Do not rewrite earlier package metadata, dependency resolutions, receipt pins or historical evidence.",
+          "verification": "An identifier field accepts a reasoned not-applicable unit; a measurement missing units remains incomplete. Identical wire names in distinct release/distribution/schema contexts have distinct IDs. Invalid or foreign context cannot become resolved. The current identity package seal and frozen machine compatibility checks pass. Contract discovery recognizes all three machine-toolkit versions and separately executes each test/validate command. The v1.2 schema remains strict and self-contained; literal encodings, mapping ambiguity, concept-versus-definition, unresolved context and unit applicability retain their established meanings. Independently compare the entire lock object before and after, permitting only the two exact workspace/link entries."
         },
         {
           "id": "C-008-2",
@@ -989,13 +996,14 @@
         {
           "id": "C-008-3",
           "subject": "Represent name mappings explicitly",
-          "instructions": "Add evidence-bearing documented-name to wire-name mappings with exact, reviewed alias, ambiguous or unmatched state. Do not normalize away semantic differences automatically.",
+          "instructions": "Add evidence-bearing documented-name to wire-name mappings with exact, reviewed alias, ambiguous or unmatched state. Do not normalize away semantic differences automatically. Retain the original missing-package gate failure and append package-completion, lockfile and evidence correction commits without rebasing or relabeling the historical PR008 base/dependency packet. The new lock is a separately reviewed current input for PR086; do not widen WP11 historical approval, alter the current wrapper, or claim combined acceptance from contract-package tests. A precise PR086 current-input amendment and joint exact-candidate gate remain prerequisites to integration acceptance.",
           "verification": "The retained sample-shape-comparison.json audit records 117 payload and 117 dictionary fields with 11 identifier discrepancies; keep those supplied literal differences unresolved until additional payload/document context supports each match. The audit is a discrepancy summary, not a full 117-field inventory. Exact, reviewed-alias, ambiguous and unmatched cases retain evidence and alternatives; counts or punctuation normalization alone never approve a mapping."
         }
       ],
       "acceptance": [
         "A 117-field count cannot conceal mismatched field identifiers.",
-        "Variable IDs are scoped by source release/distribution/schema."
+        "Variable IDs are scoped by source release/distribution/schema.",
+        "The complete v1.2 variable package executes alongside both earlier machine-toolkit versions. Its additive workspace lock requires separate current-input review, with historical/current approvals kept distinct and the combined gate passing before acceptance."
       ],
       "owner_role": "Luna Max, Grok or DeepSeek; assign one owner at dispatch",
       "reviewer_role": "Astra; named human domain/owner decision when required",
@@ -1008,8 +1016,12 @@
         "node --test tests/dictionary-review.test.mjs",
         "node --test tests/update-cycle.test.mjs",
         "node --test tests/cms-layout.test.mjs",
+        "node --test contracts/machine-toolkit/v1.2.0/tests/variable-identity.test.mjs",
         "npm test --prefix packages/identity",
-        "npm run validate --prefix packages/identity"
+        "npm run validate --prefix packages/identity",
+        "npm run validate --prefix contracts/machine-toolkit/v1.2.0",
+        "npm run test:contracts",
+        "node --test tests/contract-package-inventory.test.mjs"
       ]
     },
     {
@@ -5654,19 +5666,19 @@
         {
           "id": "C-086-1",
           "subject": "Retain and verify original WP11 input bytes",
-          "instructions": "Retain all 154 actual historical preimages from commit 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0 in a portable content-addressed snapshot outside verification/wp11/v1.3.0. Match exact path, length and SHA-256 against the immutable approved receipt e596e1b18a0251f611990c9752e1d12fb36cd05dab16bf55cf96e8d1fc431f9d, subject 294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98. Add a bounded snapshot reader under the owned current-attestation directory and use it for historical input proof. Preserve the historical package, approvals, evidence, receipts and predecessor chain byte-for-byte. Historical validation must work without Git/network and cannot substitute current or synthetic bytes. Keep the existing historical-pins and current-replay records as prior-candidate evidence; new records are additive and clearly identified.",
-          "verification": "Recover and verify 154 files totaling 1,347,732 bytes against the sealed inventory. Test missing, extra, one-byte-tampered and current-substituted blobs, incomplete inventories, duplicate paths and invalid path references. Prove verification from retained bytes with Git unavailable and unchanged historical subject. Rejected bytes cannot yield a passing historical proof."
+          "instructions": "Retain all 154 actual historical preimages from commit 30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0 in a portable content-addressed snapshot outside verification/wp11/v1.3.0. Match exact path, length and SHA-256 against the immutable approved receipt e596e1b18a0251f611990c9752e1d12fb36cd05dab16bf55cf96e8d1fc431f9d, subject 294d8b40bb5a2dbe1f55cdfde4a60205de75ee1ffe48e0108eae69aea2db0f98. Add a bounded snapshot reader under the owned current-attestation directory and use it for historical input proof. Preserve the historical package, approvals, evidence, receipts and predecessor chain byte-for-byte. Historical validation must work without Git/network and cannot substitute current or synthetic bytes. Keep the existing historical-pins and current-replay records as prior-candidate evidence; new records are additive and clearly identified. The PR006/PR008 combined a30cd77 gate exposes a current-test assumption that equates 156 actual current files with the immutable 154 historical pins. Correct only the current assertion using a test-local independent inventory derived from the declared scope, four broad roots and explicit root files. Compare every path, length and SHA-256, preserving uniqueness and order; never import the builder enumeration as its own oracle. Add meaningful current-file addition, removal, byte-change, duplicate and hash/length negative controls in task-owned temporary fixtures. Retain all historical 154-file, total-byte and subject checks unchanged. Keep named pre-PR005 package transitions portable by retaining exact PR003 package.json and PR085 package-lock.json with a manifest under verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/; the historical snapshot directory remains byte-identical. Read these named fixtures without Git or mutable current-file fallback.",
+          "verification": "Recover and verify 154 files totaling 1,347,732 bytes against the sealed inventory. Test missing, extra, one-byte-tampered and current-substituted blobs, incomplete inventories, duplicate paths and invalid path references. Prove verification from retained bytes with Git unavailable and unchanged historical subject. Rejected bytes cannot yield a passing historical proof. Independent positive current inventory matches the actual candidate, while additions/removals, duplicate records and altered lengths/hashes fail against the unchanged baseline. Named fixture payloads match their separately retained exact reviewed transition hashes and work without Git. Current technical and wrapper drafts remain pending with approval=null."
         },
         {
           "id": "C-086-2",
           "subject": "Bind current WP11 checks without transferring approval",
-          "instructions": "Keep the existing WP11 v1.3.0 technical builder, validator, successor helper and general runner unchanged. Invoke the actual builder on current source bytes and validate its complete current inventory. Separately bind adapter, tests, policy, unchanged runner, snapshot and snapshot reader into an explicit current wrapper subject. Preserve distinct technical and wrapper package identities and approval=null on both. Emit every historical-versus-current changed input with both hashes, sizes and source roles; no first-failure-only report or silent allowlist of the 11 PR005 files. Preserve all current technical/disabled-feature checks, strict direct --validate/--issue, exact aggregate routing, actual suite execution, future-version behavior, nonzero-test requirement, error, signal, timeout and output-bound propagation. Do not merge product inputs into a wrapper that substitutes for the existing technical subject or rebuild historical evidence from mixed current/snapshot reads. Record the existing builder coverage limits explicitly without expanding historical package scope or implying full release qualification.",
-          "verification": "An actual current-file change changes its pending technical subject while original snapshot proof still passes. Missing snapshot/reader bindings, stale policy pins, failed/malformed current evidence and any approval/release overclaim fail. A PR005-941c9cd comparison reports all 13 changed inputs (11 new plus two package transitions); the pre-PR005 integration comparison reports two. Preserve existing real runner, future-version, zero-test, timeout and child-error tests; strict direct validation and issuance still reject historical approval on the current subject."
+          "instructions": "Keep the existing WP11 v1.3.0 technical builder, validator, successor helper and general runner unchanged. Invoke the actual builder on current source bytes and validate its complete current inventory. Separately bind adapter, tests, policy, unchanged runner, snapshot and snapshot reader into an explicit current wrapper subject. Preserve distinct technical and wrapper package identities and approval=null on both. Emit every historical-versus-current changed input with both hashes, sizes and source roles; no first-failure-only report or silent allowlist of the 11 PR005 files. Preserve all current technical/disabled-feature checks, strict direct --validate/--issue, exact aggregate routing, actual suite execution, future-version behavior, nonzero-test requirement, error, signal, timeout and output-bound propagation. Do not merge product inputs into a wrapper that substitutes for the existing technical subject or rebuild historical evidence from mixed current/snapshot reads. Record the existing builder coverage limits explicitly without expanding historical package scope or implying full release qualification. The separately owned PR008 v1.2 workspace changes the current lock. After the controller independently reviews exact committed PR008 lock bytes and verifies that the full lock-object delta contains only the new workspace descriptor and its local link, add a separately named PR008_REVIEWED_PACKAGE_LOCK current-input record and pr008_workspace_lock_transition role. Preserve ALLOWED_PACKAGE_LOCK historical/pr085 records, historical proofs, strict direct validation and issue controls. Record exact before/after hashes, lengths, immutable source commit/tree and durable independent review receipt in the current policy reviewed_current_transitions section. Bind the transition review and all three named fixture files into the pending wrapper implementation subject. Fail closed for unknown, partial, altered or unrelated lock changes; no generic dynamic lock approval or future hash is allowed. Scope review and package checks alone are not full PR008 integration acceptance; the exact jointly composed candidate must still pass independent checks and the release gate. The reviewed lock is a required immutable correction input, not a retroactive change to the original accepted PR086 dependencies.",
+          "verification": "An actual current-file change changes its pending technical subject while original snapshot proof still passes. Missing snapshot/reader bindings, stale policy pins, failed/malformed current evidence and any approval/release overclaim fail. A PR005-941c9cd comparison reports all 13 changed inputs (11 new plus two package transitions); the pre-PR005 integration comparison reports two. Preserve existing real runner, future-version, zero-test, timeout and child-error tests; strict direct validation and issuance still reject historical approval on the current subject. The exact reviewed new lock returns its distinct current role with approval=null and a complete 154-pin current-versus-historical diff. Old named transitions retain their old roles. One-byte mutation, partial workspace/link update, unrelated dependency drift, stale policy/review bindings and unknown bytes remain rejected. Historical approval is rejected for both current subjects."
         },
         {
           "id": "C-086-3",
           "subject": "Publish current-input evidence and combined acceptance boundary",
-          "instructions": "Retain sanitized complete commands, snapshot provenance, all original failed receipts, fresh candidate-specific replays and an evidence index. Explain historical approval, current technical draft, wrapper draft and their separate identities in the current-attestation documentation and PR086 handoff. Bind exact integration/dependency/source hashes; a typed pending final head avoids self-reference. PR005 functional work produced under its earlier dependency packet remains historical producer evidence and can integrate only after the combined PR005/PR086 candidate passes independent checks. PR082 consumes this assignment and still resolves current-subject approval and exact release qualification. No historical approval is widened, no current approval is issued and no deployment is performed.",
+          "instructions": "Retain sanitized complete commands, snapshot provenance, all original failed receipts, fresh candidate-specific replays and an evidence index. Explain historical approval, current technical draft, wrapper draft and their separate identities in the current-attestation documentation and PR086 handoff. Bind exact integration/dependency/source hashes; a typed pending final head avoids self-reference. PR005 functional work produced under its earlier dependency packet remains historical producer evidence and can integrate only after the combined PR005/PR086 candidate passes independent checks. PR082 consumes this assignment and still resolves current-subject approval and exact release qualification. No historical approval is widened, no current approval is issued and no deployment is performed. Retain the a30cd77 gate failure, initial incomplete test-only proposal and corrected independent scope review. Preserve the original accepted PR086 implementation, handoff and dependency identities as historical records; use a new isolated correction task with an explicit authority packet and append new evidence. The controller reviews every substantive implementation change independently, then composes it with final PR006/PR008 heads for a new gate. No production, deployment, scientific approval, historical repin or R01-R16 acceptance is granted by this correction.",
           "verification": "Run the focused WP11 attestation tests, actual selected WP11 aggregate, current adapter and handoff validation. The controller independently inspects original byte hashes, decisive negative cases and the final immutable head, then runs the applicable full gate and hosted CI on the combined candidate. Producer-only success, synthetic overlays and old gate receipts do not qualify the combined result; R01-R16 definitions and frozen cohorts remain unchanged."
         }
       ],

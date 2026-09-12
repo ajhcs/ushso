@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { execFile as execFileCallback, spawnSync } from 'node:child_process'
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import test from 'node:test'
 import { promisify } from 'node:util'
@@ -15,6 +15,10 @@ import {
 } from '../scripts/run-contract-suites.mjs'
 import {
   ALLOWED_PACKAGE_LOCK,
+  NAMED_PRE_PR005_FIXTURE_FILES,
+  NAMED_PRE_PR005_FIXTURE_MANIFEST_PATH,
+  NAMED_PRE_PR005_FIXTURE_SCHEMA,
+  PR008_REVIEWED_CURRENT_LOCK,
   HISTORICAL_WP11_V1_3,
   ORIGINAL_PR085_PACKAGE_SNAPSHOT,
   PR005_941C9CD_CHANGED_INPUTS,
@@ -45,6 +49,68 @@ import {
 import { sha256 } from '../verification/successor-support.mjs'
 import { packageId } from '../verification/wp11/v1.3.0/tools/verify.mjs'
 const execFile = promisify(execFileCallback)
+
+const CURRENT_WP11_BROAD_ROOTS = Object.freeze([
+  'verification/wp11/v1.3.0',
+  'apps/web/src',
+  'packages/retrieval/tools',
+  'packages/retrieval/schemas',
+])
+const CURRENT_WP11_EXPLICIT_FILES = Object.freeze([
+  'verification/successor-support.mjs',
+  'package.json',
+  'package-lock.json',
+])
+const CURRENT_WP11_SKIP_DIRECTORIES = new Set([
+  'node_modules',
+  '.git',
+  'receipts',
+  'approvals',
+  'drafts',
+  'dist',
+  '.wrangler',
+])
+
+async function independentlyListCurrentFiles(root, relative) {
+  const entries = await readdir(path.join(root, relative), { withFileTypes: true })
+  const files = []
+  for (const entry of entries.sort((left, right) => left.name.localeCompare(right.name))) {
+    if (CURRENT_WP11_SKIP_DIRECTORIES.has(entry.name)) continue
+    const child = path.posix.join(relative, entry.name)
+    if (entry.isDirectory()) files.push(...await independentlyListCurrentFiles(root, child))
+    else if (entry.isFile()) files.push(child)
+    else throw new Error('WP11_INDEPENDENT_UNSUPPORTED_FILE_TYPE:' + child)
+  }
+  return files
+}
+
+async function independentlyReadCurrentTechnicalInventory(root = repoRoot) {
+  const scope = JSON.parse(await readFile(path.join(root, 'verification/wp11/v1.3.0/scope-paths.json'), 'utf8'))
+  assert.ok(Array.isArray(scope), 'WP11_INDEPENDENT_SCOPE_MISSING')
+  const paths = new Set([...CURRENT_WP11_EXPLICIT_FILES, ...scope])
+  for (const broadRoot of CURRENT_WP11_BROAD_ROOTS) {
+    for (const relative of await independentlyListCurrentFiles(root, broadRoot)) paths.add(relative)
+  }
+  const files = []
+  for (const relative of [...paths].sort()) {
+    assert.ok(!path.isAbsolute(relative) && !relative.split('/').includes('..'), 'WP11_INDEPENDENT_UNSAFE_PATH:' + relative)
+    const bytes = await readFile(path.join(root, relative))
+    assert.ok(bytes.length > 0, 'WP11_INDEPENDENT_EMPTY:' + relative)
+    files.push({ path: relative, bytes: bytes.length, sha256: sha256(bytes) })
+  }
+  return files
+}
+
+function normalizeCurrentTechnicalFiles(files) {
+  return files.map((file) => ({ path: file.path, bytes: file.bytes, sha256: file.sha256 })).sort((left, right) => left.path.localeCompare(right.path))
+}
+
+function assertCurrentTechnicalInventoryMatches(draft, expected) {
+  const actual = draft?.technical_evidence?.files
+  assert.ok(Array.isArray(actual), 'WP11_CURRENT_TECHNICAL_FILES_MISSING')
+  assert.equal(new Set(actual.map((file) => file.path)).size, actual.length, 'WP11_CURRENT_TECHNICAL_DUPLICATE_PATH')
+  assert.deepEqual(normalizeCurrentTechnicalFiles(actual), normalizeCurrentTechnicalFiles(expected), 'WP11_CURRENT_TECHNICAL_INVENTORY_MISMATCH')
+}
 
 async function historicalBytes() {
   const names = HISTORICAL_WP11_V1_3.files
@@ -149,28 +215,53 @@ function assertCompleteIndependentDiff(report, independent) {
     if (item.path === 'package.json') {
       assert.equal(item.role, 'reviewed_pr003_package_transition')
     } else if (item.path === 'package-lock.json') {
-      assert.equal(item.role, 'pr085_ci_v14_workspace_lock')
+      assert.ok(['pr085_ci_v14_workspace_lock', 'pr008_workspace_lock_transition'].includes(item.role))
     } else {
       assert.equal(item.role, 'current_unapproved_input_change')
     }
   }
 }
 
-async function readNamedPrePr005CurrentFile(retained, _root, relativePath) {
-  if (relativePath === 'package.json') {
-    const bytes = await readFile(path.resolve(repoRoot, relativePath))
-    assert.deepEqual(
-      { bytes: bytes.length, sha256: sha256(bytes) },
-      { bytes: REVIEWED_PR003_PACKAGE_SNAPSHOT.bytes, sha256: REVIEWED_PR003_PACKAGE_SNAPSHOT.sha256 },
-    )
-    return bytes
+let namedPrePr005FixturePromise
+async function readNamedPrePr005Fixture() {
+  if (!namedPrePr005FixturePromise) {
+    namedPrePr005FixturePromise = (async () => {
+      const manifestBytes = await readFile(path.resolve(repoRoot, NAMED_PRE_PR005_FIXTURE_MANIFEST_PATH))
+      assert.ok(manifestBytes.length > 0, 'WP11_NAMED_FIXTURE_MANIFEST_EMPTY')
+      const manifest = JSON.parse(manifestBytes.toString('utf8'))
+      assert.equal(manifest.schema_version, NAMED_PRE_PR005_FIXTURE_SCHEMA)
+      assert.equal(manifest.fixture_id, 'pre-pr005-package-transitions')
+      assert.equal(manifest.git_required, false)
+      assert.equal(manifest.file_count, Object.keys(NAMED_PRE_PR005_FIXTURE_FILES).length)
+      assert.equal(manifest.total_bytes, Object.values(NAMED_PRE_PR005_FIXTURE_FILES).reduce((sum, file) => sum + file.bytes, 0))
+      assert.ok(Array.isArray(manifest.files))
+      const result = new Map()
+      const manifestDir = path.dirname(path.resolve(repoRoot, NAMED_PRE_PR005_FIXTURE_MANIFEST_PATH))
+      for (const expected of Object.values(NAMED_PRE_PR005_FIXTURE_FILES)) {
+        const entry = manifest.files.find((item) => item.path === expected.relative_path)
+        assert.ok(entry, 'WP11_NAMED_FIXTURE_MISSING:' + expected.relative_path)
+        assert.equal(entry.fixture_path, path.posix.basename(expected.path))
+        assert.equal(entry.role, expected.role)
+        assert.equal(entry.source_state, expected.source_state)
+        assert.equal(entry.source_commit, expected.source_commit)
+        assert.equal(entry.source_path, expected.source_path)
+        assert.equal(entry.bytes, expected.bytes)
+        assert.equal(entry.sha256, expected.sha256)
+        const bytes = await readFile(path.join(manifestDir, entry.fixture_path))
+        assert.equal(bytes.length, expected.bytes, 'WP11_NAMED_FIXTURE_BYTES:' + expected.relative_path)
+        assert.equal(sha256(bytes), expected.sha256, 'WP11_NAMED_FIXTURE_HASH:' + expected.relative_path)
+        result.set(expected.relative_path, bytes)
+      }
+      assert.equal(result.size, manifest.files.length)
+      return result
+    })()
   }
-  if (relativePath === 'package-lock.json') {
-    const bytes = await readFile(path.resolve(repoRoot, relativePath))
-    assert.deepEqual(
-      { bytes: bytes.length, sha256: sha256(bytes) },
-      { bytes: ALLOWED_PACKAGE_LOCK.pr085_ci_v14.bytes, sha256: ALLOWED_PACKAGE_LOCK.pr085_ci_v14.sha256 },
-    )
+  return namedPrePr005FixturePromise
+}
+async function readNamedPrePr005CurrentFile(retained, _root, relativePath) {
+  if (relativePath === 'package.json' || relativePath === 'package-lock.json') {
+    const bytes = (await readNamedPrePr005Fixture()).get(relativePath)
+    assert.ok(bytes, 'WP11_NAMED_FIXTURE_MISSING:' + relativePath)
     return bytes
   }
   const bytes = retained.bytesByPath.get(relativePath)
@@ -193,8 +284,9 @@ const BUILDER_FIXTURE_EXTRA_FILES = Object.freeze([
 
 async function materializeMutableCurrentInputFixture(relativePath) {
   const retained = await readHistoricalPreimageSnapshot()
+  const currentInventory = await independentlyReadCurrentTechnicalInventory()
   const root = await mkdtemp(path.join(await verificationTempRoot(), 'ushso-pr086-wp11-current-input-'))
-  const paths = new Set(retained.files.map((pin) => pin.path))
+  const paths = new Set(currentInventory.map((file) => file.path))
   for (const extra of BUILDER_FIXTURE_EXTRA_FILES) paths.add(extra)
   for (const item of paths) {
     const dest = path.join(root, item)
@@ -206,6 +298,7 @@ async function materializeMutableCurrentInputFixture(relativePath) {
     relativePath,
     filePath: path.join(root, relativePath),
     retained,
+    currentInventory,
   }
 }
 
@@ -386,13 +479,55 @@ test('current technical builder hashes actual current files and remains unapprov
   assert.equal(draft.approval, null)
   assert.equal(draft.status, 'pending_authorized_review')
   assert.equal(draft.release_gate_pass, false)
-  assert.equal(draft.technical_evidence.files.length, SEALED_WP11_FILE_COUNT)
+  const expected = await independentlyReadCurrentTechnicalInventory()
+  assert.ok(expected.length > SEALED_WP11_FILE_COUNT)
+  assertCurrentTechnicalInventoryMatches(draft, expected)
   assert.notEqual(draft.subject_sha256, HISTORICAL_WP11_V1_3.subject_sha256)
   const resultCard = draft.technical_evidence.files.find((file) => file.path === 'apps/web/src/components/ResultCard.test.ts')
   assert.deepEqual(
     { bytes: resultCard.bytes, sha256: resultCard.sha256 },
     await hashPinned('apps/web/src/components/ResultCard.test.ts'),
   )
+})
+
+test('independent current inventory rejects additions, removals, duplicate records and byte or length drift', async () => {
+  const fixture = await materializeMutableCurrentInputFixture('apps/web/src/components/ResultCard.test.ts')
+  const expected = fixture.currentInventory
+  const resultCardPath = fixture.filePath
+  const resultCardBytes = await readFile(resultCardPath)
+  const missingPath = path.join(fixture.root, 'apps/web/src/pages/SourcesPage.test.tsx')
+  const extraPath = path.join(fixture.root, 'apps/web/src/__wp11_unexpected_current_file.txt')
+  try {
+    const baseline = await buildCurrentWp11Draft({ root: fixture.root })
+    assertCurrentTechnicalInventoryMatches(baseline, expected)
+
+    await rm(missingPath)
+    const missing = await buildCurrentWp11Draft({ root: fixture.root, validateCurrent: null })
+    assert.throws(() => assertCurrentTechnicalInventoryMatches(missing, expected), /WP11_CURRENT_TECHNICAL_INVENTORY_MISMATCH/u)
+    await writeFile(missingPath, await readFile(path.join(repoRoot, 'apps/web/src/pages/SourcesPage.test.tsx')))
+
+    await writeFile(extraPath, Buffer.from('unexpected current input\n'))
+    const extra = await buildCurrentWp11Draft({ root: fixture.root, validateCurrent: null })
+    assert.throws(() => assertCurrentTechnicalInventoryMatches(extra, expected), /WP11_CURRENT_TECHNICAL_INVENTORY_MISMATCH/u)
+    await rm(extraPath)
+
+    const duplicate = structuredClone(baseline)
+    duplicate.technical_evidence.files.push({ ...duplicate.technical_evidence.files[0] })
+    assert.throws(() => assertCurrentTechnicalInventoryMatches(duplicate, expected), /WP11_CURRENT_TECHNICAL_DUPLICATE_PATH/u)
+
+    const tampered = Buffer.from(resultCardBytes)
+    tampered[tampered.length - 1] ^= 1
+    await writeFile(resultCardPath, tampered)
+    const changedHash = await buildCurrentWp11Draft({ root: fixture.root, validateCurrent: null })
+    assert.throws(() => assertCurrentTechnicalInventoryMatches(changedHash, expected), /WP11_CURRENT_TECHNICAL_INVENTORY_MISMATCH/u)
+
+    const changedLength = Buffer.concat([resultCardBytes, Buffer.from('length-drift')])
+    await writeFile(resultCardPath, changedLength)
+    const changedBytes = await buildCurrentWp11Draft({ root: fixture.root, validateCurrent: null })
+    assert.throws(() => assertCurrentTechnicalInventoryMatches(changedBytes, expected), /WP11_CURRENT_TECHNICAL_INVENTORY_MISMATCH/u)
+  } finally {
+    await rm(fixture.root, { recursive: true, force: true })
+  }
 })
 
 test('actual current-file change updates the pending technical subject while snapshot proof still passes', async () => {
@@ -480,6 +615,12 @@ test('missing snapshot or reader bindings and stale policy pins fail closed', as
   const staleReader = structuredClone(policy)
   staleReader.historical_preimage_reader.sha256 = '11'.repeat(32)
   await assert.rejects(bindWrapperImplementation({ policy: staleReader }), /WP11_WRAPPER_POLICY_STALE_READER/u)
+  const stalePr008Lock = structuredClone(policy)
+  stalePr008Lock.reviewed_current_transitions.pr008_workspace_lock_transition.current_lock.sha256 = '00'.repeat(32)
+  await assert.rejects(bindWrapperImplementation({ policy: stalePr008Lock }), /WP11_WRAPPER_POLICY_STALE_PR008_CURRENT_LOCK/u)
+  const stalePr008Review = structuredClone(policy)
+  stalePr008Review.reviewed_current_transitions.pr008_workspace_lock_transition.review_receipt.sha256 = '11'.repeat(32)
+  await assert.rejects(bindWrapperImplementation({ policy: stalePr008Review }), /WP11_WRAPPER_POLICY_STALE_PR008_REVIEW_RECEIPT/u)
 })
 
 test('PR005-941c9cd comparison reports all 13 changed inputs and is not combined acceptance', async () => {
@@ -522,6 +663,42 @@ test('named pre-PR005 fixture comparison reports only the two package transition
   for (const item of report.changed) {
     assert.equal(item.current_source, 'pre_pr005_named_fixture')
   }
+})
+
+test('the independently reviewed PR008 lock is one exact current transition and remains unapproved', async () => {
+  const reviewedLock = await readGitBytes(PR008_REVIEWED_CURRENT_LOCK.source_commit, PR008_REVIEWED_CURRENT_LOCK.path)
+  assert.deepEqual(
+    { bytes: reviewedLock.length, sha256: sha256(reviewedLock) },
+    { bytes: PR008_REVIEWED_CURRENT_LOCK.bytes, sha256: PR008_REVIEWED_CURRENT_LOCK.sha256 },
+  )
+  const retained = await readHistoricalPreimageSnapshot()
+  const readCurrentFile = async (_root, relativePath) => relativePath === 'package-lock.json'
+    ? reviewedLock
+    : readFile(path.resolve(repoRoot, relativePath))
+  const report = await reportCurrentVersusHistoricalInputs({
+    snapshot: retained,
+    readCurrentFile,
+    currentSource: 'pr008_reviewed_current_lock_transition',
+  })
+  const independent = await independentlyDiffAgainstSealedPins({ readCurrentFile })
+  assertCompleteIndependentDiff(report, independent)
+  assert.equal(report.changed_count, independent.changed.length)
+  assert.equal(report.changed.find((item) => item.path === 'package-lock.json').current_bytes, PR008_REVIEWED_CURRENT_LOCK.bytes)
+  assert.equal(report.changed.find((item) => item.path === 'package-lock.json').current_sha256, PR008_REVIEWED_CURRENT_LOCK.sha256)
+  assert.equal(report.changed.find((item) => item.path === 'package-lock.json').role, 'pr008_workspace_lock_transition')
+  assert.equal(report.approval, null)
+  assert.equal(report.combined_acceptance, false)
+
+  const tampered = Buffer.from(reviewedLock)
+  tampered[tampered.length - 1] ^= 1
+  await assert.rejects(
+    reportCurrentVersusHistoricalInputs({
+      snapshot: retained,
+      readCurrentFile: async (_root, relativePath) => relativePath === 'package-lock.json' ? tampered : readFile(path.resolve(repoRoot, relativePath)),
+      currentSource: 'pr008_reviewed_current_lock_tampered',
+    }),
+    /WP11_CURRENT_INPUT_UNREVIEWED_DRIFT/u,
+  )
 })
 
 test('corrected PR005 afb9056 comparison is a complete unapproved report, not combined acceptance', async () => {

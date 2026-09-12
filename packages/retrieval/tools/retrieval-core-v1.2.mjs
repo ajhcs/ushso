@@ -22,6 +22,71 @@ const EVIDENCE_WEIGHT = { verified_first_party: 8, source_asserted: 5, inferred:
 const STOPWORDS = new Set(['a', 'about', 'an', 'and', 'are', 'by', 'can', 'data', 'dataset', 'datasets', 'describe', 'excluding', 'exclude', 'except', 'find', 'for', 'from', 'i', 'in', 'is', 'me', 'need', 'no', 'not', 'of', 'on', 'only', 'public', 'show', 'source', 'sources', 'study', 'the', 'to', 'use', 'what', 'which', 'with', 'without']);
 const RANKING_VERSION = 'observatory-canonical-ranking.v1.2.0';
 const SORTS = new Set(['canonical_relevance', 'title_asc', 'release_newest', 'observation_latest']);
+const FACET_SOURCE_LABELS = {
+  'cdc-socrata': 'Centers for Disease Control and Prevention Data Catalog',
+  'census-api': 'U.S. Census Bureau API Catalog',
+  'cms-data-catalog': 'Centers for Medicare & Medicaid Services Data Catalog'
+};
+const FACET_ACCESS_LABELS = {
+  public_direct: 'Public direct',
+  public_catalog: 'Public catalog metadata; payload access unresolved',
+  registration_required: 'Registration required',
+  application_required: 'Application required',
+  dua_required: 'Data-use agreement required',
+  licensed_paid: 'Licensed / paid',
+  controlled: 'Controlled access',
+  temporarily_unavailable: 'Temporarily unavailable',
+  unavailable: 'Unavailable',
+  unknown: 'Access unresolved'
+};
+const FACET_GEOGRAPHY_LABELS = {
+  national: 'National coverage',
+  multi_state: 'Multi-state coverage',
+  state: 'State coverage',
+  county: 'County coverage',
+  facility: 'Facility coverage',
+  mixed: 'Mixed coverage',
+  unknown: 'Geography unresolved',
+  US: 'United States jurisdiction',
+  'US-PA': 'Pennsylvania',
+  'US-CA': 'California',
+  'US-TX': 'Texas',
+  'US-NY': 'New York'
+};
+const FACET_UNIT_LABELS = {
+  county_equivalent: 'County equivalent',
+  facility_period: 'Facility-period',
+  health_system: 'Health system',
+  survey_response: 'Survey response',
+  unknown: 'Observation unit unresolved'
+};
+const FACET_CAPABILITY_LABELS = {
+  behavioral_health: 'Behavioral health and substance use',
+  claims: 'Claims and encounters',
+  costs_prices: 'Costs, prices, and transparency',
+  facility_licensure: 'Facility licensure and certification',
+  geography_access: 'Geography, rurality, and access context',
+  hospital_capacity: 'Hospital capacity and operations',
+  hospital_financials: 'Hospital financials',
+  maternal_child_health: 'Maternal and child health',
+  ownership: 'Ownership and organizational relationships',
+  public_health: 'Public health surveillance',
+  quality: 'Quality and outcomes',
+  payer: 'Payer and coverage',
+  utilization: 'Hospital and provider utilization',
+  workforce: 'Healthcare workforce',
+  'topic:hospital-financials': 'Hospital financials',
+  'topic:utilization': 'Hospital and provider utilization',
+  'topic:claims': 'Claims and encounters',
+  'topic:quality': 'Quality and outcomes',
+  'topic:workforce': 'Healthcare workforce',
+  'topic:public-health': 'Public health surveillance',
+  'topic:payer': 'Payer and coverage',
+  'topic:ownership': 'Ownership and organizational relationships',
+  'topic:costs-prices': 'Costs, prices, and transparency',
+  'use-case-metadata-discovery': 'Metadata discovery and source routing',
+  'use-case-access-routing': 'Access routing'
+};
 
 export function resolveObservationClock(now, corpus = {}) {
   if (now == null || now === '') {
@@ -458,6 +523,39 @@ function sortMatches(matches, sort) {
   return matches.sort(canonical);
 }
 
+function observedFacetLabel(matches, sectionId, value) {
+  const labels = new Set();
+  for (const item of matches) {
+    if (sectionId === 'source' && item.record.identity?.source?.source_id === value && item.record.identity.source.name) {
+      labels.add(item.record.identity.source.name);
+    }
+    if (sectionId === 'capability') {
+      for (const capability of capabilityRows(item.record)) {
+        if (capability.id === value && capability.label) labels.add(capability.label);
+      }
+    }
+  }
+  return labels.size === 1 ? [...labels][0] : null;
+}
+
+function readableFacetLabel(matches, sectionId, value) {
+  const captured = observedFacetLabel(matches, sectionId, value);
+  if (captured) return captured;
+  if (sectionId === 'source') return FACET_SOURCE_LABELS[value] ?? value;
+  if (sectionId === 'access_status') return FACET_ACCESS_LABELS[value] ?? value;
+  if (sectionId === 'geography') {
+    if (FACET_GEOGRAPHY_LABELS[value]) return FACET_GEOGRAPHY_LABELS[value];
+    if (/^US-[A-Z]{2}$/.test(String(value))) return 'United States jurisdiction ' + String(value).slice(3);
+    return value;
+  }
+  if (sectionId === 'unit_of_analysis') return FACET_UNIT_LABELS[value] ?? value;
+  if (sectionId === 'capability') {
+    if (FACET_CAPABILITY_LABELS[value]) return FACET_CAPABILITY_LABELS[value];
+    if (/^use-case[:\-]/.test(String(value))) return 'Unresolved research concept';
+  }
+  return value;
+}
+
 function facetResponse(matches) {
   const specifications = [
     ['source', 'Source', item => [item.record.identity?.source?.source_id]],
@@ -473,7 +571,7 @@ function facetResponse(matches) {
     sections: specifications.map(([id, label, values]) => {
       const counts = new Map();
       for (const item of matches) for (const value of new Set(values(item).filter(Boolean))) counts.set(value, (counts.get(value) ?? 0) + 1);
-      return { id, label, options: [...counts].sort(([a], [b]) => String(a).localeCompare(String(b))).map(([value, count]) => ({ value, label: value, count })) };
+      return { id, label, options: [...counts].sort(([a], [b]) => String(a).localeCompare(String(b))).map(([value, count]) => ({ value, label: readableFacetLabel(matches, id, value), count })) };
     })
   };
 }

@@ -111,7 +111,8 @@ export interface DatasetRecord extends DatasetFamily {
 export interface FacetOption {
   value: string
   label: string
-  count: number
+  /** Counts are omitted for UI-only include-unknown controls. */
+  count?: number
   disabled?: boolean
 }
 
@@ -121,6 +122,9 @@ export interface FacetSectionConfig {
   options: FacetOption[]
   collapsed?: boolean
   expandable?: boolean
+  /** Browser-only availability metadata; never sent in the frozen API response. */
+  availability?: 'available' | 'unavailable'
+  availabilityReason?: string
 }
 
 export interface CatalogSearchResponse {

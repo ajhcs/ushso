@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {parseTypedLayout} from '../scripts/research/cms-typed-layout.mjs';
 import {parseVariableLayout} from '../scripts/research/cms-variable-layout.mjs';
+import {hash,extractVersionedVariables,verifyVariableIdentity} from '../scripts/research/source-extractors.mjs';
 const fixture=async name=>JSON.parse(await fs.readFile(new URL('./fixtures/research-layouts/'+name+'.json',import.meta.url)));
 test('public HHA layout retains CHAR identifiers, wrapped names and bounded evidence spans',async()=>{
  const source=await fixture('cms-hha'),p=parseTypedLayout(source);
@@ -28,3 +29,28 @@ test('layout parsers reject missing headers, narrow cells, duplicate names and a
  assert.throws(()=>parseTypedLayout({...source,text:source.text+'\n'+lines[header+1]}),/VARIABLE_IDENTITY/);
  assert.throws(()=>parseTypedLayout({...source,text:source.text+'\n'+' '.repeat(5000)+'bad'}),/AMBIGUOUS_ROW/);
 });
+
+test('CMS layout adapter consumes parser rows without rewriting parser semantics',async()=>{
+ const source=await fixture('cms-hha'),parsed=parseTypedLayout(source),body=JSON.stringify(parsed),capture={status:'captured',url:'https://example.test/cms-layout.json',text:body,data:parsed,sha256:hash(body),captured_at:'2026-09-11T00:00:00Z',evidence_id:'evidence:test:cms-v1'};
+ const variables=extractVersionedVariables(parsed,'cms',{capture}),first=variables[0];
+ assert.equal(first.wire_name,null);assert.equal(first.mapping.state,'unmatched');assert.equal(first.mapping.documented_name,'ENROLLMENT ID');assert.equal(first.variable_id,null);assert.equal(first.publisher_label,'Enrollment ID');assert.match(first.definition,/unique 15-digit/);assert.equal(first.source_type.value,'CHAR');assert.equal(first.unit.state,'unknown');
+ assert.equal(first.publication_authorized,false);assert.equal(first.promotion_eligible,false);assert.ok(first.limitations.some(value=>/partial/.test(value)));assert.equal(verifyVariableIdentity(first,capture),true);
+});
+test('CMS explicit wire spellings without mapping evidence stay unresolved',async()=>{
+ const run=(entry)=>{const data={variables:[entry]},body=JSON.stringify(data),capture={status:'captured',url:'https://example.test/cms-explicit-wire.json',text:body,data,sha256:hash(body),captured_at:'2026-09-11T00:00:00Z',evidence_id:'evidence:test:cms-explicit-wire'};const [claim]=extractVersionedVariables(data,'cms',{capture});return {claim,verified:verifyVariableIdentity(claim,capture)}};
+ for(const entry of [{name:'FIELD',wire_name:'FIELD',label:'Documented field'},{name:'FIELD',wire_name:'FIELD',label:'Documented field',mapping:{state:'exact',documented_name:'FIELD',wire_name:'FIELD',candidate_wire_names:[],evidence_ids:[]}}]){
+  const {claim,verified}=run(entry);
+  assert.equal(verified,true);
+  assert.ok(!['exact','reviewed_alias'].includes(claim.mapping.state),'wire spelling alone must not create an evidence-bearing CMS mapping');
+  assert.equal(claim.wire_name,null);
+  assert.equal(claim.mapping.documented_name,'FIELD');
+ }
+});
+test('CMS explicit exact and reviewed-alias mappings with evidence remain supported',async()=>{
+ const run=(entry)=>{const data={variables:[entry]},body=JSON.stringify(data),capture={status:'captured',url:'https://example.test/cms-explicit-wire.json',text:body,data,sha256:hash(body),captured_at:'2026-09-11T00:00:00Z',evidence_id:'evidence:test:cms-explicit-wire'};const [claim]=extractVersionedVariables(data,'cms',{capture});return {claim,verified:verifyVariableIdentity(claim,capture)}};
+ const exact=run({name:'FIELD',wire_name:'FIELD',mapping:{state:'exact',documented_name:'FIELD',wire_name:'FIELD',candidate_wire_names:[],evidence_ids:['evidence:test:payload-name-mapping']}});
+ assert.equal(exact.claim.mapping.state,'exact');assert.equal(exact.verified,true);assert.equal(exact.claim.publication_authorized,false);
+ const alias=run({name:'Documented field',wire_name:'API_FIELD',mapping:{state:'reviewed_alias',documented_name:'Documented field',wire_name:'API_FIELD',candidate_wire_names:['API_FIELD'],evidence_ids:['evidence:test:reviewed-alias']}});
+ assert.equal(alias.claim.mapping.state,'reviewed_alias');assert.equal(alias.verified,true);assert.equal(alias.claim.promotion_eligible,false);
+});
+
