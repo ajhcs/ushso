@@ -1,11 +1,11 @@
 {
   "format": "ushso.pr-handoff.v1",
   "pr_id": "PR-009",
-  "status": "in_progress",
+  "status": "producer_checked",
   "owner": "/root/publication_readiness",
   "reviewer": "Astra/root",
   "base_sha": "b3fdf5f3145538c8316e0565a130b4c6987a000f",
-  "head_sha": null,
+  "head_sha": "ae9e54caa7298c7d53ba8900bc4ed65fc61f70b7",
   "dependency_merge_shas": {
     "PR-003": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
     "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
@@ -40,10 +40,42 @@
     "verification/research-program/pr-009/successor-binding-20260912/historical/evidence-index.json",
     "verification/research-program/pr-009/successor-binding-20260912/historical/execution-ledger.json.gz",
     "verification/research-program/pr-009/successor-binding-20260912/historical/task-binding.json",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/adr.json",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/adr.stderr",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/adr.stdout",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/handoff.json",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/handoff.stderr",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/handoff.stdout",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/independent-boundaries.json",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/independent-boundaries.stderr",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/independent-boundaries.stdout",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/producer.json",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/producer.stderr",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/producer.stdout",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/root-review.json",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/summary.json",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-shape-review/check.mjs",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-shape-review/command.json",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-shape-review/results.json",
+    "verification/research-program/pr-009/successor-correction-20260912/baseline-shape-review/subject.json",
+    "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/adr.json",
+    "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/adr.stderr",
+    "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/adr.stdout",
+    "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/producer.json",
+    "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/producer.stderr",
+    "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/producer.stdout",
+    "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/reviewer-harness-feedback.json",
+    "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/reviewer-harness-feedback.stderr",
+    "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/reviewer-harness-feedback.stdout",
+    "verification/research-program/pr-009/successor-correction-20260912/retained-evidence-manifest.json",
+    "verification/research-program/pr-009/successor-correction-20260912/review-harnesses/pr009-final-independent-boundaries.test.mjs",
+    "verification/research-program/pr-009/successor-correction-20260912/review-harnesses/pr009-independent-boundaries.test.mjs",
+    "verification/research-program/pr-009/successor-correction-20260912/source-commit-receipt.json",
+    "verification/research-program/pr-009/successor-correction-20260912/summary.json",
     "verification/research-program/pr-009/task-binding.json"
   ],
-  "problem": "The preserved PR009 producer used a pre-acceptance base. This successor binds actual accepted dependencies and the owner-deferred cost scope before implementation review.",
-  "resulting_behavior": "Controller binding only. Original policy/receipt code is preserved pending native checks. No current behavior pass or measured topology qualification is asserted; all activation remains disabled. Controller ledger edits are recorded by the successor dispatch and are outside producer ownership.",
+  "problem": "The accepted-base PR009 successor admitted invalid numeric/retention limits and contradictory individually valid ingestion records; malformed policy containers could throw instead of returning typed invalid results.",
+  "resulting_behavior": "Policy validation rejects invalid bounds and malformed containers. Receipt validation enforces cited identity, byte/status/media and capture projections while 304 reuse preserves earlier capture provenance. The clean source candidate ae9e54c passes focused checks. This later metadata transport does not inherit an exact-tree gate claim. The current receipt context does not prove approved-descriptor resolution or hash equality. Existing public runtime and activation remain unchanged; controller ledger changes remain outside producer ownership.",
   "commits": [
     {
       "id": "C-009-1",
@@ -69,6 +101,11 @@
       "id": "C-009-3-R2",
       "subject": "fix(research): name descriptor hash basis on matched receipts (PR-009 C-009-3-R2)",
       "sha": "80f781d60e970272a0afdacf8985404afa7decec"
+    },
+    {
+      "id": "C-009-3-R3",
+      "subject": "fix(research): enforce policy bounds and receipt consistency for PR-009",
+      "sha": "ae9e54caa7298c7d53ba8900bc4ed65fc61f70b7"
     }
   ],
   "source_identities": [
@@ -76,7 +113,7 @@
       "kind": "adr",
       "id": "docs/adr/0008-operating-bounds-and-evidence-receipts.md",
       "location": "local",
-      "sha256": "06c17ca0fe891d7ddf55710996b1afcaec43efbdaebe33353ab9aafbbdbabacd"
+      "sha256": "e9e7b1f2dabf409046f9df94f523a474666a451ed091e707d614b8a33a6b2b8d"
     },
     {
       "kind": "policy",
@@ -115,15 +152,169 @@
       "git_commit": "b3fdf5f3145538c8316e0565a130b4c6987a000f",
       "git_path": "docs/master-plan/2026-09-10/prs/PR-009.md",
       "sha256": "ab20e088fb2d3982f09f83af5ce3876bef2214657c3aa0aa41684c5eee995048"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "scripts/research-program/operating-bounds.mjs",
+      "location": "local",
+      "sha256": "f9da46ab59d2ab2a9bc6c173d7698426a8558c3742e68105b0150dcfc4f36eaa"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "tests/research-program/operating-bounds.test.mjs",
+      "location": "local",
+      "sha256": "2a0f2095ea01b06ec5b23b9a06b72630944c702a971c77546711f93df77f98c3"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "scripts/research-program/receipts/v1.0.0/README.md",
+      "location": "local",
+      "sha256": "8a37d54a7f591ad1bc420c23d8c84ef20f2f245ed5e68b82c335b9a3843d359e"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "packages/connectors/src/descriptors.mjs",
+      "location": "local",
+      "sha256": "7c8ce9c616cdecc9fa3c2bc7b8f344426bb71b9ad2edc95c99abbf4ff92a1e5d"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "packages/connectors/src/route-manifest.mjs",
+      "location": "local",
+      "sha256": "be3787542b8c27ed3d7f294ae88789c9530717f2741cfd862ee5a24f46197bfc"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "packages/connectors/src/canonical.mjs",
+      "location": "local",
+      "sha256": "ba524d6baa275bc5ca05e4b3cc9dac9dda02cda0992a2b8f8cf2ec762da9cb48"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "contracts/ingestion/v1.0.0/fixtures/valid-fixtures.json",
+      "location": "local",
+      "sha256": "f558231315f7f57de06a6cc10fb95a175ddef4da30d310b98d581464452b5038"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "contracts/ingestion/v1.0.0/schemas/metadata-fetch.schema.json",
+      "location": "local",
+      "sha256": "5981d9bdb78f5233aed1bca98afe760a68ec773c9966c53e69f41ed50287a456"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "contracts/ingestion/v1.0.0/schemas/capture-reference.schema.json",
+      "location": "local",
+      "sha256": "8b38c9bd5c5291121010fad275d562248d1778f0fa9bc4ce284935daf20ae285"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "contracts/ingestion/v1.0.0/tools/schema.mjs",
+      "location": "local",
+      "sha256": "23d310fc92819bef85995632457e98f6e1252af57ffd5689750a414e1341f459"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "contracts/ingestion/v1.0.0/tools/semantics.mjs",
+      "location": "local",
+      "sha256": "26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639"
+    },
+    {
+      "kind": "source-or-frozen-context",
+      "id": "package-lock.json",
+      "location": "local",
+      "sha256": "f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8"
     }
   ],
-  "commands": [],
+  "commands": [
+    {
+      "id": "cmd-pr009-successor-producer",
+      "command": "node --test tests/research-program/operating-bounds.test.mjs",
+      "started_at": "2026-09-12T05:37:55.822284Z",
+      "completed_at": "2026-09-12T05:37:56.820547Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "81/81 Node tests passed on immutable source ae9e54caa7298c7d53ba8900bc4ed65fc61f70b7; producer-run feedback is not independent acceptance.",
+      "expected": "Focused suite exits zero",
+      "actual": "81 passed, 0 failed",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-pr009-successor-producer-event-source",
+        "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/producer.json",
+        "sha256": "85a532f804d135bdadbf053dc605a5dee2677d9bcc0278779c90a9111f3f7bb4",
+        "bytes": 1171
+      }
+    },
+    {
+      "id": "cmd-pr009-successor-adr",
+      "command": "node --test verification/wp0/v1.0.0/tests/adr-documentation.test.mjs",
+      "started_at": "2026-09-12T05:37:56.844492Z",
+      "completed_at": "2026-09-12T05:37:56.995803Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "1/1 Node tests passed on immutable source ae9e54caa7298c7d53ba8900bc4ed65fc61f70b7; producer-run feedback is not independent acceptance.",
+      "expected": "Focused suite exits zero",
+      "actual": "1 passed, 0 failed",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-pr009-successor-adr-event-source",
+        "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/adr.json",
+        "sha256": "cbac59f944c271f471038227ee4a41e8d7985377b010998ace05aabb2c71937f",
+        "bytes": 1163
+      }
+    },
+    {
+      "id": "cmd-pr009-successor-reviewer-harness-feedback",
+      "command": "USHSO_PR009_REVIEW_REPO=/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr009-successor-20260912 USHSO_PR009_REVIEW_HEAD=ae9e54caa7298c7d53ba8900bc4ed65fc61f70b7 node --test /mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr009-review-harness/pr009-final-independent-boundaries.test.mjs",
+      "started_at": "2026-09-12T05:37:57.022123Z",
+      "completed_at": "2026-09-12T05:37:57.755802Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "51/51 Node tests passed on immutable source ae9e54caa7298c7d53ba8900bc4ed65fc61f70b7; producer-run feedback is not independent acceptance.",
+      "expected": "Focused suite exits zero",
+      "actual": "51 passed, 0 failed",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-pr009-successor-reviewer-harness-feedback-event-source",
+        "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/reviewer-harness-feedback.json",
+        "sha256": "7019c93c4894574703bb7361eebd7b7a1c8a3faef64ba2456c97e392c5268681",
+        "bytes": 1768
+      }
+    }
+  ],
   "artifacts": [
     {
       "id": "docs__adr__0008-operating-bounds-and-evidence-receipts.md",
       "path": "docs/adr/0008-operating-bounds-and-evidence-receipts.md",
-      "sha256": "06c17ca0fe891d7ddf55710996b1afcaec43efbdaebe33353ab9aafbbdbabacd",
-      "bytes": 14003
+      "sha256": "e9e7b1f2dabf409046f9df94f523a474666a451ed091e707d614b8a33a6b2b8d",
+      "bytes": 16023
+    },
+    {
+      "id": "scripts__research-program__operating-bounds.mjs",
+      "path": "scripts/research-program/operating-bounds.mjs",
+      "sha256": "f9da46ab59d2ab2a9bc6c173d7698426a8558c3742e68105b0150dcfc4f36eaa",
+      "bytes": 34119
     },
     {
       "id": "scripts__research-program__policy.json",
@@ -132,28 +323,16 @@
       "bytes": 28532
     },
     {
-      "id": "scripts__research-program__operating-bounds.mjs",
-      "path": "scripts/research-program/operating-bounds.mjs",
-      "sha256": "612261d10112591cfa2ff6ba95671a4b38add841919dfb3de20d6d0532aa501c",
-      "bytes": 29560
+      "id": "scripts__research-program__receipts__v1.0.0__README.md",
+      "path": "scripts/research-program/receipts/v1.0.0/README.md",
+      "sha256": "8a37d54a7f591ad1bc420c23d8c84ef20f2f245ed5e68b82c335b9a3843d359e",
+      "bytes": 2807
     },
     {
       "id": "scripts__research-program__receipts__v1.0.0__evidence-receipt.schema.json",
       "path": "scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json",
       "sha256": "b0785f439b2ba525ad3b72ef7832adeb9eb6eccc5454a6eedaabdfbc746375eb",
       "bytes": 7262
-    },
-    {
-      "id": "scripts__research-program__receipts__v1.0.0__README.md",
-      "path": "scripts/research-program/receipts/v1.0.0/README.md",
-      "sha256": "3b150df60c9b5e94dfcd608f337cb7375876c5e69c1e8153dbea0b633bc0e706",
-      "bytes": 1704
-    },
-    {
-      "id": "tests__research-program__operating-bounds.test.mjs",
-      "path": "tests/research-program/operating-bounds.test.mjs",
-      "sha256": "ce461133178f97abb6e019836b288ab34ba03f429d2e5f6407a1ab61d564132a",
-      "bytes": 24528
     },
     {
       "id": "tests__research-program__fixtures__pr009-census-negative__manifest.json",
@@ -180,16 +359,22 @@
       "bytes": 937
     },
     {
-      "id": "verification__research-program__pr-009__successor-binding-20260912__historical__execution-ledger.json.gz",
-      "path": "verification/research-program/pr-009/successor-binding-20260912/historical/execution-ledger.json.gz",
-      "sha256": "34948f33bfd82c8d7c2f61209e5b2f8c6746a3de8aa1a1895c592418176da98d",
-      "bytes": 36099
+      "id": "tests__research-program__operating-bounds.test.mjs",
+      "path": "tests/research-program/operating-bounds.test.mjs",
+      "sha256": "2a0f2095ea01b06ec5b23b9a06b72630944c702a971c77546711f93df77f98c3",
+      "bytes": 33824
     },
     {
-      "id": "verification__research-program__pr-009__successor-binding-20260912__historical__task-binding.json",
-      "path": "verification/research-program/pr-009/successor-binding-20260912/historical/task-binding.json",
-      "sha256": "fb8b15e44c5ae23901f67a8c8014fcffe0c76ceea2343b1be8af35e33d2914b9",
-      "bytes": 4891
+      "id": "verification__research-program__pr-009__evidence-index.json",
+      "path": "verification/research-program/pr-009/evidence-index.json",
+      "sha256": "e1e20662189d3b95b72f4fd336e2eea06905d121a1572462140ea3fe87b7f28d",
+      "bytes": 17147
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-binding-20260912__dispatch.json",
+      "path": "verification/research-program/pr-009/successor-binding-20260912/dispatch.json",
+      "sha256": "4c8337d494e2b998752f91c6653cb70649016f0383e1a5d609fc31232a3cedbc",
+      "bytes": 3909
     },
     {
       "id": "verification__research-program__pr-009__successor-binding-20260912__historical__PR-009.json",
@@ -204,22 +389,214 @@
       "bytes": 6504
     },
     {
+      "id": "verification__research-program__pr-009__successor-binding-20260912__historical__execution-ledger.json.gz",
+      "path": "verification/research-program/pr-009/successor-binding-20260912/historical/execution-ledger.json.gz",
+      "sha256": "34948f33bfd82c8d7c2f61209e5b2f8c6746a3de8aa1a1895c592418176da98d",
+      "bytes": 36099
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-binding-20260912__historical__task-binding.json",
+      "path": "verification/research-program/pr-009/successor-binding-20260912/historical/task-binding.json",
+      "sha256": "fb8b15e44c5ae23901f67a8c8014fcffe0c76ceea2343b1be8af35e33d2914b9",
+      "bytes": 4891
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__adr.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/adr.json",
+      "sha256": "0b1ec596b41ea53a111996ccdc39768e57725eb49722f6db789c67dcccd77bc2",
+      "bytes": 870
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__adr.stderr",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/adr.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__adr.stdout",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/adr.stdout",
+      "sha256": "b5cc415b7acfa295ffcf7e5c2bf71393410e1f22f65b9a514be8bc688f2f7794",
+      "bytes": 450
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__handoff.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/handoff.json",
+      "sha256": "df5004712fb987597bffd84587dafca8dbd90e6025a4671ffea371a7dbebf598",
+      "bytes": 905
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__handoff.stderr",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/handoff.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__handoff.stdout",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/handoff.stdout",
+      "sha256": "1b8218f7a06367945ea8d935122987a05983d77f6f98a8fb082d2b9168b017d4",
+      "bytes": 5504
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__independent-boundaries.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/independent-boundaries.json",
+      "sha256": "c9fff1d51a1fb51fd6f8f9095f3ff1ccead76e3e28acaa06ca71297488b8a906",
+      "bytes": 980
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__independent-boundaries.stderr",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/independent-boundaries.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__independent-boundaries.stdout",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/independent-boundaries.stdout",
+      "sha256": "5805dde8bae49dcdae6dd282a9ecd8aa71a0cd93304e45782de921e64477aab4",
+      "bytes": 43294
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__producer.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/producer.json",
+      "sha256": "161318f5820f9512ad68e391ed4053f5454ab65b320492a154cbdbdc32504f71",
+      "bytes": 877
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__producer.stderr",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/producer.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__producer.stdout",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/producer.stdout",
+      "sha256": "a20f16117db36142aa9d3398b030017ae907ecbff856e96ccb8078720ca2f531",
+      "bytes": 980
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__root-review.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/root-review.json",
+      "sha256": "8102bbca839522acad3489027394e34d937df345d8daa1a8251fd1b0f2a89c9d",
+      "bytes": 5023
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-35c27d6__summary.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-35c27d6/summary.json",
+      "sha256": "7fe22aeb7cb1fcce2834933eb51f26d929370a76ae2133475eaec0d0e88cf43c",
+      "bytes": 4639
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-shape-review__check.mjs",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-shape-review/check.mjs",
+      "sha256": "8b916e7967ea5d5d3e96c7b27b570cccf81b2b55c8afc89f7db22ecaaebb2f49",
+      "bytes": 2100
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-shape-review__command.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-shape-review/command.json",
+      "sha256": "14aec29231be9cf808d009fddeceb631eef2bfc868a4fc847e12de22174b0c9f",
+      "bytes": 1486
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-shape-review__results.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-shape-review/results.json",
+      "sha256": "e5360f0c1eeb9e07e31512ab9d4ec4a5c324113d540ba1e7eed9705d74e1bbce",
+      "bytes": 1243
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__baseline-shape-review__subject.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/baseline-shape-review/subject.json",
+      "sha256": "b7062dc227de568bc464c5830ed72946174445af014d635a19b14baf685c391f",
+      "bytes": 865
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__immutable-source-ae9e54c__adr.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/adr.json",
+      "sha256": "cbac59f944c271f471038227ee4a41e8d7985377b010998ace05aabb2c71937f",
+      "bytes": 1163
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__immutable-source-ae9e54c__adr.stderr",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/adr.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__immutable-source-ae9e54c__adr.stdout",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/adr.stdout",
+      "sha256": "0879454e8e0152acb9aa80430403e761c2d7e5b4e79799bfa729c5387f61f65e",
+      "bytes": 451
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__immutable-source-ae9e54c__producer.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/producer.json",
+      "sha256": "85a532f804d135bdadbf053dc605a5dee2677d9bcc0278779c90a9111f3f7bb4",
+      "bytes": 1171
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__immutable-source-ae9e54c__producer.stderr",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/producer.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__immutable-source-ae9e54c__producer.stdout",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/producer.stdout",
+      "sha256": "a5ee34cc6e7c12a3906a08ff75f8d09282b6bc8dad184afd1d6cc97bfa8eb6db",
+      "bytes": 5032
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__immutable-source-ae9e54c__reviewer-harness-feedback.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/reviewer-harness-feedback.json",
+      "sha256": "7019c93c4894574703bb7361eebd7b7a1c8a3faef64ba2456c97e392c5268681",
+      "bytes": 1768
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__immutable-source-ae9e54c__reviewer-harness-feedback.stderr",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/reviewer-harness-feedback.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__immutable-source-ae9e54c__reviewer-harness-feedback.stdout",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/immutable-source-ae9e54c/reviewer-harness-feedback.stdout",
+      "sha256": "8b539240b91abb2acf7bee9fb7546d60b0048514d70b680741e791ef178c6b63",
+      "bytes": 8275
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__retained-evidence-manifest.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/retained-evidence-manifest.json",
+      "sha256": "027574f39400487ddc420b05aefc1bf5c0fd43e5fc4f2c0926baf436c718d985",
+      "bytes": 13043
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__review-harnesses__pr009-final-independent-boundaries.test.mjs",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/review-harnesses/pr009-final-independent-boundaries.test.mjs",
+      "sha256": "461ce7b699effad1e3f3afabd3836bd4ff0cf32fc656a78c983c27ea9085308d",
+      "bytes": 21468
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__review-harnesses__pr009-independent-boundaries.test.mjs",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/review-harnesses/pr009-independent-boundaries.test.mjs",
+      "sha256": "5dd21893ec8fbc7a983dc8300108256bcf423c259b605b7148e0a55c2b23015a",
+      "bytes": 19452
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__source-commit-receipt.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/source-commit-receipt.json",
+      "sha256": "b42487f7b5ef0176740e3063a76e12cb1629e116745d8d80b4ea3a08923db654",
+      "bytes": 1201
+    },
+    {
+      "id": "verification__research-program__pr-009__successor-correction-20260912__summary.json",
+      "path": "verification/research-program/pr-009/successor-correction-20260912/summary.json",
+      "sha256": "2a8dfac00824226e740c18ba99b05c92257509cafd44e8704f525632d7e6eb34",
+      "bytes": 4454
+    },
+    {
       "id": "verification__research-program__pr-009__task-binding.json",
       "path": "verification/research-program/pr-009/task-binding.json",
-      "sha256": "e95d52807ba27997793896c3f61ffdfeeceeda6b65e09f8351e1bc715788a434",
-      "bytes": 7040
-    },
-    {
-      "id": "verification__research-program__pr-009__successor-binding-20260912__dispatch.json",
-      "path": "verification/research-program/pr-009/successor-binding-20260912/dispatch.json",
-      "sha256": "4c8337d494e2b998752f91c6653cb70649016f0383e1a5d609fc31232a3cedbc",
-      "bytes": 3909
-    },
-    {
-      "id": "verification__research-program__pr-009__evidence-index.json",
-      "path": "verification/research-program/pr-009/evidence-index.json",
-      "sha256": "4927dd810d6c52171842fa90e1022cd509b73cac6cff3704730937a32cb64b29",
-      "bytes": 5306
+      "sha256": "33158d6b0c678e77e45b790220976097fcbb5250fd476942fbd9954545b5cc21",
+      "bytes": 7193
     }
   ],
   "acceptance_results": [
@@ -231,22 +608,38 @@
     },
     {
       "id": "C-009-2-successor-policy",
-      "status": "pending",
-      "result": "Bound successor policy checks have not run.",
-      "command_ids": []
+      "status": "producer_checked",
+      "result": "Bounds, evidenced retention durations and malformed containers satisfy focused producer checks; independent final review pending.",
+      "command_ids": [
+        "cmd-pr009-successor-producer",
+        "cmd-pr009-successor-reviewer-harness-feedback"
+      ]
     },
     {
       "id": "C-009-3-successor-receipts",
-      "status": "pending",
-      "result": "Bound successor receipt checks have not run.",
-      "command_ids": []
+      "status": "producer_checked",
+      "result": "Captured and 304 identities/projections pass focused checks, preserving original nine cases and prior capture provenance. No admission, persistence, payload access or descriptor-registry proof.",
+      "command_ids": [
+        "cmd-pr009-successor-producer",
+        "cmd-pr009-successor-reviewer-harness-feedback"
+      ]
     }
   ],
   "failures_and_skipped_checks": [
     {
-      "id": "SUCCESSOR-CHECKS",
+      "id": "BOUND-BASELINE-FAILURES",
+      "status": "failed",
+      "detail": "Historical35c baseline retained unchanged:22/36 leaf boundary failures and four additional TypeErrors. Corrected ae9e54c feedback passes; history is not overwritten."
+    },
+    {
+      "id": "FINAL-INDEPENDENT-REVIEW",
       "status": "pending",
-      "detail": "Original commands are retained in historical handoff and immutable original80f781d; successor checks are pending."
+      "detail": "Astra/root must review the final immutable source plus metadata identity. Producer-run reviewer harness is feedback only."
+    },
+    {
+      "id": "FULL-GATE-HOSTED-CI",
+      "status": "skipped",
+      "detail": "No producer build/full gate or hosted CI run; controller owns later qualification."
     }
   ],
   "unresolved_claims": [
@@ -254,23 +647,29 @@
       "id": "C-009-1-measured-topology-qualification",
       "status": "unresolved",
       "detail": "Measured cheapest topology is null. Pure engineering does not qualify architecture, release or R01-R16."
+    },
+    {
+      "id": "APPROVED-DESCRIPTOR-RESOLUTION",
+      "status": "unresolved",
+      "detail": "Current matched_descriptor_route validates supplied record consistency and named digest format, not registry approval or canonical digest equality. PR010 resolver/interface decision remains pending."
     }
   ],
   "risks": [
     {
-      "id": "SUCCESSOR-IMPLEMENTATION-PENDING",
+      "id": "ENGINEERING-ACCEPTANCE-PENDING",
       "status": "risk",
-      "detail": "The accepted dependency binding does not establish that the preserved PR009 implementation satisfies policy and receipt boundaries; exact successor checks and independent review remain pending."
+      "detail": "Focused passing source checks do not establish independent acceptance, release qualification, measured topology, or R01-R16 acceptance."
     }
   ],
-  "next_consumer": "Astra/root independent engineering review; PR010 eligibility requires actual later accepted engineering identities and interface review.",
-  "next_action": "Native implementation and focused verification of the bound successor, followed by independent root review. C0091 qualification stays unresolved.",
+  "next_consumer": "Astra/root independent final engineering review; PR010 requires actual later accepted engineering identities and descriptor-resolver interface review.",
+  "next_action": "Review the final immutable producer transport, rerun decisive checks independently, then make controller acceptance and integration decisions. C0091 measured qualification stays unresolved.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
     "decisive_checks": [],
     "limitations": [
-      "Scope and binding only; no successor implementation verdict, release qualification or production authorization."
+      "Producer harness feedback is not independent acceptance. Root independently reviews the final source and metadata identity.",
+      "No measured topology, release qualification, R01-R16 or production authorization is asserted."
     ]
   }
 }

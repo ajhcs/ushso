@@ -1,0 +1,70 @@
+{"event":"independent_review_subject","root":"/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr009-successor-20260912","head":"ae9e54caa7298c7d53ba8900bc4ed65fc61f70b7","tree":"5021e5761513074f5387d231cba3dc0049d240a7","status":"","hashes":{"scripts/research-program/operating-bounds.mjs":"f9da46ab59d2ab2a9bc6c173d7698426a8558c3742e68105b0150dcfc4f36eaa","scripts/research-program/policy.json":"6230fe7b10aa5da20d9426cf4fcce39f0565e306ec512cbc791428544088fbda","scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json":"b0785f439b2ba525ad3b72ef7832adeb9eb6eccc5454a6eedaabdfbc746375eb","tests/research-program/operating-bounds.test.mjs":"2a0f2095ea01b06ec5b23b9a06b72630944c702a971c77546711f93df77f98c3","verification/research-program/pr-009/task-binding.json":"e95d52807ba27997793896c3f61ffdfeeceeda6b65e09f8351e1bc715788a434","docs/research-program/handoffs/PR-009.json":"a0f5cf886a1c0707a37d11de61ffdb0ce903f5c6d3783606565dfe22b0415264","docs/research-program/execution-ledger.json":"b3cf57383aba462a60cd72a947903d7ecc8bfabd8c7ff8f242a5e4055281ab2c","packages/connectors/src/descriptors.mjs":"7c8ce9c616cdecc9fa3c2bc7b8f344426bb71b9ad2edc95c99abbf4ff92a1e5d","packages/connectors/src/route-manifest.mjs":"be3787542b8c27ed3d7f294ae88789c9530717f2741cfd862ee5a24f46197bfc","packages/connectors/src/canonical.mjs":"ba524d6baa275bc5ca05e4b3cc9dac9dda02cda0992a2b8f8cf2ec762da9cb48","contracts/ingestion/v1.0.0/fixtures/valid-fixtures.json":"f558231315f7f57de06a6cc10fb95a175ddef4da30d310b98d581464452b5038","contracts/ingestion/v1.0.0/schemas/metadata-fetch.schema.json":"5981d9bdb78f5233aed1bca98afe760a68ec773c9966c53e69f41ed50287a456","contracts/ingestion/v1.0.0/schemas/capture-reference.schema.json":"8b38c9bd5c5291121010fad275d562248d1778f0fa9bc4ce284935daf20ae285","contracts/ingestion/v1.0.0/tools/schema.mjs":"23d310fc92819bef85995632457e98f6e1252af57ffd5689750a414e1341f459","contracts/ingestion/v1.0.0/tools/semantics.mjs":"26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639","package-lock.json":"f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8"},"scope":"PR009 boundary probes; no component acceptance or cost qualification"}
+▶ R009-I1: known source, descriptor, revision and route cannot be mixed
+  ✔ registered descriptor from a different source (5.49336ms)
+  ✔ unbound configuration revision (3.706223ms)
+  ✔ foreign registered endpoint/template pair (4.511725ms)
+  ✔ omitted approved route (3.872546ms)
+✔ R009-I1: known source, descriptor, revision and route cannot be mixed (26.539441ms)
+▶ R009-I2: each per-source request limit is specified and meaningful
+  ✔ missing source timeout (3.716392ms)
+  ✔ zero source timeout (5.840491ms)
+  ✔ negative redirect allowance (4.683975ms)
+  ✔ missing concurrency allowance (3.997451ms)
+  ✔ fractional concurrency allowance (5.916703ms)
+  ✔ negative request rate (5.4005ms)
+✔ R009-I2: each per-source request limit is specified and meaningful (35.069192ms)
+▶ R009-I3: evidence-bearing retention overrides permit shorter/longer days, not undefined durations
+  ✔ explicit supported 14-day override (3.278491ms)
+  ✔ explicit supported 120-day override (4.194685ms)
+  ✔ invalid evidenced duration 0 (4.020349ms)
+  ✔ invalid evidenced duration -1 (3.665213ms)
+  ✔ invalid evidenced duration 1.5 (4.990233ms)
+  ✔ invalid evidenced duration null (4.469287ms)
+  ✔ missing evidenced duration (4.65967ms)
+  ✔ shortened security/audit protection (4.162116ms)
+  ✔ removed dependency lineage protection (4.558264ms)
+✔ R009-I3: evidence-bearing retention overrides permit shorter/longer days, not undefined durations (39.14368ms)
+▶ R009-I4: malformed strict ingestion records fail despite intact version labels
+  ✔ extra fetch property (10.039005ms)
+  ✔ missing capture content address (1.159998ms)
+  ✔ invalid fetch timestamp (0.816678ms)
+✔ R009-I4: malformed strict ingestion records fail despite intact version labels (12.547601ms)
+▶ R009-I5: schema-valid capture/fetch/receipt identities must describe the same observation
+  ✔ receipt source differs from capture source (0.611215ms)
+  ✔ receipt endpoint differs from fetch endpoint (0.339941ms)
+  ✔ receipt capture ID differs from cited capture (0.291537ms)
+  ✔ individually valid fetch and capture belong to different runs (0.561106ms)
+  ✔ individually valid fetch points to a different capture ID (0.410445ms)
+  ✔ canonical basis cannot disguise a different hash version (0.242519ms)
+✔ R009-I5: schema-valid capture/fetch/receipt identities must describe the same observation (3.55645ms)
+▶ R009-I6: accepted capture byte/hash projections remain bound to the cited record
+  ✔ capture projection compressed byte drift (0.218825ms)
+  ✔ capture projection expanded byte drift (0.262488ms)
+  ✔ capture projection hash drift (0.268871ms)
+  ✔ receipt status contradicts captured fetch (0.304929ms)
+  ✔ truncated bytes cannot be an accepted complete capture (0.278751ms)
+✔ R009-I6: accepted capture byte/hash projections remain bound to the cited record (2.042757ms)
+▶ R009-I7: 304 reuse cannot invent new response bytes or different cached hashes
+  ✔ 304 receipt invents response bytes (0.340879ms)
+  ✔ 304 receipt claims a different HTTP status (0.242042ms)
+  ✔ 304 receipt changes retained capture hash (0.246879ms)
+✔ R009-I7: 304 reuse cannot invent new response bytes or different cached hashes (2.120184ms)
+▶ R009-I8: malformed policy collections return typed validation outcomes
+  ✔ sources object (2.678561ms)
+  ✔ null source entry (4.328036ms)
+  ✔ routes object (4.319471ms)
+  ✔ forbidden classes object (4.078245ms)
+✔ R009-I8: malformed policy collections return typed validation outcomes (15.918259ms)
+▶ R009-I9: current observation and cached capture provenance remain distinct
+  ✔ 304 reuse preserves earlier run and connector provenance (0.551416ms)
+  ✔ captured receipt cannot change JSON evidence to HTML media (0.278298ms)
+✔ R009-I9: current observation and cached capture provenance remain distinct (1.464522ms)
+{"event":"independent_review_subject_after","unchanged":true,"head":"ae9e54caa7298c7d53ba8900bc4ed65fc61f70b7","tree":"5021e5761513074f5387d231cba3dc0049d240a7","status":"","hashes":{"scripts/research-program/operating-bounds.mjs":"f9da46ab59d2ab2a9bc6c173d7698426a8558c3742e68105b0150dcfc4f36eaa","scripts/research-program/policy.json":"6230fe7b10aa5da20d9426cf4fcce39f0565e306ec512cbc791428544088fbda","scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json":"b0785f439b2ba525ad3b72ef7832adeb9eb6eccc5454a6eedaabdfbc746375eb","tests/research-program/operating-bounds.test.mjs":"2a0f2095ea01b06ec5b23b9a06b72630944c702a971c77546711f93df77f98c3","verification/research-program/pr-009/task-binding.json":"e95d52807ba27997793896c3f61ffdfeeceeda6b65e09f8351e1bc715788a434","docs/research-program/handoffs/PR-009.json":"a0f5cf886a1c0707a37d11de61ffdb0ce903f5c6d3783606565dfe22b0415264","docs/research-program/execution-ledger.json":"b3cf57383aba462a60cd72a947903d7ecc8bfabd8c7ff8f242a5e4055281ab2c","packages/connectors/src/descriptors.mjs":"7c8ce9c616cdecc9fa3c2bc7b8f344426bb71b9ad2edc95c99abbf4ff92a1e5d","packages/connectors/src/route-manifest.mjs":"be3787542b8c27ed3d7f294ae88789c9530717f2741cfd862ee5a24f46197bfc","packages/connectors/src/canonical.mjs":"ba524d6baa275bc5ca05e4b3cc9dac9dda02cda0992a2b8f8cf2ec762da9cb48","contracts/ingestion/v1.0.0/fixtures/valid-fixtures.json":"f558231315f7f57de06a6cc10fb95a175ddef4da30d310b98d581464452b5038","contracts/ingestion/v1.0.0/schemas/metadata-fetch.schema.json":"5981d9bdb78f5233aed1bca98afe760a68ec773c9966c53e69f41ed50287a456","contracts/ingestion/v1.0.0/schemas/capture-reference.schema.json":"8b38c9bd5c5291121010fad275d562248d1778f0fa9bc4ce284935daf20ae285","contracts/ingestion/v1.0.0/tools/schema.mjs":"23d310fc92819bef85995632457e98f6e1252af57ffd5689750a414e1341f459","contracts/ingestion/v1.0.0/tools/semantics.mjs":"26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639","package-lock.json":"f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8"}}
+ℹ tests 51
+ℹ suites 0
+ℹ pass 51
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 691.370531
