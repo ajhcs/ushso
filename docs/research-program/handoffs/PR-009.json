@@ -30,10 +30,12 @@
     "verification/research-program/pr-009/command-receipts/cmd-c009-1-adr-audit.stdout",
     "verification/research-program/pr-009/command-receipts/cmd-c009-3-operating-bounds.json",
     "verification/research-program/pr-009/command-receipts/cmd-c009-3-operating-bounds.stdout",
+    "verification/research-program/pr-009/command-receipts/cmd-c009-3-r1-operating-bounds.json",
+    "verification/research-program/pr-009/command-receipts/cmd-c009-3-r1-operating-bounds.stdout",
     "docs/research-program/handoffs/PR-009.json"
   ],
   "problem": "Collection, retention, and control-plane topology bounds were unspecified, so later jobs could invent cheapest providers, arbitrary URLs, or unnamed descriptor hashes. PR-008 is present on this candidate but not accepted into integration.",
-  "resulting_behavior": "Proposed ADR 0008 preserves the current static public runtime and leaves measured_cheapest_new_topology null. A fixture-only policy keeps activation false and reuses paused descriptor, harvest retry, and DLQ bounds. A standalone evidence-receipt contract records capture, 304 reuse, access-only, pre-egress, typed failure, truncation, and the unmatched Census 200-HTML historical negative with unknown redirect count. Descriptor hash_basis is ushso-canonical-json.v1. No connector or ingestion bytes, live request, persistence, or GitHub publication occurred. PR-008 has no integration merge SHA.",
+  "resulting_behavior": "Proposed ADR 0008 preserves the current static public runtime and leaves measured_cheapest_new_topology null. A fixture-only policy keeps activation false and reuses paused descriptor, harvest retry, and DLQ bounds. A standalone evidence-receipt contract records capture, 304 reuse, access-only, pre-egress, typed failure, truncation, and the unmatched Census 200-HTML historical negative with unknown redirect count. The committed fixture receipt is a sanitized projection that omits the historical query URL. Descriptor hash_basis is ushso-canonical-json.v1. No connector or ingestion bytes, live request, persistence, or GitHub publication occurred. PR-008 has no integration merge SHA.",
   "commits": [
     {
       "id": "C-009-1",
@@ -48,6 +50,11 @@
     {
       "id": "C-009-3",
       "subject": "feat(research): add evidence-receipt contract and Census negative (PR-009 C-009-3)",
+      "sha": "fda273aa3a608f299d6b72a252bf923bb61f6ff2"
+    },
+    {
+      "id": "C-009-3-R1",
+      "subject": "fix(research): omit Census historical query from the receipt fixture (PR-009 C-009-3-R1)",
       "sha": null
     }
   ],
@@ -86,7 +93,7 @@
       "kind": "census-receipt",
       "id": "tests/research-program/fixtures/pr009-census-negative/sample-census-acs.receipt.json",
       "location": "local",
-      "sha256": "59db025a433a8af7508d7e70786c611b033d8d82da71e29c8d9d7368bc7f138c"
+      "sha256": "ec82248a6c9e4ba7f92b5d5721aed46b639036a96a0f5df0297e45ac51738896"
     },
     {
       "kind": "assignment",
@@ -147,6 +154,31 @@
         "sha256": "1c74c3a1683812c93fad8ec00f0419c6125bb13fe4739cff508eb286b6d1db38",
         "bytes": 659
       }
+    },
+    {
+      "id": "cmd-c009-3-r1-operating-bounds",
+      "command": "node --test tests/research-program/operating-bounds.test.mjs",
+      "started_at": "2026-09-12T02:42:51Z",
+      "completed_at": "2026-09-12T02:42:51Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sanitized Census projection omits the historical query; fabricated route IDs, capture claims, unnamed hash basis, and missing validators fail.",
+      "expected": "7 tests pass",
+      "actual": "7 passed, 0 failed",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c009-3-r1-operating-bounds-receipt",
+        "path": "verification/research-program/pr-009/command-receipts/cmd-c009-3-r1-operating-bounds.json",
+        "sha256": "8c70fc2e8e63832ce237aa20ca98d71d296cf5198d45b50530df3380df51a6ee",
+        "bytes": 662
+      }
     }
   ],
   "artifacts": [
@@ -183,14 +215,14 @@
     {
       "id": "tests__research-program__operating-bounds.test.mjs",
       "path": "tests/research-program/operating-bounds.test.mjs",
-      "sha256": "e2e55262cf216cb7290725f4f0f1d039fbb4fcc0c4cb522134a9d91abb0b2473",
-      "bytes": 18606
+      "sha256": "9e2036bd6462f29e1eefefe01975f73f70fd898854d8c602161f6fd481516878",
+      "bytes": 21690
     },
     {
       "id": "tests__research-program__fixtures__pr009-census-negative__manifest.json",
       "path": "tests/research-program/fixtures/pr009-census-negative/manifest.json",
-      "sha256": "ad80a7f2c1a0ed3518daaf9655cc7f3bf56d6a75f991cfe97070674b1c00f9e6",
-      "bytes": 1047
+      "sha256": "7c533501dd53be9773bf8d71625bc835d98052e9ffb202a7af704c1f5f6c7878",
+      "bytes": 1115
     },
     {
       "id": "tests__research-program__fixtures__pr009-census-negative__sample-census-acs.html",
@@ -207,14 +239,14 @@
     {
       "id": "tests__research-program__fixtures__pr009-census-negative__sample-census-acs.receipt.json",
       "path": "tests/research-program/fixtures/pr009-census-negative/sample-census-acs.receipt.json",
-      "sha256": "59db025a433a8af7508d7e70786c611b033d8d82da71e29c8d9d7368bc7f138c",
-      "bytes": 585
+      "sha256": "ec82248a6c9e4ba7f92b5d5721aed46b639036a96a0f5df0297e45ac51738896",
+      "bytes": 937
     },
     {
       "id": "verification__research-program__pr-009__task-binding.json",
       "path": "verification/research-program/pr-009/task-binding.json",
-      "sha256": "92b00cc986e2216420287d19f48b6713bc3879b2d451719164fd10ff9f620e7d",
-      "bytes": 3983
+      "sha256": "317603c885d69dafcbda7844430708bda8f603a0457a42dd8f63b6bd826f7b0b",
+      "bytes": 4472
     },
     {
       "id": "verification__research-program__pr-009__command-receipts__cmd-c009-1-adr-audit.json",
@@ -241,10 +273,22 @@
       "bytes": 707
     },
     {
+      "id": "verification__research-program__pr-009__command-receipts__cmd-c009-3-r1-operating-bounds.json",
+      "path": "verification/research-program/pr-009/command-receipts/cmd-c009-3-r1-operating-bounds.json",
+      "sha256": "8c70fc2e8e63832ce237aa20ca98d71d296cf5198d45b50530df3380df51a6ee",
+      "bytes": 662
+    },
+    {
+      "id": "verification__research-program__pr-009__command-receipts__cmd-c009-3-r1-operating-bounds.stdout",
+      "path": "verification/research-program/pr-009/command-receipts/cmd-c009-3-r1-operating-bounds.stdout",
+      "sha256": "b0d5ca7d872caf8d42b1a43823c076898d28da7381da3b821274d8a9b07316e8",
+      "bytes": 791
+    },
+    {
       "id": "verification__research-program__pr-009__evidence-index.json",
       "path": "verification/research-program/pr-009/evidence-index.json",
-      "sha256": "a7b057d6e102cdba28ddb1b7b82658e13344ea9a7a9426fddf4c29216e1de2d7",
-      "bytes": 5060
+      "sha256": "f922cdec732b6f54312beafc6cdc7eabf14d8a91859e450106e8af2a37f85a4f",
+      "bytes": 5774
     }
   ],
   "acceptance_results": [
@@ -275,10 +319,12 @@
       "status": "producer_checked",
       "result": "Retained Census 200 HTML is typed access/content failure with null redirect_count and no capture/schema/payload success.",
       "command_ids": [
-        "cmd-c009-3-operating-bounds"
+        "cmd-c009-3-operating-bounds",
+        "cmd-c009-3-r1-operating-bounds"
       ],
       "artifact_ids": [
-        "tests__research-program__fixtures__pr009-census-negative__sample-census-acs.html"
+        "tests__research-program__fixtures__pr009-census-negative__sample-census-acs.html",
+        "tests__research-program__fixtures__pr009-census-negative__sample-census-acs.receipt.json"
       ]
     }
   ],

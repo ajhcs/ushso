@@ -392,9 +392,12 @@ test('Census unmatched historical HTML is an access failure with unknown redirec
   assert.equal(sha256(gz), 'df6a615ab36472bb4e7bbf47e77f9603192f236c05a7266f3726549c9b9d09d3');
   assert.equal(body.byteLength, 8531);
   assert.equal(retained.sha256, manifest.files['sample-census-acs.html'].sha256);
-  assert.equal(retained.status, 200);
-  assert.match(retained.final_url, /missing_key\.html$/);
-  assert.doesNotMatch(JSON.stringify(manifest), /B27001_001E/);
+  assert.equal(retained.observed_status, 200);
+  assert.equal(retained.safe_final_path, '/data/missing_key.html');
+  assert.equal(retained.redirect_count, null);
+  assert.equal(retained.historical_query_omitted, true);
+  assert.doesNotMatch(JSON.stringify(manifest), /B27001_001E|acs5\?get=/);
+  assert.doesNotMatch(JSON.stringify(retained), /B27001_001E|acs5\?get=/);
 
   const context = await receiptContext();
   const composed = await composeEvidenceReceipt({
@@ -431,4 +434,67 @@ test('Census unmatched historical HTML is an access failure with unknown redirec
   const zeroResult = await validateEvidenceReceipt(zeroRedirects, context);
   assert.equal(zeroResult.valid, false);
   assert.ok(codes(zeroResult).includes('HISTORICAL_REDIRECT_COUNT_FABRICATED'));
+
+  const fabricatedRoute = clone(composed.receipt);
+  fabricatedRoute.source_id = 'source_census_metadata';
+  fabricatedRoute.descriptor_id = 'descriptor_census_metadata_fixture_v1';
+  fabricatedRoute.endpoint_id = 'endpoint_census_metadata';
+  fabricatedRoute.template_id = 'route_census_dataset_inventory';
+  fabricatedRoute.configuration_revision = 1;
+  fabricatedRoute.purpose = 'catalog_metadata';
+  const fabricatedResult = await validateEvidenceReceipt(fabricatedRoute, context);
+  assert.equal(fabricatedResult.valid, false);
+  assert.ok(codes(fabricatedResult).includes('HISTORICAL_IDENTITY_FABRICATED'));
+
+  const captureClaim = clone(composed.receipt);
+  captureClaim.capture.raw_sha256 = sha256(body);
+  const captureResult = await validateEvidenceReceipt(captureClaim, context);
+  assert.equal(captureResult.valid, false);
+  assert.ok(codes(captureResult).includes('HISTORICAL_CAPTURE_CLAIMED'));
+});
+
+test('version strings do not substitute for injected schema validation', async () => {
+  const records = await validRecords();
+  const context = await receiptContext();
+  const missingValidator = await composeEvidenceReceipt({
+    receipt_id: 'receipt_capture_cms_page_001',
+    request_type: 'catalog_metadata',
+    source_id: 'source_cms_catalog',
+    descriptor_id: 'descriptor_cms_catalog_v1',
+    endpoint_id: 'endpoint_cms_catalog',
+    template_id: 'route_cms_catalog_page',
+    configuration_revision: 1,
+    descriptor_hash: {
+      algorithm: 'sha256',
+      hash_basis: 'ushso-canonical-json.v1',
+      hash_version: 'ushso-canonical-json.v1',
+      sha256: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    },
+    purpose: 'catalog_metadata',
+    expected_content_classes: ['catalog_collection', 'catalog_item_record'],
+    safe_final_host: 'data.cms.gov',
+    safe_final_path: '/data-api/v1/dataset/page-1',
+    redirect_count: 0,
+    observed_status: 200,
+    observed_media_type: 'application/json',
+    observed_bytes: 512,
+    truncated: false,
+    metadata_fetch: records.valid_fetch_captured,
+    capture_reference: records.valid_capture_reference,
+    parser_state: 'not_run',
+    connector_name: 'dcat-catalog',
+    connector_version: '1.0.0',
+    attempt_outcome: 'captured',
+    schema_validated: true,
+    next_action: 'none',
+    observed_at: '2026-08-30T00:01:03.000Z',
+  }, { validateReceiptSchema: context.validateReceiptSchema });
+  assert.equal(missingValidator.valid, false);
+  assert.ok(codes(missingValidator).includes('INGESTION_VALIDATOR_MISSING'));
+
+  const unnamedHash = clone(await readJson(POLICY_PATH));
+  unnamedHash.descriptor_identity.hash_basis = 'registry_field_shape_only';
+  const unnamedResult = await validateOperatingBoundsPolicy(unnamedHash, await policyContext());
+  assert.equal(unnamedResult.valid, false);
+  assert.ok(codes(unnamedResult).includes('DESCRIPTOR_HASH_BASIS_UNNAMED'));
 });
