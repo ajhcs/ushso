@@ -1,5 +1,5 @@
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
-import { matchesFacetFilterToken } from '../data/facets'
+import { canonicalFacetValues, matchesFacetFilter, matchesFacetFilterToken, normalizeFacetValue } from '../data/facets'
 import { browserRecordErrors } from '../../../../packages/retrieval/tools/catalog-contract.mjs'
 import { safeExternalHttpsUrl } from '../../../../packages/retrieval/tools/external-url-policy.mjs'
 import type { DiscoveryQuery, DiscoveryResult, DiscoverySort } from '../types/discovery'
@@ -227,21 +227,146 @@ function queryWithTraversal(query: DiscoveryQuery, traversal?: DiscoveryTraversa
   }
 }
 
-function fixtureFacetFilters(query: DiscoveryQuery, traversal?: DiscoveryTraversalRequest) {
+const LEGACY_BROWSER_SECTION_ALIASES: Record<string, string> = {
+  'data-category': 'capability',
+  access: 'access_status',
+  'reporting-unit': 'unit_of_analysis',
+}
+
+function canonicalFixtureFilters(query: DiscoveryQuery): Record<string, string[]> {
   const grouped: Record<string, string[]> = {}
-  const add = (section: string, value: string) => {
-    if (!section || !value) return
-    grouped[section] = [...(grouped[section] ?? []), value]
-  }
   for (const [section, values] of Object.entries(query.facet_filters ?? {})) {
-    for (const value of values) add(section, value)
+    const kept = (values ?? []).filter((value) => typeof value === 'string' && value.length > 0)
+    if (kept.length === 0) continue
+    grouped[section] = [...(grouped[section] ?? []), ...kept]
   }
+  return grouped
+}
+
+export interface FixtureTraversalToken {
+  section: string
+  value: string
+}
+
+function canonicalSectionForToken(section: string): string {
+  return LEGACY_BROWSER_SECTION_ALIASES[section] ?? section
+}
+
+function traversalFixtureTokens(traversal?: DiscoveryTraversalRequest): FixtureTraversalToken[] {
+  const tokens: FixtureTraversalToken[] = []
   for (const filter of traversal?.filters ?? []) {
     const separator = filter.indexOf(':')
     if (separator <= 0 || separator === filter.length - 1) continue
-    add(filter.slice(0, separator), filter.slice(separator + 1))
+    const section = filter.slice(0, separator)
+    const value = filter.slice(separator + 1)
+    if (!section || !value) continue
+    tokens.push({ section, value })
+  }
+  return tokens
+}
+
+function traversalFixtureFilters(traversal?: DiscoveryTraversalRequest): Record<string, string[]> {
+  const grouped: Record<string, string[]> = {}
+  for (const token of traversalFixtureTokens(traversal)) {
+    grouped[token.section] = [...(grouped[token.section] ?? []), token.value]
   }
   return grouped
+}
+
+function combinedFixtureFilters(canonical: Record<string, string[]>, traversal: Record<string, string[]>): Record<string, string[]> {
+  const combined: Record<string, string[]> = {}
+  for (const [section, values] of [...Object.entries(canonical), ...Object.entries(traversal)]) {
+    for (const value of values) {
+      if (!section || !value) continue
+      const current = combined[section] ?? []
+      if (!current.includes(value)) combined[section] = [...current, value]
+    }
+  }
+  return combined
+}
+
+function fixtureFacetFilters(query: DiscoveryQuery, traversal?: DiscoveryTraversalRequest) {
+  return combinedFixtureFilters(canonicalFixtureFilters(query), traversalFixtureFilters(traversal))
+}
+
+/**
+ * Canonical query values are exact wire IDs. Legacy compatibility applies only to
+ * explicit browser traversal tokens at this boundary. Raw browser sections are
+ * preserved through matching because the legacy matcher uses the original section
+ * to select value normalization.
+ */
+function recordMatchesFixtureFilters(
+  record: DiscoveryResult['results'][number]['record'],
+  canonical: Record<string, string[]>,
+  tokens: FixtureTraversalToken[],
+) {
+  const byCanonical = new Map<string, { canonicalValues: string[]; tokens: FixtureTraversalToken[] }>()
+  for (const [section, values] of Object.entries(canonical)) {
+    const entry = byCanonical.get(section) ?? { canonicalValues: [], tokens: [] }
+    entry.canonicalValues.push(...values)
+    byCanonical.set(section, entry)
+  }
+  for (const token of tokens) {
+    const canon = canonicalSectionForToken(token.section)
+    const entry = byCanonical.get(canon) ?? { canonicalValues: [], tokens: [] }
+    entry.tokens.push(token)
+    byCanonical.set(canon, entry)
+  }
+  for (const [canon, grouped] of byCanonical) {
+    if (grouped.canonicalValues.length === 0 && grouped.tokens.length === 0) continue
+    const canonicalHit = grouped.canonicalValues.some((value) => matchesFacetFilter(record, canon, value))
+    const traversalHit = grouped.tokens.some((token) => matchesFacetFilterToken(record, token.section, token.value))
+    if (!(canonicalHit || traversalHit)) return false
+  }
+  return true
+}
+
+/**
+ * Translate applied filters to effective canonical wire IDs so the recorded
+ * query/receipt filters replay against the exact engine. Legacy browser aliases
+ * resolve to their canonical targets; legacy capability/unit aliases resolve to
+ * the wire IDs present in the filtered records that normalize to the request.
+ */
+function effectiveCanonicalFilters(
+  canonical: Record<string, string[]>,
+  tokens: FixtureTraversalToken[],
+  filteredResults: DiscoveryResult['results'],
+): Record<string, string[]> {
+  const effective: Record<string, string[]> = {}
+  const add = (section: string, value: string) => {
+    if (!section || !value) return
+    const current = effective[section] ?? []
+    if (!current.includes(value)) effective[section] = [...current, value]
+  }
+  for (const [section, values] of Object.entries(canonical)) {
+    for (const value of values) add(section, value)
+  }
+  for (const token of tokens) {
+    const canon = canonicalSectionForToken(token.section)
+    const value = token.value
+    if (canon === 'geography' && value === 'pennsylvania') {
+      add('geography', 'US-PA')
+    } else if (canon === 'access_status' && value === 'catalog-metadata-only') {
+      add('access_status', 'public_catalog')
+    } else if (LEGACY_BROWSER_SECTION_ALIASES[token.section] && (canon === 'capability' || canon === 'unit_of_analysis')) {
+      const wanted = normalizeFacetValue(value)
+      const found = new Set<string>()
+      for (const result of filteredResults) {
+        const values = (canonicalFacetValues(result.record as never)[canon as 'capability' | 'unit_of_analysis'] ?? []) as string[]
+        for (const candidate of values) {
+          if (normalizeFacetValue(candidate) === wanted) found.add(candidate)
+        }
+      }
+      if (found.size > 0) {
+        for (const candidate of found) add(canon, candidate)
+      } else {
+        add(canon, value)
+      }
+    } else {
+      add(canon, value)
+    }
+  }
+  return effective
 }
 
 function recomputeFixtureFacets(response: DiscoveryResult) {
@@ -256,7 +381,7 @@ function recomputeFixtureFacets(response: DiscoveryResult) {
         options: section.options
           .map((option) => ({
             ...option,
-            count: records.filter((result) => matchesFacetFilterToken(result.record, section.id, option.value)).length,
+            count: records.filter((result) => matchesFacetFilter(result.record, section.id, option.value)).length,
           }))
           .filter((option) => option.count > 0),
       }))
@@ -264,13 +389,29 @@ function recomputeFixtureFacets(response: DiscoveryResult) {
   }
 }
 
-function applyFixtureFacetFilters(response: DiscoveryResult, filters: Record<string, string[]>) {
-  const entries = Object.entries(filters).filter(([, values]) => values.length > 0)
-  if (entries.length === 0) return response
+function applyFixtureFacetFilters(
+  response: DiscoveryResult,
+  filters: Record<string, string[]>,
+  canonicalFilters?: Record<string, string[]>,
+  traversalFilters?: Record<string, string[]> | FixtureTraversalToken[],
+) {
+  const canonical = canonicalFilters ?? filters
+  const tokens: FixtureTraversalToken[] = Array.isArray(traversalFilters)
+    ? traversalFilters
+    : traversalFilters !== undefined
+      ? Object.entries(traversalFilters).flatMap(([section, values]) => values.map((value) => ({ section, value })))
+      : Object.entries(filters)
+        .filter(([section]) => !(section in canonical))
+        .flatMap(([section, values]) => values.map((value) => ({ section, value })))
+  const hasExplicitSources = canonicalFilters !== undefined || traversalFilters !== undefined
+  const hasRequestedFilters = Object.values(canonical).some((values) => values.length > 0) || tokens.length > 0
+  if (!hasRequestedFilters) return response
   const selectedIds = new Set<string>()
   response.results = response.results
     .filter((result) => {
-      const matches = entries.every(([section, values]) => values.some((value) => matchesFacetFilterToken(result.record, section, value)))
+      const matches = hasExplicitSources
+        ? recordMatchesFixtureFilters(result.record, canonical, tokens)
+        : Object.entries(filters).every(([section, values]) => values.some((value) => matchesFacetFilterToken(result.record, section, value)))
       if (matches) selectedIds.add(result.record_id)
       return matches
     })
@@ -298,19 +439,28 @@ function applyFixtureFacetFilters(response: DiscoveryResult, filters: Record<str
       ...(response.sections.incompatible ? { incompatible: response.sections.incompatible.filter((id) => selectedIds.has(id)) } : {}),
     }
   }
+  const effective = hasExplicitSources
+    ? effectiveCanonicalFilters(canonical, tokens, response.results)
+    : Object.fromEntries(Object.entries(filters).filter(([, values]) => values.length > 0))
+  const recordedFacetFilters = Object.fromEntries(Object.entries(effective).filter(([, values]) => (values as string[]).length > 0))
   if (response.receipt) {
     const orderedIds = response.results.map((result) => result.record_id)
+    const priorFilters = (response.receipt.filters ?? {}) as Record<string, unknown>
     response.receipt = {
       ...response.receipt,
       displayed_ordered_ids: orderedIds,
       citations: orderedIds.flatMap((id) => response.receipt?.citations.filter((citation) => citation.record_id === id) ?? []),
+      filters: {
+        ...priorFilters,
+        facet_filters: recordedFacetFilters,
+      },
     }
   }
   response.query = {
     ...response.query,
     filters: {
       ...response.query.filters,
-      facet_filters: Object.fromEntries(entries),
+      facet_filters: recordedFacetFilters,
     },
   }
   response.join_routes = response.join_routes.filter((route) => selectedIds.has(route.from_record_id) && selectedIds.has(route.to_record_id))
@@ -349,7 +499,9 @@ export class FixtureDiscoveryProvider implements DiscoveryProvider {
         'The checked-in fixture does not contain an accepted response for this question. Configure the API provider for unrestricted queries.',
       )
     }
-    return applyFixtureFacetFilters(structuredClone(response), fixtureFacetFilters(query, options.traversal))
+    const canonical = canonicalFixtureFilters(query)
+    const tokens = traversalFixtureTokens(options.traversal)
+    return applyFixtureFacetFilters(structuredClone(response), combinedFixtureFilters(canonical, traversalFixtureFilters(options.traversal)), canonical, tokens)
   }
 
   async browse(options: DiscoveryRequestOptions = {}) {
@@ -369,7 +521,8 @@ export class FixtureDiscoveryProvider implements DiscoveryProvider {
       filters: { mode: 'catalog_browse' },
     }
     response.warnings = ['Fixture browse mode lists the accepted published records; order does not imply relevance or quality.', ...response.warnings]
-    return applyFixtureFacetFilters(response, fixtureFacetFilters({ question: '' }, options.traversal))
+    const tokens = traversalFixtureTokens(options.traversal)
+    return applyFixtureFacetFilters(response, combinedFixtureFilters({}, traversalFixtureFilters(options.traversal)), {}, tokens)
   }
 
   async dataset(id: string, options: DiscoveryRequestOptions = {}) {

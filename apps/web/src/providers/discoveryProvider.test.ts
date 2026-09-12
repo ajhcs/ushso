@@ -133,6 +133,81 @@ describe('DiscoveryProvider contract', () => {
     expect(nearUnit.facets?.sections.find((section) => section.id === 'unit_of_analysis')).toBeUndefined()
   })
 
+
+  it('preserves legacy browser section aliases through fixture matching', async () => {
+    const record = structuredClone(acceptedResponse.results[0].record)
+    const makeRecords = () => ['US-PA', 'US-CA'].map((geography, index) => {
+      const next = structuredClone(record)
+      next.record_id = 'fixture:legacy-alias:' + index
+      next.identity.asset.asset_id = next.record_id
+      next.identity.asset.name = next.title = 'Legacy alias record ' + index
+      next.description = 'Synthetic legacy alias record for provider parity.'
+      next.geography.coverage_level = 'state'
+      next.geography.jurisdictions = [geography]
+      next.access.status = 'public_catalog'
+      next.unit_of_analysis = ['facility_period']
+      next.capabilities.topics = [{ ...record.capabilities.topics[0], id: 'topic:claims', label: 'Claims' }]
+      next.capabilities.use_cases = []
+      return next
+    })
+    const records = makeRecords()
+    const engine = createRetrievalEngine({
+      records,
+      searchDocuments: null,
+      vocabulary: controlledVocabulary,
+      joinRoutes: [],
+      namedSourceRegistry: { sources: [] },
+      corpus: { corpus_id: 'pr006-legacy-alias', corpus_version: '1.0.0', record_count: 2, join_route_count: 0, generation: 'pr006-legacy-alias' },
+      catalogValidation: { valid: records, invalid: [] },
+    })
+    const unfiltered = engine.browse({ page_size: 10 })
+    const provider = new FixtureDiscoveryProvider(() => unfiltered)
+    for (const filter of ['data-category:topic-claims', 'reporting-unit:facility-period']) {
+      const result = await provider.browse({ traversal: { filters: [filter] } })
+      expect(result.results.map((item: { record_id: string }) => item.record_id).sort()).toEqual(records.map((item) => item.record_id).sort())
+    }
+  })
+
+  it('records effective canonical values that replay against the engine', async () => {
+    const record = structuredClone(acceptedResponse.results[0].record)
+    const records = ['US-PA', 'US-CA'].map((geography, index) => {
+      const next = structuredClone(record)
+      next.record_id = 'fixture:canonical-replay:' + index
+      next.identity.asset.asset_id = next.record_id
+      next.identity.asset.name = next.title = 'Canonical replay record ' + index
+      next.description = 'Synthetic canonical replay record for provider parity.'
+      next.geography.coverage_level = 'state'
+      next.geography.jurisdictions = [geography]
+      next.access.status = 'public_catalog'
+      next.unit_of_analysis = ['facility_period']
+      next.capabilities.topics = [{ ...record.capabilities.topics[0], id: 'topic:claims', label: 'Claims' }]
+      next.capabilities.use_cases = []
+      return next
+    })
+    const engine = createRetrievalEngine({
+      records,
+      searchDocuments: null,
+      vocabulary: controlledVocabulary,
+      joinRoutes: [],
+      namedSourceRegistry: { sources: [] },
+      corpus: { corpus_id: 'pr006-canonical-replay', corpus_version: '1.0.0', record_count: 2, join_route_count: 0, generation: 'pr006-canonical-replay' },
+      catalogValidation: { valid: records, invalid: [] },
+    })
+    const unfiltered = engine.browse({ page_size: 10 })
+    const provider = new FixtureDiscoveryProvider(() => unfiltered)
+    const pennsylvania = await provider.browse({ traversal: { filters: ['geography:pennsylvania'] } })
+    expect(pennsylvania.results.map((item: { record_id: string }) => item.record_id)).toEqual(['fixture:canonical-replay:0'])
+    expect(pennsylvania.query.filters.facet_filters).toEqual({ geography: ['US-PA'] })
+    expect(pennsylvania.receipt?.filters).toMatchObject({ facet_filters: { geography: ['US-PA'] } })
+    const replayPennsylvania = engine.browse({ page_size: 10, facet_filters: pennsylvania.receipt?.filters.facet_filters as Record<string, string[]> })
+    expect(replayPennsylvania.results.map((item: { record_id: string }) => item.record_id)).toEqual(pennsylvania.results.map((item: { record_id: string }) => item.record_id))
+    const catalogOnly = await provider.browse({ traversal: { filters: ['access:catalog-metadata-only'] } })
+    expect(catalogOnly.results).toHaveLength(2)
+    expect(catalogOnly.query.filters.facet_filters).toEqual({ access_status: ['public_catalog'] })
+    expect(catalogOnly.receipt?.filters).toMatchObject({ facet_filters: { access_status: ['public_catalog'] } })
+    const replayCatalog = engine.browse({ page_size: 10, facet_filters: catalogOnly.receipt?.filters.facet_filters as Record<string, string[]> })
+    expect(replayCatalog.results.map((item: { record_id: string }) => item.record_id).sort()).toEqual(catalogOnly.results.map((item: { record_id: string }) => item.record_id).sort())
+  })
   it('retains a selected filter through a fixture zero-result roundtrip', async () => {
     const provider = new FixtureDiscoveryProvider(loadAcceptedDiscoveryFixture, 'accepted')
     const response = await provider.browse({ traversal: { filters: ['geography:unknown'] } })
