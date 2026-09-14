@@ -1,0 +1,77 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr031-grain-and-time-20260914",
+  "slice_id": "C-031-1",
+  "pr_id": "PR-031",
+  "title": "Model observation grain and temporal applicability",
+  "owner": "/root/pr031_grain_and_time",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr031-grain-and-time-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr031-grain-and-time-20260914",
+  "objective": "A source card distinguishes what one row represents from release and reporting dates.",
+  "outcome": "Observation grain, sampled entity, reporting organization, universe and geographic dimension are separate evidenced fields with explicit unknown states. HCRIS facility/report/year and PLACES county/measure/year cannot collapse into a generic hospital/person tag. Collection period, fiscal/calendar year, release, revision and projection horizon bind only from captured statements. A metadata-modified date cannot fill observation end. A projection to 2100 is not observed future data. Overlapping ACS periods and rolling releases are preserved. Incompatible reporting periods yield a specific caution/blocker; there is no automatic fiscal-to-calendar equivalence. Source-native terms remain visible alongside normalized fields. Sealed packages/identity/src and packages/normalization/src are not edited.",
+  "dependencies": [
+    "PR-007",
+    "PR-008",
+    "PR-029"
+  ],
+  "owned_paths": [
+    "packages/enrichment/grain-and-time.mjs",
+    "tests/research-program/grain-and-time.test.mjs",
+    "docs/research-program/grain-and-time.md",
+    "verification/research-program/pr-031/",
+    "docs/research-program/handoffs/PR-031.json"
+  ],
+  "commits": [
+    {
+      "id": "C-031-1",
+      "subject": "Define distinct research dimensions",
+      "instructions": "Represent observation grain, sampled entity, reporting organization, universe and geographic dimension separately. Use explicit unknown states for undocumented dimensions.",
+      "verification": "HCRIS facility/report/year and PLACES county/measure/year fixtures cannot collapse into a generic hospital/person tag."
+    },
+    {
+      "id": "C-031-2",
+      "subject": "Bind date roles to evidence",
+      "instructions": "Map collection period, fiscal/calendar year, release, revision and projection horizon from captured statements. Preserve overlapping ACS periods and rolling releases.",
+      "verification": "A metadata-modified date cannot fill observation end; a projection to 2100 is not observed future data."
+    },
+    {
+      "id": "C-031-3",
+      "subject": "Add context-specific scientific checks",
+      "instructions": "Check essential date/grain consistency for priority examples and route conflicts for review. Show source-native terms alongside normalized fields.",
+      "verification": "Incompatible reporting periods yield a specific caution/blocker; no automatic fiscal-to-calendar equivalence."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/grain-and-time.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node packages/normalization/tools/validate-package.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-031.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-031/",
+  "binding": {
+    "base_sha": "7cfa9f43d3b2d6d171181ee09a5bd6b7382462a2",
+    "base_tree": "dbb72eaf11d56970402fd6ad71f224ea2546cdb9",
+    "dependency_merge_shas": {
+      "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+      "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+      "PR-029": "ddb8f4cc88106ab937220a2c231ed62928ae101f",
+      "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
