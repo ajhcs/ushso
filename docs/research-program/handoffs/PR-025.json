@@ -1,0 +1,251 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-025",
+  "status": "producer_checked",
+  "owner": "/root/pr025_residual_tasks",
+  "reviewer": "Astra/root",
+  "base_sha": "e3af35c4c2be6ad40ef82a1b1fb2ef6a5279fa96",
+  "head_sha": "d498a863e9a8880926b493eeeb76a04f9b872f22",
+  "dependency_merge_shas": {
+    "PR-018": "fdda1278b5796b8ca112b2d722182f23308f196c",
+    "PR-021": "ed08e8ee861622b99d5d7c3150d68304ecc95881",
+    "PR-024": "467f4fbd91f54f1e0d7603162b510647591d2b63"
+  },
+  "branch": "codex/ushso-pr025-residual-tasks-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/task-builder.mjs",
+    "packages/enrichment/task.schema.json",
+    "tests/research-program/residual-task.test.mjs",
+    "verification/research-program/pr-025/",
+    "docs/research-program/handoffs/PR-025.json"
+  ],
+  "problem": "Models could receive the entire corpus, be asked to guess a missing publisher document, lose table headers across pages, double-count overlapping chunks, or be asked to authorize access. Incomplete context could be forced to completion.",
+  "resulting_behavior": "classifyResidualType separates prose definition, table extraction, scientific ambiguity, missing evidence and access blockade. Only prose definition and table extraction are routine model extraction; scientific ambiguity is an adjudication proposal. A missing publisher document abstains and cannot be converted into a guess. chunkPassages preserves table headers, denominators, page positions, field context and overlap identity so a multi-page table does not lose its header/denominator and overlapping chunks cannot double-count a field. Accepted tasks have source bytes and a stable ID. Oversized or low-information cases return to parsing. Incomplete context abstains rather than forcing completion. No task processes the entire corpus. Models are never asked to authorize access or establish endpoint availability.",
+  "commits": [
+    {
+      "id": "C-025-1",
+      "subject": "Classify residual task types",
+      "sha": "08d632d2b74100975d86cb2746b57169e2c6e576"
+    },
+    {
+      "id": "C-025-2",
+      "subject": "Chunk with evidence boundaries",
+      "sha": "08d632d2b74100975d86cb2746b57169e2c6e576"
+    },
+    {
+      "id": "C-025-3",
+      "subject": "Emit task manifests and abstention paths",
+      "sha": "d498a863e9a8880926b493eeeb76a04f9b872f22"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "task-builder",
+      "id": "packages/enrichment/task-builder.mjs",
+      "location": "local",
+      "sha256": "09514cd7b6c7b5c0713d83039cc0138ddc0ecf929ec94d12bc97f3f89bf4932b"
+    },
+    {
+      "kind": "task-schema",
+      "id": "packages/enrichment/task.schema.json",
+      "location": "local",
+      "sha256": "dfbd100c863e4657ec222cdf2cd891839e15776c5eb9fcb81847bb3d338959eb"
+    },
+    {
+      "kind": "residual-task-tests",
+      "id": "tests/research-program/residual-task.test.mjs",
+      "location": "local",
+      "sha256": "13978f219591de6d6c48f19b83db546b0206601575f43b15ffbd2f12378bd0e6"
+    },
+    {
+      "kind": "residual-queue-consume",
+      "id": "packages/coverage/research-program/v1.0.0/src/qualify-deterministic.mjs",
+      "location": "local",
+      "sha256": "17b72bb4bf4b867519b9fa6bfe8dde37cf1afafefafb552f13c10a7a32a948ce"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c025-focused",
+      "command": "node --test tests/research-program/residual-task.test.mjs",
+      "started_at": "2026-09-14T07:44:29.080742Z",
+      "completed_at": "2026-09-14T07:44:29.177074Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 residual-task tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c025-focused-event",
+        "path": "verification/research-program/pr-025/producer-20260914/commands/focused-residual/event.json",
+        "sha256": "3bd4fc62cc37e17563d48a1d05d09c00e020be0042b1af5b9432312777a88f00",
+        "bytes": 1042
+      }
+    },
+    {
+      "id": "cmd-c025-qualify",
+      "command": "node --test tests/research-program/qualify-deterministic.test.mjs",
+      "started_at": "2026-09-14T07:44:29.177427Z",
+      "completed_at": "2026-09-14T07:44:33.491575Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "4/4 qualify-deterministic tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c025-qualify-event",
+        "path": "verification/research-program/pr-025/producer-20260914/commands/qualify-deterministic/event.json",
+        "sha256": "6b702d0f7b03bb064a5029b54f81955ac936ed250b7f588a833c9bedf2deee09",
+        "bytes": 1073
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr025-artifact-0",
+      "path": "verification/research-program/pr-025/task-binding.json",
+      "bytes": 3544,
+      "sha256": "f3bb672d702dc305a36db6bf92b53df640b153053a9641db1cbb43a60fa916f2"
+    },
+    {
+      "id": "pr025-artifact-1",
+      "path": "verification/research-program/pr-025/dispatch.json",
+      "bytes": 2121,
+      "sha256": "baaa266774993ac7c88ee00e89deaaba5f0aa9e326dba213af60216231f3a46d"
+    },
+    {
+      "id": "pr025-artifact-2",
+      "path": "verification/research-program/pr-025/producer-20260914/commands/focused-residual/receipt.json",
+      "bytes": 460,
+      "sha256": "5056baccaddd61c30d1f02c2f906796013aec9191c79ea629aafc0ee8499e188"
+    },
+    {
+      "id": "pr025-artifact-3",
+      "path": "verification/research-program/pr-025/producer-20260914/commands/focused-residual/stdout.log",
+      "bytes": 433,
+      "sha256": "7fe8516ae1d50cc3d20efed94d07116dbc7395d234c0f81432d3f5b3eab47547"
+    },
+    {
+      "id": "pr025-artifact-4",
+      "path": "verification/research-program/pr-025/producer-20260914/commands/focused-residual/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr025-artifact-5",
+      "path": "verification/research-program/pr-025/producer-20260914/commands/focused-residual/event.json",
+      "bytes": 1042,
+      "sha256": "3bd4fc62cc37e17563d48a1d05d09c00e020be0042b1af5b9432312777a88f00"
+    },
+    {
+      "id": "pr025-artifact-6",
+      "path": "verification/research-program/pr-025/producer-20260914/commands/qualify-deterministic/receipt.json",
+      "bytes": 473,
+      "sha256": "9b639af7e6fa9957aa1e5da76cca48c3f1d7ae2066507f1b3429739a0422cca5"
+    },
+    {
+      "id": "pr025-artifact-7",
+      "path": "verification/research-program/pr-025/producer-20260914/commands/qualify-deterministic/stdout.log",
+      "bytes": 534,
+      "sha256": "146b9a5613c67694be7ea8ea30f6eb7e766c493e6a15599ca492a1e75b8e6b33"
+    },
+    {
+      "id": "pr025-artifact-8",
+      "path": "verification/research-program/pr-025/producer-20260914/commands/qualify-deterministic/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr025-artifact-9",
+      "path": "verification/research-program/pr-025/producer-20260914/commands/qualify-deterministic/event.json",
+      "bytes": 1073,
+      "sha256": "6b702d0f7b03bb064a5029b54f81955ac936ed250b7f588a833c9bedf2deee09"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-025-1",
+      "status": "producer_checked",
+      "result": "A missing publisher document is not converted into a request to guess the contents. Access blockade is not a model authorization task.",
+      "command_ids": [
+        "cmd-c025-focused"
+      ]
+    },
+    {
+      "id": "C-025-2",
+      "status": "producer_checked",
+      "result": "A multi-page table keeps its header/denominator. Overlapping chunks cannot double-count a field.",
+      "command_ids": [
+        "cmd-c025-focused"
+      ]
+    },
+    {
+      "id": "C-025-3",
+      "status": "producer_checked",
+      "result": "Every accepted task has source bytes and a stable ID. Incomplete context abstains. The corpus is not processed by default. Qualify-deterministic tests remain green.",
+      "command_ids": [
+        "cmd-c025-focused",
+        "cmd-c025-qualify"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-openrouter-http",
+      "status": "accepted",
+      "detail": "Task construction is fixture-only. Paid calls remain disabled."
+    },
+    {
+      "id": "full-corpus-task-generation",
+      "status": "skipped",
+      "detail": "Manifests are bounded residual lists, not 3434-record default processing."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-residual-task-review",
+      "status": "pending",
+      "detail": "Independent review of task classification, chunking and abstention remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "token-estimate-is-character-heuristic",
+      "status": "risk",
+      "detail": "Token estimates use a 4-characters-per-token heuristic for fixture bounding, not a provider tokenizer."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of task classification, chunking and abstention, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-025 source and replay focused residual-task and qualify-deterministic tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
