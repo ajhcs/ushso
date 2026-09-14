@@ -183,9 +183,27 @@ assert.equal(preflight.headers.get('access-control-allow-origin'), '*');
 assert.match(machineGuide.headers.get('content-type') ?? '', /^text\/plain/);
 assert.equal(unknownPage.status, 404);
 
+// Exercise the largest HTTP page against real published metadata, then resume
+// with the same oversized requested limit to prove the clamp preserves cursors.
+const largestPageResponse = await fetch(`${base}/api/catalog?limit=200`);
+assert.equal(largestPageResponse.status, 200);
+const largestPageBytes = Buffer.from(await largestPageResponse.arrayBuffer());
+assert.ok(largestPageBytes.length <= 2 * 1024 * 1024, 'catalog page exceeds 2 MiB');
+const largestPage = JSON.parse(largestPageBytes.toString('utf8'));
+assert.equal(largestPage.returned_count, Math.min(100, largestPage.total_matches));
+assert.ok(largestPage.pagination.next_cursor, 'bounded catalog page must retain continuation');
+const continuation = await jsonResponse(`${base}/api/catalog?limit=200&cursor=${encodeURIComponent(largestPage.pagination.next_cursor)}`);
+assert.equal(continuation.response.status, 200);
+assert.equal(continuation.body.returned_count, 100);
+assert.equal(continuation.body.total_matches, largestPage.total_matches);
+const firstPageIds = new Set(largestPage.results.map(row => row.record_id));
+assert.ok(continuation.body.results.every(row => !firstPageIds.has(row.record_id)), 'continuation repeated a record');
+
 const receipt = {
   schema_version: 'observatory-staging-http-receipt.v1.0.0',
   status: 'PASS',
+  maximum_catalog_page_bytes: largestPageBytes.length,
+  catalog_continuation_checked: true,
   observed_at: new Date().toISOString(),
   base,
   generation,

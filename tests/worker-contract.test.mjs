@@ -116,3 +116,19 @@ test('serves machine files with their real types and gives unknown pages HTTP 40
   assert.match(sitemap.headers.get('content-type'), /^application\/xml/);
   assert.equal(unknown.status, 404);
 });
+
+
+test('HTTP catalog page limits remain bounded while preserving traversal options', async () => {
+  const observed = [];
+  const bounded = createWorker({publicQueryService:{
+    async openRequest(){return {};},
+    async browse(_session, options){observed.push(options);return {ok:true};},
+  }});
+  for (const query of ['limit=200','page_size=200&cursor=resume&generation=current','page_size=50','']) {
+    const response = await bounded.fetch(new Request('https://ushso.org/api/catalog?'+query),env);
+    assert.equal(response.status,200);
+  }
+  assert.deepEqual(observed.map(row=>row.page_size),[100,100,50,20]);
+  assert.equal(observed[1].cursor,'resume');
+  assert.equal(observed[1].generation,'current');
+});
