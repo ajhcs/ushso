@@ -1,0 +1,79 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr063-machine-parity-20260914",
+  "slice_id": "C-063-1",
+  "pr_id": "PR-063",
+  "title": "Independently verify HTTP, MCP and WebMCP parity",
+  "owner": "/root/pr063_machine_parity",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr063-machine-parity-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr063-machine-parity-20260914",
+  "objective": "All enabled machine features have actual cross-transport evidence.",
+  "outcome": "Do not use made-up schema IDs for the positive path; fixtures explicitly distinguish protocol and research success. All advertised tools are discovered and callable; browser unavailability is recorded as untested rather than passed. A discrepancy blocks qualification even if each transport passed its own producer tests. plan_research remains disabled. worker/index.mjs does not import enrichment. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-058",
+    "PR-059",
+    "PR-060",
+    "PR-061",
+    "PR-062"
+  ],
+  "owned_paths": [
+    "verification/research-program/machine/",
+    "scripts/research-program/verify-machine.mjs",
+    "tests/research-program/machine-parity.test.mjs",
+    "verification/research-program/pr-063/",
+    "docs/research-program/handoffs/PR-063.json"
+  ],
+  "commits": [
+    {
+      "id": "C-063-1",
+      "subject": "Create one cross-transport scenario set",
+      "instructions": "Use exact priority source contexts and output expectations for every tool, including positive, partial, unknown, restricted and missing-source cases.",
+      "verification": "Do not use made-up schema IDs for the positive path; fixtures explicitly distinguish protocol and research success."
+    },
+    {
+      "id": "C-063-2",
+      "subject": "Invoke real clients on the candidate",
+      "instructions": "Run HTTP requests, a packaged stdio MCP server, and native browser discovery/invocation against the same staged generation. Retain sanitized exchanges.",
+      "verification": "All advertised tools are discovered and callable; browser unavailability is recorded as untested rather than passed."
+    },
+    {
+      "id": "C-063-3",
+      "subject": "Compare scientific and identity fields",
+      "instructions": "Normalize only transport envelope differences and compare source IDs, context, fields, evidence, access and join states. Have Astra independently replay decisive scenarios.",
+      "verification": "A discrepancy blocks qualification even if each transport passed its own producer tests."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/machine-parity.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-063.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-063/",
+  "binding": {
+    "base_sha": "96625a0df72a1da6e001f00ef8de22da36479d04",
+    "base_tree": "f1fc22d8f50303cd33604d0c8042f08137f77dc9",
+    "dependency_merge_shas": {
+      "PR-058": "7ebaded20cd1ece299a9611eace8eed884544e09",
+      "PR-059": "6c412f64a0bb2c901fdf593744b5ffcc61d18f80",
+      "PR-060": "4ea2cb499e44a884a9b9831e8977a00319202a0d",
+      "PR-061": "9768f9b469c1c9b8d8f4082c05e3df534f65e1e2",
+      "PR-062": "e0ec1fc989dcb00eede11f2059cad640bf98d8b4"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
