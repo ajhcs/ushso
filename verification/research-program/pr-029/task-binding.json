@@ -1,0 +1,81 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr029-promotion-20260914",
+  "slice_id": "C-029-1",
+  "pr_id": "PR-029",
+  "title": "Promote qualified metadata under explicit rules",
+  "owner": "/root/pr029_promotion",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr029-promotion-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr029-promotion-20260914",
+  "objective": "Supported literal metadata can scale while high-impact uncertainty remains reviewable.",
+  "outcome": "Validated literal publisher metadata can promote under an approved field/source rule. Inferred scientific statements, identity merges and ambiguous mappings cannot receive literal-observation status. Stale approvals, incomplete source runs and changed field hashes cannot promote. Unaffected accepted claims remain available. Rollback restores prior public facts and retains newer attempt/review history. Scientific and technical acceptance are separate. Automated rules cannot authorize source access or legal rights. Sealed packages/normalization/src and packages/identity/src/review-ledger.mjs are not edited.",
+  "dependencies": [
+    "PR-004",
+    "PR-007",
+    "PR-008",
+    "PR-028"
+  ],
+  "owned_paths": [
+    "packages/enrichment/promotion.mjs",
+    "scripts/research/claim-selector.mjs",
+    "tests/research-program/promotion.test.mjs",
+    "docs/research-program/promotion-rules.md",
+    "verification/research-program/pr-029/",
+    "docs/research-program/handoffs/PR-029.json"
+  ],
+  "commits": [
+    {
+      "id": "C-029-1",
+      "subject": "Define promotion classes",
+      "instructions": "Allow validated literal publisher metadata under an approved field/source rule; require explicit review for high-impact scientific interpretations, identity merges and ambiguous mappings. Record the policy version.",
+      "verification": "Not every literal field needs a separate human click, but no inferred scientific statement receives literal-observation status."
+    },
+    {
+      "id": "C-029-2",
+      "subject": "Apply exact accepted claim revisions",
+      "instructions": "Build a candidate revision using source/generation/value hashes and individual dispositions. Keep rejected/conflicting/unknown values and their provenance intact.",
+      "verification": "A stale approval, incomplete source run or changed field hash cannot promote; unaffected accepted claims remain available."
+    },
+    {
+      "id": "C-029-3",
+      "subject": "Produce reversible promotion diffs",
+      "instructions": "Output before/after source-card/schema/example changes plus dependent search/API effects. Support returning to the previous accepted generation without destructive data migration.",
+      "verification": "Rollback restores prior public facts and retains the newer attempt/review history for diagnosis."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/promotion.test.mjs",
+    "node --test tests/claim-selector.test.mjs",
+    "node --test tests/research-program/review-queue.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node packages/normalization/tools/validate-package.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-029.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-029/",
+  "binding": {
+    "base_sha": "a4aea2c787cff97576d92e5bec27c7b51e2bdcb0",
+    "base_tree": "7c3e6c97935686ae9276522f349bf5fec6ccdcc2",
+    "dependency_merge_shas": {
+      "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+      "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+      "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+      "PR-028": "7658a28f932dcb8f9f8fe89033455f3a7eecc748"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
