@@ -71,8 +71,7 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
   return (
     <article id={id} className="result-card" data-result-id={result.id} aria-label={displayRank ? `Result ${displayRank}: ${result.title}` : undefined}>
       <div className="result-card__main">
-        <p className="result-card__source" data-result-region="source">{result.sourceName}{result.familyStatus === "Family" ? ` · ${result.familySiblingCount + 1} related records` : ""}</p>
-        <h2 data-result-region="title"><Link to={detailsHref} onClick={onDetailsClick}>{result.title}</Link></h2>
+        <h2 data-result-region="title"><span className="result-card__source">{result.sourceName}{result.familyStatus === "Family" ? ` · ${result.familySiblingCount + 1} related records` : ""}</span><Link to={detailsHref} onClick={onDetailsClick}>{result.title}</Link></h2>
         <p className="result-card__description" data-result-region="description">{description}</p>
         {metadata?.named_source_role === 'secondary_mention' && <p className="result-card__source-role">Secondary mention—not the requested source</p>}
         {corrupted && <p className="result-card__quality"><AlertTriangle aria-hidden="true" />Captured description may contain encoding damage; inspect the source.</p>}

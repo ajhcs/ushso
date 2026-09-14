@@ -19,9 +19,8 @@ describe('result card six-region presentation contract', () => {
       createElement(ResultCard, { result, displayRank: 1 }),
     ))
 
-    expect(markup.match(/data-result-region=/g)).toHaveLength(7)
+    expect(markup.match(/data-result-region=/g)).toHaveLength(6)
     expect(markup).toContain(`aria-label="Result 1: ${result.title}"`)
-    expect(markup).toContain('data-result-region="source"')
     expect(markup).toContain('data-result-region="title"')
     expect(markup).toContain('data-result-region="description"')
     expect(markup).toContain('data-result-region="why-match"')
