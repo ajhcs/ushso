@@ -28,7 +28,7 @@ export function createMachineCursorSigner({ signingKey, clock = () => Date.now()
   return Object.freeze({
     ephemeral: signingKey === undefined,
     async page({ capability, input, generation, manifest, items, section }) {
-      const maximum=capability==='search_assets'?20:capability==='get_coverage_status'?100:capability==='get_asset'?50:capability==='dictionary_review'?1:0;
+      const maximum=capability==='search_assets'?20:capability==='get_coverage_status'?100:capability==='get_asset'?50:capability==='get_variables'?100:capability==='dictionary_review'?1:0;
       if(!Number.isSafeInteger(input?.limit)||input.limit<1||input.limit>maximum||!Array.isArray(items))fail();
       const { cursor, ...query } = input;
       if (query.expected_generation != null && query.expected_generation !== generation) fail();

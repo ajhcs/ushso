@@ -1,0 +1,285 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-057",
+  "status": "producer_checked",
+  "owner": "/root/pr057_machine_variables",
+  "reviewer": "Astra/root",
+  "base_sha": "55834fb545f969e765d79ab67e3770a697b84347",
+  "head_sha": "ffdff8be7d19be1f7fd9fca2395bba3c5f5d1f47",
+  "dependency_merge_shas": {
+    "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+    "PR-029": "ddb8f4cc88106ab937220a2c231ed62928ae101f",
+    "PR-055": "a6c63c1ca35f98517e7000b44602c1e8f765e2d5"
+  },
+  "branch": "codex/ushso-pr057-machine-variables-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/registry/qualified-variable-contexts.mjs",
+    "packages/registry/index.mjs",
+    "worker/static-machine-toolkit-service.mjs",
+    "worker/machine-cursor.mjs",
+    "packages/machine-toolkit/src/service.mjs",
+    "worker/dictionary-review-router.mjs",
+    "tests/research-program/machine-variables.test.mjs",
+    "verification/research-program/pr-057/",
+    "docs/research-program/handoffs/PR-057.json"
+  ],
+  "problem": "get_variables returned a generic unknown error for every request. Clients needed invented schema IDs. A supplied schema identifier could be treated as dictionary applicability. Unapproved documentation could leak into the canonical schema. A 154-field dictionary could omit or duplicate fields. Dictionary proposals could be confused with canonical schema. Enrichment could be imported into worker/index.mjs.",
+  "resulting_behavior": "The positive HCRIS fixture uses accepted PROVNUM and NET_PATIENT_REVENUE wire mappings. Unapproved documentation does not leak into the canonical schema. A supplied schema identifier does not establish dictionary applicability. A 154-field dictionary traverses without omissions or duplicates. A known dictionary proposal remains a proposal. get_variables stays honest about an unbound schema. worker/index.mjs does not import enrichment. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-057-1",
+      "subject": "Read accepted variable contexts",
+      "sha": "c88bd3a2bf57442cb55d8cb5768f3e88e50d9c0e"
+    },
+    {
+      "id": "C-057-2",
+      "subject": "Support bounded variable search and paging",
+      "sha": "d0bf80e3fcabc8dedefbd6d2d9921db67729d337"
+    },
+    {
+      "id": "C-057-3",
+      "subject": "Explain unresolved dictionary states",
+      "sha": "ffdff8be7d19be1f7fd9fca2395bba3c5f5d1f47"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "qualified-variable-contexts",
+      "id": "packages/registry/qualified-variable-contexts.mjs",
+      "location": "local",
+      "sha256": "ef58b3d32fdf7a57dafd88d17b91e9ffd74d0726648389b1895f9194c6216739"
+    },
+    {
+      "kind": "registry-index",
+      "id": "packages/registry/index.mjs",
+      "location": "local",
+      "sha256": "6a76d3da0c7f29ebae701b51e4770ac80824c95c9ba7d326c5bb0c0f5f285bea"
+    },
+    {
+      "kind": "static-machine-toolkit-service",
+      "id": "worker/static-machine-toolkit-service.mjs",
+      "location": "local",
+      "sha256": "5a69d506ae3c439548e40dacadc8045ba84cf001d8cae2c2ca99f01ba005129f"
+    },
+    {
+      "kind": "machine-cursor",
+      "id": "worker/machine-cursor.mjs",
+      "location": "local",
+      "sha256": "8d00cb9e01dde9fec131b7bfdf49cdb6de50de3e6b01e857c93013b41cdc845a"
+    },
+    {
+      "kind": "machine-toolkit-service",
+      "id": "packages/machine-toolkit/src/service.mjs",
+      "location": "local",
+      "sha256": "a6b9bcb0aefdb75c8a29cf871fa18b3d2f498e67c1bc43eb20c57ec646849791"
+    },
+    {
+      "kind": "dictionary-review-router",
+      "id": "worker/dictionary-review-router.mjs",
+      "location": "local",
+      "sha256": "4616bd627d9db6b7d33160031d050a11cc0b425d632e980e1c2dd6ccb4b446c0"
+    },
+    {
+      "kind": "machine-variables-tests",
+      "id": "tests/research-program/machine-variables.test.mjs",
+      "location": "local",
+      "sha256": "d4d328f23904d72d5934c4b049000e1ad3f923c83ff1568a7ca972276ffbbfd6"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "worker-index-no-enrichment-import",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "0be15165ba0deb5d3cc94e9d02f5bf63394aea84a74f474d26854bceadf760c4"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c057-focused",
+      "command": "node --test tests/research-program/machine-variables.test.mjs",
+      "started_at": "2026-09-14T19:05:29.489856Z",
+      "completed_at": "2026-09-14T19:05:29.627263Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 machine-variables tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c057-focused-event",
+        "path": "verification/research-program/pr-057/producer-20260914/commands/focused-variables/event.json",
+        "sha256": "2009ae0839b77b54ffc3786a43de578801570c4fdd690ac014358fda4e558746",
+        "bytes": 1053
+      }
+    },
+    {
+      "id": "cmd-c057-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T19:05:29.627711Z",
+      "completed_at": "2026-09-14T19:05:29.689383Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c057-identity-event",
+        "path": "verification/research-program/pr-057/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "21c17a4f3c6f8201fe06efb8f1be2d9434e233eb684ead33928e36ffd6ed4359",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr057-artifact-0",
+      "path": "verification/research-program/pr-057/task-binding.json",
+      "bytes": 3755,
+      "sha256": "eb5b87b25ca49b21ef08aefb8d3c00cc4d26eabd5b780d8453be7b0622e2a1bc"
+    },
+    {
+      "id": "pr057-artifact-1",
+      "path": "verification/research-program/pr-057/dispatch.json",
+      "bytes": 2296,
+      "sha256": "2e2a129343dff286621d1d8c797f2d0d69a995033e0cbedaf27bf6a98563cdff"
+    },
+    {
+      "id": "pr057-artifact-2",
+      "path": "verification/research-program/pr-057/producer-20260914/commands/focused-variables/receipt.json",
+      "bytes": 465,
+      "sha256": "c5091c836b124e672d3c98ea60629b51ca46724ef86f652a444c2b1c714ff496"
+    },
+    {
+      "id": "pr057-artifact-3",
+      "path": "verification/research-program/pr-057/producer-20260914/commands/focused-variables/stdout.log",
+      "bytes": 522,
+      "sha256": "6f3db2a423cb4c812f3493421040a6200bb1bb1b0976ff5c79f9867e89cfc8bb"
+    },
+    {
+      "id": "pr057-artifact-4",
+      "path": "verification/research-program/pr-057/producer-20260914/commands/focused-variables/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr057-artifact-5",
+      "path": "verification/research-program/pr-057/producer-20260914/commands/focused-variables/event.json",
+      "bytes": 1053,
+      "sha256": "2009ae0839b77b54ffc3786a43de578801570c4fdd690ac014358fda4e558746"
+    },
+    {
+      "id": "pr057-artifact-6",
+      "path": "verification/research-program/pr-057/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "b718332cbcef5545e38b6dc4490e0a551144e0f2af505042ebf251598c05202b"
+    },
+    {
+      "id": "pr057-artifact-7",
+      "path": "verification/research-program/pr-057/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr057-artifact-8",
+      "path": "verification/research-program/pr-057/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr057-artifact-9",
+      "path": "verification/research-program/pr-057/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "21c17a4f3c6f8201fe06efb8f1be2d9434e233eb684ead33928e36ffd6ed4359"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-057-1",
+      "status": "producer_checked",
+      "result": "The positive HCRIS fixture uses accepted wire mappings. Unapproved documentation does not leak into the canonical schema. A supplied schema identifier does not establish dictionary applicability.",
+      "command_ids": [
+        "cmd-c057-focused"
+      ]
+    },
+    {
+      "id": "C-057-2",
+      "status": "producer_checked",
+      "result": "A 154-field dictionary traverses without omissions or duplicates.",
+      "command_ids": [
+        "cmd-c057-focused"
+      ]
+    },
+    {
+      "id": "C-057-3",
+      "status": "producer_checked",
+      "result": "A known dictionary proposal remains a proposal. get_variables stays honest about an unbound schema. Sealed identity package validates. worker/index.mjs does not import enrichment.",
+      "command_ids": [
+        "cmd-c057-focused",
+        "cmd-c057-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "supplied-schema-id",
+      "status": "accepted",
+      "detail": "A supplied schema identifier does not establish dictionary applicability."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-machine-variables-review",
+      "status": "pending",
+      "detail": "Independent review of HCRIS wire mappings, 154-field traversal and unbound schema honesty remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "hcris-example-packet-not-full-schema",
+      "status": "risk",
+      "detail": "Accepted HCRIS fields are the example-packet wire mappings PROVNUM and NET_PATIENT_REVENUE. They are not a complete HCRIS schema and not payload access."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of HCRIS wire mappings, 154-field traversal and unbound schema honesty, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-057 source and replay focused machine-variables and identity validators. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

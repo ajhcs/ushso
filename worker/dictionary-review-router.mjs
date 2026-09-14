@@ -1,5 +1,6 @@
 import { dictionaryReviewPage } from './dictionary-review-store.mjs';
-const ROUTE = '/api/research/v1/dictionary-review';
+export const DICTIONARY_REVIEW_ROUTE = '/api/research/v1/dictionary-review';
+const ROUTE = DICTIONARY_REVIEW_ROUTE;
 const headers = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'access-control-allow-origin': '*' };
 const reply = (body, status = 200) => new Response(JSON.stringify(body) + '\n', { status, headers });
 const error = (code, status) => reply({ review_status: 'pending_owner_review', publication_authorized: false, result: null, error: { code } }, status);
