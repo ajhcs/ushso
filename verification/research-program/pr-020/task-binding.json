@@ -1,0 +1,82 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr020-baseline-sweep-20260914",
+  "slice_id": "C-020-1",
+  "pr_id": "PR-020",
+  "title": "Schedule a complete baseline eligibility and attempt sweep",
+  "owner": "/root/pr020_baseline_sweep",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr020-baseline-sweep-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr020-baseline-sweep-20260914",
+  "objective": "Every baseline record receives a bounded processing disposition.",
+  "outcome": "Inventory count equals the sum of disjoint dispositions. Unknown eligibility is visible and not counted as attempted. A stopped/restarted batch has identical final membership to an uninterrupted fixture with no duplicate capture charges. All original audit gaps have an observed disposition. Completion cannot be asserted while unattempted eligible records remain. All 3434 baseline IDs are present in the sweep receipt. Live source access respects selected budgets and current source policies; this assignment is fixture-only.",
+  "dependencies": [
+    "PR-012",
+    "PR-013",
+    "PR-014",
+    "PR-015",
+    "PR-016",
+    "PR-019"
+  ],
+  "owned_paths": [
+    "scripts/research-program/sweep.mjs",
+    "packages/coverage/",
+    "tests/research-program/sweep-accounting.test.mjs",
+    "verification/research-program/pr-020/",
+    "docs/research-program/handoffs/PR-020.json"
+  ],
+  "commits": [
+    {
+      "id": "C-020-1",
+      "subject": "Compile the full inventory into jobs",
+      "instructions": "Join all 3434 IDs to source adapters, documentation and sample eligibility. Record why an operation is not applicable or blocked and reserve budgets before dispatch.",
+      "verification": "Inventory count equals the sum of disjoint dispositions; unknown eligibility is visible and not counted as attempted."
+    },
+    {
+      "id": "C-020-2",
+      "subject": "Run resumable source batches",
+      "instructions": "Execute selected bounded jobs through the shared runner, saving partial outcomes. Reuse unchanged captures and route format/access exceptions to named queues.",
+      "verification": "A stopped/restarted batch has identical final membership to an uninterrupted fixture; no duplicate capture charges."
+    },
+    {
+      "id": "C-020-3",
+      "subject": "Write source and field deficit manifests",
+      "instructions": "Emit the remaining missing facts and exact next action per record, with counts by cause and priority-cohort impact.",
+      "verification": "All original audit gaps have an observed disposition; completion cannot be asserted while unattempted eligible records remain."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/sweep-accounting.test.mjs",
+    "node --test tests/research-program/example-runner.test.mjs",
+    "node --test tests/research-program/http-outcomes.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-020.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-020/",
+  "binding": {
+    "base_sha": "b0e68a18c996d33c9bc911967a3e952a087b7f90",
+    "base_tree": "5f98c78e3429a985d46e5184e0bada5827ff6aff",
+    "dependency_merge_shas": {
+      "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+      "PR-013": "861a7808fec20e5e7795bb8f8082f82717e01f11",
+      "PR-014": "8878aa2cc8bd9b36995d429774f377e3de66aca7",
+      "PR-015": "df5f7f9b8460b6b118f5a4699673b9c96c15b07b",
+      "PR-016": "0f601a908e74492a9803906ce35cbd346df28565",
+      "PR-019": "94d7d904800de12df7c9fe5e9a6fdc252e4687e9"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
