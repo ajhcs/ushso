@@ -1,0 +1,353 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-016",
+  "status": "producer_checked",
+  "owner": "/root/pr016_parser_routing",
+  "reviewer": "Astra/root",
+  "base_sha": "b9490a0b55ba98d7a466222de5f870282c33a73f",
+  "head_sha": "bae5d28facf78f6c665e1edcbd890708feb877b2",
+  "dependency_merge_shas": {
+    "PR-013": "861a7808fec20e5e7795bb8f8082f82717e01f11",
+    "PR-014": "8878aa2cc8bd9b36995d429774f377e3de66aca7",
+    "PR-015": "df5f7f9b8460b6b118f5a4699673b9c96c15b07b"
+  },
+  "branch": "codex/ushso-pr016-parser-routing-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "scripts/research/parser-routing.mjs",
+    "scripts/research/collect-pdf-windows.mjs",
+    "tests/research-program/parser-routing.test.mjs",
+    "verification/research-program/pr-016/",
+    "docs/research-program/handoffs/PR-016.json"
+  ],
+  "problem": "Captured CMS/CDC/Census documents mixed CSV, XLSX, text-PDF and painted-grid families. Unsupported, scanned, encrypted and ambiguous layouts could be treated as payload success, and PDF window checkpoints could be reused after source or extractor bytes changed.",
+  "resulting_behavior": "routeDocument selects CSV (parseTextCodebook), XLSX (parseWorkbookCells), text-PDF (parseCmsDictionary or captured pypdf 6.18.0 windows) and grid (parseGrid) only from validated format/layout evidence. Unsupported, scanned, encrypted, missing-source, ambiguous-layout and parser-defect documents remain residual with payload_success and publication_authorized false. resumeDocumentWindows merges mid-document PDF windows without lost or duplicate pages and invalidates checkpoints when pdf_sha256 or extractor_sha256 change. buildDocumentExtractionCoverage groups those residual reasons without live source traffic. collect-pdf-windows.mjs remains a gated CLI and exports the resume helpers. Live fetch is forbidden.",
+  "commits": [
+    {
+      "id": "C-016-1",
+      "subject": "Build a parser capability registry",
+      "sha": "e82aafdaf696664c3229c50616a51d7a03e7c465"
+    },
+    {
+      "id": "C-016-2",
+      "subject": "Connect bounded page-window resume",
+      "sha": "e82aafdaf696664c3229c50616a51d7a03e7c465"
+    },
+    {
+      "id": "C-016-3",
+      "subject": "Emit a document extraction coverage report",
+      "sha": "bae5d28facf78f6c665e1edcbd890708feb877b2"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "parser-routing",
+      "id": "scripts/research/parser-routing.mjs",
+      "location": "local",
+      "sha256": "5d7a5150f57fbdbd4055c5f3b3aff25a8322177b4ff00cb3d8cba5f8eaf0b532"
+    },
+    {
+      "kind": "pdf-windows",
+      "id": "scripts/research/collect-pdf-windows.mjs",
+      "location": "local",
+      "sha256": "ebcaead47fea8811c5c7300af869bcd73b5c718a53c20f53b8210c9c6c70fc72"
+    },
+    {
+      "kind": "grid-parser",
+      "id": "scripts/research/cms-grid-parser.mjs",
+      "location": "local",
+      "sha256": "c26ffe09111053b79bb2f6f0314dc8f0449819e8d785dac6554b905f670e18fd"
+    },
+    {
+      "kind": "research-python",
+      "id": "scripts/research/research-python.mjs",
+      "location": "local",
+      "sha256": "416b48cd983b579a20bf6bbea04993473369a86bb7913e08a3c465ad0d1ac07c"
+    },
+    {
+      "kind": "parser-routing-tests",
+      "id": "tests/research-program/parser-routing.test.mjs",
+      "location": "local",
+      "sha256": "7fc1d53156095d2702058e3bf04bc1a06751ac9a96fb0d0d39d0ea8cfd2d5752"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c016-focused",
+      "command": "node --test tests/research-program/parser-routing.test.mjs scripts/research/pdf-window-resume.test.mjs tests/cms-grid-parser.test.mjs",
+      "started_at": "2026-09-14T04:36:34.959187Z",
+      "completed_at": "2026-09-14T04:36:35.328550Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "25/25 focused parser, PDF resume and grid tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c016-focused-event",
+        "path": "verification/research-program/pr-016/producer-20260914/commands/focused-parser-routing/event.json",
+        "sha256": "8600bc893a72ea9e2fe9ce60a5d2779e4d1d525b82ba50b5341fcb2426ed02c4",
+        "bytes": 1175
+      }
+    },
+    {
+      "id": "cmd-c016-cms",
+      "command": "node --test tests/research-program/cms-resources.test.mjs",
+      "started_at": "2026-09-14T04:36:35.328889Z",
+      "completed_at": "2026-09-14T04:36:37.129882Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "10/10 CMS resources tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c016-cms-event",
+        "path": "verification/research-program/pr-016/producer-20260914/commands/cms-resources/event.json",
+        "sha256": "6e2cfadecea1a55b8fad3ed6dc0b5ea1c79f4f397407b67ba0f62ebd0f50b499",
+        "bytes": 1036
+      }
+    },
+    {
+      "id": "cmd-c016-cdc",
+      "command": "node --test tests/research-program/cdc-view.test.mjs",
+      "started_at": "2026-09-14T04:36:37.130268Z",
+      "completed_at": "2026-09-14T04:36:38.169045Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "9/9 CDC view tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c016-cdc-event",
+        "path": "verification/research-program/pr-016/producer-20260914/commands/cdc-view/event.json",
+        "sha256": "48e5594fdfa09d9ee4ec36a1d3916771511f17f312d0b14e46a05b2865f195ae",
+        "bytes": 1008
+      }
+    },
+    {
+      "id": "cmd-c016-census",
+      "command": "node --test tests/research-program/census-api.test.mjs",
+      "started_at": "2026-09-14T04:36:38.169410Z",
+      "completed_at": "2026-09-14T04:36:38.302890Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "8/8 Census API tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c016-census-event",
+        "path": "verification/research-program/pr-016/producer-20260914/commands/census-api/event.json",
+        "sha256": "60bfe6812f8beebff568e1f3c513de02c3eb35fd216664f4c4a9873553d22ebf",
+        "bytes": 1018
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr016-artifact-0",
+      "path": "verification/research-program/pr-016/task-binding.json",
+      "bytes": 3650,
+      "sha256": "7e1b1607415456e2edb9c0392b67d128fdacbab47b7dde5bfb2e0e7b20149715"
+    },
+    {
+      "id": "pr016-artifact-1",
+      "path": "verification/research-program/pr-016/dispatch.json",
+      "bytes": 2215,
+      "sha256": "8e70deb3361fe6f34f879d0f48758260a0dff7698ebe8cd985656d194c393662"
+    },
+    {
+      "id": "pr016-artifact-2",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/focused-parser-routing/receipt.json",
+      "bytes": 557,
+      "sha256": "cda8d2a5a4d6451107f55896d839204400616061d2e361afc75ca071e7e2441c"
+    },
+    {
+      "id": "pr016-artifact-3",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/focused-parser-routing/stdout.log",
+      "bytes": 1997,
+      "sha256": "d91febd16819be923d21070c06010695a89372d2df3180a4c1526cbe1d20433b"
+    },
+    {
+      "id": "pr016-artifact-4",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/focused-parser-routing/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr016-artifact-5",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/focused-parser-routing/event.json",
+      "bytes": 1175,
+      "sha256": "8600bc893a72ea9e2fe9ce60a5d2779e4d1d525b82ba50b5341fcb2426ed02c4"
+    },
+    {
+      "id": "pr016-artifact-6",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/cms-resources/receipt.json",
+      "bytes": 458,
+      "sha256": "4188c80bc1a9c5b8a3158101c9678060a2706b8b5b4e48bc1ec7b030606afb7a"
+    },
+    {
+      "id": "pr016-artifact-7",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/cms-resources/stdout.log",
+      "bytes": 1000,
+      "sha256": "d3b8ea1a82f3fe384674adbeec3f94bcadeb23cb664ab19425ed2e66c73fc642"
+    },
+    {
+      "id": "pr016-artifact-8",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/cms-resources/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr016-artifact-9",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/cms-resources/event.json",
+      "bytes": 1036,
+      "sha256": "6e2cfadecea1a55b8fad3ed6dc0b5ea1c79f4f397407b67ba0f62ebd0f50b499"
+    },
+    {
+      "id": "pr016-artifact-10",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/cdc-view/receipt.json",
+      "bytes": 447,
+      "sha256": "9f29346c002dfefadfae5356bc6850096ce5f812f3fb0ea492b02ac8daa4093f"
+    },
+    {
+      "id": "pr016-artifact-11",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/cdc-view/stdout.log",
+      "bytes": 884,
+      "sha256": "4cefaa0638889e43e59f643d84bac26472b27afa6b6f9381e9f9e712ec8f07ef"
+    },
+    {
+      "id": "pr016-artifact-12",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/cdc-view/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr016-artifact-13",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/cdc-view/event.json",
+      "bytes": 1008,
+      "sha256": "48e5594fdfa09d9ee4ec36a1d3916771511f17f312d0b14e46a05b2865f195ae"
+    },
+    {
+      "id": "pr016-artifact-14",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/census-api/receipt.json",
+      "bytes": 451,
+      "sha256": "d6e6e8e80d1d3ed2f2737a5fd93e18b30f83df201dcd24e8b1822d770dcfae92"
+    },
+    {
+      "id": "pr016-artifact-15",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/census-api/stdout.log",
+      "bytes": 881,
+      "sha256": "2bb4e89e82c455fc63edf5e44e81f7fa9fbf0d05176ae9a4b3756175e1b268ee"
+    },
+    {
+      "id": "pr016-artifact-16",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/census-api/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr016-artifact-17",
+      "path": "verification/research-program/pr-016/producer-20260914/commands/census-api/event.json",
+      "bytes": 1018,
+      "sha256": "60bfe6812f8beebff568e1f3c513de02c3eb35fd216664f4c4a9873553d22ebf"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-016-1",
+      "status": "producer_checked",
+      "result": "CSV, XLSX, text-PDF and grid families select a parser from validated layout evidence. Unsupported and scanned documents remain residual.",
+      "command_ids": [
+        "cmd-c016-focused"
+      ]
+    },
+    {
+      "id": "C-016-2",
+      "status": "producer_checked",
+      "result": "Mid-document PDF window resume loses no fields and duplicates none. Changed source or extractor bytes invalidate checkpoints. Existing pdf-window-resume tests remain green.",
+      "command_ids": [
+        "cmd-c016-focused"
+      ]
+    },
+    {
+      "id": "C-016-3",
+      "status": "producer_checked",
+      "result": "Coverage report groups parser defect, missing source, encrypted/scanned and ambiguous layout. Residual work is not payload success. CMS, CDC and Census consumer tests remain green.",
+      "command_ids": [
+        "cmd-c016-focused",
+        "cmd-c016-cms",
+        "cmd-c016-cdc",
+        "cmd-c016-census"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-cms-cdc-census-http",
+      "status": "accepted",
+      "detail": "Tests consume in-memory fixtures and existing grid/PDF resume fixtures. blockedFetch forbids live HTTP."
+    },
+    {
+      "id": "ocr-default",
+      "status": "skipped",
+      "detail": "OCR remains disabled. Scanned/image-only captures stay residual."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-parser-routing-review",
+      "status": "pending",
+      "detail": "Independent review of parser selection, residual queues and PDF-window resume remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "fixture-only-routing",
+      "status": "risk",
+      "detail": "Routing uses retained in-memory signatures rather than reprocessing every retained CMS/CDC/Census document byte. Coverage grouping is exact for the fixture set and does not claim corpus-wide extraction completeness."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of parser routing, residual queues and PDF-window resume, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-016 source and replay focused parser, PDF resume, grid, CMS, CDC and Census tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
