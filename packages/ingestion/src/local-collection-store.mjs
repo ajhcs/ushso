@@ -23,7 +23,8 @@ const KINDS = new Set([
   'wrapper_outcome',
   'capture_reference',
   'request_ledger',
-  'replay_session'
+  'replay_session',
+  'attempt_evidence'
 ]);
 const UNSAFE_KEYS =
   /^(?:__proto__|constructor|prototype|authorization|cookie|password|secret|raw_body|body|text)$/i;

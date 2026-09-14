@@ -25,7 +25,8 @@ import {
   DESCRIPTOR_HASH_BASIS,
   LocalCollectionError,
   requireLocal,
-  blocked
+  blocked,
+  exactKeys
 } from './collection-job.mjs';
 import { LocalCollectionStore, valueDigest } from './local-collection-store.mjs';
 import { loadFixtureCatalog, FIXTURE_CLOCK, JOURNAL_BOUNDS } from './local-fixture-catalog.mjs';
@@ -1288,6 +1289,115 @@ export async function createLocalCollector({
     await store.close();
     throw error;
   }
+
+  const EVIDENCE_KINDS = new Set([
+    'catalog_metadata_validation',
+    'documentation_reachability',
+    'payload_validation',
+    'browser_cors_observation'
+  ]);
+  const ORIGINS = new Set(['local_fixture_execution', 'retained_observation_fixture']);
+  function seriesKey(series) {
+    requireLocal(series && Object.getPrototypeOf(series) === Object.prototype, 'EVIDENCE_SERIES_INVALID');
+    exactKeys(series, ['source_id', 'descriptor_role', 'record_or_route_id', 'evidence_kind', 'origin_class'], 'EVIDENCE_SERIES_INVALID');
+    requireLocal(
+      typeof series.source_id === 'string' &&
+        series.source_id.length > 0 &&
+        series.source_id.length <= 512,
+      'EVIDENCE_SERIES_INVALID'
+    );
+    requireLocal(EVIDENCE_KINDS.has(series.evidence_kind), 'EVIDENCE_KIND_INVALID');
+    requireLocal(ORIGINS.has(series.origin_class), 'EVIDENCE_ORIGIN_INVALID');
+    requireLocal(
+      typeof series.descriptor_role === 'string' &&
+        typeof series.record_or_route_id === 'string' &&
+        series.descriptor_role.length <= 512 &&
+        series.record_or_route_id.length <= 512,
+      'EVIDENCE_SERIES_INVALID'
+    );
+    return series;
+  }
+  function evidenceStatus(query = {}) {
+    store.assertUsable();
+    const wanted = seriesKey(query.series);
+    const wantedCanon = canonicalJson(wanted);
+    const rows = store.byKind('attempt_evidence').filter(
+      (record) => canonicalJson(record.payload.series) === wantedCanon
+    );
+    const ordered = [...rows].sort((a, b) => a.payload.attempt_order - b.payload.attempt_order);
+    const latest = ordered.at(-1) ?? null;
+    const lastGood = [...ordered].reverse().find((row) => row.result.qualified_success === true) ?? null;
+    return {
+      series: wanted,
+      latest_attempt: latest
+        ? {
+            attempt_order: latest.payload.attempt_order,
+            operation_id: latest.operation_id,
+            observation: copy(latest.result.observation),
+            proof: copy(latest.payload.proof),
+            qualified_success: latest.result.qualified_success
+          }
+        : null,
+      last_good: lastGood
+        ? {
+            attempt_order: lastGood.payload.attempt_order,
+            operation_id: lastGood.operation_id,
+            observation: copy(lastGood.result.observation),
+            proof: copy(lastGood.payload.proof),
+            qualified_success: true
+          }
+        : null
+    };
+  }
+  async function recordAttemptEvidence(context = {}) {
+    store.assertUsable(true);
+    requireLocal(context && Object.getPrototypeOf(context) === Object.prototype, 'EVIDENCE_CONTEXT_INVALID');
+    const origin = context.origin;
+    requireLocal(ORIGINS.has(origin), 'EVIDENCE_ORIGIN_INVALID');
+    const series = seriesKey(context.series);
+    requireLocal(series.origin_class === origin, 'EVIDENCE_ORIGIN_MISMATCH');
+    requireLocal(Number.isSafeInteger(context.attempt_order) && context.attempt_order >= 1, 'EVIDENCE_ORDER_INVALID');
+    const observation = context.observation;
+    requireLocal(observation && Object.getPrototypeOf(observation) === Object.prototype, 'EVIDENCE_OBSERVATION_INVALID');
+    requireLocal(!('body' in observation) && !('text' in observation) && !('raw_body' in observation), 'EVIDENCE_UNSAFE_FIELD');
+    const proof = context.proof;
+    requireLocal(proof && Object.getPrototypeOf(proof) === Object.prototype, 'EVIDENCE_PROOF_INVALID');
+    if (origin === 'retained_observation_fixture') {
+      requireLocal(
+        proof.retained_artifact &&
+          typeof proof.retained_artifact.path === 'string' &&
+          /^[a-f0-9]{64}$/.test(proof.retained_artifact.sha256) &&
+          Number.isSafeInteger(proof.retained_artifact.bytes),
+        'EVIDENCE_RETAINED_PROOF_INVALID'
+      );
+    } else {
+      requireLocal(
+        typeof proof.response_op_id === 'string' && proof.response_op_id.length > 0,
+        'EVIDENCE_EXECUTION_PROOF_INVALID'
+      );
+    }
+    const qualified = context.qualified_success === true;
+    const operationId =
+      typeof context.operation_id === 'string' && context.operation_id.length > 0
+        ? context.operation_id
+        : `evidence:${sha256(canonicalJson({ series, attempt_order: context.attempt_order }))}`;
+    const payload = {
+      origin,
+      series,
+      attempt_order: context.attempt_order,
+      proof: copy(proof),
+      publication_authorized: false,
+      promotion_authorized: false,
+      production_composition: false
+    };
+    const result = {
+      observation: copy(observation),
+      qualified_success: qualified
+    };
+    await store.record('attempt_evidence', operationId, payload, result);
+    return evidenceStatus({ series });
+  }
+
   return Object.freeze({
     admit,
     schedule,
@@ -1306,7 +1416,9 @@ export async function createLocalCollector({
         )
       };
     },
-    close: () => store.close()
+    close: () => store.close(),
+    recordAttemptEvidence,
+    evidenceStatus
   });
 }
 
