@@ -112,6 +112,24 @@ export const PR008_REVIEWED_CURRENT_LOCK = Object.freeze({
   }),
 })
 
+export const PR087_REVIEWED_CURRENT_LOCK = Object.freeze({
+  source_commit: '33b3146dec73984087b49724cc18e690310b0b1d',
+  source_tree: 'e130179e17b0d4b32aa6ad7b01cfb1e56f1698e9',
+  path: 'package-lock.json',
+  bytes: 135196,
+  sha256: '7001c1d478ff1468464abe40990ff183f639fc60e769e20a0189638878f4d3a3',
+  previous_current_lock: Object.freeze({
+    path: 'package-lock.json',
+    bytes: 134907,
+    sha256: 'f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8',
+  }),
+  review: Object.freeze({
+    path: 'verification/research-program/pr-086/pr087-wp5-v1.1-lock-review/review.json',
+    bytes: 4014,
+    sha256: '23d37ad10dc490c3cca94fc23d4fe15dc2895314812d492f6392e0526453083b',
+  }),
+})
+
 export const WP11_WRAPPER_IMPLEMENTATION_FILES = Object.freeze([
   'scripts/verify-wp11-attestation.mjs',
   'scripts/run-contract-suites.mjs',
@@ -122,6 +140,7 @@ export const WP11_WRAPPER_IMPLEMENTATION_FILES = Object.freeze([
   NAMED_PRE_PR005_FIXTURE_MANIFEST_PATH,
   ...Object.values(NAMED_PRE_PR005_FIXTURE_FILES).map((file) => file.path),
   PR008_REVIEWED_CURRENT_LOCK.review.path,
+  PR087_REVIEWED_CURRENT_LOCK.review.path,
 ])
 
 export const WP11_POLICY_PATH = 'verification/research-program/ci-attestation/wp11-v1.3.0/policy.json'
@@ -238,6 +257,9 @@ function lockStateFor(bytes) {
   }
   if (digest === PR008_REVIEWED_CURRENT_LOCK.sha256 && bytes.length === PR008_REVIEWED_CURRENT_LOCK.bytes) {
     return 'pr008_reviewed_current'
+  }
+  if (digest === PR087_REVIEWED_CURRENT_LOCK.sha256 && bytes.length === PR087_REVIEWED_CURRENT_LOCK.bytes) {
+    return 'pr087_wp5_v11_reviewed_current'
   }
   throw new Error('WP11_CURRENT_LOCK_UNREVIEWED_DRIFT')
 }
@@ -362,6 +384,7 @@ function currentInputRole(relativePath, bytes) {
     try {
       const lockState = lockStateFor(bytes)
       if (lockState === 'pr008_reviewed_current') return 'pr008_workspace_lock_transition'
+      if (lockState === 'pr087_wp5_v11_reviewed_current') return 'pr087_wp5_v11_workspace_lock_transition'
       return lockState === 'pr085_ci_v14' ? 'pr085_ci_v14_workspace_lock' : 'historical_package_lock'
     } catch {
       return 'unreviewed_package_lock'
@@ -538,6 +561,67 @@ async function assertPr008ReviewedCurrentLockBinding({ root, parsed, implementat
   assert.equal(review.release_qualified, false, 'WP11_WRAPPER_PR008_LOCK_REVIEW_RELEASE_OVERCLAIM')
 }
 
+function lockPin(lock) {
+  return { path: lock.path, bytes: lock.bytes, sha256: lock.sha256 }
+}
+
+function previousCurrentLockPin(lock) {
+  return {
+    path: lock.previous_current_lock.path,
+    bytes: lock.previous_current_lock.bytes,
+    sha256: lock.previous_current_lock.sha256,
+  }
+}
+
+async function assertPr087ReviewedCurrentLockBinding({ root, parsed, implementationFiles }) {
+  const configured = parsed.reviewed_current_transitions?.pr087_wp5_v11_workspace_lock_transition
+  assert.ok(configured && typeof configured === 'object', 'WP11_WRAPPER_PR087_LOCK_REVIEW_BINDING_MISSING')
+  assert.equal(configured.kind, 'current_package_lock_transition', 'WP11_WRAPPER_PR087_LOCK_REVIEW_KIND')
+  assert.equal(configured.status, 'reviewed', 'WP11_WRAPPER_PR087_LOCK_REVIEW_STATUS')
+  assert.deepEqual(configured.previous_current_lock, previousCurrentLockPin(PR087_REVIEWED_CURRENT_LOCK), 'WP11_WRAPPER_POLICY_STALE_PR087_PREVIOUS_LOCK')
+  assert.deepEqual(configured.current_lock, lockPin(PR087_REVIEWED_CURRENT_LOCK), 'WP11_WRAPPER_POLICY_STALE_PR087_CURRENT_LOCK')
+  assert.equal(configured.source_commit, PR087_REVIEWED_CURRENT_LOCK.source_commit, 'WP11_WRAPPER_POLICY_STALE_PR087_SOURCE_COMMIT')
+  assert.equal(configured.source_tree, PR087_REVIEWED_CURRENT_LOCK.source_tree, 'WP11_WRAPPER_POLICY_STALE_PR087_SOURCE_TREE')
+  assert.deepEqual(configured.review_receipt, PR087_REVIEWED_CURRENT_LOCK.review, 'WP11_WRAPPER_POLICY_STALE_PR087_REVIEW_RECEIPT')
+  assert.equal(configured.current_approval_issued, false, 'WP11_WRAPPER_PR087_CURRENT_APPROVAL_OVERCLAIM')
+  assert.equal(configured.historical_approval_transferred, false, 'WP11_WRAPPER_PR087_HISTORICAL_TRANSFER_OVERCLAIM')
+  assert.equal(configured.combined_acceptance, false, 'WP11_WRAPPER_PR087_COMBINED_ACCEPTANCE_OVERCLAIM')
+  assert.equal(configured.release_qualified, false, 'WP11_WRAPPER_PR087_RELEASE_OVERCLAIM')
+  const reviewPin = implementationFiles.find((file) => file.path === PR087_REVIEWED_CURRENT_LOCK.review.path)
+  assert.ok(reviewPin, 'WP11_WRAPPER_PR087_LOCK_REVIEW_BINDING_MISSING')
+  assert.equal(reviewPin.bytes, PR087_REVIEWED_CURRENT_LOCK.review.bytes, 'WP11_WRAPPER_PR087_LOCK_REVIEW_BYTES')
+  assert.equal(reviewPin.sha256, PR087_REVIEWED_CURRENT_LOCK.review.sha256, 'WP11_WRAPPER_PR087_LOCK_REVIEW_HASH')
+  const reviewBytes = await readFile(path.resolve(root, PR087_REVIEWED_CURRENT_LOCK.review.path))
+  assert.equal(reviewBytes.length, PR087_REVIEWED_CURRENT_LOCK.review.bytes, 'WP11_WRAPPER_PR087_LOCK_REVIEW_BYTES')
+  assert.equal(sha256(reviewBytes), PR087_REVIEWED_CURRENT_LOCK.review.sha256, 'WP11_WRAPPER_PR087_LOCK_REVIEW_CHANGED')
+  const review = parseJson(reviewBytes, 'PR087_LOCK_REVIEW')
+  assert.equal(review.format, 'ushso.pr087-reviewed-current-lock.v1', 'WP11_WRAPPER_PR087_LOCK_REVIEW_FORMAT')
+  assert.equal(review.status, 'PASS', 'WP11_WRAPPER_PR087_LOCK_REVIEW_STATUS')
+  assert.equal(review.source_commit, PR087_REVIEWED_CURRENT_LOCK.source_commit, 'WP11_WRAPPER_PR087_LOCK_REVIEW_SOURCE_COMMIT')
+  assert.equal(review.source_tree, PR087_REVIEWED_CURRENT_LOCK.source_tree, 'WP11_WRAPPER_PR087_LOCK_REVIEW_SOURCE_TREE')
+  assert.deepEqual(previousCurrentLockPin({ previous_current_lock: review.previous_current_lock }), previousCurrentLockPin(PR087_REVIEWED_CURRENT_LOCK), 'WP11_WRAPPER_PR087_LOCK_REVIEW_PREVIOUS_LOCK')
+  assert.deepEqual(lockPin(review.current_lock), lockPin(PR087_REVIEWED_CURRENT_LOCK), 'WP11_WRAPPER_PR087_LOCK_REVIEW_CURRENT_LOCK')
+  assert.deepEqual(review.allowed_added_entries, {
+    'verification/wp5/v1.1.0': {
+      name: '@ushso/verification-wp5-v1-1',
+      version: '1.1.0',
+      engines: { node: '>=22.15.0' },
+    },
+    'node_modules/@ushso/verification-wp5-v1-1': {
+      resolved: 'verification/wp5/v1.1.0',
+      link: true,
+    },
+  }, 'WP11_WRAPPER_PR087_LOCK_REVIEW_ALLOWED_DELTA')
+  assert.equal(review.unchanged_preexisting_entries, 356, 'WP11_WRAPPER_PR087_LOCK_REVIEW_UNCHANGED_ENTRIES')
+  assert.deepEqual(review.changed_preexisting_entries, [], 'WP11_WRAPPER_PR087_LOCK_REVIEW_CHANGED_ENTRIES')
+  assert.deepEqual(review.removed_entries, [], 'WP11_WRAPPER_PR087_LOCK_REVIEW_REMOVED_ENTRIES')
+  assert.deepEqual(review.changed_top_level_keys, [], 'WP11_WRAPPER_PR087_LOCK_REVIEW_TOP_LEVEL_DRIFT')
+  assert.equal(review.current_approval_issued, false, 'WP11_WRAPPER_PR087_LOCK_REVIEW_APPROVAL_OVERCLAIM')
+  assert.equal(review.historical_approval_transferred, false, 'WP11_WRAPPER_PR087_LOCK_REVIEW_HISTORICAL_TRANSFER')
+  assert.equal(review.combined_acceptance, false, 'WP11_WRAPPER_PR087_LOCK_REVIEW_COMBINED_ACCEPTANCE')
+  assert.equal(review.release_qualified, false, 'WP11_WRAPPER_PR087_LOCK_REVIEW_RELEASE_OVERCLAIM')
+}
+
 export async function assertCurrentWrapperPolicy({
   root = repoRoot,
   implementationFiles,
@@ -572,6 +656,7 @@ export async function assertCurrentWrapperPolicy({
   }
   await assertNamedPrePr005FixtureBinding({ root, parsed, implementationFiles })
   await assertPr008ReviewedCurrentLockBinding({ root, parsed, implementationFiles })
+  await assertPr087ReviewedCurrentLockBinding({ root, parsed, implementationFiles })
   return parsed
 }
 
