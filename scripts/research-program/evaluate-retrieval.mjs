@@ -203,9 +203,8 @@ export function writeEvalArtifacts(result, { methodsDir = path.join(root, 'evalu
     '',
     'Failing domains:',
     ...result.metrics.failing_domains.map((row) => `- ${row.domain}: remediation ${row.remediation_task}`),
-    '',
   ].join('\n');
-  writeFileSync(methodsPath, `${methods}\n`);
+  writeFileSync(methodsPath, `${methods.replace(/\n+$/, '')}\n`);
   return freeze({ resultPath, methodsPath, result_sha256: sha(readFileSync(resultPath)), methods_sha256: sha(readFileSync(methodsPath)) });
 }
 
