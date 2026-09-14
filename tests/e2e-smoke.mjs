@@ -183,7 +183,7 @@ assert.equal(preflight.headers.get('access-control-allow-origin'), '*');
 assert.match(machineGuide.headers.get('content-type') ?? '', /^text\/plain/);
 assert.equal(unknownPage.status, 404);
 
-// Exercise the largest HTTP page against real published metadata, then resume
+// Exercise the first maximum-size HTTP page against real published metadata, then resume
 // with the same oversized requested limit to prove the clamp preserves cursors.
 const largestPageResponse = await fetch(`${base}/api/catalog?limit=200`);
 assert.equal(largestPageResponse.status, 200);
@@ -202,7 +202,7 @@ assert.ok(continuation.body.results.every(row => !firstPageIds.has(row.record_id
 const receipt = {
   schema_version: 'observatory-staging-http-receipt.v1.0.0',
   status: 'PASS',
-  maximum_catalog_page_bytes: largestPageBytes.length,
+  first_maximum_size_catalog_page_bytes: largestPageBytes.length,
   catalog_continuation_checked: true,
   observed_at: new Date().toISOString(),
   base,
