@@ -129,4 +129,28 @@ describe('search result display and receipt ordering', () => {
     expect(markup.indexOf('Uncertain match')).toBeLessThan(markup.indexOf('Documented match'))
     expect(receipt.displayed_ordered_ids).toEqual(expectedIds)
   })
+
+  it('does not treat unknown geography as a confirmed match and keeps contextual cards visibly separated', async () => {
+    const source = await loadAcceptedDiscoveryFixture()
+    assertDiscoveryResult(source)
+    const records = adaptDiscoveryResponse(source).records.slice(0, 2)
+    records[0].canonicalResult.match_state = 'contextual'
+    records[1].canonicalResult.match_state = 'supported'
+    const markup = renderedCardsMarkup(records)
+    expect(markup.indexOf('Broader context')).toBeLessThan(markup.indexOf('Documented match'))
+    const geography = buildSearchFacetSections(source, records, ['geography:US-PA'])
+      .find((section) => section.id === 'geography')
+    const unknown = geography?.options.find((option) => option.value === 'unknown')
+    expect(unknown?.label).toMatch(/unresolved geography/i)
+    expect(unknown?.label).not.toMatch(/confirmed/i)
+  })
+
+  it('collapses routine interpretation receipts at 390px so a result can begin in the first viewport', async () => {
+    const { readFile } = await import('node:fs/promises')
+    const { fileURLToPath } = await import('node:url')
+    const repositoryRoot = fileURLToPath(new URL('../../../../', import.meta.url))
+    const css = await readFile(`${repositoryRoot}apps/web/src/styles.css`, 'utf8')
+    expect(css).toMatch(/@media \(max-width: 390px\)[\s\S]*\.query-evidence[\s\S]*display: none/)
+    expect(css).toMatch(/@media \(max-width: 390px\)[\s\S]*\.catalog-scope-summary[\s\S]*display: none/)
+  })
 })
