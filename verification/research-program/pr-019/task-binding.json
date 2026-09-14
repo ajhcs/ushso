@@ -1,0 +1,83 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr019-example-runner-20260914",
+  "slice_id": "C-019-1",
+  "pr_id": "PR-019",
+  "title": "Build a bounded API and file example tester",
+  "owner": "/root/pr019_example_runner",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr019-example-runner-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr019-example-runner-20260914",
+  "objective": "Each recipe can prove exactly what a small real request checked.",
+  "outcome": "CMS/CDC audit samples and Census keyless response produce distinct expected outcomes. Wrong MIME, missing key, unexpected field, empty-but-valid data and ignored row limit have explicit results. HTTP success alone never produces a tested-example badge. Sample field/type checks stay separate from full dataset/schema checks. Generated examples round-trip to the bounded recipe and cannot silently drop limits, context pins or credential placeholders. No restricted/private value enters a public artifact.",
+  "dependencies": [
+    "PR-009",
+    "PR-011",
+    "PR-013",
+    "PR-014",
+    "PR-015",
+    "PR-017"
+  ],
+  "owned_paths": [
+    "packages/connectors/src/testing/",
+    "scripts/research-program/test-example.mjs",
+    "tests/research-program/example-runner.test.mjs",
+    "verification/research-program/pr-019/",
+    "docs/research-program/handoffs/PR-019.json"
+  ],
+  "commits": [
+    {
+      "id": "C-019-1",
+      "subject": "Define example-request receipts",
+      "instructions": "Store source/release/distribution, sanitized parameters, expected content/fields, size and row limits, observation time and attempted checks. Support documented manual/keyed outcomes.",
+      "verification": "CMS/CDC audit samples and Census keyless response produce distinct expected outcomes."
+    },
+    {
+      "id": "C-019-2",
+      "subject": "Execute and validate bounded samples",
+      "instructions": "Run approved read-only sample recipes, compare actual fields/types to the contextual schema, and stop on content/limit mismatch. Do not treat sample success as full-file validation.",
+      "verification": "Wrong MIME, missing key, unexpected field, empty-but-valid data and ignored row limit have explicit results."
+    },
+    {
+      "id": "C-019-3",
+      "subject": "Publish example previews safely",
+      "instructions": "Generate a small approved aggregate preview or explicitly synthetic schema example, with capture date and scope. Preserve source pointers even when sample values cannot be retained. Generate copyable cURL and Python examples from the same tested recipe, retaining credential placeholders, exact wire fields, request limits and source/release/distribution identities. Explicitly mark untested or credential-blocked examples.",
+      "verification": "A user can distinguish actual sampled values from synthetic examples; no restricted/private value enters a public artifact. Generated examples round-trip to the bounded recipe and cannot silently drop its limits, context pins or credential placeholders."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/example-runner.test.mjs",
+    "node --test tests/research-program/http-outcomes.test.mjs",
+    "node --test tests/research-program/census-api.test.mjs",
+    "node --test tests/research-program/cms-resources.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-019.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-019/",
+  "binding": {
+    "base_sha": "176875b71176d65d038609a2b2e82ad1cfeb242e",
+    "base_tree": "93d9a882df22ecd8c1200a4b1a971ede01faed3c",
+    "dependency_merge_shas": {
+      "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+      "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74",
+      "PR-013": "861a7808fec20e5e7795bb8f8082f82717e01f11",
+      "PR-014": "8878aa2cc8bd9b36995d429774f377e3de66aca7",
+      "PR-015": "df5f7f9b8460b6b118f5a4699673b9c96c15b07b",
+      "PR-017": "2e43f46908b7970c933e110fcd2072b7aab9ddd4"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
