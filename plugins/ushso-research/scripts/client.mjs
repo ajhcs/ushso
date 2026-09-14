@@ -6,6 +6,8 @@
 
 // Deliberately small transport boundary. Complete schema validation runs against
 // advertised artifact schemas in verification, not on every browser request.
+// HTTP 200 is not task completion. Domain ok/result_state remain authoritative,
+// nonretryable errors are not retried here, and abort stops this request only.
 function checkResponse(value         , capability        ) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('USHSO_INVALID_RESPONSE_ENVELOPE')
   const envelope = value
@@ -89,6 +91,12 @@ export function createBrowserMachineToolkitClient(fetchImpl            = globalT
   return Object.freeze({
     async invokeWebMcp(capability        , input         , options                           = {}) {
       if (!input || typeof input !== 'object' || Array.isArray(input)) throw new TypeError('Machine-toolkit input must be an object')
+      if (options.signal?.aborted) {
+        if (typeof options.signal.throwIfAborted === 'function') options.signal.throwIfAborted()
+        const aborted = new Error('The operation was aborted.')
+        aborted.name = 'AbortError'
+        throw aborted
+      }
       const route = routeFor(capability, input              )
       const response = await fetchImpl(route.path, {
         method: route.method,
@@ -96,8 +104,15 @@ export function createBrowserMachineToolkitClient(fetchImpl            = globalT
         body: route.method === 'POST' ? JSON.stringify(input) : undefined,
         signal: options.signal,
       })
-      if (!response.ok) throw new Error(`USHSO machine toolkit returned HTTP ${response.status}`)
-      return checkResponse(await response.json(), capability)
+      let value
+      try { value = await response.json() }
+      catch { throw new Error('USHSO_INVALID_RESPONSE_ENVELOPE') }
+      try {
+        return checkResponse(value, capability)
+      } catch (error) {
+        if (!response.ok) throw new Error(`USHSO machine toolkit returned HTTP ${response.status}`)
+        throw error
+      }
     },
   })
 }
