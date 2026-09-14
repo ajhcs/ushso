@@ -6,6 +6,7 @@ import {
 import { createMachineCursorSigner } from './machine-cursor.mjs';
 import { collectAssetContext } from '../packages/registry/asset-context-collections.mjs';
 import { buildAccessPlan, buildRetrievalRecipe, matchQualifiedRoute } from '../packages/registry/qualified-access-routes.mjs';
+import { filterQualifiedFields, matchQualifiedVariableContext } from '../packages/registry/qualified-variable-contexts.mjs';
 
 const POLICY_ID = 'policy.public-metadata-only.v1';
 const POLICY_EVIDENCE_ID = 'evidence.policy.public-metadata-only.v1';
@@ -452,13 +453,30 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
     async getVariables(input) {
       const generationError = generationUnavailable('get_variables', input, context);
       if (generationError) return generationError;
-      if (input.cursor) return unavailable('get_variables', input, context, 'cursor_expired', { restartRequired: true });
       const record = recordsById.get(input.record_id);
       if (!record) return unavailable('get_variables', input, context);
-      const response = unavailable('get_variables', input, context, 'schema_context_required', { resultState: 'unknown' });
-      response.warnings = [warning('This generation does not establish a verified release, distribution and schema identity for this asset. Supplied identifiers are not an established schema, and no fields or known-empty schema are asserted.')];
-      response.evidence_references = uniqueEvidence([record], canonicalAsOf);
-      return response;
+      const qualified = matchQualifiedVariableContext(input);
+      if (!qualified) {
+        const response = unavailable('get_variables', input, context, 'schema_context_required', { resultState: 'unknown' });
+        response.warnings = [warning('A supplied schema identifier does not establish dictionary applicability. Call get_asset for documented collection IDs, then request get_variables with those exact IDs. Unapproved dictionary documentation is not a canonical schema.')];
+        response.evidence_references = uniqueEvidence([record], canonicalAsOf);
+        return response;
+      }
+      const fields = [...filterQualifiedFields(qualified, { semantic_query: input.semantic_query, filters: input.filters })];
+      const pagination = await page('get_variables', input, fields, 'fields');
+      if (pagination.error) return pagination.error;
+      return withPagination(successCore({
+        capability: 'get_variables', context, records: [record],
+        resultState: pagination.resultState === 'empty' ? 'empty' : (pagination.envelope.truncated ? 'partial' : 'complete'),
+        result: {
+          asset_id: qualified.record_id,
+          release_id: qualified.release_id,
+          distribution_id: qualified.distribution_id,
+          schema_id: qualified.schema_id,
+          schema_completeness: pagination.envelope.truncated ? 'partial' : qualified.schema_completeness,
+          fields: pagination.selected,
+        },
+      }), pagination);
     },
 
     async getJoinRoutes(input) {
