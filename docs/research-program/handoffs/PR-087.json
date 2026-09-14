@@ -1,0 +1,3492 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-087",
+  "status": "producer_checked",
+  "owner": "/root/pr010_contract_review",
+  "reviewer": "Astra/root",
+  "base_sha": "e268652c5e92876a3540809595636c4795ebec6f",
+  "head_sha": "33b3146dec73984087b49724cc18e690310b0b1d",
+  "dependency_merge_shas": {
+    "PR-010": "e268652c5e92876a3540809595636c4795ebec6f"
+  },
+  "branch": "codex/ushso-pr087-current-wp5-20260912",
+  "github_pr_url": null,
+  "changed_files": [
+    "docs/research-program/handoffs/PR-087.json",
+    "package-lock.json",
+    "verification/research-program/pr-087/producer-20260912/README.md",
+    "verification/research-program/pr-087/producer-20260912/commands/current-root-wp5/event.json",
+    "verification/research-program/pr-087/producer-20260912/commands/current-root-wp5/receipt.json",
+    "verification/research-program/pr-087/producer-20260912/commands/current-root-wp5/stderr.log",
+    "verification/research-program/pr-087/producer-20260912/commands/current-root-wp5/stdout.log",
+    "verification/research-program/pr-087/producer-20260912/commands/historical-wp5-stale/event.json",
+    "verification/research-program/pr-087/producer-20260912/commands/historical-wp5-stale/receipt.json",
+    "verification/research-program/pr-087/producer-20260912/commands/historical-wp5-stale/stderr.log",
+    "verification/research-program/pr-087/producer-20260912/commands/historical-wp5-stale/stdout.log",
+    "verification/research-program/pr-087/producer-20260912/commands/package-node22/event.json",
+    "verification/research-program/pr-087/producer-20260912/commands/package-node22/receipt.json",
+    "verification/research-program/pr-087/producer-20260912/commands/package-node22/stderr.log",
+    "verification/research-program/pr-087/producer-20260912/commands/package-node22/stdout.log",
+    "verification/research-program/pr-087/producer-20260912/commands/package-node24/event.json",
+    "verification/research-program/pr-087/producer-20260912/commands/package-node24/receipt.json",
+    "verification/research-program/pr-087/producer-20260912/commands/package-node24/stderr.log",
+    "verification/research-program/pr-087/producer-20260912/commands/package-node24/stdout.log",
+    "verification/research-program/pr-087/producer-20260912/commands/validate-node22/event.json",
+    "verification/research-program/pr-087/producer-20260912/commands/validate-node22/receipt.json",
+    "verification/research-program/pr-087/producer-20260912/commands/validate-node22/stderr.log",
+    "verification/research-program/pr-087/producer-20260912/commands/validate-node22/stdout.log",
+    "verification/research-program/pr-087/producer-20260912/commands/validate-node24/event.json",
+    "verification/research-program/pr-087/producer-20260912/commands/validate-node24/receipt.json",
+    "verification/research-program/pr-087/producer-20260912/commands/validate-node24/stderr.log",
+    "verification/research-program/pr-087/producer-20260912/commands/validate-node24/stdout.log",
+    "verification/research-program/pr-087/producer-20260912/commands/wp11-current-unknown-lock/event.json",
+    "verification/research-program/pr-087/producer-20260912/commands/wp11-current-unknown-lock/receipt.json",
+    "verification/research-program/pr-087/producer-20260912/commands/wp11-current-unknown-lock/stderr.log",
+    "verification/research-program/pr-087/producer-20260912/commands/wp11-current-unknown-lock/stdout.log",
+    "verification/research-program/pr-087/producer-20260912/commands/wp11-historical-stale/event.json",
+    "verification/research-program/pr-087/producer-20260912/commands/wp11-historical-stale/receipt.json",
+    "verification/research-program/pr-087/producer-20260912/commands/wp11-historical-stale/stderr.log",
+    "verification/research-program/pr-087/producer-20260912/commands/wp11-historical-stale/stdout.log",
+    "verification/research-program/pr-087/producer-20260912/current-node22.json",
+    "verification/research-program/pr-087/producer-20260912/current-node24.json",
+    "verification/research-program/pr-087/producer-20260912/history-notes.json",
+    "verification/research-program/pr-087/producer-20260912/index.json",
+    "verification/research-program/pr-087/producer-20260912/lock-review-input.json",
+    "verification/research-program/pr-087/producer-20260912/origin-and-boundaries.json",
+    "verification/research-program/pr-087/producer-20260912/prior-attempts-manifest.json",
+    "verification/research-program/pr-087/producer-20260912/prior-attempts.tar.gz",
+    "verification/research-program/pr-087/producer-20260912/source-manifest.json",
+    "verification/wp5/v1.1.0/README.md",
+    "verification/wp5/v1.1.0/evidence-ledger.json",
+    "verification/wp5/v1.1.0/package.json",
+    "verification/wp5/v1.1.0/receipts/activation-status.json",
+    "verification/wp5/v1.1.0/receipts/current-subject-policy.json",
+    "verification/wp5/v1.1.0/receipts/delivery-wave-fixtures.json",
+    "verification/wp5/v1.1.0/receipts/fixture-matrix.json",
+    "verification/wp5/v1.1.0/receipts/legacy-lane-parity.json",
+    "verification/wp5/v1.1.0/receipts/r2-capture-protocol.json",
+    "verification/wp5/v1.1.0/receipts/request-capture-reconciliation.json",
+    "verification/wp5/v1.1.0/receipts/v1.0-package-pins.json",
+    "verification/wp5/v1.1.0/receipts/zero-payload-proof.json",
+    "verification/wp5/v1.1.0/tests/current-technical.test.mjs",
+    "verification/wp5/v1.1.0/tests/wp5-verification.test.mjs",
+    "verification/wp5/v1.1.0/tools/common.mjs",
+    "verification/wp5/v1.1.0/tools/validate-wp5.mjs"
+  ],
+  "problem": "Add complete WP5 current technical verification with preserved historical evidence",
+  "resulting_behavior": "Current WP5 controls execute against newly measured bounded source/module/runtime inputs and emit unapproved technical subjects. Frozen historical evidence remains unchanged; exact new lock awaits independently reviewed PR086 correction.",
+  "commits": [
+    {
+      "id": "C-087-1",
+      "subject": "Add complete current technical WP5 package",
+      "sha": "eb446d9da8ad6243f927a82dc5ca07710efc1a7e"
+    },
+    {
+      "id": "C-087-2",
+      "subject": "Enforce bounded current semantic inputs",
+      "sha": "09f9bb5bffe44e8695dd9738c6df56527460360f"
+    },
+    {
+      "id": "C-087-2-R1",
+      "subject": "Bind mandatory leaves and nested package identities",
+      "sha": "33b3146dec73984087b49724cc18e690310b0b1d"
+    },
+    {
+      "id": "C-087-3",
+      "subject": "Retain immutable current evidence and exact PR086 correction input",
+      "sha": null
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/README.md",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/README.md",
+      "sha256": "a1028554b5dcaad0dbe6879748067f10787e4a0e051c3cb8d80427ed692b52df"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/fixtures/adversarial-fixtures.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/fixtures/adversarial-fixtures.json",
+      "sha256": "e3c03f43dbb060a068f16ea987ab7ddfe48c0f71457b28613d22a6440234d27b"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/fixtures/state-transitions.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/fixtures/state-transitions.json",
+      "sha256": "15e821341ca3a5477ece271d8717f3f45c378e0f2ae3ea46d505abd12216d66c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/fixtures/valid-fixtures.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/fixtures/valid-fixtures.json",
+      "sha256": "f558231315f7f57de06a6cc10fb95a175ddef4da30d310b98d581464452b5038"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/manifests/package-manifest.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/manifests/package-manifest.json",
+      "sha256": "842888bae6092da9d00982bed4186a43ceb6aeace9f837947c5a4eb6e0da9886"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/package.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/package.json",
+      "sha256": "ff98eae7074fb4d922f52873dabdb8f0d316856d87659d3bf6ad51e3786b14fd"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/capture-reference.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/capture-reference.schema.json",
+      "sha256": "8b38c9bd5c5291121010fad275d562248d1778f0fa9bc4ce284935daf20ae285"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/checkpoint.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/checkpoint.schema.json",
+      "sha256": "cbf91351a63649740500a656ee3f993823fa39fc7b66569075c754cbca012e88"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/common.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/common.schema.json",
+      "sha256": "3fdab41ebb9d6dec142a632172fe2a83af01a2db7cb2dd4535b43de8f13538b0"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/enumeration-control.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/enumeration-control.schema.json",
+      "sha256": "7d0effc45738874198232f870d0e9b196013662d74e48342481725daecb44c3b"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/event-ledger.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/event-ledger.schema.json",
+      "sha256": "cc046eb3087622a5d4049c9a60cd0097ebfbfd3871e6da09d2dc5eb74870ee21"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/failure-policy.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/failure-policy.schema.json",
+      "sha256": "2042cef1ecb92faf02862fb40422ed788537e8c4d2f5b2251eebe4eed9bacb39"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/fixture-bundle.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/fixture-bundle.schema.json",
+      "sha256": "1c156bd2f8a48c40c029903da7c6f520a0de2367438c4e8a729bd473c947659e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/harvest-plan.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/harvest-plan.schema.json",
+      "sha256": "2cf3b6df940420e28cced1db72ca25a0f4c7d40584d31edc2b532526a08751be"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/harvest-run.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/harvest-run.schema.json",
+      "sha256": "9ff550bc27f9e70e418c8a586b0798eeafa122357ec8e9d99c4dc2a4b566f959"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/ingest-attempt.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/ingest-attempt.schema.json",
+      "sha256": "d3111e41f3de95efe25d80793314379acd69347eb593d058bed9ae57881520e9"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/ingest-job.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/ingest-job.schema.json",
+      "sha256": "e7db23b96b4d7d393ae59a95d878a74c46ae718e127ddb12e1e1a2617935fb02"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/metadata-fetch.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/metadata-fetch.schema.json",
+      "sha256": "5981d9bdb78f5233aed1bca98afe760a68ec773c9966c53e69f41ed50287a456"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/package-manifest.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/package-manifest.schema.json",
+      "sha256": "53747014981e7ad6df97ff72b19cad916fda5d1ffefca4ab34f8378abb6655d1"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/source-descriptor.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/source-descriptor.schema.json",
+      "sha256": "cafa5600f6bd38affb018543cf49760a82400f8f81c5018279ce9dd61c7086d2"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/state-transition-fixture.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/state-transition-fixture.schema.json",
+      "sha256": "6bd0daa8b13b3c2ab812688c413d084a2c002b4b18e40bfefddb7fe2b13fa9a4"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/schemas/validation-receipt.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/schemas/validation-receipt.schema.json",
+      "sha256": "d8ac04b1577e5efd66541aec3e98acbcaa5d603aaee1dd19aaef8dc6cf80f10d"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/tests/ingestion-contract.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/tests/ingestion-contract.test.mjs",
+      "sha256": "ee18aa440c5043336668b548378aad5c16cdf7c7d42d29716f7a23d099603d15"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/tools/build-manifest.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/tools/build-manifest.mjs",
+      "sha256": "86bba1af4c608b9700a842ecd5eea30daef0d76fa6232b2b02b1626c0ccf4150"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/tools/common.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/tools/common.mjs",
+      "sha256": "d3094879b09abc40925d50084842aa09997f7c9baa858f487c051a2265c05660"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/tools/index.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/tools/index.mjs",
+      "sha256": "790588f12b9e8b76ddb73cdb2c0bc104f4024b2eb2d2bc79adcfd8d01c0236ea"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/tools/schema.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/tools/schema.mjs",
+      "sha256": "23d310fc92819bef85995632457e98f6e1252af57ffd5689750a414e1341f459"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/tools/semantics.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/tools/semantics.mjs",
+      "sha256": "26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/tools/validate-package.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/tools/validate-package.mjs",
+      "sha256": "7f91eebd225b646d0dfdd780ec17bc6dd3ebdbc954131ab36e7e3a50739ee2fe"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.0.0/validation/validation-receipt.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.0.0/validation/validation-receipt.json",
+      "sha256": "665174c8ec848ae93fdb8034010f03892b2771aa67b777b361526dd6f396f8e8"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/README.md",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/README.md",
+      "sha256": "3e989c9d473dcabd41b37c635b8bd216b3175037c86fac06ce6118f2489907a9"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/fixtures/adversarial-fixtures.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/fixtures/adversarial-fixtures.json",
+      "sha256": "6631b44d38a8141857dba2e988aa059201aa4c1fd942882c7a27f1dcaadcd8c4"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/fixtures/state-transitions.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/fixtures/state-transitions.json",
+      "sha256": "0131606207ccfcf3e104db03af1e02b30411852f40facaf5bd7d97e2d52c0f36"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/fixtures/valid-fixtures.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/fixtures/valid-fixtures.json",
+      "sha256": "f2cc6a7590dbdc808d3551e8b5df1af9c21aefcd35cea4cdea4bb78936f1b6d2"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/fixtures/workflow-instance-id-compatibility.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/fixtures/workflow-instance-id-compatibility.json",
+      "sha256": "dd79133be3669180e3b85929d641dffc859195509d9df37c5cc497b179465edd"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/manifests/package-manifest.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/manifests/package-manifest.json",
+      "sha256": "c1458a43d98eecf8f0ab10ae4573d6da0eb88d197cdb1823b8aa6e7cda4683b9"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/package.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/package.json",
+      "sha256": "46d811b686194c5cf719beec9dd696f05c6bdd3c2fa35f4c9cecef7771cf2e5e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/capture-reference.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/capture-reference.schema.json",
+      "sha256": "484b9c6b4141d4db8af6ffe0412fa1c31a763dbd0142d649a5ddfb526418f198"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/checkpoint.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/checkpoint.schema.json",
+      "sha256": "c2ec9a84945c661d3c87bc86a94704ff17a817f632c4c66dc441a51f039d4280"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/common.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/common.schema.json",
+      "sha256": "22fc8e734330465e3fe4bb27d8882b142eeee627f6daa5b06c199f81663b825f"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/enumeration-control.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/enumeration-control.schema.json",
+      "sha256": "bea19c75d5b4b4767e1ad0f7115aba3d570be0c875b307cffa671b73940bc1c6"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/event-ledger.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/event-ledger.schema.json",
+      "sha256": "1cabc903e42fac3ac58aa26f11c147b5c5653212b4d7bb9fbf7994cd45786be4"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/failure-policy.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/failure-policy.schema.json",
+      "sha256": "3bcbc8589de9a785d21ff6c81cc7f78ea98f7497d35391ae64b7621ec531d55f"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/fixture-bundle.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/fixture-bundle.schema.json",
+      "sha256": "2edb461b99eabaf6ce5c2fd1ba6315521260da0f7fc7974494756b9a26f93769"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/harvest-plan.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/harvest-plan.schema.json",
+      "sha256": "3a85a19a33c68a55fb8e8347070a3a6bd739ea6b8c358b1139af093c718f2d92"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/harvest-run.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/harvest-run.schema.json",
+      "sha256": "d79bbfdba1fa18c954b9128363f13dcdc4abbdccb720c65db0a6f1a70567cf5f"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/ingest-attempt.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/ingest-attempt.schema.json",
+      "sha256": "47f2bcf63ffa4b9964e74c2ce3e00ef3c942648726caebd15ad26784270cb1f5"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/ingest-job.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/ingest-job.schema.json",
+      "sha256": "849f7119329ed7a2dc02df6e78998f7fde46712a46995a446b3180d8076c627c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/metadata-fetch.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/metadata-fetch.schema.json",
+      "sha256": "94e48c7162ddd06c96cc667494aa17b46dc55aeb2d371900e62fa09496236f07"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/package-manifest.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/package-manifest.schema.json",
+      "sha256": "e8960fe1b75654fee438990000a77ac03eb9035a5f68425ed5c4e43cd6bae677"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/source-descriptor.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/source-descriptor.schema.json",
+      "sha256": "f8ad3f8263a81e3d51eec3a054c300b5b664f6cd5793ea94578aae6c8efeb68a"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/state-transition-fixture.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/state-transition-fixture.schema.json",
+      "sha256": "4049eaf278fdaa11cf0cc92f411c4181504daf7768824a3b623b27aedd63cfb1"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/validation-receipt.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/validation-receipt.schema.json",
+      "sha256": "d472cff5605dbe73406f3546ae45cab074b9ced2492dc5ab831896b0f9fc2bb2"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/schemas/workflow-instance-id-compatibility-fixture.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/schemas/workflow-instance-id-compatibility-fixture.schema.json",
+      "sha256": "7f1fadfd802ffa2fe32a8c037bfafc99dbbc7f84450964030ba84ac01cbda02a"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/tests/ingestion-contract.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/tests/ingestion-contract.test.mjs",
+      "sha256": "a9e1d208c4f0f15d621d9408d335ee92f012a150e8aab6cd67cfa0e8866cc815"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/tools/build-manifest.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/tools/build-manifest.mjs",
+      "sha256": "2a1edbebfd459af5f3e38395fcb5156a207e6547bce9b910e4cb8d85de7bdcac"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/tools/common.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/tools/common.mjs",
+      "sha256": "d3094879b09abc40925d50084842aa09997f7c9baa858f487c051a2265c05660"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/tools/index.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/tools/index.mjs",
+      "sha256": "b278fd9782fd043527d6574b12189e2a44381ed61c4a1ad0eb4f7313a21b68d6"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/tools/schema.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/tools/schema.mjs",
+      "sha256": "23d310fc92819bef85995632457e98f6e1252af57ffd5689750a414e1341f459"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/tools/semantics.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/tools/semantics.mjs",
+      "sha256": "26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/tools/validate-package.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/tools/validate-package.mjs",
+      "sha256": "3ba8b7538914dd85f58e498338f94b30236fda7c1a23383260cb51d07fffa200"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/tools/workflow-instance-id.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/tools/workflow-instance-id.mjs",
+      "sha256": "885d5bc3c9f4d248913ca126d2348dce7f2e9d277e580ab4f2c50224efb2b017"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "contracts/ingestion/v1.1.0/validation/validation-receipt.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "contracts/ingestion/v1.1.0/validation/validation-receipt.json",
+      "sha256": "2c49148f748a20a869a1fe41de1459b9a6f9b644b6a0d96c79acb0beabcc2e82"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "package-lock.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "package-lock.json",
+      "sha256": "7001c1d478ff1468464abe40990ff183f639fc60e769e20a0189638878f4d3a3"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "package.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "package.json",
+      "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/README.md",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/README.md",
+      "sha256": "9f19160719018426548825834249ef691ecf36aed4490d08fd0ab8c73dfd3cf0"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/package.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/package.json",
+      "sha256": "0a8a1f416280705e85e80e5da2f6d816834c08f5bf23f9762dfd0c48ef932f6c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/arcgis.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/arcgis.mjs",
+      "sha256": "d46846b2d0ee9c207b7b917ec16bcacb267c2ace4d9fe613ec47ad7c77bb6796"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/base.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/base.mjs",
+      "sha256": "ee7f8423da5b62f331d832882e1a9259e08cbf53a71064e86a02d2de17a74a51"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/census.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/census.mjs",
+      "sha256": "5b3f2bd0dc99be9ea36b2afa562ab0024c9ea490587fb7b8d7335944c963047d"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/ckan.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/ckan.mjs",
+      "sha256": "ac5a61947a9d6e856694da2822eab8eb37579ca7144db76c96a43d66bfa3e82e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/cms.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/cms.mjs",
+      "sha256": "de22c63f229457c54d1f1c9b5220aa2e9719cd5a71e79e12b558a7c892315fbc"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/data-gov-v4.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/data-gov-v4.mjs",
+      "sha256": "3c3b452d0668d680e86373c76d30e6929f30b451fc90011431915bc305173cf1"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/datacite.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/datacite.mjs",
+      "sha256": "5e92db6c3563a847e340a83e3eedf9aac9c4344e879c7b4ba0fd974a375ea822"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/dataverse.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/dataverse.mjs",
+      "sha256": "902bf4b176b9f478ece90196d9a8176aa7ba68d00d0849de3e6c9f975c5216cc"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/dcat-data-json.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/dcat-data-json.mjs",
+      "sha256": "1d3135c98a047d963fa2465a5c1050fabc40974ce1c7994723504f6af1b0b861"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/extractors.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/extractors.mjs",
+      "sha256": "0b01253c112bbf8b4c936866959f695a0cb77fe161464f54ae22513f9fee4c35"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/html-release-inventory.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/html-release-inventory.mjs",
+      "sha256": "fd0fcfe3d39ae6512098c57ebaa7c4f2eb917d46755f63fe0f17a3b7352ba5b0"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/oai-pmh.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/oai-pmh.mjs",
+      "sha256": "8e15cbebb045c9bd6517474bf3d34dc890a9758e0b3cce44162d3fd20d03b2d4"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/adapters/socrata.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/adapters/socrata.mjs",
+      "sha256": "f367f9241141949f9e36bfd4cc8516c7416ef92ce8d4746421070c0b51c089c6"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/bounded-http-client.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/bounded-http-client.mjs",
+      "sha256": "552d95a9b490ececde7fb77517b0991dc388b7a014359d9f755f2b29256b3eb4"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/canonical.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/canonical.mjs",
+      "sha256": "ba524d6baa275bc5ca05e4b3cc9dac9dda02cda0992a2b8f8cf2ec762da9cb48"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/capture-protocol.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/capture-protocol.mjs",
+      "sha256": "7f5a86e1a042bb936b4349ee55ba21a432bb503da82d4cf899e5a786cb42cd87"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/content-classifier.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/content-classifier.mjs",
+      "sha256": "d8090a7eb1889cdaa8af3d0a3b5d7b23ef1de6d60e5d4dc029fca4a5306979c9"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/contract-versions.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/contract-versions.mjs",
+      "sha256": "0469ef541c6bdf4db0f6424f78ac5b6c561c23a809112e29819f3fdffd883e84"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/deletion-policy.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/deletion-policy.mjs",
+      "sha256": "2740268f9b479c40ac8f192e71177340818f69b0ef516e7419e4e0e6fce67a9f"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/delivery-waves.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/delivery-waves.mjs",
+      "sha256": "9fd0d10c98173d36ed84fc81f5bebc8942834341085d40ef702661128bea9059"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/descriptors.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/descriptors.mjs",
+      "sha256": "7c8ce9c616cdecc9fa3c2bc7b8f344426bb71b9ad2edc95c99abbf4ff92a1e5d"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/errors.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/errors.mjs",
+      "sha256": "ace5e4d07cd58cea6c18cfe09ed366b429cb03fc97b8c80c2c3abf04d2c794c6"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/index.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/index.mjs",
+      "sha256": "be4a019f4d99d373cfc176dcdd2509e54207defb28e72f79e96c33f911f22824"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/legacy-lane-parity.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/legacy-lane-parity.mjs",
+      "sha256": "d3a9386d6a2230cdafcd22fe8ff75b7548d092bd58d0e1acc42fb5ba4e95ecfb"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/network-policy.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/network-policy.mjs",
+      "sha256": "a648c6d73377a053a9b09839ccef371365765d2bd87dde55b9db417f729288ad"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/origin-governor.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/origin-governor.mjs",
+      "sha256": "302f092e5f76c73266f89a5dbade411f528ae1347e6cee37bf4ede99c33cce52"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/pinned-streaming-transport.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/pinned-streaming-transport.mjs",
+      "sha256": "f4b8cfdfce55fcfdd7e853d17c4992c474e16e2f646226e90c5ddebabb72ca08"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/regulator-apcd-registry.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/regulator-apcd-registry.mjs",
+      "sha256": "62668503a1e1acc7977c5306622175e8172ce063ad475dcceff99bec57b4c857"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/route-manifest.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/route-manifest.mjs",
+      "sha256": "be3787542b8c27ed3d7f294ae88789c9530717f2741cfd862ee5a24f46197bfc"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/runner.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/runner.mjs",
+      "sha256": "50af43de5732a562fc506cae854c634998ca43b6d283b270d542d7891c171bf6"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/source-route-allowlist.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/source-route-allowlist.mjs",
+      "sha256": "15eb8c87e94722e83aa006540ce96fccbc3c1cccf664df76157499943a64fe16"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/testing/fixture-matrix.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/testing/fixture-matrix.mjs",
+      "sha256": "ba658028523b88107f3d328a7cd2d8c081ee7ac8bf1682f693b46e38a6be24ce"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/testing/fixtures.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/testing/fixtures.mjs",
+      "sha256": "a97fb601b72c507ba33309e3cca45e18e595b814566e855814214ab76ce62668"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/testing/index.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/testing/index.mjs",
+      "sha256": "6d67b24df5c165714a72a39086c585ca2169d4870176e1834be90303758e8cbe"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/testing/memory-ports.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/testing/memory-ports.mjs",
+      "sha256": "33843172e8f9e0d2fb5258b2d5a13167b3794ee73c713f721cf4d00928f7ad93"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/testing/reconciliation-audit.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/testing/reconciliation-audit.mjs",
+      "sha256": "bf5755390561d984291c3539527565b6dad6d24e44d0b2cea85a56e36c1d372d"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/src/testing/wave-fixtures.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/src/testing/wave-fixtures.mjs",
+      "sha256": "0f0b6943de65b765215977c0565664595d84903c420bdb1ecb33f67734850f35"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/tests/adapters.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/tests/adapters.test.mjs",
+      "sha256": "323bd6b71cebf30e7c9f8703ee0bae745b270cc19e798703eb05d29d7757edad"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/tests/contracts.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/tests/contracts.test.mjs",
+      "sha256": "2fa07f41443bafc90272f7fdf7a23e435519d8b970bb776745d2413c60d4a9cc"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/tests/delivery-waves.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/tests/delivery-waves.test.mjs",
+      "sha256": "75161f3677dc28197ba8d3a00d197b7b3ebc7984d79e52012f1fd47044311570"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/tests/fixture-matrix.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/tests/fixture-matrix.test.mjs",
+      "sha256": "42e0ada3bf0b35d1838375cb9c9debe86a306f26ec21f65e49f051be8e283c66"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/tests/security.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/tests/security.test.mjs",
+      "sha256": "13deb7facae922c3c5579e99583cedab83253507c3865f2486a7b3eb0330c7a7"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/tools/run-fixture-matrix.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/tools/run-fixture-matrix.mjs",
+      "sha256": "553a96ed77f1f34df0584933b289d19f8ec06756566c9e80ed7cf33ac5121be2"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/connectors/tools/validate-package.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/connectors/tools/validate-package.mjs",
+      "sha256": "bd2f57ea47fbdf975fb044a11162e1b38554385ec87af16bc260c117f18cc367"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/package.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/package.json",
+      "sha256": "5e1fb040ab53f4f63668e5c2f91ee95d19cb77a2eec929c5a99d59b216547e14"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/audit-principal.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/audit-principal.mjs",
+      "sha256": "a06495cfcf473ccde6b91552a7cd49768ba9104eba96e1bce194f19aebee75e8"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/collection-job.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/collection-job.mjs",
+      "sha256": "bd73171b3781413c0a5e5cd9f5c143bbdd5e73471a212afda14dbce6f5ca22d9"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/common.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/common.mjs",
+      "sha256": "b9d881927621a993557e791490d316b688cdbfadb5961ff3ba2a8f06555b8b51"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/dead-letter.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/dead-letter.mjs",
+      "sha256": "0e1c96599da830288d865865e2aea9b81a1d34feacea3bd33482f43d4bfa219d"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/dlq-observation-ingress.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/dlq-observation-ingress.mjs",
+      "sha256": "711e76dc25858311a919d13e4af8de5e0f17e8087e94e9d3d03785ada977ca31"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/dlq-sink-policy.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/dlq-sink-policy.mjs",
+      "sha256": "dc71659e18a0802876136d550d0256e5485713df8bc27d2ba5a82fcd118696bd"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/failure-policy.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/failure-policy.mjs",
+      "sha256": "0dd6bb7afe0eeef6c3aaa422054f71b26b9954dac5a4cf766209cb1d6a741e85"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/harvest-workflow.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/harvest-workflow.mjs",
+      "sha256": "db4431256cbf4139bfec7dc3e91742ecb72e198dee294d8f6f3ae08dbb98d266"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/in-memory-control-plane.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/in-memory-control-plane.mjs",
+      "sha256": "bbdb163c998411b4c518d69e086a091925f2836ff32446cd0a06751b9a20d9dd"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/index.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/index.mjs",
+      "sha256": "0f25a3c48b376f5b62d365eb9889ea9705d007ee575ed6a7acea402b83ca1efd"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/local-collection-store.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/local-collection-store.mjs",
+      "sha256": "ba58fc8ba262d252c5ba88ee0d7b86856117360a27e184ce014cd8d6275c9d8a"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/local-collector-adapter.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/local-collector-adapter.mjs",
+      "sha256": "e88fba008b558c62f6380f47b828566a0ddb4b16f53f2b210f7d6f4d52547f01"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/local-fixture-catalog.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/local-fixture-catalog.mjs",
+      "sha256": "0bd64a7c2660d72ac1a56edfff2461458df5ecf57f695b08c5eec8c6ad829a39"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/local-job-cli.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/local-job-cli.mjs",
+      "sha256": "366c55f86d58e6959888cd7789b36cbfac944c222b0ef74c13c540cd94da1cee"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/message-contract.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/message-contract.mjs",
+      "sha256": "fef1fc3141f08f6315f827571c80140f198b0cb3a6ffb5ed6d48814e91e36c68"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/origin-control.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/origin-control.mjs",
+      "sha256": "b501e050c851715591683617695860d917187593ab62ae769046e70945bbc828"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/outbox-dispatcher.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/outbox-dispatcher.mjs",
+      "sha256": "b8645a52929a00e0be65acb3aec3d6156c87df677fd51cd1b8cd5f2b20dc872c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/ports.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/ports.mjs",
+      "sha256": "3f832c244528602ac5dbfa7769b5906ff72610859ecd2ab5ca440c5b9739394c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/postgres-control-store.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/postgres-control-store.mjs",
+      "sha256": "00cd03bf6e1b81ceb1eb15073370fa6c7cff022cca2bbfc306483a7b8c5918c1"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/queue-consumer.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/queue-consumer.mjs",
+      "sha256": "edeb6e052bf5dd0de181c24e108a96272f6ca7cf5da3dda05ec5c83ab9b2711d"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/queue-retention-reconciler.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/queue-retention-reconciler.mjs",
+      "sha256": "a69ed847a8a0a9a68ade90b2355b829fc36bf505e71c1dbc9c411ccaeb6f0491"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/redaction.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/redaction.mjs",
+      "sha256": "0d42af1a5c7d912c93284ae7e74dc9bf568ffa110fe7a0b2b9d05db76eee8ebc"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/retention-gc.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/retention-gc.mjs",
+      "sha256": "0d222d12884384b250d6ab87114af011aaa20a9d9c56323d213f290b69154eac"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/scheduler.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/scheduler.mjs",
+      "sha256": "62155eefa91e4678477839c309b084afb9557f273bfe5281236fbc0b9c44dbeb"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/source-control.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/source-control.mjs",
+      "sha256": "ddc0ff01425714e18575b756c35353e0fe9f1cb8d2b5ced996a60e865cda0b31"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/src/workflow-reconciler.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/src/workflow-reconciler.mjs",
+      "sha256": "aa599771791859487fc327a415047109def4280a025d4462357727920d5202c6"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/tests/adversarial-control-plane.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/tests/adversarial-control-plane.test.mjs",
+      "sha256": "b4343585132ee96631b5eb2edca404f98f20b496dd374c190c3b886e25634ac6"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/tests/helpers.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/tests/helpers.mjs",
+      "sha256": "85139bdc1e4e90fc808c8fcdb82530fe0ec075bb1d27d0648a2055c7ce8029fb"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/tests/outbox-queue-dlq.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/tests/outbox-queue-dlq.test.mjs",
+      "sha256": "62a201c389b514eae0d38e47e85489142fa68ea7450c2e45056ac001bf9120ae"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/tests/postgres-control-store.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/tests/postgres-control-store.test.mjs",
+      "sha256": "85487b15d4d1fd5197281ebf9dc57a9592d0ed82a715128e9a880131bf949ba8"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/tests/retention-workers-policy.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/tests/retention-workers-policy.test.mjs",
+      "sha256": "c63469e9bd632301c1fc8513d5e7becb7715612993ad761321e5e0731445a87c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/tests/scheduler-workflow.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/tests/scheduler-workflow.test.mjs",
+      "sha256": "e20761bd0495c48e5b1ab9cc181f2a2508ac4ca6585b97dd62b8d47e6b773c61"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/ingestion/tests/source-origin-gc-redaction.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/ingestion/tests/source-origin-gc-redaction.test.mjs",
+      "sha256": "8cd6a6be2425a44460c6f177aae2730e34819ca29cff7e18a7bfec36bdd19109"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/analysis-use-cards.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/analysis-use-cards.mjs",
+      "sha256": "7aa43a75269ba4bf471330de4892819d0d0e8a49b54b348d32f2b3c8ae0d1d32"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/build-analysis-use-fixture.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/build-analysis-use-fixture.mjs",
+      "sha256": "856d14583db60fe7d8b3a73698702d7bad478f9f04c68510c8ee7ea1a3562c9e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/build-national-successor.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/build-national-successor.mjs",
+      "sha256": "788590d2cfe9e6b7985f168687733a96c547063c04e7be28349d387b9da8dd1c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/build-package.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/build-package.mjs",
+      "sha256": "1672823e163938563a4cd5cc016352837a0f8df6ee35211f1ecc561e37a001f9"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/catalog-contract.d.mts",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/catalog-contract.d.mts",
+      "sha256": "22feec753b01e835efd723f524f16f5571f9526c7dd93b460e8818aea16709b2"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/catalog-contract.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/catalog-contract.mjs",
+      "sha256": "bbba437c0ba61a774fe02d8a2f3436900756ae4715ad05c0cc36894ee70df160"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/curated-adapter.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/curated-adapter.mjs",
+      "sha256": "351cd319423f41ff2a8f28810d16e2eb7cffc1336b510a95026d07cb3a005162"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/external-url-policy.d.mts",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/external-url-policy.d.mts",
+      "sha256": "eee4ea03277d012d0ff489833c2daac8379686586385af041dd08b4484f63588"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/external-url-policy.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/external-url-policy.mjs",
+      "sha256": "79105a2fb2e76108bbaa3423dc2e02281264e3d8cd653ef4ab83d1dfb4446ba0"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/intent-compiler-v1.2.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/intent-compiler-v1.2.mjs",
+      "sha256": "89e5e783092f9076138dc7b11624326e484e3dea658453fb211dec86da1ef080"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/intent-compiler.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/intent-compiler.mjs",
+      "sha256": "bc9f560d0b6426b853f1c13c0437685d5bf3ba56b8c8c94efd364c0b9d522d60"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/join-routes.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/join-routes.mjs",
+      "sha256": "d254ce352e87cfff3cc020962167b3ad12b1d130d39a987b6fb4156d3c0f945e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/lexical-artifact.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/lexical-artifact.mjs",
+      "sha256": "6fcc774b1925218c68c0cc87edcd72fe7b2c5ce4d47f44503f3678dd72419f70"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/load-corpus.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/load-corpus.mjs",
+      "sha256": "43ba33c6a171eb36686a597f5bc9fdc2da6f546fed3e8175fd84874a76d506af"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/national-backbone-adapter.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/national-backbone-adapter.mjs",
+      "sha256": "cc92b705abdb0feeaff3349c2f77f6f0357f30e586eba8b424f7691dc204517b"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/package-common.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/package-common.mjs",
+      "sha256": "bec1e693dde0506406d756f91d66b6bedd592ab9710543e67b4773874f4471ed"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/query-schema.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/query-schema.mjs",
+      "sha256": "cac214e25fc23157e843c7d94c39dd01f63a91c68c430866e6466d76ccbde0e1"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/question-parser-v1.2.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/question-parser-v1.2.mjs",
+      "sha256": "b6a1d883d8a2dc91f6b1b55c60f55663d937e6f43d5aaad9914a3ac2f87b3b3e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/question-parser.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/question-parser.mjs",
+      "sha256": "736a5d9e57ca7e572954a59f8fd6e06d82a8d186e95ef69ea090224b95ae38e8"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/record-semantics.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/record-semantics.mjs",
+      "sha256": "32f4b1a2f8ae94e99ffb2f353cab01cf0e4bb157ded6405c2d1b1fe15b89047b"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+      "sha256": "b42ef12b6efda9e10c02f8b8ef4589fb7c2bcfd1f77e38c321b15081c220d23a"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/retrieval-core.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/retrieval-core.mjs",
+      "sha256": "58386eac62508dd231161837130515585e14df4162ea429a5aaa3eb146d3724e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/retrieval-v2.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/retrieval-v2.mjs",
+      "sha256": "6b1e00cae6ed01b671b33fafb8761bf03e48d134abfa10f5cb6de39e07a68c51"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/run-query.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/run-query.mjs",
+      "sha256": "6d60397c3ce99e330d8875e059c07b560243740aca9fc4a478dcf4339f7b20a2"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/schema-validation.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/schema-validation.mjs",
+      "sha256": "1f3bf192ee9fd23995b25997ff1f3b6c837afb066a3899f580f050cbc9b7f090"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/search-document-v1.2.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/search-document-v1.2.mjs",
+      "sha256": "1b28ddc1da6325d006c577780ba6f1dd3a1411f0126fd28aa0d4fbec8e38d843"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/search-document.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/search-document.mjs",
+      "sha256": "437f45224dcd13fc880ad6d2f2ac97a1effc5306e612d5e2751ff06bf11dbde4"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/search-receipt-replay.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/search-receipt-replay.mjs",
+      "sha256": "e176b65ffbc952b30a7960f40fba35c87de9782e69162fb727db1f3363e673fb"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/validate-catalog-publication.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/validate-catalog-publication.mjs",
+      "sha256": "c4b1dbc2901df4e5291bf2f8c14e960b9a2678c185f783a9aa3e9ad6937f1466"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/validate-national-successor.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/validate-national-successor.mjs",
+      "sha256": "8b93be1b39a71bf27f25a8412c633efbaa8a3908b8294399722dbeac63570764"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/validate-package.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/validate-package.mjs",
+      "sha256": "51109fb7fe98b2097f9b8d664b5c0ec0050bc82da97c6e78a65e4d24a18353ed"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/verified-analysis-requirements.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/verified-analysis-requirements.mjs",
+      "sha256": "1db99d195b3dbb0f65b92cbb669ec54f0e7a7dcb6ddcd8212594762d2b7ddb06"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/tools/webmcp.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/tools/webmcp.mjs",
+      "sha256": "15407becb8f138f276527ef1157b4ddb0236abfb539eec4830691545800b6434"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "packages/retrieval/versions/v1.1.0/corpus/records.jsonl",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "packages/retrieval/versions/v1.1.0/corpus/records.jsonl",
+      "sha256": "458c8e7ec15e059e60bc908fc98f6b94f8deafd9bd1862d1dc0b576ac830f046"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research-program/check-handoff.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research-program/check-handoff.mjs",
+      "sha256": "45136e123eab6b9b6ac7dc81cc99f81e1db5e458caac2ab9f17f816f8aebe098"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research-program/operating-bounds.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research-program/operating-bounds.mjs",
+      "sha256": "f9da46ab59d2ab2a9bc6c173d7698426a8558c3742e68105b0150dcfc4f36eaa"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research-program/policy.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research-program/policy.json",
+      "sha256": "6230fe7b10aa5da20d9426cf4fcce39f0565e306ec512cbc791428544088fbda"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research-program/receipts/v1.0.0/README.md",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research-program/receipts/v1.0.0/README.md",
+      "sha256": "8a37d54a7f591ad1bc420c23d8c84ef20f2f245ed5e68b82c335b9a3843d359e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json",
+      "sha256": "b0785f439b2ba525ad3b72ef7832adeb9eb6eccc5454a6eedaabdfbc746375eb"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/PYTHON.md",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/PYTHON.md",
+      "sha256": "3fc57b9cc91faae0fa79623ac947d76e56005143f3155d6618efe4ed6e62a21e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/build-review.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/build-review.mjs",
+      "sha256": "ceff2fb253f0b0c99be2de4175f04ebdea9ed23d1a3934a574c5891237198690"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/claim-selector.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/claim-selector.mjs",
+      "sha256": "ee2ca21064bf9b8f57c5e941e34279a2ad7ca13f4d32ada31a00be47849b1d0c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-cost-report-grid-parser.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-cost-report-grid-parser.mjs",
+      "sha256": "b6a852534b98727388fe8b3e4f96bf9aa1397b1e4b040af81b50ce476097f35d"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-cost-report-grid-parser.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-cost-report-grid-parser.test.mjs",
+      "sha256": "68d56303838b85a95a9175718b52c84d88527d24f6ba436d3b56b3c2c78e1cc5"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-dictionary-parser.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-dictionary-parser.mjs",
+      "sha256": "263cfbf6dfccf69a60f72fad01be89e6fce5b97ad9e61509ef78f445cafbb493"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-documents.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-documents.mjs",
+      "sha256": "7d167802e3e76e0c22c5fdfcf7cba441e91c0c4693180c3e4f8fe6d5159349b2"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-grid-binding.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-grid-binding.mjs",
+      "sha256": "ccf68aad3527d98ca2d8dbe5027d83dd244ca024d9dcf5480b1ada5a58508bf5"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-grid-extract.py",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-grid-extract.py",
+      "sha256": "a875c7baa70db27b8a0a255e1a7a9e5ad1154d9608afc12d22cfa699de8829a4"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-grid-extract.test.py",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-grid-extract.test.py",
+      "sha256": "8f0ab4584414e2b9baf0e152ce77a900ba19701e34cba7d37c5e9c22376fa41e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-grid-fragmented-parser.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-grid-fragmented-parser.mjs",
+      "sha256": "02ff50b85d2acda8958cf7d79bbad9a7c5abcbc23aa173e9d3621f9e421eeec9"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-grid-fragmented-parser.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-grid-fragmented-parser.test.mjs",
+      "sha256": "8e0f51fdc03dbb0ef722071294365c575e2947195555560dc6820cb41c0ed4eb"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-grid-parser.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-grid-parser.mjs",
+      "sha256": "c26ffe09111053b79bb2f6f0314dc8f0449819e8d785dac6554b905f670e18fd"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-grid-term-passages.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-grid-term-passages.mjs",
+      "sha256": "bac6f052d6a25f77801a2a4152e1af5c022be264bcbca417dd602145ee0cd7ba"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-structured-dictionary.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-structured-dictionary.mjs",
+      "sha256": "6f2baa3d81900dececfbe14eb5442784d5e482644c7993c4b8c775b1be2d30a3"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-structured-dictionary.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-structured-dictionary.test.mjs",
+      "sha256": "b17e4d8a2f84de9d223f050d59c6258d3d914ac64ea22229268c5a19f7059378"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-typed-layout.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-typed-layout.mjs",
+      "sha256": "4b44f34bcbaa75110583bff79974ebe3955604d13332ac79cb27f7e698a98e46"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-update-cycle.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-update-cycle.mjs",
+      "sha256": "a9006aefbe143ef7115499b541b36cfffa10294ae03d68d2211727073d24be45"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-update-cycle.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-update-cycle.test.mjs",
+      "sha256": "702f035154e3f5e9b7e815697ead8f96e97825d6d95a9ca9ac3766f5af70fc5f"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-variable-layout.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-variable-layout.mjs",
+      "sha256": "49b93cfd8d2c5c792e06255bf0d2013ef2eb075fbabe4ab9debd749fd14140b4"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-xlsx-cells.py",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-xlsx-cells.py",
+      "sha256": "3b4ecf533b3216443c366895e45eaf7de50fd6048718838b8b60dc56bb7405db"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/cms-xlsx-cells.test.py",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/cms-xlsx-cells.test.py",
+      "sha256": "ce91823aa1ab72d7e92a5c66572fbc30a67fc012480d22dd9dfdf8d0d20930a6"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/collect-grid-cms.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/collect-grid-cms.mjs",
+      "sha256": "b604e288b4827fc051e496e62d81703eac852b5208c677f6a0934be90543e688"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/collect-pdf-windows.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/collect-pdf-windows.mjs",
+      "sha256": "d4666971e0532137c1c337b826e25890af3fee9ec38c4cde86e4610bf66fecd3"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/collect-typed-cms.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/collect-typed-cms.mjs",
+      "sha256": "5a9dc759b7cb846cb50ee38674249d7f52db6fdcfac2da9deb47b482c285d625"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/compose-dictionary-review.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/compose-dictionary-review.mjs",
+      "sha256": "93db2830ad09f029023f325cb3e6d6eaa3a118d9efee4146946361505661975b"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/compose-review-context.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/compose-review-context.test.mjs",
+      "sha256": "22c78c65dd68baf2e1a1cd8ac5182846fe8326d3c7d4e994ebe595f3314a8a0b"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/compose-scientific-approval.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/compose-scientific-approval.test.mjs",
+      "sha256": "93ddf13c43a7b5901b9d2d47816a1fab563409c687bd2f062360ea7c512b3091"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/composition-fixes.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/composition-fixes.test.mjs",
+      "sha256": "8f7a2f0d1ca7410a8065530bd2d0aeecf9fd26fb9bfe617289bb82a76a7b3a04"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/dictionary-compose-race.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/dictionary-compose-race.test.mjs",
+      "sha256": "028850ffc009581c0a5526098c15be83b72f5f9d3ef4912792c5a22e42bdf8db"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/dictionary-field-supplements.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/dictionary-field-supplements.mjs",
+      "sha256": "4340be8974e4c14299e7c53a0d763527cd9713f2f8d5b041424296ed258ac455"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/dictionary-package-closure.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/dictionary-package-closure.mjs",
+      "sha256": "60133ab79332aa6636eb195f9c75c2ebbd2b87762c7d795e4cfbfe8264851a3a"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/dictionary-package-closure.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/dictionary-package-closure.test.mjs",
+      "sha256": "2865c5854851f8bbadf7cb09d6c5614fe3c9f562b9d14ebca3cd5c94730ce8ef"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/dictionary-proposal-verification.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/dictionary-proposal-verification.mjs",
+      "sha256": "01a8a9ed52f83d32ed822518f21b81aa5ad54588a0ac0e4ccc03e16a31271d08"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/document-integrity.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/document-integrity.mjs",
+      "sha256": "1dccc8e50a8ac3bfaa613adc40bb813abe7040c4f101c860a4848b118a8d0408"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/fixtures/cms-cost-grid/hha.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/fixtures/cms-cost-grid/hha.json",
+      "sha256": "ebad6dae4e56b7a589e9c80898e39dea4da5ca90e250eedc8775eb6932105897"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/fixtures/cms-cost-grid/hospital.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/fixtures/cms-cost-grid/hospital.json",
+      "sha256": "bf4664b88832e8a2854d367915fb72dd48af6c894d0a8c31075b44c37cc8be3c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/fixtures/cms-cost-grid/provenance.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/fixtures/cms-cost-grid/provenance.json",
+      "sha256": "96a76884727071871efc06da4a21f3f39cd8c0a76dd2fafb3f7e41164fcfb1f7"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/fixtures/cms-fragmented/42c948aeaac82ecf5a7cc735ed8c6ed60553bcf6111ac6a79374e2cba55fe5d4.geometry.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/fixtures/cms-fragmented/42c948aeaac82ecf5a7cc735ed8c6ed60553bcf6111ac6a79374e2cba55fe5d4.geometry.json",
+      "sha256": "e50b2aad3b52a749cff7cddf83ccbc49a41974bdf54287a3abe787ef1791e6d3"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/fixtures/cms-fragmented/47806afba6d852c3ec0e2d5d8cc9ec76cfc590b58d15cf3dc7268884c0753472.geometry.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/fixtures/cms-fragmented/47806afba6d852c3ec0e2d5d8cc9ec76cfc590b58d15cf3dc7268884c0753472.geometry.json",
+      "sha256": "5fc017113d2f829ff149d8d474c328275e22456642c6a1b6dc428dccdc72a2df"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/fixtures/cms-fragmented/9e00f0de9a69ee74b2d62a4c0c8ac6653d6f2a2162d27697f14d5d7b6c4ace23.geometry.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/fixtures/cms-fragmented/9e00f0de9a69ee74b2d62a4c0c8ac6653d6f2a2162d27697f14d5d7b6c4ace23.geometry.json",
+      "sha256": "d4c88d388e99cf18ca2dfdfc528fcdd33ab6e7b1da6e420fc041a4189b9bf7a1"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/fixtures/cms-fragmented/provenance.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/fixtures/cms-fragmented/provenance.json",
+      "sha256": "ab184d5ebed41c9e288714b4bfc07962a79db0ef639bfbb42f368272a912b510"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/large-dictionary-parser.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/large-dictionary-parser.test.mjs",
+      "sha256": "a5024169250d6142bc1672e5d0b9b7f5553005df669bd27df3f243a1a83c302f"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/mcbs-window-parser.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/mcbs-window-parser.mjs",
+      "sha256": "c3d43ccbed77e9b41c64c26197ad417ba2d0a77c7b4d8f10d5ef1f5f029cbf77"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/package-cms-derived-review.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/package-cms-derived-review.mjs",
+      "sha256": "87a66b55ee741582da03bd798aabf4dd0d15f61c622e53f1952dfa67ac3660fa"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/package-cms-grid-review.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/package-cms-grid-review.mjs",
+      "sha256": "c86fbfd27f121a594fe569ef5cb3997f720221d014608270d119a840118538e5"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/package-cms-legacy-review.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/package-cms-legacy-review.mjs",
+      "sha256": "6dd93e7e9407597ada801a6b9f97b01a922156237db68a16a9e033d45e755e6b"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/package-cms-structured-review.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/package-cms-structured-review.mjs",
+      "sha256": "dd10f6526337e6cf14476a211ab4cb0ecc663027d0889bb2d8c5ec5ee1b245d0"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/package-cms-structured-review.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/package-cms-structured-review.test.mjs",
+      "sha256": "52d4e8dd7e75db4186e824c257e2d0bba3d847a833e9b6292711c33bddf606c7"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/package-dictionary-review.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/package-dictionary-review.mjs",
+      "sha256": "2695ceee0fa15348567bd3fdb199f1534e8ac42e18c11fe42b8b634224890fbb"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/package-scientific-conflicts.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/package-scientific-conflicts.mjs",
+      "sha256": "c47b4e2620bacb8515da8881ef61aa0773e050dacaaf37672969c7789b5243c1"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/package-scientific-review.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/package-scientific-review.mjs",
+      "sha256": "083ff5f1a320a3a778fe901b9017b7964fe804d5715d218ba03d80b0d1148f59"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/pdf-layout.py",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/pdf-layout.py",
+      "sha256": "7e2d5131ce6403b27fd691cbb410533daa20fb66e3ea6ab8b97cd96663fc44ba"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/pdf-text-window.py",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/pdf-text-window.py",
+      "sha256": "783ee67229f0a3500f2edc0a1ecff432f713fc45f878a52008758c1641e9455e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/pdf-text-window.test.py",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/pdf-text-window.test.py",
+      "sha256": "2e225092e002a4b2d903eaf0200dba7e9b34eec0ab7684da941c12889848567a"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/pdf-text.py",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/pdf-text.py",
+      "sha256": "3009126d556a1e7b758895f1992914ece30457a570b95e046efd9de3d5ccc0cd"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/pdf-window-resume.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/pdf-window-resume.test.mjs",
+      "sha256": "b7c7492d9f54de5e409bea78396a25b26948d66a10ed5ec6627f56ed6c7e0630"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/prepare-catalog-update.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/prepare-catalog-update.mjs",
+      "sha256": "607574615c9ca41d243b3ee593bb8c19c6917694737380669e3183869f4fad5c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/prepare-scientific-decisions.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/prepare-scientific-decisions.mjs",
+      "sha256": "e81ab198cd770559b8086bbbdfd62c9013112e445b13f82041b71ec84d049dc7"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/qies-window-parser.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/qies-window-parser.mjs",
+      "sha256": "02c021c95088067e8469a78122ffd2b6f927f3169531298b98ca4dd9b9269ac8"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/refresh.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/refresh.mjs",
+      "sha256": "89e577d0a32a7c1e6f9e14229bc15db03928792a8636eef5b5b635a25365907d"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/requirements.txt",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/requirements.txt",
+      "sha256": "2ad414e049edbf778758b78e28c7e3d05a826e8b23f8f2efdcf79e0977f13833"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/research-python.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/research-python.mjs",
+      "sha256": "416b48cd983b579a20bf6bbea04993473369a86bb7913e08a3c465ad0d1ac07c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/review-note-builder.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/review-note-builder.mjs",
+      "sha256": "74271b4a6061d2233be742d0dc9767a0486a3c16c719dc6f8cc795396e82b203"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/scientific-conflicts-fixture.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/scientific-conflicts-fixture.mjs",
+      "sha256": "f95763fbf1ee7e5aa4f1319a9ad12b6313d346a3ce6a07dbcd0a91937b9c9583"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/scientific-conflicts-unit.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/scientific-conflicts-unit.test.mjs",
+      "sha256": "d58bd5ce8526e44e101e2fe20e18cfe6d5a58d9c0270167db0cd68e4601eb6c5"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/scientific-selection.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/scientific-selection.mjs",
+      "sha256": "64a318aa024783c025160a8608b8fea6505519075d54c7b12286dcb39d32eb68"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/source-extractors.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/source-extractors.mjs",
+      "sha256": "c9d519a79074a8a8235d15c6d6e9ac5a51c80c33245c10f9ebf569dddbed04cc"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/sweep.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/sweep.mjs",
+      "sha256": "02ccfd3328ec2e3be25a4f00cf5e00054062bbc6df4ba69ea0b5868c8c730f4a"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/update-cycle.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/update-cycle.mjs",
+      "sha256": "9f3e946ce6eedbf51b1699c28db254817906290ba5594ea36ba08c8474ecf863"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/verify-cms-layout-proposals.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/verify-cms-layout-proposals.mjs",
+      "sha256": "53ef029fbc86d4f1aa957f813a450e65d8f2f0447830604c1d0e87d1bba1695c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/verify-scientific-conflicts-package.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/verify-scientific-conflicts-package.mjs",
+      "sha256": "1a9a467c74092c7e5a1cdb8e7fea34986715f58510bb9aa02d5e82bbd5c3e6dc"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/research/verify-scientific-preview.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/research/verify-scientific-preview.mjs",
+      "sha256": "ece17bfb9b20a962ae326033dc6640817e1de856f632398a095c375a1ebc3d7e"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "scripts/run-contract-suites.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "scripts/run-contract-suites.mjs",
+      "sha256": "3a13c51986e1cd90b530465d4e8fc30cc3763a86189d06930c4dbf6f65c5e261"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "tests/research-automation.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "tests/research-automation.test.mjs",
+      "sha256": "48b39888c478bddef2beb8191437c9361e816065f07a0a7d63062af6d64237ec"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "tests/research-program/job-lifecycle.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "tests/research-program/job-lifecycle.test.mjs",
+      "sha256": "fc13ecdad7eb1a9a177317e9e9f5ff2d6e1803924bb07c961e57fe811bc1e447"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "tests/update-cycle.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "tests/update-cycle.test.mjs",
+      "sha256": "4c268379d03616d19bb8cda7dd7b226bae56439b542d2c2c6938575fc2c9ef33"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/README.md",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/README.md",
+      "sha256": "a0bf03119af1157e1243d987530f7702bd3c1a97413666bf36d00075e8a6454d"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/evidence-ledger.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/evidence-ledger.json",
+      "sha256": "74fd2fd92ddcbd85841e7b81c4ad6ae08c420bdfd9d37feda93059dba0bab2e5"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/package.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/package.json",
+      "sha256": "f08c6e657f17a50459c0e09a011b984e507de6a9b68f85941f3f42b20ab6631c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/receipts/activation-status.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/receipts/activation-status.json",
+      "sha256": "439b258fc261f8e537ccaf72a8c07efe08c03d239a73e07591b0fb41e813c9cc"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/receipts/delivery-wave-fixtures.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/receipts/delivery-wave-fixtures.json",
+      "sha256": "8d68a1b1ddf138e7e44d7c0b24bf9c51fbce6a6f6bab3d60e6e10a6e8479cd35"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/receipts/fixture-matrix.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/receipts/fixture-matrix.json",
+      "sha256": "94414bd4b9eabcca81e07bea90b340b3b37efade18416a16cedd9d29abb6bf1c"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/receipts/legacy-lane-parity.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/receipts/legacy-lane-parity.json",
+      "sha256": "d47143f458631d109b88f5655ec9398ed6f00b298f615297a40f70d8509d76ed"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/receipts/r2-capture-protocol.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/receipts/r2-capture-protocol.json",
+      "sha256": "48696a9225a91e8cf75a4915bd85f322535dfc66723a6a783e8c55e906a93547"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/receipts/request-capture-reconciliation.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/receipts/request-capture-reconciliation.json",
+      "sha256": "7751e80f77f7b5c90832294ada4868320c9bd1b99339bb0bbd8bc31dd7eafc88"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/receipts/zero-payload-proof.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/receipts/zero-payload-proof.json",
+      "sha256": "a6f5c89704a66de71f0037c366ff174546b03e185d79b343d1d8c384ca6b100f"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/tests/wp5-verification.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/tests/wp5-verification.test.mjs",
+      "sha256": "60b4c1bbc2da3e7b3e62b788c0bf05e22e4bc1f8beb99146e83eb6be0ae05222"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/tools/common.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/tools/common.mjs",
+      "sha256": "3a8c6c619271600daf16d98377c7ca0ab1c39728c7bd3aa31d48d7ba1b916e39"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.0.0/tools/validate-wp5.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.0.0/tools/validate-wp5.mjs",
+      "sha256": "96d3653a8b9500f0b8d5f8d8d298b591058a39788fea247584acb03d94dd0991"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/README.md",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/README.md",
+      "sha256": "5b324b69231d1a02f2178136ebac3fa20dea72ac5ba231942863e361dc5d26b1"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/evidence-ledger.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/evidence-ledger.json",
+      "sha256": "0bc685a16a43a93050297f5286439d450de6c950831ecba7f88de63c17077980"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/package.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/package.json",
+      "sha256": "9afb749dc1e421705a55b7be5a9565fdc9ee15b3879cf57dafc61c098b258353"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/receipts/activation-status.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/receipts/activation-status.json",
+      "sha256": "467c493243ee89d309f2fc7cd0d757d8ced6b87a43dbb7e3d5ff00b2655fcf59"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/receipts/current-subject-policy.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/receipts/current-subject-policy.json",
+      "sha256": "0581d2e31a99a91fcbd99de89020e3cbb32f9c80cae0048c16cc10085000dcf1"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/receipts/delivery-wave-fixtures.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/receipts/delivery-wave-fixtures.json",
+      "sha256": "fb499429229e1ffb37b356855029148c8d0588f652d5b9b2e80f4d7146e7fd45"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/receipts/fixture-matrix.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/receipts/fixture-matrix.json",
+      "sha256": "ab1229692edda9df78f89ac21e81595214eaf286a24acb9e275b352886c36584"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/receipts/legacy-lane-parity.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/receipts/legacy-lane-parity.json",
+      "sha256": "7627f64927a8bddb56f54473a870e53d21efbcda16c7faad2923199e66dceb15"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/receipts/r2-capture-protocol.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/receipts/r2-capture-protocol.json",
+      "sha256": "f91a18fff1795e4f3a482fbd9e447a9fe7c8ec49719cd52519a2ce729ef8d50b"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/receipts/request-capture-reconciliation.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/receipts/request-capture-reconciliation.json",
+      "sha256": "9eeaaff69f322fc9a3c74f5b1c95b3bd475a8a9c440a60763f8992518dbae17b"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/receipts/v1.0-package-pins.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/receipts/v1.0-package-pins.json",
+      "sha256": "627824c814239131771cf9f273b3d98435cdec5b5347f94ed8fb7974b561e43b"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/receipts/zero-payload-proof.json",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/receipts/zero-payload-proof.json",
+      "sha256": "15bf7d4cfb4b4898ca7c87e78cfb71fd4ddc34838fe4bf15ecb8596437a7838b"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/tests/current-technical.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/tests/current-technical.test.mjs",
+      "sha256": "317a7159cf2fdf15e43482c927bf61a579ec680edbc299f9ce8e9637e90917fe"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/tests/wp5-verification.test.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/tests/wp5-verification.test.mjs",
+      "sha256": "4cb6c1c12e92feccb4830daa8f013d1be2caf7c5581d84a8714b1d4bea32e494"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/tools/common.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/tools/common.mjs",
+      "sha256": "722068114548dd715b50dc658759ca1a18683d75971a1d2c27c00b201c3f9aa9"
+    },
+    {
+      "kind": "immutable_current_subject_file",
+      "id": "verification/wp5/v1.1.0/tools/validate-wp5.mjs",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "verification/wp5/v1.1.0/tools/validate-wp5.mjs",
+      "sha256": "9942e8eb656661e6b1c229f7ec733f32d2e9de07d6091df296adee71dbed3aa3"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/2020.js",
+      "location": "local",
+      "sha256": "908e9670b478b2ba126802a221b7e47006f50cf467e2c5dd7935d3dbef10a20a"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/codegen/code.js",
+      "location": "local",
+      "sha256": "1287153722f1fc3c5342647de7ae1d7b6fb68bdb3378a0776a937d273fc97e0d"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/codegen/index.js",
+      "location": "local",
+      "sha256": "f03b2b72597ef86878d1d4030580c2d0964046efad4867f3d05aa91065ba034c"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/codegen/scope.js",
+      "location": "local",
+      "sha256": "d2a0a97af2faa2cad88702314fe421e235ab17f11e0d62883d58d8d4dc734286"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/errors.js",
+      "location": "local",
+      "sha256": "53990f8f2cc05922bba410ae68231d3f869de4f8343277ede5b4834fa564c6c2"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/index.js",
+      "location": "local",
+      "sha256": "05b34da22814f3787bfa3ac68dad59c9047f56e55a607e0a20719ebf5afe69ac"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/names.js",
+      "location": "local",
+      "sha256": "3cab37a2240b996b9bed92fe7a041d91689cfe3ad2e9ae4c0ab99e4146408493"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/ref_error.js",
+      "location": "local",
+      "sha256": "81c98fdf34c3037c91bfcc02277ec32156c71e34048f36cfe4e084416e916cb7"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/resolve.js",
+      "location": "local",
+      "sha256": "df75af0e0cf03fa1c6452e8dc61019f5aec645a8a5f6f494dc4e13cb5502d2d9"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/rules.js",
+      "location": "local",
+      "sha256": "ec1d86500f497aa8e20f9f0c1695951159d9a909669d00a261ce1bb22b3cf0a9"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/util.js",
+      "location": "local",
+      "sha256": "fa911f5631f29d4d6420adfe086cb693b94b08de2719475c78c54bcb82f831a5"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/validate/applicability.js",
+      "location": "local",
+      "sha256": "50c5cba5894a7fb9874b3432355b46ec71b73c9368dafb1323ded8567cca8fc0"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/validate/boolSchema.js",
+      "location": "local",
+      "sha256": "c08abdbdbd3d8b1dcc0552a20fbc7d837ed44f4ca6abb2e464985590ac94377f"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/validate/dataType.js",
+      "location": "local",
+      "sha256": "697bd7005361ec7066a23c18830a10b0ef28aec1a33138b4e3098bf78c4fae52"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/validate/defaults.js",
+      "location": "local",
+      "sha256": "05721971df94faa57b09c8cfd60c2eef81b6d14910a7dea5f539d693a029c428"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/validate/index.js",
+      "location": "local",
+      "sha256": "cb2103e5f890e04592c10d24b45857dad91155bae9f9460138a2459bdaaea2cd"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/validate/keyword.js",
+      "location": "local",
+      "sha256": "ab8f070c75c25eee9be5c837f364748909b58f5db66149a2beccbd2f66afeb76"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/compile/validate/subschema.js",
+      "location": "local",
+      "sha256": "ca783d6052af91e65ebb59a5b48b47fb459a2241d37ca6a042f767d4ce451bdc"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/core.js",
+      "location": "local",
+      "sha256": "51be29c7ed7288622f755c0f1bebd3da4a9907d77aa2c33b0f2a0a5b6b339603"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/refs/data.json",
+      "location": "local",
+      "sha256": "d24ab8a97c18b3f5afdde7d7024a0e0ac1df0614a16a41cb88f81379edcc2db3"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/refs/json-schema-2020-12/index.js",
+      "location": "local",
+      "sha256": "2e39089b0aaa14efa7901ecf5384622ec3d5897b206e1d589d2420f17b9fa6e1"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/refs/json-schema-2020-12/meta/applicator.json",
+      "location": "local",
+      "sha256": "f1e465ff0c0cc86bee5c0cc4b51d2734c532e6ea12c75b60a2ac093a4577b2d4"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/refs/json-schema-2020-12/meta/content.json",
+      "location": "local",
+      "sha256": "7ede86f2c48d646202bf1332aefaf46db268c943d59752727db7247dc2920516"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/refs/json-schema-2020-12/meta/core.json",
+      "location": "local",
+      "sha256": "c3a5947992d4fe67c95cda7910911207376bbae41c0a124ec9e7e699172e7a49"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/refs/json-schema-2020-12/meta/format-annotation.json",
+      "location": "local",
+      "sha256": "1e31131b1ed21f98c007f04deb501343b8c4dd77f1c5a8494a9c2085f68d769d"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/refs/json-schema-2020-12/meta/meta-data.json",
+      "location": "local",
+      "sha256": "eb008c756b29bdaa237c1f06d32ea4a21f6ef22148b03c6372cea5e4c0782273"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/refs/json-schema-2020-12/meta/unevaluated.json",
+      "location": "local",
+      "sha256": "8f7f75f4274745faa32e4abdba12de99f49b21df225f52f723b5c62043b0edca"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/refs/json-schema-2020-12/meta/validation.json",
+      "location": "local",
+      "sha256": "3cae7069843679429e4ada7df261bb8961fa34cac15be89296026e69af312092"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/refs/json-schema-2020-12/schema.json",
+      "location": "local",
+      "sha256": "5333c7df76bceee098e865881d0808238dea836126c6c60b49299ec85c6c7a56"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/runtime/equal.js",
+      "location": "local",
+      "sha256": "c94467da09ee94e5d194483a7ab821b9bb3bf1c04397270f2ab53dea9de59274"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/runtime/ucs2length.js",
+      "location": "local",
+      "sha256": "1df012dd3d23fced07255a7204798004509687cb1f431ae0ab976db436bbd890"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/runtime/uri.js",
+      "location": "local",
+      "sha256": "d1d61baf97ed87d7310df847a78ed73d19c8cc003207bf5aaec977500bdb1578"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/runtime/validation_error.js",
+      "location": "local",
+      "sha256": "11bf5b4affc8114e5e7cdf65b93006c2d997ab60ada1152c22e136f9b828b815"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/additionalItems.js",
+      "location": "local",
+      "sha256": "7beb0fbda5e349907067c8398bb8cc3260a6267b6e5dff9793a5ab2171934099"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js",
+      "location": "local",
+      "sha256": "e237cb180cd2e3f2e676feb714d7dcc6a42116640f9db2ad830cd20d9dfc540a"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/allOf.js",
+      "location": "local",
+      "sha256": "98f46a6434ebe5f851b406480e18b776dd7f1bcc275e28c16a13bfef3cc067c7"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/anyOf.js",
+      "location": "local",
+      "sha256": "8d7368d4aebad0514b713191b934993b4f0bf570e1bab93b07dc69712db2cec5"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/contains.js",
+      "location": "local",
+      "sha256": "56165dc93cd8b0b4611db50a97f1e7d7f9af6c5ffe95a7a5b054d6eeaa7f6a8c"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/dependencies.js",
+      "location": "local",
+      "sha256": "c1a83bf484b6fde4d268935f079ddba5e74a2f589dfc6d15ca2e20ba4d06ee5b"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/dependentSchemas.js",
+      "location": "local",
+      "sha256": "d17d23755b0cf8699c180dd98b8b7270b688d2e4fe5a4c4fcc53ffdcc18ee58e"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/if.js",
+      "location": "local",
+      "sha256": "42374ee5dc681433579cc689b0c4ae5343f5bf78d4d6a561722b9277c5335ec4"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/index.js",
+      "location": "local",
+      "sha256": "5a61978f6d81bbabfa8b9ccb71d7de816ed6dd1fd7de5c72657439a76c2a7cb3"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/items.js",
+      "location": "local",
+      "sha256": "fa87f74adc3aac1f1b5e3e7dddf73294e6850e1dd49ed131fca4352e9645c54e"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/items2020.js",
+      "location": "local",
+      "sha256": "c449ef64aec16263c7935293ed450cfc2da3ba66f6df5f99c3198c05f169838f"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/not.js",
+      "location": "local",
+      "sha256": "ab2f2758d4ea97ac8763fe5540dd0f4d877859676fe5d6c750a18deca387f718"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/oneOf.js",
+      "location": "local",
+      "sha256": "e2aeb6c22d49fd5f348bedcf7f5c4d7b31f5a05dd7ff1a0c531374c6968792a2"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/patternProperties.js",
+      "location": "local",
+      "sha256": "0d43da49a82452c439ba990de7372ad5cedb663717918a5f6dae07025abff655"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/prefixItems.js",
+      "location": "local",
+      "sha256": "16264f7b3233a6dcb98b48700643efbd3ebc4d11e27b3eacffc83ccb5f44fb23"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/properties.js",
+      "location": "local",
+      "sha256": "c896873ae7251093a2c8880545b69b6e8cb55c44817a53ec830a49818d74104f"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/propertyNames.js",
+      "location": "local",
+      "sha256": "b3411cfeaff8efd5e6de12971bb5dc339e64b61fbe62d3b950794c077315c2e7"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/applicator/thenElse.js",
+      "location": "local",
+      "sha256": "9bc42eb8699d57188a7ec2a710d3f38052f92bd78c5d4d0442cf98cf2ebbe22d"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/code.js",
+      "location": "local",
+      "sha256": "9212ddf8bd0a4c3b1c4b44cdadd141183b2b36f561b91d13df53c83911e3bf63"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/core/id.js",
+      "location": "local",
+      "sha256": "49c8eff694ce4371450c1f9986e934fcbf4bd143311caef5332113f29175bc11"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/core/index.js",
+      "location": "local",
+      "sha256": "f420e1011b95e27b54c58323a7ed4ffbd0a88cdb4496f771bb6782c2aa22d23e"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/core/ref.js",
+      "location": "local",
+      "sha256": "1422c1454b3621d890066042048f37746fe1cf213088307099816199889bbfd1"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/discriminator/index.js",
+      "location": "local",
+      "sha256": "b58b58025d2dbe5a6967376faec9295b860a338664c47037e9a1035c1e8fb88e"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/discriminator/types.js",
+      "location": "local",
+      "sha256": "2365341d1f30dc72cece7703e908e47aacb8f904b9f66ec4019fe889ae1e57fa"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/draft2020.js",
+      "location": "local",
+      "sha256": "2d0dc3a14abd48a45ad1407a97f23a0f943fa5244923037f86e95a7de04a7445"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/dynamic/dynamicAnchor.js",
+      "location": "local",
+      "sha256": "78222a5b42bab186253d880f9af4b012394ae5988bfab78e79f2510caed0ccf7"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/dynamic/dynamicRef.js",
+      "location": "local",
+      "sha256": "acc2913c91d11ff57150dde1751cdd5d9f486a0cb156037870ede203273af917"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/dynamic/index.js",
+      "location": "local",
+      "sha256": "8c05d09948653957427f351d9c6172965b932a5663f7dcb63014a491a533cc0b"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/dynamic/recursiveAnchor.js",
+      "location": "local",
+      "sha256": "9f6cb7e509f9deada1b884010f08c52876f8eace32dcf0e7da28f6d0d91f3f76"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/dynamic/recursiveRef.js",
+      "location": "local",
+      "sha256": "7b0c651e2c5b5218639cd3ad7e5162f1e226fc9814107a85f4c3e47f5138670d"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/format/format.js",
+      "location": "local",
+      "sha256": "6fae0d5124fd821b1a9959492f7d6d7b528bee8830d49a7a4759fc9a9ab81d5f"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/format/index.js",
+      "location": "local",
+      "sha256": "d5dad5f95c9c5f48f8ca956cdbb927aafc7b56baabfca8c0b0403d92c5ebeb67"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/metadata.js",
+      "location": "local",
+      "sha256": "45c178744a7ec57e20c85ceeaea8d9f36b5663636ab7e495ea2c3c1bf4a58609"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/next.js",
+      "location": "local",
+      "sha256": "491c4d9738e50a6c22b3090cb1df49911b4bb7c3b7dcafc2f2dd4c074c4d82e7"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/unevaluated/index.js",
+      "location": "local",
+      "sha256": "4e7936d1a55051e70e2ebbbfc8de94fbe7f1e7b055252df5a984481ea7c156a4"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedItems.js",
+      "location": "local",
+      "sha256": "4d7010c39f1b7af4a2fe1a62e5b65c8f763d4e58ac3d710099d367659f5e4fda"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/unevaluated/unevaluatedProperties.js",
+      "location": "local",
+      "sha256": "665029a99612ec32e9bef99c9c4b09a4dc0be6c71d7b920594d414d404806ebe"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/const.js",
+      "location": "local",
+      "sha256": "ace994e9ab97a70899a9484794794f4be5ee03bfb3cf32242d3f091d77f0329a"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/dependentRequired.js",
+      "location": "local",
+      "sha256": "cd69a90089328b24d2232c12edae57858c14f66aaa56923c12929eb3d673e8fa"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/enum.js",
+      "location": "local",
+      "sha256": "61062b318a40eb52fc5a8283e7f4781db98349841744961ef4fe04a4722ebf22"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/index.js",
+      "location": "local",
+      "sha256": "4a1839832de5f10ff423c1c0c6cb232b5b6e1b34980a28862cf56b2763136de4"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/limitContains.js",
+      "location": "local",
+      "sha256": "0ea6f2e43359add298e1ed9306fe5020c62e086392f2915f10226b01394b200d"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/limitItems.js",
+      "location": "local",
+      "sha256": "49f0427d29b38aef2fa8aead26e68bda12deb9a2da22f7a7804ba0fed44e1fec"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/limitLength.js",
+      "location": "local",
+      "sha256": "379c28317faaf7784680b6049c3562692d3df6d65cce33f48e6c6c723beeeec2"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/limitNumber.js",
+      "location": "local",
+      "sha256": "3dd4bd41dbfc76c522078ff54b6479683485c4e97faa04cfcfaf2d8cb0fb8e65"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/limitProperties.js",
+      "location": "local",
+      "sha256": "8523a3f7b36c34882ca32b0ec71a2157d7930907cb86b778a97c1514fa6258ac"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/multipleOf.js",
+      "location": "local",
+      "sha256": "df128c2a6ca74ae57c65fbfe3aea8a101447a3ae8c41fd53cfc5693fa23cc8bd"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/pattern.js",
+      "location": "local",
+      "sha256": "86e84206bfc6a66ef18bf1fe43fbc56ebe7f7f4d57841197b6d044c529e0c195"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/required.js",
+      "location": "local",
+      "sha256": "b953bc18d94274bd73374dd5b4282d7a21159cec8c0e7a357e1eaf3f326b9054"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/dist/vocabularies/validation/uniqueItems.js",
+      "location": "local",
+      "sha256": "666d1a2aa25c0dfe3cf41312d0f9d40e9f99eb2c19be7469134ad89005aadd52"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/ajv/package.json",
+      "location": "local",
+      "sha256": "1f9033ee5a6515e7d76938b7072941862d1ed228a6879cc7fe10cdeb75107989"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/fast-deep-equal/index.js",
+      "location": "local",
+      "sha256": "eb469e206280321a3878f2335ec98aa2104a155079d8ed83a23029098dccd215"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/fast-deep-equal/package.json",
+      "location": "local",
+      "sha256": "a5c63940db0260739be9e2ac67f3aac268df4db5770420ee4e34e493152f97d2"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/fast-uri/index.js",
+      "location": "local",
+      "sha256": "45b52d2d77365bcc8a41bfac0223482bf73e3bedf7d232027b4b27544f40097b"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/fast-uri/lib/schemes.js",
+      "location": "local",
+      "sha256": "c2c61d3fd0bc63a587100928a399e75be8c420d210c439d75f7346da4aa4f3c3"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/fast-uri/lib/utils.js",
+      "location": "local",
+      "sha256": "a523a2da0a4cc3354d6d171107ee9af303ba6437d6db228be0a629e9698d1602"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/fast-uri/package.json",
+      "location": "local",
+      "sha256": "d62cb9be0a111b42131b264efe1fee4638a5f643ff25fe0bc3627675a9b92a8b"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/json-schema-traverse/index.js",
+      "location": "local",
+      "sha256": "024191b747afac01b28ff11d744e9f82720bbad5f716163ba5c962eb62aa2350"
+    },
+    {
+      "kind": "actual_loaded_dependency",
+      "id": "node_modules/json-schema-traverse/package.json",
+      "location": "local",
+      "sha256": "156fb24af02845c190701360d06dfda35ef04282e34a734289ea9535ad9819ae"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-pr087-package-node24",
+      "command": "node /mnt/d/cache/plumbob/npm/_npx/ae109337638209d1/node_modules/npm/bin/npm-cli.js test --prefix verification/wp5/v1.1.0",
+      "started_at": "2026-09-12T18:49:02.950833Z",
+      "completed_at": "2026-09-12T18:49:06.184135Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "23/23 focused groups; 48 actual connector leaves and full validator/current comparisons.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-pr087-package-node24",
+        "path": "verification/research-program/pr-087/producer-20260912/commands/package-node24/event.json",
+        "sha256": "41db0ae6f8ae78d8e3bfb312e4d6b9caaf32c79605fc85d0752f93f305f83e42",
+        "bytes": 1533
+      }
+    },
+    {
+      "id": "cmd-pr087-package-node22",
+      "command": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node --test verification/wp5/v1.1.0/tests/wp5-verification.test.mjs verification/wp5/v1.1.0/tests/current-technical.test.mjs",
+      "started_at": "2026-09-12T18:49:06.323274Z",
+      "completed_at": "2026-09-12T18:49:09.802169Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "23/23 focused groups on exact Node22.15; actual current controls pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-pr087-package-node22",
+        "path": "verification/research-program/pr-087/producer-20260912/commands/package-node22/event.json",
+        "sha256": "2c19ea5b69ec2d5253dd2f448b6c58dcc4533aee6deef2be9c050be4aeaac9ff",
+        "bytes": 1604
+      }
+    },
+    {
+      "id": "cmd-pr087-validate-node22",
+      "command": "/mnt/d/tmp/plumbob/ushso-implementation-plan-20260907/toolchains/node-v22.15.0-linux-x64/bin/node verification/wp5/v1.1.0/tools/validate-wp5.mjs",
+      "started_at": "2026-09-12T18:49:09.803759Z",
+      "completed_at": "2026-09-12T18:49:13.162201Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Current technical PASS on Node22.15; 290 files, 140 modules, 4 package boundaries; approval null.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-pr087-validate-node22",
+        "path": "verification/research-program/pr-087/producer-20260912/commands/validate-node22/event.json",
+        "sha256": "84024c3c965ad36bc3de76489d43a25a9e05edd7da99da0b64d77ffe1a519255",
+        "bytes": 1549
+      }
+    },
+    {
+      "id": "cmd-pr087-validate-node24",
+      "command": "/home/plumbob/.nvm/versions/node/v24.14.0/bin/node verification/wp5/v1.1.0/tools/validate-wp5.mjs",
+      "started_at": "2026-09-12T18:49:13.164830Z",
+      "completed_at": "2026-09-12T18:49:16.279231Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Current technical PASS on Node24.14; 290 files, 140 modules, 4 package boundaries; approval null.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-pr087-validate-node24",
+        "path": "verification/research-program/pr-087/producer-20260912/commands/validate-node24/event.json",
+        "sha256": "e4afce574e88988539fc67f792878246e652a6686340ee6b77e1553f564f5990",
+        "bytes": 1502
+      }
+    },
+    {
+      "id": "cmd-pr087-current-root-wp5",
+      "command": "node scripts/run-contract-suites.mjs --suite wp5",
+      "started_at": "2026-09-12T18:50:15.631824Z",
+      "completed_at": "2026-09-12T18:50:22.310057Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Unchanged root runner selects complete v1.1 and executes its actual tests/validate on committed H087.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-pr087-current-root-wp5",
+        "path": "verification/research-program/pr-087/producer-20260912/commands/current-root-wp5/event.json",
+        "sha256": "c78125ba1fc7e84c2ab4ca46809351721fb9960a91497d4b623485f0e9721fbb",
+        "bytes": 1394
+      }
+    },
+    {
+      "id": "cmd-pr087-historical-wp5-stale",
+      "command": "node verification/wp5/v1.0.0/tools/validate-wp5.mjs",
+      "started_at": "2026-09-12T18:50:22.311102Z",
+      "completed_at": "2026-09-12T18:50:22.376529Z",
+      "exit_code": 1,
+      "completion_status": "completed",
+      "result": "Original frozen v1.0 direct validator retains stale-fingerprint rejection.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "event_source": {
+        "id": "event-pr087-historical-wp5-stale",
+        "path": "verification/research-program/pr-087/producer-20260912/commands/historical-wp5-stale/event.json",
+        "sha256": "c9f3211367aab427d47e0d823b53eab49399491c9d442ef78f49e18466b4293a",
+        "bytes": 1365
+      }
+    },
+    {
+      "id": "cmd-pr087-wp11-historical-stale",
+      "command": "node verification/wp11/v1.3.0/tools/verify.mjs --validate",
+      "started_at": "2026-09-12T18:50:22.376927Z",
+      "completed_at": "2026-09-12T18:50:22.458757Z",
+      "exit_code": 1,
+      "completion_status": "completed",
+      "result": "Frozen WP11 direct validator retains SUCCESSOR_APPROVAL_STALE_SUBJECT; no historical approval transfer.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "event_source": {
+        "id": "event-pr087-wp11-historical-stale",
+        "path": "verification/research-program/pr-087/producer-20260912/commands/wp11-historical-stale/event.json",
+        "sha256": "5def3811dfc81157c8cba8c7a6dae90c57923b4cda03f29b5f43f7632c9ca34b",
+        "bytes": 1410
+      }
+    },
+    {
+      "id": "cmd-pr087-wp11-current-unknown-lock",
+      "command": "node scripts/verify-wp11-attestation.mjs",
+      "started_at": "2026-09-12T18:50:22.459264Z",
+      "completed_at": "2026-09-12T18:50:22.676985Z",
+      "exit_code": 1,
+      "completion_status": "completed",
+      "result": "Current WP11 adapter rejects WP11_CURRENT_INPUT_UNREVIEWED_DRIFT:package-lock.json. Exact new lock awaits separate PR086 correction.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "event_source": {
+        "id": "event-pr087-wp11-current-unknown-lock",
+        "path": "verification/research-program/pr-087/producer-20260912/commands/wp11-current-unknown-lock/event.json",
+        "sha256": "69ef3b101542d529d562f589af4c87f304afa498aae2378fd67449ea1f04193b",
+        "bytes": 1426
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr087-artifact-0",
+      "path": "verification/research-program/pr-087/producer-20260912/README.md",
+      "sha256": "e8df8ba70225d34b0875673fd298a7c3182205e851fbd1191cd40986f0c63c0d",
+      "bytes": 1674
+    },
+    {
+      "id": "pr087-artifact-3",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/current-root-wp5/event.json",
+      "sha256": "c78125ba1fc7e84c2ab4ca46809351721fb9960a91497d4b623485f0e9721fbb",
+      "bytes": 1394
+    },
+    {
+      "id": "pr087-artifact-4",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/current-root-wp5/receipt.json",
+      "sha256": "e8bd6a0033b147d400214db1fbc47d3efae6fc73f1762d4bdc674672dd2099fb",
+      "bytes": 465
+    },
+    {
+      "id": "pr087-artifact-5",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/current-root-wp5/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr087-artifact-6",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/current-root-wp5/stdout.log",
+      "sha256": "941d9fb35978f84e3f01a079a90c7fcb8730a0a71f73f0ece761fc170050e02a",
+      "bytes": 246302
+    },
+    {
+      "id": "pr087-artifact-8",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/historical-wp5-stale/event.json",
+      "sha256": "c9f3211367aab427d47e0d823b53eab49399491c9d442ef78f49e18466b4293a",
+      "bytes": 1365
+    },
+    {
+      "id": "pr087-artifact-9",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/historical-wp5-stale/receipt.json",
+      "sha256": "e31ac2b7dc2b0907ec2a6efb194fb98d7fe16fdcc320487bea5656dd4cbe84f1",
+      "bytes": 454
+    },
+    {
+      "id": "pr087-artifact-10",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/historical-wp5-stale/stderr.log",
+      "sha256": "641b49f4c7896f0c2a0379b38cb0bdd7255dbaada029f7ae5cde993c165a883f",
+      "bytes": 603
+    },
+    {
+      "id": "pr087-artifact-11",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/historical-wp5-stale/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr087-artifact-13",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/package-node22/event.json",
+      "sha256": "2c19ea5b69ec2d5253dd2f448b6c58dcc4533aee6deef2be9c050be4aeaac9ff",
+      "bytes": 1604
+    },
+    {
+      "id": "pr087-artifact-14",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/package-node22/receipt.json",
+      "sha256": "8decb918f72cb771f4f18da13f83f494252fd223b9a0b4b12491803a514ae9ba",
+      "bytes": 600
+    },
+    {
+      "id": "pr087-artifact-15",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/package-node22/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr087-artifact-16",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/package-node22/stdout.log",
+      "sha256": "1e9a2f0ddb7d430e852f5406f09c8793393deb602eeb72172a23557242236c6e",
+      "bytes": 5358
+    },
+    {
+      "id": "pr087-artifact-18",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/package-node24/event.json",
+      "sha256": "41db0ae6f8ae78d8e3bfb312e4d6b9caaf32c79605fc85d0752f93f305f83e42",
+      "bytes": 1533
+    },
+    {
+      "id": "pr087-artifact-19",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/package-node24/receipt.json",
+      "sha256": "4ec73eb2b75cf995ada7af51885bb76fb25fb1fb56e7b0ee687b793ec4329145",
+      "bytes": 395
+    },
+    {
+      "id": "pr087-artifact-20",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/package-node24/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr087-artifact-21",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/package-node24/stdout.log",
+      "sha256": "62890561fef4c5131a45f958fd527ba8728a9df02a9646710c82c76555986df9",
+      "bytes": 2404
+    },
+    {
+      "id": "pr087-artifact-23",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/validate-node22/event.json",
+      "sha256": "84024c3c965ad36bc3de76489d43a25a9e05edd7da99da0b64d77ffe1a519255",
+      "bytes": 1549
+    },
+    {
+      "id": "pr087-artifact-24",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/validate-node22/receipt.json",
+      "sha256": "fbe4b16ca8694354f68fb90f64e56042178f7485001a13eece6247a7b229312c",
+      "bytes": 513
+    },
+    {
+      "id": "pr087-artifact-25",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/validate-node22/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr087-artifact-26",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/validate-node22/stdout.log",
+      "sha256": "5bb6c66c2c6b3b8743149db242a3f2d2b4bda373c7be51ee4ef16df0a3d33185",
+      "bytes": 244129
+    },
+    {
+      "id": "pr087-artifact-28",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/validate-node24/event.json",
+      "sha256": "e4afce574e88988539fc67f792878246e652a6686340ee6b77e1553f564f5990",
+      "bytes": 1502
+    },
+    {
+      "id": "pr087-artifact-29",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/validate-node24/receipt.json",
+      "sha256": "1e2f75544760cabe182ac7d1a0a1fb7163f0bff8f962398ffc9c3696efa3131e",
+      "bytes": 466
+    },
+    {
+      "id": "pr087-artifact-30",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/validate-node24/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr087-artifact-31",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/validate-node24/stdout.log",
+      "sha256": "82c019a27fe488c21da06ce48ce964156070da9cb28ae52a42618f6bfb58c01e",
+      "bytes": 243657
+    },
+    {
+      "id": "pr087-artifact-33",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/wp11-current-unknown-lock/event.json",
+      "sha256": "69ef3b101542d529d562f589af4c87f304afa498aae2378fd67449ea1f04193b",
+      "bytes": 1426
+    },
+    {
+      "id": "pr087-artifact-34",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/wp11-current-unknown-lock/receipt.json",
+      "sha256": "00b3bf950223a0bd819b541f525dadbf4248a36a4dd38f5140e382100ae81442",
+      "bytes": 443
+    },
+    {
+      "id": "pr087-artifact-35",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/wp11-current-unknown-lock/stderr.log",
+      "sha256": "b38f150b7723c17fcd3baba148f9fe69ff5938b38f15738f82132180e10bb9ae",
+      "bytes": 94
+    },
+    {
+      "id": "pr087-artifact-36",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/wp11-current-unknown-lock/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr087-artifact-38",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/wp11-historical-stale/event.json",
+      "sha256": "5def3811dfc81157c8cba8c7a6dae90c57923b4cda03f29b5f43f7632c9ca34b",
+      "bytes": 1410
+    },
+    {
+      "id": "pr087-artifact-39",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/wp11-historical-stale/receipt.json",
+      "sha256": "a55b97b65c4896863ca6dcdb90e9d53224db26aad8379af9960b42567ca37a69",
+      "bytes": 467
+    },
+    {
+      "id": "pr087-artifact-40",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/wp11-historical-stale/stderr.log",
+      "sha256": "65da63281ab28204191e751e5aeae815b1f44b3b2fc53ad70b3811738201d532",
+      "bytes": 193
+    },
+    {
+      "id": "pr087-artifact-41",
+      "path": "verification/research-program/pr-087/producer-20260912/commands/wp11-historical-stale/stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr087-artifact-42",
+      "path": "verification/research-program/pr-087/producer-20260912/current-node22.json",
+      "sha256": "5bb6c66c2c6b3b8743149db242a3f2d2b4bda373c7be51ee4ef16df0a3d33185",
+      "bytes": 244129
+    },
+    {
+      "id": "pr087-artifact-43",
+      "path": "verification/research-program/pr-087/producer-20260912/current-node24.json",
+      "sha256": "82c019a27fe488c21da06ce48ce964156070da9cb28ae52a42618f6bfb58c01e",
+      "bytes": 243657
+    },
+    {
+      "id": "pr087-artifact-44",
+      "path": "verification/research-program/pr-087/producer-20260912/history-notes.json",
+      "sha256": "127e1e4dda08a3e939c304be7c409f99dd73fa3497cf880b727e867c50b70c80",
+      "bytes": 1863
+    },
+    {
+      "id": "pr087-artifact-45",
+      "path": "verification/research-program/pr-087/producer-20260912/index.json",
+      "sha256": "73997568d323a785859e9570e7e392f78f280cf3c75235c7c9234bc61261888d",
+      "bytes": 9505
+    },
+    {
+      "id": "pr087-artifact-46",
+      "path": "verification/research-program/pr-087/producer-20260912/lock-review-input.json",
+      "sha256": "172e78d46962441cddb75802f4a648aaaf88dfe62f12eaec26bbe79c92fb2fb6",
+      "bytes": 1030
+    },
+    {
+      "id": "pr087-artifact-47",
+      "path": "verification/research-program/pr-087/producer-20260912/origin-and-boundaries.json",
+      "sha256": "2551859ca69a6927455c341061242c82f5afd7adbc1d8df242997660bbb0717c",
+      "bytes": 4974
+    },
+    {
+      "id": "pr087-artifact-48",
+      "path": "verification/research-program/pr-087/producer-20260912/prior-attempts-manifest.json",
+      "sha256": "d68157aabcc6aa8f2029d678f4e3e7182e981d233cb70daab067ef32691fe345",
+      "bytes": 15876
+    },
+    {
+      "id": "pr087-artifact-49",
+      "path": "verification/research-program/pr-087/producer-20260912/prior-attempts.tar.gz",
+      "sha256": "4a860015f678c40286bbeb76ea777438709be8855b62ccad3f4202a8b94e708b",
+      "bytes": 373719
+    },
+    {
+      "id": "pr087-artifact-50",
+      "path": "verification/research-program/pr-087/producer-20260912/source-manifest.json",
+      "sha256": "7886869a92ef0e09439aa2f7f70d60ada35e10eb227098dccd4d5b932d689bf3",
+      "bytes": 3278
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-087-1",
+      "status": "producer_checked",
+      "result": "Complete current package and exact lock addition; frozen historical files preserved.",
+      "command_ids": [
+        "cmd-pr087-current-root-wp5"
+      ]
+    },
+    {
+      "id": "C-087-2",
+      "status": "producer_checked",
+      "result": "Bounded actual input/module controls, mandatory leaf checks and current source execution pass on both supported runtimes.",
+      "command_ids": [
+        "cmd-pr087-package-node24",
+        "cmd-pr087-package-node22",
+        "cmd-pr087-validate-node22",
+        "cmd-pr087-validate-node24"
+      ]
+    },
+    {
+      "id": "C-087-3",
+      "status": "producer_checked",
+      "result": "Immutable source/lock/current manifests and retained expected rejection evidence supplied for independent review; joint acceptance remains pending.",
+      "command_ids": [
+        "cmd-pr087-current-root-wp5",
+        "cmd-pr087-wp11-current-unknown-lock",
+        "cmd-pr087-historical-wp5-stale",
+        "cmd-pr087-wp11-historical-stale"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "initial-producer-failures",
+      "status": "failed",
+      "detail": "All initial C2 and corrective native-parent failures retained in explicitly scoped history archive; final corrected bytes pass. See history-notes.json."
+    },
+    {
+      "id": "wp11-unreviewed-lock",
+      "status": "pending",
+      "detail": "Unchanged adapter rejects exact new package lock. Root must independently review H087 and bind separate PR086 correction before joint qualification."
+    },
+    {
+      "id": "joint-release",
+      "status": "pending",
+      "detail": "Root owns independent final review, exact composition gate, hosted CI, publication and integration. No full gate/build/deployment ran in this producer task."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Owner-deferred qualification remains unresolved; no scientific approval is issued."
+    },
+    {
+      "id": "joint-integration",
+      "status": "pending",
+      "detail": "PR010 research integration, PR087 acceptance, separate PR086 correction, joint gate/hosted CI and PR011 readiness remain pending."
+    }
+  ],
+  "next_consumer": "Astra/root for exact H087 and lock-delta review, then separately bound PR086 continuation.",
+  "next_action": "Independently review exact H087 source and lock, finalize C0873 transport identity, then dispatch only the precise separately owned PR086 correction. Qualify the exact joint composition before any research integration or release.",
+  "independent_review": {
+    "status": "in_review",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer checks and prior-candidate independent findings do not constitute final acceptance. Root retains judgment."
+    ]
+  },
+  "risks": [
+    {
+      "id": "historical-subject-boundary",
+      "status": "risk",
+      "detail": "Old WP5 receipts remain historical and the actual current technical subject must execute; no historical PASS or approval may transfer."
+    }
+  ]
+}

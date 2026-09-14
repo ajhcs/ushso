@@ -1,0 +1,217 @@
+{
+  "format": "ushso.wp5-current-subject-policy-design.v1",
+  "status": "finalized_proposal_pending_root_review_and_exact_controller_application",
+  "purpose": "Execute present WP5 controls with an explicit, changing technical subject; preserve frozen historical evidence without transferring its approval.",
+  "connector_fingerprint": {
+    "algorithm": "Existing SHA256 of sorted connector-relative path, NUL, exact file bytes, NUL; unchanged exclusions for node_modules and manifests/package-manifest.json.",
+    "historical_fingerprint": "df5fb94f4f3f3468ca2631a63768a4bf7711696657c88c4b7df57830e7031b99",
+    "interpretation": "Historical fingerprint remains historical. Current connector fingerprint is measured anew and is not an approval or a persistent PASS receipt."
+  },
+  "repository_inventory": {
+    "recursive_roots": [
+      "packages/connectors",
+      "packages/ingestion/src",
+      "packages/ingestion/tests",
+      "contracts/ingestion/v1.0.0",
+      "contracts/ingestion/v1.1.0",
+      "scripts/research",
+      "scripts/research-program",
+      "packages/retrieval/tools",
+      "verification/wp5/v1.0.0",
+      "verification/wp5/v1.1.0"
+    ],
+    "exact_files": [
+      "package.json",
+      "package-lock.json",
+      "packages/ingestion/package.json",
+      "packages/retrieval/versions/v1.1.0/corpus/records.jsonl",
+      "scripts/run-contract-suites.mjs",
+      "tests/research-program/job-lifecycle.test.mjs",
+      "tests/research-automation.test.mjs",
+      "tests/update-cycle.test.mjs"
+    ],
+    "excluded_subtrees": [
+      "node_modules directories only, separately handled as actual loaded dependency modules"
+    ],
+    "notes": "The larger current inventory includes connector package-manifest bytes even though the unchanged historical connector-fingerprint algorithm excludes that exact file. All16 successor package files are source or historical/policy data, including the pin manifest and policy; no generated execution receipt is persisted there. Task capsules and scratch emitted results are not recursively included.",
+    "path_rules": "Resolve roots from the verifier's own repository location. Required roots/files must exist. Unique sorted POSIX relative paths using byte-stable UTF8 order; reject traversal, absolute entries, symlink components, special files and out-of-repository real paths. No silent skips except named node_modules handling.",
+    "bounds": {
+      "maximum_files": 2048,
+      "maximum_total_bytes": 67108864,
+      "maximum_file_bytes": 16777216,
+      "maximum_depth": 16
+    },
+    "file_record": [
+      "path",
+      "sha256",
+      "bytes"
+    ],
+    "preparation_measurement": "Independent read-only baseline scan: proposed existing roots253 tracked files/3568580bytes, largest1062135, depth6; actual final subject must be independently measured and can differ."
+  },
+  "executed_module_coverage": {
+    "mechanism": "Preload tools/common.mjs in each fresh control child. Before registerHooks it imports Node builtins only. Hook every actual ESM/CJS/JSON file load and preserve the loader result; no import rewriting or regex closure authority.",
+    "bootstrap": "The guard remains inside the declared sixteen-file package. Application/control imports occur only after the guard is installed. Any proposed additional package file requires a new ownership decision.",
+    "repository_modules": "Require every resolved repository file in the bounded source manifest. Reject unsupported schemes, queries/fragments on module URLs, symlink components, outside paths, unknown native addons and unaccounted modules.",
+    "installed_dependencies": "Use task-owned installed node_modules directly. For each loaded dependency record its actual bytes/hash/length, every applicable package.json resolution boundary and exact matching lock entry/name/version. Reject unexplained nested/alias/workspace resolution; no generic outside-node_modules allowance. This records actual loaded bytes, not a claim that npm archive integrity alone proves installed contents.",
+    "bounds": {
+      "maximum_packages": 256,
+      "maximum_module_files": 2048,
+      "maximum_total_module_bytes": 67108864,
+      "maximum_module_file_bytes": 16777216,
+      "maximum_package_depth": 16
+    },
+    "cjs_shape": "Synchronous CJS loads can return exact source bytes with result.format absent (75 observed in the retained Node24.14 feasibility run). Record reported_format:null and supported context/package metadata without inventing a format. Require supported returned byte/string source equal to the measured file; reject unsupported source forms.",
+    "drift": "Hash before execution, check exact source bytes at each load, then rehash repository and loaded dependency/package metadata after execution under the normal managed-writer discipline. Reject any observed drift.",
+    "limits": "This is semantic input accounting, not a security sandbox. Hooks do not account for arbitrary fs data reads, eval or hostile children; declared schemas, fixtures, policy and corpus files are in the explicit inventory and their use remains source-reviewed."
+  },
+  "execution": {
+    "required_existing_test_files": [
+      "packages/connectors/tests/adapters.test.mjs",
+      "packages/connectors/tests/contracts.test.mjs",
+      "packages/connectors/tests/delivery-waves.test.mjs",
+      "packages/connectors/tests/fixture-matrix.test.mjs",
+      "packages/connectors/tests/security.test.mjs"
+    ],
+    "controls": "Run all discovered current connector tests, require all five original files and their retained mandatory case names, and reject missing/skipped/todo/cancelled/failed mandatory controls. Execute current fixture matrix, delivery waves, legacy parity and request/capture reconciliation and compare actual outcomes with preserved policy expectations. Execute actual R2/security/strict-contract/cursor/304 controls; historical R2 and zero-payload booleans cannot replace current execution.",
+    "test_protocol": "Use bounded fresh child process commands and structured native test events or strictly validated retained TAP with nonzero leaf counts, original required cases, exit/signal/deadline/output bounds and actual source/subject checks before and after. Root runner remains unchanged and selects latest complete WP5 package. Current package test and validate entrypoints both enforce the complete applicable controls without mutating sealed artifacts.",
+    "results": "Generated current outcomes and manifests are emitted to stdout or task-owned scratch outside all sealed package/source roots. No historical PASS file is restamped.",
+    "subject_drift": "Recompute source/dependency inventories after execution and reject mid-run changes; a later legitimate source change produces a distinct unapproved subject requiring new root review/gate/CI.",
+    "commands": {
+      "tests": "For each discovered connector test file: node --import ABSOLUTE_TOOLS_COMMON --test-reporter=tap ABSOLUTE_TEST_FILE, in a fresh bounded child with no inherited NODE_OPTIONS, NODE_PATH or NODE_TEST_CONTEXT.",
+      "validator": "node --import ABSOLUTE_TOOLS_COMMON packages/connectors/tools/validate-package.mjs, without --fingerprint-only.",
+      "limits": {
+        "maximum_children": 128,
+        "maximum_child_milliseconds": 60000,
+        "maximum_combined_milliseconds": 150000,
+        "maximum_output_bytes_per_child": 8388608,
+        "maximum_combined_output_bytes": 33554432
+      },
+      "protocol": "Retain exact commands/exit/signal/output hashes, one terminal receipt per expected child and strict named leaf TAP. Reject missing/empty/duplicate required cases, skip/todo/cancel/fail, file-wrapper-only output, malformed/truncated output, timeout or missing terminal events. Preserve all discovered current cases, not only the mandatory minimum."
+    },
+    "actual_validator_controls": "Retain strict 18 descriptor/29 route checks, source direct-I/O screen, 18/81 foundation and 10/64 delivery controls, parity/reconciliation and the actual R2/security/cursor/304 tests. The existing I/O regex and zero-action fixture counters do not constitute a sandbox.",
+    "self_tests": "Both package test and validate entrypoints enforce current applicable controls. Keep the original historical verifier immutable. New current-technical tests exercise traversal/bounds, package/load pins, mandatory-case protocol, subject drift and approval rejection using task-owned temporary fixtures, not real source edits."
+  },
+  "subject": {
+    "canonical_basis": "ushso-canonical-json.v1; deterministic manifest of policy/version, current connector fingerprint, bounded file hash/length records, actual loaded module records, runtime Node version/process.versions/platform/arch and lock/configured packageManager. Current test/result identity is bound separately without self-referential persistent receipt.",
+    "npm_observation": "Configured packageManager is distinct from actually observed installer/command npm evidence. Direct Node checks report npm execution unobserved unless independently pinned command evidence exists; do not spawn ambient npm or trust npm_user_agent as installer proof. Actual managed npm11.19.1 bootstrap is gate evidence.",
+    "origin": {
+      "required_kind": "actual independently reviewed isolated PR010 component merge M010",
+      "merge_sha": null,
+      "tree": null,
+      "source_head": "1318cda5c76cd3262c7668fb7f56fab842876c6f",
+      "transport_head": "1e5342f4b0671c2e67f22bcf202bbb2c33b8ee0f",
+      "planning_heads_are_not_origin": true,
+      "rule": "Before PR087 dispatch record actual M010 parents/tree, accepted focused source and fixture pins plus retained stale-v1 result. M010 is not research integration, general consumer readiness or approval."
+    },
+    "receipt_separation": "PID, timestamps, scratch paths and execution output hashes belong to the separate execution receipt. The deterministic canonical semantic subject includes policy/version, file/load/package metadata and actual Node runtime/platform/arch, but no generated receipt or its own hash. Never persist generated current PASS inside the sixteen sealed files."
+  },
+  "output_boundaries": {
+    "evidence_kind": "current_technical_only",
+    "approval": null,
+    "historical_approval_transferred": false,
+    "current_approval_issued": false,
+    "release_qualified": false,
+    "live_collection": false,
+    "managed_persistence": false,
+    "production_changed": false
+  },
+  "negative_cases": [
+    "Missing/altered frozen historical file or pin; relabeled historical PASS.",
+    "Changed connector, nonconnector runtime dependency, schema, fixture, policy, verifier/test, installed loaded dependency, runtime or lock changes current subject; old subject receipt rejects.",
+    "Unsupported/symlink/out-of-root import or file, incomplete root inventory, missing required file, duplicate manifest entry, file/depth/count/byte bound.",
+    "Empty/removed/skipped mandatory test, copied prior results, missing terminal event, process failure/signal/deadline/output truncation, mid-run source change.",
+    "Strict query-bearing public reference, wrong final cursor, missing304 lineage or same-ID conflicting old capture bytes.",
+    "Historical approval on current subject, current approval issuance or external activation overclaim."
+  ],
+  "repository_edits": false,
+  "minimum_node": "22.15.0",
+  "mandatory_case_inventory": {
+    "planning_source_head": "1318cda5c76cd3262c7668fb7f56fab842876c6f",
+    "planning_transport_head": "1e5342f4b0671c2e67f22bcf202bbb2c33b8ee0f",
+    "actual_origin_merge": null,
+    "files": [
+      {
+        "file": "packages/connectors/tests/adapters.test.mjs",
+        "mandatory_names": [
+          "DCAT data.json parses only metadata records and normalizes deterministically",
+          "CKAN adapter traverses bounded metadata pagination",
+          "Socrata adapter uses metadata endpoints and never SODA row routes",
+          "bounded HTML release inventory accepts labeled links and rejects unlabeled crawling",
+          "documentation and schema extractors are bounded and reject active or row content"
+        ],
+        "leaf_count": 5
+      },
+      {
+        "file": "packages/connectors/tests/contracts.test.mjs",
+        "mandatory_names": [
+          "all approved-source templates are strict ingestion descriptors and disabled pending authorization",
+          "captured fetch and capture reference conform to ingestion contracts",
+          "compressed transport accounting retains the exact decoded metadata capture",
+          "every discovery reconciles to one exact source locator and confirmed capture",
+          "request/capture reconciliation audit proves zero prohibited capture",
+          "strict reference store rejects the historical query-bearing reference before commit",
+          "public capture locator completes the real two-page runner with strict capture and checkpoint records",
+          "same body and clocks retain baseline query-sensitive capture and request identities",
+          "wrong final query remains rejected before object or reference writes",
+          "no-query capture retains its baseline observation identity and locator",
+          "public projection contains no userinfo, query or fragment without changing query-sensitive identity",
+          "released strict validator still rejects a tampered query-bearing public reference",
+          "two-page 304 reuse still uses full request keys and original capture references"
+        ],
+        "leaf_count": 13
+      },
+      {
+        "file": "packages/connectors/tests/delivery-waves.test.mjs",
+        "mandatory_names": [
+          "Waves 2-6 recorded fixture matrix passes with no external action",
+          "required 304/change/cursor/failure and source-specific fixtures are all executable",
+          "every source-specific instance is disabled, paused, candidate-only, and AUTH-04 gated",
+          "route inventory declares metadata only and Form 990 never routes to bulk archives",
+          "regulator/APCD workflows cannot become executable through declarative state",
+          "protocol-specific metadata allowances do not create row or active-XML bypasses",
+          "all 52 Dataverse and 50 DataCite records retain stable IDs and complete evidence lineage"
+        ],
+        "leaf_count": 7
+      },
+      {
+        "file": "packages/connectors/tests/fixture-matrix.test.mjs",
+        "mandatory_names": [
+          "mandatory WP5 fixture matrix passes without external actions"
+        ],
+        "leaf_count": 1
+      },
+      {
+        "file": "packages/connectors/tests/security.test.mjs",
+        "mandatory_names": [
+          "IP policy rejects private, loopback, link-local, metadata, multicast, reserved, and mapped ranges",
+          "payload and query sentinels are blocked before transport egress",
+          "paused sources and unprofiled response media are blocked at the egress boundary",
+          "compressed, decompressed, duration, and page bounds fail closed",
+          "nested row containers, plain-text challenges, and length mismatches quarantine before capture",
+          "response structure and cardinality limits fail before capture or page persistence",
+          "HTML links and runner observations are bounded before mapping and persistence",
+          "classification exceptions release the origin lease and quarantine without capture",
+          "unmanifested hosts, routes, methods, parameters, and secret query names fail closed",
+          "DNS rebinding and connected-address substitution are rejected",
+          "credentials are resolved only into an initial-host request and never persisted",
+          "conditional validators and retained response headers cannot persist injected locator material",
+          "redirects drop credentials and preserve destination target-class semantics",
+          "allowlisted cross-origin redirects receive neither credentials nor conditional validators",
+          "missing security integration ports and required credentials fail before egress",
+          "shared origin governor enforces concurrency, pacing, and circuit state",
+          "terminal runs do not fetch again and checkpoint transaction failure is atomic and resumable",
+          "later-clock refetch after capture-reference commit reuses content but preserves observation identity",
+          "source descriptors must match the frozen positive metadata-route allowlist",
+          "raw redirect Location path checks reject dot-segment evasion before a second transport call",
+          "R2 capture rejects incoherent URLs and oversize compressed or decompressed bodies",
+          "transport requests pin approved addresses before connect and stream response limits"
+        ],
+        "leaf_count": 22
+      }
+    ],
+    "required_original_case_count": 40,
+    "required_cursor_case_count": 8,
+    "minimum_leaf_count": 48,
+    "rule": "All names are required with their file identity; execute every additional discovered current test too. Bind actual M010 test/source pins before implementation. Planning heads are not merge or acceptance identities."
+  }
+}

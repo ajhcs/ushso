@@ -19,6 +19,7 @@ import {
   NAMED_PRE_PR005_FIXTURE_MANIFEST_PATH,
   NAMED_PRE_PR005_FIXTURE_SCHEMA,
   PR008_REVIEWED_CURRENT_LOCK,
+  PR087_REVIEWED_CURRENT_LOCK,
   HISTORICAL_WP11_V1_3,
   ORIGINAL_PR085_PACKAGE_SNAPSHOT,
   PR005_941C9CD_CHANGED_INPUTS,
@@ -215,7 +216,11 @@ function assertCompleteIndependentDiff(report, independent) {
     if (item.path === 'package.json') {
       assert.equal(item.role, 'reviewed_pr003_package_transition')
     } else if (item.path === 'package-lock.json') {
-      assert.ok(['pr085_ci_v14_workspace_lock', 'pr008_workspace_lock_transition'].includes(item.role))
+      assert.ok([
+        'pr085_ci_v14_workspace_lock',
+        'pr008_workspace_lock_transition',
+        'pr087_wp5_v11_workspace_lock_transition',
+      ].includes(item.role))
     } else {
       assert.equal(item.role, 'current_unapproved_input_change')
     }
@@ -337,6 +342,10 @@ test('current WP11 verifier keeps historical proof, technical draft and wrapper 
   assert.equal(result.historical.input_bindings.execute_retained_sources, false)
   assert.equal(result.historical.input_bindings.subject_sha256, HISTORICAL_WP11_SUBJECT_SHA256)
   assertCompleteIndependentDiff(result.current_versus_historical, await independentlyDiffAgainstSealedPins())
+  assert.equal(
+    result.current_versus_historical.changed.find((item) => item.path === 'package-lock.json').role,
+    'pr087_wp5_v11_workspace_lock_transition',
+  )
   assert.equal(result.builder_coverage_limits.unpinned_legacy_builder_reads.length, WP11_BUILDER_UNPINNED_READS.length)
   const actualPackage = await hashPinned('package.json')
   const reviewedTransition = actualPackage.sha256 === REVIEWED_PR003_PACKAGE_SNAPSHOT.sha256
@@ -621,6 +630,12 @@ test('missing snapshot or reader bindings and stale policy pins fail closed', as
   const stalePr008Review = structuredClone(policy)
   stalePr008Review.reviewed_current_transitions.pr008_workspace_lock_transition.review_receipt.sha256 = '11'.repeat(32)
   await assert.rejects(bindWrapperImplementation({ policy: stalePr008Review }), /WP11_WRAPPER_POLICY_STALE_PR008_REVIEW_RECEIPT/u)
+  const stalePr087Lock = structuredClone(policy)
+  stalePr087Lock.reviewed_current_transitions.pr087_wp5_v11_workspace_lock_transition.current_lock.sha256 = '00'.repeat(32)
+  await assert.rejects(bindWrapperImplementation({ policy: stalePr087Lock }), /WP11_WRAPPER_POLICY_STALE_PR087_CURRENT_LOCK/u)
+  const stalePr087Review = structuredClone(policy)
+  stalePr087Review.reviewed_current_transitions.pr087_wp5_v11_workspace_lock_transition.review_receipt.sha256 = '11'.repeat(32)
+  await assert.rejects(bindWrapperImplementation({ policy: stalePr087Review }), /WP11_WRAPPER_POLICY_STALE_PR087_REVIEW_RECEIPT/u)
 })
 
 test('PR005-941c9cd comparison reports all 13 changed inputs and is not combined acceptance', async () => {
@@ -699,6 +714,161 @@ test('the independently reviewed PR008 lock is one exact current transition and 
     }),
     /WP11_CURRENT_INPUT_UNREVIEWED_DRIFT/u,
   )
+})
+
+test('the independently reviewed PR087 WP5 v1.1 lock is the exact current transition and remains unapproved', async () => {
+  const currentLock = await readFile(path.resolve(repoRoot, PR087_REVIEWED_CURRENT_LOCK.path))
+  assert.deepEqual(
+    { bytes: currentLock.length, sha256: sha256(currentLock) },
+    { bytes: PR087_REVIEWED_CURRENT_LOCK.bytes, sha256: PR087_REVIEWED_CURRENT_LOCK.sha256 },
+  )
+  const result = await verifyWp11Attestation()
+  const independent = await independentlyDiffAgainstSealedPins()
+  assertCompleteIndependentDiff(result.current_versus_historical, independent)
+  const lockChange = result.current_versus_historical.changed.find((item) => item.path === 'package-lock.json')
+  assert.ok(lockChange)
+  assert.equal(lockChange.current_bytes, PR087_REVIEWED_CURRENT_LOCK.bytes)
+  assert.equal(lockChange.current_sha256, PR087_REVIEWED_CURRENT_LOCK.sha256)
+  assert.equal(lockChange.role, 'pr087_wp5_v11_workspace_lock_transition')
+  assert.equal(result.current_versus_historical.approval, null)
+  assert.equal(result.current_versus_historical.current_approval_issued, false)
+  assert.equal(result.current_versus_historical.historical_approval_transferred, false)
+  assert.equal(result.current_versus_historical.combined_acceptance, false)
+  assert.equal(result.current_versus_historical.release_qualified, false)
+  assert.equal(result.current.approval, null)
+  assert.equal(result.wrapper.approval, null)
+  assert.equal(result.boundaries.current_approval_issued, false)
+  assert.equal(result.boundaries.combined_acceptance, false)
+  assert.equal(result.boundaries.current_release_qualified, false)
+  assert.ok(result.wrapper.implementation_files.some((file) => (
+    file.path === PR087_REVIEWED_CURRENT_LOCK.review.path
+    && file.bytes === PR087_REVIEWED_CURRENT_LOCK.review.bytes
+    && file.sha256 === PR087_REVIEWED_CURRENT_LOCK.review.sha256
+  )))
+})
+
+function mutateLockPackages(lockBytes, mutate) {
+  const parsed = JSON.parse(Buffer.from(lockBytes).toString('utf8'))
+  mutate(parsed.packages)
+  return Buffer.from(JSON.stringify(parsed, null, 2) + '\n')
+}
+
+async function materializeWrapperImplementationFixture() {
+  const root = await mkdtemp(path.join(await verificationTempRoot(), 'ushso-pr086-wp11-wrapper-'))
+  for (const relativePath of WP11_WRAPPER_IMPLEMENTATION_FILES) {
+    const dest = path.join(root, relativePath)
+    await mkdir(path.dirname(dest), { recursive: true })
+    await cp(path.join(repoRoot, relativePath), dest)
+  }
+  return root
+}
+
+test('PR087 lock transition fails closed for mutated, partial, unrelated, missing and stale bindings', async () => {
+  const retained = await readHistoricalPreimageSnapshot()
+  const currentLock = await readFile(path.resolve(repoRoot, PR087_REVIEWED_CURRENT_LOCK.path))
+  const readExceptLock = (bytes) => async (_root, relativePath) => relativePath === 'package-lock.json'
+    ? bytes
+    : readFile(path.resolve(repoRoot, relativePath))
+
+  const oneByte = Buffer.from(currentLock)
+  oneByte[oneByte.length - 1] ^= 1
+  await assert.rejects(
+    reportCurrentVersusHistoricalInputs({
+      snapshot: retained,
+      readCurrentFile: readExceptLock(oneByte),
+      currentSource: 'pr087_reviewed_current_lock_one_byte_tamper',
+    }),
+    /WP11_CURRENT_INPUT_UNREVIEWED_DRIFT:package-lock\.json/u,
+  )
+
+  const workspaceOnly = mutateLockPackages(currentLock, (packages) => {
+    delete packages['node_modules/@ushso/verification-wp5-v1-1']
+  })
+  assert.notEqual(sha256(workspaceOnly), PR087_REVIEWED_CURRENT_LOCK.sha256)
+  await assert.rejects(
+    reportCurrentVersusHistoricalInputs({
+      snapshot: retained,
+      readCurrentFile: readExceptLock(workspaceOnly),
+      currentSource: 'pr087_reviewed_current_lock_workspace_only',
+    }),
+    /WP11_CURRENT_INPUT_UNREVIEWED_DRIFT:package-lock\.json/u,
+  )
+
+  const linkOnly = mutateLockPackages(currentLock, (packages) => {
+    delete packages['verification/wp5/v1.1.0']
+  })
+  assert.notEqual(sha256(linkOnly), PR087_REVIEWED_CURRENT_LOCK.sha256)
+  await assert.rejects(
+    reportCurrentVersusHistoricalInputs({
+      snapshot: retained,
+      readCurrentFile: readExceptLock(linkOnly),
+      currentSource: 'pr087_reviewed_current_lock_link_only',
+    }),
+    /WP11_CURRENT_INPUT_UNREVIEWED_DRIFT:package-lock\.json/u,
+  )
+
+  const alteredLink = mutateLockPackages(currentLock, (packages) => {
+    packages['node_modules/@ushso/verification-wp5-v1-1'] = {
+      resolved: 'verification/wp5/v1.0.0',
+      link: true,
+    }
+  })
+  assert.notEqual(sha256(alteredLink), PR087_REVIEWED_CURRENT_LOCK.sha256)
+  await assert.rejects(
+    reportCurrentVersusHistoricalInputs({
+      snapshot: retained,
+      readCurrentFile: readExceptLock(alteredLink),
+      currentSource: 'pr087_reviewed_current_lock_altered_link',
+    }),
+    /WP11_CURRENT_INPUT_UNREVIEWED_DRIFT:package-lock\.json/u,
+  )
+
+  const unknownLock = Buffer.from('{"name":"ushso","lockfileVersion":3,"requires":true,"packages":{}}\n')
+  assert.notEqual(sha256(unknownLock), PR087_REVIEWED_CURRENT_LOCK.sha256)
+  await assert.rejects(
+    reportCurrentVersusHistoricalInputs({
+      snapshot: retained,
+      readCurrentFile: readExceptLock(unknownLock),
+      currentSource: 'pr087_unrelated_unknown_lock_bytes',
+    }),
+    /WP11_CURRENT_INPUT_UNREVIEWED_DRIFT:package-lock\.json/u,
+  )
+
+  const policy = JSON.parse(await readFile(path.join(repoRoot, 'verification/research-program/ci-attestation/wp11-v1.3.0/policy.json'), 'utf8'))
+  const missingTransition = structuredClone(policy)
+  delete missingTransition.reviewed_current_transitions.pr087_wp5_v11_workspace_lock_transition
+  await assert.rejects(bindWrapperImplementation({ policy: missingTransition }), /WP11_WRAPPER_PR087_LOCK_REVIEW_BINDING_MISSING/u)
+  const missingReviewBinding = structuredClone(policy)
+  missingReviewBinding.wrapper_implementation_files = missingReviewBinding.wrapper_implementation_files.filter(
+    (name) => name !== PR087_REVIEWED_CURRENT_LOCK.review.path,
+  )
+  await assert.rejects(bindWrapperImplementation({ policy: missingReviewBinding }), /WP11_WRAPPER_POLICY_STALE_BINDINGS/u)
+  await assert.rejects(
+    bindWrapperImplementation({
+      implementationFileNames: WP11_WRAPPER_IMPLEMENTATION_FILES.filter((name) => name !== PR087_REVIEWED_CURRENT_LOCK.review.path),
+    }),
+    /WP11_WRAPPER_FILE_MISSING|WP11_WRAPPER_PR087_LOCK_REVIEW_BINDING_MISSING|WP11_WRAPPER_POLICY_STALE_BINDINGS/u,
+  )
+
+  const reviewRoot = await materializeWrapperImplementationFixture()
+  const reviewPath = path.join(reviewRoot, PR087_REVIEWED_CURRENT_LOCK.review.path)
+  try {
+    const originalReview = await readFile(reviewPath)
+    await rm(reviewPath)
+    await assert.rejects(bindWrapperImplementation({ root: reviewRoot }), /ENOENT|WP11_WRAPPER_FILE_MISSING|WP11_WRAPPER_PR087_LOCK_REVIEW/u)
+    const changedHash = Buffer.from(originalReview)
+    changedHash[changedHash.length - 1] ^= 1
+    await writeFile(reviewPath, changedHash)
+    await assert.rejects(bindWrapperImplementation({ root: reviewRoot }), /WP11_WRAPPER_PR087_LOCK_REVIEW_CHANGED|WP11_WRAPPER_PR087_LOCK_REVIEW_HASH|WP11_WRAPPER_PR087_LOCK_REVIEW_BYTES/u)
+    const changedFields = JSON.parse(Buffer.from(originalReview).toString('utf8'))
+    changedFields.status = 'FAIL'
+    changedFields.unchanged_preexisting_entries = 355
+    changedFields.current_approval_issued = true
+    await writeFile(reviewPath, Buffer.from(JSON.stringify(changedFields, null, 2) + '\n'))
+    await assert.rejects(bindWrapperImplementation({ root: reviewRoot }), /WP11_WRAPPER_PR087_LOCK_REVIEW/u)
+  } finally {
+    await rm(reviewRoot, { recursive: true, force: true })
+  }
 })
 
 test('corrected PR005 afb9056 comparison is a complete unapproved report, not combined acceptance', async () => {

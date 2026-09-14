@@ -1,0 +1,1333 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-010",
+  "status": "producer_checked",
+  "owner": "/root/pr010_contract_review",
+  "reviewer": "Astra/root",
+  "base_sha": "50a844d218600f95c13e64c2db64ab4d8562ae0d",
+  "head_sha": "1318cda5c76cd3262c7668fb7f56fab842876c6f",
+  "dependency_merge_shas": {
+    "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a"
+  },
+  "branch": "codex/ushso-pr010-local-jobs-20260912",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/connectors/src/capture-protocol.mjs",
+    "packages/connectors/tests/contracts.test.mjs",
+    "packages/ingestion/README.md",
+    "packages/ingestion/package.json",
+    "packages/ingestion/src/collection-job.mjs",
+    "packages/ingestion/src/local-collection-store.mjs",
+    "packages/ingestion/src/local-collector-adapter.mjs",
+    "packages/ingestion/src/local-fixture-catalog.mjs",
+    "packages/ingestion/src/local-job-cli.mjs",
+    "scripts/research/refresh.mjs",
+    "tests/research-automation.test.mjs",
+    "tests/research-program/job-lifecycle.test.mjs",
+    "verification/research-program/pr-010/producer-20260912/README.md",
+    "verification/research-program/pr-010/producer-20260912/api-handoff.json",
+    "verification/research-program/pr-010/producer-20260912/behavioral-groups.json",
+    "verification/research-program/pr-010/producer-20260912/commands/connectors.json",
+    "verification/research-program/pr-010/producer-20260912/commands/connectors.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/commands/connectors.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/commands/ingestion.json",
+    "verification/research-program/pr-010/producer-20260912/commands/ingestion.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/commands/ingestion.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/commands/lifecycle.json",
+    "verification/research-program/pr-010/producer-20260912/commands/lifecycle.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/commands/lifecycle.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/commands/research-update.json",
+    "verification/research-program/pr-010/producer-20260912/commands/research-update.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/commands/research-update.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/commands/runtime-pins.json",
+    "verification/research-program/pr-010/producer-20260912/commands/runtime-pins.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/commands/runtime-pins.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0101-attempt1/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0101-attempt1/0.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0101-attempt1/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-attempt1/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-attempt1/0.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-attempt1/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-attempt2/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-attempt2/0.stdout.log.gz",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-attempt2/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-attempt3/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-attempt3/0.stdout.log.gz",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-attempt3/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-boundaries-expanded-attempt1/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-boundaries-expanded-attempt1/0.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-boundaries-expanded-attempt1/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-final-focused-commit-attempt1/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-final-focused-commit-attempt1/0.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-final-focused-commit-attempt1/1.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-final-focused-commit-attempt1/1.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-final-focused-commit-attempt1/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt1/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt1/0.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt1/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/0.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/1.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/1.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/2.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/2.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/3.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/3.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/4.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/4.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt1/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt1/0.stdout.log.gz",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt1/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt2/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt2/0.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt2/1.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt2/1.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt2/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-map-and-path-attempt1/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-map-and-path-attempt1/0.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-map-and-path-attempt1/1.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-map-and-path-attempt1/1.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-map-and-path-attempt1/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-prefix-replay-attempt1/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-prefix-replay-attempt1/0.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0102-prefix-replay-attempt1/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/0.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/1.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/1.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/2.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/2.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-final-focused-commit-attempt1/0.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-final-focused-commit-attempt1/0.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-final-focused-commit-attempt1/1.stderr.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-final-focused-commit-attempt1/1.stdout.log",
+    "verification/research-program/pr-010/producer-20260912/history/c0103-final-focused-commit-attempt1/receipt.json",
+    "verification/research-program/pr-010/producer-20260912/history-index.json",
+    "verification/research-program/pr-010/producer-20260912/index.json",
+    "verification/research-program/pr-010/producer-20260912/runtime-pins.json",
+    "verification/research-program/pr-010/producer-20260912/source-identity.json",
+    "docs/research-program/handoffs/PR-010.json"
+  ],
+  "problem": "PR010 requires approved descriptor identity and durable fixture-local captured-page recovery through the actual research collector.",
+  "resulting_behavior": "The fixed synthetic two-page catalog runs through the actual research capture entry point, durable whole-transaction and per-child reducer replay, and an explicit preview/run/status/resume CLI. Crash recovery retains evidence and charged unknown deliveries without false completion; production composition remains disabled.",
+  "commits": [
+    {
+      "id": "C-010-1",
+      "subject": "Add strict fixture collection job admission and scheduling identity",
+      "sha": "6e2898d5c8e9755036cc2cec75c8a45aa2fe013e"
+    },
+    {
+      "id": "C-010-2",
+      "subject": "feat(ingestion): journal fixture collector ports and replay durable jobs",
+      "sha": "16bae1abf9084493d5ecd87f80922ac468fcaacb"
+    },
+    {
+      "id": "C-010-3",
+      "subject": "feat(ingestion): expose fixture job preview and recovery CLI",
+      "sha": "1318cda5c76cd3262c7668fb7f56fab842876c6f"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/capture-reference.schema.json",
+      "location": "local",
+      "sha256": "8b38c9bd5c5291121010fad275d562248d1778f0fa9bc4ce284935daf20ae285"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/checkpoint.schema.json",
+      "location": "local",
+      "sha256": "cbf91351a63649740500a656ee3f993823fa39fc7b66569075c754cbca012e88"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/common.schema.json",
+      "location": "local",
+      "sha256": "3fdab41ebb9d6dec142a632172fe2a83af01a2db7cb2dd4535b43de8f13538b0"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/enumeration-control.schema.json",
+      "location": "local",
+      "sha256": "7d0effc45738874198232f870d0e9b196013662d74e48342481725daecb44c3b"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/event-ledger.schema.json",
+      "location": "local",
+      "sha256": "cc046eb3087622a5d4049c9a60cd0097ebfbfd3871e6da09d2dc5eb74870ee21"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/failure-policy.schema.json",
+      "location": "local",
+      "sha256": "2042cef1ecb92faf02862fb40422ed788537e8c4d2f5b2251eebe4eed9bacb39"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/fixture-bundle.schema.json",
+      "location": "local",
+      "sha256": "1c156bd2f8a48c40c029903da7c6f520a0de2367438c4e8a729bd473c947659e"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/harvest-plan.schema.json",
+      "location": "local",
+      "sha256": "2cf3b6df940420e28cced1db72ca25a0f4c7d40584d31edc2b532526a08751be"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/harvest-run.schema.json",
+      "location": "local",
+      "sha256": "9ff550bc27f9e70e418c8a586b0798eeafa122357ec8e9d99c4dc2a4b566f959"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/ingest-attempt.schema.json",
+      "location": "local",
+      "sha256": "d3111e41f3de95efe25d80793314379acd69347eb593d058bed9ae57881520e9"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/ingest-job.schema.json",
+      "location": "local",
+      "sha256": "e7db23b96b4d7d393ae59a95d878a74c46ae718e127ddb12e1e1a2617935fb02"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/metadata-fetch.schema.json",
+      "location": "local",
+      "sha256": "5981d9bdb78f5233aed1bca98afe760a68ec773c9966c53e69f41ed50287a456"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/package-manifest.schema.json",
+      "location": "local",
+      "sha256": "53747014981e7ad6df97ff72b19cad916fda5d1ffefca4ab34f8378abb6655d1"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/source-descriptor.schema.json",
+      "location": "local",
+      "sha256": "cafa5600f6bd38affb018543cf49760a82400f8f81c5018279ce9dd61c7086d2"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/state-transition-fixture.schema.json",
+      "location": "local",
+      "sha256": "6bd0daa8b13b3c2ab812688c413d084a2c002b4b18e40bfefddb7fe2b13fa9a4"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/schemas/validation-receipt.schema.json",
+      "location": "local",
+      "sha256": "d8ac04b1577e5efd66541aec3e98acbcaa5d603aaee1dd19aaef8dc6cf80f10d"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/tools/common.mjs",
+      "location": "local",
+      "sha256": "d3094879b09abc40925d50084842aa09997f7c9baa858f487c051a2265c05660"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/tools/index.mjs",
+      "location": "local",
+      "sha256": "790588f12b9e8b76ddb73cdb2c0bc104f4024b2eb2d2bc79adcfd8d01c0236ea"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/tools/schema.mjs",
+      "location": "local",
+      "sha256": "23d310fc92819bef85995632457e98f6e1252af57ffd5689750a414e1341f459"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.0.0/tools/semantics.mjs",
+      "location": "local",
+      "sha256": "26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/capture-reference.schema.json",
+      "location": "local",
+      "sha256": "484b9c6b4141d4db8af6ffe0412fa1c31a763dbd0142d649a5ddfb526418f198"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/checkpoint.schema.json",
+      "location": "local",
+      "sha256": "c2ec9a84945c661d3c87bc86a94704ff17a817f632c4c66dc441a51f039d4280"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/common.schema.json",
+      "location": "local",
+      "sha256": "22fc8e734330465e3fe4bb27d8882b142eeee627f6daa5b06c199f81663b825f"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/enumeration-control.schema.json",
+      "location": "local",
+      "sha256": "bea19c75d5b4b4767e1ad0f7115aba3d570be0c875b307cffa671b73940bc1c6"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/event-ledger.schema.json",
+      "location": "local",
+      "sha256": "1cabc903e42fac3ac58aa26f11c147b5c5653212b4d7bb9fbf7994cd45786be4"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/failure-policy.schema.json",
+      "location": "local",
+      "sha256": "3bcbc8589de9a785d21ff6c81cc7f78ea98f7497d35391ae64b7621ec531d55f"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/fixture-bundle.schema.json",
+      "location": "local",
+      "sha256": "2edb461b99eabaf6ce5c2fd1ba6315521260da0f7fc7974494756b9a26f93769"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/harvest-plan.schema.json",
+      "location": "local",
+      "sha256": "3a85a19a33c68a55fb8e8347070a3a6bd739ea6b8c358b1139af093c718f2d92"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/harvest-run.schema.json",
+      "location": "local",
+      "sha256": "d79bbfdba1fa18c954b9128363f13dcdc4abbdccb720c65db0a6f1a70567cf5f"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/ingest-attempt.schema.json",
+      "location": "local",
+      "sha256": "47f2bcf63ffa4b9964e74c2ce3e00ef3c942648726caebd15ad26784270cb1f5"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/ingest-job.schema.json",
+      "location": "local",
+      "sha256": "849f7119329ed7a2dc02df6e78998f7fde46712a46995a446b3180d8076c627c"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/metadata-fetch.schema.json",
+      "location": "local",
+      "sha256": "94e48c7162ddd06c96cc667494aa17b46dc55aeb2d371900e62fa09496236f07"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/package-manifest.schema.json",
+      "location": "local",
+      "sha256": "e8960fe1b75654fee438990000a77ac03eb9035a5f68425ed5c4e43cd6bae677"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/source-descriptor.schema.json",
+      "location": "local",
+      "sha256": "f8ad3f8263a81e3d51eec3a054c300b5b664f6cd5793ea94578aae6c8efeb68a"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/state-transition-fixture.schema.json",
+      "location": "local",
+      "sha256": "4049eaf278fdaa11cf0cc92f411c4181504daf7768824a3b623b27aedd63cfb1"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/validation-receipt.schema.json",
+      "location": "local",
+      "sha256": "d472cff5605dbe73406f3546ae45cab074b9ced2492dc5ab831896b0f9fc2bb2"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/schemas/workflow-instance-id-compatibility-fixture.schema.json",
+      "location": "local",
+      "sha256": "7f1fadfd802ffa2fe32a8c037bfafc99dbbc7f84450964030ba84ac01cbda02a"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/tools/common.mjs",
+      "location": "local",
+      "sha256": "d3094879b09abc40925d50084842aa09997f7c9baa858f487c051a2265c05660"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/tools/index.mjs",
+      "location": "local",
+      "sha256": "b278fd9782fd043527d6574b12189e2a44381ed61c4a1ad0eb4f7313a21b68d6"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/tools/schema.mjs",
+      "location": "local",
+      "sha256": "23d310fc92819bef85995632457e98f6e1252af57ffd5689750a414e1341f459"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/tools/semantics.mjs",
+      "location": "local",
+      "sha256": "26801e00b82be3668e3befcf756881d1795fe8739c04237596cda8026b507639"
+    },
+    {
+      "kind": "source",
+      "id": "contracts/ingestion/v1.1.0/tools/workflow-instance-id.mjs",
+      "location": "local",
+      "sha256": "885d5bc3c9f4d248913ca126d2348dce7f2e9d277e580ab4f2c50224efb2b017"
+    },
+    {
+      "kind": "source",
+      "id": "package-lock.json",
+      "location": "local",
+      "sha256": "f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/adapters/base.mjs",
+      "location": "local",
+      "sha256": "ee7f8423da5b62f331d832882e1a9259e08cbf53a71064e86a02d2de17a74a51"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/adapters/dcat-data-json.mjs",
+      "location": "local",
+      "sha256": "1d3135c98a047d963fa2465a5c1050fabc40974ce1c7994723504f6af1b0b861"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/bounded-http-client.mjs",
+      "location": "local",
+      "sha256": "552d95a9b490ececde7fb77517b0991dc388b7a014359d9f755f2b29256b3eb4"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/canonical.mjs",
+      "location": "local",
+      "sha256": "ba524d6baa275bc5ca05e4b3cc9dac9dda02cda0992a2b8f8cf2ec762da9cb48"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/capture-protocol.mjs",
+      "location": "local",
+      "sha256": "7f5a86e1a042bb936b4349ee55ba21a432bb503da82d4cf899e5a786cb42cd87"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/content-classifier.mjs",
+      "location": "local",
+      "sha256": "d8090a7eb1889cdaa8af3d0a3b5d7b23ef1de6d60e5d4dc029fca4a5306979c9"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/deletion-policy.mjs",
+      "location": "local",
+      "sha256": "2740268f9b479c40ac8f192e71177340818f69b0ef516e7419e4e0e6fce67a9f"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/descriptors.mjs",
+      "location": "local",
+      "sha256": "7c8ce9c616cdecc9fa3c2bc7b8f344426bb71b9ad2edc95c99abbf4ff92a1e5d"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/errors.mjs",
+      "location": "local",
+      "sha256": "ace5e4d07cd58cea6c18cfe09ed366b429cb03fc97b8c80c2c3abf04d2c794c6"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/network-policy.mjs",
+      "location": "local",
+      "sha256": "a648c6d73377a053a9b09839ccef371365765d2bd87dde55b9db417f729288ad"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/origin-governor.mjs",
+      "location": "local",
+      "sha256": "302f092e5f76c73266f89a5dbade411f528ae1347e6cee37bf4ede99c33cce52"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/pinned-streaming-transport.mjs",
+      "location": "local",
+      "sha256": "f4b8cfdfce55fcfdd7e853d17c4992c474e16e2f646226e90c5ddebabb72ca08"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/route-manifest.mjs",
+      "location": "local",
+      "sha256": "be3787542b8c27ed3d7f294ae88789c9530717f2741cfd862ee5a24f46197bfc"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/runner.mjs",
+      "location": "local",
+      "sha256": "50af43de5732a562fc506cae854c634998ca43b6d283b270d542d7891c171bf6"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/source-route-allowlist.mjs",
+      "location": "local",
+      "sha256": "15eb8c87e94722e83aa006540ce96fccbc3c1cccf664df76157499943a64fe16"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/testing/fixtures.mjs",
+      "location": "local",
+      "sha256": "a97fb601b72c507ba33309e3cca45e18e595b814566e855814214ab76ce62668"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/src/testing/memory-ports.mjs",
+      "location": "local",
+      "sha256": "33843172e8f9e0d2fb5258b2d5a13167b3794ee73c713f721cf4d00928f7ad93"
+    },
+    {
+      "kind": "source",
+      "id": "packages/connectors/tests/contracts.test.mjs",
+      "location": "local",
+      "sha256": "2fa07f41443bafc90272f7fdf7a23e435519d8b970bb776745d2413c60d4a9cc"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/README.md",
+      "location": "local",
+      "sha256": "21feb2dfd3603c3bdde4192072c00662fc7a2d51e84930159ed4a5c4723a0138"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/package.json",
+      "location": "local",
+      "sha256": "5e1fb040ab53f4f63668e5c2f91ee95d19cb77a2eec929c5a99d59b216547e14"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/audit-principal.mjs",
+      "location": "local",
+      "sha256": "a06495cfcf473ccde6b91552a7cd49768ba9104eba96e1bce194f19aebee75e8"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/collection-job.mjs",
+      "location": "local",
+      "sha256": "bd73171b3781413c0a5e5cd9f5c143bbdd5e73471a212afda14dbce6f5ca22d9"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/common.mjs",
+      "location": "local",
+      "sha256": "b9d881927621a993557e791490d316b688cdbfadb5961ff3ba2a8f06555b8b51"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/dlq-sink-policy.mjs",
+      "location": "local",
+      "sha256": "dc71659e18a0802876136d550d0256e5485713df8bc27d2ba5a82fcd118696bd"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/failure-policy.mjs",
+      "location": "local",
+      "sha256": "0dd6bb7afe0eeef6c3aaa422054f71b26b9954dac5a4cf766209cb1d6a741e85"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/in-memory-control-plane.mjs",
+      "location": "local",
+      "sha256": "bbdb163c998411b4c518d69e086a091925f2836ff32446cd0a06751b9a20d9dd"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/local-collection-store.mjs",
+      "location": "local",
+      "sha256": "ba58fc8ba262d252c5ba88ee0d7b86856117360a27e184ce014cd8d6275c9d8a"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/local-collector-adapter.mjs",
+      "location": "local",
+      "sha256": "e88fba008b558c62f6380f47b828566a0ddb4b16f53f2b210f7d6f4d52547f01"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/local-fixture-catalog.mjs",
+      "location": "local",
+      "sha256": "0bd64a7c2660d72ac1a56edfff2461458df5ecf57f695b08c5eec8c6ad829a39"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/local-job-cli.mjs",
+      "location": "local",
+      "sha256": "366c55f86d58e6959888cd7789b36cbfac944c222b0ef74c13c540cd94da1cee"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/ports.mjs",
+      "location": "local",
+      "sha256": "3f832c244528602ac5dbfa7769b5906ff72610859ecd2ab5ca440c5b9739394c"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/redaction.mjs",
+      "location": "local",
+      "sha256": "0d42af1a5c7d912c93284ae7e74dc9bf568ffa110fe7a0b2b9d05db76eee8ebc"
+    },
+    {
+      "kind": "source",
+      "id": "packages/ingestion/src/scheduler.mjs",
+      "location": "local",
+      "sha256": "62155eefa91e4678477839c309b084afb9557f273bfe5281236fbc0b9c44dbeb"
+    },
+    {
+      "kind": "source",
+      "id": "packages/retrieval/tools/catalog-contract.mjs",
+      "location": "local",
+      "sha256": "bbba437c0ba61a774fe02d8a2f3436900756ae4715ad05c0cc36894ee70df160"
+    },
+    {
+      "kind": "source",
+      "id": "packages/retrieval/tools/external-url-policy.mjs",
+      "location": "local",
+      "sha256": "79105a2fb2e76108bbaa3423dc2e02281264e3d8cd653ef4ab83d1dfb4446ba0"
+    },
+    {
+      "kind": "source",
+      "id": "packages/retrieval/tools/record-semantics.mjs",
+      "location": "local",
+      "sha256": "32f4b1a2f8ae94e99ffb2f353cab01cf0e4bb157ded6405c2d1b1fe15b89047b"
+    },
+    {
+      "kind": "source",
+      "id": "scripts/research-program/operating-bounds.mjs",
+      "location": "local",
+      "sha256": "f9da46ab59d2ab2a9bc6c173d7698426a8558c3742e68105b0150dcfc4f36eaa"
+    },
+    {
+      "kind": "source",
+      "id": "scripts/research-program/policy.json",
+      "location": "local",
+      "sha256": "6230fe7b10aa5da20d9426cf4fcce39f0565e306ec512cbc791428544088fbda"
+    },
+    {
+      "kind": "source",
+      "id": "scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json",
+      "location": "local",
+      "sha256": "b0785f439b2ba525ad3b72ef7832adeb9eb6eccc5454a6eedaabdfbc746375eb"
+    },
+    {
+      "kind": "source",
+      "id": "scripts/research/refresh.mjs",
+      "location": "local",
+      "sha256": "89e577d0a32a7c1e6f9e14229bc15db03928792a8636eef5b5b635a25365907d"
+    },
+    {
+      "kind": "source",
+      "id": "tests/research-automation.test.mjs",
+      "location": "local",
+      "sha256": "48b39888c478bddef2beb8191437c9361e816065f07a0a7d63062af6d64237ec"
+    },
+    {
+      "kind": "source",
+      "id": "tests/research-program/job-lifecycle.test.mjs",
+      "location": "local",
+      "sha256": "fc13ecdad7eb1a9a177317e9e9f5ff2d6e1803924bb07c961e57fe811bc1e447"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-pr010-final-lifecycle",
+      "command": "node --test tests/research-program/job-lifecycle.test.mjs",
+      "started_at": "2026-09-12T16:27:20.367272Z",
+      "completed_at": "2026-09-12T16:27:55.482171Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "41/41 passed, 0 failed on immutable source 1318cda5c76cd3262c7668fb7f56fab842876c6f.",
+      "expected": "Exit zero with all selected checks passing.",
+      "actual": "41/41 passed, 0 failed",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-pr010-final-lifecycle-event",
+        "path": "verification/research-program/pr-010/producer-20260912/commands/lifecycle.json",
+        "sha256": "69f5bbfa5a84021ee0ecf81189342d07d0fca30d8957a0fbf0bd43b173148a93",
+        "bytes": 1185
+      }
+    },
+    {
+      "id": "cmd-pr010-final-research-update",
+      "command": "node --test tests/research-automation.test.mjs tests/update-cycle.test.mjs",
+      "started_at": "2026-09-12T16:27:55.500327Z",
+      "completed_at": "2026-09-12T16:27:57.303458Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "11/11 passed, 0 failed on immutable source 1318cda5c76cd3262c7668fb7f56fab842876c6f.",
+      "expected": "Exit zero with all selected checks passing.",
+      "actual": "11/11 passed, 0 failed",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-pr010-final-research-update-event",
+        "path": "verification/research-program/pr-010/producer-20260912/commands/research-update.json",
+        "sha256": "9106c411013fe593f071f4b32c5c4d30e2a51164728ddcacce070bf6e9bcf54c",
+        "bytes": 1227
+      }
+    },
+    {
+      "id": "cmd-pr010-final-ingestion",
+      "command": "node /mnt/d/cache/plumbob/npm/_npx/ae109337638209d1/node_modules/npm/bin/npm-cli.js test --prefix packages/ingestion",
+      "started_at": "2026-09-12T16:27:57.328805Z",
+      "completed_at": "2026-09-12T16:27:58.485071Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "46/46 passed, 0 failed on immutable source 1318cda5c76cd3262c7668fb7f56fab842876c6f.",
+      "expected": "Exit zero with all selected checks passing.",
+      "actual": "46/46 passed, 0 failed",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-pr010-final-ingestion-event",
+        "path": "verification/research-program/pr-010/producer-20260912/commands/ingestion.json",
+        "sha256": "4afd795c916e9b283680cf8fdae0d1f1bca72dab9aa5a6f555c12a37ac301350",
+        "bytes": 1258
+      }
+    },
+    {
+      "id": "cmd-pr010-final-connectors",
+      "command": "node /mnt/d/cache/plumbob/npm/_npx/ae109337638209d1/node_modules/npm/bin/npm-cli.js test --prefix packages/connectors",
+      "started_at": "2026-09-12T16:27:58.512763Z",
+      "completed_at": "2026-09-12T16:27:59.517910Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "48/48 passed, 0 failed on immutable source 1318cda5c76cd3262c7668fb7f56fab842876c6f.",
+      "expected": "Exit zero with all selected checks passing.",
+      "actual": "48/48 passed, 0 failed",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-pr010-final-connectors-event",
+        "path": "verification/research-program/pr-010/producer-20260912/commands/connectors.json",
+        "sha256": "74642670e56da86f3ceb4ae311404cab4373d1c5850a7eb25d93541e417cf0bd",
+        "bytes": 1262
+      }
+    },
+    {
+      "id": "cmd-pr010-final-runtime-pins",
+      "command": "node --input-type=module -e 'import { localRuntimePins } from '\"'\"'./packages/ingestion/src/local-collector-adapter.mjs'\"'\"'; import { loadFixtureCatalog } from '\"'\"'./packages/ingestion/src/local-fixture-catalog.mjs'\"'\"'; console.log(JSON.stringify(await localRuntimePins(await loadFixtureCatalog()), null, 2));'",
+      "started_at": "2026-09-12T16:27:59.538909Z",
+      "completed_at": "2026-09-12T16:27:59.685488Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Refreshed 80 actual runtime import/schema/data pins on immutable source 1318cda5c76cd3262c7668fb7f56fab842876c6f.",
+      "expected": "Exit zero with all selected checks passing.",
+      "actual": "Refreshed 80 actual runtime import/schema/data pins",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-pr010-final-runtime-pins-event",
+        "path": "verification/research-program/pr-010/producer-20260912/commands/runtime-pins.json",
+        "sha256": "a40b402c2820c6055fa3f857c7d968232a92844112d0a8d9303a0dc2a438e592",
+        "bytes": 1352
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr010-artifact-001",
+      "path": "verification/research-program/pr-010/producer-20260912/README.md",
+      "sha256": "fef040948e0b717e35a8f1971d10f116c1b7c7c5c5c08ca5984001ed2d01761e",
+      "bytes": 1906
+    },
+    {
+      "id": "pr010-artifact-002",
+      "path": "verification/research-program/pr-010/producer-20260912/api-handoff.json",
+      "sha256": "906a42df6da2ed3c58e6ed660adbf37cd0010f613d13c1d79cde552c97b6c6ae",
+      "bytes": 2285
+    },
+    {
+      "id": "pr010-artifact-003",
+      "path": "verification/research-program/pr-010/producer-20260912/behavioral-groups.json",
+      "sha256": "c5d9b752b7efb6ab6f74162fc4583d029bebc546ff99d2bc170e976b11bfe915",
+      "bytes": 30889
+    },
+    {
+      "id": "pr010-artifact-004",
+      "path": "verification/research-program/pr-010/producer-20260912/commands/connectors.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-005",
+      "path": "verification/research-program/pr-010/producer-20260912/commands/connectors.stdout.log",
+      "sha256": "4caabc6f9b761855c2338e66d7fa534b4efee1b395c9967ed31a55a2a848c60e",
+      "bytes": 4855
+    },
+    {
+      "id": "pr010-artifact-006",
+      "path": "verification/research-program/pr-010/producer-20260912/commands/ingestion.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-007",
+      "path": "verification/research-program/pr-010/producer-20260912/commands/ingestion.stdout.log",
+      "sha256": "8cc9d9b8887a569038d4e913bdfb0139a6df16345ef7e832c988e8098b8270d5",
+      "bytes": 5141
+    },
+    {
+      "id": "pr010-artifact-008",
+      "path": "verification/research-program/pr-010/producer-20260912/commands/lifecycle.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-009",
+      "path": "verification/research-program/pr-010/producer-20260912/commands/lifecycle.stdout.log",
+      "sha256": "c7dc50cf4ee14cde93d8c9445cd9e0540aa8781bf2e29cb0a7caa8b4b433ef0e",
+      "bytes": 4447
+    },
+    {
+      "id": "pr010-artifact-010",
+      "path": "verification/research-program/pr-010/producer-20260912/commands/research-update.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-011",
+      "path": "verification/research-program/pr-010/producer-20260912/commands/research-update.stdout.log",
+      "sha256": "28fdfe3b925bd63f8297e0bae3e9f9cb65eb9174b972521ffae40ba30838902d",
+      "bytes": 1258
+    },
+    {
+      "id": "pr010-artifact-012",
+      "path": "verification/research-program/pr-010/producer-20260912/commands/runtime-pins.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-013",
+      "path": "verification/research-program/pr-010/producer-20260912/commands/runtime-pins.stdout.log",
+      "sha256": "ca459311d3681f9180d2f5630ad22b87fadf95f9cb5793c05c74553205ba506c",
+      "bytes": 14238
+    },
+    {
+      "id": "pr010-artifact-014",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0101-attempt1/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-015",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0101-attempt1/0.stdout.log",
+      "sha256": "4bd443f2ba7888549466e3674ca8fa15ae2f54bbac72aae9f3cc6448a8c36563",
+      "bytes": 743
+    },
+    {
+      "id": "pr010-artifact-016",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0101-attempt1/receipt.json",
+      "sha256": "e17364779be7047fb999f94e026bd93ce62bfe17d8a23091dd621665b3468d23",
+      "bytes": 1749
+    },
+    {
+      "id": "pr010-artifact-017",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-attempt1/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-018",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-attempt1/0.stdout.log",
+      "sha256": "ad655ea831d138b2bf75d74b5cee8751ecbc965fb0bed11383cf9a5489ae5d4c",
+      "bytes": 2250
+    },
+    {
+      "id": "pr010-artifact-019",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-attempt1/receipt.json",
+      "sha256": "ccb33581fb6cdfe66e5e5e684b570e4851eb10431383f41f7dd64ffa598ea830",
+      "bytes": 2007
+    },
+    {
+      "id": "pr010-artifact-020",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-attempt2/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-021",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-attempt2/0.stdout.log.gz",
+      "sha256": "26a2b44c497512948cead36fc5c692a245a5604e4f1ba1bceacf2d544521f256",
+      "bytes": 981
+    },
+    {
+      "id": "pr010-artifact-022",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-attempt2/receipt.json",
+      "sha256": "caa5120fd9079df4cb717aa0acd18d9eca367e62e7090c65c5d25f261dc3011f",
+      "bytes": 2007
+    },
+    {
+      "id": "pr010-artifact-023",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-attempt3/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-024",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-attempt3/0.stdout.log.gz",
+      "sha256": "49453b31e4730532e65b098ca06f7a123c95a24883b677fcc9bf12b25e587bbc",
+      "bytes": 1266
+    },
+    {
+      "id": "pr010-artifact-025",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-attempt3/receipt.json",
+      "sha256": "287cabadb433f3b9f18da8cac16e9c3c450a2672c35f6dd620adc247a35d7334",
+      "bytes": 2007
+    },
+    {
+      "id": "pr010-artifact-026",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-boundaries-expanded-attempt1/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-027",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-boundaries-expanded-attempt1/0.stdout.log",
+      "sha256": "bae5f45065e2e7f567ddb735c4ef4f7212d3892ced8ed0e543ef11ce3783d0a0",
+      "bytes": 1893
+    },
+    {
+      "id": "pr010-artifact-028",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-boundaries-expanded-attempt1/receipt.json",
+      "sha256": "35d6009e971f8b81f98ea97895b6399cb4c1f39db9a212fbc001bed0711b0fb4",
+      "bytes": 2296
+    },
+    {
+      "id": "pr010-artifact-029",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-final-focused-commit-attempt1/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-030",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-final-focused-commit-attempt1/0.stdout.log",
+      "sha256": "8b7af065dff5d02f5bf06c7a8df0570a2f791c6b130c710173307f7d3a5e439a",
+      "bytes": 349
+    },
+    {
+      "id": "pr010-artifact-031",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-final-focused-commit-attempt1/1.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-032",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-final-focused-commit-attempt1/1.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-033",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-final-focused-commit-attempt1/receipt.json",
+      "sha256": "b2fe447a868f5f902e6faa21224ce91f7d051ed83c26ead05a338b1b56a63959",
+      "bytes": 3223
+    },
+    {
+      "id": "pr010-artifact-034",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt1/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-035",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt1/0.stdout.log",
+      "sha256": "ff9d7a102bf77c8f90730b9aac2606bd58fd4cb2269eadd4bd4540fcfe01ec9b",
+      "bytes": 5813
+    },
+    {
+      "id": "pr010-artifact-036",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt1/receipt.json",
+      "sha256": "c600606bda36a2c48025152d39253a5380b790c0d613593fec881f2ffe3b27ab",
+      "bytes": 2628
+    },
+    {
+      "id": "pr010-artifact-037",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-038",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/0.stdout.log",
+      "sha256": "382abab3ef5b9c918a3f79c32a4621c4f46a1fa00ad750d1eb01b07d0861d927",
+      "bytes": 4143
+    },
+    {
+      "id": "pr010-artifact-039",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/1.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-040",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/1.stdout.log",
+      "sha256": "2c9dea8082b8259382882a47dc375458ef1198fc46096634a0dd89a87d8d2eea",
+      "bytes": 1263
+    },
+    {
+      "id": "pr010-artifact-041",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/2.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-042",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/2.stdout.log",
+      "sha256": "c9467b98b215c020e4f90f90fd05915b99d5f4b2c3bd33fcbc0b292521103c1d",
+      "bytes": 1400
+    },
+    {
+      "id": "pr010-artifact-043",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/3.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-044",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/3.stdout.log",
+      "sha256": "b30685f44dba82778fb1866f998c619eb9d12912f427db7a2e06802a011c2cd4",
+      "bytes": 5144
+    },
+    {
+      "id": "pr010-artifact-045",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/4.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-046",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/4.stdout.log",
+      "sha256": "86fa5878a6ea7898fd2f92abe8e0c8aa56066a352db1e3aa8331c249ee9829cd",
+      "bytes": 4861
+    },
+    {
+      "id": "pr010-artifact-047",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-full-cursor-attempt2/receipt.json",
+      "sha256": "7ac1035e1f3c3213b45242fa885ac854018bc5be91ae7918e99f4d9fceff4dae",
+      "bytes": 4594
+    },
+    {
+      "id": "pr010-artifact-048",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt1/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-049",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt1/0.stdout.log.gz",
+      "sha256": "a3ec5b36e0cccaa012d40f5b5414206272b8b7d7e81ef87ed44d7174537e929c",
+      "bytes": 1041
+    },
+    {
+      "id": "pr010-artifact-050",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt1/receipt.json",
+      "sha256": "209d7670db02cd05c7e46c095dc776258da352ff439318bf25c61cb225925c03",
+      "bytes": 2284
+    },
+    {
+      "id": "pr010-artifact-051",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt2/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-052",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt2/0.stdout.log",
+      "sha256": "976959c7c0289a572e9da48ee0aee2053ea19417abecb32857069ea06e8ce986",
+      "bytes": 851
+    },
+    {
+      "id": "pr010-artifact-053",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt2/1.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-054",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt2/1.stdout.log",
+      "sha256": "59fde2dd0a0bd43da315e67a4f81d916bcef5b6791f32b4ac6875c2a1cf8727a",
+      "bytes": 1260
+    },
+    {
+      "id": "pr010-artifact-055",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-independent-boundaries-attempt2/receipt.json",
+      "sha256": "da56eff70f0537aa593bc7815d825b3d8d2642cd1f823f6cbdcf75ea54d43174",
+      "bytes": 2756
+    },
+    {
+      "id": "pr010-artifact-056",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-map-and-path-attempt1/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-057",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-map-and-path-attempt1/0.stdout.log",
+      "sha256": "44542dd3e51a114c1c0f2bed698a86d50da5c1cfafbbbe736b3b74d73cf2cd12",
+      "bytes": 324
+    },
+    {
+      "id": "pr010-artifact-058",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-map-and-path-attempt1/1.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-059",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-map-and-path-attempt1/1.stdout.log",
+      "sha256": "9f1d429f264ed8e6c9a5d590f09effc871e85cd223e10485516967377bcb9523",
+      "bytes": 1260
+    },
+    {
+      "id": "pr010-artifact-060",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-map-and-path-attempt1/receipt.json",
+      "sha256": "460c19dd170991900591ec3bd355c04ad9a40d29cfc936e82c70aa3021dcb906",
+      "bytes": 2745
+    },
+    {
+      "id": "pr010-artifact-061",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-prefix-replay-attempt1/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-062",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-prefix-replay-attempt1/0.stdout.log",
+      "sha256": "fca9c7fec34badeecde9861ed23e00981b21cf76826fafefd1ee095da78b80be",
+      "bytes": 428
+    },
+    {
+      "id": "pr010-artifact-063",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0102-prefix-replay-attempt1/receipt.json",
+      "sha256": "26412c24f4d658cb0591262459452047bd6e1bd0af3f31631fb3890b059c635c",
+      "bytes": 2264
+    },
+    {
+      "id": "pr010-artifact-064",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-065",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/0.stdout.log",
+      "sha256": "e35e6a637d8a3cf970b679a9bf5a2fa3c97361019ce6d3c17b328db253d4e40b",
+      "bytes": 4449
+    },
+    {
+      "id": "pr010-artifact-066",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/1.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-067",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/1.stdout.log",
+      "sha256": "2df982598931321152933ad6689f0935a0b63c386134db76a4db68d879e4fbf4",
+      "bytes": 5024
+    },
+    {
+      "id": "pr010-artifact-068",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/2.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-069",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/2.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-070",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-cli-attempt1/receipt.json",
+      "sha256": "46097ccd7201907cdfce0a014d34c9f04356dbadf60aeea73e55406d60a852a0",
+      "bytes": 2723
+    },
+    {
+      "id": "pr010-artifact-071",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-final-focused-commit-attempt1/0.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-072",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-final-focused-commit-attempt1/0.stdout.log",
+      "sha256": "d34e212152673cb9126521a201417d11258163e38b680b3195268c28f4afa9b2",
+      "bytes": 232
+    },
+    {
+      "id": "pr010-artifact-073",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-final-focused-commit-attempt1/1.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-074",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-final-focused-commit-attempt1/1.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr010-artifact-075",
+      "path": "verification/research-program/pr-010/producer-20260912/history/c0103-final-focused-commit-attempt1/receipt.json",
+      "sha256": "5a92dec2612daf98c3895f055e2bc26ac352915a0d4c90de3459d21e19228cdc",
+      "bytes": 2360
+    },
+    {
+      "id": "pr010-artifact-076",
+      "path": "verification/research-program/pr-010/producer-20260912/history-index.json",
+      "sha256": "b62d4b791f6634ad363cfdaa5273343c4df2ea91088487ed124e4b62d137dc08",
+      "bytes": 19849
+    },
+    {
+      "id": "pr010-artifact-077",
+      "path": "verification/research-program/pr-010/producer-20260912/runtime-pins.json",
+      "sha256": "ca459311d3681f9180d2f5630ad22b87fadf95f9cb5793c05c74553205ba506c",
+      "bytes": 14238
+    },
+    {
+      "id": "pr010-artifact-078",
+      "path": "verification/research-program/pr-010/producer-20260912/source-identity.json",
+      "sha256": "7aa943f56394bd24b8ac5e90cc4c60c8fa1e63e6d668f52462ff379920a486ad",
+      "bytes": 17305
+    },
+    {
+      "id": "pr010-artifact-index",
+      "path": "verification/research-program/pr-010/producer-20260912/index.json",
+      "sha256": "13046c5d4bee1a83eb353cac31488a5cf66216e0709a091b3fa6120112608d81",
+      "bytes": 22267
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-010-1",
+      "status": "producer_checked",
+      "result": "Strict approved descriptor admission, dense selected IDs and stable parent/separate child identities pass producer checks.",
+      "command_ids": [
+        "cmd-pr010-final-lifecycle"
+      ]
+    },
+    {
+      "id": "C-010-2",
+      "status": "producer_checked",
+      "result": "Actual capture bridge, whole-operation durability, fresh-process recovery and strict cursor/304 provenance pass producer checks.",
+      "command_ids": [
+        "cmd-pr010-final-lifecycle",
+        "cmd-pr010-final-research-update",
+        "cmd-pr010-final-ingestion",
+        "cmd-pr010-final-connectors"
+      ]
+    },
+    {
+      "id": "C-010-3",
+      "status": "producer_checked",
+      "result": "Fixed fixture preview/run/status/resume CLI and process-level checkpoint/unresolved outcomes pass producer checks.",
+      "command_ids": [
+        "cmd-pr010-final-lifecycle"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "INITIAL-PRODUCER-FAILURES",
+      "status": "failed",
+      "detail": "Retained original parent-outbox lookup failures, pre-amendment strict cursor incompatibility, an operation-ID reader typo, and the first full 37/38 empty-catalog runner exception. Corrected final immutable suites pass; history-index.json preserves every original producer attempt."
+    },
+    {
+      "id": "FROZEN-WP5-STALE",
+      "status": "pending",
+      "detail": "Frozen WP5 v1.0 remains unchanged; its historical fingerprint result is stale after the authorized connector change. Root retained that expected result. No WP5 verifier/build/full gate was rerun by this producer."
+    },
+    {
+      "id": "FINAL-INDEPENDENT-REVIEW",
+      "status": "pending",
+      "detail": "Astra/root owns independent exact-source review, provisional PR087 and PR086 adoption, combined local gate, hosted CI, publication and any component/integration merge."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C-009-1-measured-topology-qualification",
+      "status": "unresolved",
+      "detail": "Accepted PR009 engineering does not qualify measured topology; owner-deferred numeric budget remains null."
+    },
+    {
+      "id": "PR010-independent-acceptance",
+      "status": "pending",
+      "detail": "All 36 groups are producer checked only. No component merge, research integration, PR011 readiness, R acceptance or release qualification is granted."
+    }
+  ],
+  "risks": [
+    {
+      "id": "fixture-only",
+      "detail": "Synthetic local journal evidence does not qualify real-source coverage, managed persistence, production pacing or source access.",
+      "status": "unresolved"
+    },
+    {
+      "id": "unknown-delivery",
+      "detail": "A durable intent with no verified response remains charged and terminal partial_unresolved. There is no exactly-once external request guarantee.",
+      "status": "unresolved"
+    },
+    {
+      "id": "runtime-binding",
+      "detail": "Changed runtime import/schema/data/lock/fixture pins intentionally block existing journal replay; migration is outside this fixture scope.",
+      "status": "unresolved"
+    }
+  ],
+  "next_consumer": "Astra/root independent implementation review; subsequent consumers remain gated.",
+  "next_action": "Astra/root independently reviews immutable source 1318cda5c76cd3262c7668fb7f56fab842876c6f and its final evidence transport identity, then applies the adopted successor/lock gates before any publication or merge.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Root performed incremental admission/capture reviews on prior exact snapshots; no final-candidate independent acceptance is claimed.",
+      "Full gate, hosted CI, release qualification and production activation are pending."
+    ]
+  }
+}

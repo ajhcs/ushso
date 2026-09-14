@@ -1,0 +1,119 @@
+{
+  "format": "ushso.pr010-locator-compatibility-probe.v1",
+  "recorded_at": "2026-09-12T14:06:27.569Z",
+  "reviewed_head": "27d0b0d7c31d8825b91d899dc280cd843af21465",
+  "reviewed_tree": "aef0428057d73645fab00f4d3aecb3418296f79b",
+  "probe_scope": "Actual existing validateDescriptor/compileManifestRequest and unchanged legacy metadataUrl/capture default guard. The proposed locatorPolicy seam is not implemented or tested here.",
+  "descriptor_sha256": "688657fa60077bf18d63085f0ae02c6956f8dbd5d1fbc57c034a88db997bad0c",
+  "descriptor_hash_basis": "ushso-canonical-json.v1",
+  "checks": [
+    {
+      "id": "stock_source_id",
+      "expected": "source_fixture_catalog",
+      "actual": "source_fixture_catalog",
+      "pass": true
+    },
+    {
+      "id": "tight_descriptor_accepted",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "id": "first_exact_locator",
+      "expected": "https://catalog.example.gov/data.json",
+      "actual": "https://catalog.example.gov/data.json",
+      "pass": true
+    },
+    {
+      "id": "cursor_exact_locator",
+      "expected": "https://catalog.example.gov/data.json?cursor=page-2",
+      "actual": "https://catalog.example.gov/data.json?cursor=page-2",
+      "pass": true
+    },
+    {
+      "id": "cursor_target_class",
+      "expected": "pagination_cursor",
+      "actual": "pagination_cursor",
+      "pass": true
+    },
+    {
+      "id": "unregistered_fixture_id_rejected",
+      "expected": true,
+      "actual": true,
+      "pass": true,
+      "error": {
+        "rejected": true,
+        "name": "TypeError",
+        "code": null,
+        "message": "No positive metadata-route allowlist for source_fixture_other."
+      }
+    },
+    {
+      "id": "prior_v2_locator_rejected",
+      "expected": true,
+      "actual": true,
+      "pass": true,
+      "error": {
+        "rejected": true,
+        "name": "TypeError",
+        "code": null,
+        "message": "Descriptor routes are not the positive allowlist for source_fixture_catalog."
+      }
+    },
+    {
+      "id": "unknown_fixture_path_rejected",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "id": "undeclared_query_rejected",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "id": "unknown_route_rejected",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "id": "legacy_default_fixture_locator_blocked",
+      "expected": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "id": "actual_legacy_default_capture_blocked",
+      "expected": "blocked_locator",
+      "actual": "blocked_locator",
+      "pass": true
+    },
+    {
+      "id": "actual_legacy_default_no_fetch",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "legacy_default_official_locator_preserved",
+      "expected": "https://data.cdc.gov/a",
+      "actual": "https://data.cdc.gov/a",
+      "pass": true
+    },
+    {
+      "id": "no_global_fetch",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  ],
+  "total": 15,
+  "passed": 15,
+  "fixture_transport_deliveries": 0,
+  "live_fetch_calls": 0,
+  "repository_edits": false,
+  "implementation_tests_executed": false
+}

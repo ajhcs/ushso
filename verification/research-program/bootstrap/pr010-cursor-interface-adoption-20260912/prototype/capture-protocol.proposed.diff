@@ -1,0 +1,29 @@
+--- a/packages/connectors/src/capture-protocol.mjs
++++ b/packages/connectors/src/capture-protocol.mjs
+@@ -28,6 +28,17 @@
+     content_length: Number.isSafeInteger(parsedLength) ? parsedLength : null,
+     cache_control: cacheControl && /^[A-Za-z0-9_.*="' ,=-]+$/.test(cacheControl) ? cacheControl : null,
+   };
++}
++
++// Public capture references expose no query or credential-bearing locator fields.
++// Request coherence and observation identity still use the full redacted locator.
++function publicCaptureLocator(urlInput) {
++  const url = new URL(urlInput);
++  url.username = '';
++  url.password = '';
++  url.search = '';
++  url.hash = '';
++  return url.toString();
+ }
+ 
+ function captureClassification(purpose) {
+@@ -179,7 +190,7 @@
+         template_id: compiledRequest.route.template_id,
+         final_host: new URL(finalUrl).hostname,
+         final_path_class: compiledRequest.targetClass,
+-        redacted_locator: redactedLocator(finalUrl),
++        redacted_locator: publicCaptureLocator(finalUrl),
+       },
+       safe_response_headers: retainedHeaders,
+       media_type: mediaType,

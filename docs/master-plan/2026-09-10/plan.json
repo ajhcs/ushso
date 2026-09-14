@@ -3,7 +3,7 @@
   "date": "2026-09-10",
   "status": "proposed_not_implemented",
   "mission": "Help humans and AI find, understand and obtain tested routes to US health-systems data.",
-  "source_sha256": "34d5385fcd01985650221ded8a0ee9538af24b6bec9628dc87883f020728a561",
+  "source_sha256": "66064210b6698dd3813320a5ba9844f52c10ad1accb041b73b3c6f34158df4d7",
   "requirements": [
     {
       "id": "R01",
@@ -235,7 +235,8 @@
       "prs": [
         "PR-010",
         "PR-011",
-        "PR-012"
+        "PR-012",
+        "PR-087"
       ]
     },
     {
@@ -1108,36 +1109,48 @@
         "F32"
       ],
       "files": [
-        "packages/ingestion/",
-        "services/scheduler-worker/",
-        "services/harvest-worker/",
-        "tests/research-program/job-lifecycle.test.mjs"
+        "packages/ingestion/src/collection-job.mjs",
+        "packages/ingestion/src/local-collection-store.mjs",
+        "packages/ingestion/src/local-collector-adapter.mjs",
+        "packages/ingestion/src/local-job-cli.mjs",
+        "packages/ingestion/src/local-fixture-catalog.mjs",
+        "packages/ingestion/package.json",
+        "packages/ingestion/README.md",
+        "tests/research-program/job-lifecycle.test.mjs",
+        "scripts/research/refresh.mjs",
+        "tests/research-automation.test.mjs",
+        "verification/research-program/pr-010/",
+        "docs/research-program/handoffs/PR-010.json",
+        "packages/connectors/src/capture-protocol.mjs",
+        "packages/connectors/tests/contracts.test.mjs"
       ],
       "outcome": "Bounded collection jobs resume safely and have durable outcomes.",
       "commits": [
         {
           "id": "C-010-1",
           "subject": "Add a collection job specification",
-          "instructions": "Reuse ingestion run/outbox/lease primitives and add source ID, exact configuration hash, selected record IDs, capture class and budget reservation. Keep scheduling separate from execution.",
+          "instructions": "Reuse ingestion run/outbox/lease primitives and add source ID, exact configuration hash, selected record IDs, capture class and budget reservation. Keep scheduling separate from execution. Adopt the exact v3 resolver and separate child-job identity contracts in verification/research-program/bootstrap/pr010-interface-adoption-20260912/proposal-v3/proposal.json (SHA256 0a6184f9da889e019439562c2de94850bf97ca85e7b8b3c85e0ab2b49a126409). Verify approved source/revision/route and ushso-canonical-json.v1 descriptor digest before admission or effects; reuse existing scheduler identity unchanged, with one connector repository per child. The ten named implementation/test paths replace the former broad directories; task evidence and handoff remain owned.",
           "verification": "Duplicate schedule deliveries create one logical job; changing configuration produces a distinct job identity."
         },
         {
           "id": "C-010-2",
           "subject": "Implement the collector port adapter",
-          "instructions": "Connect existing research collector entry points through injected storage/network/clock ports. Checkpoint after bounded units and close database work between steps.",
+          "instructions": "Connect existing research collector entry points through injected storage/network/clock ports. Checkpoint after bounded units and close database work between steps. Adopt the same v3 actual refresh.capture integration, durable whole-transaction journal and strict result/Map/byte codec; keep shared poison, child/parent recovery, durable intent/reservation/response ordering, unknown-intent partial_unresolved, cancellation/deadline fences and fresh-process replay. Add only the capture clock and paired locatorPolicy/explicit own callable fetchImpl seam, defaulting to unchanged metadataUrl. Use exactly source_fixture_catalog, catalog.example.gov and /data.json with its bounded cursor; preserve actual 304 null-body handling. Keep observation/recorded/governor clocks separate and in-memory governor state explicitly non-durable. The later exact cursor amendment in verification/research-program/bootstrap/pr010-cursor-interface-adoption-20260912/decision.json owns only packages/connectors/src/capture-protocol.mjs and packages/connectors/tests/contracts.test.mjs: omit query/userinfo/fragment only from the public capture-reference locator; preserve query-sensitive request/capture identity and compiled/final coherence, global redactedLocator and all released validators. Retain strict cursor positive/negative, unchanged no-query and 304 provenance controls.",
           "verification": "Interrupt after a successful capture and resume without duplicate source requests or losing the capture reference."
         },
         {
           "id": "C-010-3",
           "subject": "Expose dry-run and local execution commands",
-          "instructions": "Add a CLI that lists selected jobs and estimated limits before running. Emit terminal statuses and resumable checkpoint locations.",
+          "instructions": "Add a CLI that lists selected jobs and estimated limits before running. Emit terminal statuses and resumable checkpoint locations. Adopt the exact fixed-fixture preview/run/resume/status CLI and package-local job:preview/job:fixture scripts from the v3 proposal. Preview performs no file writes; mutating fixture execution requires the OS-held lock. Preserve frozen connectors/WP5, ingestion contracts, SQL/grants, root package/lockfile, all service compositions and disabled live/managed/paid/production boundaries. Retain all 36 planned implementation test groups; the earlier 15/15 compatibility probe is not implementation acceptance. Preserve frozen WP5 and all connector bytes except the exact two-file cursor amendment adopted above; that later amendment controls the earlier connector-exclusion wording.",
           "verification": "An intern can run a fixture job through selected, running, partial and complete states; production composition stays disabled."
         }
       ],
       "acceptance": [
         "No process crash can convert an uncompleted job into successful coverage.",
         "Each attempt has one durable outcome and exact configuration identity.",
-        "For this bounded fixture-only engineering scope, consume an actual merged and integrated PR009 policy/receipt interface with independent C-009-2/C-009-3 acceptance, exact artifact hashes, canonical descriptor hash basis ushso-canonical-json.v1 and an explicit still-unresolved C-009-1 qualification record. Bind the actual PR009 component merge SHA and separate integration identity against the live ledger and ancestry. A producer head, null SHA, passing handoff parser or unknown-state documentation check is insufficient. Before dispatch, review the exact accepted dependency interfaces and resolve the pending descriptor-hash resolver and CLI ownership contracts; this amendment selects no signature, module path, package script or implementation contract. It enables no live collection, managed persistence, paid inference, sample storage or production composition and grants no general readiness to other PR009 consumers."
+        "For this bounded fixture-only engineering scope, consume an actual merged and integrated PR009 policy/receipt interface with independent C-009-2/C-009-3 acceptance, exact artifact hashes, canonical descriptor hash basis ushso-canonical-json.v1 and an explicit still-unresolved C-009-1 qualification record. Bind the actual PR009 component merge SHA and separate integration identity against the live ledger and ancestry. A producer head, null SHA, passing handoff parser or unknown-state documentation check is insufficient. Before dispatch, review the exact accepted dependency interfaces and resolve the pending descriptor-hash resolver and CLI ownership contracts; this amendment selects no signature, module path, package script or implementation contract. It enables no live collection, managed persistence, paid inference, sample storage or production composition and grants no general readiness to other PR009 consumers.",
+        "Controller interface adoption on 2026-09-12 selects the exact signatures, module names, ten owned implementation/test paths and 36 planned test groups in verification/research-program/bootstrap/pr010-interface-adoption-20260912/proposal-v3/proposal.json (SHA256 0a6184f9da889e019439562c2de94850bf97ca85e7b8b3c85e0ab2b49a126409), independently reviewed and adopted in verification/research-program/bootstrap/pr010-interface-adoption-20260912/controller/root-interface-adoption.json. This resolves only the previous PR010 pending-interface choice; preserve that prior amendment as history. Bind source base 50a844d218600f95c13e64c2db64ab4d8562ae0d and actual PR009 component/integration merge 80996a8d3c00792d8abb8946a67a69e0400f621a against the live ledger and ancestry. Controller plan/ledger/adoption metadata is excluded from producer ownership. C-009-1 remains unresolved; no R01-R16 acceptance, general consumer readiness, live collection, managed persistence, paid inference, sample storage or production activation is granted. Source work begins only after root applies and validates the exact controller metadata/task binding; implementation checks and independent review remain pending.",
+        "The cursor amendment supersedes only the two-file connector exclusion. Frozen WP5 v1.0 remains unchanged and its expected stale fingerprint failure is retained. Complete focused source review first; an isolated component merge remains conditional on exact adoption of the provisional earlier PR087 current-technical successor and separately reviewed PR086 lock continuation. No research integration, PR011 readiness, R acceptance or release qualification before the exact combined candidate passes independent review, full local gate and hosted CI. All future merge identities remain null until observed."
       ],
       "owner_role": "Luna Max, Grok or DeepSeek; assign one owner at dispatch",
       "reviewer_role": "Astra; named human domain/owner decision when required",
@@ -1145,7 +1158,9 @@
       "evidence_directory": "verification/research-program/pr-010/",
       "verification_scope": "Use the existing affected package tests plus the specific fixtures described below. Add meaningful regression/integration tests for behavior changes; documentation-only commits use link, schema or artifact checks. Full npm test/build/cf:dry-run run at the integration/release gate.",
       "check_commands": [
-        "node --test tests/research-program/job-lifecycle.test.mjs"
+        "node --test tests/research-program/job-lifecycle.test.mjs",
+        "node --test tests/research-automation.test.mjs",
+        "node --test packages/connectors/tests/contracts.test.mjs"
       ]
     },
     {
@@ -1155,7 +1170,8 @@
       "title": "Validate HTTP content and source access outcomes",
       "dependencies": [
         "PR-009",
-        "PR-010"
+        "PR-010",
+        "PR-087"
       ],
       "requirements": [
         "R03"
@@ -1165,9 +1181,13 @@
         "F13"
       ],
       "files": [
-        "packages/connectors/src/",
+        "packages/connectors/src/content-classifier.mjs",
+        "packages/connectors/src/bounded-http-client.mjs",
+        "packages/connectors/src/pinned-streaming-transport.mjs",
         "scripts/research/document-integrity.mjs",
-        "tests/research-program/http-outcomes.test.mjs"
+        "tests/research-program/http-outcomes.test.mjs",
+        "verification/research-program/pr-011/",
+        "docs/research-program/handoffs/PR-011.json"
       ],
       "outcome": "Normal source failures are correctly typed and do not contaminate metadata.",
       "commits": [
@@ -1192,7 +1212,8 @@
       ],
       "acceptance": [
         "200 alone never proves payload access.",
-        "Bounded failures retain actionable context without credentials or full private bodies."
+        "Bounded failures retain actionable context without credentials or full private bodies.",
+        "Offline/local HTTP/content/resource-role classification and separate latest-attempt/last-good evidence using actual accepted PR009 engineering and PR010 ports. Original R03 outcomes and unresolved C0091 remain. Require actual accepted PR010/PR087 group identities and independent review of exact durable failed-attempt interfaces. The five named behavior/test files are the current proposal; any necessary ingestion path/API needs a separate narrow ownership amendment before editing. Do not guess exports, add a second journal or claim memory durability."
       ],
       "owner_role": "Luna Max, Grok or DeepSeek; assign one owner at dispatch",
       "reviewer_role": "Astra; named human domain/owner decision when required",
@@ -5413,7 +5434,8 @@
         "PR-080",
         "PR-081",
         "PR-085",
-        "PR-086"
+        "PR-086",
+        "PR-087"
       ],
       "requirements": [
         "R16"
@@ -5451,7 +5473,8 @@
       "acceptance": [
         "The release evidence includes all R01\u2013R16 statuses and independent reviewer identity.",
         "A release-gate failure is repaired and requalified, not waived by regenerating a receipt.",
-        "Full program/release qualification must explicitly evaluate PR009/C-009-1. Merged/integrated engineering with unresolved measured-topology qualification is not a pass. Consume the exact independent cost/capacity/recovery/rights decision and applicable authorization; reject unresolved required qualification rather than counting engineering dependency integration as full acceptance. Preserve all R01-R16 thresholds and denominators."
+        "Full program/release qualification must explicitly evaluate PR009/C-009-1. Merged/integrated engineering with unresolved measured-topology qualification is not a pass. Consume the exact independent cost/capacity/recovery/rights decision and applicable authorization; reject unresolved required qualification rather than counting engineering dependency integration as full acceptance. Preserve all R01-R16 thresholds and denominators.",
+        "Consume the actual accepted PR010/PR087 composition and separately reviewed exact PR086 H087-lock continuation, with current technical WP5 evidence, full exact local gate and hosted CI. Component-only merges, old PASS receipts, unknown locks or unresolved required C0091 qualification do not meet release acceptance. Preserve every original R01-R16 threshold and historical approval."
       ],
       "owner_role": "Astra",
       "reviewer_role": "Astra verifies the final candidate; a separate reviewer or owner reviews any substantive code Astra authored",
@@ -5701,6 +5724,83 @@
         "node scripts/verify-wp11-attestation.mjs",
         "node scripts/run-contract-suites.mjs --suite wp11"
       ]
+    },
+    {
+      "id": "PR-087",
+      "phase": "P2",
+      "subphase": "2A",
+      "title": "Add complete WP5 current technical verification with preserved historical evidence",
+      "dependencies": [
+        "PR-010"
+      ],
+      "requirements": [
+        "R03",
+        "R16"
+      ],
+      "findings": [
+        "F03",
+        "F13",
+        "F32"
+      ],
+      "files": [
+        "verification/wp5/v1.1.0/README.md",
+        "verification/wp5/v1.1.0/evidence-ledger.json",
+        "verification/wp5/v1.1.0/package.json",
+        "verification/wp5/v1.1.0/receipts/activation-status.json",
+        "verification/wp5/v1.1.0/receipts/delivery-wave-fixtures.json",
+        "verification/wp5/v1.1.0/receipts/fixture-matrix.json",
+        "verification/wp5/v1.1.0/receipts/legacy-lane-parity.json",
+        "verification/wp5/v1.1.0/receipts/r2-capture-protocol.json",
+        "verification/wp5/v1.1.0/receipts/request-capture-reconciliation.json",
+        "verification/wp5/v1.1.0/receipts/zero-payload-proof.json",
+        "verification/wp5/v1.1.0/tests/wp5-verification.test.mjs",
+        "verification/wp5/v1.1.0/tools/common.mjs",
+        "verification/wp5/v1.1.0/tools/validate-wp5.mjs",
+        "verification/wp5/v1.1.0/receipts/v1.0-package-pins.json",
+        "verification/wp5/v1.1.0/receipts/current-subject-policy.json",
+        "verification/wp5/v1.1.0/tests/current-technical.test.mjs",
+        "package-lock.json",
+        "verification/research-program/pr-087/",
+        "docs/research-program/handoffs/PR-087.json"
+      ],
+      "outcome": "Current connector controls execute against an explicit bounded semantic subject without inheriting historical approval.",
+      "commits": [
+        {
+          "id": "C-087-1",
+          "subject": "Add the complete current technical WP5 package",
+          "instructions": "Start only from actual independently reviewed component merge M010, not producer H010 or transport metadata. Add all sixteen declared v1.1 files as a runnable private package @ushso/verification-wp5-v1-1 version1.1.0 with Node >=22.15.0, unchanged test/validate script shapes, and only its two exact workspace/link lock entries. Preserve all thirteen frozen v1.0 files and the original connector fingerprint algorithm. Follow verification/research-program/bootstrap/pr087-current-technical-adoption-20260912/current-subject-policy.json. Retained old receipt results are historical references, never current PASS.",
+          "verification": "The root latest-suite discovery selects the complete v1.1 package without root runner/package edits. Historical file pins match; current real controls run with no skipped required cases or external actions."
+        },
+        {
+          "id": "C-087-2",
+          "subject": "Verify current semantic inputs and actual connector controls",
+          "instructions": "Implement the bounded source/module/package inventory and builtin-only preload in tools/common.mjs. Execute all five connector test files with the exact 40 original plus 8 current cursor mandatory cases, all newly discovered cases, and unchanged validate-package.mjs controls. Add meaningful subject, traversal, bounds, module/lock/CJS/JSON, missing/skipped-case, stale-history and approval-overclaim regressions in the declared current-technical test. Require actual M010 source/fixture bindings; preserve strict validators and all disabled activation boundaries.",
+          "verification": "Each relevant source, policy, schema, fixture, verifier, loaded dependency, Node/runtime or lock change changes the current unapproved subject or fails the declared bound. Uncovered modules and altered historical pins reject; current outputs never issue or transfer approval."
+        },
+        {
+          "id": "C-087-3",
+          "subject": "Retain the current technical evidence and correction input",
+          "instructions": "Retain exact source versus metadata heads, M010/tree/parents and source/fixture origins, deterministic current manifests and actual commands/leaf results outside the sixteen sealed files. Freeze H087 and its exact lock for independent review before the separately owned PR086 correction. Retain the expected old WP11 unknown-lock failure; no joint-gate prerequisite is invented for preparing its correction. Complete default live-ledger handoff without context substitution.",
+          "verification": "All evidence pins resolve; actual H087 lock has exactly the two approved additions and unchanged prior content. Root independently reviews, composes and qualifies the exact group; no producer, component or technical PASS is called research integration or release acceptance."
+        }
+      ],
+      "acceptance": [
+        "Preserve every frozen v1.0 byte and original direct stale rejection. Execute all actual current controls, with exact source/fixture/runtime/lock evidence and no historical PASS copy or approval transfer.",
+        "Package ownership is exactly sixteen v1.1 files, two new lock entries, task evidence and handoff. Root package/runner, connector/ingestion behavior, frozen contracts and all historical WP11 records remain outside this assignment.",
+        "After independent root review of the final exact PR010 source and controller adoption of this graph/policy, root may create one real no-ff PR010 component merge M010 on an isolated assembly branch. Retain focused tests, live handoff and the exact expected frozen-WP5 stale-fingerprint result. This exception covers only that known verifier mismatch; it does not waive unrelated failures, count research integration, enable PR011 dispatch or issue release/R acceptance. PR087 consumes actual M010; its reviewed H087 lock enables only the separate PR086 correction. The final exact PR010+PR087+PR086 composition must pass independent review, full local gate and hosted CI before research integration and actual acceptance identities are recorded."
+      ],
+      "owner_role": "Luna Max, Grok or DeepSeek; assign one owner at dispatch",
+      "reviewer_role": "Astra; named human domain/owner decision when required",
+      "status": "planned",
+      "evidence_directory": "verification/research-program/pr-087/",
+      "verification_scope": "Use the existing affected package tests plus the specific fixtures described below. Add meaningful regression/integration tests for behavior changes; documentation-only commits use link, schema or artifact checks. Full npm test/build/cf:dry-run run at the integration/release gate.",
+      "check_commands": [
+        "node --test verification/wp5/v1.1.0/tests/wp5-verification.test.mjs",
+        "node --test verification/wp5/v1.1.0/tests/current-technical.test.mjs",
+        "npm test --prefix verification/wp5/v1.1.0",
+        "npm run validate --prefix verification/wp5/v1.1.0",
+        "node scripts/run-contract-suites.mjs --suite wp5"
+      ]
     }
   ],
   "terminal_pr": "PR-084",
@@ -5730,6 +5830,16 @@
       "reason": "Retain all 154 original sealed input preimages portably and verify current bytes in a separate pending technical subject, preserving historical approval and every current execution gate.",
       "independent_design_review_sha256": "15aa02045e670ad67ba087114292328e1d034be3e8f2d8265eaec8a47a09fc39",
       "controller_preimage_audit": "verification/research-program/bootstrap/wp11-plan-and-pr007-r2-review-20260911/wp11-historical-preimages-controller-audit.json"
+    },
+    {
+      "id": "PR-087",
+      "parent_pr": "PR-010",
+      "kind": "bounded_wp5_current_technical_successor",
+      "trigger": "The approved-query cursor capture-reference correction needed by PR010 changes the frozen WP5 connector fingerprint before PR011.",
+      "reason": "Add complete current technical verification and a separately reviewed exact PR086 lock continuation while preserving historical evidence and all final integration gates.",
+      "controller_proposal": "verification/research-program/bootstrap/pr087-current-technical-adoption-20260912/proposal.json",
+      "feasibility_review_sha256": "77cc4da44c67821de5ebb3a73fc7df035cbe6617b4bc9cad0433de164e738df9",
+      "independent_controller_adoption_required": true
     }
   ]
 }

@@ -103,3 +103,308 @@ test('request/capture reconciliation audit proves zero prohibited capture', asyn
   assert.equal(audit.healthcare_row_captures, 0);
   assert.equal(audit.prohibited_capture_classifications, 0);
 });
+import { R2CaptureProtocol } from '../src/capture-protocol.mjs';
+import { compileManifestRequest, redactedLocator } from '../src/route-manifest.mjs';
+import { connectorRequestKey } from '../src/runner.mjs';
+const validateIngestionRecord = validateIngestionV10;
+const OBS = '2026-09-12T12:00:00.000Z';
+const BASE = 'https://catalog.example.gov/data.json';
+const descriptor = validateDescriptor(
+  makeFixtureDescriptor({
+    maximumPages: 2,
+    maximumResponseBytes: 4096,
+    maximumDecompressedBytes: 4096,
+    maximumRedirects: 0,
+    redirectPolicy: 'deny'
+  })
+);
+const request = (query = {}) => ({
+  endpointId: 'endpoint_fixture_catalog',
+  templateId: 'route_fixture_catalog',
+  purpose: 'catalog_metadata',
+  method: 'GET',
+  targetClass: 'collection',
+  pathParameters: {},
+  query
+});
+function harness({ strict = true, clock = () => new Date(OBS) } = {}) {
+  const h = makeHarness({ descriptor, clock });
+  h.validationResults = [];
+  h.fetches = [];
+  const originalCommit = h.referenceStore.commit.bind(h.referenceStore);
+  h.referenceStore.commit = async (reference) => {
+    const result = await validateIngestionRecord('capture-reference.schema.json', reference);
+    h.validationResults.push({ reference: structuredClone(reference), validation: result });
+    if (strict && !result.valid)
+      throw Object.assign(new Error('STRICT_CAPTURE_REFERENCE_REJECTED'), {
+        code: 'STRICT_CAPTURE_REFERENCE_REJECTED'
+      });
+    return originalCommit(reference);
+  };
+  h.captureProtocol = new R2CaptureProtocol({
+    objectStore: h.objectStore,
+    referenceStore: h.referenceStore,
+    clock
+  });
+  h.client.captureProtocol = h.captureProtocol;
+  const execute = h.client.execute.bind(h.client);
+  h.client.execute = async (context) => {
+    const result = await execute(context);
+    h.fetches.push(structuredClone(result));
+    if (result.metadataFetch)
+      assert.deepEqual(
+        await validateIngestionRecord('metadata-fetch.schema.json', result.metadataFetch),
+        { valid: true, issues: [] }
+      );
+    return result;
+  };
+  h.connector = new DcatDataJsonConnector({
+    descriptor,
+    endpointId: 'endpoint_fixture_catalog',
+    templateId: 'route_fixture_catalog'
+  });
+  return h;
+}
+function twoPages(h) {
+  h.transport.add(
+    'GET',
+    BASE,
+    jsonResponse(
+      {
+        dataset: [
+          { identifier: 'fixture-a', title: 'Fixture A', modified: '2026-09-10T00:00:00.000Z' }
+        ],
+        next_cursor: 'page-2'
+      },
+      { etag: '"fixture-page-1"' }
+    )
+  );
+  h.transport.add(
+    'GET',
+    BASE + '?cursor=page-2',
+    jsonResponse(
+      {
+        dataset: [
+          { identifier: 'fixture-b', title: 'Fixture B', modified: '2026-09-11T00:00:00.000Z' }
+        ]
+      },
+      { etag: '"fixture-page-2"' }
+    )
+  );
+}
+async function execute(h, q = {}, runId = 'run_locator_capture', jobId = 'job_locator_capture') {
+  return h.client.execute({
+    descriptor,
+    runId,
+    jobId,
+    request: request(q),
+    responseProfile: h.connector.responseProfile()
+  });
+}
+async function oneCapture(q = {}) {
+  const h = harness();
+  const url = compileManifestRequest(descriptor, request(q)).url.href;
+  h.transport.add('GET', url, jsonResponse({ dataset: [{ identifier: 'same', title: 'Same' }] }));
+  const result = await execute(h, q);
+  assert.equal(result.outcome, 'captured');
+  return { h, result };
+}
+
+test('strict reference store rejects the historical query-bearing reference before commit', async () => {
+  const h = harness();
+  twoPages(h);
+  const first = await execute(h);
+  const tampered = structuredClone(first.capture);
+  tampered.source_locator.redacted_locator = BASE + '?cursor=page-2';
+  const before = h.referenceStore.commitCalls.length;
+  await assert.rejects(h.referenceStore.commit(tampered), {
+    code: 'STRICT_CAPTURE_REFERENCE_REJECTED'
+  });
+  assert.equal(h.referenceStore.commitCalls.length, before);
+  assert.equal(h.referenceStore.references.size, 1);
+});
+
+test('public capture locator completes the real two-page runner with strict capture and checkpoint records', async () => {
+  const h = harness();
+  twoPages(h);
+  const run = await h.runner.run({
+    connector: h.connector,
+    runId: 'run_prototype_two_page',
+    scheduledSlot: OBS,
+    mode: 'full_membership'
+  });
+  assert.equal(run.outcome, 'succeeded');
+  assert.equal(run.checkpointCommitted, true);
+  assert.equal(run.seal.pagesCommitted, 2);
+  assert.deepEqual(
+    run.seal.observations.map((x) => x.nativeId),
+    ['fixture-a', 'fixture-b']
+  );
+  assert.deepEqual(await validateIngestionRecord('checkpoint.schema.json', run.checkpoint), {
+    valid: true,
+    issues: []
+  });
+  assert.equal(h.referenceStore.references.size, 2);
+  assert.ok(h.validationResults.every((x) => x.validation.valid));
+  assert.deepEqual(
+    [...h.referenceStore.references.values()].map((x) => x.source_locator.redacted_locator),
+    [BASE, BASE]
+  );
+  assert.deepEqual(
+    h.requestLedger.records.map((x) => x.redacted_locator),
+    [BASE, BASE + '?cursor=page-2']
+  );
+});
+
+test('same body and clocks retain baseline query-sensitive capture and request identities', async () => {
+  const h = harness(),
+    values = ['page-2', 'page-3'],
+    captures = [];
+  for (const cursor of values) {
+    h.transport.add(
+      'GET',
+      BASE + '?cursor=' + cursor,
+      jsonResponse({ dataset: [{ identifier: 'same', title: 'Same' }] })
+    );
+    captures.push(
+      (await execute(h, { cursor }, 'run_identity_equal', 'job_identity_equal')).capture
+    );
+  }
+  assert.equal(captures[0].raw_sha256, captures[1].raw_sha256);
+  assert.deepEqual(captures[0].clocks, captures[1].clocks);
+  // Exact values observed from the accepted pre-amendment implementation.
+  assert.deepEqual(
+    captures.map((x) => x.capture_ref_id),
+    ['capture_09f6988222e703a5bed883b58fdf9442', 'capture_8d9cd9b349185899d2656bcaa03deeb7']
+  );
+  assert.deepEqual(
+    h.requestLedger.records.map((x) => x.request_id),
+    ['request_7d27d70fec3410ae146c076c4d623743', 'request_59a2524f2dc8cf60541cf6ba40da73ee']
+  );
+  assert.equal(h.objectStore.objects.size, 1);
+  assert.equal(h.referenceStore.references.size, 2);
+  assert.notEqual(
+    connectorRequestKey(request({ cursor: 'page-2' })),
+    connectorRequestKey(request({ cursor: 'page-3' }))
+  );
+  assert.equal(redactedLocator(BASE + '?cursor=page-2'), BASE + '?cursor=page-2');
+});
+
+test('wrong final query remains rejected before object or reference writes', async () => {
+  {
+    const h = harness();
+    const compiled = compileManifestRequest(descriptor, request({ cursor: 'page-2' }));
+    await assert.rejects(
+      h.captureProtocol.capture({
+        descriptor,
+        runId: 'run_wrong_final',
+        compiledRequest: compiled,
+        finalUrl: BASE + '?cursor=page-3',
+        headers: new Headers({ 'content-type': 'application/json' }),
+        bodyBytes: new TextEncoder().encode('{}'),
+        observedAt: OBS
+      }),
+      (error) => error.safeDetailCode === 'CAPTURE_FINAL_URL_MISMATCH'
+    );
+    assert.equal(h.objectStore.putCalls.length, 0);
+    assert.equal(h.referenceStore.commitCalls.length, 0);
+  }
+});
+
+test('no-query capture retains its baseline observation identity and locator', async () => {
+  const { h, result } = await oneCapture();
+  assert.equal(result.capture.capture_ref_id, 'capture_f212d1fe1ec41e0da1584552d26d2d19');
+  assert.equal(result.capture.source_locator.redacted_locator, BASE);
+  assert.equal(h.requestLedger.records[0].redacted_locator, BASE);
+  assert.deepEqual(await validateIngestionRecord('capture-reference.schema.json', result.capture), {
+    valid: true,
+    issues: []
+  });
+});
+
+test('public projection contains no userinfo, query or fragment without changing query-sensitive identity', async () => {
+  const h = harness();
+  const compiled = compileManifestRequest(descriptor, request({ cursor: 'page-2' }));
+  const reference = await h.captureProtocol.capture({
+    descriptor,
+    runId: 'run_public_projection',
+    compiledRequest: compiled,
+    finalUrl:
+      'https://fixture-user:fixture-value@catalog.example.gov/data.json?cursor=page-2#fixture-fragment',
+    headers: new Headers({ 'content-type': 'application/json' }),
+    bodyBytes: new TextEncoder().encode('{}'),
+    observedAt: OBS
+  });
+  assert.equal(reference.source_locator.redacted_locator, BASE);
+  assert.deepEqual(await validateIngestionRecord('capture-reference.schema.json', reference), {
+    valid: true,
+    issues: []
+  });
+});
+
+test('released strict validator still rejects a tampered query-bearing public reference', async () => {
+  const { result } = await oneCapture();
+  const tampered = structuredClone(result.capture);
+  tampered.source_locator.redacted_locator = BASE + '?cursor=page-2';
+  const check = await validateIngestionRecord('capture-reference.schema.json', tampered);
+  assert.equal(check.valid, false);
+  assert.ok(check.issues.some((x) => x.code === 'CAPTURE_LOCATOR_SECRET_RISK'));
+});
+
+test('two-page 304 reuse still uses full request keys and original capture references', async () => {
+  const h = harness();
+  twoPages(h);
+  const firstId = 'run_before_304';
+  const nextId = 'run_after_304';
+  const first = await h.runner.run({
+    connector: h.connector,
+    runId: firstId,
+    scheduledSlot: OBS,
+    mode: 'full_membership'
+  });
+  assert.equal(first.outcome, 'succeeded');
+  const refsBefore = structuredClone([...h.referenceStore.references.values()]);
+  const pages = [...h.runRepository.runs.get(firstId).pages.values()];
+  for (const page of pages) {
+    assert.equal(page.pageKey, connectorRequestKey(page.request));
+    const ref = h.referenceStore.references.get(page.captureRefId);
+    h.runRepository.setConditional(nextId, page.pageKey, {
+      validators: { etag: ref.safe_response_headers.etag },
+      priorCaptureRefId: ref.capture_ref_id
+    });
+    h.transport.add(
+      'GET',
+      compileManifestRequest(descriptor, page.request).url.href,
+      jsonResponse(null, { status: 304, bodyBytes: '', contentLength: 0 })
+    );
+  }
+  const second = await h.runner.run({
+    connector: h.connector,
+    runId: nextId,
+    scheduledSlot: OBS,
+    mode: 'full_membership',
+    checkpoint: first.checkpoint
+  });
+  assert.equal(second.outcome, 'succeeded');
+  assert.equal(second.seal.pagesCommitted, 2);
+  assert.deepEqual([...h.referenceStore.references.values()], refsBefore);
+  assert.equal(h.referenceStore.commitCalls.length, 2);
+  const reused = h.fetches.slice(2);
+  assert.equal(reused.length, 2);
+  assert.ok(
+    reused.every(
+      (x) =>
+        x.outcome === 'not_modified' &&
+        x.capture === null &&
+        x.bodyBytes === null &&
+        x.metadataFetch.response_bytes === 0 &&
+        x.metadataFetch.decompressed_bytes === 0
+    )
+  );
+  assert.deepEqual(
+    reused.map((x) => x.metadataFetch.reused_capture_ref_id),
+    pages.map((x) => x.captureRefId)
+  );
+  assert.ok([...h.referenceStore.references.values()].every((x) => x.run_id === firstId));
+  assert.deepEqual(second.seal.observations, first.seal.observations);
+});
