@@ -151,7 +151,7 @@ export function buildResearcherGuidance(dataset: DatasetFamily): ResearcherGuida
   const useCases = record.capabilities.use_cases.filter((item) => item.fitness === 'primary' || item.fitness === 'supporting')
   const topicTags = unique([
     ...((record as { topics?: string[] }).topics ?? []),
-    ...record.capabilities.use_cases.filter((item) => item.fitness === 'contextual' || item.fitness === 'unknown').map((item) => item.label),
+    ...record.capabilities.use_cases.filter((item) => item.fitness === 'context_only' || item.fitness === 'unknown').map((item) => item.label),
   ])
   const documentedBestFor = useCases.filter((item) => Array.isArray(item.evidence_ids) && item.evidence_ids.length > 0)
   const bestForRaw = documentedBestFor.length > 0
