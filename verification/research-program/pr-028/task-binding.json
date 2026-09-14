@@ -1,0 +1,75 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr028-review-queue-20260914",
+  "slice_id": "C-028-1",
+  "pr_id": "PR-028",
+  "title": "Create a review queue for exact claims and conflicts",
+  "owner": "/root/pr028_review_queue",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr028-review-queue-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr028-review-queue-20260914",
+  "objective": "Reviewers see a proposed value, its source and its precise downstream effect.",
+  "outcome": "A reviewer can accept one field while leaving others unresolved. Packet hashes bind the precise values reviewed. Identical evidence is grouped without merging separate source identities. Dispositions are accept, reject, request evidence and supersede. Revised source bytes or changed proposals invalidate stale decisions. Every pending essential field has an owner/next step. The report never describes pending proposals as public facts. A reviewer is never asked to approve an unspecified whole dataset. Evidence validation is independently replayable from each packet. Existing identity-candidate buildReviewQueue behavior is preserved.",
+  "dependencies": [
+    "PR-026",
+    "PR-027"
+  ],
+  "owned_paths": [
+    "packages/identity/src/review-queue.mjs",
+    "packages/enrichment/review-packet.mjs",
+    "docs/research-program/review-rules.md",
+    "tests/research-program/review-queue.test.mjs",
+    "verification/research-program/pr-028/",
+    "docs/research-program/handoffs/PR-028.json"
+  ],
+  "commits": [
+    {
+      "id": "C-028-1",
+      "subject": "Build compact claim review packets",
+      "instructions": "Show before/after values, exact release/context, cited passage, parser/model version, disagreements and affected products/examples. Group identical evidence without merging separate source identities.",
+      "verification": "A reviewer can accept one field while leaving others unresolved; packet hashes bind the precise values reviewed."
+    },
+    {
+      "id": "C-028-2",
+      "subject": "Add recorded dispositions",
+      "instructions": "Support accept, reject, request evidence and supersede with reviewer identity and rationale. Give scientific units, denominators, grain and identity conflicts higher review priority.",
+      "verification": "Revised source bytes or changed proposals invalidate stale decisions instead of inheriting approval."
+    },
+    {
+      "id": "C-028-3",
+      "subject": "Expose queue and turnaround metrics",
+      "instructions": "Report queue age, cause, priority-cohort blockers and accepted/rejected counts. Route factual owner disclosures separately from source-document interpretation.",
+      "verification": "Every pending essential field has an owner/next step; the report never describes pending proposals as public facts."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/review-queue.test.mjs",
+    "node --test tests/research-program/claim-validation.test.mjs",
+    "node --test packages/identity/test/review-projection-family.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-028.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-028/",
+  "binding": {
+    "base_sha": "ef63413fa1d3e13e2cfbd180962df2090be07f80",
+    "base_tree": "37521afd4c5198bbeee5bb1c596dd03aa4e5c4fb",
+    "dependency_merge_shas": {
+      "PR-026": "d50de58bbb834d3924a3a223e14a3444a420611a",
+      "PR-027": "62fc8514c508c1876f2435c03aee8bee3659d825"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
