@@ -9,7 +9,7 @@ export function SourceSummary({ dataset }: { dataset: DatasetFamily }) {
   const metadata = dataset.canonicalResult.metadata
   const hcris = record.record_id === HCRIS_HOSPITAL_COST_REPORT_ID
   const cost = metadata?.access?.cost_state ?? 'unknown'
-  const quota = metadata?.access?.usage_limit_state ?? 'unknown'
+  const quota = 'unknown'
   const lastSuccessful = dataset.verification.lastSuccessfulMetadataCheck
   const payloadState = !dataset.verification.payloadCheckState || dataset.verification.payloadCheckState === 'not_attempted'
     ? 'Not attempted'
