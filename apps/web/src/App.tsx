@@ -4,6 +4,7 @@ import { AboutPage } from './pages/AboutPage'
 import { ContactPage } from './pages/ContactPage'
 import { DatasetDetailsPage } from './pages/DatasetDetailsPage'
 import { LandingPage } from './pages/LandingPage'
+import { LearnPage } from './pages/LearnPage'
 import { PlanPage } from './pages/PlanPage'
 import { MethodsPage } from './pages/MethodsPage'
 import { SearchResultsPage } from './pages/SearchResultsPage'
@@ -16,6 +17,7 @@ export default function App() {
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/learn" element={<LearnPage />} />
         <Route path="/search" element={<SearchResultsPage />} />
         <Route path="/agents" element={<AgentsPage />} />
         <Route path="/plan" element={<PlanPage />} />

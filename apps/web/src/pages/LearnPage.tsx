@@ -1,0 +1,54 @@
+import { Link } from 'react-router-dom'
+import { ObservatoryFooter } from '../components/ObservatoryFooter'
+import { ObservatoryHeader } from '../components/ObservatoryHeader'
+import { PageTitle } from '../components/PageTitle'
+
+export const CURRENT_GENERATION = 'live-2026-09-03-85b50522b420'
+
+const destinations = [
+  { question: 'Where do I browse sources?', href: '/search', label: 'Explore', example: 'Search CMS HCRIS hospital cost-report metadata.' },
+  { question: 'What is currently indexed?', href: '/sources', label: 'Coverage', example: 'Inspect generation ' + CURRENT_GENERATION + ' coverage and known gaps.' },
+  { question: 'Who operates this and what is in scope?', href: '/about', label: 'About', example: 'Read operator, scope, and disclosure statements.' },
+  { question: 'How do agents call the same evidence?', href: '/agents', label: 'Developers', example: 'Use the eight read-only inspection tools. plan_research stays disabled.' },
+] as const
+
+export function LearnPage() {
+  return (
+    <div className="information-page">
+      <PageTitle label="Learn how to use USHSO" />
+      <ObservatoryHeader compact />
+      <main id="main-content" className="information-page__main">
+        <header className="information-page__heading">
+          <p>Learn</p>
+          <h1>Finding a source is not obtaining the data.</h1>
+          <p>USHSO helps you inspect published metadata and documented access routes. A successful page load, search result, or tool envelope is not a completed research task. Restricted files still require the publisher’s process.</p>
+        </header>
+
+        <section aria-labelledby="learn-destinations-heading">
+          <h2 id="learn-destinations-heading">Choose a starting route</h2>
+          <ul className="learn-destinations">
+            {destinations.map((item) => (
+              <li key={item.href}>
+                <p>{item.question}</p>
+                <Link to={item.href}>{item.label}</Link>
+                <p>{item.example}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section id="restricted-data" aria-labelledby="learn-restricted-heading">
+          <h2 id="learn-restricted-heading">Public, keyed, and restricted access</h2>
+          <p>Public CMS catalog pages can be opened without a USHSO login. Census metadata may name an API key that you hold. HCUP research files remain a restricted application route. USHSO does not collect eligibility or credentials, and it does not retrieve those files.</p>
+        </section>
+
+        <section aria-labelledby="learn-disabled-heading">
+          <h2 id="learn-disabled-heading">Disabled features stay off the primary path</h2>
+          <p>Research-plan compilation is not available yet. The planner is not a primary action from this navigation. Do not treat a disabled <code>plan_research</code> capability as an enabled product.</p>
+          <p><Link to="/learn">Stay on the learning material</Link> or <Link to="/search">explore catalog sources</Link>.</p>
+        </section>
+      </main>
+      <ObservatoryFooter />
+    </div>
+  )
+}
