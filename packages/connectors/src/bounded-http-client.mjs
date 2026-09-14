@@ -122,6 +122,68 @@ function metadataFetchBase(context, compiled, observedAt) {
   };
 }
 
+function locatorProjection(urlInput) {
+  if (!urlInput) return { transmitted: null, historical_query_omitted: null };
+  try {
+    const url = new URL(urlInput);
+    const hadQuery = url.search.length > 0;
+    url.username = '';
+    url.password = '';
+    url.hash = '';
+    url.search = '';
+    return { transmitted: url.toString(), historical_query_omitted: hadQuery };
+  } catch {
+    return { transmitted: null, historical_query_omitted: null };
+  }
+}
+
+function attemptObservation({
+  outcome = null,
+  failure = null,
+  compiled = null,
+  initialCompiled = null,
+  currentUrl = null,
+  status = null,
+  mediaType = null,
+  redirectCount = null,
+  compressedBytes = null,
+  decompressedBytes = null,
+  observedAt = null,
+  classification = null,
+} = {}) {
+  const requested = initialCompiled?.url ?? null;
+  const finalUrl = currentUrl ?? compiled?.url ?? requested;
+  const requestedLoc = locatorProjection(requested);
+  const finalLoc = locatorProjection(finalUrl);
+  const purpose = compiled?.purpose ?? initialCompiled?.purpose ?? null;
+  const evidenceKind = purpose === 'documentation' || purpose === 'access_probe'
+    ? 'documentation_reachability'
+    : purpose === 'catalog_metadata' || purpose === 'schema'
+      ? 'catalog_metadata_validation'
+      : null;
+  return Object.freeze({
+    evidence_kind: evidenceKind,
+    outcome,
+    classification: classification ?? failure?.failure_type ?? null,
+    detail_code: failure?.safe_detail_code ?? null,
+    http_status: Number.isSafeInteger(status) ? status : null,
+    media_type: mediaType ?? null,
+    response_bytes: Number.isSafeInteger(compressedBytes) ? compressedBytes : null,
+    decompressed_bytes: Number.isSafeInteger(decompressedBytes) ? decompressedBytes : null,
+    redirect_count: Number.isSafeInteger(redirectCount) ? redirectCount : null,
+    requested_locator: requestedLoc.transmitted,
+    final_locator: finalLoc.transmitted,
+    historical_query_omitted: finalLoc.historical_query_omitted,
+    observed_at: observedAt ?? null,
+    publication_authorized: false,
+    production_composition: false,
+  });
+}
+
+function withAttemptObservation(result, fields) {
+  return { ...result, attemptObservation: attemptObservation(fields) };
+}
+
 export class BoundedHttpClient {
   constructor({
     transport,
@@ -176,7 +238,7 @@ export class BoundedHttpClient {
         outcome: 'blocked_before_egress', failure_type: failure.failure_type,
         safe_detail_code: failure.safe_detail_code, observed_at: observedAt,
       });
-      return { outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch: null, blockedBeforeEgress: true };
+      return withAttemptObservation({ outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch: null, blockedBeforeEgress: true }, { outcome: 'typed_failure', failure, compiled, initialCompiled: compiled, currentUrl: compiled?.url, observedAt });
     }
 
     const initialCompiled = compiled;
@@ -263,7 +325,7 @@ export class BoundedHttpClient {
           outcome: transportInvoked ? 'typed_failure' : 'blocked_before_egress',
           failure_type: failure.failure_type, safe_detail_code: failure.safe_detail_code, observed_at: observedAt,
         });
-        return { outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch: null, blockedBeforeEgress: !transportInvoked };
+        return withAttemptObservation({ outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch: null, blockedBeforeEgress: !transportInvoked }, { outcome: 'typed_failure', failure, compiled, initialCompiled, currentUrl, observedAt });
       }
 
       const status = response.status;
@@ -335,7 +397,7 @@ export class BoundedHttpClient {
             capture_classification: 'redirect_quarantined', outcome: 'quarantined',
             failure_type: failure.failure_type, safe_detail_code: failure.safe_detail_code, observed_at: observedAt,
           });
-          return { outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch: null, blockedBeforeEgress: false };
+          return withAttemptObservation({ outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch: null, blockedBeforeEgress: false }, { outcome: 'typed_failure', failure, compiled, initialCompiled, currentUrl, status, redirectCount: redirects, compressedBytes: wireBytes.byteLength, decompressedBytes: bodyBytes.byteLength, observedAt });
         }
       }
 
@@ -352,7 +414,7 @@ export class BoundedHttpClient {
         };
         await this.#appendSuccessLedger(context, compiled, currentUrl, requestId, observedAt, 0, 0, null, 'not_modified');
         lease.release({ success: true });
-        return { outcome: 'not_modified', failure: null, capture: null, bodyBytes: null, metadataFetch, blockedBeforeEgress: false };
+        return withAttemptObservation({ outcome: 'not_modified', failure: null, capture: null, bodyBytes: null, metadataFetch, blockedBeforeEgress: false }, { outcome: 'not_modified', compiled, initialCompiled, currentUrl, status: 304, redirectCount: redirects, compressedBytes: 0, decompressedBytes: 0, observedAt });
       }
 
       if (status !== 200 && status !== 204) {
@@ -374,7 +436,7 @@ export class BoundedHttpClient {
           response_bytes: wireBytes.byteLength, decompressed_bytes: bodyBytes.byteLength,
           redirect_count: redirects, observed_at: observedAt,
         };
-        return { outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch, blockedBeforeEgress: false };
+        return withAttemptObservation({ outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch, blockedBeforeEgress: false }, { outcome: 'typed_failure', failure, compiled, initialCompiled, currentUrl, status, redirectCount: redirects, compressedBytes: wireBytes.byteLength, decompressedBytes: bodyBytes.byteLength, observedAt });
       }
 
       if (compiled.method === 'HEAD' || compiled.purpose === 'access_probe') {
@@ -384,11 +446,11 @@ export class BoundedHttpClient {
         }
         await this.#appendSuccessLedger(context, compiled, currentUrl, requestId, observedAt, 0, 0, 'access_status_headers', 'access_observed');
         lease.release({ success: true });
-        return {
+        return withAttemptObservation({
           outcome: 'access_observed', failure: null, capture: null, bodyBytes: null,
           accessObservation: { status, mediaType: mediaTypeFromHeaders(response.headers), observedAt },
           metadataFetch: null, blockedBeforeEgress: false,
-        };
+        }, { outcome: 'access_observed', compiled, initialCompiled, currentUrl, status, mediaType: mediaTypeFromHeaders(response.headers), redirectCount: redirects, compressedBytes: 0, decompressedBytes: 0, observedAt });
       }
 
       let classification;
@@ -427,7 +489,7 @@ export class BoundedHttpClient {
           failure: null, response_bytes: wireBytes.byteLength, decompressed_bytes: bodyBytes.byteLength,
           redirect_count: redirects, observed_at: observedAt,
         };
-        return { outcome: 'captured', failure: null, capture, bodyBytes, parsed: classification.parsed, metadataFetch, blockedBeforeEgress: false };
+        return withAttemptObservation({ outcome: 'captured', failure: null, capture, bodyBytes, parsed: classification.parsed, metadataFetch, blockedBeforeEgress: false }, { outcome: 'captured', compiled, initialCompiled, currentUrl, status, mediaType: mediaTypeFromHeaders(response.headers), redirectCount: redirects, compressedBytes: wireBytes.byteLength, decompressedBytes: bodyBytes.byteLength, observedAt, classification: classification.classification });
       } catch (error) {
         lease.release({ success: false, consumeFailureBudget: true });
         const failure = failureRecord(error, observedAt);
@@ -441,7 +503,7 @@ export class BoundedHttpClient {
           capture_classification: classification.classification, outcome: 'capture_failed',
           failure_type: failure.failure_type, safe_detail_code: failure.safe_detail_code, observed_at: observedAt,
         });
-        return { outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch: null, blockedBeforeEgress: false };
+        return withAttemptObservation({ outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch: null, blockedBeforeEgress: false }, { outcome: 'typed_failure', failure, compiled, initialCompiled, currentUrl, status, redirectCount: redirects, compressedBytes: wireBytes.byteLength, decompressedBytes: bodyBytes.byteLength, observedAt, classification: classification.classification });
       }
     }
   }
@@ -468,7 +530,7 @@ export class BoundedHttpClient {
       decompressed_bytes: Math.min(decompressedBytes, 104_857_600),
       redirect_count: redirects, observed_at: observedAt,
     };
-    return { outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch, blockedBeforeEgress: false, quarantined: true };
+    return withAttemptObservation({ outcome: 'typed_failure', failure, capture: null, bodyBytes: null, metadataFetch, blockedBeforeEgress: false, quarantined: true }, { outcome: 'typed_failure', failure, compiled, initialCompiled, currentUrl, status, mediaType: mediaTypeFromHeaders(new Headers()), redirectCount: redirects, compressedBytes: compressedBytes, decompressedBytes: decompressedBytes, observedAt, classification });
   }
 
   async #appendSuccessLedger(context, compiled, currentUrl, requestId, observedAt, compressedBytes, decompressedBytes, classification, outcome) {

@@ -9,3 +9,9 @@ export async function verifyDocumentCache(receipt,url,read) {
  if(!Array.isArray(parsed.pages)||parsed.parser!==receipt.parser||parsed.version!==receipt.parser_version)throw Error('DOCUMENT_PARSER_IDENTITY');
  return receipt;
 }
+export function verifyRetainedArtifact(bytes, expectedSha256, expectedBytes) {
+  if (!/^[a-f0-9]{64}$/.test(expectedSha256)) throw Error('RETAINED_DIGEST_INVALID');
+  if (hash(bytes) !== expectedSha256) throw Error('RETAINED_ARTIFACT_HASH');
+  if (Number.isSafeInteger(expectedBytes) && bytes.byteLength !== expectedBytes) throw Error('RETAINED_ARTIFACT_SIZE');
+  return { sha256: expectedSha256, bytes: bytes.byteLength };
+}

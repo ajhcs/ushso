@@ -231,3 +231,77 @@ export function classifyResponse({ purpose, expectedContentClasses, headers, bod
 
   return rejected('UNVALIDATED_METADATA_RESPONSE', 'schema_drift');
 }
+
+export function classifyResourceRole(input = {}) {
+  const requestedUrl = typeof input.requestedUrl === 'string' ? input.requestedUrl : null;
+  const finalUrl = typeof input.finalUrl === 'string' ? input.finalUrl : null;
+  const expectedRole = typeof input.expectedRole === 'string' ? input.expectedRole : null;
+  const observedTitle = typeof input.observedTitle === 'string' ? input.observedTitle : null;
+  const mediaType = typeof input.mediaType === 'string' ? input.mediaType : null;
+  const status = Number.isSafeInteger(input.status) ? input.status : null;
+  const redirectCount = Number.isSafeInteger(input.redirectCount) ? input.redirectCount : null;
+  const purpose = typeof input.purpose === 'string' ? input.purpose : null;
+
+  let observedRole = null;
+  if (finalUrl) {
+    try {
+      const url = new URL(finalUrl);
+      const pathAndHash = url.pathname + url.hash;
+      if (/\/widgets(?:\/|$)/i.test(url.pathname)) observedRole = 'widgets_documentation';
+      else if (/missing_key/i.test(url.pathname)) observedRole = 'error_html';
+      else if (/data-data-products|data_api|\/api(?:\/|$)/i.test(pathAndHash)) {
+        observedRole = 'developer_api_data_products_documentation';
+      }
+    } catch {
+      observedRole = null;
+    }
+  }
+  if (!observedRole && observedTitle && /widgets/i.test(observedTitle)) observedRole = 'widgets_documentation';
+  if (!observedRole && observedTitle && /missing key/i.test(observedTitle)) observedRole = 'error_html';
+
+  const jsonExpected = purpose === 'catalog_metadata' || expectedRole === 'catalog_metadata' || expectedRole === 'payload';
+  const htmlMedia = typeof mediaType === 'string' && mediaType.toLowerCase().startsWith('text/html');
+  let jsonSuccessPossible = null;
+  if (jsonExpected) {
+    jsonSuccessPossible = false;
+    if (!htmlMedia && mediaType && /json/i.test(mediaType) && status === 200 && observedRole !== 'error_html') {
+      jsonSuccessPossible = true;
+    }
+  }
+
+  const destinationMatch = Boolean(expectedRole && observedRole && expectedRole === observedRole);
+  let reasonCode = null;
+  let classification = 'resource_role';
+  if (expectedRole && observedRole && expectedRole !== observedRole) {
+    reasonCode = 'DESTINATION_RESOURCE_ROLE_MISMATCH';
+    classification = 'content-mismatch';
+  } else if (jsonSuccessPossible === false) {
+    reasonCode = 'JSON_SUCCESS_IMPOSSIBLE';
+    classification = 'content-mismatch';
+  }
+
+  const actionableRecipe = Boolean(
+    destinationMatch &&
+      expectedRole === 'documentation_page' &&
+      jsonSuccessPossible !== false
+  );
+
+  return Object.freeze({
+    expected_role: expectedRole,
+    observed_role: observedRole,
+    requested_url: requestedUrl,
+    final_url: finalUrl,
+    observed_title: observedTitle,
+    media_type: mediaType,
+    http_status: status,
+    redirect_count: redirectCount,
+    destination_match: destinationMatch,
+    classification,
+    reason_code: reasonCode,
+    json_success_possible: jsonSuccessPossible,
+    actionable_recipe: actionableRecipe,
+    publication_authorized: false,
+    promotion_authorized: false,
+    production_composition: false,
+  });
+}
