@@ -1,0 +1,254 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-052",
+  "status": "producer_checked",
+  "owner": "/root/pr052_price_semantics",
+  "reviewer": "Astra/root",
+  "base_sha": "a1aa840b2f4130c364299b20438545220353aa67",
+  "head_sha": "03a06a87db424ffa894e3f889d59f8f12f3baf0b",
+  "dependency_merge_shas": {
+    "PR-032": "6fe431f855c2bb65c97cdb0526ef8ed54ea6a74a",
+    "PR-047": "70e2bc44364daaaffe3fbc806e11c9fa06e4bb6b",
+    "PR-048": "e698f55cec1de955c3ed283c18fae741d89acbf4",
+    "PR-050": "50a49d7288fd306d5eae05d98300e412c91db046",
+    "PR-051": "6ad983fd52c1bf33819fd64a97ef20bca4f1e834"
+  },
+  "branch": "codex/ushso-pr052-price-semantics-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/connectors/mrf/price-semantics.mjs",
+    "evaluation/research-program/mrf-validation/",
+    "tests/research-program/price-semantics.test.mjs",
+    "docs/research-program/price-semantics.md",
+    "verification/research-program/pr-052/",
+    "docs/research-program/handoffs/PR-052.json"
+  ],
+  "problem": "Price previews could collapse gross charges, discounted cash prices, negotiated amounts and allowed amounts into one comparable measure. Algorithm, percentage and per-diem values could be treated as dollar prices. Missing or negative/zero values could be dropped or treated as valid prices. A passing sample could be treated as legal compliance, complete hospital reporting or comparable patient costs. An obsolete generic MRF schema could replace current pinned CMS definitions.",
+  "resulting_behavior": "Price-semantics lives in packages/connectors/mrf/price-semantics.mjs because identity is WP7-sealed. Gross, cash, negotiated and allowed-amount remain different measures. Algorithm, percentage and per-diem values remain non-comparable. Missing or negative/zero values are investigated by documented semantics, not universally dropped or treated as valid prices. A passing sample does not imply legal compliance, complete hospital reporting or comparable patient costs. Current pinned CMS hospital v3.0.0 and payer TiC v2.2.1 definitions are used. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-052-1",
+      "subject": "Define comparable price context",
+      "sha": "2a2a4207f159428a90e8c36cc64b178c4dcb618b"
+    },
+    {
+      "id": "C-052-2",
+      "subject": "Add quality and compatibility checks",
+      "sha": "cb03475b7a7279636c396e5f4206f303f731132a"
+    },
+    {
+      "id": "C-052-3",
+      "subject": "Produce sample-validation summaries",
+      "sha": "03a06a87db424ffa894e3f889d59f8f12f3baf0b"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "price-semantics",
+      "id": "packages/connectors/mrf/price-semantics.mjs",
+      "location": "local",
+      "sha256": "dadd64181dfbd46a5d9cf1d2031000b9aa1bdaf3c593acc69dba022aa6f68305"
+    },
+    {
+      "kind": "price-semantics-tests",
+      "id": "tests/research-program/price-semantics.test.mjs",
+      "location": "local",
+      "sha256": "ce113c8140141440f1f6b3551aa6c7c01ddb3ac209475963ae0ce61c8536d150"
+    },
+    {
+      "kind": "price-semantics-docs",
+      "id": "docs/research-program/price-semantics.md",
+      "location": "local",
+      "sha256": "b83d7dfdbda20056a0416bdd2ae4412b6ed68eb13906f98c80a798ecfcdd0227"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c052-focused",
+      "command": "node --test tests/research-program/price-semantics.test.mjs",
+      "started_at": "2026-09-14T16:40:42.953749Z",
+      "completed_at": "2026-09-14T16:40:43.107457Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 price-semantics tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c052-focused-event",
+        "path": "verification/research-program/pr-052/producer-20260914/commands/focused-price/event.json",
+        "sha256": "f47a29877b571fae7880ee54e28d4815dcd16872c41927fa7fb79cbf8eb7b215",
+        "bytes": 1037
+      }
+    },
+    {
+      "id": "cmd-c052-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T16:40:43.107916Z",
+      "completed_at": "2026-09-14T16:40:43.166771Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c052-identity-event",
+        "path": "verification/research-program/pr-052/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "807310eceda1ca67f32f0fbadd6b9a67ac7f7aeea639e432c911a4b2a121b6c0",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr052-artifact-0",
+      "path": "verification/research-program/pr-052/task-binding.json",
+      "bytes": 3903,
+      "sha256": "42accd698d48eebce535aa27176f2ac7cda9042bd82f99f42d91ab1fbc7c4c7f"
+    },
+    {
+      "id": "pr052-artifact-1",
+      "path": "verification/research-program/pr-052/dispatch.json",
+      "bytes": 2909,
+      "sha256": "a22d423c1c5112e27a78aa09e25ab4cda274f727e69ae3668afa5455cb96bcb3"
+    },
+    {
+      "id": "pr052-artifact-2",
+      "path": "verification/research-program/pr-052/producer-20260914/commands/focused-price/receipt.json",
+      "bytes": 459,
+      "sha256": "47594a8bd5577fed1e142a4dc2d9ff5c3c3c09d37c027d428270bd48d9dc634e"
+    },
+    {
+      "id": "pr052-artifact-3",
+      "path": "verification/research-program/pr-052/producer-20260914/commands/focused-price/stdout.log",
+      "bytes": 497,
+      "sha256": "c6fe6f7a86b9d03c61750227dd56af80622e585fc39f1f5ee5ee9a9b1d05da7f"
+    },
+    {
+      "id": "pr052-artifact-4",
+      "path": "verification/research-program/pr-052/producer-20260914/commands/focused-price/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr052-artifact-5",
+      "path": "verification/research-program/pr-052/producer-20260914/commands/focused-price/event.json",
+      "bytes": 1037,
+      "sha256": "f47a29877b571fae7880ee54e28d4815dcd16872c41927fa7fb79cbf8eb7b215"
+    },
+    {
+      "id": "pr052-artifact-6",
+      "path": "verification/research-program/pr-052/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "ad33d60db2a67b37a0e03bdbaf3e73a21a81d01663b7bd6ca5bca8723a3316b9"
+    },
+    {
+      "id": "pr052-artifact-7",
+      "path": "verification/research-program/pr-052/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr052-artifact-8",
+      "path": "verification/research-program/pr-052/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr052-artifact-9",
+      "path": "verification/research-program/pr-052/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "807310eceda1ca67f32f0fbadd6b9a67ac7f7aeea639e432c911a4b2a121b6c0"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-052-1",
+      "status": "producer_checked",
+      "result": "Gross, cash, negotiated and allowed-amount remain different measures.",
+      "command_ids": [
+        "cmd-c052-focused"
+      ]
+    },
+    {
+      "id": "C-052-2",
+      "status": "producer_checked",
+      "result": "Missing or negative/zero values are investigated by documented semantics, not universally dropped or treated as valid prices.",
+      "command_ids": [
+        "cmd-c052-focused"
+      ]
+    },
+    {
+      "id": "C-052-3",
+      "status": "producer_checked",
+      "result": "A passing sample does not imply legal compliance, complete hospital reporting or comparable patient costs. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c052-focused",
+        "cmd-c052-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "identity-src-untouched",
+      "status": "accepted",
+      "detail": "packages/identity was not edited. Ledger-named packages/identity/mrf/ was not created."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Price-semantics validation is not R05/R10 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-price-semantics-review",
+      "status": "pending",
+      "detail": "Independent review of distinct measures, non-positive investigation and non-compliance of passing samples remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "sample-not-compliance",
+      "status": "risk",
+      "detail": "A passing focused sample remains a sample. It is not legal compliance or complete hospital reporting."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of distinct measures, non-positive investigation and non-compliance of passing samples, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-052 source and replay focused price-semantics and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
