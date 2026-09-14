@@ -1,0 +1,278 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-049",
+  "status": "producer_checked",
+  "owner": "/root/pr049_tic_index",
+  "reviewer": "Astra/root",
+  "base_sha": "958504ef0336ac7c91f4e7dd20e7ec3589042274",
+  "head_sha": "94fc6209f2ec8de8d6d4cbc7ec57c08ca4eb9715",
+  "dependency_merge_shas": {
+    "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+    "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+    "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74",
+    "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+    "PR-034": "a8437e36ecf102af6f3bc86cf539a0d6b1739796"
+  },
+  "branch": "codex/ushso-pr049-tic-index-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/connectors/mrf/payer-index.mjs",
+    "packages/connectors/mrf/payer-cohort.json",
+    "evaluation/research-program/mrf-fixtures/payer-index/",
+    "tests/research-program/tic-index.test.mjs",
+    "docs/research-program/tic-index.md",
+    "verification/research-program/pr-049/",
+    "docs/research-program/handoffs/PR-049.json"
+  ],
+  "problem": "Payer Transparency in Coverage indexes could substitute employer plan IDs, insurer identities and hospital identities. Shared files could be fetched repeatedly and lose plan associations. Inaccessible bulk files could drop out of the frozen 10-entity denominator. Hospital HPT schemas could be treated as payer TiC. Allowed-amount files could be treated as validated by the in-network parser.",
+  "resulting_behavior": "Payer index parsing lives in packages/connectors/mrf/payer-index.mjs because identity is WP7-sealed. Frozen 10 HIOS issuer IDs are consumed without replacement or silent deduplication. Employer plan ID, insurer identity and hospital identity cannot be substituted. The same file linked by many plans is fetched once but retains all supported plan associations. All ten reporting entities are accounted for; an inaccessible bulk file remains a valid documented route with failed sample state. Hospital HPT and payer TiC schemas remain separate. Allowed-amount files are discoverable without pretending the in-network parser validates them. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-049-1",
+      "subject": "Define payer and file identity",
+      "sha": "fc6ce88aa538025549339a2d5da51f799abdf1b6"
+    },
+    {
+      "id": "C-049-2",
+      "subject": "Parse bounded table-of-contents indexes",
+      "sha": "fbb155e8b15e4224e206c90f47cc0d580e13880e"
+    },
+    {
+      "id": "C-049-3",
+      "subject": "Build the payer cohort ledger",
+      "sha": "94fc6209f2ec8de8d6d4cbc7ec57c08ca4eb9715"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "payer-index",
+      "id": "packages/connectors/mrf/payer-index.mjs",
+      "location": "local",
+      "sha256": "70d728e8f62866c56452a9a17bad3c1ef8f7b4a7efccc567be9be994699d5fad"
+    },
+    {
+      "kind": "payer-cohort",
+      "id": "packages/connectors/mrf/payer-cohort.json",
+      "location": "local",
+      "sha256": "966fbb32ac1a7ad5f23c05e00b82fecc1c86587db25c6603683ecdf60ff7d614"
+    },
+    {
+      "kind": "tic-index-tests",
+      "id": "tests/research-program/tic-index.test.mjs",
+      "location": "local",
+      "sha256": "ed8727799e074a22f9dbbb90b711c0e3e23ffbc5ee7930a56518a62c01a05e4c"
+    },
+    {
+      "kind": "tic-index-docs",
+      "id": "docs/research-program/tic-index.md",
+      "location": "local",
+      "sha256": "14a34c135c93950c96957365d684e8431a8d449c8caaa2a4084b2c8a48cbbee4"
+    },
+    {
+      "kind": "cms-toc-schema",
+      "id": "evaluation/research-program/mrf-fixtures/payer-index/table-of-contents.json",
+      "location": "local",
+      "sha256": "a2386cdd7741602c3bce1722d8050e96d4546a409039359b16de90006922896a"
+    },
+    {
+      "kind": "cms-toc-example",
+      "id": "evaluation/research-program/mrf-fixtures/payer-index/table-of-contents-sample.json",
+      "location": "local",
+      "sha256": "1bc9144703d9c20da2a30ff0666b2b9b13e390ad7bae33647253de08727ab42e"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c049-focused",
+      "command": "node --test tests/research-program/tic-index.test.mjs",
+      "started_at": "2026-09-14T15:54:48.371842Z",
+      "completed_at": "2026-09-14T15:54:48.529549Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "4/4 TiC index tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c049-focused-event",
+        "path": "verification/research-program/pr-049/producer-20260914/commands/focused-tic/event.json",
+        "sha256": "88e9b9804fea7601be9f64421f9f554c5edff70c821617fcb956a220e50a526d",
+        "bytes": 1019
+      }
+    },
+    {
+      "id": "cmd-c049-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T15:54:48.529871Z",
+      "completed_at": "2026-09-14T15:54:48.589384Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c049-identity-event",
+        "path": "verification/research-program/pr-049/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "bfd4376c9e12835c9c24683dc8aa679cd7ba9c4ba847d2688db88407cd73a8ad",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr049-artifact-0",
+      "path": "verification/research-program/pr-049/task-binding.json",
+      "bytes": 3951,
+      "sha256": "186024c9ccd44b14d076d613655d8ec1f27877f057219d11921d74e0824dd027"
+    },
+    {
+      "id": "pr049-artifact-1",
+      "path": "verification/research-program/pr-049/dispatch.json",
+      "bytes": 3510,
+      "sha256": "81c78cfdcff929f7c9fe84486b56cf27de0a1121b41f24b0bc35f74ac2e4367a"
+    },
+    {
+      "id": "pr049-artifact-2",
+      "path": "verification/research-program/pr-049/producer-20260914/commands/focused-tic/receipt.json",
+      "bytes": 451,
+      "sha256": "8e806dd6bf4354388f670c911793a284e904391448ac542e06a14f9a685dab75"
+    },
+    {
+      "id": "pr049-artifact-3",
+      "path": "verification/research-program/pr-049/producer-20260914/commands/focused-tic/stdout.log",
+      "bytes": 626,
+      "sha256": "e0552fa12875baa8b51b217687c3126221121e2cc35cd604c462861790850276"
+    },
+    {
+      "id": "pr049-artifact-4",
+      "path": "verification/research-program/pr-049/producer-20260914/commands/focused-tic/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr049-artifact-5",
+      "path": "verification/research-program/pr-049/producer-20260914/commands/focused-tic/event.json",
+      "bytes": 1019,
+      "sha256": "88e9b9804fea7601be9f64421f9f554c5edff70c821617fcb956a220e50a526d"
+    },
+    {
+      "id": "pr049-artifact-6",
+      "path": "verification/research-program/pr-049/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "1ad757fd7453c9b8eb32b46d015bde65f99a3ddb8dc55b8a754919ca96f508a4"
+    },
+    {
+      "id": "pr049-artifact-7",
+      "path": "verification/research-program/pr-049/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr049-artifact-8",
+      "path": "verification/research-program/pr-049/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr049-artifact-9",
+      "path": "verification/research-program/pr-049/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "bfd4376c9e12835c9c24683dc8aa679cd7ba9c4ba847d2688db88407cd73a8ad"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-049-1",
+      "status": "producer_checked",
+      "result": "Employer plan ID, insurer identity and hospital identity cannot be substituted.",
+      "command_ids": [
+        "cmd-c049-focused"
+      ]
+    },
+    {
+      "id": "C-049-2",
+      "status": "producer_checked",
+      "result": "The same file linked by many plans is fetched once but retains all supported plan associations.",
+      "command_ids": [
+        "cmd-c049-focused"
+      ]
+    },
+    {
+      "id": "C-049-3",
+      "status": "producer_checked",
+      "result": "All ten reporting entities are accounted for. Inaccessible bulk files remain documented failed routes. Hospital HPT and payer TiC remain separate. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c049-focused",
+        "cmd-c049-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "identity-src-untouched",
+      "status": "accepted",
+      "detail": "packages/identity was not edited. Ledger-named packages/identity/mrf/ was not created."
+    },
+    {
+      "id": "live-tic-download",
+      "status": "accepted",
+      "detail": "Parser operates on pinned official fictional TOC fixtures. No full-size live TiC download."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "TiC index parsing is not R10 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-tic-index-review",
+      "status": "pending",
+      "detail": "Independent review of identity substitution, shared-file fetch-once and hospital/payer schema separation remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "locators-not-materialized",
+      "status": "risk",
+      "detail": "Frozen payer IDs remain ids_frozen_locators_not_materialized. This PR records dispositions and index semantics, not live payload availability."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of identity substitution, shared-file fetch-once and hospital/payer schema separation, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-049 source and replay focused TiC index and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
