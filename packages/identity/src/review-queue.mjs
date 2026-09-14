@@ -55,3 +55,104 @@ export function buildReviewQueue(candidates, { currentDecisions = new Map(), ass
     })
     .sort((left, right) => right.priority - left.priority || left.candidate_id.localeCompare(right.candidate_id));
 }
+
+export const CLAIM_DISPOSITIONS = Object.freeze(['accept', 'reject', 'request_evidence', 'supersede']);
+export const CLAIM_PRIORITY = Object.freeze({
+  identity_conflict: 100,
+  grain_conflict: 90,
+  denominator: 80,
+  scientific_unit: 70,
+  source_document_interpretation: 40,
+  owner_disclosure: 30,
+});
+
+function freeze(value) {
+  return Object.freeze(value);
+}
+
+function fail(code, detail) {
+  const error = new Error(detail ?? code);
+  error.code = code;
+  throw error;
+}
+
+export function claimPriority(cause) {
+  return CLAIM_PRIORITY[cause] ?? 20;
+}
+
+export function enqueueClaimPackets(packets, { now = '2026-09-14T00:00:00.000Z' } = {}) {
+  const items = packets.map((packet) => freeze({
+    queue_item_id: `claim-review:${packet.packet_id}`,
+    packet_id: packet.packet_id,
+    record_id: packet.record_id,
+    field: packet.field,
+    source_id: packet.source_id,
+    priority: claimPriority(packet.cause),
+    cause: packet.cause,
+    owner: packet.owner ?? 'Astra/root',
+    next_step: packet.next_step ?? 'review_exact_claim',
+    essential: packet.essential !== false,
+    lane: packet.lane ?? (packet.cause === 'owner_disclosure' ? 'owner_disclosure' : 'source_document_interpretation'),
+    state: 'pending',
+    public_fact: false,
+    enqueued_at: now,
+    packet_hash: packet.packet_hash,
+    source_bytes_sha256: packet.source_bytes_sha256,
+    proposal_hash: packet.proposal_hash,
+  }));
+  return freeze(items.sort((left, right) => right.priority - left.priority || left.packet_id.localeCompare(right.packet_id)));
+}
+
+export function recordClaimDisposition(item, disposition, { reviewer, rationale, now = '2026-09-14T00:00:00.000Z', currentPacketHash, currentSourceBytesSha256, currentProposalHash } = {}) {
+  if (!CLAIM_DISPOSITIONS.includes(disposition)) fail('UNKNOWN_DISPOSITION');
+  if (item.asks_whole_dataset === true) fail('WHOLE_DATASET_APPROVAL_FORBIDDEN');
+  if (!reviewer) fail('REVIEWER_REQUIRED');
+  if (!rationale) fail('RATIONALE_REQUIRED');
+  if (currentPacketHash && currentPacketHash !== item.packet_hash) fail('STALE_PACKET');
+  if (currentSourceBytesSha256 && currentSourceBytesSha256 !== item.source_bytes_sha256) fail('STALE_SOURCE_BYTES');
+  if (currentProposalHash && currentProposalHash !== item.proposal_hash) fail('STALE_PROPOSAL');
+  return freeze({
+    ...item,
+    state: disposition === 'request_evidence' ? 'pending' : disposition,
+    disposition,
+    reviewer,
+    rationale,
+    decided_at: now,
+    public_fact: false,
+  });
+}
+
+export function invalidateStaleDisposition(decision, { packetHash, sourceBytesSha256, proposalHash }) {
+  if (decision.packet_hash !== packetHash || decision.source_bytes_sha256 !== sourceBytesSha256 || decision.proposal_hash !== proposalHash) {
+    return freeze({ ...decision, state: 'invalidated', inherited_approval: false, public_fact: false, reason: 'SOURCE_OR_PROPOSAL_CHANGED' });
+  }
+  return decision;
+}
+
+export function reportClaimQueue(items, { now = '2026-09-14T01:00:00.000Z' } = {}) {
+  const pending = items.filter((row) => row.state === 'pending');
+  const missing = pending.filter((row) => row.essential && (!row.owner || !row.next_step));
+  if (missing.length) fail('PENDING_ESSENTIAL_FIELD_UNOWNED');
+  if (items.some((row) => row.public_fact === true && row.state === 'pending')) fail('PENDING_NOT_PUBLIC_FACT');
+  const ageHours = (row) => (Date.parse(now) - Date.parse(row.enqueued_at ?? now)) / 36e5;
+  return freeze({
+    pending_count: pending.length,
+    accepted_count: items.filter((row) => row.state === 'accept').length,
+    rejected_count: items.filter((row) => row.state === 'reject').length,
+    request_evidence_count: items.filter((row) => row.disposition === 'request_evidence').length,
+    items: freeze(items.map((row) => freeze({
+      packet_id: row.packet_id,
+      field: row.field,
+      cause: row.cause,
+      priority: row.priority,
+      owner: row.owner,
+      next_step: row.next_step,
+      lane: row.lane,
+      age_hours: ageHours(row),
+      state: row.state,
+      public_fact: false,
+    }))),
+    pending_are_public_facts: false,
+    whole_dataset_approval: false,
+  });
+}
