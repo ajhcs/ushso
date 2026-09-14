@@ -1,0 +1,76 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr017-wire-key-20260914",
+  "slice_id": "C-017-1",
+  "pr_id": "PR-017",
+  "title": "Reconcile dictionary names with observed wire keys",
+  "owner": "/root/pr017_wire_key",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr017-wire-key-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr017-wire-key-20260914",
+  "objective": "Generated recipes use actual field names and reviewed aliases.",
+  "outcome": "Count equality can pass while exact-key comparison reports all eleven HCRIS mismatches. Hyphen/case aliases, Adult/Adults wording and two ambiguous candidates cannot silently pick a wrong field. Accepted mappings feed recipes using observed API keys while retaining original labels, dictionary citations and mapping version. No broad punctuation stripping merges two source columns. Every accepted nonexact mapping has a review/evidence record.",
+  "dependencies": [
+    "PR-008",
+    "PR-013",
+    "PR-016"
+  ],
+  "owned_paths": [
+    "scripts/research/cms-variable-layout.mjs",
+    "packages/identity/src/schema-catalog.mjs",
+    "tests/research-program/wire-key-reconciliation.test.mjs",
+    "verification/research-program/pr-017/",
+    "docs/research-program/handoffs/PR-017.json"
+  ],
+  "commits": [
+    {
+      "id": "C-017-1",
+      "subject": "Retain the HCRIS mismatch fixture",
+      "instructions": "Package the 117 source-document names and 117 observed API keys with hashes, including the eleven mismatches. Keep documentation labels distinct from wire identifiers.",
+      "verification": "Count equality passes but exact-key comparison fails on the old behavior; report all eleven differences."
+    },
+    {
+      "id": "C-017-2",
+      "subject": "Implement evidence-scoped key reconciliation",
+      "instructions": "Match exact names first; propose normalization candidates with their differences and context. Require unambiguous evidence/review for wording changes and reject collisions.",
+      "verification": "Fixtures with hyphen/case aliases, Adult/Adults wording and two ambiguous candidates cannot silently pick a wrong field."
+    },
+    {
+      "id": "C-017-3",
+      "subject": "Feed accepted mappings into recipes",
+      "instructions": "Use accepted wire names for query construction while retaining original labels, dictionary citations and mapping version.",
+      "verification": "An example request uses the observed API key, and a documentation update invalidates only the affected mapping for review."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/wire-key-reconciliation.test.mjs",
+    "node --test tests/research-program/parser-routing.test.mjs",
+    "node --test tests/research-program/cms-resources.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-017.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-017/",
+  "binding": {
+    "base_sha": "d4dc5320039243331f8fd665e9e0b90f39406e34",
+    "base_tree": "fb958d1dbd333d532ba5412b6975d430238000ba",
+    "dependency_merge_shas": {
+      "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+      "PR-013": "861a7808fec20e5e7795bb8f8082f82717e01f11",
+      "PR-016": "0f601a908e74492a9803906ce35cbd346df28565"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
