@@ -1,0 +1,78 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr030-publication-parity-20260914",
+  "slice_id": "C-030-1",
+  "pr_id": "PR-030",
+  "title": "Publish coherent metadata generations",
+  "owner": "/root/pr030_publication_parity",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr030-publication-parity-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr030-publication-parity-20260914",
+  "objective": "UI, search, dictionaries and machine tools consume the same accepted generation.",
+  "outcome": "Publication-manifest closure rejects missing assets, source-context mismatches and undeclared partial fragments. A historical Pennsylvania published-record count cannot appear as current coverage. A large dictionary is paged predictably; one bad asset does not blank the entire catalog. No request mixes old catalog records with a new dictionary. Failed publication leaves the last good version live. Static fallback remains a tested recovery option. Sealed packages/search/publication-lifecycle-v2.mjs is not edited.",
+  "dependencies": [
+    "PR-007",
+    "PR-021",
+    "PR-029"
+  ],
+  "owned_paths": [
+    "packages/registry/publication-parity.mjs",
+    "apps/web/src/pages/SourcesPage.tsx",
+    "apps/web/src/pages/SourcesPage.test.tsx",
+    "scripts/stage-research-assets.mjs",
+    "tests/research-program/publication-parity.test.mjs",
+    "verification/research-program/pr-030/",
+    "docs/research-program/handoffs/PR-030.json"
+  ],
+  "commits": [
+    {
+      "id": "C-030-1",
+      "subject": "Assemble the accepted publication manifest",
+      "instructions": "Include canonical revisions, dictionary bindings, examples, source cards, coverage, search projection and contract versions. Reconcile the Sources page v1.1.0 national-readiness table with the current generation: migrate supported facts or explicitly archive that historical view. Reuse immutable publication/checksum machinery.",
+      "verification": "Manifest closure rejects missing assets, source-context mismatches and undeclared partial fragments; a historical Pennsylvania published-record count cannot appear as current coverage."
+    },
+    {
+      "id": "C-030-2",
+      "subject": "Integrate bounded content delivery",
+      "instructions": "Serve only needed record/dictionary/example pages through existing repository ports. Measure asset-count and response-size consequences before selecting a storage transition.",
+      "verification": "A large dictionary is paged predictably; one bad asset does not blank the entire catalog."
+    },
+    {
+      "id": "C-030-3",
+      "subject": "Verify generation promotion and rollback",
+      "instructions": "Compare every public projection against the accepted source revision and publish only after closure checks. Exercise N-1 retrieval and typed expired-generation behavior.",
+      "verification": "No request mixes old catalog records with a new dictionary; failed publication leaves the last good version live."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/publication-parity.test.mjs",
+    "npm run test:web -- --run apps/web/src/pages/SourcesPage.test.tsx",
+    "node packages/search/manifests/validate-package.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-030.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-030/",
+  "binding": {
+    "base_sha": "42735bbe42a24a2896e5e9ffa0f99023be4656b1",
+    "base_tree": "66d6044ed45163670f1920ec2820326728890fdc",
+    "dependency_merge_shas": {
+      "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+      "PR-021": "ed08e8ee861622b99d5d7c3150d68304ecc95881",
+      "PR-029": "ddb8f4cc88106ab937220a2c231ed62928ae101f"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
