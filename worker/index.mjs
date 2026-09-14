@@ -203,7 +203,7 @@ function isStaticPath(pathname) {
 function machineText(request, pathname) {
   const origin = new URL(request.url).origin;
   if (pathname === '/llms.txt') {
-    return `# United States Health Systems Observatory (USHSO)\n\nUSHSO routes people and machines to authoritative health-systems data sources. It does not host the underlying datasets.\n\nAPI contract: ${origin}/api/contract\nHuman discovery: POST ${origin}/api/discover with application/json (maximum request size: 20 KiB)\nCatalog browse: GET ${origin}/api/catalog\nStable human-facing record: GET ${origin}/api/datasets/{record_id}\nMachine toolkit: eight read-only inspection routes under ${origin}/api/machine/v1/\nHuman and agent guide: ${origin}/agents\n\nVerification means the first-party catalog metadata entry was observed live for the published snapshot. It does not assert dataset-payload availability, schema completeness, authorization, geographic coverage, or analytic fitness. A zero-result response is not evidence that no source exists.\n`;
+    return `# United States Health Systems Observatory (USHSO)\n\nUSHSO routes people and machines to authoritative health-systems data sources. It does not host the underlying datasets.\n\nAPI contract: ${origin}/api/contract\nHuman discovery: POST ${origin}/api/discover with application/json (maximum request size: 20 KiB)\nCatalog browse: GET ${origin}/api/catalog\nStable human-facing record: GET ${origin}/api/datasets/{record_id}\nMachine toolkit: eight read-only inspection routes under ${origin}/api/machine/v1/\nHuman and agent guide: ${origin}/agents\n\nVerification means the first-party catalog metadata entry was observed live for the published snapshot. It does not assert dataset-payload availability, schema completeness, authorization, geographic coverage, or analytic fitness. A zero-result response is not evidence that no source exists. A successful tool envelope is not a completed research task.\n`;
   }
   if (pathname === '/robots.txt') return `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`;
   if (pathname === '/sitemap.xml') {
@@ -353,6 +353,23 @@ export function createWorker({
         if (request.method !== 'GET' && !head) return textResponse('Method not allowed.\n', 'text/plain; charset=utf-8', { status: 405 });
         const contentType = url.pathname === '/sitemap.xml' ? 'application/xml; charset=utf-8' : 'text/plain; charset=utf-8';
         return textResponse(machineBody, contentType, { cacheControl: 'public, max-age=300', head });
+      }
+
+      if (url.pathname.startsWith('/contracts/')) {
+        if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
+        const asset = await env.ASSETS.fetch(new Request(url, { method: 'GET' }));
+        const contentType = asset.headers.get('content-type') ?? '';
+        if (!asset.ok) return errorResponse(404, 'schema_not_found', 'No contract schema exists at this path.', { head });
+        const body = await asset.text();
+        const looksHtml = /^\s*</.test(body) || /text\/html/i.test(contentType);
+        if (looksHtml || !/^application\/json(?:;|$)/i.test(contentType)) {
+          return errorResponse(415, 'schema_not_json', 'HTML fallback cannot satisfy a contract schema URL.', { head });
+        }
+        try {
+          return jsonResponse(JSON.parse(body), { cacheControl: 'public, max-age=300', head });
+        } catch {
+          return errorResponse(415, 'schema_not_json', 'HTML fallback cannot satisfy a contract schema URL.', { head });
+        }
       }
 
       if (url.pathname === '/favicon.ico') return Response.redirect(new URL('/observatory-lighthouse.png', request.url), 308);
