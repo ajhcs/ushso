@@ -1,0 +1,258 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-058",
+  "status": "producer_checked",
+  "owner": "/root/pr058_schema_closure",
+  "reviewer": "Astra/root",
+  "base_sha": "6b96e9331065298eaaf0b3c5d3e387041d3899d9",
+  "head_sha": "1df1e853647a44262f1352e8d139cc3332b95c46",
+  "dependency_merge_shas": {
+    "PR-055": "a6c63c1ca35f98517e7000b44602c1e8f765e2d5",
+    "PR-056": "413e70b342f4fc1a8fed65dbb2b0fd68ffb1813d",
+    "PR-057": "81533dfed8e814485a451cf66629babb181fbeda"
+  },
+  "branch": "codex/ushso-pr058-schema-closure-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "contracts/machine-toolkit/v1.1.0/MIGRATION.md",
+    "packages/machine-toolkit/public-webmcp-tool.json",
+    "worker/index.mjs",
+    "tests/research-program/schema-closure.test.mjs",
+    "verification/research-program/pr-058/",
+    "docs/research-program/handoffs/PR-058.json"
+  ],
+  "problem": "Public contract files and examples could drift from deployed operations. Old clients could silently accept a different v1.1 response shape. HTML SPA fallback could masquerade as a schema URL. The agent guide could publish stale generation labels. A successful tool envelope could be treated as a completed research task. Enrichment could be imported into worker/index.mjs.",
+  "resulting_behavior": "Old clients receive supported compatibility or a typed version error, not a silently different response shape. Fetch/compile the actual served schema closure; HTML fallback for a schema URL fails with schema_not_json. Exactly eight advertised tools exist; plan_research remains disabled. The agent guide does not publish stale generation labels. All eight actual response envelopes validate against the served schemas. Protocol success and scientific-result states remain separate. A successful tool envelope is not a completed research task. worker/index.mjs does not import enrichment. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-058-1",
+      "subject": "Version the changed input/output contracts",
+      "sha": "157e7e056375f593ff054e472fcb71bf8687a4c7"
+    },
+    {
+      "id": "C-058-2",
+      "subject": "Publish all transitive schema references",
+      "sha": "9882dd0a7d2ccaf491fc40c465dd56f3506d5473"
+    },
+    {
+      "id": "C-058-3",
+      "subject": "Generate capability and example manifests",
+      "sha": "1df1e853647a44262f1352e8d139cc3332b95c46"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "v1.1-migration",
+      "id": "contracts/machine-toolkit/v1.1.0/MIGRATION.md",
+      "location": "local",
+      "sha256": "e867bae018fb0c87ce57540624f4eb6c6cd449f88a2ea32c896cf17acaf779e9"
+    },
+    {
+      "kind": "public-webmcp-tool",
+      "id": "packages/machine-toolkit/public-webmcp-tool.json",
+      "location": "local",
+      "sha256": "d0b36bb4f3c51cea54d1ce32ea6c3ad8c90d1e58de84ee7429b36a510a0785aa"
+    },
+    {
+      "kind": "worker-index-schema-json-only",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "ca413cc6224ce2ef472d2116b3acf9ce3f60f4d9181e31f8bfdc1c2d2963ace1"
+    },
+    {
+      "kind": "schema-closure-tests",
+      "id": "tests/research-program/schema-closure.test.mjs",
+      "location": "local",
+      "sha256": "8d9d19eaf78ddcbb9e4afc641c484c7a130586951564dc65de52999c28bd7be7"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c058-focused",
+      "command": "node --test tests/research-program/schema-closure.test.mjs",
+      "started_at": "2026-09-14T19:33:29.587654Z",
+      "completed_at": "2026-09-14T19:33:30.851930Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "4/4 schema-closure tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c058-focused-event",
+        "path": "verification/research-program/pr-058/producer-20260914/commands/focused-closure/event.json",
+        "sha256": "0f08b01268021b96c0d489d5ca1b136b61a8fa57bc96312146b06dd1fb895fef",
+        "bytes": 1041
+      }
+    },
+    {
+      "id": "cmd-c058-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T19:33:30.852366Z",
+      "completed_at": "2026-09-14T19:33:30.909373Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c058-identity-event",
+        "path": "verification/research-program/pr-058/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "a47f95034e57124f51b930ba8eafae00aec10d4dcfae3009ce9e12000df21ad4",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr058-artifact-0",
+      "path": "verification/research-program/pr-058/task-binding.json",
+      "bytes": 3699,
+      "sha256": "319b5fff52ac0375adb89c1bdd53826b9bbd466c007a9755fbe8c65b0a0bc189"
+    },
+    {
+      "id": "pr058-artifact-1",
+      "path": "verification/research-program/pr-058/dispatch.json",
+      "bytes": 2086,
+      "sha256": "0ac58eb7be76b80e145c455d8e1ce8d20657d8fb237aefe7b1ee86ffd2c244e1"
+    },
+    {
+      "id": "pr058-artifact-2",
+      "path": "verification/research-program/pr-058/producer-20260914/commands/focused-closure/receipt.json",
+      "bytes": 460,
+      "sha256": "48ef12a0f3849b8383a99a2bb2a53fedbebec5a8c88ef03a19fc078ec7994846"
+    },
+    {
+      "id": "pr058-artifact-3",
+      "path": "verification/research-program/pr-058/producer-20260914/commands/focused-closure/stdout.log",
+      "bytes": 794,
+      "sha256": "988ab47701c8898e387a8a127aa6a757e6257a0c894e29db86683010fd35dcee"
+    },
+    {
+      "id": "pr058-artifact-4",
+      "path": "verification/research-program/pr-058/producer-20260914/commands/focused-closure/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr058-artifact-5",
+      "path": "verification/research-program/pr-058/producer-20260914/commands/focused-closure/event.json",
+      "bytes": 1041,
+      "sha256": "0f08b01268021b96c0d489d5ca1b136b61a8fa57bc96312146b06dd1fb895fef"
+    },
+    {
+      "id": "pr058-artifact-6",
+      "path": "verification/research-program/pr-058/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "8ae8f43545db2ed0075a34de85df5c177f3cfd766bf58dc90e704d65541f147c"
+    },
+    {
+      "id": "pr058-artifact-7",
+      "path": "verification/research-program/pr-058/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr058-artifact-8",
+      "path": "verification/research-program/pr-058/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr058-artifact-9",
+      "path": "verification/research-program/pr-058/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "a47f95034e57124f51b930ba8eafae00aec10d4dcfae3009ce9e12000df21ad4"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-058-1",
+      "status": "producer_checked",
+      "result": "Old clients receive supported compatibility or a typed version error, not a silently different response shape.",
+      "command_ids": [
+        "cmd-c058-focused"
+      ]
+    },
+    {
+      "id": "C-058-2",
+      "status": "producer_checked",
+      "result": "Fetch/compile the actual served schema closure. HTML fallback for a schema URL fails.",
+      "command_ids": [
+        "cmd-c058-focused"
+      ]
+    },
+    {
+      "id": "C-058-3",
+      "status": "producer_checked",
+      "result": "Exactly the advertised tools and versions exist. The agent guide does not publish stale generation labels. All eight envelopes validate. A successful tool envelope is not a completed research task. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c058-focused",
+        "cmd-c058-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "envelope-not-task",
+      "status": "accepted",
+      "detail": "A successful tool envelope is not a completed research task. Protocol success and scientific-result states remain separate."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-schema-closure-review",
+      "status": "pending",
+      "detail": "Independent review of served schema closure, typed version errors and envelope-not-task boundary remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "schema-closure-is-not-scientific-approval",
+      "status": "risk",
+      "detail": "A passing schema is not scientific approval. Eight validated envelopes are protocol evidence, not R11 acceptance."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of served schema closure, typed version errors and envelope-not-task boundary, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-058 source and replay focused schema-closure and identity validators. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
