@@ -1,0 +1,264 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-035",
+  "status": "producer_checked",
+  "owner": "/root/pr035_crosswalks",
+  "reviewer": "Astra/root",
+  "base_sha": "e1c2ccf5b4c80b2f549c94106c4583e1e6fd06be",
+  "head_sha": "d2855fed2413623acf4ffaaf4543ead57c286e4a",
+  "dependency_merge_shas": {
+    "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+    "PR-019": "94d7d904800de12df7c9fe5e9a6fdc252e4687e9",
+    "PR-034": "a8437e36ecf102af6f3bc86cf539a0d6b1739796"
+  },
+  "branch": "codex/ushso-pr035-crosswalks-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/crosswalks.mjs",
+    "scripts/research-program/crosswalks.mjs",
+    "tests/research-program/crosswalks.test.mjs",
+    "docs/research-program/crosswalks.md",
+    "verification/research-program/pr-035/",
+    "docs/research-program/handoffs/PR-035.json"
+  ],
+  "problem": "A many-to-many or ambiguous mapping could collapse to one preferred row silently. Unmatched keys and date scope could be dropped. Source-native IDs could be heuristically merged. A shared field name alone could produce a join route. Candidate routes could be treated as qualified before scoped validation and review. Editing sealed identity family-graph.mjs or join-routes.mjs would break WP7.",
+  "resulting_behavior": "Crosswalks live in packages/enrichment/crosswalks.mjs with a thin re-export at scripts/research-program/crosswalks.mjs. Priority CCN/NPI/facility and geographic-vintage crosswalks store publisher, release, rights and exact access route. Entity and key-system mismatches fail closed. Absence of a crosswalk is explicit. One-to-many mappings, unmatched keys and date scope are preserved. A many-to-many or ambiguous mapping cannot collapse to one preferred row. Candidate routes remain candidate until scoped validation and review. A shared field name alone cannot produce a route. Mapping files are data products with their own versions. Sealed packages/identity/src/family-graph.mjs (4322 bytes) and join-routes.mjs (6287 bytes) are unchanged.",
+  "commits": [
+    {
+      "id": "C-035-1",
+      "subject": "Register priority crosswalk sources",
+      "sha": "bbed98e223be53f550fa405f968edc3051ed59ae"
+    },
+    {
+      "id": "C-035-2",
+      "subject": "Parse bounded mapping evidence",
+      "sha": "bbed98e223be53f550fa405f968edc3051ed59ae"
+    },
+    {
+      "id": "C-035-3",
+      "subject": "Create evidence-bearing route candidates",
+      "sha": "d2855fed2413623acf4ffaaf4543ead57c286e4a"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "crosswalks",
+      "id": "packages/enrichment/crosswalks.mjs",
+      "location": "local",
+      "sha256": "a3f18d65c03d03474c2661c44ace6728400fe97ea50f551a990f98bf654203e0"
+    },
+    {
+      "kind": "crosswalks-script",
+      "id": "scripts/research-program/crosswalks.mjs",
+      "location": "local",
+      "sha256": "bd70d86ec5eff2e07491fb1e39ec893181dd67661c882daa33b55b05a0f6717b"
+    },
+    {
+      "kind": "crosswalks-tests",
+      "id": "tests/research-program/crosswalks.test.mjs",
+      "location": "local",
+      "sha256": "746708b50308483e4fb43e0d988c196ed2ee2c49c113c1c22c97f1b37ad3f08e"
+    },
+    {
+      "kind": "crosswalks-docs",
+      "id": "docs/research-program/crosswalks.md",
+      "location": "local",
+      "sha256": "13241c8a609e83284a9f03d6d1f4eb62557be5c2126cd510a0339b6d5ac45ab2"
+    },
+    {
+      "kind": "sealed-family-graph-unchanged",
+      "id": "packages/identity/src/family-graph.mjs",
+      "location": "local",
+      "sha256": "28eeb0a674404e9583335aeeb0a0ab925ddc19d4f4a3a4730dff74aed0a958bd"
+    },
+    {
+      "kind": "sealed-join-routes-unchanged",
+      "id": "packages/identity/src/join-routes.mjs",
+      "location": "local",
+      "sha256": "89a325c4d8ae94be562d7eb9ec69191d694f5dd60ac9953f5cd24ab103584ede"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c035-focused",
+      "command": "node --test tests/research-program/crosswalks.test.mjs",
+      "started_at": "2026-09-14T11:25:51.445424Z",
+      "completed_at": "2026-09-14T11:25:51.540183Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 crosswalks tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c035-focused-event",
+        "path": "verification/research-program/pr-035/producer-20260914/commands/focused-crosswalks/event.json",
+        "sha256": "309e28aa4e57c0aaff6fa9ec47b400bc2c0c01ebe7750897f6e06136e6e2fa7c",
+        "bytes": 1042
+      }
+    },
+    {
+      "id": "cmd-c035-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T11:25:51.540583Z",
+      "completed_at": "2026-09-14T11:25:51.602175Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c035-identity-event",
+        "path": "verification/research-program/pr-035/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "09cc1f504d8df71aaaa37d65ade036d8d96ea131ff2b66fb5acdad9c2961577c",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr035-artifact-0",
+      "path": "verification/research-program/pr-035/task-binding.json",
+      "bytes": 3738,
+      "sha256": "d4da820e0da296f2bacd440280ad4bb7a90e97e982c17347815b6dd00bea1fb0"
+    },
+    {
+      "id": "pr035-artifact-1",
+      "path": "verification/research-program/pr-035/dispatch.json",
+      "bytes": 2290,
+      "sha256": "954dbbb0ea14346fe28bc8fac22f88bb846a40b46be1d3fee85bc8b922c5f65a"
+    },
+    {
+      "id": "pr035-artifact-2",
+      "path": "verification/research-program/pr-035/producer-20260914/commands/focused-crosswalks/receipt.json",
+      "bytes": 459,
+      "sha256": "478b0e89cd98a14db65f1b1a1ea05c7fa9204d37f68cb217aaa4625715a23216"
+    },
+    {
+      "id": "pr035-artifact-3",
+      "path": "verification/research-program/pr-035/producer-20260914/commands/focused-crosswalks/stdout.log",
+      "bytes": 521,
+      "sha256": "9eea362a3cd508a6ebadb1dd94fc1ec79efc9d403f94cd97c20df9a30a73a311"
+    },
+    {
+      "id": "pr035-artifact-4",
+      "path": "verification/research-program/pr-035/producer-20260914/commands/focused-crosswalks/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr035-artifact-5",
+      "path": "verification/research-program/pr-035/producer-20260914/commands/focused-crosswalks/event.json",
+      "bytes": 1042,
+      "sha256": "309e28aa4e57c0aaff6fa9ec47b400bc2c0c01ebe7750897f6e06136e6e2fa7c"
+    },
+    {
+      "id": "pr035-artifact-6",
+      "path": "verification/research-program/pr-035/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "492e5ee4632da64500374be5ce24d01f2875af5a648a3c84bb142343f45805cd"
+    },
+    {
+      "id": "pr035-artifact-7",
+      "path": "verification/research-program/pr-035/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr035-artifact-8",
+      "path": "verification/research-program/pr-035/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr035-artifact-9",
+      "path": "verification/research-program/pr-035/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "09cc1f504d8df71aaaa37d65ade036d8d96ea131ff2b66fb5acdad9c2961577c"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-035-1",
+      "status": "producer_checked",
+      "result": "Each route\u2019s intended entity and key system matches the research task. Absence of a crosswalk is explicit.",
+      "command_ids": [
+        "cmd-c035-focused"
+      ]
+    },
+    {
+      "id": "C-035-2",
+      "status": "producer_checked",
+      "result": "A many-to-many or ambiguous mapping cannot collapse to one preferred row silently. Unmatched keys and date scope are preserved.",
+      "command_ids": [
+        "cmd-c035-focused"
+      ]
+    },
+    {
+      "id": "C-035-3",
+      "status": "producer_checked",
+      "result": "A candidate route remains candidate until scoped validation and review. A shared field name alone cannot produce a route. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c035-focused",
+        "cmd-c035-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "sealed-identity-src",
+      "status": "accepted",
+      "detail": "packages/identity/src including family-graph.mjs and join-routes.mjs was not edited. identity validate passes."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Crosswalk candidate modeling is not R08 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-crosswalk-review",
+      "status": "pending",
+      "detail": "Independent review of ambiguous-mapping refusal, entity/key-system match and candidate-until-review routes remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "ledger-owned-paths-named-sealed-packages",
+      "status": "risk",
+      "detail": "The original ledger named packages/identity/src/family-graph.mjs and join-routes.mjs. Implementation is in enrichment plus scripts/research-program/crosswalks.mjs to preserve the identity artifact seal."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of ambiguous-mapping refusal, entity/key-system match and candidate-until-review routes, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-035 source and replay focused crosswalks and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
