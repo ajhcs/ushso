@@ -5,7 +5,7 @@ import { ResearcherDecisionSummary } from '../components/ResearcherDecisionSumma
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
 import { assertDiscoveryResult } from '../providers/discoveryProvider'
 import { adaptDiscoveryResponse } from './catalogAdapter'
-import { buildResearcherGuidance } from './researcherGuidance'
+import { buildResearcherGuidance, refuseBestForFromTopicTags } from './researcherGuidance'
 
 const response = await loadAcceptedDiscoveryFixture()
 assertDiscoveryResult(response)
@@ -107,5 +107,14 @@ describe('researcher decision guidance', () => {
     const markup = renderToStaticMarkup(createElement(ResearcherDecisionSummary, { dataset: unsafe }))
     expect(guidance.retrievalRecipe.steps[0].url).toBeNull()
     expect(markup).not.toContain(url)
+  })
+
+  it('cannot declare Best for from topic tags alone', () => {
+    expect(refuseBestForFromTopicTags(['hospitals', 'finance'], ['hospitals', 'finance'])).toEqual([
+      'Best for cannot be declared from topic tags alone; documented use evidence is required.',
+    ])
+    const guidance = buildResearcherGuidance(dataset)
+    const best = guidance.useCard.fields.find((field) => field.label === 'Best for')
+    expect(best?.values.join(' ')).not.toMatch(/^Best for hospital$/i)
   })
 })
