@@ -57,3 +57,25 @@ describe('source inventory facet presentation', () => {
     expect(groups[0].label).not.toBe('Conflicting current-page source label')
   })
 })
+
+describe('historical readiness is not current coverage', () => {
+  it('archives the v1.1.0 Pennsylvania published-record count', async () => {
+    const { archiveHistoricalReadiness, overlayLabel, HISTORICAL_PA_PUBLISHED_RECORD_COUNT } = await import('./SourcesPage')
+    const readiness = await fetch('/state-readiness-v0.1.0.json').then((response) => response.json()).catch(async () => {
+      const { readFileSync } = await import('node:fs')
+      const { fileURLToPath } = await import('node:url')
+      const path = await import('node:path')
+      const file = path.join(path.dirname(fileURLToPath(import.meta.url)), '../../public/state-readiness-v0.1.0.json')
+      return JSON.parse(readFileSync(file, 'utf8'))
+    })
+    const archived = archiveHistoricalReadiness(readiness)
+    const pa = archived.states.find((state: { postal: string }) => state.postal === 'PA')
+    expect(pa).toBeDefined()
+    if (!pa) throw new Error('expected archived Pennsylvania readiness row')
+    expect(pa.archived_published_state_record_count).toBe(HISTORICAL_PA_PUBLISHED_RECORD_COUNT)
+    expect(pa.current_published_state_record_count).toBe(0)
+    expect(pa.published_state_record_count_is_current).toBe(false)
+    expect(overlayLabel(pa)).toContain('not current coverage')
+    expect(overlayLabel(pa)).not.toBe('24 state records published')
+  })
+})

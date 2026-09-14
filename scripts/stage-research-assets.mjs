@@ -825,3 +825,24 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     process.exitCode = 1;
   });
 }
+
+export function measureAssetPage(entries = [], { pageSize = 50, maxPageBytes = LIMITS.maxPageBytes } = {}) {
+  if (!Array.isArray(entries)) fail('DICTIONARY_ENTRIES_REQUIRED');
+  const pages = [];
+  let current = [];
+  let bytes = 0;
+  for (const entry of entries) {
+    const encoded = JSON.stringify(entry);
+    const size = Buffer.byteLength(encoded);
+    if (size > maxPageBytes) fail('DICTIONARY_ENTRY_TOO_LARGE');
+    if (current.length >= pageSize || bytes + size > maxPageBytes) {
+      if (current.length) pages.push(current);
+      current = [];
+      bytes = 0;
+    }
+    current.push(entry);
+    bytes += size;
+  }
+  if (current.length) pages.push(current);
+  return { page_count: pages.length, page_size: pageSize, max_page_bytes: maxPageBytes, pages, asset_count: entries.length };
+}
