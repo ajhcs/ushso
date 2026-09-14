@@ -1,0 +1,75 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr024-inference-budget-20260914",
+  "slice_id": "C-024-1",
+  "pr_id": "PR-024",
+  "title": "Enforce inference budgets, deduplication and usage accounting",
+  "owner": "/root/pr024_inference_budget",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr024-inference-budget-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr024-inference-budget-20260914",
+  "objective": "Concurrent enrichment jobs cannot silently exceed the selected spend cap.",
+  "outcome": "Two workers racing for the final budget unit cannot both proceed. Missing price data fails closed. Timeout after send, 402, 429, malformed usage and process restart leave uncertain charges that are not assumed free. A changed source or prompt invalidates the cache; an unchanged rerun performs no duplicate inference. The proposed $10 pilot/$50 monthly values are editable configuration, not hidden defaults. The cost report includes failures, retries and rejected proposals.",
+  "dependencies": [
+    "PR-012",
+    "PR-022",
+    "PR-023"
+  ],
+  "owned_paths": [
+    "packages/enrichment/budget-ledger.mjs",
+    "packages/enrichment/job-cache.mjs",
+    "tests/research-program/inference-budget.test.mjs",
+    "verification/research-program/pr-024/",
+    "docs/research-program/handoffs/PR-024.json"
+  ],
+  "commits": [
+    {
+      "id": "C-024-1",
+      "subject": "Reserve worst-case request spend",
+      "instructions": "Compute reservations from input tokens, maximum output/reasoning allowance, selected maximum prices and retry policy. Use atomic durable reservations and a configurable UTC period.",
+      "verification": "Two workers racing for the final budget unit cannot both proceed; missing price data fails closed."
+    },
+    {
+      "id": "C-024-2",
+      "subject": "Reconcile actual provider usage",
+      "instructions": "Persist usage/cost/provider IDs on success and uncertain-charge state on interrupted responses. Cap retries and honor Retry-After without repeatedly purchasing the same task.",
+      "verification": "Tests cover timeout after send, 402, 429, malformed usage and process restart; uncertain charges are not assumed free."
+    },
+    {
+      "id": "C-024-3",
+      "subject": "Cache by complete task identity",
+      "instructions": "Key cached proposals by source bytes, parser/prompt/schema/model/provider-policy versions and task scope. Emit cost per accepted claim and review workload.",
+      "verification": "A changed source or prompt invalidates the cache; an unchanged rerun performs no duplicate inference."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/inference-budget.test.mjs",
+    "node --test tests/research-program/provider-policy.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-024.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-024/",
+  "binding": {
+    "base_sha": "2852bdd10df0ea85079c4a9ad49e5c925f5db95a",
+    "base_tree": "93d914529c6ed97ba5c55338475b3dce82d73ea6",
+    "dependency_merge_shas": {
+      "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+      "PR-022": "00b2c0a5073b21f9d0c7f365a72d1432bbd18014",
+      "PR-023": "6d0666d7a2aec2c61a42995e160f8224ef05a05a"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
