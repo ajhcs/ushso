@@ -1,0 +1,377 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-014",
+  "status": "producer_checked",
+  "owner": "/root/pr014_cdc_view",
+  "reviewer": "Astra/root",
+  "base_sha": "861a7808fec20e5e7795bb8f8082f82717e01f11",
+  "head_sha": "2cb51b5317dced251281bbf96820646bfda3163d",
+  "dependency_merge_shas": {
+    "PR-007": "0d730aaf07b89bb16fb66fc224841a2d66c80d49",
+    "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+    "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74",
+    "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0"
+  },
+  "branch": "codex/ushso-pr014-cdc-view-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/connectors/src/adapters/cdc-view.mjs",
+    "tests/research-program/cdc-view.test.mjs",
+    "verification/research-program/pr-014/",
+    "docs/research-program/handoffs/PR-014.json"
+  ],
+  "problem": "CDC catalog entries mixed tabular datasets with documents, visualizations and external links. Field extraction could run before view identity was verified, treat a dashboard as a queryable table, infer geography completeness or person-level grain from PLACES columns, or drop isolated records.",
+  "resulting_behavior": "bindCdcView verifies the Socrata view id before extracting columns. Tabular table views stay in the row-sample queue. Documents (blobby), visualizations (story/chart/map) and external links (href) stay out and are not queryable tables. PLACES county GIS 2023 (7cmc-7y5g) produces 154 documented fields without geography completeness or person-level grain. buildCdcExtractionReceipt reconciles all 1472 CDC IDs; none disappear. The four empty-description isolated records remain in compatibility/missing-data handling. Dictionary counts use record IDs with parse receipts, not fetched pages. HTTP 200 HTML cannot be JSON success. Live fetch is forbidden.",
+  "commits": [
+    {
+      "id": "C-014-1",
+      "subject": "Resolve exact Socrata view metadata",
+      "sha": "1cbaa0ac8f8e644fad82019cf5b92008f54a8cfc"
+    },
+    {
+      "id": "C-014-2",
+      "subject": "Extract columns and metadata roles",
+      "sha": "1cbaa0ac8f8e644fad82019cf5b92008f54a8cfc"
+    },
+    {
+      "id": "C-014-3",
+      "subject": "Build the CDC extraction receipt",
+      "sha": "2cb51b5317dced251281bbf96820646bfda3163d"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "cdc-view-adapter",
+      "id": "packages/connectors/src/adapters/cdc-view.mjs",
+      "location": "local",
+      "sha256": "881af31d56f084960423f68d8222928da71091d441579b82cc7b8a05edfeb3e6"
+    },
+    {
+      "kind": "cdc-view-tests",
+      "id": "tests/research-program/cdc-view.test.mjs",
+      "location": "local",
+      "sha256": "69f5a3c37eb8657c3cd17e05b448ecc07bcb6f1f7523484415f3802d4d283f39"
+    },
+    {
+      "kind": "cdc-view-index",
+      "id": "verification/research-program/pr-014/fixtures/cdc-view-index.json.gz",
+      "location": "local",
+      "sha256": "dec0d7abbce8badc1831a52d362ca0c2fa0e272dc795559a672f24d5e370b3c5"
+    },
+    {
+      "kind": "places-154-fixture",
+      "id": "verification/research-program/pr-014/fixtures/places-7cmc-7y5g.json.gz",
+      "location": "local",
+      "sha256": "d60f29198c7dc340123767048a0d79633fbcb9eb12b2c8be122c234bb6c40c64"
+    },
+    {
+      "kind": "source-extractors",
+      "id": "scripts/research/source-extractors.mjs",
+      "location": "local",
+      "sha256": "c9d519a79074a8a8235d15c6d6e9ac5a51c80c33245c10f9ebf569dddbed04cc"
+    },
+    {
+      "kind": "socrata-adapter",
+      "id": "packages/connectors/src/adapters/socrata.mjs",
+      "location": "local",
+      "sha256": "f367f9241141949f9e36bfd4cc8516c7416ef92ce8d4746421070c0b51c089c6"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c014-focused",
+      "command": "node --test tests/research-program/cdc-view.test.mjs",
+      "started_at": "2026-09-14T03:42:25.995529Z",
+      "completed_at": "2026-09-14T03:42:27.068442Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "9/9 focused CDC view tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c014-focused-event",
+        "path": "verification/research-program/pr-014/producer-20260914/commands/focused-cdc-view/event.json",
+        "sha256": "3c2549be16892cf845835a3c0edf6c971e24e190019820e197abc9346d34ba4a",
+        "bytes": 1040
+      }
+    },
+    {
+      "id": "cmd-c014-extractors",
+      "command": "node --test tests/research-extractors.test.mjs",
+      "started_at": "2026-09-14T03:42:27.068827Z",
+      "completed_at": "2026-09-14T03:42:27.262673Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "19/19 research-extractors tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c014-extractors-event",
+        "path": "verification/research-program/pr-014/producer-20260914/commands/research-extractors/event.json",
+        "sha256": "11e883ad0e6dd25cae64e47896449204240b4d8466209280cc2ad2f16c0d369e",
+        "bytes": 1049
+      }
+    },
+    {
+      "id": "cmd-c014-http",
+      "command": "node --test tests/research-program/http-outcomes.test.mjs",
+      "started_at": "2026-09-14T03:42:27.263004Z",
+      "completed_at": "2026-09-14T03:42:28.208323Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "10/10 HTTP outcomes tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c014-http-event",
+        "path": "verification/research-program/pr-014/producer-20260914/commands/http-outcomes/event.json",
+        "sha256": "c34c3118a23205c29ba759706e518c4ea228ab956f19e337e9ede74c288ec409",
+        "bytes": 1035
+      }
+    },
+    {
+      "id": "cmd-c014-cms",
+      "command": "node --test tests/research-program/cms-resources.test.mjs",
+      "started_at": "2026-09-14T03:42:28.208693Z",
+      "completed_at": "2026-09-14T03:42:30.089430Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "10/10 CMS resources tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c014-cms-event",
+        "path": "verification/research-program/pr-014/producer-20260914/commands/cms-resources/event.json",
+        "sha256": "ee4c7a49428539e0a1369020353c566766d633c248ce167a8842a67e01e24f10",
+        "bytes": 1036
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr014-artifact-0",
+      "path": "verification/research-program/pr-014/task-binding.json",
+      "bytes": 3716,
+      "sha256": "94cfa7aa57f0d1b67b466292c7d4e5cd7d59ccfeb7edcb39a6c9c06b04ced9f0"
+    },
+    {
+      "id": "pr014-artifact-1",
+      "path": "verification/research-program/pr-014/dispatch.json",
+      "bytes": 2539,
+      "sha256": "284198b9c7d8cc7c073f513f6fccefddf668c597495d7ead06bf4830f31fee77"
+    },
+    {
+      "id": "pr014-artifact-2",
+      "path": "verification/research-program/pr-014/fixtures/cdc-view-index.json.gz",
+      "bytes": 150150,
+      "sha256": "dec0d7abbce8badc1831a52d362ca0c2fa0e272dc795559a672f24d5e370b3c5"
+    },
+    {
+      "id": "pr014-artifact-3",
+      "path": "verification/research-program/pr-014/fixtures/places-7cmc-7y5g.json.gz",
+      "bytes": 5164,
+      "sha256": "d60f29198c7dc340123767048a0d79633fbcb9eb12b2c8be122c234bb6c40c64"
+    },
+    {
+      "id": "pr014-artifact-4",
+      "path": "verification/research-program/pr-014/fixtures/cdc-view-type-examples.json",
+      "bytes": 2370,
+      "sha256": "82e57496c16dfe34b55fd0ee42a19de04d34e8c63cdcebab02f181782afa2e2c"
+    },
+    {
+      "id": "pr014-artifact-5",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/focused-cdc-view/receipt.json",
+      "bytes": 455,
+      "sha256": "aefa93107ccbad2566242aa1d63e590a51f330b6354e2dae8b686dac9b1963f5"
+    },
+    {
+      "id": "pr014-artifact-6",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/focused-cdc-view/stdout.log",
+      "bytes": 881,
+      "sha256": "a3f6802ce4e3a35cabf0fbed12a6ef8c481eabe1d639f550c1c23e22fbecd3e7"
+    },
+    {
+      "id": "pr014-artifact-7",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/focused-cdc-view/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr014-artifact-8",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/focused-cdc-view/event.json",
+      "bytes": 1040,
+      "sha256": "3c2549be16892cf845835a3c0edf6c971e24e190019820e197abc9346d34ba4a"
+    },
+    {
+      "id": "pr014-artifact-9",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/research-extractors/receipt.json",
+      "bytes": 453,
+      "sha256": "a08e407d05e4d81d38c7710ba0b7aca636f1c5650d7498e4eba3d2cef647f497"
+    },
+    {
+      "id": "pr014-artifact-10",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/research-extractors/stdout.log",
+      "bytes": 2037,
+      "sha256": "77d44298d21bb32b6165d4132a99463fb30065b7620690b6d947c4ea618a1db2"
+    },
+    {
+      "id": "pr014-artifact-11",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/research-extractors/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr014-artifact-12",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/research-extractors/event.json",
+      "bytes": 1049,
+      "sha256": "11e883ad0e6dd25cae64e47896449204240b4d8466209280cc2ad2f16c0d369e"
+    },
+    {
+      "id": "pr014-artifact-13",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/http-outcomes/receipt.json",
+      "bytes": 457,
+      "sha256": "f5ebdb3551da5b4a06e4fe6682ee88ea2dfd485673433c76129d36992d658bb7"
+    },
+    {
+      "id": "pr014-artifact-14",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/http-outcomes/stdout.log",
+      "bytes": 989,
+      "sha256": "9ef68dee9291d6667f7fb6f23b734af0a2e053e52bd203cd1305e8401f580977"
+    },
+    {
+      "id": "pr014-artifact-15",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/http-outcomes/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr014-artifact-16",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/http-outcomes/event.json",
+      "bytes": 1035,
+      "sha256": "c34c3118a23205c29ba759706e518c4ea228ab956f19e337e9ede74c288ec409"
+    },
+    {
+      "id": "pr014-artifact-17",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/cms-resources/receipt.json",
+      "bytes": 458,
+      "sha256": "4078a45a572e22a542d3861d2e98610faccb93413e40bf083ce09bcc321dbef1"
+    },
+    {
+      "id": "pr014-artifact-18",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/cms-resources/stdout.log",
+      "bytes": 1001,
+      "sha256": "f31d21e3092c536bf339f30de202a4412db538753393c5106a30764217cdd022"
+    },
+    {
+      "id": "pr014-artifact-19",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/cms-resources/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr014-artifact-20",
+      "path": "verification/research-program/pr-014/producer-20260914/commands/cms-resources/event.json",
+      "bytes": 1036,
+      "sha256": "ee4c7a49428539e0a1369020353c566766d633c248ce167a8842a67e01e24f10"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-014-1",
+      "status": "producer_checked",
+      "result": "View identity is verified before extraction. Tabular tables stay in the row-sample queue; document/visualization/external-link views stay out.",
+      "command_ids": [
+        "cmd-c014-focused"
+      ]
+    },
+    {
+      "id": "C-014-2",
+      "status": "producer_checked",
+      "result": "PLACES 7cmc-7y5g produces 154 documented fields. Wire fieldName/label/type/description/code samples are preserved. Geography completeness and person-level grain remain false.",
+      "command_ids": [
+        "cmd-c014-focused"
+      ]
+    },
+    {
+      "id": "C-014-3",
+      "status": "producer_checked",
+      "result": "All 1472 CDC IDs have a reconciled row. Four isolated records stay in compatibility/missing-data handling. Dictionary counts use record IDs with parse receipts. Extractors, HTTP outcomes and CMS resources remain green.",
+      "command_ids": [
+        "cmd-c014-focused",
+        "cmd-c014-extractors",
+        "cmd-c014-http",
+        "cmd-c014-cms"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-cdc-http",
+      "status": "accepted",
+      "detail": "Tests consume retained gzip view-index and PLACES fixtures. blockedFetch forbids live HTTP to data.cdc.gov."
+    },
+    {
+      "id": "full-column-bodies-for-all-1472",
+      "status": "skipped",
+      "detail": "The 1472-row index carries viewType/displayType/named_column_count. Full column arrays are retained for the PLACES 154-field fixture; other IDs are classified from the index without asserting payload success."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-cdc-view-review",
+      "status": "pending",
+      "detail": "Independent review of view-kind classification, PLACES 154-field extraction and isolated-record handling remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "index-named-column-count-without-bodies",
+      "status": "risk",
+      "detail": "Dictionary parse receipts are issued only when a full column array is supplied (PLACES fixture). The 1472-row receipt classifies row-sample eligibility from retained view kinds without inventing columns."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of CDC view binding, PLACES columns and isolated-record handling, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-014 source and replay focused CDC, extractors, HTTP outcomes and CMS resources tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
