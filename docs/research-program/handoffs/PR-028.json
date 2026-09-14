@@ -5,52 +5,45 @@
   "owner": "/root/pr028_review_queue",
   "reviewer": "Astra/root",
   "base_sha": "ef63413fa1d3e13e2cfbd180962df2090be07f80",
-  "head_sha": "15720fad04924d0ba81a7d89db4a41134a9619d2",
+  "head_sha": "fb8d67e150f6580db70d88d8a11efd8db4620f72",
   "dependency_merge_shas": {
     "PR-026": "d50de58bbb834d3924a3a223e14a3444a420611a",
     "PR-027": "62fc8514c508c1876f2435c03aee8bee3659d825"
   },
   "branch": "codex/ushso-pr028-review-queue-20260914",
-  "github_pr_url": null,
+  "github_pr_url": "https://github.com/ajhcs/ushso/pull/46",
   "changed_files": [
-    "packages/identity/src/review-queue.mjs",
     "packages/enrichment/review-packet.mjs",
     "docs/research-program/review-rules.md",
     "tests/research-program/review-queue.test.mjs",
     "verification/research-program/pr-028/",
     "docs/research-program/handoffs/PR-028.json"
   ],
-  "problem": "Reviewers could be asked to approve an unspecified whole dataset. Accepting one field could silently accept others. Identical evidence grouping could merge separate source identities. Stale approvals could survive revised source bytes. Pending proposals could be described as public facts. Existing identity-candidate queues could be broken.",
-  "resulting_behavior": "buildClaimReviewPacket shows before/after, release/context, cited passage, parser/model versions, disagreements and affected products/examples. Packet hashes bind the precise values reviewed. Identical evidence is grouped without merging source identities. A reviewer can accept one field while leaving others unresolved. Dispositions are accept, reject, request evidence and supersede. Units, denominators, grain and identity conflicts have higher priority. Revised source bytes or changed proposals invalidate stale decisions. Queue reports age, cause, owners and accepted/rejected counts. Pending proposals are never public facts. Whole-dataset approval is forbidden. Existing identity-candidate buildReviewQueue behavior is preserved. schema-catalog.mjs remains 16653 bytes.",
+  "problem": "Reviewers could be asked to approve an unspecified whole dataset. Accepting one field could silently accept others. Identical evidence grouping could merge separate source identities. Stale approvals could survive revised source bytes. Pending proposals could be described as public facts. Editing sealed identity sources broke the WP7 artifact seal.",
+  "resulting_behavior": "Claim-review packets live in packages/enrichment/review-packet.mjs. A reviewer can accept one field while leaving others unresolved. Packet hashes bind reviewed values. Identical evidence is grouped without merging source identities. Dispositions are accept, reject, request evidence and supersede. Revised source bytes invalidate stale decisions. Pending proposals are never public facts. Whole-dataset approval is forbidden. Sealed packages/identity/src/review-queue.mjs remains 3033 bytes / 86196f3e\u2026 and schema-catalog.mjs remains 16653 bytes. WP7 identity artifact seal validates.",
   "commits": [
     {
       "id": "C-028-1",
       "subject": "Build compact claim review packets",
-      "sha": "e024e859339fad85f1b87aeb3584c756c26bf8b4"
+      "sha": "fb8d67e150f6580db70d88d8a11efd8db4620f72"
     },
     {
       "id": "C-028-2",
       "subject": "Add recorded dispositions",
-      "sha": "e024e859339fad85f1b87aeb3584c756c26bf8b4"
+      "sha": "fb8d67e150f6580db70d88d8a11efd8db4620f72"
     },
     {
       "id": "C-028-3",
       "subject": "Expose queue and turnaround metrics",
-      "sha": "15720fad04924d0ba81a7d89db4a41134a9619d2"
+      "sha": "fb8d67e150f6580db70d88d8a11efd8db4620f72"
     }
   ],
   "source_identities": [
     {
-      "kind": "review-queue",
-      "id": "packages/identity/src/review-queue.mjs",
-      "location": "local",
-      "sha256": "5b796fe3c837ea3f5ae5da91b6c4403c2e286740ea73560c8f6913ceb9d93a0d"
-    },
-    {
       "kind": "review-packet",
       "id": "packages/enrichment/review-packet.mjs",
       "location": "local",
-      "sha256": "96dfdd37042d798aa91755c5fbc250e89d6814e1bc4af73771773a698c77822b"
+      "sha256": "9375f034aef608c10ffe840816457a7cb519cba257135ed4dd53751ed5a62663"
     },
     {
       "kind": "review-rules",
@@ -62,7 +55,13 @@
       "kind": "review-queue-tests",
       "id": "tests/research-program/review-queue.test.mjs",
       "location": "local",
-      "sha256": "a7c37ade9f5091670ed84bcb4d23645b7997260c3e16538981aa5363978d0382"
+      "sha256": "26832e4b4b5257746c4c263fa56617570c6b5fa6bea00cd2fb732295a1d0956b"
+    },
+    {
+      "kind": "sealed-identity-review-queue-unchanged",
+      "id": "packages/identity/src/review-queue.mjs",
+      "location": "local",
+      "sha256": "86196f3e93e13caee5e0fd6d747f5f26e81bf8f879d4c876d2a61e6e9f7e7ed6"
     },
     {
       "kind": "sealed-schema-catalog-unchanged",
@@ -75,8 +74,8 @@
     {
       "id": "cmd-c028-focused",
       "command": "node --test tests/research-program/review-queue.test.mjs",
-      "started_at": "2026-09-14T08:41:30.134913Z",
-      "completed_at": "2026-09-14T08:41:30.243159Z",
+      "started_at": "2026-09-14T08:54:00.820022Z",
+      "completed_at": "2026-09-14T08:54:00.924816Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "3/3 review-queue tests pass.",
@@ -91,15 +90,15 @@
       "event_source": {
         "id": "cmd-c028-focused-event",
         "path": "verification/research-program/pr-028/producer-20260914/commands/focused-review/event.json",
-        "sha256": "0d2df3bf8386d2dc874a3b77b44d1745bf8bc9b331c34ed19ab91762973e9b1e",
+        "sha256": "7952d8a80033e5e633b66e3d7ea7b831763eaf5088f7f6cf765e60fb2366d767",
         "bytes": 1034
       }
     },
     {
       "id": "cmd-c028-claims",
       "command": "node --test tests/research-program/claim-validation.test.mjs",
-      "started_at": "2026-09-14T08:41:30.243551Z",
-      "completed_at": "2026-09-14T08:41:30.355560Z",
+      "started_at": "2026-09-14T08:54:00.925248Z",
+      "completed_at": "2026-09-14T08:54:01.038122Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "3/3 claim-validation tests pass.",
@@ -114,15 +113,15 @@
       "event_source": {
         "id": "cmd-c028-claims-event",
         "path": "verification/research-program/pr-028/producer-20260914/commands/claim-validation/event.json",
-        "sha256": "60487914fc273c575d57bf71dce6cc8b4e4c5aa9b7ecfb58b9044b7cfd575392",
+        "sha256": "526bc567c79bde1b4184388a5ee667ff44ba0217ea96a60039a45c1ed48dafdc",
         "bytes": 1048
       }
     },
     {
       "id": "cmd-c028-identity",
       "command": "node --test packages/identity/test/review-projection-family.test.mjs",
-      "started_at": "2026-09-14T08:41:30.355977Z",
-      "completed_at": "2026-09-14T08:41:30.551682Z",
+      "started_at": "2026-09-14T08:54:01.038589Z",
+      "completed_at": "2026-09-14T08:54:01.235018Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "Existing identity-candidate review-queue tests pass.",
@@ -137,8 +136,31 @@
       "event_source": {
         "id": "cmd-c028-identity-event",
         "path": "verification/research-program/pr-028/producer-20260914/commands/identity-queue/event.json",
-        "sha256": "115d865c76e13d7b3f88ec931452656ab60d6f69728289fb996a2c5fc2391205",
+        "sha256": "5d712de24cf120271789b16433b695272f10557be8555f3c1f2df316138b86f2",
         "bytes": 1071
+      }
+    },
+    {
+      "id": "cmd-c028-wp7",
+      "command": "node verification/wp7/v1.0.0/tools/validate.mjs",
+      "started_at": "2026-09-14T08:54:01.235491Z",
+      "completed_at": "2026-09-14T08:54:01.513900Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "WP7 identity artifact seal validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c028-wp7-event",
+        "path": "verification/research-program/pr-028/producer-20260914/commands/wp7-validate/event.json",
+        "sha256": "df08880d6cdf54632170c91f9f5e4941fda73d3a4368f64db951cdea2dbdf390",
+        "bytes": 1022
       }
     }
   ],
@@ -159,13 +181,13 @@
       "id": "pr028-artifact-2",
       "path": "verification/research-program/pr-028/producer-20260914/commands/focused-review/receipt.json",
       "bytes": 457,
-      "sha256": "49dca589d6fe0c1cf8ffdbffb9f10ee448afdbce35b69ff8da902e9aabe4f6d1"
+      "sha256": "c9f2f2b7cf1e7537b1ddf2aec9660baeb3f08a5b4ee979bd568f835d4461ccf3"
     },
     {
       "id": "pr028-artifact-3",
       "path": "verification/research-program/pr-028/producer-20260914/commands/focused-review/stdout.log",
-      "bytes": 495,
-      "sha256": "f97051d2935093bec496d808fdb6875057b12d977df644acd9f6debaadeba5f9"
+      "bytes": 494,
+      "sha256": "03b21872662e347e6baf527f8ef5e05b96826aacffb19892d5eb451763abf500"
     },
     {
       "id": "pr028-artifact-4",
@@ -177,19 +199,19 @@
       "id": "pr028-artifact-5",
       "path": "verification/research-program/pr-028/producer-20260914/commands/focused-review/event.json",
       "bytes": 1034,
-      "sha256": "0d2df3bf8386d2dc874a3b77b44d1745bf8bc9b331c34ed19ab91762973e9b1e"
+      "sha256": "7952d8a80033e5e633b66e3d7ea7b831763eaf5088f7f6cf765e60fb2366d767"
     },
     {
       "id": "pr028-artifact-6",
       "path": "verification/research-program/pr-028/producer-20260914/commands/claim-validation/receipt.json",
       "bytes": 463,
-      "sha256": "5c2d2cd854aaae2696e79556319041aee0ad811d5acfb8db3c1d2b0d9cc0b1fa"
+      "sha256": "6da76422ed395953c589130fb78dbf0d0fd7dad16640732da9fbf6bb0d448269"
     },
     {
       "id": "pr028-artifact-7",
       "path": "verification/research-program/pr-028/producer-20260914/commands/claim-validation/stdout.log",
       "bytes": 430,
-      "sha256": "b99c4d793493370d3a0882c78f56a8d18d7f6993a8cac16c381bc67873cb4be1"
+      "sha256": "cb0f4c8e0597cd85f44f9cccd842a5cfba3dfa6282bcbe7b649b0db32031c866"
     },
     {
       "id": "pr028-artifact-8",
@@ -201,19 +223,19 @@
       "id": "pr028-artifact-9",
       "path": "verification/research-program/pr-028/producer-20260914/commands/claim-validation/event.json",
       "bytes": 1048,
-      "sha256": "60487914fc273c575d57bf71dce6cc8b4e4c5aa9b7ecfb58b9044b7cfd575392"
+      "sha256": "526bc567c79bde1b4184388a5ee667ff44ba0217ea96a60039a45c1ed48dafdc"
     },
     {
       "id": "pr028-artifact-10",
       "path": "verification/research-program/pr-028/producer-20260914/commands/identity-queue/receipt.json",
       "bytes": 470,
-      "sha256": "86c118c91148b14f2f09bd92926dfd853a5aa857d6d7bf96e63fe974547cec34"
+      "sha256": "6133c19d567fab9127d8d116153e300a6964ea41f95889d708ae9dc11276f20c"
     },
     {
       "id": "pr028-artifact-11",
       "path": "verification/research-program/pr-028/producer-20260914/commands/identity-queue/stdout.log",
-      "bytes": 1173,
-      "sha256": "ab45e54f4f04f97b32beab15cba34a936b0d049243abdf3f8ce381dcad18f9b9"
+      "bytes": 1175,
+      "sha256": "82d29271d685ade686588cc75b4c83fab2722e54a486fc90a43a1018e4c2daba"
     },
     {
       "id": "pr028-artifact-12",
@@ -225,52 +247,76 @@
       "id": "pr028-artifact-13",
       "path": "verification/research-program/pr-028/producer-20260914/commands/identity-queue/event.json",
       "bytes": 1071,
-      "sha256": "115d865c76e13d7b3f88ec931452656ab60d6f69728289fb996a2c5fc2391205"
+      "sha256": "5d712de24cf120271789b16433b695272f10557be8555f3c1f2df316138b86f2"
+    },
+    {
+      "id": "pr028-artifact-14",
+      "path": "verification/research-program/pr-028/producer-20260914/commands/wp7-validate/receipt.json",
+      "bytes": 440,
+      "sha256": "c86ae61c22dd033f88bd1ad07a5e1e1b250a65bdbfd16feb4701964b37043a5f"
+    },
+    {
+      "id": "pr028-artifact-15",
+      "path": "verification/research-program/pr-028/producer-20260914/commands/wp7-validate/stdout.log",
+      "bytes": 1687,
+      "sha256": "637cc357b1dc515e7591fcfba0840e50f14b82bccd23d7b0ef6f4712d9141b61"
+    },
+    {
+      "id": "pr028-artifact-16",
+      "path": "verification/research-program/pr-028/producer-20260914/commands/wp7-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr028-artifact-17",
+      "path": "verification/research-program/pr-028/producer-20260914/commands/wp7-validate/event.json",
+      "bytes": 1022,
+      "sha256": "df08880d6cdf54632170c91f9f5e4941fda73d3a4368f64db951cdea2dbdf390"
     }
   ],
   "acceptance_results": [
     {
       "id": "C-028-1",
       "status": "producer_checked",
-      "result": "A reviewer can accept one field while leaving others unresolved. Packet hashes bind reviewed values. Evidence validation is independently replayable from the packet.",
-      "command_ids": [
-        "cmd-c028-focused",
-        "cmd-c028-claims"
-      ]
-    },
-    {
-      "id": "C-028-2",
-      "status": "producer_checked",
-      "result": "Identical evidence is grouped without merging source identities. Revised source bytes invalidate stale decisions instead of inheriting approval.",
+      "result": "A reviewer can accept one field while leaving others unresolved. Packet hashes bind reviewed values.",
       "command_ids": [
         "cmd-c028-focused"
       ]
     },
     {
-      "id": "C-028-3",
+      "id": "C-028-2",
       "status": "producer_checked",
-      "result": "Pending essential fields have owners/next steps. Reports never describe pending proposals as public facts. Whole-dataset approval is forbidden. Existing identity-candidate tests remain green.",
+      "result": "Revised source bytes invalidate stale decisions. Identity-candidate tests remain green.",
       "command_ids": [
         "cmd-c028-focused",
         "cmd-c028-identity"
+      ]
+    },
+    {
+      "id": "C-028-3",
+      "status": "producer_checked",
+      "result": "Pending proposals are not public facts. Whole-dataset approval is forbidden. WP7 identity seal validates.",
+      "command_ids": [
+        "cmd-c028-focused",
+        "cmd-c028-wp7"
       ]
     }
   ],
   "failures_and_skipped_checks": [
     {
-      "id": "human-domain-acceptance",
+      "id": "first-gate-wp7-seal",
       "status": "accepted",
-      "detail": "These are fixture dispositions. They do not accept R02/R05/R14 or issue current WP11 approval."
+      "detail": "First local gate/CI failed ARTIFACT_MANIFEST_MISMATCH after editing sealed review-queue.mjs. Identity file restored; claim review moved to enrichment. WP7 validate now passes."
     },
     {
-      "id": "schema-catalog-sealed",
+      "id": "human-domain-acceptance",
       "status": "accepted",
-      "detail": "packages/identity/src/schema-catalog.mjs remains 16653 bytes and was not edited."
+      "detail": "Fixture dispositions do not accept R02/R05/R14 or issue current WP11 approval."
     },
     {
       "id": "joint-gate",
       "status": "skipped",
-      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+      "detail": "Full local release-gate and hosted CI remain root-owned after this correction."
     }
   ],
   "unresolved_claims": [
@@ -282,18 +328,18 @@
     {
       "id": "independent-review-queue-review",
       "status": "pending",
-      "detail": "Independent review of claim packets, stale invalidation and pending-not-public-fact reports remains required before integration."
+      "detail": "Independent review of the enrichment-only claim-review packets remains required before integration."
     }
   ],
   "risks": [
     {
-      "id": "identity-candidate-queue-still-present",
+      "id": "identity-package-is-sealed",
       "status": "risk",
-      "detail": "buildReviewQueue remains the identity-candidate API. Claim review uses enqueueClaimPackets so the two queues are not mixed."
+      "detail": "Claim review must not edit packages/identity/src; WP7 seals the whole identity payload."
     }
   ],
-  "next_consumer": "Astra/root independent review of claim packets, stale invalidation and pending-not-public-fact reports, then joint local gate and hosted CI.",
-  "next_action": "Independently review C-028 source and replay focused review-queue, claim-validation and identity-candidate tests. Do not issue current approval or R acceptance.",
+  "next_consumer": "Astra/root independent review of enrichment claim packets after the WP7 seal correction, then joint local gate and hosted CI.",
+  "next_action": "Independently review the restored identity queue and enrichment claim packets. Replay focused tests and WP7 validate. Do not issue current approval.",
   "independent_review": {
     "status": "not_started",
     "reviewed_head_sha": null,
