@@ -171,6 +171,56 @@ test('missing dictionary locator stays unresolved rather than dictionary-absent'
   assert.ok(ledger.rows.every((row) => row.dictionary_locator_status === 'present' || row.dictionary_locator_status === 'unresolved'));
 });
 
+test('XLSX tables without the word dictionary stay unresolved, not dictionary-present', async () => {
+  const [catalog, records] = await Promise.all([loadCatalog(), loadCmsRecords()]);
+  const acoIds = [
+    'https://data.cms.gov/data-api/v1/dataset/9767cb68-8ea9-4f0b-8179-9431abc89f11/data-viewer',
+    'https://data.cms.gov/data-api/v1/dataset/5b227bd9-82d4-4145-86fd-809e02ca7f18/data-viewer',
+    'https://data.cms.gov/data-api/v1/dataset/ae8c9418-acc9-4442-b217-33291448f6b8/data-viewer',
+  ];
+  const ledger = buildCmsCauseLedger({ records, catalogCapture: catalog });
+  for (const id of acoIds) {
+    const row = ledger.rows.find((item) => item.source_native_id === id);
+    assert.ok(row, id);
+    assert.equal(row.dictionary_locator_status, 'unresolved');
+    assert.notEqual(row.eligibility, 'dictionary_locator_present');
+    assert.notEqual(row.next_action, 'review_xlsx_dictionary_locator');
+  }
+  const explicit = {
+    record_id: 'obs:asset:cms-data-catalog:xlsx-dictionary',
+    title: 'Explicit dictionary workbook',
+    identity: {
+      source: { source_id: 'cms-data-catalog' },
+      match_fields: { source_id: 'https://data.cms.gov/data-api/v1/dataset/xlsx-dictionary/data-viewer' },
+    },
+  };
+  const dataset = [{
+    identifier: explicit.identity.match_fields.source_id,
+    title: explicit.title,
+    modified: '2026-01-01',
+    temporal: '2020-01-01/2020-12-31',
+    landingPage: 'https://data.cms.gov/xlsx-dictionary',
+    distribution: [{
+      format: 'XLSX',
+      title: 'Data dictionary',
+      downloadURL: 'https://data.cms.gov/dictionary.xlsx',
+      resourcesAPI: 'https://data.cms.gov/data-api/v1/dataset-resources/xlsx-dictionary',
+    }],
+  }];
+  const text = JSON.stringify({ dataset });
+  const capture = retainedCatalogCapture({
+    url: 'https://data.cms.gov/data.json',
+    status: 'captured',
+    sha256: sha256Text(text),
+    text,
+    data: JSON.parse(text),
+  });
+  const bound = bindCmsCatalogResources(explicit, capture);
+  assert.equal(bound.distributions[0].role, 'xlsx_dictionary');
+  const present = buildCmsCauseLedger({ records: [explicit], catalogCapture: capture }).rows[0];
+  assert.equal(present.dictionary_locator_status, 'present');
+});
+
 test('HTTP 200 HTML documentation cannot become JSON payload success', () => {
   const classified = htmlDocumentationCannotBeJsonSuccess({
     headers: headers('text/html; charset=utf-8'),

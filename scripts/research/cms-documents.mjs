@@ -183,7 +183,7 @@ export function bindCmsCatalogResources(record, catalogCapture) {
 
 export function dictionaryLocatorStatus(bound, resourceCaptures = {}) {
   const dictionaryLike = bound.distributions.filter((candidate) =>
-    /dictionary|pdf_dictionary|xlsx_dictionary/.test(candidate.role)
+    ['dictionary', 'pdf_dictionary', 'xlsx_dictionary'].includes(candidate.role)
   );
   if (dictionaryLike.some((candidate) => candidate.locators.length > 0)) return 'present';
   const resourceUrls = bound.distributions.flatMap((candidate) =>
