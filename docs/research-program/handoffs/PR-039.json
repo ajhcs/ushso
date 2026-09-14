@@ -1,0 +1,368 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-039",
+  "status": "producer_checked",
+  "owner": "/root/pr039_retrieval_eval",
+  "reviewer": "Astra/root",
+  "base_sha": "2c39b74a35966429f574583b0e3660fb53eadee1",
+  "head_sha": "bc99202546333c49b95c8083d44cd37d8523d82a",
+  "dependency_merge_shas": {
+    "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+    "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7",
+    "PR-036": "a6c2fc568062c4af3c93d7639bc0bb005ac88dd1",
+    "PR-038": "0c48d23e0573c1bf2a3edf3430b7d1c58d39071e"
+  },
+  "branch": "codex/ushso-pr039-retrieval-eval-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "evaluation/research-program/retrieval-eval/",
+    "scripts/research-program/evaluate-retrieval.mjs",
+    "tests/research-program/evaluate-retrieval.test.mjs",
+    "docs/EVALUATION.md",
+    "verification/research-program/pr-039/",
+    "docs/research-program/handoffs/PR-039.json"
+  ],
+  "problem": "Current-generation retrieval evaluation could overwrite the historical 143-record v1.0.1 baseline. Mismatched cohorts or generations could be compared as improvements. Known absent sources could vanish from the full-universe denominator. Held-out reviewer labels could leak into producer scoring. R07 could be summarized as passing despite failing domains. Editing fingerprint-sealed question-parser.mjs, retrieval-core-v1.2.mjs or controlled-vocabulary.json would break retrieval algorithm fingerprints.",
+  "resulting_behavior": "Current-generation evaluation lives in scripts/research-program/evaluate-retrieval.mjs with identities and public questions under evaluation/research-program/retrieval-eval/. The historical 143-record v1.0.1 baseline remains separate; historical EVALUATION.md metrics are not overwritten. Comparisons reject mismatched cohorts or generations. Known absent named sources remain in the full-universe denominator and reduce coverage. Producer tests and independent reviewer labels are reported separately; held-out labels are unused in producer scoring. R07 remains incomplete: failing domains have bounded remediation tasks instead of a passing summary. Fingerprint-sealed question-parser.mjs (10068 bytes), retrieval-core-v1.2.mjs (48161 bytes) and controlled-vocabulary.json (11268 bytes) are unchanged.",
+  "commits": [
+    {
+      "id": "C-039-1",
+      "subject": "Bind evaluator and result identities",
+      "sha": "585c85ab0e34e50bf43a9e424257d737b63383a6"
+    },
+    {
+      "id": "C-039-2",
+      "subject": "Compute research-level metrics",
+      "sha": "dfdb080d19cf2dfbb18313f8bae97c58e22f24f2"
+    },
+    {
+      "id": "C-039-3",
+      "subject": "Publish results and failures",
+      "sha": "1d28c3a61705dd85a1f853afa2a5ecb1880da4ae"
+    },
+    {
+      "id": "C-039-4",
+      "subject": "Keep retrieval-eval METHODS.md writes to a single trailing newline",
+      "sha": "bc99202546333c49b95c8083d44cd37d8523d82a"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "evaluate-retrieval",
+      "id": "scripts/research-program/evaluate-retrieval.mjs",
+      "location": "local",
+      "sha256": "3998f1b527f95448fc7922cc0c83ae27fc612ad36089e9a0cd21e7a2bc06a055"
+    },
+    {
+      "kind": "eval-identities",
+      "id": "evaluation/research-program/retrieval-eval/identities.json",
+      "location": "local",
+      "sha256": "6ffc570022266d3659c304de226ba93a9ff71bbb0b4321bede57928aba17bd1a"
+    },
+    {
+      "kind": "eval-questions-public",
+      "id": "evaluation/research-program/retrieval-eval/questions.public.json",
+      "location": "local",
+      "sha256": "27eabec23c1f82dcad08e5c826e40cbdb3ce674fd33a3547614603648408b155"
+    },
+    {
+      "kind": "eval-result",
+      "id": "evaluation/research-program/retrieval-eval/result.json",
+      "location": "local",
+      "sha256": "e5ba0be257513757f6c7d249aea00dfb71fb5a5695f3d0dc4c194b26b70762ac"
+    },
+    {
+      "kind": "eval-methods",
+      "id": "evaluation/research-program/retrieval-eval/METHODS.md",
+      "location": "local",
+      "sha256": "db4dfe73a69f2706e52440ddcec05a7b03455d418093caa5be7222f4d95bcd5e"
+    },
+    {
+      "kind": "evaluate-retrieval-tests",
+      "id": "tests/research-program/evaluate-retrieval.test.mjs",
+      "location": "local",
+      "sha256": "c3636512fa8eb554c176b71c8643d14e752b47515e4c39b36c0a0232fbe4c097"
+    },
+    {
+      "kind": "evaluation-md",
+      "id": "docs/EVALUATION.md",
+      "location": "local",
+      "sha256": "fd595c65b03c66edd56359b6463baf07f0ee858ee8453a545ab52928b373ce8f"
+    },
+    {
+      "kind": "fingerprint-sealed-question-parser-unchanged",
+      "id": "packages/retrieval/tools/question-parser.mjs",
+      "location": "local",
+      "sha256": "736a5d9e57ca7e572954a59f8fd6e06d82a8d186e95ef69ea090224b95ae38e8"
+    },
+    {
+      "kind": "retrieval-core-v12-unchanged",
+      "id": "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+      "location": "local",
+      "sha256": "b42ef12b6efda9e10c02f8b8ef4589fb7c2bcfd1f77e38c321b15081c220d23a"
+    },
+    {
+      "kind": "controlled-vocabulary-unchanged",
+      "id": "packages/retrieval/fixtures/controlled-vocabulary.json",
+      "location": "local",
+      "sha256": "e3cf00dc343b74428948276c0206a05f35ea06c0ea61788019ce727bb4720642"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c039-focused",
+      "command": "node --test tests/research-program/evaluate-retrieval.test.mjs",
+      "started_at": "2026-09-14T13:01:06.300602Z",
+      "completed_at": "2026-09-14T13:01:06.426103Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 evaluate-retrieval tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c039-focused-event",
+        "path": "verification/research-program/pr-039/producer-20260914/commands/focused-eval/event.json",
+        "sha256": "d1b06c70ad4ab7d867c6f32bbbffcb87cff29ad0782615caa5c4ace851f3707a",
+        "bytes": 1040
+      }
+    },
+    {
+      "id": "cmd-c039-cli",
+      "command": "node scripts/research-program/evaluate-retrieval.mjs",
+      "started_at": "2026-09-14T13:01:06.426550Z",
+      "completed_at": "2026-09-14T13:01:06.470246Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Current-generation evaluator writes result.json and METHODS.md.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c039-cli-event",
+        "path": "verification/research-program/pr-039/producer-20260914/commands/evaluate-cli/event.json",
+        "sha256": "c736058510d7f2322e2515305425d306042ac07ea2f46a09bee95253b6a1c045",
+        "bytes": 1053
+      }
+    },
+    {
+      "id": "cmd-c039-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T13:01:06.470655Z",
+      "completed_at": "2026-09-14T13:01:06.531700Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c039-identity-event",
+        "path": "verification/research-program/pr-039/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "3e44832bd28a30ad726a5f0be3df09c1a3a6f708a10e4f9a197a2e606144cd6e",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr039-artifact-0",
+      "path": "verification/research-program/pr-039/task-binding.json",
+      "bytes": 4219,
+      "sha256": "da02efcb22d5b3fefda13231bbe67e4d0b696e7e1480b1eac0d734b2637a4719"
+    },
+    {
+      "id": "pr039-artifact-1",
+      "path": "verification/research-program/pr-039/dispatch.json",
+      "bytes": 2965,
+      "sha256": "5cdbd8f9a94babf02f99b022d82d99a5e688d74e0289c82e64757fc6ee402280"
+    },
+    {
+      "id": "pr039-artifact-2",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/focused-eval/receipt.json",
+      "bytes": 461,
+      "sha256": "92f298377722fd917567720fd4ae37c7d317ad2e3051457c0cf4c639448a1b62"
+    },
+    {
+      "id": "pr039-artifact-3",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/focused-eval/stdout.log",
+      "bytes": 514,
+      "sha256": "43546084e8f47aec43012c68a4912499f23944ddf4de4a7480882a128cc52991"
+    },
+    {
+      "id": "pr039-artifact-4",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/focused-eval/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr039-artifact-5",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/focused-eval/event.json",
+      "bytes": 1040,
+      "sha256": "d1b06c70ad4ab7d867c6f32bbbffcb87cff29ad0782615caa5c4ace851f3707a"
+    },
+    {
+      "id": "pr039-artifact-6",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/evaluate-cli/receipt.json",
+      "bytes": 445,
+      "sha256": "206ab62e7740cf4aa76c66e0e01a6c410d048332c6988348560726e62f922706"
+    },
+    {
+      "id": "pr039-artifact-7",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/evaluate-cli/stdout.log",
+      "bytes": 2085,
+      "sha256": "02a44603da81a6a8fb7d8a73469cf71b3dc04eb7aba19215b51d91675f2e1834"
+    },
+    {
+      "id": "pr039-artifact-8",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/evaluate-cli/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr039-artifact-9",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/evaluate-cli/event.json",
+      "bytes": 1053,
+      "sha256": "c736058510d7f2322e2515305425d306042ac07ea2f46a09bee95253b6a1c045"
+    },
+    {
+      "id": "pr039-artifact-10",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "46dec260c6e603938b8ec4e70cc804765864d10ae2de7dbb1e8368adececfb65"
+    },
+    {
+      "id": "pr039-artifact-11",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr039-artifact-12",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr039-artifact-13",
+      "path": "verification/research-program/pr-039/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "3e44832bd28a30ad726a5f0be3df09c1a3a6f708a10e4f9a197a2e606144cd6e"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-039-1",
+      "status": "producer_checked",
+      "result": "Comparisons reject mismatched cohorts or generations. Historical 143-record baseline is retained separately.",
+      "command_ids": [
+        "cmd-c039-focused"
+      ]
+    },
+    {
+      "id": "C-039-2",
+      "status": "producer_checked",
+      "result": "Known absent sources reduce full-universe coverage and do not vanish. Held-out labels unused.",
+      "command_ids": [
+        "cmd-c039-focused",
+        "cmd-c039-cli"
+      ]
+    },
+    {
+      "id": "C-039-3",
+      "status": "producer_checked",
+      "result": "R07 remains incomplete. Failing domains have bounded remediation tasks. Methods page links to this exact result. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c039-focused",
+        "cmd-c039-cli",
+        "cmd-c039-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "historical-143-metrics",
+      "status": "accepted",
+      "detail": "Historical Must-not-miss recall at 1 | 0.216270 remains in docs/EVALUATION.md."
+    },
+    {
+      "id": "held-out-labels",
+      "status": "accepted",
+      "detail": "Producer public questions do not include expected_first_record_id or reviewer_disagreement."
+    },
+    {
+      "id": "fingerprint-sealed-question-parser",
+      "status": "accepted",
+      "detail": "packages/retrieval/tools/question-parser.mjs was not edited (10068 bytes)."
+    },
+    {
+      "id": "retrieval-core-v12",
+      "status": "accepted",
+      "detail": "packages/retrieval/tools/retrieval-core-v1.2.mjs was not edited (48161 bytes)."
+    },
+    {
+      "id": "controlled-vocabulary",
+      "status": "accepted",
+      "detail": "packages/retrieval/fixtures/controlled-vocabulary.json was not edited (11268 bytes)."
+    },
+    {
+      "id": "r07-complete",
+      "status": "accepted",
+      "detail": "R07 remains incomplete; failing domains have remediation tasks."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Current-generation evaluation is not R07/R16 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-retrieval-eval-review",
+      "status": "pending",
+      "detail": "Independent review of mismatched-cohort refusal, absent-source denominators and incomplete R07 remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "current-eval-is-not-live-ranking",
+      "status": "risk",
+      "detail": "This evaluator scores public producer fixtures through enrichment relevance policy. It does not retune live retrieval-core-v1.2 ranking."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of mismatched-cohort refusal, absent-source denominators and incomplete R07, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-039 source and replay focused evaluate-retrieval and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

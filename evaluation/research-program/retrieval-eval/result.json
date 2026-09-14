@@ -1,0 +1,260 @@
+{
+  "format": "ushso.retrieval-eval-result.v1",
+  "evaluator_version": "ushso.retrieval-eval.v1",
+  "generation": "live-2026-09-03-85b50522b420",
+  "corpus_id": "ushso-live-catalog-2026-09-03",
+  "corpus_version": "1.2.0",
+  "record_count": 3434,
+  "historical_baseline_record_count": 143,
+  "held_out_labels_used": false,
+  "producer_tests_separate_from_reviewer_labels": true,
+  "absent_named_sources": [
+    "ahrq-hcup",
+    "ahrq-meps",
+    "ahrq-compendium",
+    "cms-nppes",
+    "hrsa-ahrf",
+    "samhsa-facility-services",
+    "cms-tmsis-taf",
+    "cdc-atsdr-svi",
+    "state-apcd-programs",
+    "state-facility-licensure",
+    "rural-hospital-closure-tracking",
+    "aha-annual-survey"
+  ],
+  "results": [
+    {
+      "question_id": "q-maternal",
+      "domain": "quality",
+      "ranked": [
+        {
+          "record_id": "cdc-nvss-maternal-mortality",
+          "title": "Maternal Mortality Rates",
+          "description": "CDC NVSS maternal deaths.",
+          "source_id": "cdc-nvss-maternal-mortality",
+          "measure": "maternal_mortality",
+          "publisher": "CDC",
+          "state": "exact",
+          "reason": "SUPPORTED_DIMENSION",
+          "title_only": false
+        }
+      ],
+      "excluded": [],
+      "present_hits": 1,
+      "present_denominator": 1,
+      "universe_hits": 1,
+      "universe_denominator": 2,
+      "absent_sources": [
+        "named-missing:nvss-maternal"
+      ],
+      "forbidden": 0,
+      "named_source_misses": 1,
+      "uncertain": 0,
+      "leading": "cdc-nvss-maternal-mortality"
+    },
+    {
+      "question_id": "q-hcris",
+      "domain": "finance",
+      "ranked": [
+        {
+          "record_id": "cms-hcris",
+          "title": "HCRIS hospital cost reports",
+          "description": "CMS HCRIS.",
+          "source_id": "cms-hcris",
+          "measure": "cost_report",
+          "publisher": "CMS",
+          "state": "exact",
+          "reason": "SUPPORTED_DIMENSION",
+          "title_only": false
+        }
+      ],
+      "excluded": [],
+      "present_hits": 1,
+      "present_denominator": 1,
+      "universe_hits": 1,
+      "universe_denominator": 1,
+      "absent_sources": [],
+      "forbidden": 0,
+      "named_source_misses": 0,
+      "uncertain": 0,
+      "leading": "cms-hcris"
+    },
+    {
+      "question_id": "q-hcup",
+      "domain": "utilization",
+      "ranked": [],
+      "excluded": [],
+      "present_hits": 0,
+      "present_denominator": 0,
+      "universe_hits": 0,
+      "universe_denominator": 1,
+      "absent_sources": [
+        "ahrq-hcup"
+      ],
+      "forbidden": 0,
+      "named_source_misses": 1,
+      "uncertain": 0,
+      "leading": null
+    },
+    {
+      "question_id": "q-nppes",
+      "domain": "workforce",
+      "ranked": [],
+      "excluded": [],
+      "present_hits": 0,
+      "present_denominator": 0,
+      "universe_hits": 0,
+      "universe_denominator": 1,
+      "absent_sources": [
+        "cms-nppes"
+      ],
+      "forbidden": 0,
+      "named_source_misses": 1,
+      "uncertain": 0,
+      "leading": null
+    },
+    {
+      "question_id": "q-census-uninsured",
+      "domain": "population",
+      "ranked": [
+        {
+          "record_id": "cdc-places",
+          "title": "PLACES uninsured adults",
+          "description": "CDC PLACES.",
+          "source_id": "cdc-places",
+          "publisher": "CDC",
+          "state": "contextual",
+          "reason": "MISSING_CONTEXT",
+          "title_only": false
+        }
+      ],
+      "excluded": [
+        {
+          "record_id": "census-sahie",
+          "title": "SAHIE uninsured estimates",
+          "description": "Census SAHIE.",
+          "source_id": "census-sahie",
+          "publisher": "U.S. Census Bureau",
+          "state": "excluded",
+          "reason": "EXPLICIT_WITHOUT_CENSUS"
+        }
+      ],
+      "present_hits": 1,
+      "present_denominator": 1,
+      "universe_hits": 1,
+      "universe_denominator": 2,
+      "absent_sources": [],
+      "forbidden": 0,
+      "named_source_misses": 0,
+      "uncertain": 0,
+      "leading": null
+    },
+    {
+      "question_id": "q-nonsense-pa",
+      "domain": "geography",
+      "ranked": [],
+      "result_count": 0,
+      "state": "scoped_zero",
+      "present_hits": 0,
+      "present_denominator": 0,
+      "universe_hits": 0,
+      "universe_denominator": 0,
+      "forbidden": 0,
+      "named_source_misses": 0,
+      "uncertain": 0
+    }
+  ],
+  "metrics": {
+    "present_source_recall_at_10": 1,
+    "precision_at_5": 0.6,
+    "full_universe_recall": 0.42857142857142855,
+    "forbidden_results": 0,
+    "named_source_misses": 3,
+    "uncertainty": 0,
+    "denominators": {
+      "present": 3,
+      "universe": 7
+    },
+    "per_domain": {
+      "quality": {
+        "hits": 1,
+        "denominator": 1,
+        "forbidden": 0,
+        "named_source_misses": 1
+      },
+      "finance": {
+        "hits": 1,
+        "denominator": 1,
+        "forbidden": 0,
+        "named_source_misses": 0
+      },
+      "utilization": {
+        "hits": 0,
+        "denominator": 1,
+        "forbidden": 0,
+        "named_source_misses": 1
+      },
+      "workforce": {
+        "hits": 0,
+        "denominator": 1,
+        "forbidden": 0,
+        "named_source_misses": 1
+      },
+      "population": {
+        "hits": 1,
+        "denominator": 1,
+        "forbidden": 0,
+        "named_source_misses": 0
+      },
+      "geography": {
+        "hits": 0,
+        "denominator": 1,
+        "forbidden": 0,
+        "named_source_misses": 0
+      }
+    },
+    "failing_domains": [
+      {
+        "domain": "quality",
+        "hits": 1,
+        "denominator": 1,
+        "forbidden": 0,
+        "named_source_misses": 1,
+        "remediation_task": "PR-039-quality-remediation",
+        "passing_summary_forbidden": true
+      },
+      {
+        "domain": "utilization",
+        "hits": 0,
+        "denominator": 1,
+        "forbidden": 0,
+        "named_source_misses": 1,
+        "remediation_task": "PR-039-utilization-remediation",
+        "passing_summary_forbidden": true
+      },
+      {
+        "domain": "workforce",
+        "hits": 0,
+        "denominator": 1,
+        "forbidden": 0,
+        "named_source_misses": 1,
+        "remediation_task": "PR-039-workforce-remediation",
+        "passing_summary_forbidden": true
+      },
+      {
+        "domain": "geography",
+        "hits": 0,
+        "denominator": 1,
+        "forbidden": 0,
+        "named_source_misses": 0,
+        "remediation_task": "PR-039-geography-remediation",
+        "passing_summary_forbidden": true
+      }
+    ],
+    "r07_complete": false,
+    "r07_reason": "FAILING_DOMAIN_HAS_REMEDIATION_NOT_PASSING_SUMMARY",
+    "critical_forbidden_matches": 0
+  },
+  "identities_sha256": "ba38aa963921d54d9139bc94c051b6c9aee71336753266d40988af7ce69904b7",
+  "questions_sha256": "41068c50829c0a0207d07f30cc9698eea42f8c23c0fe2d2e8d0156b81d26024a"
+}
