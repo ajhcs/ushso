@@ -5,7 +5,7 @@
   "owner": "/root/pr017_wire_key",
   "reviewer": "Astra/root",
   "base_sha": "d4dc5320039243331f8fd665e9e0b90f39406e34",
-  "head_sha": "0da20966542d753b5fd35cadc3764d443f923bb6",
+  "head_sha": "8aba504588dcd4ee8c2efa8d416699ad0a82c956",
   "dependency_merge_shas": {
     "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
     "PR-013": "861a7808fec20e5e7795bb8f8082f82717e01f11",
@@ -21,7 +21,7 @@
     "docs/research-program/handoffs/PR-017.json"
   ],
   "problem": "HCRIS dictionary names and observed API keys can have equal counts while eleven literals differ by hyphen, case or Adult/Adults wording. Broad punctuation stripping could merge two columns, and recipes could use documented labels instead of observed wire keys.",
-  "resulting_behavior": "The PR-008 117/117 HCRIS comparison is packaged with per-literal hashes. Count equality can pass while exact-key comparison reports all eleven mismatches. Exact names match first. Hyphen/case aliases and Adult/Adults wording stay ambiguous unless a review/evidence record accepts a single wire name. Two candidates cannot silently pick a field. Accepted mappings feed recipes using the observed API key while retaining original labels, dictionary citations and mapping version. A documentation update invalidates only the affected mapping. No broad punctuation stripping merges two source columns. Live fetch is forbidden.",
+  "resulting_behavior": "The PR-008 117/117 HCRIS comparison is packaged with per-literal hashes. Count equality can pass while exact-key comparison reports all eleven mismatches. Exact names match first. Hyphen/case aliases and Adult/Adults wording stay ambiguous unless a review/evidence record accepts a single wire name. Two candidates cannot silently pick a field. Accepted mappings feed recipes using the observed API key while retaining original labels, dictionary citations and mapping version. A documentation update invalidates only the affected mapping. No broad punctuation stripping merges two source columns. Live fetch is forbidden. packages/identity/src/schema-catalog.mjs remains the sealed identity payload; field IDs for accepted mappings are minted from cms-variable-layout.mjs.",
   "commits": [
     {
       "id": "C-017-1",
@@ -37,6 +37,11 @@
       "id": "C-017-3",
       "subject": "Feed accepted mappings into recipes",
       "sha": "0da20966542d753b5fd35cadc3764d443f923bb6"
+    },
+    {
+      "id": "C-017-2-R1",
+      "subject": "Keep identity schema-catalog sealed and route wire-key field IDs from layout",
+      "sha": "8aba504588dcd4ee8c2efa8d416699ad0a82c956"
     }
   ],
   "source_identities": [
@@ -44,19 +49,19 @@
       "kind": "cms-variable-layout",
       "id": "scripts/research/cms-variable-layout.mjs",
       "location": "local",
-      "sha256": "f935d0793d9e8cac7de5e3526902b715aa33f7df421b9b01dce1a0176f9a7a39"
+      "sha256": "ad42780eeff9071b6c16b99428b9f9179fdd2dd0be5490712c341e0b5a70d710"
     },
     {
       "kind": "schema-catalog",
       "id": "packages/identity/src/schema-catalog.mjs",
       "location": "local",
-      "sha256": "8cccd0d61bb2e10c2646245a44f2070f3695accbd2fb43ddb731138cc05aa768"
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
     },
     {
       "kind": "wire-key-tests",
       "id": "tests/research-program/wire-key-reconciliation.test.mjs",
       "location": "local",
-      "sha256": "ddc37fdbd89eae72ceb87f0e6136c17df6bc5a29d3d4501f69f7b3b8ac2209cd"
+      "sha256": "1c4017ffff7b9c10824688aed6d330002afc3b3c3cfb745465bb1051eed4b851"
     },
     {
       "kind": "hcris-fixture",
@@ -75,11 +80,11 @@
     {
       "id": "cmd-c017-focused",
       "command": "node --test tests/research-program/wire-key-reconciliation.test.mjs tests/cms-layout.test.mjs tests/research-program/variable-identity.test.mjs",
-      "started_at": "2026-09-14T05:04:13.930483Z",
-      "completed_at": "2026-09-14T05:04:14.316739Z",
+      "started_at": "2026-09-14T05:15:42.140312Z",
+      "completed_at": "2026-09-14T05:15:42.519996Z",
       "exit_code": 0,
       "completion_status": "completed",
-      "result": "29/29 wire-key, layout and variable-identity tests pass.",
+      "result": "wire-key, layout and variable-identity tests pass after sealed-file restoration.",
       "expected_outcome": {
         "kind": "observed_exit",
         "exit_code": 0
@@ -91,15 +96,15 @@
       "event_source": {
         "id": "cmd-c017-focused-event",
         "path": "verification/research-program/pr-017/producer-20260914/commands/focused-wire-key/event.json",
-        "sha256": "c41c84cf5a265dd4e9e5469ab858523694cbc76c14a14e0fb96f60fc86928a4c",
-        "bytes": 1170
+        "sha256": "958b26ef6d56edfb862658ee5e77b79d71257f415fddd443dcf578c3b4646b6e",
+        "bytes": 1194
       }
     },
     {
       "id": "cmd-c017-parser",
       "command": "node --test tests/research-program/parser-routing.test.mjs",
-      "started_at": "2026-09-14T05:04:14.317188Z",
-      "completed_at": "2026-09-14T05:04:14.432457Z",
+      "started_at": "2026-09-14T05:15:42.520388Z",
+      "completed_at": "2026-09-14T05:15:42.621921Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "8/8 parser-routing tests pass.",
@@ -114,15 +119,15 @@
       "event_source": {
         "id": "cmd-c017-parser-event",
         "path": "verification/research-program/pr-017/producer-20260914/commands/parser-routing/event.json",
-        "sha256": "dcc194e1a904582de1dd5d4f8939d3ec8c3ebdd5b7989a86395428f8bdb571ea",
+        "sha256": "7385a0f053aa8ad3b23fdfe5947fa028ae53c74dfbeeee2339c2cc671a556945",
         "bytes": 1038
       }
     },
     {
       "id": "cmd-c017-cms",
       "command": "node --test tests/research-program/cms-resources.test.mjs",
-      "started_at": "2026-09-14T05:04:14.432803Z",
-      "completed_at": "2026-09-14T05:04:16.222249Z",
+      "started_at": "2026-09-14T05:15:42.622303Z",
+      "completed_at": "2026-09-14T05:15:44.438117Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "10/10 CMS resources tests pass.",
@@ -137,8 +142,31 @@
       "event_source": {
         "id": "cmd-c017-cms-event",
         "path": "verification/research-program/pr-017/producer-20260914/commands/cms-resources/event.json",
-        "sha256": "f367a1dc3d37003f14ccf620ee4cd2e6f81a800e886475f35dc5688018a0feb4",
+        "sha256": "fb586270268ac4bb5da63d1e987d03945e7e6964c3c27d259cf81f1b2fd469a2",
         "bytes": 1036
+      }
+    },
+    {
+      "id": "cmd-c017-wp7",
+      "command": "npm run validate --workspace @ushso/verification-wp7-v1",
+      "started_at": "2026-09-14T05:15:44.438486Z",
+      "completed_at": "2026-09-14T05:15:44.885714Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "WP7 package validate passes with sealed schema-catalog restored.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c017-wp7-event",
+        "path": "verification/research-program/pr-017/producer-20260914/commands/wp7-validate/event.json",
+        "sha256": "33983b7a8ddb29764465b37a277500108f0060eb25bf4846b2e0a72e1ee776ae",
+        "bytes": 1078
       }
     }
   ],
@@ -165,13 +193,13 @@
       "id": "pr017-artifact-3",
       "path": "verification/research-program/pr-017/producer-20260914/commands/focused-wire-key/receipt.json",
       "bytes": 561,
-      "sha256": "db937d4febd2000a55d9213dde6063f1cf61311a51e42f5fabd454154844f2c1"
+      "sha256": "ec8b064fb2d2ea3a89ef440b96c3c4d0146a5a185997d4b30989d475c96a6ee5"
     },
     {
       "id": "pr017-artifact-4",
       "path": "verification/research-program/pr-017/producer-20260914/commands/focused-wire-key/stdout.log",
-      "bytes": 2843,
-      "sha256": "8f6180a237917b476a39b1beb27cfe0513e59f87a5a403293a587f403e52567c"
+      "bytes": 2841,
+      "sha256": "f5ae7d94d7952fad107e783a8c7fc5fa780bd0c3fecd568c9c0953d40e3e07d1"
     },
     {
       "id": "pr017-artifact-5",
@@ -182,20 +210,20 @@
     {
       "id": "pr017-artifact-6",
       "path": "verification/research-program/pr-017/producer-20260914/commands/focused-wire-key/event.json",
-      "bytes": 1170,
-      "sha256": "c41c84cf5a265dd4e9e5469ab858523694cbc76c14a14e0fb96f60fc86928a4c"
+      "bytes": 1194,
+      "sha256": "958b26ef6d56edfb862658ee5e77b79d71257f415fddd443dcf578c3b4646b6e"
     },
     {
       "id": "pr017-artifact-7",
       "path": "verification/research-program/pr-017/producer-20260914/commands/parser-routing/receipt.json",
       "bytes": 459,
-      "sha256": "7c04cfea6a7e1ce8ba5a87b6d43e3345b3ab7b0fc1ce861a42fde92d07afcf3c"
+      "sha256": "61a4212d89c2743b591f3e4c33ea931aff6ba9735f643c95ffed51de48db75de"
     },
     {
       "id": "pr017-artifact-8",
       "path": "verification/research-program/pr-017/producer-20260914/commands/parser-routing/stdout.log",
-      "bytes": 806,
-      "sha256": "510184904d3b09c664a785206747e6cf0e6734d70bb4dc3a96fa2177969e79b6"
+      "bytes": 804,
+      "sha256": "e8472a9bb6a7f404e637d7740448a0f2102a3d59df35d8869aea2dbfdb922e21"
     },
     {
       "id": "pr017-artifact-9",
@@ -207,19 +235,19 @@
       "id": "pr017-artifact-10",
       "path": "verification/research-program/pr-017/producer-20260914/commands/parser-routing/event.json",
       "bytes": 1038,
-      "sha256": "dcc194e1a904582de1dd5d4f8939d3ec8c3ebdd5b7989a86395428f8bdb571ea"
+      "sha256": "7385a0f053aa8ad3b23fdfe5947fa028ae53c74dfbeeee2339c2cc671a556945"
     },
     {
       "id": "pr017-artifact-11",
       "path": "verification/research-program/pr-017/producer-20260914/commands/cms-resources/receipt.json",
       "bytes": 458,
-      "sha256": "6edae92e16932d9e4684b326a4fcc4e6ca1af49dbadcc2ec073e2d95f28a4893"
+      "sha256": "4740a812d93fafc36338055a0b9d789b03a252aafea8ccf77bbe677e24e12f4a"
     },
     {
       "id": "pr017-artifact-12",
       "path": "verification/research-program/pr-017/producer-20260914/commands/cms-resources/stdout.log",
       "bytes": 1000,
-      "sha256": "a3327d3f70f5c5fd8efdf7b36e8d540dc2d16881eb11ebb6d5a4da24c9514663"
+      "sha256": "3fc6f70e179606c138a74121a8d29f67065cc65c32f9e397122b3568dad2c987"
     },
     {
       "id": "pr017-artifact-13",
@@ -231,7 +259,31 @@
       "id": "pr017-artifact-14",
       "path": "verification/research-program/pr-017/producer-20260914/commands/cms-resources/event.json",
       "bytes": 1036,
-      "sha256": "f367a1dc3d37003f14ccf620ee4cd2e6f81a800e886475f35dc5688018a0feb4"
+      "sha256": "fb586270268ac4bb5da63d1e987d03945e7e6964c3c27d259cf81f1b2fd469a2"
+    },
+    {
+      "id": "pr017-artifact-15",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/wp7-validate/receipt.json",
+      "bytes": 469,
+      "sha256": "056f2c5288dfc57114b4fa35c79db98ab5ff14b2ad9a3dc0eec474a5839359c6"
+    },
+    {
+      "id": "pr017-artifact-16",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/wp7-validate/stdout.log",
+      "bytes": 1759,
+      "sha256": "a7e1fa5514cc268d5a3d2b040c8945c1638eaa89aff8b3f24c6412dd9675b927"
+    },
+    {
+      "id": "pr017-artifact-17",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/wp7-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr017-artifact-18",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/wp7-validate/event.json",
+      "bytes": 1078,
+      "sha256": "33983b7a8ddb29764465b37a277500108f0060eb25bf4846b2e0a72e1ee776ae"
     }
   ],
   "acceptance_results": [
@@ -259,6 +311,15 @@
         "cmd-c017-focused",
         "cmd-c017-parser",
         "cmd-c017-cms"
+      ]
+    },
+    {
+      "id": "C-017-2-R1",
+      "status": "producer_checked",
+      "result": "Sealed schema-catalog restored. WP7 validate and identity package seal pass. Wire-key tests still pass.",
+      "command_ids": [
+        "cmd-c017-focused",
+        "cmd-c017-wp7"
       ]
     }
   ],
