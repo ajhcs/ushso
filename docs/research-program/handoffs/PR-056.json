@@ -1,0 +1,272 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-056",
+  "status": "producer_checked",
+  "owner": "/root/pr056_machine_recipes",
+  "reviewer": "Astra/root",
+  "base_sha": "382f25c6c110b59992685f90a71751e633f974ef",
+  "head_sha": "b7daa7db44c25bbbd8bbf2742dfe747354c97349",
+  "dependency_merge_shas": {
+    "PR-019": "94d7d904800de12df7c9fe5e9a6fdc252e4687e9",
+    "PR-033": "ad0091998837a32c84f495ad67c4cbbaee3edd44",
+    "PR-045": "ed9cd5dfaf022d032068dc7d6f1c85027be2e3b7",
+    "PR-055": "a6c63c1ca35f98517e7000b44602c1e8f765e2d5"
+  },
+  "branch": "codex/ushso-pr056-machine-recipes-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/registry/qualified-access-routes.mjs",
+    "packages/registry/index.mjs",
+    "worker/static-machine-toolkit-service.mjs",
+    "packages/machine-toolkit/src/service.mjs",
+    "tests/research-program/machine-recipes.test.mjs",
+    "verification/research-program/pr-056/",
+    "docs/research-program/handoffs/PR-056.json"
+  ],
+  "problem": "get_access_plan and get_retrieval_recipe returned generic unknown errors for every request. Public CMS, keyed Census and restricted HCUP could not produce different next steps. Recipes could embed secrets or execute on inspect. Missing cost/quota could be guessed. route_not_documented told clients to retry blindly. Enrichment could be imported into worker/index.mjs. Sealed identity/access-workflows could be edited.",
+  "resulting_behavior": "Public CMS, keyed Census and restricted HCUP fixtures produce different legitimate next steps. A returned recipe contains no secret or source payload and does not execute merely because a client inspected it. Credentials are named only. Missing cost/quota stays unknown. Nonretryable route_not_documented points to get_asset or publisher documentation instead of a blind retry. worker/index.mjs does not import enrichment. packages/identity/access-workflows remains unused because identity is WP7-sealed. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-056-1",
+      "subject": "Map qualified route contexts",
+      "sha": "d249343242c2c8885f2528538c679e5dee719b8c"
+    },
+    {
+      "id": "C-056-2",
+      "subject": "Return tested recipes and precise limits",
+      "sha": "704bf79a23c0f1630017c535712751bf39a0ac95"
+    },
+    {
+      "id": "C-056-3",
+      "subject": "Replace generic retry guidance",
+      "sha": "b7daa7db44c25bbbd8bbf2742dfe747354c97349"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "qualified-access-routes",
+      "id": "packages/registry/qualified-access-routes.mjs",
+      "location": "local",
+      "sha256": "0b6145eeafc773d8cc88d2efaf70e4accdcc759cad31c76010543c7c5cdeee23"
+    },
+    {
+      "kind": "registry-index",
+      "id": "packages/registry/index.mjs",
+      "location": "local",
+      "sha256": "c8964bd57830e60b736e59f257a83f6dedfefc38ddadf2ed2c63cda9b9eaedb2"
+    },
+    {
+      "kind": "static-machine-toolkit-service",
+      "id": "worker/static-machine-toolkit-service.mjs",
+      "location": "local",
+      "sha256": "93e655938df18f082d7abc2e2bad7e87fc1c2cc5d7e9bf78bd6843fa1baf4a12"
+    },
+    {
+      "kind": "machine-toolkit-service",
+      "id": "packages/machine-toolkit/src/service.mjs",
+      "location": "local",
+      "sha256": "b27a8c395af57d4762516c269dd459f5ec7e73d798be26bddb265737279d9ff0"
+    },
+    {
+      "kind": "machine-recipes-tests",
+      "id": "tests/research-program/machine-recipes.test.mjs",
+      "location": "local",
+      "sha256": "f9b02c2a080fe112c1a7046fc673e5280a4a8e6c897e59736bbb5c455072438b"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "worker-index-no-enrichment-import",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "0be15165ba0deb5d3cc94e9d02f5bf63394aea84a74f474d26854bceadf760c4"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c056-focused",
+      "command": "node --test tests/research-program/machine-recipes.test.mjs",
+      "started_at": "2026-09-14T18:48:31.639640Z",
+      "completed_at": "2026-09-14T18:48:31.756867Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 machine-recipes tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c056-focused-event",
+        "path": "verification/research-program/pr-056/producer-20260914/commands/focused-recipes/event.json",
+        "sha256": "430c72e99e9ecd16c456657305411b69ba275eb108635343e61386cc8210126c",
+        "bytes": 1043
+      }
+    },
+    {
+      "id": "cmd-c056-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T18:48:31.757262Z",
+      "completed_at": "2026-09-14T18:48:31.813116Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c056-identity-event",
+        "path": "verification/research-program/pr-056/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "7b3ef9dd3ca6e6d226b70278168a50d5978edce7b34ec18557f362d500547746",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr056-artifact-0",
+      "path": "verification/research-program/pr-056/task-binding.json",
+      "bytes": 3965,
+      "sha256": "76086d6b06f8ec491f3334b4878a73b620c066c686126953c0c164667f7b5881"
+    },
+    {
+      "id": "pr056-artifact-1",
+      "path": "verification/research-program/pr-056/dispatch.json",
+      "bytes": 2565,
+      "sha256": "c09204f204c0dfe13f8663ca375488f46645e4f9ba82b8f373d07570385205df"
+    },
+    {
+      "id": "pr056-artifact-2",
+      "path": "verification/research-program/pr-056/producer-20260914/commands/focused-recipes/receipt.json",
+      "bytes": 461,
+      "sha256": "799c2c6bacc02e139b9a256beccb60ba40901f910b8d7b1e3a5087f893feba6b"
+    },
+    {
+      "id": "pr056-artifact-3",
+      "path": "verification/research-program/pr-056/producer-20260914/commands/focused-recipes/stdout.log",
+      "bytes": 468,
+      "sha256": "048b1c260da8994ed9224944ae17dc3b6d8a182be3c13b7aaa359c381b4909a1"
+    },
+    {
+      "id": "pr056-artifact-4",
+      "path": "verification/research-program/pr-056/producer-20260914/commands/focused-recipes/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr056-artifact-5",
+      "path": "verification/research-program/pr-056/producer-20260914/commands/focused-recipes/event.json",
+      "bytes": 1043,
+      "sha256": "430c72e99e9ecd16c456657305411b69ba275eb108635343e61386cc8210126c"
+    },
+    {
+      "id": "pr056-artifact-6",
+      "path": "verification/research-program/pr-056/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "67e27be8e049e4626247feccf8754751ed959de47386c953adfb8b68bb5216a5"
+    },
+    {
+      "id": "pr056-artifact-7",
+      "path": "verification/research-program/pr-056/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr056-artifact-8",
+      "path": "verification/research-program/pr-056/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr056-artifact-9",
+      "path": "verification/research-program/pr-056/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "7b3ef9dd3ca6e6d226b70278168a50d5978edce7b34ec18557f362d500547746"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-056-1",
+      "status": "producer_checked",
+      "result": "Public CMS, keyed Census and restricted HCUP fixtures produce different legitimate next steps.",
+      "command_ids": [
+        "cmd-c056-focused"
+      ]
+    },
+    {
+      "id": "C-056-2",
+      "status": "producer_checked",
+      "result": "A returned recipe contains no secret or source payload and does not execute because a client inspected it.",
+      "command_ids": [
+        "cmd-c056-focused"
+      ]
+    },
+    {
+      "id": "C-056-3",
+      "status": "producer_checked",
+      "result": "Nonretryable route_not_documented no longer tells clients to retry blindly. Sealed identity package validates. worker/index.mjs does not import enrichment.",
+      "command_ids": [
+        "cmd-c056-focused",
+        "cmd-c056-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "identity-access-workflows",
+      "status": "accepted",
+      "detail": "packages/identity/access-workflows remains unused because identity is WP7-sealed. Owned implementation lives in packages/registry/qualified-access-routes.mjs."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-machine-recipes-review",
+      "status": "pending",
+      "detail": "Independent review of CMS/Census/HCUP next steps, no-secret recipes and nonretryable missing-route guidance remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "qualified-routes-are-fixtures",
+      "status": "risk",
+      "detail": "Positive CMS/Census/HCUP paths are qualified fixtures with documented IDs. Catalog membership still does not prove payload access. HTTP 200 is not a tested-example badge."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of CMS/Census/HCUP next steps, no-secret recipes and nonretryable missing-route guidance, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-056 source and replay focused machine-recipes and identity validators. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

@@ -5,6 +5,7 @@ import {
 } from '../packages/machine-toolkit/src/index.mjs';
 import { createMachineCursorSigner } from './machine-cursor.mjs';
 import { collectAssetContext } from '../packages/registry/asset-context-collections.mjs';
+import { buildAccessPlan, buildRetrievalRecipe, matchQualifiedRoute } from '../packages/registry/qualified-access-routes.mjs';
 
 const POLICY_ID = 'policy.public-metadata-only.v1';
 const POLICY_EVIDENCE_ID = 'evidence.policy.public-metadata-only.v1';
@@ -417,10 +418,17 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
       if (generationError) return generationError;
       const record = recordsById.get(input.record_id);
       if (!record) return unavailable('get_access_plan', input, context);
-      const response = unavailable('get_access_plan', input, context, 'route_not_documented', { resultState: 'unknown' });
-      response.warnings = [warning('This generation has asset-level catalog metadata but no verified release, distribution or access-route identity. Supplied context identifiers are not validated or echoed as established routes. Inspect the asset publisher evidence instead.')];
-      response.evidence_references = uniqueEvidence([record], canonicalAsOf);
-      return response;
+      const route = matchQualifiedRoute(input);
+      if (!route) {
+        const response = unavailable('get_access_plan', input, context, 'route_not_documented', { resultState: 'unknown' });
+        response.warnings = [warning('No verified release, distribution or access-route identity is documented for these identifiers. Call get_asset for documented collection IDs, or inspect the publisher documentation. Do not retry the same undocumented identifiers.')];
+        response.evidence_references = uniqueEvidence([record], canonicalAsOf);
+        return response;
+      }
+      return successCore({
+        capability: 'get_access_plan', context, records: [record], resultState: 'complete',
+        result: buildAccessPlan(route),
+      });
     },
 
     async getRetrievalRecipe(input) {
@@ -428,10 +436,17 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
       if (generationError) return generationError;
       const record = recordsById.get(input.record_id);
       if (!record) return unavailable('get_retrieval_recipe', input, context);
-      const response = unavailable('get_retrieval_recipe', input, context, 'route_not_documented', { resultState: 'unknown' });
-      response.warnings = [warning('This generation has asset-level catalog metadata but no verified release, distribution or access-route identity. Supplied context identifiers are not validated or echoed as established routes. Inspect the asset publisher evidence instead.')];
-      response.evidence_references = uniqueEvidence([record], canonicalAsOf);
-      return response;
+      const route = matchQualifiedRoute(input);
+      if (!route) {
+        const response = unavailable('get_retrieval_recipe', input, context, 'route_not_documented', { resultState: 'unknown' });
+        response.warnings = [warning('No verified release, distribution or access-route identity is documented for these identifiers. Call get_asset for documented collection IDs, or inspect the publisher documentation. Do not retry the same undocumented identifiers.')];
+        response.evidence_references = uniqueEvidence([record], canonicalAsOf);
+        return response;
+      }
+      return successCore({
+        capability: 'get_retrieval_recipe', context, records: [record], resultState: 'complete',
+        result: buildRetrievalRecipe(route),
+      });
     },
 
     async getVariables(input) {
