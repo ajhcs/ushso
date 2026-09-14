@@ -1,0 +1,86 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr042-qualify-core-20260914",
+  "slice_id": "C-042-1",
+  "pr_id": "PR-042",
+  "title": "Qualify scientific completeness of the priority cohort",
+  "owner": "/root/pr042_qualify_core",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr042-qualify-core-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr042-qualify-core-20260914",
+  "objective": "Core research usefulness is independently assessed, with deficits blocking acceptance.",
+  "outcome": "Assemble a 100-product review matrix. No unknown cell counts as supported. An implementer or model cannot approve its own scientific output. Failed cases remain visible and receive bounded follow-up PRs. R04/R05/R07/R08 are not issued as pass; the failed matrix is retained. Frozen cohorts.json is not edited. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-032",
+    "PR-039",
+    "PR-040",
+    "PR-041",
+    "PR-043",
+    "PR-044",
+    "PR-045",
+    "PR-054"
+  ],
+  "owned_paths": [
+    "evaluation/research-program/review/",
+    "scripts/research-program/qualify-core.mjs",
+    "docs/research-program/core-acceptance.md",
+    "tests/research-program/qualify-core.test.mjs",
+    "verification/research-program/pr-042/",
+    "docs/research-program/handoffs/PR-042.json"
+  ],
+  "commits": [
+    {
+      "id": "C-042-1",
+      "subject": "Assemble a reviewable core matrix",
+      "instructions": "Produce one row per product with essential-field outcomes and links to examples/citations, plus per-domain totals. Expose every unsupported claim and conflict.",
+      "verification": "All 100 products reconcile to their source contexts and acceptance requirements; no unknown cell counts as supported."
+    },
+    {
+      "id": "C-042-2",
+      "subject": "Review high-impact semantics",
+      "instructions": "Have Astra independently check unit/grain/date/denominator/join evidence and route unresolved domain judgments to a named human research reviewer. Record exact accepted values.",
+      "verification": "An implementer or model cannot approve its own scientific output; failed cases remain visible and receive bounded follow-up PRs."
+    },
+    {
+      "id": "C-042-3",
+      "subject": "Issue the core qualification receipt",
+      "instructions": "Run the complete core checks on the accepted generation and record readiness, reviewer scope and remaining limits.",
+      "verification": "Only issue a pass when R04/R05/R07/R08 actually hold; otherwise retain the failed matrix and continue remediation."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/qualify-core.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-042.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-042/",
+  "binding": {
+    "base_sha": "21548add724b92da7d1b83a6e2358bb003b2fa87",
+    "base_tree": "3e929463f3c7519b45a79c3035ffd07edbc17de0",
+    "dependency_merge_shas": {
+      "PR-032": "6fe431f855c2bb65c97cdb0526ef8ed54ea6a74a",
+      "PR-039": "1c83b4e331caa6d62adb42be6e1ca35f243a97d5",
+      "PR-040": "0b3ca8442de86175a35b52c008f83e1b42b39204",
+      "PR-041": "7ee6ef80c438b584d16025ad3f60c24bb8c0c83e",
+      "PR-043": "7699d7c1098287d8757ccd20971825d307ea9f54",
+      "PR-044": "71302b4367d7824d45923d62c8933e7429134c10",
+      "PR-045": "ed9cd5dfaf022d032068dc7d6f1c85027be2e3b7",
+      "PR-054": "4b8c8e0ec6c8b7a397ecb4d0d7dc00904f3ee924"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
