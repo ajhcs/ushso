@@ -1,0 +1,73 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr022-openrouter-client-20260914",
+  "slice_id": "C-022-1",
+  "pr_id": "PR-022",
+  "title": "Add a product-owned OpenRouter extraction adapter",
+  "owner": "/root/pr022_openrouter_client",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr022-openrouter-client-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr022-openrouter-client-20260914",
+  "objective": "Residual extraction can call an exact provider/model through a small typed interface.",
+  "outcome": "Offline fixtures cover missing credentials, unsupported structured outputs and a missing exact model; none falls back silently. Malformed JSON, truncated output, provider error and schema-valid but unsupported fields are rejected without publishing claims. A fake-provider end-to-end residual job passes without a harness installation. No model is imported into the public Worker request path. Paid calls remain disabled until budget/key are provisioned. Provider transport success is not claim acceptance.",
+  "dependencies": [
+    "PR-009",
+    "PR-021"
+  ],
+  "owned_paths": [
+    "packages/enrichment/openrouter-client.mjs",
+    "packages/enrichment/provider-schema.json",
+    "tests/research-program/openrouter-client.test.mjs",
+    "verification/research-program/pr-022/",
+    "docs/research-program/handoffs/PR-022.json"
+  ],
+  "commits": [
+    {
+      "id": "C-022-1",
+      "subject": "Define the provider request contract",
+      "instructions": "Add model/endpoint identity, prompt hash, evidence IDs, JSON response schema, token limits and timeout. Keep provider credentials behind an injected secret port.",
+      "verification": "Offline fixtures cover missing credentials, unsupported structured outputs and a missing exact model; none falls back silently."
+    },
+    {
+      "id": "C-022-2",
+      "subject": "Implement the bounded OpenRouter client",
+      "instructions": "Use the official API through an injected transport; require supported parameters and validate the returned JSON locally. Retain response/model/usage identifiers and typed errors.",
+      "verification": "Malformed JSON, truncated output, provider error and schema-valid but unsupported fields are rejected without publishing claims."
+    },
+    {
+      "id": "C-022-3",
+      "subject": "Replace the extraction shell dependency",
+      "instructions": "Connect the residual-job port to the adapter instead of launching dsh for product enrichment. Keep external coding implementers separate from this runtime.",
+      "verification": "A fake-provider end-to-end job passes without a harness installation; no model is imported into the public Worker request path."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/openrouter-client.test.mjs",
+    "node --test tests/research-program/qualify-deterministic.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-022.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-022/",
+  "binding": {
+    "base_sha": "7fbc8fe1a79f4ba6470da81a7c6a37c9023d458e",
+    "base_tree": "cd0a7207fcbdc272deb9e8c162aca03ab2c3d5a3",
+    "dependency_merge_shas": {
+      "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+      "PR-021": "ed08e8ee861622b99d5d7c3150d68304ecc95881"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

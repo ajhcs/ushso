@@ -1,0 +1,226 @@
+{
+  "artifact_kind": "pr005_read_only_source_and_entrypoint_map",
+  "prepared_at": "2026-09-10",
+  "pinned_commit": "6c5007faa80632864e87d592b695fa2e7d75d47d",
+  "pinned_tree": "434a0b977570ad4828bcc7ef03034f5ed462a175",
+  "observed_worktree": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910",
+  "observed_branch_head_at_setup": "601c20c17dc1fea39117e942a061e62bc52ebf2c",
+  "observed_branch_tree_at_setup": "ec3aa51c041923755e8c91ff78f73da0cbcc90a7",
+  "source_paths": [
+    {
+      "path": "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+      "scope": "owned",
+      "exists_at_pinned_commit": true,
+      "git_blob": "053a67a551a705e4f6c1aa18598d66cc9e33bc41",
+      "sha256": "5763d7687e7228d8dacdd098ed2b9a0e8e59995c0243c25719102926c2105306",
+      "entrypoints": [
+        "createRetrievalEngine:452",
+        "retrieve(rawQuery, { signal, now = null, browse = false }):528-533",
+        "unitScore:174-184",
+        "facetResponse:400-416",
+        "metadata freshness projection:617-628",
+        "receipt generated_at:675-687"
+      ]
+    },
+    {
+      "path": "worker/public-query-service.mjs",
+      "scope": "owned",
+      "exists_at_pinned_commit": true,
+      "git_blob": "879166fd5ebb7f0f5ca34aff52acc200662f24e3",
+      "sha256": "fdde04663dba01ade179e9399c939261f6ca2237f1d68f4d65229700560c870b",
+      "entrypoints": [
+        "PublicQueryService.openRequest:71-74",
+        "PublicQueryService.browse:87-132",
+        "PublicQueryService.dataset:135-166",
+        "PublicQueryService.discover:168-176"
+      ]
+    },
+    {
+      "path": "apps/web/src/lib/researcherGuidance.ts",
+      "scope": "owned",
+      "exists_at_pinned_commit": true,
+      "git_blob": "a65bd8c5aafaf5c2f511373f17013ae3f7c85bd4",
+      "sha256": "52b6964ed67bfc96f659c0bf2a071fefac7ffd847dd576ee3f13c95ae4a199fc",
+      "entrypoints": [
+        "ResearcherGuidance interface:5-45",
+        "buildResearcherGuidance:97-197",
+        "observedAt mapping:129-132",
+        "Typical unit field:138",
+        "update/frequency field:140",
+        "machineReadiness observedAt fields:187-194"
+      ]
+    },
+    {
+      "path": "tests/research-program/freshness-and-grain.test.mjs",
+      "scope": "owned_planned_test",
+      "exists_at_pinned_commit": false,
+      "git_blob": null,
+      "sha256": null,
+      "entrypoints": [
+        "planned by PR-005 packet; no file at pinned commit"
+      ]
+    },
+    {
+      "path": "packages/retrieval/tools/catalog-contract.mjs",
+      "scope": "direct_contract_dependency_read_only",
+      "exists_at_pinned_commit": true,
+      "git_blob": "33e9f8dc1934f0b0768d12bcfac5e24918cf9f3d",
+      "sha256": "bbba437c0ba61a774fe02d8a2f3436900756ae4715ad05c0cc36894ee70df160",
+      "entrypoints": [
+        "freshnessState(record, now):177-193",
+        "metadataDimensions(record):196-216",
+        "metadata_observed_at date projection:219-231"
+      ]
+    },
+    {
+      "path": "packages/search/static-search-backend.mjs",
+      "scope": "clock_forwarding_gap_outside_owned_scope",
+      "exists_at_pinned_commit": true,
+      "git_blob": "6eec13b12814fc4f2ca0b464823507dbe4a32c89",
+      "sha256": "67f1a77845e6a5ed1efe180a367725218c3feb0159cdf236d9f199658b1a32cb",
+      "entrypoints": [
+        "#engine loadEngine(request, env):20-26",
+        "searchAssets engine.retrieve(query, { signal }):32-34",
+        "browseAssets engine.browse(query, { signal }):36-39"
+      ]
+    },
+    {
+      "path": "worker/index.mjs",
+      "scope": "direct_api_request_seam_read_only",
+      "exists_at_pinned_commit": true,
+      "git_blob": "379bba70e9c1ba1e68ee23d1e9c76c5c2f6d39e4",
+      "sha256": "0be15165ba0deb5d3cc94e9d02f5bf63394aea84a74f474d26854bceadf760c4",
+      "entrypoints": [
+        "loadCatalogFromAssets:83-156",
+        "loadEngineFromAssets:158-160",
+        "GET /api/catalog -> publicQueryService.browse:281-290",
+        "GET /api/datasets -> publicQueryService.dataset:293-309",
+        "POST /api/discover -> publicQueryService.discover:311-346"
+      ]
+    },
+    {
+      "path": "worker/retrieval-v1.2.0.mjs",
+      "scope": "production_delegate_read_only",
+      "exists_at_pinned_commit": true,
+      "git_blob": "96410e9ca310ba9178f4c4ce69c8997f39308d2a",
+      "sha256": "bf16dacc774dd2a307ed6213591df52ba01a32b4dab4a8f0e0a748a692a8ca98",
+      "entrypoints": [
+        "imports owned core:6",
+        "createRetrievalEngine delegates to current core:220-222"
+      ]
+    },
+    {
+      "path": "apps/web/src/lib/catalogAdapter.ts",
+      "scope": "direct_ui_adapter_read_only",
+      "exists_at_pinned_commit": true,
+      "git_blob": "63537941bfe289c8bb4985d42dea06af82129a28",
+      "sha256": "6d5519bbb6a6d63e9cfc7ad5bdcb7c381cff6a23efd6c56a3be69ea4c3f36bda",
+      "entrypoints": [
+        "verificationDetails:110-139",
+        "grainDisplay:51-55",
+        "unitFacets:200-204",
+        "resultToView:223-275"
+      ]
+    },
+    {
+      "path": "apps/web/src/components/ResultCard.tsx",
+      "scope": "freshness_ui_consumer_outside_owned_scope",
+      "exists_at_pinned_commit": true,
+      "git_blob": "f2805ee107534aa9a0685aa107f7f65d7921a88b",
+      "sha256": "4f6c605c7e286162b494d177dceba01120d160a9205ba77588949eda87b9becb",
+      "entrypoints": [
+        "checkedLabel:15-29",
+        "ResultCard:44-106",
+        "browser Date.now fallback:27"
+      ]
+    },
+    {
+      "path": "apps/web/src/pages/DatasetDetailsPage.tsx",
+      "scope": "freshness_ui_consumer_outside_owned_scope",
+      "exists_at_pinned_commit": true,
+      "git_blob": "53a38bfe31a0926c77b4553a1ea8bac7148ddad7",
+      "sha256": "856c41e52fe768ed2e9ecabf3401266f352d88f178a594f2abbb8bd97fad689b",
+      "entrypoints": [
+        "freshnessState(record):40-47",
+        "response/fallback selection:105-112",
+        "freshness panel:203-208",
+        "browser Date.now fallback:45"
+      ]
+    },
+    {
+      "path": "apps/web/src/components/ResearcherDecisionSummary.tsx",
+      "scope": "current_visual_guidance_consumer_read_only",
+      "exists_at_pinned_commit": true,
+      "git_blob": "d4bd21efc34abaac429b5b0bf6efb8aae725fa81",
+      "sha256": "84413eaf166fc2d95eaeb55568003df4625797289a1a1a2e90d22bfa17f4f227",
+      "entrypoints": [
+        "ResearcherDecisionSummary:15-80",
+        "renders buildResearcherGuidance fields:30-37",
+        "renders machineReadiness:74-77",
+        "no freshness section present"
+      ]
+    },
+    {
+      "path": "apps/web/src/types/discovery.ts",
+      "scope": "wire_type_gap_read_only",
+      "exists_at_pinned_commit": true,
+      "git_blob": "53b4d2d0f50b9a52c5b4c7e613a5f97eb44940e7",
+      "sha256": "53b84d32bf5d13f5fe207dba57f310a64ef20a99603c1ac92938d8738a50d246",
+      "entrypoints": [
+        "raw freshness_verification:224-231",
+        "derived DiscoveryResultMetadata.freshness:281-288"
+      ]
+    }
+  ],
+  "existing_test_paths": [
+    {
+      "path": "packages/retrieval/tests/release-contract.test.mjs",
+      "git_blob": "77a74270927aabe01397ed3d6909acb74dc0fca9",
+      "sha256": "5a7e5d9adac18da7eef46e975f9c39d981eff3a9a812dca3a0dbb9ec4754e434",
+      "entrypoints": ["clock and immutable metadata:271-284", "grain/facet separation:286-297"]
+    },
+    {
+      "path": "packages/retrieval/tests/search-receipt-replay.test.mjs",
+      "git_blob": "8661fdd61b7c89e9421ead28015777fafd96ee87",
+      "sha256": "c33f722720196fb1782ae7a5011bce4edd11ee3f27087a70287f7a69401e1369",
+      "entrypoints": ["receipt roundtrip and generation pinning:12-29"]
+    },
+    {
+      "path": "tests/direct-base-regression.test.mjs",
+      "git_blob": "50682cb635c045ec6de08509fd46c602f9904077",
+      "sha256": "32afd4a163b7d9e299f0c34fd207e7bc63a35f402c9e52b433b72543dae7c977",
+      "entrypoints": ["byte parity and immutable input:1-4"]
+    },
+    {
+      "path": "tests/wp1-repository-abstraction.test.mjs",
+      "git_blob": "6d6afb15b7fd964e9de7fe862d8155e43d25295a",
+      "sha256": "d13279e04f1ca4b55ac7a65f5c0e0249857657f4c9a8d7f8f085218af0751f83",
+      "entrypoints": ["public service context:123-153", "adapter parity:155-169"]
+    },
+    {
+      "path": "tests/static-machine-toolkit.test.mjs",
+      "git_blob": "b90fa668d12928933bbfd1e3afd49da16de59b77",
+      "sha256": "82966179c7a4bb2374822943a6ff247cc05e2a3c3d1b076419ecc5f71d3e1720",
+      "entrypoints": ["fixed runtime/toolkit clock:28-73"]
+    },
+    {
+      "path": "apps/web/src/lib/researcherGuidance.test.tsx",
+      "git_blob": "8286aa689534fc71da446fddff877be21bcd0127",
+      "sha256": "268aa7fee578fe98ce4dd8a787e03066a88c756a8a1e50f217edf23a9bfa2cf1",
+      "entrypoints": ["guidance structure:14-33", "non-executing UI rendering:35-58"]
+    },
+    {
+      "path": "apps/web/src/components/ResultCard.test.ts",
+      "git_blob": "32f985d1e621ae6ddc0f70bf27266cb19e2e932a",
+      "sha256": "16226fad7dbbb87f6ca90541fcb33366b4104d8f7324e1f2373cff8446afe06d",
+      "entrypoints": ["six-region card presentation:13-48"]
+    },
+    {
+      "path": "apps/web/src/lib/catalogAdapter.test.ts",
+      "git_blob": "07b5c62bd9d4596a2d7d31cc2543f93c0471888e",
+      "sha256": "296231dce39268e55bc608dd492138adb65186a06e2819cf7a32538db31f267f",
+      "entrypoints": ["unresolved grain:55-62", "catalog vs payload access:64-72"]
+    }
+  ],
+  "hash_note": "All listed existing paths have SHA-256 values computed from git show <pinned_commit>:<path>; no working-tree files were used. git_blob is recorded for every existing path. The only null hash fields are for the planned test path absent at the pinned commit."
+}

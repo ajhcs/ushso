@@ -1,0 +1,81 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr046-hpt-discovery-20260914",
+  "slice_id": "C-046-1",
+  "pr_id": "PR-046",
+  "title": "Discover hospital MRF locators and schema versions",
+  "owner": "/root/pr046_hpt_discovery",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr046-hpt-discovery-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr046-hpt-discovery-20260914",
+  "objective": "The selected 25 hospitals have an auditable MRF locator/disposition.",
+  "outcome": "Consume the frozen 25 hospital candidate IDs from evaluation/research-program/cohorts.json without replacement, silent deduplication, or shrinking the denominator. A health-system landing page is not counted as a verified file for every hospital it owns. Broken links, redirect gates and unexpected formats receive typed outcomes; no crawler explores arbitrary sites. Declared and detected schema versions remain distinct. An enforcement dataset cannot satisfy a rate-file entry. No full-size MRF download is initiated without its own budget decision. Sealed packages/identity and frozen cohorts.json are not edited. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-002",
+    "PR-009",
+    "PR-011",
+    "PR-012",
+    "PR-034"
+  ],
+  "owned_paths": [
+    "packages/connectors/mrf/hospital-registry.mjs",
+    "packages/connectors/mrf/hospital-cohort.json",
+    "evaluation/research-program/mrf-hospitals/",
+    "tests/research-program/hpt-discovery.test.mjs",
+    "docs/research-program/hpt-discovery.md",
+    "verification/research-program/pr-046/",
+    "docs/research-program/handoffs/PR-046.json"
+  ],
+  "commits": [
+    {
+      "id": "C-046-1",
+      "subject": "Define hospital MRF identity",
+      "instructions": "Bind hospital/facility identity, publisher locator, reporting date, declared schema version and file format. Support multiple facilities/files and source-native change history.",
+      "verification": "A health-system landing page is not counted as a verified file for every hospital it owns."
+    },
+    {
+      "id": "C-046-2",
+      "subject": "Collect documented MRF links",
+      "instructions": "Follow official hospital price-transparency pages and declared machine-readable locators through the bounded collector. Capture terms, size/encoding and link evidence.",
+      "verification": "Broken links, redirect gates and unexpected formats receive typed outcomes; no crawler explores arbitrary sites."
+    },
+    {
+      "id": "C-046-3",
+      "subject": "Reconcile the hospital cohort",
+      "instructions": "Produce exact selected/discovered/accessible/unresolved counts and a parser queue by version/format.",
+      "verification": "All 25 hospitals remain in the denominator, including failures; an enforcement dataset cannot satisfy a rate-file entry."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/hpt-discovery.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-046.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-046/",
+  "binding": {
+    "base_sha": "bbc64f81935ae7c72acca9d3a6f5a0f834eb687b",
+    "base_tree": "14dc5f2c1051727b531adafac981d9581421ae83",
+    "dependency_merge_shas": {
+      "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+      "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+      "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74",
+      "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+      "PR-034": "a8437e36ecf102af6f3bc86cf539a0d6b1739796"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

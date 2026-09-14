@@ -5,8 +5,14 @@ import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { PageTitle } from '../components/PageTitle'
 import { adaptDiscoveryResponse } from '../lib/catalogAdapter'
-import { normalizeFacetValue } from '../data/facets'
+import { presentFacetOptionLabel } from '../data/facets'
 import { useDiscoveryResult } from '../providers/DiscoveryProviderContext'
+import type { DatasetRecord } from '../types/catalog'
+import type { DiscoveryResult } from '../types/discovery'
+
+export const CURRENT_CORPUS_VERSION = '1.2.0'
+export const CURRENT_GENERATION = 'live-2026-09-03-85b50522b420'
+export const HISTORICAL_PA_PUBLISHED_RECORD_COUNT = 24
 
 interface ReadinessState {
   name: string
@@ -19,20 +25,74 @@ interface ReadinessState {
   published_state_record_count: number
   interpretation: string
   next_step: string
+  historical_view?: boolean
+  published_state_record_count_is_current?: boolean
+  current_published_state_record_count?: number
+  archived_published_state_record_count?: number | null
 }
 
 interface NationalReadiness {
   corpus_version: string
-  summary: { jurisdictions: number; federal_sources_live_metadata_validated: number; published_records: number }
+  summary: { jurisdictions: number; federal_sources_live_metadata_validated: number; published_records: number; published_records_are_current?: boolean }
   states: ReadinessState[]
   limitations: string[]
+  historical_view?: boolean
+  current_coverage?: boolean
+  archived_reason?: string | null
+  current_corpus_version?: string
+  current_generation?: string
 }
 
-function overlayLabel(state: ReadinessState) {
+export function archiveHistoricalReadiness(readiness: NationalReadiness, currentCorpusVersion = CURRENT_CORPUS_VERSION): NationalReadiness {
+  const historical = readiness.corpus_version !== currentCorpusVersion
+  return {
+    ...readiness,
+    historical_view: historical,
+    current_coverage: !historical,
+    archived_reason: historical ? 'v1.1.0 national-readiness table is a historical view, not current generation coverage' : null,
+    current_corpus_version: currentCorpusVersion,
+    current_generation: CURRENT_GENERATION,
+    summary: {
+      ...readiness.summary,
+      published_records_are_current: !historical,
+    },
+    states: readiness.states.map((state) => {
+      const historicalPublished = historical && state.published_state_record_count > 0
+      return {
+        ...state,
+        historical_view: historical,
+        published_state_record_count_is_current: historicalPublished ? false : state.published_state_record_count > 0,
+        current_published_state_record_count: historical ? 0 : state.published_state_record_count,
+        archived_published_state_record_count: historical ? state.published_state_record_count : null,
+      }
+    }),
+  }
+}
+
+export function overlayLabel(state: ReadinessState) {
+  if (state.historical_view) {
+    if (state.postal === 'PA' && state.archived_published_state_record_count === HISTORICAL_PA_PUBLISHED_RECORD_COUNT) {
+      return 'Historical v1.1.0 overlay archived; 24 published records are not current coverage'
+    }
+    return 'Historical readiness view; not current generation coverage'
+  }
   if (state.state_overlay_status === 'published_dense_overlay') return `${state.published_state_record_count} state records published`
   if (state.overlay_readiness_status.includes('navigation_only')) return `${state.candidate_record_count} navigation candidates; asset depth unverified`
   if (state.state_overlay_status === 'candidate_available') return `${state.candidate_record_count} candidates awaiting integration review`
   return 'Bounded evidence gap; not an absence claim'
+}
+
+export function sourceGroupsFromResponse(response: DiscoveryResult, records: DatasetRecord[]) {
+  const sourceFacet = response.facets?.sections.find((section) => section.id === 'source')
+  if (sourceFacet) return sourceFacet.options.map((option) => ({
+    id: option.value,
+    label: presentFacetOptionLabel('source', option.value, option.label, records),
+    count: option.count,
+    examples: records.filter((record) => record.canonicalResult.record.identity.source.source_id === option.value),
+  }))
+  const groups = new Map<string, DatasetRecord[]>()
+  for (const record of records) groups.set(record.sourceName, [...(groups.get(record.sourceName) ?? []), record])
+  return [...groups.entries()].map(([label, examples]) => ({ id: label, label, count: examples.length, examples }))
 }
 
 export function SourcesPage() {
@@ -42,23 +102,15 @@ export function SourcesPage() {
   const catalog = useMemo(() => discovery.status === 'ready' ? adaptDiscoveryResponse(discovery.result) : null, [discovery])
   const sourceGroups = useMemo(() => {
     if (discovery.status !== 'ready') return []
-    const sourceFacet = discovery.result.facets?.sections.find((section) => section.id === 'source')
-    if (sourceFacet) return sourceFacet.options.map((option) => ({
-      id: option.value,
-      label: option.label,
-      count: option.count,
-      examples: (catalog?.records ?? []).filter((record) => normalizeFacetValue(record.canonicalResult.record.identity.source.source_id) === normalizeFacetValue(option.value)),
-    }))
-    const groups = new Map<string, NonNullable<typeof catalog>['records']>()
-    for (const record of catalog?.records ?? []) groups.set(record.sourceName, [...(groups.get(record.sourceName) ?? []), record])
-    return [...groups.entries()].map(([label, examples]) => ({ id: label, label, count: examples.length, examples }))
+    return sourceGroupsFromResponse(discovery.result, catalog?.records ?? [])
   }, [catalog, discovery])
 
   useEffect(() => {
     const controller = new AbortController()
     fetch('/state-readiness-v0.1.0.json', { signal: controller.signal }).then(async response => {
       if (!response.ok) throw new Error('readiness unavailable')
-      setReadiness(await response.json() as NationalReadiness)
+      const raw = await response.json() as NationalReadiness
+      setReadiness(archiveHistoricalReadiness(raw))
     }).catch(error => {
       if (error instanceof DOMException && error.name === 'AbortError') return
       setReadinessError(true)
@@ -83,11 +135,14 @@ export function SourcesPage() {
 
         {readiness && (
           <section className="readiness" aria-labelledby="readiness-heading">
-            <h2 id="readiness-heading">National readiness</h2>
+            <h2 id="readiness-heading">{readiness.historical_view ? 'Historical national readiness (archived)' : 'National readiness'}</h2>
+            {readiness.historical_view && (
+              <p className="coverage-boundary" role="note">This v{readiness.corpus_version} table is a historical view. Current generation {readiness.current_generation} / corpus v{readiness.current_corpus_version} does not inherit those published-record counts. A historical Pennsylvania count of {HISTORICAL_PA_PUBLISHED_RECORD_COUNT} is not current coverage.</p>
+            )}
             <div className="readiness__summary">
               <div><strong>{readiness.summary.jurisdictions}</strong><span>states plus DC recognized</span></div>
               <div><strong>{readiness.summary.federal_sources_live_metadata_validated}</strong><span>federal source routes live metadata-checked</span></div>
-              <div><strong>{readiness.summary.published_records}</strong><span>published records in corpus v{readiness.corpus_version}</span></div>
+              <div><strong>{readiness.historical_view ? 'archived' : readiness.summary.published_records}</strong><span>{readiness.historical_view ? `v${readiness.corpus_version} published records are not current coverage` : `published records in corpus v${readiness.corpus_version}`}</span></div>
             </div>
             <p>The readiness artifact reports indexed federal routes separately from state overlays. A national source is not automatically documented as suitable for state-level analysis, and a navigation candidate is not a validated dataset.</p>
             <div className="readiness-table-wrap">

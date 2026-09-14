@@ -1,0 +1,722 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-086",
+  "status": "producer_checked",
+  "owner": "Luna Max (native Codex collaboration; gpt-5.6-luna; reasoning max; assignment ushso-pr086-current-inventory-20260911)",
+  "reviewer": "Astra/root",
+  "base_sha": "a30cd7730de04200f7cd3ffb75ca83378c9e9a1d",
+  "head_sha": null,
+  "dependency_merge_shas": {
+    "PR-003": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
+    "PR-085": "34ca9dd1d68896a091fe18116bcff8abf8bed33b"
+  },
+  "branch": "codex/ushso-pr086-current-inventory-20260911",
+  "github_pr_url": null,
+  "changed_files": [
+    "tests/wp11-attestation.test.mjs",
+    "scripts/verify-wp11-attestation.mjs",
+    "verification/research-program/ci-attestation/wp11-v1.3.0/policy.json",
+    "verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/manifest.json",
+    "verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/package.json",
+    "verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/package-lock.json",
+    "verification/research-program/pr-086/",
+    "docs/research-program/handoffs/PR-086.json",
+    "docs/research-program/ci-attestations.md"
+  ],
+  "problem": "Current WP11 checks and prior named fixture were tied to mutable current package bytes and did not independently prove the actual current path/hash/length set. Completing PR008 also required one exact reviewed workspace-lock transition while preserving unknown-lock rejection and current approval boundaries.",
+  "resulting_behavior": "Current inventory is independently enumerated and compared by path, byte length and SHA-256, with addition/removal/duplicate/hash/length negatives. Portable named fixture bytes bind the reviewed PR003 package and previous CURRENT PR085 lock. The exact reviewed PR008 current lock is accepted only under its named transition role and receipt; current and wrapper subjects remain pending with approval null. Historical 154-file proof and strict released schema bytes are preserved.",
+  "commits": [
+    {
+      "id": "C-086-2-R2",
+      "subject": "Bind portable WP11 current transition inputs",
+      "sha": "e23843bb5ad578c248f0b1cedf9e73a0006fb6fc"
+    },
+    {
+      "id": "C-086-2-R3",
+      "subject": "Verify WP11 current inventory independently",
+      "sha": "0ddacd2be49f8d8df4a43bf8272385311e65722b"
+    },
+    {
+      "id": "C-086-3-R2",
+      "subject": "Record PR086 current-input continuation evidence",
+      "sha": null
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "dispatch-record",
+      "id": "verification/research-program/pr-086/source/dispatch.json",
+      "location": "local",
+      "version": "PR086-CURRENT-INPUT-20260911; gpt-5.6-luna/max",
+      "sha256": "802a056e95e6e0ad1a7f9cfec67bfa536971a5ed0f511b574b728dafcb173360"
+    },
+    {
+      "kind": "authority-decision",
+      "id": "verification/research-program/pr-086/source/authority-decision.json",
+      "location": "local",
+      "version": "controller scope decision at authority head 96431eca22ddb9f33ad0244538d198624228d37a",
+      "sha256": "e9fef00c7ba814c5e540bcddb5036ba249f8645a716f117a7339708ee9a8e374"
+    },
+    {
+      "kind": "wp11-verifier",
+      "id": "scripts/verify-wp11-attestation.mjs",
+      "location": "local",
+      "version": "fail-closed named fixtures and exact PR008 transition",
+      "sha256": "8e8622fadb81c17ae545d5034f549ebe56a2bd4845144c1961412d4fe94220d6"
+    },
+    {
+      "kind": "wp11-tests",
+      "id": "tests/wp11-attestation.test.mjs",
+      "location": "local",
+      "version": "independent current inventory and 19-test focused suite",
+      "sha256": "8ea1b498beab7ab24689eebfdca3c89d01c2f1df1c8108e8003d10b4c7d6a549"
+    },
+    {
+      "kind": "wp11-policy",
+      "id": "verification/research-program/ci-attestation/wp11-v1.3.0/policy.json",
+      "location": "local",
+      "version": "portable fixtures and reviewed transition policy",
+      "sha256": "7b73f8638b47b91089ac0e97dc525bbde9406551499e85b2ce126fbb490c0f17"
+    },
+    {
+      "kind": "named-fixture-manifest",
+      "id": "verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/manifest.json",
+      "location": "local",
+      "sha256": "3daf892e85452f4f289c02994769881047db090ea9acd822128ff279456de043"
+    },
+    {
+      "kind": "named-fixture-package",
+      "id": "verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/package.json",
+      "location": "local",
+      "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e"
+    },
+    {
+      "kind": "named-fixture-previous-current-lock",
+      "id": "verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/package-lock.json",
+      "location": "local",
+      "sha256": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c"
+    },
+    {
+      "kind": "pr008-review-receipt",
+      "id": "verification/research-program/pr-086/pr008-lock-review-072241e/review.json",
+      "location": "local",
+      "sha256": "a4d52b75b44f7d3340e8a91ad0dc4716ce4d513b84d18edf8b4ebca656e94b3a"
+    },
+    {
+      "kind": "historical-sealed-receipt",
+      "id": "verification/wp11/v1.3.0/receipts/approved.json",
+      "location": "local",
+      "sha256": "e596e1b18a0251f611990c9752e1d12fb36cd05dab16bf55cf96e8d1fc431f9d"
+    },
+    {
+      "kind": "pr003-package-source",
+      "id": "package.json@PR003-reviewed",
+      "location": "external",
+      "git_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "git_path": "package.json",
+      "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e"
+    },
+    {
+      "kind": "pr085-previous-current-lock-source",
+      "id": "package-lock.json@PR085-previous-current",
+      "location": "external",
+      "git_commit": "4f90157108a92ce9541c340d5536eac31f24a1d8",
+      "git_path": "package-lock.json",
+      "sha256": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c"
+    },
+    {
+      "kind": "pr008-reviewed-current-lock-source",
+      "id": "package-lock.json@PR008-reviewed-current",
+      "location": "external",
+      "git_commit": "072241ed12f2c0b04deb833eee857ca43920b9d3",
+      "git_path": "package-lock.json",
+      "sha256": "f90550e267d390cb7fc328319f0d2cf849b76a9e52b5e83f6eefc4a045d58ec8"
+    },
+    {
+      "kind": "historical-snapshot-inventory",
+      "id": "verification/research-program/ci-attestation/wp11-v1.3.0/historical-preimage-snapshot/inventory.json",
+      "location": "local",
+      "sha256": "46fc584ae6b494ca562455968c14ba799970c45237479b7edadb74939cd1a000"
+    },
+    {
+      "kind": "root-independent-current-input-review",
+      "id": "verification/research-program/pr-086/independent-review/pr086-current-input-review-0ddacd2/receipt.json",
+      "location": "local",
+      "version": "Astra/root review of 0ddacd2 implementation; PASS; joint acceptance pending",
+      "sha256": "c5469dd676cc36ea9593caae8725345c74d2089be9b53e74d53d793408ba8f36"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c086-r3-focused",
+      "command": "node --test tests/wp11-attestation.test.mjs",
+      "started_at": "2026-09-11T21:03:02.602Z",
+      "completed_at": "2026-09-11T21:03:10.237Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "19 focused WP11 attestation tests passed, including independent current inventory and fail-closed mutation controls.",
+      "expected": "Expected exit 0 with all 19 focused tests passing.",
+      "actual": "Observed exit 0; 19 passed, 0 failed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-cmd-c086-r3-focused",
+        "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-focused.json",
+        "sha256": "b3405788c85815176ec819bb309a412aacbe3e8966058777c142b182c3351f8e",
+        "bytes": 652
+      }
+    },
+    {
+      "id": "cmd-c086-r3-verifier",
+      "command": "node scripts/verify-wp11-attestation.mjs",
+      "started_at": "2026-09-11T21:03:10.239Z",
+      "completed_at": "2026-09-11T21:03:10.466Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Verifier PASS with historical proof intact, current technical file count 156, and current/wrapper approvals null.",
+      "expected": "Expected exit 0 with current/wrapper approvals null.",
+      "actual": "Observed exit 0; verifier PASS and approvals remain null.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-cmd-c086-r3-verifier",
+        "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-verifier.json",
+        "sha256": "096835387c93a4aed903e1b3f6eb7c37eb960ca0a158cb23959b58ce5d4e1f52",
+        "bytes": 639
+      }
+    },
+    {
+      "id": "cmd-c086-r3-suite",
+      "command": "node scripts/run-contract-suites.mjs --suite wp11",
+      "started_at": "2026-09-11T21:03:10.467Z",
+      "completed_at": "2026-09-11T21:03:11.459Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "result": "Registered WP11 aggregate executed the real four-test package suite and current-attestation adapter.",
+      "expected": "Expected exit 0 with exact registered WP11 routing.",
+      "actual": "Observed exit 0; package suite and adapter executed.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "event-cmd-c086-r3-suite",
+        "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-suite.json",
+        "sha256": "f77df37dbab5a41b800948fcc74b907f165c4157baf92673fd81f68f8163a0ab",
+        "bytes": 668
+      }
+    },
+    {
+      "id": "cmd-c086-r3-direct-validate",
+      "command": "USHSO_ALLOW_RECEIPT_WRITES=0 node verification/wp11/v1.3.0/tools/verify.mjs --validate",
+      "started_at": "2026-09-11T21:03:11.460Z",
+      "completed_at": "2026-09-11T21:03:11.547Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "result": "Expected direct successor rejection of stale historical approval; no receipt write.",
+      "expected": "Expected exit 1 with SUCCESSOR_APPROVAL_STALE_SUBJECT.",
+      "actual": "Observed exit 1 with stale approval rejection and no write.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "event_source": {
+        "id": "event-cmd-c086-r3-direct-validate",
+        "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-direct-validate.json",
+        "sha256": "26eb9e958851d99a24e701aea9f0d6ca9379384e944ad97d5bb5f9793ececfcb",
+        "bytes": 713
+      }
+    },
+    {
+      "id": "cmd-c086-r3-direct-issue",
+      "command": "USHSO_ALLOW_RECEIPT_WRITES=0 node verification/wp11/v1.3.0/tools/verify.mjs --issue",
+      "started_at": "2026-09-11T21:03:11.548Z",
+      "completed_at": "2026-09-11T21:03:11.631Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "result": "Expected direct successor issue rejection of stale historical approval; no receipt write.",
+      "expected": "Expected exit 1 with SUCCESSOR_APPROVAL_STALE_SUBJECT.",
+      "actual": "Observed exit 1 with stale approval rejection and no write.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "event_source": {
+        "id": "event-cmd-c086-r3-direct-issue",
+        "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-direct-issue.json",
+        "sha256": "4d45c2e65f54d7cdd52c1cab7228a11d65f2d1c4b26daeae2b0f960a2f73c320",
+        "bytes": 704
+      }
+    },
+    {
+      "id": "cmd-c086-r3-handoff",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-086.json",
+      "started_at": "2026-09-11T21:15:48.497Z",
+      "completed_at": "2026-09-11T21:15:48.758Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "result": "Default handoff checker rejected only the stale shared execution-ledger PR086 base binding; packet schema, scope, artifact, source and command checks passed.",
+      "expected": "Expected exit 1 until root records this continuation base in the shared execution ledger.",
+      "actual": "Observed exit 1 with one binding_conflict: ledger base 7e10fd637e092d7fbe14cef97c8da22a1f5d1ad1 versus continuation base a30cd7730de04200f7cd3ffb75ca83378c9e9a1d.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "event_source": {
+        "id": "event-cmd-c086-r3-handoff",
+        "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-handoff.json",
+        "sha256": "3ecf92782fb2a06b70e1e95ab4a56912f5ac07371ffdd80d8e53d073de2290e8",
+        "bytes": 744
+      }
+    },
+    {
+      "id": "cmd-c086-r3-handoff-final",
+      "command": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-086.json",
+      "started_at": "2026-09-11T21:19:30.571Z",
+      "completed_at": "2026-09-11T21:19:30.819Z",
+      "exit_code": 1,
+      "completion_status": "observed_exit_1",
+      "result": "Final handoff check preserved one stale shared execution-ledger base conflict; packet-local checks passed.",
+      "expected": "Expected exit 1 until root records the continuation base in the shared execution ledger.",
+      "actual": "Observed exit 1 with one binding_conflict and no other findings.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 1
+      },
+      "event_source": {
+        "id": "event-cmd-c086-r3-handoff-final",
+        "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-handoff-final.json",
+        "sha256": "b3021066e0cd726a72c3eddf17b4c31c6b6162e49db0adb95486afbb1ba3b2d9",
+        "bytes": 750
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "evidence-index",
+      "path": "verification/research-program/pr-086/evidence-index.json",
+      "sha256": "38877c9226ce915164f9bafc789af8230255c3e3892b78aa491e67b0da65c4f1",
+      "bytes": 12457
+    },
+    {
+      "id": "task-binding",
+      "path": "verification/research-program/pr-086/task-binding.json",
+      "sha256": "8690dc40c78c901e8cd62f6d1e9bf6530cc50240f2f07d70af76fbc2d577930f",
+      "bytes": 4484
+    },
+    {
+      "id": "archive-manifest",
+      "path": "verification/research-program/pr-086/archive/original-r2/manifest.json",
+      "sha256": "7984543885d8014f3fdc5618d5bcb31f216a7a68ec5b7d3538620e0b8216457c",
+      "bytes": 1369
+    },
+    {
+      "id": "source-manifest",
+      "path": "verification/research-program/pr-086/source/manifest.json",
+      "sha256": "76f439702f3370cbcfda1e153f5f90f623b15c0b0ed9d942d1f38ebb428667da",
+      "bytes": 1015
+    },
+    {
+      "id": "authority-pr086",
+      "path": "verification/research-program/pr-086/source/authority-pr086.md",
+      "sha256": "8fea1108ed7e1fb9f2c6c79b471755d5ab4daf5d790963d31df6af1d98f65d8b",
+      "bytes": 11443
+    },
+    {
+      "id": "authority-decision",
+      "path": "verification/research-program/pr-086/source/authority-decision.json",
+      "sha256": "e9fef00c7ba814c5e540bcddb5036ba249f8645a716f117a7339708ee9a8e374",
+      "bytes": 3942
+    },
+    {
+      "id": "dispatch-record",
+      "path": "verification/research-program/pr-086/source/dispatch.json",
+      "sha256": "802a056e95e6e0ad1a7f9cfec67bfa536971a5ed0f511b574b728dafcb173360",
+      "bytes": 4512
+    },
+    {
+      "id": "wp11-verifier",
+      "path": "scripts/verify-wp11-attestation.mjs",
+      "sha256": "8e8622fadb81c17ae545d5034f549ebe56a2bd4845144c1961412d4fe94220d6",
+      "bytes": 44237
+    },
+    {
+      "id": "wp11-tests",
+      "path": "tests/wp11-attestation.test.mjs",
+      "sha256": "8ea1b498beab7ab24689eebfdca3c89d01c2f1df1c8108e8003d10b4c7d6a549",
+      "bytes": 49118
+    },
+    {
+      "id": "wp11-policy",
+      "path": "verification/research-program/ci-attestation/wp11-v1.3.0/policy.json",
+      "sha256": "7b73f8638b47b91089ac0e97dc525bbde9406551499e85b2ce126fbb490c0f17",
+      "bytes": 7871
+    },
+    {
+      "id": "named-fixture-manifest",
+      "path": "verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/manifest.json",
+      "sha256": "3daf892e85452f4f289c02994769881047db090ea9acd822128ff279456de043",
+      "bytes": 985
+    },
+    {
+      "id": "named-fixture-package",
+      "path": "verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/package.json",
+      "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e",
+      "bytes": 3666
+    },
+    {
+      "id": "named-fixture-previous-current-lock",
+      "path": "verification/research-program/ci-attestation/wp11-v1.3.0/named-pre-pr005-fixture/package-lock.json",
+      "sha256": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c",
+      "bytes": 134511
+    },
+    {
+      "id": "pr008-lock-review",
+      "path": "verification/research-program/pr-086/pr008-lock-review-072241e/review.json",
+      "sha256": "a4d52b75b44f7d3340e8a91ad0dc4716ce4d513b84d18edf8b4ebca656e94b3a",
+      "bytes": 9360
+    },
+    {
+      "id": "historical-inventory",
+      "path": "verification/research-program/ci-attestation/wp11-v1.3.0/historical-preimage-snapshot/inventory.json",
+      "sha256": "46fc584ae6b494ca562455968c14ba799970c45237479b7edadb74939cd1a000",
+      "bytes": 41674
+    },
+    {
+      "id": "historical-reader",
+      "path": "verification/research-program/ci-attestation/wp11-v1.3.0/historical-preimage-reader.mjs",
+      "sha256": "09b946ce97065e08fb3082601363563eaffae04febc02ae63fc93d04e3b850a2",
+      "bytes": 11287
+    },
+    {
+      "id": "current-attestation-docs",
+      "path": "docs/research-program/ci-attestations.md",
+      "sha256": "622a3bad75b8e348fe760e6cd56ca6bd4ad6a2f766ba0679121ea5fc384cc4ec",
+      "bytes": 20263
+    },
+    {
+      "id": "cmd-c086-r3-focused-receipt",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-focused.json",
+      "sha256": "b3405788c85815176ec819bb309a412aacbe3e8966058777c142b182c3351f8e",
+      "bytes": 652
+    },
+    {
+      "id": "cmd-c086-r3-focused-stdout",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-focused.stdout",
+      "sha256": "595450b49fd7e380b8ceb15df6a5e93942e33ea29382914dd98212f010959775",
+      "bytes": 23119
+    },
+    {
+      "id": "cmd-c086-r3-focused-stderr",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-focused.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "cmd-c086-r3-verifier-receipt",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-verifier.json",
+      "sha256": "096835387c93a4aed903e1b3f6eb7c37eb960ca0a158cb23959b58ce5d4e1f52",
+      "bytes": 639
+    },
+    {
+      "id": "cmd-c086-r3-verifier-stdout",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-verifier.stdout",
+      "sha256": "5fa41f9619f54fc8dcc8aa454914ff1be97f7ba353ed4496bed1ff6a8f108f55",
+      "bytes": 18694
+    },
+    {
+      "id": "cmd-c086-r3-verifier-stderr",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-verifier.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "cmd-c086-r3-suite-receipt",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-suite.json",
+      "sha256": "f77df37dbab5a41b800948fcc74b907f165c4157baf92673fd81f68f8163a0ab",
+      "bytes": 668
+    },
+    {
+      "id": "cmd-c086-r3-suite-stdout",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-suite.stdout",
+      "sha256": "1a042fb198c566b875e46e4a1377bebc92d65c1197894727ce8679aab99894a6",
+      "bytes": 19357
+    },
+    {
+      "id": "cmd-c086-r3-suite-stderr",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-suite.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "cmd-c086-r3-direct-validate-receipt",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-direct-validate.json",
+      "sha256": "26eb9e958851d99a24e701aea9f0d6ca9379384e944ad97d5bb5f9793ececfcb",
+      "bytes": 713
+    },
+    {
+      "id": "cmd-c086-r3-direct-validate-stdout",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-direct-validate.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "cmd-c086-r3-direct-validate-stderr",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-direct-validate.stderr",
+      "sha256": "39690f918309e623e673f42a85bbf51671506bdf91ac76508b52d754a3275715",
+      "bytes": 193
+    },
+    {
+      "id": "cmd-c086-r3-direct-issue-receipt",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-direct-issue.json",
+      "sha256": "4d45c2e65f54d7cdd52c1cab7228a11d65f2d1c4b26daeae2b0f960a2f73c320",
+      "bytes": 704
+    },
+    {
+      "id": "cmd-c086-r3-direct-issue-stdout",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-direct-issue.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "cmd-c086-r3-direct-issue-stderr",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-direct-issue.stderr",
+      "sha256": "39690f918309e623e673f42a85bbf51671506bdf91ac76508b52d754a3275715",
+      "bytes": 193
+    },
+    {
+      "id": "cmd-c086-r3-handoff-receipt",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-handoff.json",
+      "sha256": "3ecf92782fb2a06b70e1e95ab4a56912f5ac07371ffdd80d8e53d073de2290e8",
+      "bytes": 744
+    },
+    {
+      "id": "cmd-c086-r3-handoff-stdout",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-handoff.stdout",
+      "sha256": "d33f780e45d446583d0b0f87fab122a912e203afa4853963a947b9ff90bf507b",
+      "bytes": 5919
+    },
+    {
+      "id": "cmd-c086-r3-handoff-stderr",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-handoff.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "root-independent-review",
+      "path": "verification/research-program/pr-086/independent-review/pr086-current-input-review-0ddacd2/receipt.json",
+      "sha256": "c5469dd676cc36ea9593caae8725345c74d2089be9b53e74d53d793408ba8f36",
+      "bytes": 8614
+    },
+    {
+      "id": "cmd-c086-r3-handoff-final-json",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-handoff-final.json",
+      "sha256": "b3021066e0cd726a72c3eddf17b4c31c6b6162e49db0adb95486afbb1ba3b2d9",
+      "bytes": 750
+    },
+    {
+      "id": "cmd-c086-r3-handoff-final-stdout",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-handoff-final.stdout",
+      "sha256": "0dcd885308da13cd3e7737a8ac668c48cc9dcecf3492107bb2c0d097f5c83060",
+      "bytes": 6004
+    },
+    {
+      "id": "cmd-c086-r3-handoff-final-stderr",
+      "path": "verification/research-program/pr-086/command-receipts/cmd-c086-r3-handoff-final.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "historical-offline-byte-proof",
+      "status": "producer_checked",
+      "result": "Retained historical proof remains 154 files totaling 1,347,732 bytes with the sealed subject and no Git requirement.",
+      "command_ids": [
+        "cmd-c086-r3-focused",
+        "cmd-c086-r3-verifier"
+      ],
+      "artifact_ids": [
+        "historical-inventory",
+        "wp11-verifier"
+      ]
+    },
+    {
+      "id": "independent-current-inventory",
+      "status": "producer_checked",
+      "result": "Current builder output is independently compared against actual current path/hash/length enumeration; additions, removals, duplicates, byte changes and length changes fail closed.",
+      "command_ids": [
+        "cmd-c086-r3-focused",
+        "cmd-c086-r3-verifier"
+      ],
+      "artifact_ids": [
+        "wp11-tests",
+        "wp11-verifier"
+      ]
+    },
+    {
+      "id": "portable-named-fixture",
+      "status": "producer_checked",
+      "result": "Named pre-PR005 comparison uses retained package bytes and reports exactly the package and previous CURRENT lock transitions without mutable-root reads.",
+      "command_ids": [
+        "cmd-c086-r3-focused",
+        "cmd-c086-r3-verifier"
+      ],
+      "artifact_ids": [
+        "named-fixture-manifest",
+        "named-fixture-package",
+        "named-fixture-previous-current-lock"
+      ]
+    },
+    {
+      "id": "pr008-reviewed-lock-transition",
+      "status": "producer_checked",
+      "result": "Only exact reviewed PR008 current lock bytes/hash and named structural delta receive the current technical role; unknown and tampered lock bytes remain rejected.",
+      "command_ids": [
+        "cmd-c086-r3-focused",
+        "cmd-c086-r3-verifier"
+      ],
+      "artifact_ids": [
+        "pr008-lock-review"
+      ]
+    },
+    {
+      "id": "registered-wp11-suite",
+      "status": "producer_checked",
+      "result": "Registered WP11 aggregate runs the real four-test package suite and current-attestation adapter.",
+      "command_ids": [
+        "cmd-c086-r3-suite"
+      ],
+      "artifact_ids": [
+        "cmd-c086-r3-suite-stdout"
+      ]
+    },
+    {
+      "id": "strict-successor-approval-boundary",
+      "status": "producer_checked",
+      "result": "Direct successor validate and issue each reject stale historical approval with exit 1 and no receipt writes.",
+      "command_ids": [
+        "cmd-c086-r3-direct-validate",
+        "cmd-c086-r3-direct-issue"
+      ]
+    },
+    {
+      "id": "handoff-validation",
+      "status": "blocked",
+      "result": "The exact default handoff checker ran and preserved one shared execution-ledger binding conflict; all packet-local checks passed.",
+      "command_ids": [
+        "cmd-c086-r3-handoff"
+      ],
+      "artifact_ids": [
+        "cmd-c086-r3-handoff-receipt"
+      ]
+    },
+    {
+      "id": "handoff-validation-final",
+      "status": "blocked",
+      "result": "Final exact handoff check has no packet-local findings; the shared execution-ledger base transition remains blocked.",
+      "command_ids": [
+        "cmd-c086-r3-handoff-final"
+      ],
+      "artifact_ids": [
+        "cmd-c086-r3-handoff-final-json"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "shared-execution-ledger-continuation-base",
+      "status": "blocked",
+      "detail": "Default handoff validation is blocked because execution-ledger PR086 still declares base 7e10fd637e092d7fbe14cef97c8da22a1f5d1ad1 while this continuation is bound to a30cd7730de04200f7cd3ffb75ca83378c9e9a1d.",
+      "next_action": "Root records the continuation task/base in shared ledger and reruns the exact handoff checker."
+    },
+    {
+      "id": "combined-pr006-pr008-pr086-gate",
+      "status": "skipped",
+      "detail": "Combined exact-candidate gate and final CI are root-owned downstream checks."
+    },
+    {
+      "id": "current-approval",
+      "status": "pending",
+      "detail": "Current technical and wrapper approvals remain null pending independent root review."
+    },
+    {
+      "id": "hosted-ci-and-public-integration",
+      "status": "skipped",
+      "detail": "No network, push, public PR, merge, deployment or production activation was performed."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "pending-head-sha",
+      "status": "pending",
+      "detail": "head_sha and final tree are null because the evidence commit cannot self-embed its own identity; root binds the final continuation head after review."
+    },
+    {
+      "id": "pending-joint-acceptance",
+      "status": "pending",
+      "detail": "Producer PASS does not issue current approval or qualify the combined PR006/PR008/PR086 candidate."
+    },
+    {
+      "id": "controller-authority-source-correction",
+      "status": "pending",
+      "detail": "Root corrected the retained assignment to exact authority96431eca bytes and updated current reference hashes after the producer handoff. Original producer bytes and failed source review remain in bootstrap/pr086-current-input-review-20260911. This is controller-authored metadata; separate peer review remains pending. Product/test/policy bytes are unchanged from the independently reviewed implementation0ddacd2b."
+    }
+  ],
+  "risks": [
+    {
+      "id": "legacy-builder-reads",
+      "status": "risk",
+      "detail": "Existing WP11 builder coverage limits remain four unpinned legacy reads outside the sealed 154-file inventory; this continuation records them and does not expand historical scope."
+    }
+  ],
+  "next_consumer": "Root/Astra, who owns shared execution-ledger continuation binding, independent review and the combined PR006/PR008/PR086 exact-candidate gate. PR-082 remains the downstream consumer of current-subject approval and exact release qualification.",
+  "next_action": "Review e23843b and 0ddacd2 from base a30cd7730de04200f7cd3ffb75ca83378c9e9a1d, update shared ledger for this continuation, rerun the exact handoff checker, then run the combined PR006/PR008/PR086 candidate gate/CI before any current approval or release qualification.",
+  "independent_review": {
+    "status": "in_review",
+    "reviewed_head_sha": "0ddacd2be49f8d8df4a43bf8272385311e65722b",
+    "decisive_checks": [
+      "controller 14 current-input and mutation cases",
+      "WP11 registered regression tests",
+      "current adapter and aggregate suite",
+      "portable named fixture and PR008 review bytes",
+      "protected historical, runner and root package paths unchanged"
+    ],
+    "limitations": [
+      "Root review covers the two implementation commits only; evidence commit and final shared-ledger binding remain pending.",
+      "No current approval, combined acceptance, release qualification or hosted CI is claimed."
+    ]
+  }
+}

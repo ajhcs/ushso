@@ -1,0 +1,266 @@
+{
+  "format": "ushso.pr004.final-semantic-review.v1",
+  "prepared_at": "2026-09-11T01:19:34.421Z",
+  "reviewer": "independent final semantic reviewer",
+  "review_mode": "bounded_read_only_exact_final_tree",
+  "disposition": "changes_requested",
+  "acceptance_status": "not_final_acceptance",
+  "scope": "Acceptance-relevant normalization, coverage, evidence-catalog, access-summary, temporal, compact-payload, consumer-binding and controller-metadata semantics for the exact final C4 tree.",
+  "repository": {
+    "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+    "head_sha": "cd4076792ecf6b262ae13f0e092baa9123fc2c14",
+    "tree_sha": "ce01ea2bc7029633116599394ca83ee3b575221c",
+    "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+    "status": "clean_and_unchanged_during_review"
+  },
+  "reviewed_instructions_and_docs": {
+    "AGENTS.md": "4c1789435fe34aac1d75ecfd6e9350412e5672b6b4b24867f78119d7e19f89e6",
+    "README.md": "e46f4c12a25ae9ed628002e6b0380feebdd4f9b60a23cefca41b66f3eaed8d6d",
+    "docs/ARCHITECTURE.md": "f70fe0b4c35dfc5f4d64790f5eb0b4941a88c869586c4ddec63c86ebc87e0f70",
+    "docs/EVALUATION.md": "4fe2c290c2adaea7a2b859e34c65997a478824a0a1722480f2873798c131d389",
+    "docs/master-plan/2026-09-10/EXECUTION.md": "4118d4f46a7ebec45749676881c753529593842792a439cfb5e53e50bc1fdfc3",
+    "docs/master-plan/2026-09-10/prs/PR-004.md": "fbf6642288434a700c31d4e073d6ae21899408e6d5a830dd2f87c0ffb33bb37c"
+  },
+  "reviewed_files": {
+    "packages/coverage/index.mjs": "5c4459f6b75de6ed518039a290778978b974a1cbd4920e7cb4e9ecdfda672d9a",
+    "packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json": "fb4c38e72fdb1a9e686f7d238cc3fdaf5ddd78f836349560a57f7f0bfb5c3639",
+    "packages/coverage/research-program/v1.0.0/src/completeness.mjs": "c4fd448c99d2bdda8e6f0403544476288533cb8b1427e2ec3662ef7bf82d9ac0",
+    "packages/normalization/manifests/package-manifest.json": "ce26fe7a26265ce9c13a7d9b98a0b6acab4d60327aa5febaed68b1d164ac0a03",
+    "packages/normalization/schemas/field-observation.schema.json": "96ee40618f8f8703a4cb6797abecea3ba0120314d6751e033dc64dfc1d3ea007",
+    "packages/normalization/src/field-observation.mjs": "6e18c72101e3a12b69be025512eb6d76ca54f2ff5ed3d6a29fd80f3682ed2639",
+    "packages/normalization/src/index.mjs": "7d1b9af8a2c119ce1351a985dbe75ea2f7dd8d3efe773e1d4ef93665be703e5e",
+    "tests/research-program/field-states.test.mjs": "63338e398202f64adbb99b11d601fbfc7ef309fbaf2056e77df62d89b1afeb8d",
+    "verification/research-program/pr-004/build-completeness-view.mjs": "8c9aba55062777b1423714bc31a02c1368d0a5b7dcf6f85f9785540df55c89a4",
+    "verification/research-program/pr-004/completeness-view.json": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
+    "verification/research-program/pr-004/evidence.json": "21c8191004eca6f58b8f05fb8a404548ad8f686af0cd951b4a1df09b6a447e73",
+    "verification/research-program/pr-004/verify.mjs": "dfc458fb4e5752b7f00049ad6e29806fb24fe527e526c013d516b2d476e1fcf8",
+    "docs/research-program/handoffs/PR-004.json": "8e7db1f0069d9a58d6553370677fbc0869902d1798cbb08ef79b381b57a1bcd5"
+  },
+  "findings": [
+    {
+      "id": "PR004-C4-FINAL-001",
+      "severity": "P1",
+      "status": "open",
+      "title": "Unlinked prior observations are silently dropped from the vector and evidence catalog.",
+      "locations": [
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:396-410",
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:428-447",
+        "packages/normalization/src/field-observation.mjs:513-544"
+      ],
+      "trigger": "Provide a valid older succeeded observation and a separate newer failed observation for the same record_id/source_id/field_id, with distinct observation_id values and no explicit history item on the newer observation.",
+      "actual_behavior": "deriveFieldObservation finds historical_success, but unsignedView renders only selected.current_observation. The older observation and its evidence are absent from the vector history and evidence catalog; buildCompletenessView and assertCompletenessView still pass.",
+      "fixture_result": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/supplemental-replays.mjs",
+        "input_success_attempt_count": 1,
+        "vector_attempt_state": "failed",
+        "vector_history_count": 0,
+        "old_evidence_in_catalog": false,
+        "build_and_assert_passed": true
+      },
+      "impact": "A flat ledger input can lose the retained historical successful access/value and its source, record, revision and time-bound evidence. The helper reports retention internally, but the published completeness vector and catalog do not carry it.",
+      "minimal_fix": "Reject more than one observation for a record/source/field unless prior revisions are explicitly chained, or inject all eligible prior revisions from deriveFieldObservation into the rendered observation history before building the vector and catalog. Use the same complete set for access-summary derivation.",
+      "acceptance_basis": "PR-004 requires failed/current states to retain historical success and evidence provenance in the machine-readable view, not only in an intermediate derivation result."
+    },
+    {
+      "id": "PR004-C4-FINAL-002",
+      "severity": "P1",
+      "status": "open",
+      "title": "Global observation_id first-wins deduplication drops a retained history revision from the access summary.",
+      "locations": [
+        "packages/normalization/src/field-observation.mjs:465-475",
+        "packages/normalization/src/field-observation.mjs:319-326"
+      ],
+      "trigger": "Give two valid current failed observations in different records or sources, each with a historical successful snapshot that reuses the same revision_id but has distinct provenance and evidence.",
+      "actual_behavior": "expandObservationHistory keys all current and historical observations by a global observation_id and silently keeps the first occurrence. Per-containing-observation validation only checks history IDs against that containing current observation, so the cross-observation collision is accepted.",
+      "fixture_result": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/decisive-replays.mjs",
+        "expected_historical_success_count": 2,
+        "actual_access_summary_historical_success_count": 1,
+        "access_summary_revision_history_count": 3,
+        "catalog_retained_both_history_bindings": true,
+        "build_and_assert_passed": true
+      },
+      "impact": "One source/record's retained successful access disappears from revision_history even though the evidence catalog preserves both bindings. This makes the access summary incomplete and can attach the surviving revision identity to the wrong provenance context.",
+      "minimal_fix": "Reject duplicate revision IDs globally with their full record/source/field provenance, or key history expansion by record_id/source_id/field_id/revision_id and retain those bindings in every check summary. Do not silently first-win."
+    },
+    {
+      "id": "PR004-C4-FINAL-003",
+      "severity": "P2",
+      "status": "open",
+      "title": "Independent completeness assertion omits documented access facts and access-summary boundaries from its comparison.",
+      "locations": [
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:785-796",
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:799-832",
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:965-969"
+      ],
+      "trigger": "Clone a valid compact view, change an endpoint's documented cost from unknown/null to documented_free/0/USD, change a boundary value, recompute the self digest and artifact ID, and provide the independent membership/cohort/generation/as_of/input-digest context.",
+      "actual_behavior": "assertCompletenessView validates documented fact shape, timestamps and evidence presence, but accessSummaryProjection compares only schema/as_of, endpoint scopes, latest checks, revision history and browser observations. It omits documented credential/cost/usage facts and endpoint/top-level boundaries. The rehashed forged view passes both assertCompletenessView and createOfflineCompletenessConsumer; the original artifact digest correctly rejects it.",
+      "fixture_result": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/decisive-replays.mjs",
+        "original_cost_state": "unknown",
+        "forged_cost_state": "documented_free",
+        "assertion_with_independent_non_digest_context_accepted": true,
+        "consumer_with_rehashed_artifact_digest_accepted": true,
+        "consumer_with_original_artifact_digest_rejected": true
+      },
+      "impact": "A generic authoritative consumer can accept a semantically self-consistent artifact whose documented credential/cost/usage facts or access boundaries disagree with the vector-derived facts. The frozen producer verifier and builder's exact supplied-summary check reduce this risk for the current artifact, but do not repair the generic assertion contract.",
+      "minimal_fix": "Include complete normalized documented facts and endpoint/top-level boundaries in accessSummaryProjection, or compare a canonical full access summary after compact evidence normalization. Keep full and compact forms equivalent under that comparison."
+    },
+    {
+      "id": "PR004-C4-FINAL-004",
+      "severity": "P2",
+      "status": "open",
+      "title": "Date.parse-based timestamp validation accepts non-ISO and impossible calendar timestamps.",
+      "locations": [
+        "packages/normalization/src/field-observation.mjs:20-21",
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:51-53",
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:708-711",
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs:806",
+        "tests/research-program/field-states.test.mjs:24",
+        "verification/research-program/pr-004/verify.mjs:31"
+      ],
+      "trigger": "Use 2026-02-31T00:00:00.000Z for observation/source/recording/attempt/evidence clocks, or use a non-ISO Date.parse string such as 09/01/2026. JavaScript normalizes the impossible February date to 2026-03-03T00:00:00.000Z.",
+      "actual_behavior": "The normalization and coverage validators accept any finite Date.parse result, and the test/verifier AJV date-time callbacks use the same predicate. The observation, completeness view and generated-at-after-as-of control all assert successfully.",
+      "fixture_result": {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/supplemental-replays.mjs",
+        "input_timestamp": "2026-02-31T00:00:00.000Z",
+        "javascript_timestamp_normalization": "2026-03-03T00:00:00.000Z",
+        "observation_constructed": true,
+        "view_asserted": true,
+        "generated_at_after_as_of_accepted": true
+      },
+      "impact": "Malformed evidence clocks are accepted and silently interpreted as a different instant, undermining as-of eligibility, ordering and provenance. The valid rule that generated_at may be later than as_of must remain supported.",
+      "minimal_fix": "Use one strict RFC3339/date-time validator with calendar round-trip validation in normalization, coverage and schema test/verifier format callbacks. Preserve generated_at-after-as_of semantics while requiring observations and nested evidence/access/browser clocks to be valid and at or before as_of."
+    }
+  ],
+  "positive_checks": [
+    {
+      "id": "c4-explicit-history-retention",
+      "result": "Passed. Explicit appendFieldObservationRevision history retains prior successful access with record/source/revision/recorded/evidence bindings while the latest attempt is failed."
+    },
+    {
+      "id": "compact-membership-and-provenance",
+      "result": "Passed. Compact membership-only evidence, observation IDs, credentials, cost, usage, evidence IDs, source locators and record/source bindings survive expansion and catalog checks."
+    },
+    {
+      "id": "access-ordering-and-credential-order",
+      "result": "Passed. Credential input ordering does not alter output and latest-attempt selection follows attempted_at rather than input order."
+    },
+    {
+      "id": "temporal-boundaries",
+      "result": "Passed for the valid boundary rule. Future observation/evidence/access/browser clocks are rejected; generated_at later than as_of is accepted."
+    },
+    {
+      "id": "generic-fixture-context",
+      "result": "Passed. Generic buildCompletenessView accepts caller-supplied cohort values and does not require a globally hardcoded frozen cohort."
+    },
+    {
+      "id": "root-reported-final-replay",
+      "result": "Root independently reported byte-exact 49,808,256-byte artifact rebuild, verifier pass, 12 field-state tests, 32 normalization tests, normalization validation, and prior decisive/access-summary binding cases.",
+      "receipt": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/cd40767-final/receipt.json",
+      "receipt_sha256": "e85ec547fd3858c0e16b8fa159cfcc0e60d14477ff6eac9a23df940d197aca14"
+    }
+  ],
+  "review_fixtures": [
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/decisive-replays.mjs",
+      "sha256": "2c42429aa28e4cc5dd38fda572d41e9951aaece843be73d4358da66cd64dcd7a",
+      "command": "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/decisive-replays.mjs /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+      "exit_code": 0
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/supplemental-replays.mjs",
+      "sha256": "2ea0f137e51669d8d49f42c0c1ffc2b96fc526ba635e3119a88cc04beb2e5cab",
+      "command": "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/supplemental-replays.mjs /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+      "exit_code": 0
+    }
+  ],
+  "commands": [
+    {
+      "command": "node --test tests/research-program/field-states.test.mjs",
+      "exit_code": 0,
+      "result": "12 field-state subtests passed."
+    },
+    {
+      "command": "node verification/research-program/pr-004/verify.mjs",
+      "exit_code": 0,
+      "result": "Artifact digest sha256:7b6d763bfc652aa094b7d68c76ebc534de401c1e5904738932231b7824b42fab; artifact bytes 49,808,256; records 3,434; source memberships 3,434; isolated records 4; vector fields 13,736; metrics 25; compact-v1."
+    },
+    {
+      "command": "npm test --prefix packages/normalization",
+      "exit_code": 0,
+      "result": "6 package suites and 32 tests passed."
+    },
+    {
+      "command": "git diff --check e5c44249b9d2448df2e4b6d466077658e42a009d cd4076792ecf6b262ae13f0e092baa9123fc2c14",
+      "exit_code": 0,
+      "result": "No whitespace errors."
+    },
+    {
+      "command": "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/controller-binding-v2-check.mjs",
+      "exit_code": 0,
+      "result": "All 21 independent controller-candidate checks passed.",
+      "fixture_sha256": "0703b5444b59a95462efcd06775ddc22a0e2d4282c76383b730676b8f735ea68"
+    }
+  ],
+  "controller_binding_candidate": {
+    "status": "pass",
+    "candidate_directory": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-binding-candidate-v2",
+    "candidate_receipt": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-binding-candidate-v2/receipt.json",
+    "candidate_receipt_sha256": "2d58d2d58e7fed18fd3f5104177c146dc043c63a9131218843a376f6ffba179e",
+    "candidate_task_binding": "verification/research-program/pr-004/task-binding.json",
+    "candidate_task_binding_sha256": "9da41a7d27d32e2053582648332ea1d51d3141b4db7067e13ba8289cad08f0e3",
+    "candidate_handoff_sha256": "3ecf1d00d1dfed13e4dc4da94706da99daebb5e0e9b7ee6104ef65267ef8eeaf",
+    "candidate_parent_head": "cd4076792ecf6b262ae13f0e092baa9123fc2c14",
+    "candidate_parent_tree": "ce01ea2bc7029633116599394ca83ee3b575221c",
+    "authority": {
+      "dispatch_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/publication-review-d0131f1/payload/verification/research-program/bootstrap/pr003-pr004-dispatch.json",
+      "dispatch_sha256": "410b7356349ac40f5922b6eb726f46d15148d734da644d37692ddb33b5323e50",
+      "prompt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-dispatch-prompt.md",
+      "prompt_sha256": "b9245f4c36b63aed9d380123471ddaabefc7d108a219fde7032d7ad322f619a4",
+      "bootstrap_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr-004-worktree-create.json",
+      "bootstrap_sha256": "41f99ff139757a12f972d8712f183ac5ee73ba48742d3eeff5ad60502bfe8058",
+      "provider_interface": "native Codex sub-agent",
+      "selected_model": "gpt-5.6-luna",
+      "selected_reasoning": "max"
+    },
+    "checks": {
+      "exact_parent_head_and_tree": true,
+      "task_id_and_pr_id": true,
+      "owner_and_reviewer_match_handoff": true,
+      "branch_and_worktree_match_dispatch": true,
+      "base_sha_and_base_tree": true,
+      "direct_dependency_is_pr002": true,
+      "no_extra_pr001_direct_dependency": true,
+      "prompt_and_bootstrap_hashes": true,
+      "pending_head_sha_is_null": true,
+      "task_binding_listed_and_hash_bound": true,
+      "pr001_retained_as_transitive_source_identity": true
+    },
+    "owner_label": "Luna Max (luna-max-pr004)",
+    "disposition_note": "The v2 owner label matches the existing handoff owner. The retained dispatch independently records the requested native model gpt-5.6-luna/max; these are not conflated. Candidate is metadata-only and does not modify implementation, generated artifact, source observations or prior receipts. Root should run the actual checker after applying the guarded two-file metadata patch."
+  },
+  "limitations": [
+    "This is an independent semantic review, not final root acceptance; R01-R16 remain unaccepted.",
+    "The review worktree is read-only for this task. Root's reported final artifact replay is recorded as corroborating evidence rather than re-run here.",
+    "The direct build command was not run in this read-only checkout because it writes the checked-in artifact; the root-owned writable replay passed byte exactness. The EROFS limitation is environmental and not a product finding.",
+    "No full integrated npm/build/cf:dry-run release gate was repeated here; root owns that gate and final disposition."
+  ],
+  "review_artifact": {
+    "receipt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/receipt.json",
+    "scripts": [
+      {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/decisive-replays.mjs",
+        "sha256": "2c42429aa28e4cc5dd38fda572d41e9951aaece843be73d4358da66cd64dcd7a"
+      },
+      {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/supplemental-replays.mjs",
+        "sha256": "2ea0f137e51669d8d49f42c0c1ffc2b96fc526ba635e3119a88cc04beb2e5cab"
+      },
+      {
+        "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-final-semantic-review/controller-binding-v2-check.mjs",
+        "sha256": "0703b5444b59a95462efcd06775ddc22a0e2d4282c76383b730676b8f735ea68"
+      }
+    ]
+  }
+}

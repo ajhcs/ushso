@@ -1,0 +1,372 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-017",
+  "status": "producer_checked",
+  "owner": "/root/pr017_wire_key",
+  "reviewer": "Astra/root",
+  "base_sha": "d4dc5320039243331f8fd665e9e0b90f39406e34",
+  "head_sha": "8aba504588dcd4ee8c2efa8d416699ad0a82c956",
+  "dependency_merge_shas": {
+    "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+    "PR-013": "861a7808fec20e5e7795bb8f8082f82717e01f11",
+    "PR-016": "0f601a908e74492a9803906ce35cbd346df28565"
+  },
+  "branch": "codex/ushso-pr017-wire-key-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "scripts/research/cms-variable-layout.mjs",
+    "packages/identity/src/schema-catalog.mjs",
+    "tests/research-program/wire-key-reconciliation.test.mjs",
+    "verification/research-program/pr-017/",
+    "docs/research-program/handoffs/PR-017.json"
+  ],
+  "problem": "HCRIS dictionary names and observed API keys can have equal counts while eleven literals differ by hyphen, case or Adult/Adults wording. Broad punctuation stripping could merge two columns, and recipes could use documented labels instead of observed wire keys.",
+  "resulting_behavior": "The PR-008 117/117 HCRIS comparison is packaged with per-literal hashes. Count equality can pass while exact-key comparison reports all eleven mismatches. Exact names match first. Hyphen/case aliases and Adult/Adults wording stay ambiguous unless a review/evidence record accepts a single wire name. Two candidates cannot silently pick a field. Accepted mappings feed recipes using the observed API key while retaining original labels, dictionary citations and mapping version. A documentation update invalidates only the affected mapping. No broad punctuation stripping merges two source columns. Live fetch is forbidden. packages/identity/src/schema-catalog.mjs remains the sealed identity payload; field IDs for accepted mappings are minted from cms-variable-layout.mjs.",
+  "commits": [
+    {
+      "id": "C-017-1",
+      "subject": "Retain the HCRIS mismatch fixture",
+      "sha": "c99ccf0d8ffd3d94242d8e70f285f771f88b4389"
+    },
+    {
+      "id": "C-017-2",
+      "subject": "Implement evidence-scoped key reconciliation",
+      "sha": "cfeb253d202eda497a939aa123953de2985ac694"
+    },
+    {
+      "id": "C-017-3",
+      "subject": "Feed accepted mappings into recipes",
+      "sha": "0da20966542d753b5fd35cadc3764d443f923bb6"
+    },
+    {
+      "id": "C-017-2-R1",
+      "subject": "Keep identity schema-catalog sealed and route wire-key field IDs from layout",
+      "sha": "8aba504588dcd4ee8c2efa8d416699ad0a82c956"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "cms-variable-layout",
+      "id": "scripts/research/cms-variable-layout.mjs",
+      "location": "local",
+      "sha256": "ad42780eeff9071b6c16b99428b9f9179fdd2dd0be5490712c341e0b5a70d710"
+    },
+    {
+      "kind": "schema-catalog",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "wire-key-tests",
+      "id": "tests/research-program/wire-key-reconciliation.test.mjs",
+      "location": "local",
+      "sha256": "1c4017ffff7b9c10824688aed6d330002afc3b3c3cfb745465bb1051eed4b851"
+    },
+    {
+      "kind": "hcris-fixture",
+      "id": "verification/research-program/pr-017/fixtures/hcris-wire-key-fixture.json",
+      "location": "local",
+      "sha256": "056e6855413f7b4be64fe95bfa2c1fb7bb8b70f2c9fdc8a0c84afbf80651f9fb"
+    },
+    {
+      "kind": "pr008-mapping-audit",
+      "id": "verification/research-program/pr-008/evidence/c008-3-mapping-audit.json",
+      "location": "local",
+      "sha256": "d0e5465f0f1c0eb9ab5585830dbbcd880a58e31d47679e7fd6984f3437bbf3dd"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c017-focused",
+      "command": "node --test tests/research-program/wire-key-reconciliation.test.mjs tests/cms-layout.test.mjs tests/research-program/variable-identity.test.mjs",
+      "started_at": "2026-09-14T05:15:42.140312Z",
+      "completed_at": "2026-09-14T05:15:42.519996Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "wire-key, layout and variable-identity tests pass after sealed-file restoration.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c017-focused-event",
+        "path": "verification/research-program/pr-017/producer-20260914/commands/focused-wire-key/event.json",
+        "sha256": "958b26ef6d56edfb862658ee5e77b79d71257f415fddd443dcf578c3b4646b6e",
+        "bytes": 1194
+      }
+    },
+    {
+      "id": "cmd-c017-parser",
+      "command": "node --test tests/research-program/parser-routing.test.mjs",
+      "started_at": "2026-09-14T05:15:42.520388Z",
+      "completed_at": "2026-09-14T05:15:42.621921Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "8/8 parser-routing tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c017-parser-event",
+        "path": "verification/research-program/pr-017/producer-20260914/commands/parser-routing/event.json",
+        "sha256": "7385a0f053aa8ad3b23fdfe5947fa028ae53c74dfbeeee2339c2cc671a556945",
+        "bytes": 1038
+      }
+    },
+    {
+      "id": "cmd-c017-cms",
+      "command": "node --test tests/research-program/cms-resources.test.mjs",
+      "started_at": "2026-09-14T05:15:42.622303Z",
+      "completed_at": "2026-09-14T05:15:44.438117Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "10/10 CMS resources tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c017-cms-event",
+        "path": "verification/research-program/pr-017/producer-20260914/commands/cms-resources/event.json",
+        "sha256": "fb586270268ac4bb5da63d1e987d03945e7e6964c3c27d259cf81f1b2fd469a2",
+        "bytes": 1036
+      }
+    },
+    {
+      "id": "cmd-c017-wp7",
+      "command": "npm run validate --workspace @ushso/verification-wp7-v1",
+      "started_at": "2026-09-14T05:15:44.438486Z",
+      "completed_at": "2026-09-14T05:15:44.885714Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "WP7 package validate passes with sealed schema-catalog restored.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c017-wp7-event",
+        "path": "verification/research-program/pr-017/producer-20260914/commands/wp7-validate/event.json",
+        "sha256": "33983b7a8ddb29764465b37a277500108f0060eb25bf4846b2e0a72e1ee776ae",
+        "bytes": 1078
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr017-artifact-0",
+      "path": "verification/research-program/pr-017/task-binding.json",
+      "bytes": 3611,
+      "sha256": "ab74fbfdece8fb0b21a2175de4cefffc273e5a3ef1c5efa9af3919a55abccb21"
+    },
+    {
+      "id": "pr017-artifact-1",
+      "path": "verification/research-program/pr-017/dispatch.json",
+      "bytes": 2153,
+      "sha256": "c740d4b692a9e83832dec1365d4c2f17e9e82481a3c4167194db566c42b663dc"
+    },
+    {
+      "id": "pr017-artifact-2",
+      "path": "verification/research-program/pr-017/fixtures/hcris-wire-key-fixture.json",
+      "bytes": 5323,
+      "sha256": "056e6855413f7b4be64fe95bfa2c1fb7bb8b70f2c9fdc8a0c84afbf80651f9fb"
+    },
+    {
+      "id": "pr017-artifact-3",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/focused-wire-key/receipt.json",
+      "bytes": 561,
+      "sha256": "ec8b064fb2d2ea3a89ef440b96c3c4d0146a5a185997d4b30989d475c96a6ee5"
+    },
+    {
+      "id": "pr017-artifact-4",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/focused-wire-key/stdout.log",
+      "bytes": 2841,
+      "sha256": "f5ae7d94d7952fad107e783a8c7fc5fa780bd0c3fecd568c9c0953d40e3e07d1"
+    },
+    {
+      "id": "pr017-artifact-5",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/focused-wire-key/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr017-artifact-6",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/focused-wire-key/event.json",
+      "bytes": 1194,
+      "sha256": "958b26ef6d56edfb862658ee5e77b79d71257f415fddd443dcf578c3b4646b6e"
+    },
+    {
+      "id": "pr017-artifact-7",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/parser-routing/receipt.json",
+      "bytes": 459,
+      "sha256": "61a4212d89c2743b591f3e4c33ea931aff6ba9735f643c95ffed51de48db75de"
+    },
+    {
+      "id": "pr017-artifact-8",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/parser-routing/stdout.log",
+      "bytes": 804,
+      "sha256": "e8472a9bb6a7f404e637d7740448a0f2102a3d59df35d8869aea2dbfdb922e21"
+    },
+    {
+      "id": "pr017-artifact-9",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/parser-routing/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr017-artifact-10",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/parser-routing/event.json",
+      "bytes": 1038,
+      "sha256": "7385a0f053aa8ad3b23fdfe5947fa028ae53c74dfbeeee2339c2cc671a556945"
+    },
+    {
+      "id": "pr017-artifact-11",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/cms-resources/receipt.json",
+      "bytes": 458,
+      "sha256": "4740a812d93fafc36338055a0b9d789b03a252aafea8ccf77bbe677e24e12f4a"
+    },
+    {
+      "id": "pr017-artifact-12",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/cms-resources/stdout.log",
+      "bytes": 1000,
+      "sha256": "3fc6f70e179606c138a74121a8d29f67065cc65c32f9e397122b3568dad2c987"
+    },
+    {
+      "id": "pr017-artifact-13",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/cms-resources/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr017-artifact-14",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/cms-resources/event.json",
+      "bytes": 1036,
+      "sha256": "fb586270268ac4bb5da63d1e987d03945e7e6964c3c27d259cf81f1b2fd469a2"
+    },
+    {
+      "id": "pr017-artifact-15",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/wp7-validate/receipt.json",
+      "bytes": 469,
+      "sha256": "056f2c5288dfc57114b4fa35c79db98ab5ff14b2ad9a3dc0eec474a5839359c6"
+    },
+    {
+      "id": "pr017-artifact-16",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/wp7-validate/stdout.log",
+      "bytes": 1759,
+      "sha256": "a7e1fa5514cc268d5a3d2b040c8945c1638eaa89aff8b3f24c6412dd9675b927"
+    },
+    {
+      "id": "pr017-artifact-17",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/wp7-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr017-artifact-18",
+      "path": "verification/research-program/pr-017/producer-20260914/commands/wp7-validate/event.json",
+      "bytes": 1078,
+      "sha256": "33983b7a8ddb29764465b37a277500108f0060eb25bf4846b2e0a72e1ee776ae"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-017-1",
+      "status": "producer_checked",
+      "result": "117 documented names and 117 wire keys keep count equality while exact-key comparison reports eleven hashed mismatches. Labels stay distinct from wire identifiers.",
+      "command_ids": [
+        "cmd-c017-focused"
+      ]
+    },
+    {
+      "id": "C-017-2",
+      "status": "producer_checked",
+      "result": "Exact names match first. Hyphen/case aliases and Adult/Adults wording require review evidence. Two ambiguous candidates cannot silently pick a field. Broad punctuation stripping cannot merge two columns.",
+      "command_ids": [
+        "cmd-c017-focused"
+      ]
+    },
+    {
+      "id": "C-017-3",
+      "status": "producer_checked",
+      "result": "Accepted mapping feeds a recipe using the observed API key and retains label, citation and version. A documentation update invalidates only the affected mapping. Parser routing and CMS resources remain green.",
+      "command_ids": [
+        "cmd-c017-focused",
+        "cmd-c017-parser",
+        "cmd-c017-cms"
+      ]
+    },
+    {
+      "id": "C-017-2-R1",
+      "status": "producer_checked",
+      "result": "Sealed schema-catalog restored. WP7 validate and identity package seal pass. Wire-key tests still pass.",
+      "command_ids": [
+        "cmd-c017-focused",
+        "cmd-c017-wp7"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-cms-http",
+      "status": "accepted",
+      "detail": "Tests consume the retained PR-008 HCRIS comparison and hashed PR-017 fixture. blockedFetch forbids live HTTP."
+    },
+    {
+      "id": "full-117-literal-inventory",
+      "status": "skipped",
+      "detail": "The retained PR-008 comparison listed only the eleven mismatch literals. The 106 exact names are counted as HCRIS_EXACT_NNN placeholders and not re-invented. This is not payload qualification."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-wire-key-review",
+      "status": "pending",
+      "detail": "Independent review of HCRIS mismatch packaging, evidence-scoped aliases and recipe mapping remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "exact-name-placeholders",
+      "status": "risk",
+      "detail": "The 106 exact HCRIS names were not republished in this fixture. Count equality uses retained 117/117 counts plus eleven hashed mismatch literals from PR-008. Do not treat HCRIS_EXACT_NNN as publisher field names."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of wire-key reconciliation, HCRIS mismatches and recipe mapping, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-017 source and replay focused wire-key, layout, variable-identity, parser-routing and CMS resources tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

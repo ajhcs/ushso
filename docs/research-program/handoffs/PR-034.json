@@ -1,0 +1,257 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-034",
+  "status": "producer_checked",
+  "owner": "/root/pr034_identifier_systems",
+  "reviewer": "Astra/root",
+  "base_sha": "8ff333a0ce844ce361327f1a0a81f1b9fcd4e91e",
+  "head_sha": "c8a5eb129d5dcad4ba00b5b14fd8aa695cd8698b",
+  "dependency_merge_shas": {
+    "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+    "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+    "PR-031": "3b2d681103d80d571d44cd3e364a4327f8e046a9"
+  },
+  "branch": "codex/ushso-pr034-identifier-systems-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/identifier-systems.mjs",
+    "tests/research-program/identifier-systems.test.mjs",
+    "docs/research-program/identifier-systems.md",
+    "verification/research-program/pr-034/",
+    "docs/research-program/handoffs/PR-034.json"
+  ],
+  "problem": "CCN and NPI could be treated as interchangeable. Equal strings from different identifier systems could establish identity. Leading zeros could be lost. Sample uniqueness could be certified globally. Composite facility/report/year keys could collapse. An identifier match outside its applicability period could be treated as exact. Names could merge organizations automatically. Editing sealed identity exact-identifier-policy.mjs or schema-catalog.mjs would break WP7.",
+  "resulting_behavior": "Identifier systems live in packages/enrichment/identifier-systems.mjs. CCN, NPI, FIPS/GEOID, source report IDs, tax identifiers and plan identifiers keep source-specific formatting, entity role and leading zeros. CCN and NPI are never interchangeable; equal strings from different systems do not establish identity. Candidate/composite/foreign-key/display-label roles require documentation or scoped sample evidence. Observed uniqueness is not full-release uniqueness. Composite facility/report/year keys remain composite. An identifier match outside its applicability period is ambiguous or incompatible, not exact. No automatic name-based merge is added. Sealed packages/identity/src/exact-identifier-policy.mjs (8876 bytes) and schema-catalog.mjs (16653 bytes) are unchanged.",
+  "commits": [
+    {
+      "id": "C-034-1",
+      "subject": "Define identifier-system metadata",
+      "sha": "9d9fb6c8b45872adad0919a6b287341e5401ced7"
+    },
+    {
+      "id": "C-034-2",
+      "subject": "Attach key roles to exact fields",
+      "sha": "9d9fb6c8b45872adad0919a6b287341e5401ced7"
+    },
+    {
+      "id": "C-034-3",
+      "subject": "Validate identity and historical scope",
+      "sha": "c8a5eb129d5dcad4ba00b5b14fd8aa695cd8698b"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "identifier-systems",
+      "id": "packages/enrichment/identifier-systems.mjs",
+      "location": "local",
+      "sha256": "00512c35641d644a2396d7cc5ab0273ecab52cc391c2bce375cc66f6522aa62b"
+    },
+    {
+      "kind": "identifier-systems-tests",
+      "id": "tests/research-program/identifier-systems.test.mjs",
+      "location": "local",
+      "sha256": "069d618c88643d211869856b016952592db92eb09ac9470240ee00b81bbf6f65"
+    },
+    {
+      "kind": "identifier-systems-docs",
+      "id": "docs/research-program/identifier-systems.md",
+      "location": "local",
+      "sha256": "7d346ee9091f1fe089561373f2a4c57d6c2e77d5b96fcd2d2c3db3edd11fe7a0"
+    },
+    {
+      "kind": "sealed-exact-identifier-policy-unchanged",
+      "id": "packages/identity/src/exact-identifier-policy.mjs",
+      "location": "local",
+      "sha256": "ccb8b855651d378aff392b3112d269753704951ff0735b9cc31eb6013674aa55"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c034-focused",
+      "command": "node --test tests/research-program/identifier-systems.test.mjs",
+      "started_at": "2026-09-14T11:09:21.439784Z",
+      "completed_at": "2026-09-14T11:09:21.535626Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 identifier-systems tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c034-focused-event",
+        "path": "verification/research-program/pr-034/producer-20260914/commands/focused-ids/event.json",
+        "sha256": "fc30021962632731bce94fb658d26c7aa29f7d150c2e067841375a6893943c6f",
+        "bytes": 1037
+      }
+    },
+    {
+      "id": "cmd-c034-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T11:09:21.536049Z",
+      "completed_at": "2026-09-14T11:09:21.595141Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c034-identity-event",
+        "path": "verification/research-program/pr-034/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "1bbfe7feb2938457bafdf66b7902d45416f8119ab833f04f31e4d209d8e00db6",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr034-artifact-0",
+      "path": "verification/research-program/pr-034/task-binding.json",
+      "bytes": 3855,
+      "sha256": "f58def7545a351903cef8b7b422bdcd88e4a12863110c631935caf722127f79c"
+    },
+    {
+      "id": "pr034-artifact-1",
+      "path": "verification/research-program/pr-034/dispatch.json",
+      "bytes": 2261,
+      "sha256": "57ba79997802e3ea06886ec7de43885448ed409c107499d48fab8a07103e32af"
+    },
+    {
+      "id": "pr034-artifact-2",
+      "path": "verification/research-program/pr-034/producer-20260914/commands/focused-ids/receipt.json",
+      "bytes": 460,
+      "sha256": "828f8a3068ed4eb7e5401d50a5298718da3449810a418260b2ea7509ef5b02d3"
+    },
+    {
+      "id": "pr034-artifact-3",
+      "path": "verification/research-program/pr-034/producer-20260914/commands/focused-ids/stdout.log",
+      "bytes": 517,
+      "sha256": "16974fe6b75aa485323abd6bea8f4a028aeff2a65369b89259a2edbf2b928637"
+    },
+    {
+      "id": "pr034-artifact-4",
+      "path": "verification/research-program/pr-034/producer-20260914/commands/focused-ids/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr034-artifact-5",
+      "path": "verification/research-program/pr-034/producer-20260914/commands/focused-ids/event.json",
+      "bytes": 1037,
+      "sha256": "fc30021962632731bce94fb658d26c7aa29f7d150c2e067841375a6893943c6f"
+    },
+    {
+      "id": "pr034-artifact-6",
+      "path": "verification/research-program/pr-034/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "4747c1f5af4db012bbc36bf852bcd0cff97eb01a461a128fe1b38716f0c3a5d8"
+    },
+    {
+      "id": "pr034-artifact-7",
+      "path": "verification/research-program/pr-034/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr034-artifact-8",
+      "path": "verification/research-program/pr-034/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr034-artifact-9",
+      "path": "verification/research-program/pr-034/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "1bbfe7feb2938457bafdf66b7902d45416f8119ab833f04f31e4d209d8e00db6"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-034-1",
+      "status": "producer_checked",
+      "result": "CCN and NPI are never interchangeable. Equal strings from different systems do not establish identity. Leading zeros are preserved.",
+      "command_ids": [
+        "cmd-c034-focused"
+      ]
+    },
+    {
+      "id": "C-034-2",
+      "status": "producer_checked",
+      "result": "A sample unique identifier is not certified globally. Composite facility/report/year keys remain composite.",
+      "command_ids": [
+        "cmd-c034-focused"
+      ]
+    },
+    {
+      "id": "C-034-3",
+      "status": "producer_checked",
+      "result": "An identifier match outside its applicability period is ambiguous or incompatible, not exact. No name-based merge. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c034-focused",
+        "cmd-c034-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "sealed-identity-src",
+      "status": "accepted",
+      "detail": "packages/identity/src including exact-identifier-policy.mjs and schema-catalog.mjs was not edited. identity validate passes."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Identifier-system modeling is not R08 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-identifier-systems-review",
+      "status": "pending",
+      "detail": "Independent review of CCN/NPI non-interchangeability, composite keys and out-of-period matches remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "ledger-owned-paths-named-sealed-packages",
+      "status": "risk",
+      "detail": "The original ledger named packages/identity/src/exact-identifier-policy.mjs and schema-catalog.mjs. Implementation is in enrichment to preserve the identity artifact seal."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of CCN/NPI non-interchangeability, composite keys and out-of-period matches, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-034 source and replay focused identifier-systems and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

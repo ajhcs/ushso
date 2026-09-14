@@ -1,0 +1,279 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-003",
+  "status": "producer_checked",
+  "owner": "Luna Max (gpt-5.6-luna-max, reasoning high)",
+  "reviewer": "Astra",
+  "base_sha": "f62ce35481cc572e9aad054049c700aac6378f58",
+  "head_sha": null,
+  "dependency_merge_shas": {
+    "PR-001": "035465f3f16d15f02467679d96451d4440a36ca8",
+    "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c"
+  },
+  "branch": "codex/ushso-pr003-integrity-recovery-20260910",
+  "github_pr_url": null,
+  "changed_files": [
+    "docs/research-program/handoffs/schema/README.md",
+    "docs/research-program/handoffs/schema/handoff.schema.json",
+    "docs/research-program/handoffs/schema/task.schema.json",
+    "scripts/research-program/check-handoff.mjs",
+    "tests/research-program/handoff.test.mjs",
+    "verification/research-program/pr-003/verify-schema-contract.mjs",
+    "verification/research-program/pr-003/fixtures/task-binding.json",
+    "verification/research-program/pr-003/fixtures/handoff.valid.json",
+    "verification/research-program/pr-003/fixtures/handoff.valid-expected-negative.json",
+    "verification/research-program/pr-003/fixtures/handoff.valid-unavailable.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-claimed-pass-without-command.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-missing-artifact.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-stale-dependency-sha.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-artifact-hash-mismatch.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-nonzero-success.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-duplicate-command.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-empty-evidence.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-source-hash-omitted.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-missing-event-source.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-invalid-head.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-stale-base-sha.json"
+  ],
+  "problem": "PR-003 handoff evidence could claim completed work without proving structured command outcomes, exact local source bytes, per-PR task binding or repository-contained artifact references.",
+  "resulting_behavior": "The corrected PR-003 contract requires structured expected and observed outcomes, truthful timestamps, explicit local or external source locations, resolved and hashed artifacts including nested event sources, unique identifiers, exact per-PR task/Git bindings, and typed pending-head evidence before a controller records the final commit.",
+  "commits": [
+    {
+      "id": "C-003-1",
+      "subject": "Add the task and receipt schemas",
+      "sha": "601072e92a76623438313cdaa20f8bc1c66e929c"
+    },
+    {
+      "id": "C-003-2",
+      "subject": "Validate PR-003 handoff packets",
+      "sha": "93793bf8266c4977e8e108c456f269a8fec086b6"
+    },
+    {
+      "id": "C-003-3",
+      "subject": "Wire PR-003 review guidance",
+      "sha": "f62ce35481cc572e9aad054049c700aac6378f58"
+    },
+    {
+      "id": "C-003-1-R1",
+      "subject": "Enforce complete PR-003 handoff evidence",
+      "sha": null
+    },
+    {
+      "id": "C-003-2-R1",
+      "subject": "Bind PR-003 evidence to exact local roots",
+      "sha": null
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "execution-protocol",
+      "id": "docs/master-plan/2026-09-10/EXECUTION.md",
+      "sha256": "4118d4f46a7ebec45749676881c753529593842792a439cfb5e53e50bc1fdfc3",
+      "location": "external",
+      "git_commit": "f62ce35481cc572e9aad054049c700aac6378f58",
+      "git_path": "docs/master-plan/2026-09-10/EXECUTION.md"
+    },
+    {
+      "kind": "pr-packet",
+      "id": "docs/master-plan/2026-09-10/prs/PR-003.md",
+      "sha256": "d8456846f64f63f63d0d89581f31b36427b26e4c29fd89afcfc3433a780c0a7a",
+      "location": "external",
+      "git_commit": "f62ce35481cc572e9aad054049c700aac6378f58",
+      "git_path": "docs/master-plan/2026-09-10/prs/PR-003.md"
+    },
+    {
+      "kind": "handoff-template",
+      "id": "docs/master-plan/2026-09-10/templates/handoff.json",
+      "sha256": "0ab40c4a324d737b1ac7a2080b894acb352b3b1961ae6ad948fea59d27186276",
+      "location": "external",
+      "git_commit": "f62ce35481cc572e9aad054049c700aac6378f58",
+      "git_path": "docs/master-plan/2026-09-10/templates/handoff.json"
+    },
+    {
+      "kind": "dependency-handoff",
+      "id": "verification/research-program/pr-002/controller/integration-handoff.json",
+      "sha256": "5380b58c5d69515efb3cbfebdb1dac63492b780cdeae918f3d18c0538ad136a6",
+      "location": "local"
+    },
+    {
+      "kind": "dependency-manifest",
+      "id": "verification/research-program/pr-002/controller/integration-artifact-manifest.json",
+      "sha256": "7b451a76ccc9cd1a8ac402263799aa9174228c1b32a83dfc2c3fc97a571a8567",
+      "location": "local"
+    },
+    {
+      "kind": "dispatch-prompt",
+      "id": "native-pr003-prompts.v3.md",
+      "version": "v3",
+      "sha256": "f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d",
+      "location": "external"
+    },
+    {
+      "kind": "task-binding",
+      "id": "verification/research-program/pr-003/fixtures/task-binding.json",
+      "location": "local",
+      "sha256": "f2392c63dfc51aa275b706d417b9c59f6c2a00062181f85c5e5ebb728f67c30a"
+    },
+    {
+      "kind": "correction-prompt",
+      "id": "pr003-grok-correction-prompt.md",
+      "location": "external",
+      "version": "C-003-1-R1/C-003-2-R1",
+      "sha256": "3d651086ca17da358b7df4061a82152307e3a050644eabfdc6711b1c92247c9a"
+    },
+    {
+      "kind": "historical-parent",
+      "id": "f62ce35481cc572e9aad054049c700aac6378f58",
+      "location": "external",
+      "version": "tree 548d34311909ab3c4bb36c126896c7787d9b3dab"
+    },
+    {
+      "kind": "historical-failed-provider-run",
+      "id": "ushso-pr003-grok-corrections-20260910",
+      "location": "external",
+      "version": "grok/grok-4; terminal failed generic ACP worker failure"
+    },
+    {
+      "kind": "historical-retained-patch",
+      "id": "pr003-grok-partial-review/retained.patch",
+      "location": "external",
+      "version": "sha256 67dbf6bb4302bbc073bdfcb56646b5e1d50b341855aa560e46db2e4b76d86e99"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c003-r1-invalid-timing",
+      "command": "node verification/research-program/pr-003/verify-schema-contract.mjs",
+      "started_at": "2026-09-11T00:00:01Z",
+      "completed_at": "2026-09-11T00:00:00Z",
+      "exit_code": 0,
+      "completion_status": "observed_exit_0",
+      "expected": "exit 0 with the valid, expected-negative and unavailable fixtures accepted and each negative fixture rejected for its declared reason",
+      "actual": "exit 0 with all declared fixture outcomes and structured outcome checks satisfied",
+      "result": "Deliberate timing-order mutation for the negative fixture.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "receipt-c003-1-verify-schema-contract",
+        "path": "verification/research-program/pr-003/command-receipts/cmd-c003-1-verify-schema-contract.json",
+        "sha256": "d88316ba05c2b57fdb5d2c4e71a9e14a8350b7f2444440e5281fc5ff59a5daa8",
+        "bytes": 2323
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-task-schema",
+      "path": "docs/research-program/handoffs/schema/task.schema.json",
+      "sha256": "538998cf577ee5806804865152f32b42688a0e5899265dcd0d6fc8d91f4c3d85",
+      "bytes": 4496
+    },
+    {
+      "id": "artifact-handoff-schema",
+      "path": "docs/research-program/handoffs/schema/handoff.schema.json",
+      "sha256": "4c62652b5a03104eb69a0f66e5c025c5ecb66297fa8931a43dcc3440a7ca842e",
+      "bytes": 17926
+    },
+    {
+      "id": "artifact-schema-readme",
+      "path": "docs/research-program/handoffs/schema/README.md",
+      "sha256": "dbedb9a745f48645b5f0a4d17e1b79def4c17ecb2800160fb39f786e37f1f2ed",
+      "bytes": 23975
+    },
+    {
+      "id": "artifact-checker",
+      "path": "scripts/research-program/check-handoff.mjs",
+      "sha256": "45136e123eab6b9b6ac7dc81cc99f81e1db5e458caac2ab9f17f816f8aebe098",
+      "bytes": 69506
+    },
+    {
+      "id": "artifact-focused-test",
+      "path": "tests/research-program/handoff.test.mjs",
+      "sha256": "2814e603c6e6de838cafce4bd699cf0458ad69b1a1ea4a0917158d62c79034ec",
+      "bytes": 47161
+    },
+    {
+      "id": "artifact-schema-contract-checker",
+      "path": "verification/research-program/pr-003/verify-schema-contract.mjs",
+      "sha256": "1285373ef21553de9f2f25602a9b0c0c82d7f6b2e8e5164a27c99f8c964ab844",
+      "bytes": 9967
+    },
+    {
+      "id": "artifact-task-binding",
+      "path": "verification/research-program/pr-003/fixtures/task-binding.json",
+      "sha256": "f2392c63dfc51aa275b706d417b9c59f6c2a00062181f85c5e5ebb728f67c30a",
+      "bytes": 3031
+    },
+    {
+      "id": "artifact-schema-contract-receipt",
+      "path": "verification/research-program/pr-003/command-receipts/cmd-c003-1-verify-schema-contract.json",
+      "sha256": "d88316ba05c2b57fdb5d2c4e71a9e14a8350b7f2444440e5281fc5ff59a5daa8",
+      "bytes": 2323
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "invalid-timing-correction-check",
+      "status": "producer_checked",
+      "result": "Producer-side correction checks exercise complete structured evidence and reject incomplete, contradictory, duplicate, unbound or escaping records.",
+      "command_ids": [
+        "cmd-c003-r1-invalid-timing"
+      ],
+      "artifact_ids": [
+        "artifact-task-schema",
+        "artifact-handoff-schema",
+        "artifact-schema-readme",
+        "artifact-checker",
+        "artifact-focused-test",
+        "artifact-schema-contract-checker",
+        "artifact-task-binding",
+        "artifact-schema-contract-receipt"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [],
+  "unresolved_claims": [
+    {
+      "id": "head-sha-pending-controller-commit",
+      "status": "pending",
+      "detail": "The correction packet is precommit. head_sha and the new correction commit SHA fields remain null so the packet cannot contain its own future hash; a controller-authored external receipt must bind the exact final commit and tree.",
+      "next_action": "Controller records the final correction commit SHA/tree in an external acceptance receipt after commit."
+    },
+    {
+      "id": "independent-review-not-started",
+      "status": "unresolved",
+      "detail": "Producer checks are not independent verification.",
+      "next_action": "Astra independently reviews and replays the exact committed head."
+    }
+  ],
+  "risks": [
+    {
+      "id": "mixed-authorship-retained-grok-work",
+      "status": "risk",
+      "detail": "A failed Grok correction run left a retained patch; Luna reviewed the snapshot and reworked only useful contract ideas. The failed run has no producer commit and is preserved as historical evidence.",
+      "next_action": "Controller reviews the final Luna diff and retains the failed-run receipt separately."
+    }
+  ],
+  "next_consumer": "Astra/controller independent review of the exact committed correction head",
+  "next_action": "Controller commits the allowlisted correction, binds the resulting SHA/tree in an external receipt, and dispatches independent review.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [
+      "node verification/research-program/pr-003/verify-schema-contract.mjs",
+      "node --test tests/research-program/handoff.test.mjs",
+      "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-003.json"
+    ],
+    "limitations": [
+      "Producer-side checks only; no independent acceptance or scientific claim.",
+      "Full root npm/build/Cloudflare gates are outside this metadata correction and remain separately owned.",
+      "The precommit packet uses a typed pending head claim; a controller receipt must bind the exact final commit after commit."
+    ]
+  }
+}

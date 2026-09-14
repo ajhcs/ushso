@@ -1,0 +1,583 @@
+{
+  "format": "ushso.research-program.legacy-crosswalk.v1",
+  "pr_id": "PR-001",
+  "status": "producer_checked",
+  "recorded_at": "2026-09-10T16:08:00Z",
+  "purpose": "Map the reusable legacy work packages, ADRs, SEMP controls, release boundaries, and unmerged references to this program without activating an old candidate or treating historical evidence as current qualification.",
+  "scope": {
+    "integration_base": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+    "integration_tree": "35de194e7182a67a0275cc180f2b021da184aacd",
+    "source_candidate": "11b268c17b5b65261041734abca456720b0d9706",
+    "dependency_merge_shas": {},
+    "review_basis": "The crosswalk uses committed release source clauses and bounded historical inventories. SEMP clauses are read-only custody references from the preserved original untracked checkout, not checked-in release sources. Co-Engineer inventory is corroborating review input; source files, hashes, custody markers, and explicit constraints control the disposition.",
+    "activation_rule": "A mapped legacy work package or branch is a reuse or constraint reference only. It does not authorize deployment, source access, paid provisioning, planner enablement, identity adjudication, scientific promotion, or a production cutover."
+  },
+  "source_inventory": {
+    "plan_and_execution": [
+      {
+        "path": "docs/master-plan/2026-09-10/prs/PR-001.md",
+        "sha256": "ed7950bfd65c59f9164d4be3d9a11b02886a288cdbcc0ae1ba8ba37b0e347b9a",
+        "role": "PR-001 acceptance and three-commit contract"
+      },
+      {
+        "path": "docs/master-plan/2026-09-10/EXECUTION.md",
+        "sha256": "4118d4f46a7ebec45749676881c753529593842792a439cfb5e53e50bc1fdfc3",
+        "role": "worktree, atomic commit, handoff, and publication workflow"
+      }
+    ],
+    "adr_index": {
+      "path": "docs/adr/README.md",
+      "sha256": "fd1ba5a68ddf22d6977f0f00b8895e5ffbbf515dfc226b99eb9de5d7bd2f85cd",
+      "indexed_ids": ["ADR-0000", "ADR-0001", "ADR-0002", "ADR-0003", "ADR-0004", "ADR-0005", "ADR-0006"],
+      "omitted_existing_file": "ADR-0007",
+      "omission_disposition": "Retain and map ADR-0007 explicitly; do not interpret the README index omission as retirement."
+    },
+    "adrs": [
+      {
+        "id": "ADR-0000",
+        "path": "docs/adr/0000-adr-policy-and-repository-shape.md",
+        "sha256": "eaa3a03a910ea408338ea4ec72ef707b04b952d66b7889ca5ac60f5950fd7bb9",
+        "disposition": "reuse_and_retain",
+        "key_clauses": "Ports keep public delivery separate from connectors and mutable control-plane state; StaticAssetCatalogRepository remains the rollback adapter until WP14 retirement gates pass; migrations are forward-only.",
+        "destination_prs": ["PR-001", "PR-003", "PR-009", "PR-010", "PR-030", "PR-076", "PR-078", "PR-079", "PR-082", "PR-083", "PR-084"]
+      },
+      {
+        "id": "ADR-0001",
+        "path": "docs/adr/0001-product-and-truth-boundary.md",
+        "sha256": "a9b1fb0cb41aafd0522e63c2fb670b608fcaed3930ddc340e2219d869d250f5b",
+        "disposition": "retain_as_product_invariant",
+        "key_clauses": "Public requests do not harvest, fetch source payloads, mutate identity, grant authorization, run analysis, or enable planner/toolkit capabilities; result envelopes preserve false and unresolved states.",
+        "destination_prs": ["PR-001", "PR-004", "PR-005", "PR-006", "PR-007", "PR-008", "PR-009", "PR-022", "PR-029", "PR-030", "PR-034", "PR-055", "PR-056", "PR-057", "PR-058", "PR-062", "PR-063", "PR-064", "PR-065", "PR-066", "PR-079", "PR-081", "PR-084"]
+      },
+      {
+        "id": "ADR-0002",
+        "path": "docs/adr/0002-contract-versioning-and-shared-semantics.md",
+        "sha256": "68086fa37872cc0c300439bd2991213eaa51782b3c7c30675b370742058f4687",
+        "disposition": "reuse_immutable_contract_rule",
+        "key_clauses": "Released contract directories are immutable; additive versions carry shared semantic services and translation boundaries.",
+        "destination_prs": ["PR-004", "PR-007", "PR-008", "PR-030", "PR-058", "PR-079", "PR-082"]
+      },
+      {
+        "id": "ADR-0003",
+        "path": "docs/adr/0003-identity-family-and-join-semantics.md",
+        "sha256": "7fd3661ad4b0ade317178fe0f9625295cec718daffb40e1ba38a60faaef7195f",
+        "disposition": "retain_no_automatic_merge",
+        "key_clauses": "Source-native identity and family evidence remain distinct from adjudication; automatic resolution is disabled; legacy joins remain candidate, ambiguous, unknown, or blocked until qualified evidence exists.",
+        "destination_prs": ["PR-007", "PR-008", "PR-028", "PR-029", "PR-031", "PR-034", "PR-035", "PR-036", "PR-037", "PR-038", "PR-040", "PR-042", "PR-051", "PR-061", "PR-071", "PR-079"]
+      },
+      {
+        "id": "ADR-0004",
+        "path": "docs/adr/0004-postgresql-cloudflare-and-immutable-publication.md",
+        "sha256": "f34f32b2bfc2e2807d8bd39744316dec0f60fa47667eaac96aad1df68becc837",
+        "disposition": "retain_architecture_defer_authorized_successor",
+        "key_clauses": "PostgreSQL is canonical; search/R2 are not; publication is immutable and last-good; raw source payloads and credentials are excluded; rollback is pointer, Worker-version, or static fallback.",
+        "destination_prs": ["PR-001", "PR-009", "PR-010", "PR-012", "PR-029", "PR-030", "PR-076", "PR-077", "PR-078", "PR-082", "PR-083", "PR-084"]
+      },
+      {
+        "id": "ADR-0005",
+        "path": "docs/adr/0005-postgresql-search-backend-and-benchmark-escalation.md",
+        "sha256": "8ef67e93315269567d7e0a163f45b28ae1c680de1743389ba7b49d51ce34c69f",
+        "disposition": "retain_target_constraint_and_current_fallback",
+        "key_clauses": "The target public search path is bounded and indexed and may not scan unbounded JSONL; StaticSearchBackend is retained for fixtures and emergency rollback. The checked release still serves static ASSETS/JSONL, so that fact is a current/emergency boundary rather than a silent waiver.",
+        "destination_prs": ["PR-001", "PR-002", "PR-006", "PR-021", "PR-030", "PR-037", "PR-038", "PR-039", "PR-058", "PR-061", "PR-062", "PR-063", "PR-077", "PR-079", "PR-082"]
+      },
+      {
+        "id": "ADR-0006",
+        "path": "docs/adr/0006-retrieval-historical-schema-compatibility.md",
+        "sha256": "a3b460d8bc4b358d2eaafdcde3350550b856d0df699b2e88cd46f913cf949360",
+        "disposition": "retain_historical_pin_and_local_successor",
+        "key_clauses": "Historical schema bytes remain unrecovered; local successor validation is not proof of historical recovery and does not repin old receipts.",
+        "destination_prs": ["PR-001", "PR-003", "PR-004", "PR-007", "PR-008", "PR-030", "PR-039", "PR-079"]
+      },
+      {
+        "id": "ADR-0007",
+        "path": "docs/adr/0007-versioned-wp14-successor-attestation.md",
+        "sha256": "0c86749c849a003560c42ab38963d3ec6904fc76610ee4b23520546abd07f5e5",
+        "disposition": "retain_additive_successor_attestation",
+        "key_clauses": "WP14 v1.0.0 remains sealed; v1.1.0 is additive local/CI evidence only and grants no deploy, provider mutation, release-gate, or production-eligibility authority.",
+        "destination_prs": ["PR-001", "PR-003", "PR-078", "PR-079", "PR-081", "PR-082", "PR-083"]
+      }
+    ],
+    "release_controls": [
+      {
+        "path": "docs/CLOUDFLARE_GO_LIVE.md",
+        "sha256": "f5e63325aa06d1b273447258fe29ff0e3aa2b308a58aff4d5f600ff59db3eee2",
+        "disposition": "retain_operational_boundary"
+      },
+      {
+        "path": "docs/RELEASE_GATE_AND_AUTHORIZATION_RECONCILIATION.md",
+        "sha256": "a2d3bee53fb9d57e6e074cc01ddb11686e84d389b19694882a6ad9bb23a577c2",
+        "disposition": "retain_with_v1_1_overlay_correction"
+      },
+      {
+        "path": "docs/WP14_CUTOVER_RETIREMENT_RUNBOOK.md",
+        "sha256": "4922bafed42b8c063ed58c41826357e2013154c1c178c139775a2d35e5db0a63",
+        "disposition": "retain_no_cutover_or_retirement_claim"
+      },
+      {
+        "path": "docs/research-automation/README.md",
+        "sha256": "b8653400871dccd071449ea339ee71fe166bbb04a023cb6ed50e3d2db095a640",
+        "disposition": "retain_evidence_only_automation_boundary"
+      },
+      {
+        "path": "docs/research-automation/SCIENTIFIC-CONFLICT-PREVIEW.md",
+        "sha256": "2139037d0ea48f6bde203872fe5b62c6a402b3348833e553ef0763e17acbbb68",
+        "disposition": "retain_review_only_no_promotion"
+      }
+    ],
+    "semp": {
+      "source_custody": {
+        "original_checkout": "/mnt/d/Coding Projects/ushso",
+        "original_checkout_state": "dirty_read_only_preserved",
+        "original_captured_head": "e93ac2b5ad66cc6528182cced7e95fb3929841a9",
+        "original_captured_at": "2026-09-10T15:02:52.581748+00:00",
+        "original_path_status": "docs/semp is present only as an untracked path in the preserved original checkout",
+        "preservation_manifest": {
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/original-workspace-manifest.json",
+          "sha256": "3946fa64ea2803477195f999aca4b58c00be467fb3cdec552f9dd374542decd7",
+          "hashed_dirty_or_untracked_files": 1483
+        },
+        "selected_base": {
+          "sha": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+          "tree": "35de194e7182a67a0275cc180f2b021da184aacd",
+          "paths_absent": [
+            "docs/semp/model/ushso-system-model.json",
+            "docs/semp/model/ushso-system-model.schema.json",
+            "docs/semp/generated/manifest.json",
+            "docs/semp/tools/generate-views.mjs"
+          ],
+          "absence_verified": true
+        },
+        "original_only_paths": [
+          {
+            "relative_path": "docs/semp/model/ushso-system-model.json",
+            "absolute_path": "/mnt/d/Coding Projects/ushso/docs/semp/model/ushso-system-model.json",
+            "sha256": "08b256f4c8c1f650ad4805d18dede4482b47b6c31cfff1b25802283855dbd875",
+            "availability": "preserved_original_only"
+          },
+          {
+            "relative_path": "docs/semp/model/ushso-system-model.schema.json",
+            "absolute_path": "/mnt/d/Coding Projects/ushso/docs/semp/model/ushso-system-model.schema.json",
+            "sha256": "fc1a2b595e69adc6672f5b8390fbfd3083526ba46836d3064ee1f536b51f0e63",
+            "availability": "preserved_original_only"
+          },
+          {
+            "relative_path": "docs/semp/generated/manifest.json",
+            "absolute_path": "/mnt/d/Coding Projects/ushso/docs/semp/generated/manifest.json",
+            "sha256": "e86feced23f0fbd70fa13c3eaab3ade8ffe20d33bde1a5c47de4ed10f0b0ee70",
+            "availability": "preserved_original_only"
+          },
+          {
+            "relative_path": "docs/semp/tools/generate-views.mjs",
+            "absolute_path": "/mnt/d/Coding Projects/ushso/docs/semp/tools/generate-views.mjs",
+            "sha256": "8052450f8d59eea1dcdc9a9a88aa40d6153249cf2d01e4996038853b2b038046",
+            "availability": "preserved_original_only"
+          }
+        ],
+        "path_resolution_rule": {
+          "current_base": "Treat all four repository-relative SEMP paths as absent and unavailable in the selected base unless a future candidate contains the path and its expected SHA256.",
+          "preserved_original": "Until then, resolve the four paths only beneath original_checkout, require original_captured_head and preservation_manifest.sha256 to match, and verify each listed file SHA256 before reading it.",
+          "reuse_or_promotion": "A future reuse must create an explicitly versioned committed custody or import record and receive independent review. This correction does not copy or import the SEMP tree, activate its generated views, or promote its IDs or claims to production."
+        }
+      },
+      "stable_id_scope": {
+        "status": "map_references_only",
+        "rule": "The stable_ids below refer to local-only IDs in the preserved original SEMP model and evidence. They do not assert selected-base files, generated views, active policy, authorization, scientific approval, or production facts."
+      },
+      "canonical_model": {
+        "path": "docs/semp/model/ushso-system-model.json",
+        "sha256": "08b256f4c8c1f650ad4805d18dede4482b47b6c31cfff1b25802283855dbd875",
+        "model_id": "MODEL-USHSO-SEMP-001",
+        "version": "0.5.1",
+        "status": "candidate",
+        "lifecycle_state": "proposed",
+        "approval_state": "not_approved",
+        "authorization_state": "not_requested",
+        "as_of": "2026-09-04",
+        "canonical_source": "docs/semp/model/ushso-system-model.json",
+        "generated_root": "docs/semp/generated"
+      },
+      "schema": {
+        "path": "docs/semp/model/ushso-system-model.schema.json",
+        "sha256": "fc1a2b595e69adc6672f5b8390fbfd3083526ba46836d3064ee1f536b51f0e63"
+      },
+      "generated_views": {
+        "manifest_path": "docs/semp/generated/manifest.json",
+        "manifest_sha256": "e86feced23f0fbd70fa13c3eaab3ade8ffe20d33bde1a5c47de4ed10f0b0ee70",
+        "generator_path": "docs/semp/tools/generate-views.mjs",
+        "generator_sha256": "8052450f8d59eea1dcdc9a9a88aa40d6153249cf2d01e4996038853b2b038046",
+        "policy": "The canonical model is the source. Generated Markdown/Mermaid views are never hand-edited; PR-001 adds no generated SEMP view."
+      },
+      "stable_ids": {
+        "planning_baselines": [
+          {"id": "PBASE-001", "disposition": "retain_historical_superseded", "destination_prs": ["PR-001", "PR-003", "PR-079"]},
+          {"id": "PBASE-002", "disposition": "retain_candidate_readiness_control", "destination_prs": ["PR-001", "PR-002", "PR-003", "PR-079"]}
+        ],
+        "programs_and_subjects": [
+          {"id": "ARP-USHSO-SEP06-001", "disposition": "retain_candidate_proposed_not_approved", "destination_prs": ["PR-001", "PR-003", "PR-079", "PR-082", "PR-083"]},
+          {"id": "CFG-SUBJECT-PROD-20260903-001", "disposition": "retain_provisional_last_observed_reconstruction", "destination_prs": ["PR-001", "PR-078", "PR-079", "PR-082", "PR-083"]},
+          {"id": "CFG-SUBJECT-TARGET-20260906-001", "disposition": "retain_candidate_target_subject_without_authority", "destination_prs": ["PR-001", "PR-078", "PR-079", "PR-082", "PR-083"]},
+          {"id": "READINESS-001", "disposition": "retain_candidate_readiness_model", "destination_prs": ["PR-001", "PR-003", "PR-040", "PR-079"]},
+          {"id": "AUTHPLAN-001", "disposition": "retain_partial_provisional_authority_plan", "destination_prs": ["PR-001", "PR-003", "PR-040", "PR-079"]},
+          {"id": "QFD-USHSO-SEP06-001", "disposition": "retain_founder_validation_pending", "destination_prs": ["PR-001", "PR-002", "PR-040", "PR-080"]},
+          {"id": "CEPLAN-USHSO-SEP06-001", "disposition": "retain_internal_planning_only", "destination_prs": ["PR-001", "PR-003", "PR-079"]},
+          {"id": "RELASSURE-SEP06-001", "disposition": "retain_candidate_not_executed", "destination_prs": ["PR-001", "PR-079", "PR-081", "PR-082", "PR-083", "PR-084"]}
+        ],
+        "gates": ["GATE-00", "GATE-00A", "GATE-01", "GATE-02", "GATE-03", "GATE-04", "GATE-05", "GATE-06", "GATE-07", "GATE-08", "GATE-08A", "GATE-09"],
+        "transitions": ["GTR-000A", "GTR-001", "GTR-002", "GTR-003", "GTR-004", "GTR-005", "GTR-006", "GTR-007", "GTR-008", "GTR-008A", "GTR-009", "GTR-010", "GTR-011"],
+        "decision_work_packages": ["DWP-001", "DWP-002", "DWP-003", "DWP-004", "DWP-005", "DWP-006", "DWP-007", "DWP-008", "DWP-009", "DWP-010", "DWP-011"],
+        "control_mappings": [
+          {
+            "kind": "review_gates",
+            "ids": ["GATE-00", "GATE-00A", "GATE-01", "GATE-02", "GATE-03", "GATE-04", "GATE-05", "GATE-06", "GATE-07", "GATE-08", "GATE-08A", "GATE-09"],
+            "disposition": "retain_candidate_review_controls",
+            "destination_prs": ["PR-001", "PR-003", "PR-079", "PR-082"],
+            "reason": "Every listed gate is a proposed SEMP review control that can constrain later evidence and release decisions; PR-001 preserves the map, PR-003 consumes executable evidence controls, PR-079 independently reviews them, and PR-082 closes the exact release chain.",
+            "retained_constraints": ["Gate presence or a proposed proceed option does not establish verification, validation, qualification, acceptance, authorization, activation, deployment, or scientific approval.", "A gate may be reused only as a typed control after its exact subject, scope, authority, expiry, evidence, and custody are independently resolved.", "No gate authorizes source payload retrieval, paid provider use, planner enablement, identity adjudication, or production mutation."],
+            "supersession": "none; no selected-base release artifact supersedes these local-only controls"
+          },
+          {
+            "kind": "review_transitions",
+            "ids": ["GTR-000A", "GTR-001", "GTR-002", "GTR-003", "GTR-004", "GTR-005", "GTR-006", "GTR-007", "GTR-008", "GTR-008A", "GTR-009", "GTR-010", "GTR-011"],
+            "disposition": "retain_candidate_lifecycle_transitions",
+            "destination_prs": ["PR-001", "PR-003", "PR-079", "PR-082"],
+            "reason": "Every listed transition expresses a proposed control-state relationship between the retained review gates; the mapping preserves that relationship for downstream traceability without asserting that any transition executed.",
+            "retained_constraints": ["Transition edges are map references only and cannot move a candidate between lifecycle, authorization, activation, or operational states.", "Any reuse must bind the edge to a current exact candidate, decision record, authority, evidence package, and expiry; revise or return edges remain available when a prior baseline is invalid.", "No transition bypasses the selected-base SEMP absence, independent review, or production authorization boundaries."],
+            "supersession": "none; no selected-base release artifact supersedes these local-only transitions"
+          },
+          {
+            "kind": "decision_work_packages",
+            "ids": ["DWP-001", "DWP-002", "DWP-003", "DWP-004", "DWP-005", "DWP-006", "DWP-007", "DWP-008", "DWP-009", "DWP-010", "DWP-011"],
+            "disposition": "retain_historical_planning_and_evidence_controls",
+            "destination_prs": ["PR-001", "PR-003", "PR-079", "PR-082", "PR-083"],
+            "reason": "Every listed DWP is a bounded planning, authority, evidence, claims, or release-control record whose typed state helps downstream consumers understand what was proposed, completed, rejected, or left incomplete.",
+            "retained_constraints": ["DWP state and output IDs remain historical or candidate planning evidence; completed or passed technical steps do not prove scientific approval, acceptance, authorization, deployment, activation, or fitness.", "Reuse requires exact artifact custody, current scope, named authority, independent review, and explicit handling of blocked, unavailable, rejected, expired, and evidence-incomplete states.", "No DWP grants permission for source payload import, paid enrichment, provider mutation, planner execution, identity merge, or production change."],
+            "supersession": "none; no selected-base release artifact supersedes these local-only work-package controls"
+          }
+        ],
+        "release_packages": ["PKG-IMPL-20260906-001", "PKG-VER-20260906-001", "PKG-VAL-20260906-001", "PKG-IVV-20260906-001", "PKG-ACC-20260906-001", "PKG-AUTH-20260906-001", "PKG-DEP-20260906-001", "PKG-ACT-20260906-001", "PKG-MON-20260906-001", "PKG-CLAIM-20260906-001"],
+        "package_disposition": "Retain the package sequence and typed pending/not_requested states as planning controls. No package state is promoted to a deployment, scientific, acceptance, or operating authorization."
+      },
+      "source_and_evidence_ids": {
+        "source_ids": ["SRC-REP-ARCH", "SRC-REP-EVAL", "SRC-REP-EVAL-METRICS", "SRC-REP-CONTRACTS", "SRC-AUDIT-LIVE", "SRC-AUDIT-HTTP-20260904", "SRC-AUDIT-ANALYSIS-20260904", "SRC-REPO-AUTHORSHIP-20260904", "SRC-PROD-REV-ED7145D", "SRC-PROD-OPS-MEMORY", "SRC-CFG-OBS-20260904"],
+        "evidence_ids": ["EVD-REP-001", "EVD-REP-002", "EVD-REP-003", "EVD-AUD2-001", "EVD-AUD2-002", "EVD-AUD2-003", "EVD-AUD2-004", "EVD-AUD2-005", "EVD-AUD2-006", "EVD-AUD2-007", "EVD-AUD2-008", "EVD-CFG-001", "EVD-CFG-002", "EVD-CFG-003", "EVD-CFG-004"],
+        "conflict_ids": ["CFT-020", "CFT-021", "CFT-022"],
+        "disposition": "Retain these IDs as traceability anchors; unresolved, inferred, conflicting, and unsearched states remain typed and do not become claims of completion."
+      }
+    },
+    "authorization": {
+      "parent_register": {
+        "path": "verification/external-authorization/v1.0.0/register.json",
+        "sha256": "335b7d3516594d2372cc545b16bf6bbc18e7f69420b4485f659b52a1cdff923b",
+        "entry_count": 17,
+        "authorized_count": 0,
+        "status": "AUTH-01 through AUTH-17 not_requested and authorized false"
+      },
+      "effective_successor": {
+        "path": "verification/external-authorization/v1.1.0/register.json",
+        "sha256": "4e372ca7cc0f42378d8893600aaf6c2f68154e9a3a84a7cb361b95116a97a1db",
+        "parent_sha256": "335b7d3516594d2372cc545b16bf6bbc18e7f69420b4485f659b52a1cdff923b",
+        "delta_id": "AUTH-10",
+        "delta_status": "authorized_scoped",
+        "delta_receipt_sha256": "1c90ed77371272139bd4282ee3ab9a8d81ade32482d0945d5cba7a77e34c0a6d",
+        "branch": "codex/research-navigator-integration",
+        "base_commit": "f613b685a8821fca2393ae1ef4863d7a3fd2d359",
+        "expires_at": "2026-09-04T16:00:00Z",
+        "current_disposition": "expired_and_out_of_scope",
+        "loader_limitation": "verification/external-authorization/v1.1.0/tools/effective-register.mjs overlays the delta but does not enforce expires_at; the crosswalk applies expiry and branch scope explicitly."
+      },
+      "ap01": {
+        "id": "AP-01",
+        "status": "retained_blocker_no_auth_id_or_plan_owner",
+        "constraint": "There is no authenticated production principal source, handler inventory disposition, or owner residual-risk acceptance for caller-supplied audit identity.",
+        "destination_prs": ["PR-009", "PR-078", "PR-081", "PR-082"]
+      },
+      "publication_scope": "The current project owner approval for public GitHub code, planning, and sanitized evidence is a publication authorization outside the scientific/external-authorization register. It does not authorize deployment, paid enrichment, source payload access, planner or identity enablement, or scientific promotion."
+    },
+    "review_input": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/grok-boundary-review/provider-report.md",
+      "sha256": "728d3c20e0f3293be265e20806b5fe6332a1fdc99c19db07e470b96ec115d0c1",
+      "status": "bounded_corroborating_inventory_only",
+      "provider_envelope_model": "grok-4",
+      "runtime_self_description": "Grok 4.6",
+      "use_rule": "The report supplied leads and omission checks; source clauses and checked-in hashes control this crosswalk."
+    }
+  },
+  "work_packages": [
+    {
+      "id": "WP0",
+      "title": "Boundary baseline, contracts, receipts, and release identity",
+      "legacy_state": "Historical baseline and receipt subjects; old aggregate receipts may be stale for a later candidate.",
+      "disposition": "reuse_and_reconcile",
+      "destination_prs": ["PR-001", "PR-002", "PR-003", "PR-079", "PR-081", "PR-082"],
+      "retained_constraints": ["Exact source/corpus/runtime identity is required.", "Existing receipts stay byte-stable; stale receipts are not repinned or overwritten.", "A baseline does not qualify deployment or science."]
+    },
+    {
+      "id": "WP1",
+      "title": "Repository abstraction and static adapters",
+      "legacy_state": "Local repository ports and static adapters preserve current v1 behavior.",
+      "disposition": "reuse",
+      "destination_prs": ["PR-001", "PR-007", "PR-009", "PR-030", "PR-078"],
+      "retained_constraints": ["Public ports stay separate from connectors and mutable control-plane state.", "Static adapter remains available for emergency rollback until explicit retirement."]
+    },
+    {
+      "id": "WP2",
+      "title": "Contracts, semantic validators, cohorts, and evaluation freeze",
+      "legacy_state": "Versioned contract and evaluator assets exist; qualification and later successor contracts remain separate.",
+      "disposition": "reuse_and_extend_additively",
+      "destination_prs": ["PR-003", "PR-004", "PR-007", "PR-008", "PR-009", "PR-030", "PR-058", "PR-079", "PR-082"],
+      "retained_constraints": ["Released contract directories are immutable.", "Evaluation results are subject-bound and do not imply scientific approval."]
+    },
+    {
+      "id": "WP3",
+      "title": "Static infrastructure, least privilege, and managed foundation evidence",
+      "legacy_state": "Offline/static checks exist; managed catalog, provider, migration, recovery, and role evidence remains required.",
+      "disposition": "retain_planning_and_local_evidence",
+      "destination_prs": ["PR-009", "PR-010", "PR-012", "PR-030", "PR-076", "PR-077", "PR-078", "PR-082", "PR-083", "PR-084"],
+      "retained_constraints": ["No provider API plan/apply, paid resource, credential, or managed rollback is inferred.", "PostgreSQL remains canonical only after authorized, exact-subject evidence."]
+    },
+    {
+      "id": "WP4",
+      "title": "Local control plane and disabled scheduler/harvest composition",
+      "legacy_state": "Scheduler and harvest exports remain inert or fail closed by default; local composition markers do not mean live activation.",
+      "disposition": "retain_disabled_boundary",
+      "destination_prs": ["PR-009", "PR-010", "PR-011", "PR-012", "PR-020", "PR-076", "PR-078"],
+      "retained_constraints": ["No queue, workflow, cron, DB, provider, or source request at initialization.", "Live source egress requires the relevant authorization and managed rehearsal."]
+    },
+    {
+      "id": "WP5",
+      "title": "Fixture transport, connector safety, and payload boundary",
+      "legacy_state": "Fixture transport and negative safety tests exist; live pinning, canary, and managed capture remain pending.",
+      "disposition": "reuse_fixture_safety_only",
+      "destination_prs": ["PR-009", "PR-011", "PR-012", "PR-013", "PR-014", "PR-015", "PR-016", "PR-017", "PR-018", "PR-019", "PR-020", "PR-021", "PR-076"],
+      "retained_constraints": ["No public request-path source collection or payload retention.", "Live connector activation remains paused pending AUTH-04 and exact transport evidence."]
+    },
+    {
+      "id": "WP6",
+      "title": "Canonical normalization and import",
+      "legacy_state": "Local normalization/import and migration validation exist; managed application and rollback are not established.",
+      "disposition": "retain_local_candidate",
+      "destination_prs": ["PR-007", "PR-009", "PR-020", "PR-021", "PR-030", "PR-079", "PR-082"],
+      "retained_constraints": ["No canonical database write or source payload import is authorized by this map.", "Import must preserve source-native identity and typed failed/blocked/unavailable outcomes."]
+    },
+    {
+      "id": "WP7",
+      "title": "Contracts, identity, family, schema, and access semantics",
+      "legacy_state": "Local contract and synthetic benchmark shape exists; independent identity adjudication and reversal evidence remain pending.",
+      "disposition": "reuse_with_no_merge",
+      "destination_prs": ["PR-004", "PR-005", "PR-007", "PR-008", "PR-017", "PR-018", "PR-028", "PR-029", "PR-031", "PR-034", "PR-035", "PR-036", "PR-037", "PR-038", "PR-040", "PR-042", "PR-057", "PR-079"],
+      "retained_constraints": ["Name or embedding similarity does not prove equality.", "Legacy joins stay candidate/ambiguous/unknown/blocked until evidence qualifies them.", "AUTH-14/AP-06 remains required for production identity adjudication."]
+    },
+    {
+      "id": "WP8",
+      "title": "Search projections, quality, and benchmark escalation",
+      "legacy_state": "Projection scaffolding and local tests exist; quality, holdout, managed load, and publication evidence remain open.",
+      "disposition": "retain_non_authoritative_projection_boundary",
+      "destination_prs": ["PR-002", "PR-006", "PR-021", "PR-030", "PR-037", "PR-038", "PR-039", "PR-058", "PR-061", "PR-062", "PR-063", "PR-079", "PR-082"],
+      "retained_constraints": ["Search is not source of truth.", "The deployed JSONL lane is recorded as current/emergency runtime under ADR-0005; no silent architecture waiver or retirement is claimed.", "Historical WP0/WP8 gate failures are not this candidate's pass."]
+    },
+    {
+      "id": "WP9",
+      "title": "Coverage matrix and public coverage wording",
+      "legacy_state": "Technical coverage implementation exists; product-owner wording and production corpus evidence remain pending.",
+      "disposition": "reuse_with_claim_control",
+      "destination_prs": ["PR-002", "PR-004", "PR-006", "PR-031", "PR-039", "PR-079", "PR-081", "PR-084"],
+      "retained_constraints": ["Coverage cells are scoped denominators, not exhaustive availability claims.", "AUTH-15 remains required for approved public wording."]
+    },
+    {
+      "id": "WP10A",
+      "title": "Technical freeze and planner governance preparation",
+      "legacy_state": "Technical freeze assets exist; owner ratification and planner governance remain pending.",
+      "disposition": "retain_governance_pending",
+      "destination_prs": ["PR-002", "PR-003", "PR-009", "PR-027", "PR-039", "PR-062", "PR-079", "PR-081", "PR-082"],
+      "retained_constraints": ["Planner flag remains disabled.", "Technical readiness does not authorize a plan API or compiled-plan injection."]
+    },
+    {
+      "id": "WP10B",
+      "title": "Deterministic planner and decision-support implementation",
+      "legacy_state": "Not started by design because AUTH-12 and governance prerequisites are absent.",
+      "disposition": "retain_not_started",
+      "destination_prs": ["PR-027", "PR-058", "PR-062", "PR-079", "PR-081", "PR-082"],
+      "retained_constraints": ["No planner runtime, source acquisition, or paid model call.", "PR-009 successor must list superseded ADR clauses without granting implementation permission."]
+    },
+    {
+      "id": "WP11",
+      "title": "Candidate UI/API foundation and human evidence",
+      "legacy_state": "Candidate presentation exists; usability, expert review, and activation approval remain pending.",
+      "disposition": "reuse_candidate_preserve_human_gate",
+      "destination_prs": ["PR-033", "PR-040", "PR-041", "PR-064", "PR-065", "PR-066", "PR-067", "PR-068", "PR-069", "PR-070", "PR-071", "PR-072", "PR-073", "PR-074", "PR-075", "PR-080", "PR-081"],
+      "retained_constraints": ["A UI or route fixture is not usability or expert evidence.", "AUTH-16 and AUTH-17 remain required for their respective claims."]
+    },
+    {
+      "id": "WP12",
+      "title": "WebMCP machine toolkit",
+      "legacy_state": "Fixture-only and unwired candidate toolkit; current public contract exposes eight read-only tools and keeps planner disabled.",
+      "disposition": "retain_contract_and_gate_activation",
+      "destination_prs": ["PR-055", "PR-056", "PR-057", "PR-058", "PR-059", "PR-060", "PR-061", "PR-062", "PR-063", "PR-079", "PR-081"],
+      "retained_constraints": ["Read-only, no source network at invocation, and no payload retrieval remain explicit.", "A successful envelope is not a completed research task or scientific approval."]
+    },
+    {
+      "id": "WP13",
+      "title": "Discoverability, SEO, and public route projection",
+      "legacy_state": "Fixture-only and unwired candidate route/sitemap work; exact corpus and activation canaries remain pending.",
+      "disposition": "retain_fixture_only",
+      "destination_prs": ["PR-058", "PR-064", "PR-074", "PR-075", "PR-079", "PR-081"],
+      "retained_constraints": ["Discoverability does not prove corpus completeness or public activation authorization.", "Crawl and sitemap evidence must bind to an exact qualified subject."]
+    },
+    {
+      "id": "WP14",
+      "title": "Cutover, rollback, soak, and JSONL retirement",
+      "legacy_state": "CAS successor and state-machine fixtures exist; managed canary, recovery, load, soak, promotion, and retirement remain pending.",
+      "disposition": "retain_successor_and_no_cutover",
+      "destination_prs": ["PR-009", "PR-030", "PR-076", "PR-077", "PR-078", "PR-079", "PR-081", "PR-082", "PR-083", "PR-084"],
+      "retained_constraints": ["Static JSONL remains current/emergency fallback until explicit AUTH-09 retirement.", "Old WP14 and exact-gate SHAs remain historical and are not current candidate identity.", "Rollback is publication/static/version based and does not undo database state by destructive migration."]
+    }
+  ],
+  "production_boundaries": [
+    {
+      "boundary_id": "BOUNDARY-PUBLIC-STATIC-ASSETS-JSONL",
+      "observed_state": "wrangler.jsonc main is worker/index.mjs; it composes StaticAssetCatalogRepository and StaticSearchBackend through worker/static-composition.mjs and reads ASSETS corpus.record_files. Review flags are enabled in the checked configuration.",
+      "disposition": "retain_current_and_emergency_runtime",
+      "destination_prs": ["PR-001", "PR-007", "PR-030", "PR-077", "PR-078", "PR-082", "PR-083", "PR-084"],
+      "constraints": ["ADR-0005 target architecture prohibits public unbounded JSONL loading.", "The deployed lane is recorded honestly; it is not a silent waiver.", "AUTH-09 controls retirement."]
+    },
+    {
+      "boundary_id": "BOUNDARY-PUBLIC-MACHINE-CONTRACT",
+      "observed_state": "Public contract is read-only, source_network_allowed_at_invocation false, payload_retrieval_allowed false, eight enabled tools, and plan_research disabled_pending_gates.",
+      "disposition": "retain_wire_and_access_limits",
+      "destination_prs": ["PR-001", "PR-055", "PR-056", "PR-057", "PR-058", "PR-059", "PR-060", "PR-061", "PR-062", "PR-063", "PR-079", "PR-081"],
+      "constraints": ["Tool success does not prove task completion, source access, authorization, or scientific approval."]
+    },
+    {
+      "boundary_id": "BOUNDARY-PLANNER",
+      "observed_state": "observatory.plan_research is disabled_pending_gates; static planner throws planner_unavailable and AUTH-12 is unauthorized.",
+      "disposition": "retain_disabled",
+      "destination_prs": ["PR-027", "PR-058", "PR-062", "PR-079", "PR-081", "PR-082"],
+      "constraints": ["No live compiled plan, source acquisition, or model/provider call."]
+    },
+    {
+      "boundary_id": "BOUNDARY-IDENTITY-AND-JOINS",
+      "observed_state": "Source-native IDs and unresolved/ambiguous/blocked join states are preserved; automatic identity resolution is disabled_candidate_only.",
+      "disposition": "retain_no_merge_and_no_join_upgrade",
+      "destination_prs": ["PR-007", "PR-008", "PR-028", "PR-029", "PR-031", "PR-034", "PR-035", "PR-036", "PR-037", "PR-038", "PR-040", "PR-042", "PR-051", "PR-061", "PR-071", "PR-079"],
+      "constraints": ["AUTH-14/AP-06 remains required for adjudication.", "Similarity and catalog membership do not prove equality or join fitness."]
+    },
+    {
+      "boundary_id": "BOUNDARY-SOURCE-COLLECTION",
+      "observed_state": "Public request path performs no source collection; scheduler and harvest compositions remain disabled, and source manifests are paused/fixture-only.",
+      "disposition": "retain_no_source_egress",
+      "destination_prs": ["PR-009", "PR-010", "PR-011", "PR-012", "PR-013", "PR-014", "PR-015", "PR-016", "PR-017", "PR-018", "PR-019", "PR-020", "PR-021", "PR-076"],
+      "constraints": ["A source capture is not a payload test.", "Live connector canary requires AUTH-04 and bounded transport evidence."]
+    },
+    {
+      "boundary_id": "BOUNDARY-CANONICAL-DATABASE-AND-STORAGE",
+      "observed_state": "PostgreSQL/managed storage, roles, migrations, recovery, and R2 retention are architectural candidates with local evidence and outstanding managed authorization.",
+      "disposition": "retain_no_managed_apply_or_payload_retention",
+      "destination_prs": ["PR-009", "PR-010", "PR-012", "PR-029", "PR-030", "PR-076", "PR-077", "PR-078", "PR-082", "PR-083", "PR-084"],
+      "constraints": ["No paid provisioning, secrets, provider mutation, source dataset payload, healthcare row, or unbounded raw retention.", "PR-009 is the ADR successor destination and cannot authorize paid resources by itself."]
+    },
+    {
+      "boundary_id": "BOUNDARY-DICTIONARY-REVIEW-ASSETS",
+      "observed_state": "Canonical v1.2 has no resolved dictionary or search-document shard, while the public release serves generation-bound research-dictionaries-v1 proposal assets at /api/research/v1/dictionary-review. The package has 2,905 records, 95 isolated records, 34,081 pages, and 1,573,847 variables; publication_authorized is false and scientific applicability is unresolved.",
+      "disposition": "retain_public_pending_review_transport_and_no_promotion",
+      "destination_prs": ["PR-001", "PR-004", "PR-008", "PR-016", "PR-018", "PR-021", "PR-025", "PR-029", "PR-030", "PR-079", "PR-081"],
+      "constraints": ["The lock and manifest establish transport/provenance identity, not schema applicability, scientific approval, or canonical change.", "CSV completeness is retained with a real CSV parser; it does not turn audit pages into canonical dictionaries."]
+    },
+    {
+      "boundary_id": "BOUNDARY-SCIENTIFIC-REVIEW-AND-CONFLICTS",
+      "observed_state": "Scientific review and conflict packages are pending owner review, publication_authorized false, and unresolved for scientific applicability; review flags are enabled but do not enable planner or identity merge.",
+      "disposition": "retain_review_only",
+      "destination_prs": ["PR-008", "PR-016", "PR-018", "PR-021", "PR-025", "PR-028", "PR-029", "PR-031", "PR-032", "PR-079", "PR-081"],
+      "constraints": ["No scientific approval, expert review, paid enrichment, or production claim is inferred."]
+    },
+    {
+      "boundary_id": "BOUNDARY-DEPLOYMENT-CONTROL-PLANE",
+      "observed_state": "Read-only Cloudflare readback verifies Worker ushso deployment d0e89eef-5bf4-43d0-a0ba-20fbdc128c81, version ecc1603f-9eb4-4a1b-a566-bd9d7a415de4, and 100% traffic; Worker binary bytes remain unverified.",
+      "disposition": "retain_identity_with_binary_unknown",
+      "destination_prs": ["PR-001", "PR-078", "PR-079", "PR-081", "PR-082", "PR-083"],
+      "constraints": ["Deployment/version/traffic identity is not byte identity.", "Host operations note remains host-note-only evidence."]
+    },
+    {
+      "boundary_id": "BOUNDARY-CUTOVER-ROLLBACK-RETIREMENT",
+      "observed_state": "No production cutover, canary, soak, rollback rehearsal, or JSONL retirement was performed for this baseline.",
+      "disposition": "retain_no_transition_claim",
+      "destination_prs": ["PR-078", "PR-079", "PR-081", "PR-082", "PR-083", "PR-084"],
+      "constraints": ["AUTH-06 through AUTH-09 and matching exact-subject evidence remain required.", "Static fallback remains deployable until explicit retirement."]
+    },
+    {
+      "boundary_id": "BOUNDARY-AP01-PRINCIPAL",
+      "observed_state": "AP-01 remains without an AUTH ID, authenticated principal source, handler inventory disposition, or owner residual-risk acceptance.",
+      "disposition": "retain_blocker",
+      "destination_prs": ["PR-009", "PR-078", "PR-081", "PR-082"],
+      "constraints": ["Caller-supplied IDs are not treated as trusted production identity.", "No plan package silently owns or closes AP-01."]
+    },
+    {
+      "boundary_id": "BOUNDARY-HISTORICAL-RELEASES-AND-WP14",
+      "observed_state": "The v1.1 predecessor, old exact-gate failure, WP0 receipt, and WP14 pins are historical subjects; they are not mixed into the selected v1.2/tree baseline.",
+      "disposition": "retain_historical_separate",
+      "destination_prs": ["PR-001", "PR-003", "PR-030", "PR-078", "PR-079", "PR-081", "PR-082", "PR-083", "PR-084"],
+      "constraints": ["Historical success or failure cannot qualify this candidate.", "Successor receipts must identify their own exact subject and invalidated evidence."]
+    },
+    {
+      "boundary_id": "BOUNDARY-COVERAGE-AND-CLAIMS",
+      "observed_state": "Coverage and public claim packages retain scoped denominators, unresolved availability, and preview wording; catalog membership does not prove payload access, authorization, schema, join compatibility, or fitness.",
+      "disposition": "retain_scoped_claim_language",
+      "destination_prs": ["PR-002", "PR-004", "PR-006", "PR-021", "PR-030", "PR-031", "PR-039", "PR-079", "PR-081", "PR-084"],
+      "constraints": ["AUTH-15 and later owner wording decisions remain required.", "A passing metadata contract is not scientific or intended-use validation."]
+    }
+  ],
+  "unmerged_refs": [
+    {"ref": "codex/audit-remediation-production-20260906", "sha": "ed7145d7effb29dba35add5e81814337958c39f0", "relation": "ancestor_of_selected_base", "disposition": "inspect_only"},
+    {"ref": "codex/catalog-recovery", "sha": "cc0e1354e10c76138baad315e83e3ac82c5c911a", "relation": "diverged_from_selected_base", "disposition": "inspect_only_do_not_activate"},
+    {"ref": "codex/prod-catalog-deploy", "sha": "ed7145d7effb29dba35add5e81814337958c39f0", "relation": "ancestor_of_selected_base", "disposition": "inspect_only"},
+    {"ref": "codex/research-navigator-cas-hardening", "sha": "f00394062e15522ec2cfd80b45a7defc6158d177", "relation": "ancestor_of_selected_base", "disposition": "inspect_only"},
+    {"ref": "codex/research-navigator-connector-safety", "sha": "69c5e2fb3f71bda7dd0d9b7e7d745922b230f9d8", "relation": "ancestor_of_selected_base", "disposition": "inspect_only"},
+    {"ref": "codex/research-navigator-db-attestation", "sha": "fd80c303ef8fcca8f5067434361ec3196408267c", "relation": "ancestor_of_selected_base", "disposition": "inspect_only"},
+    {"ref": "codex/research-navigator-db-operations", "sha": "d154e7db7bd3628cb45efbe5d12e7ab823880f73", "relation": "ancestor_of_selected_base", "disposition": "inspect_only"},
+    {"ref": "codex/research-navigator-handoff", "sha": "db6ef95372910e63e3fba5bc8d6e6f58276af9ee", "relation": "ancestor_of_selected_base", "disposition": "inspect_only"},
+    {"ref": "codex/research-navigator-integration", "sha": "b31265e164a3e27739a0e011dfaebeb0c18f74ee", "relation": "ancestor_of_selected_base", "disposition": "inspect_only"},
+    {"ref": "codex/research-navigator-successor", "sha": "01620e9b74580c6720f8d982aee1e39aae127592", "relation": "ancestor_of_selected_base", "disposition": "inspect_only"},
+    {"ref": "codex/stage0-competition-freeze", "sha": "8e3ca8e3e2c42f8534f516d18122e2bcbaf61cce", "relation": "diverged_from_selected_base", "disposition": "inspect_only_do_not_activate"},
+    {"ref": "codex/ushso-research-automation-20260907", "sha": "11b268c17b5b65261041734abca456720b0d9706", "relation": "ancestor_of_selected_base_same_tree_candidate", "disposition": "identity_reference_only"}
+  ],
+  "excluded_controller_refs": [
+    {"ref": "codex/research-program-integration-20260910", "sha": "c92465f97df11a1e231983237f27e8c86db792b2", "status": "controller_integration_branch", "disposition": "not_a_dependency_and_not_activated_by_pr001"}
+  ],
+  "historical_subjects": [
+    {
+      "subject": "ushso-observatory-national-federal-1.1.0",
+      "source_commit": "6eeca2a47d4dba7eee05e9b43b15fa03f231ac6a",
+      "provenance_path": "RELEASE_PROVENANCE.json",
+      "provenance_sha256": "4de10ddb0edd788e1f80639aa51059748f76573db0a6149fba5e6c5cfc2e9bf7",
+      "disposition": "retain_historical_do_not_mix_with_v1_2"
+    },
+    {
+      "subject": "historical exact-gate candidate",
+      "references": ["c680fb6b035848e0d74b5ed035bb33ac35092d65", "40f44fc9"],
+      "disposition": "retain_failure_or_candidate_history_only; no release eligibility for selected base"
+    },
+    {
+      "subject": "WP14 successor pins",
+      "references": ["f6edbb0", "f2641a3"],
+      "disposition": "retain_historical_attestation_context; require exact-subject successor evidence"
+    }
+  ],
+  "verification": {
+    "source_clause_review": "Completed for ADR-0000 through ADR-0007, release authorization overlays, public static composition, planner, source collection, identity/join, review flags, and WP14 boundaries.",
+    "adr_0007_omission_found": true,
+    "effective_auth_overlay_expiry_applied": true,
+    "current_worker_entrypoint_verified": "worker/index.mjs",
+    "current_static_composition_verified": "worker/static-composition.mjs",
+    "generated_semp_views_changed": false,
+    "semp_source_custody_record": "source_inventory.semp.source_custody",
+    "semp_local_ids_are_map_references_only": true,
+    "semp_control_mapping_groups": {
+      "review_gates": 12,
+      "review_transitions": 13,
+      "decision_work_packages": 11
+    },
+    "historical_candidate_mixing": false,
+    "named_boundary_destination_check": "Every production boundary in production_boundaries has one or more destination_prs and an explicit retained constraint.",
+    "review_limit": "This crosswalk is a planning and preservation map. It is not independent review, release qualification, scientific approval, authorization, deployment evidence, or a waiver of an ADR."
+  }
+}

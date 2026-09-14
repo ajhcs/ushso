@@ -1,0 +1,76 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr047-hpt-json-20260914",
+  "slice_id": "C-047-1",
+  "pr_id": "PR-047",
+  "title": "Parse bounded hospital JSON MRF samples",
+  "owner": "/root/pr047_hpt_json",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr047-hpt-json-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr047-hpt-json-20260914",
+  "objective": "Hospital JSON samples expose versioned item, charge and payer fields.",
+  "outcome": "Pin CMS hospital-price-transparency JSON v3.0.0 by repository commit/hash with license and version. Official fictional examples are marked synthetic. The parser never reports an unknown newer version as compatible. A budget stop yields a partial sample, not whole-file validation. Numeric, string, percentage, algorithm and per-diem charge cases remain distinct; none is automatically represented as a comparable dollar price. File-level schema validity is unknown unless the whole required structure was validated. No full-size MRF download is initiated. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-008",
+    "PR-019",
+    "PR-046"
+  ],
+  "owned_paths": [
+    "packages/connectors/mrf/hospital-json.mjs",
+    "evaluation/research-program/mrf-fixtures/hospital-json/",
+    "tests/research-program/hpt-json.test.mjs",
+    "docs/research-program/hpt-json.md",
+    "verification/research-program/pr-047/",
+    "docs/research-program/handoffs/PR-047.json"
+  ],
+  "commits": [
+    {
+      "id": "C-047-1",
+      "subject": "Pin official JSON schemas and fixtures",
+      "instructions": "Vendor the selected CMS schema by commit/hash with its license and version. Start with current v3.0 and label historical-version support explicitly.",
+      "verification": "Official fictional examples are marked synthetic; the parser never reports an unknown newer version as compatible."
+    },
+    {
+      "id": "C-047-2",
+      "subject": "Implement bounded streaming extraction",
+      "instructions": "Read metadata and selected standard-charge items while preserving billing code system/version, setting, payer/plan, charge type, units and raw source pointers.",
+      "verification": "A budget stop yields a partial sample, not whole-file validation; numeric/string/percentage charge cases remain distinct."
+    },
+    {
+      "id": "C-047-3",
+      "subject": "Normalize only supported JSON fields",
+      "instructions": "Map values into the common pricing metadata schema, including 2026 allowed-amount elements when present. Preserve missing fields and non-dollar rate types.",
+      "verification": "No algorithm/percentage/per-diem value is automatically represented as a comparable dollar price."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/hpt-json.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-047.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-047/",
+  "binding": {
+    "base_sha": "b16d5cc4f96bbe4a3da9ded0049d8111d37c6770",
+    "base_tree": "5075f903a1caaed133c56f0e8fa0586eec1af7af",
+    "dependency_merge_shas": {
+      "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+      "PR-019": "94d7d904800de12df7c9fe5e9a6fdc252e4687e9",
+      "PR-046": "3fe90e5218b366ca086e15c45ba618e7ee76ea2a"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

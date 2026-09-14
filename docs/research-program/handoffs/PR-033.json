@@ -1,0 +1,301 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-033",
+  "status": "producer_checked",
+  "owner": "/root/pr033_source_cards",
+  "reviewer": "Astra/root",
+  "base_sha": "8cd2d7dbfc12a3ed03a2757e8eced9b9959f82c4",
+  "head_sha": "a804f43621f8f334fd321f6594884aea031b2aed",
+  "dependency_merge_shas": {
+    "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7",
+    "PR-031": "3b2d681103d80d571d44cd3e364a4327f8e046a9",
+    "PR-032": "6fe431f855c2bb65c97cdb0526ef8ed54ea6a74a"
+  },
+  "branch": "codex/ushso-pr033-source-cards-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/source-card.mjs",
+    "apps/web/src/lib/researcherGuidance.ts",
+    "apps/web/src/lib/researcherGuidance.test.tsx",
+    "tests/research-program/source-card.test.mjs",
+    "docs/research-program/source-cards.md",
+    "verification/research-program/pr-033/",
+    "docs/research-program/handoffs/PR-033.json"
+  ],
+  "problem": "A source card could declare Best for from topic tags alone. Missing essential facts could still look complete. Source-claim sentences might not resolve to evidence a reviewer can compare with a publisher passage. Readers could be forced through repeated caveats instead of purpose to variables to a tested access step. Editing sealed identity researcher-guidance.mjs would break WP7.",
+  "resulting_behavior": "Source cards live in packages/enrichment/source-card.mjs. Purpose, coverage, grain, example variables, access steps, tested state, limits and citation are required. Documented use, reviewed recommendation and unsupported use are separate. Best for cannot be declared from topic tags alone. Missing essential facts produce an explicit incomplete status. HCRIS/PLACES examples have evidence-bound claims with publisher passages. Exact release/schema/example IDs and beginner/expert guides are attached. Unknowns stay compact. The web helper refuseBestForFromTopicTags enforces the same rule. Sealed packages/identity/src/researcher-guidance.mjs is unchanged (9805 bytes). Use-case fitness compares against context_only, not contextual.",
+  "commits": [
+    {
+      "id": "C-033-1",
+      "subject": "Define a source-card view",
+      "sha": "6dd155ab1083565deaaa1ac8d93ae761f1605a78"
+    },
+    {
+      "id": "C-033-2",
+      "subject": "Generate cards for representative domains",
+      "sha": "6dd155ab1083565deaaa1ac8d93ae761f1605a78"
+    },
+    {
+      "id": "C-033-3",
+      "subject": "Connect cards to examples and guides",
+      "sha": "03d1f7f1b6fe7e63de290733f133852d3d589581"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "source-card",
+      "id": "packages/enrichment/source-card.mjs",
+      "location": "local",
+      "sha256": "7cb8bc113a55cb2c62a7fad0c25ce28fd28ad0c6173a43d68a083b2b92a6205f"
+    },
+    {
+      "kind": "web-guidance",
+      "id": "apps/web/src/lib/researcherGuidance.ts",
+      "location": "local",
+      "sha256": "3ff50e443eb2a39ba1047163cf2dd3b323a4d32b5b7ab80cb13ba9f181e4ecd2"
+    },
+    {
+      "kind": "source-card-tests",
+      "id": "tests/research-program/source-card.test.mjs",
+      "location": "local",
+      "sha256": "1e91e9b6bd2750e4d364ef3209ec5ab6d5c3d77dd666306ad12ef47745a4e719"
+    },
+    {
+      "kind": "sealed-researcher-guidance-unchanged",
+      "id": "packages/identity/src/researcher-guidance.mjs",
+      "location": "local",
+      "sha256": "209589f51b138ff752b90f5531a54d6f7f8b9e97952e65846d1e6c277abf49de"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c033-focused",
+      "command": "node --test tests/research-program/source-card.test.mjs",
+      "started_at": "2026-09-14T10:45:08.426094Z",
+      "completed_at": "2026-09-14T10:45:08.515661Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 source-card tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c033-focused-event",
+        "path": "verification/research-program/pr-033/producer-20260914/commands/focused-card/event.json",
+        "sha256": "e536fb90cd7d02b4eceba4808b0373ccdcbcfa973341c45d3055eb2e0c9003b1",
+        "bytes": 1026
+      }
+    },
+    {
+      "id": "cmd-c033-web",
+      "command": "npm test --workspace @ushso/observatory-web -- src/lib/researcherGuidance.test.tsx",
+      "started_at": "2026-09-14T10:45:08.516051Z",
+      "completed_at": "2026-09-14T10:45:09.966822Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "11/11 researcherGuidance tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c033-web-event",
+        "path": "verification/research-program/pr-033/producer-20260914/commands/web-guidance/event.json",
+        "sha256": "9eecacae9b1bfe0ddce8da43dcece2638c5a96379a31e2aeec995cdaad8633a5",
+        "bytes": 1083
+      }
+    },
+    {
+      "id": "cmd-c033-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T10:45:09.967223Z",
+      "completed_at": "2026-09-14T10:45:10.038290Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c033-identity-event",
+        "path": "verification/research-program/pr-033/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "776334cd1235298deeade304200c4414f7e78cd180f5f60bfa72659754d7300f",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr033-artifact-0",
+      "path": "verification/research-program/pr-033/task-binding.json",
+      "bytes": 3952,
+      "sha256": "86779f596578a43e1ba57df3bdebd5542d6dcadbaea9e74de2d4af0f8f67f8dd"
+    },
+    {
+      "id": "pr033-artifact-1",
+      "path": "verification/research-program/pr-033/dispatch.json",
+      "bytes": 2323,
+      "sha256": "60f82f4b845c8f28fbc751494d6ee293373916fbbb1e95e9f4ee3dd188ebe1dc"
+    },
+    {
+      "id": "pr033-artifact-2",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/focused-card/receipt.json",
+      "bytes": 454,
+      "sha256": "953ce1edeb85533c62f1fb8f7cb293cefb236de86cec1e0904da73ffd177b75d"
+    },
+    {
+      "id": "pr033-artifact-3",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/focused-card/stdout.log",
+      "bytes": 465,
+      "sha256": "aa1e6c5d1f3eedc772da4ab1564e441576efcfa7e25a47359163c1819a05de28"
+    },
+    {
+      "id": "pr033-artifact-4",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/focused-card/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr033-artifact-5",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/focused-card/event.json",
+      "bytes": 1026,
+      "sha256": "e536fb90cd7d02b4eceba4808b0373ccdcbcfa973341c45d3055eb2e0c9003b1"
+    },
+    {
+      "id": "pr033-artifact-6",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/web-guidance/receipt.json",
+      "bytes": 502,
+      "sha256": "33be3877e1b122e317d1bb309e33fd2762d6afb8a2a39c80368378ae0de530be"
+    },
+    {
+      "id": "pr033-artifact-7",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/web-guidance/stdout.log",
+      "bytes": 440,
+      "sha256": "8413ed4696dd0b5c29b4948edf58fa6ede4385459489fecd2b9e241c238a16fc"
+    },
+    {
+      "id": "pr033-artifact-8",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/web-guidance/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr033-artifact-9",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/web-guidance/event.json",
+      "bytes": 1083,
+      "sha256": "9eecacae9b1bfe0ddce8da43dcece2638c5a96379a31e2aeec995cdaad8633a5"
+    },
+    {
+      "id": "pr033-artifact-10",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "17665bf5fb1ec228c52f64ee7240b96a1159f2ca4cbf5f582f47f9c3bd736bbf"
+    },
+    {
+      "id": "pr033-artifact-11",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr033-artifact-12",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr033-artifact-13",
+      "path": "verification/research-program/pr-033/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "776334cd1235298deeade304200c4414f7e78cd180f5f60bfa72659754d7300f"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-033-1",
+      "status": "producer_checked",
+      "result": "A card cannot declare Best for from topic tags alone. Missing essential facts are explicitly incomplete.",
+      "command_ids": [
+        "cmd-c033-focused",
+        "cmd-c033-web"
+      ]
+    },
+    {
+      "id": "C-033-2",
+      "status": "producer_checked",
+      "result": "HCRIS/PLACES cards have evidence-bound claims a reviewer can compare with publisher passages.",
+      "command_ids": [
+        "cmd-c033-focused"
+      ]
+    },
+    {
+      "id": "C-033-3",
+      "status": "producer_checked",
+      "result": "A reader can move from purpose to variables to a tested access step. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c033-focused",
+        "cmd-c033-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "sealed-identity-guidance",
+      "status": "accepted",
+      "detail": "packages/identity/src/researcher-guidance.mjs was not edited. identity validate passes."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Source-card generation is not R04/R05/R13 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-source-card-review",
+      "status": "pending",
+      "detail": "Independent review of Best-for refusal, incomplete status and HCRIS/PLACES evidence binding remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "ledger-owned-paths-named-sealed-packages",
+      "status": "risk",
+      "detail": "The original ledger named packages/identity/src/researcher-guidance.mjs. Implementation is in enrichment plus the owned web helper to preserve the identity artifact seal."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of Best-for refusal, incomplete status and HCRIS/PLACES evidence binding, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-033 source and replay focused source-card, web guidance and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

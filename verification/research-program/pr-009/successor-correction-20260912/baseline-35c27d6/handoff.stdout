@@ -1,0 +1,165 @@
+{
+  "format": "ushso.pr003.c003-r3.handoff-check.v1",
+  "tool": "scripts/research-program/check-handoff.mjs",
+  "ok": true,
+  "outcome": "accepted",
+  "handoff": {
+    "path": "docs/research-program/handoffs/PR-009.json",
+    "sha256": "a0f5cf886a1c0707a37d11de61ffdb0ce903f5c6d3783606565dfe22b0415264",
+    "pr_id": "PR-009",
+    "advertised_status": "in_progress"
+  },
+  "authorities": {
+    "task_binding": {
+      "source": "per-pr-task-binding",
+      "path": "verification/research-program/pr-009/task-binding.json",
+      "sha256": "e95d52807ba27997793896c3f61ffdfeeceeda6b65e09f8351e1bc715788a434"
+    },
+    "task_bindings": [
+      {
+        "source": "per-pr-task-binding",
+        "path": "verification/research-program/pr-009/task-binding.json",
+        "sha256": "e95d52807ba27997793896c3f61ffdfeeceeda6b65e09f8351e1bc715788a434"
+      }
+    ],
+    "execution_ledger": {
+      "path": "docs/research-program/execution-ledger.json",
+      "sha256": "b3cf57383aba462a60cd72a947903d7ecc8bfabd8c7ff8f242a5e4055281ab2c",
+      "task_found": true
+    }
+  },
+  "binding_source": "per-pr-task-binding",
+  "checks": [
+    {
+      "id": "input_path_containment",
+      "status": "passed",
+      "detail": "docs/research-program/handoffs/PR-009.json stays inside the repository root"
+    },
+    {
+      "id": "handoff_readable",
+      "status": "passed",
+      "detail": "docs/research-program/handoffs/PR-009.json parsed as JSON"
+    },
+    {
+      "id": "handoff_schema",
+      "status": "passed",
+      "detail": "handoff.schema.json (Ajv 2020-12) accepted the packet"
+    },
+    {
+      "id": "task_binding",
+      "status": "passed",
+      "detail": "handoff bound using per-pr-task-binding"
+    },
+    {
+      "id": "dependency_sha_binding",
+      "status": "passed",
+      "detail": "4 dependency SHA(s) match the task binding"
+    },
+    {
+      "id": "base_sha_binding",
+      "status": "passed",
+      "detail": "handoff base_sha matches the task binding"
+    },
+    {
+      "id": "task_scope_binding",
+      "status": "not_applicable",
+      "detail": "in_progress packets are not required to match completed owner/branch/owned-path scope"
+    },
+    {
+      "id": "git_commit_binding",
+      "status": "passed",
+      "detail": "base is a local commit, every dependency SHA is a local ancestor of it, and head_sha is pending"
+    },
+    {
+      "id": "identifier_uniqueness",
+      "status": "passed",
+      "detail": "command, artifact, acceptance and source-identity ids are unique"
+    },
+    {
+      "id": "packet_evidence",
+      "status": "passed",
+      "detail": "in_progress may carry incomplete evidence by protocol state"
+    },
+    {
+      "id": "command_result_resolution",
+      "status": "passed",
+      "detail": "every command has timestamped structured outcomes and each success claim matches its expected outcome"
+    },
+    {
+      "id": "artifact_reference_resolution",
+      "status": "passed",
+      "detail": "every referenced top-level artifact id resolves"
+    },
+    {
+      "id": "artifact_path_containment",
+      "status": "passed",
+      "detail": "all artifact and event-source paths stay inside the repository root"
+    },
+    {
+      "id": "artifact_file_existence",
+      "status": "passed",
+      "detail": "all referenced artifacts and event-source files exist as regular files"
+    },
+    {
+      "id": "artifact_sha256_binding",
+      "status": "passed",
+      "detail": "all declared artifact and event-source SHA-256 (and byte) bindings match on-disk bytes"
+    },
+    {
+      "id": "source_identity_binding",
+      "status": "passed",
+      "detail": "6 current local source hash(es) match on-disk bytes with resolved containment; 1 immutable Git source snapshot hash(es) match streamed git show bytes at their bound commit/path"
+    },
+    {
+      "id": "changed_file_containment",
+      "status": "passed",
+      "detail": "all changed-file records are repository-contained after symlink resolution"
+    }
+  ],
+  "findings": [],
+  "notes": [
+    {
+      "rule": "task_binding_authority",
+      "status": "bound",
+      "detail": "concrete task binding from per-pr-task-binding at verification/research-program/pr-009/task-binding.json (sha256 e95d52807ba27997793896c3f61ffdfeeceeda6b65e09f8351e1bc715788a434); this producer-written file does not authenticate itself and does not replace controller dispatch review"
+    },
+    {
+      "rule": "head_sha_pending",
+      "status": "unresolved",
+      "detail": "head_sha is null (pending-head transport); the controller records the committed head later. A future commit cannot contain its own hash."
+    }
+  ],
+  "preserved_outcomes": {
+    "non_pass_acceptance_results": [
+      {
+        "id": "C-009-1-measured-topology-qualification",
+        "status": "unresolved"
+      },
+      {
+        "id": "C-009-2-successor-policy",
+        "status": "pending"
+      },
+      {
+        "id": "C-009-3-successor-receipts",
+        "status": "pending"
+      }
+    ],
+    "declared_unresolved_claims": [
+      {
+        "id": "C-009-1-measured-topology-qualification",
+        "status": "unresolved"
+      }
+    ],
+    "declared_failures_and_skipped_checks": [
+      {
+        "id": "SUCCESSOR-CHECKS",
+        "status": "pending"
+      }
+    ],
+    "head_sha_pending": true
+  },
+  "independent_review": {
+    "status": "not_claimed",
+    "detail": "Producer-side packet validation only. A passing packet is complete and evidence-bound; it is not independent verification or scientific acceptance."
+  }
+}

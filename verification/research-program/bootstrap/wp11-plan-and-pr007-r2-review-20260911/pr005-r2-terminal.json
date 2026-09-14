@@ -1,0 +1,757 @@
+{
+  "task": {
+    "id": "ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+    "status": "completed",
+    "provider": "grok",
+    "model": "grok-4",
+    "run_id": "ushso-pr005-grok-r2-20260911",
+    "assignment_id": "pr005-freshness-r2",
+    "access": "writer",
+    "write_scope": [
+      "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+      "worker/public-query-service.mjs",
+      "apps/web/src/lib/researcherGuidance.ts",
+      "tests/research-program/freshness-and-grain.test.mjs",
+      "packages/search/static-search-backend.mjs",
+      "apps/web/src/lib/catalogAdapter.ts",
+      "apps/web/src/components/ResultCard.tsx",
+      "apps/web/src/pages/DatasetDetailsPage.tsx",
+      "tests/wp1-repository-abstraction.test.mjs",
+      "apps/web/src/lib/researcherGuidance.test.tsx",
+      "apps/web/src/lib/catalogAdapter.test.ts",
+      "apps/web/src/components/ResultCard.test.ts",
+      "apps/web/src/pages/DatasetDetailsPage.test.tsx",
+      "docs/research-program/handoffs/PR-005.json",
+      "verification/research-program/pr-005/**",
+      "apps/web/src/types/**"
+    ],
+    "capabilities": [
+      "read_run_receipts",
+      "read_provider_logs",
+      "read_own_worktree"
+    ],
+    "child_envelope_digest": "984cf09ebbd4664161d787ac097fc71e78d5cfbc99203ac25b6df96364cdd869",
+    "role": "implement",
+    "source_repo": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621",
+    "cwd": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621-worktrees/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+    "branch": "codex/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+    "start_sha": "941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9",
+    "worktree_task": "ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+    "workspace_mode": "managed",
+    "workspace_kind": "managed-worktree",
+    "launch_reservation": null,
+    "timeout_ms": 3240000,
+    "expected_duration_ms": 2700000,
+    "duration_margin": 1.2,
+    "deadline_at": "2026-09-11T15:10:08.411Z",
+    "deadline_source": "margin",
+    "deadline_extensions": [],
+    "silence_timeout_ms": 600000,
+    "create_pr": false,
+    "schema": "codex-co-engineer.task.v1",
+    "created_at": "2026-09-11T14:16:08.427Z",
+    "updated_at": "2026-09-11T14:52:35.848Z",
+    "revision": 11,
+    "transport": "acp",
+    "started_at": "2026-09-11T14:16:08.866Z",
+    "acp_session_id": "01a090d3-680d-7c81-9531-70b96da476fa",
+    "dispatch_intent": true,
+    "fallback_safe": false,
+    "request_id": "30abc5d0-1d67-48c7-832a-0bf992b0cd5b",
+    "prompt_dispatched": true,
+    "dispatch_evidence": "authoritative",
+    "stop_reason": "end_turn",
+    "last_event": {
+      "type": "status",
+      "text": "fs/read_text_file failed read_text_file: /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621-worktrees/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b/verification/research-program/pr-005/evidence/c-005-4/_emit_handoff.py"
+    },
+    "result": "PR-005 is functionally corrected for R005-1 through R005-4. It remains integration-blocked on the independently confirmed WP11 historical-input gate.\n\n**Head (pending in the handoff):** `afb90565456a429e73527f2bb99daf9cf174aa3c`  \n**Tree:** `bf49d34160b37c79a5948bc32199c24c2c92f24a`  \n**Branch:** `codex/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b`  \n**Logical base (unchanged):** `15b351a92af729f9ba07359fd210123fdfd76bb3`  \n**Continuation execution base:** `941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9`  \n**PR-004 dependency merge (unchanged):** `463f092f71c0ed1ef2aa5baa29b186e5697d04ce`\n\nOriginal three commits are retained. Additive corrections:\n\n| ID | SHA | Subject |\n|---|---|---|\n| C-005-4 | `e7cd7e69823dcaf5f95aa578dc846d02b5882821` | Correct freshness projection, trusted clock, and grain claims |\n| C-005-5 | `afb90565456a429e73527f2bb99daf9cf174aa3c` | Record PR005 freshness correction evidence |\n\nWorking tree is clean. Nothing was pushed.\n\n**Corrected behavior**\n- Search, object browse, numeric browse fallback, and dataset lookup share one `projectFreshness` contract when a request clock is present.\n- Frozen `retrieve()` without `now` still uses catalog-contract `freshnessState` (lexical/direct-base byte-parity intact).\n- Ordinary caller `Date` headers are ignored; explicit injected `now` remains for internal tests.\n- Unknown / `not_live_verified` observations are not last-successful-check evidence; explicit null attempt timestamps stay unknown through adapter, card, and detail.\n- Only `source_asserted` / `verified_first_party` grain claims render as Typical unit/Grain; inferred/unavailable values stay qualified search aids.\n\n**Checks**\n- Freshness/grain: 11 passed\n- WP1: 7 passed\n- Web: 29 files, 162 passed\n- Retrieval: 105 passed, including frozen byte-parity\n- Controller semantics replay (`pr005-independent-semantics-v3.mjs`): 10/10 cases passed; script still hardcodes `accepted=false`; source record bytes unchanged\n- Worker functional retry: 65 passed (first recording failed because semantics files were written during the CI/WP0 sealed-artifact window; that failure is retained)\n- `npm run test:worker`: **exit 1**, 342 passed / 4 failed, all in `tests/wp11-attestation.test.mjs`\n- `check-handoff`: accepted\n\n**WP11 blocker (unchanged policy)**  \nFirst reported mismatch: `apps/web/src/components/ResultCard.test.ts` actual `f80476d8ba1a0343eaceae664b0f7aa1d4312105779b1c54cd5e2d91bbd85978` expected `16226fad7dbbb87f6ca90541fcb33366b4104d8f7324e1f2373cff8446afe06d`. Pins, approvals, receipts, and gate policy were not edited. Proposed follow-up only: `verification/research-program/pr-005/evidence/c-005-4/proposed-wp11-current-input-pins.json`.\n\n**Downstream**  \nAstra re-reviews this correction head. Bind the committed head externally (`head_sha` is pending). Keep PR-005 integration-blocked until the separately reviewed WP11 current-input attestation follow-up is combined. Do not merge or deploy from this packet.",
+    "cleanup": {
+      "status": "normal",
+      "boundary": "inactive_empty",
+      "lock": "unlocked"
+    },
+    "finished_at": "2026-09-11T14:48:55.218Z",
+    "provider_result_sink": {
+      "schema": "codex-co-engineer.local-provider-result-sink.v1",
+      "version": 1,
+      "published": true,
+      "empty": false,
+      "run_id": "ushso-pr005-grok-r2-20260911",
+      "assignment_id": "pr005-freshness-r2",
+      "provider": "grok",
+      "model": "grok-4",
+      "child_envelope_digest": "984cf09ebbd4664161d787ac097fc71e78d5cfbc99203ac25b6df96364cdd869",
+      "artifact_kind": "provider_report",
+      "relative_path": "runs/ushso-pr005-grok-r2-20260911/pr005-freshness-r2/grok/062b4d2467ad93826216fb4010ea42b43977c014ccc19da405b65ea60e72f9ba/provider-report.txt",
+      "media_type": "text/plain",
+      "raw_ref": {
+        "schema": "codex-co-engineer.artifact-ref.v1",
+        "run_id": "ushso-pr005-grok-r2-20260911",
+        "assignment_id": "pr005-freshness-r2",
+        "artifact_kind": "provider_report",
+        "artifact_class": "raw",
+        "relative_path": "runs/ushso-pr005-grok-r2-20260911/pr005-freshness-r2/grok/062b4d2467ad93826216fb4010ea42b43977c014ccc19da405b65ea60e72f9ba/provider-report.txt",
+        "byte_length": 2987,
+        "sha256": "f7e27db2916e63f0210590e8515c422ce0c7d4dde0b2fda9b72cfb0e874cccd2",
+        "media_type": "text/plain",
+        "content_encoding": "identity"
+      },
+      "sanitized_ref": {
+        "schema": "codex-co-engineer.artifact-ref.v1",
+        "run_id": "ushso-pr005-grok-r2-20260911",
+        "assignment_id": "pr005-freshness-r2",
+        "artifact_kind": "provider_report",
+        "artifact_class": "sanitized",
+        "relative_path": "runs/ushso-pr005-grok-r2-20260911/pr005-freshness-r2/grok/062b4d2467ad93826216fb4010ea42b43977c014ccc19da405b65ea60e72f9ba/provider-report.txt",
+        "byte_length": 2987,
+        "sha256": "f7e27db2916e63f0210590e8515c422ce0c7d4dde0b2fda9b72cfb0e874cccd2",
+        "media_type": "text/plain",
+        "content_encoding": "identity"
+      },
+      "raw_digest": "f7e27db2916e63f0210590e8515c422ce0c7d4dde0b2fda9b72cfb0e874cccd2",
+      "sanitized_digest": "f7e27db2916e63f0210590e8515c422ce0c7d4dde0b2fda9b72cfb0e874cccd2",
+      "ref_digest_raw": "7b4d54c4fba27816a1d01ae35d5f47f80f0d3f6527223f6e2e56195aaa1e9488",
+      "ref_digest_sanitized": "c5f3a33c0e2290826bd7d805fcb1807853eb14a61a9d7edd35f23daec9a52566",
+      "source_byte_length": 2987,
+      "sanitized_byte_length": 2987,
+      "redaction_counts": {
+        "env_assignments": 0
+      },
+      "sanitizer_version": 1,
+      "policy_id": "codex-co-engineer.artifact-redaction.v1",
+      "complete": true,
+      "source_truncated": false,
+      "provenance": {
+        "schema": "codex-co-engineer.artifact-sanitizer.v1",
+        "sanitizer_version": 1,
+        "policy_id": "codex-co-engineer.artifact-redaction.v1",
+        "source_digest": "f7e27db2916e63f0210590e8515c422ce0c7d4dde0b2fda9b72cfb0e874cccd2",
+        "source_byte_length": 2987,
+        "raw_ref": {
+          "schema": "codex-co-engineer.artifact-ref.v1",
+          "run_id": "ushso-pr005-grok-r2-20260911",
+          "assignment_id": "pr005-freshness-r2",
+          "artifact_kind": "provider_report",
+          "artifact_class": "raw",
+          "relative_path": "runs/ushso-pr005-grok-r2-20260911/pr005-freshness-r2/grok/062b4d2467ad93826216fb4010ea42b43977c014ccc19da405b65ea60e72f9ba/provider-report.txt",
+          "byte_length": 2987,
+          "sha256": "f7e27db2916e63f0210590e8515c422ce0c7d4dde0b2fda9b72cfb0e874cccd2",
+          "media_type": "text/plain",
+          "content_encoding": "identity"
+        },
+        "sanitized_ref": {
+          "schema": "codex-co-engineer.artifact-ref.v1",
+          "run_id": "ushso-pr005-grok-r2-20260911",
+          "assignment_id": "pr005-freshness-r2",
+          "artifact_kind": "provider_report",
+          "artifact_class": "sanitized",
+          "relative_path": "runs/ushso-pr005-grok-r2-20260911/pr005-freshness-r2/grok/062b4d2467ad93826216fb4010ea42b43977c014ccc19da405b65ea60e72f9ba/provider-report.txt",
+          "byte_length": 2987,
+          "sha256": "f7e27db2916e63f0210590e8515c422ce0c7d4dde0b2fda9b72cfb0e874cccd2",
+          "media_type": "text/plain",
+          "content_encoding": "identity"
+        },
+        "sanitized_digest": "f7e27db2916e63f0210590e8515c422ce0c7d4dde0b2fda9b72cfb0e874cccd2",
+        "sanitized_byte_length": 2987,
+        "redaction_counts": {
+          "env_assignments": 0
+        },
+        "complete": true,
+        "source_truncated": false
+      },
+      "inline_tail": {
+        "encoding": "utf8",
+        "text": "PR-005 is functionally corrected for R005-1 through R005-4. It remains integration-blocked on the independently confirmed WP11 historical-input gate.\n\n**Head (pending in the handoff):** `afb90565456a429e73527f2bb99daf9cf174aa3c`  \n**Tree:** `bf49d34160b37c79a5948bc32199c24c2c92f24a`  \n**Branch:** `codex/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b`  \n**Logical base (unchanged):** `15b351a92af729f9ba07359fd210123fdfd76bb3`  \n**Continuation execution base:** `941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9`  \n**PR-004 dependency merge (unchanged):** `463f092f71c0ed1ef2aa5baa29b186e5697d04ce`\n\nOriginal three commits are retained. Additive corrections:\n\n| ID | SHA | Subject |\n|---|---|---|\n| C-005-4 | `e7cd7e69823dcaf5f95aa578dc846d02b5882821` | Correct freshness projection, trusted clock, and grain claims |\n| C-005-5 | `afb90565456a429e73527f2bb99daf9cf174aa3c` | Record PR005 freshness correction evidence |\n\nWorking tree is clean. Nothing was pushed.\n\n**Corrected behavior**\n- Search, object browse, numeric browse fallback, and dataset lookup share one `projectFreshness` contract when a request clock is present.\n- Frozen `retrieve()` without `now` still uses catalog-contract `freshnessState` (lexical/direct-base byte-parity intact).\n- Ordinary caller `Date` headers are ignored; explicit injected `now` remains for internal tests.\n- Unknown / `not_live_verified` observations are not last-successful-check evidence; explicit null attempt timestamps stay unknown through adapter, card, and detail.\n- Only `source_asserted` / `verified_first_party` grain claims render as Typical unit/Grain; inferred/unavailable values stay qualified search aids.\n\n**Checks**\n- Freshness/grain: 11 passed\n- WP1: 7 passed\n- Web: 29 files, 162 passed\n- Retrieval: 105 passed, including frozen byte-parity\n- Controller semantics replay (`pr005-independent-semantics-v3.mjs`): 10/10 cases passed; script still hardcodes `accepted=false`; source record bytes unchanged\n- Worker functional retry: 65 passed (first recording failed because semantics files were written during the CI/WP0 sealed-artifact window; that failure is retained)\n- `npm run test:worker`: **exit 1**, 342 passed / 4 failed, all in `tests/wp11-attestation.test.mjs`\n- `check-handoff`: accepted\n\n**WP11 blocker (unchanged policy)**  \nFirst reported mismatch: `apps/web/src/components/ResultCard.test.ts` actual `f80476d8ba1a0343eaceae664b0f7aa1d4312105779b1c54cd5e2d91bbd85978` expected `16226fad7dbbb87f6ca90541fcb33366b4104d8f7324e1f2373cff8446afe06d`. Pins, approvals, receipts, and gate policy were not edited. Proposed follow-up only: `verification/research-program/pr-005/evidence/c-005-4/proposed-wp11-current-input-pins.json`.\n\n**Downstream**  \nAstra re-reviews this correction head. Bind the committed head externally (`head_sha` is pending). Keep PR-005 integration-blocked until the separately reviewed WP11 current-input attestation follow-up is combined. Do not merge or deploy from this packet.",
+        "byte_length": 2987,
+        "offset": 0,
+        "max_bytes": 4096,
+        "inline_clipped": false,
+        "source_truncated": false,
+        "complete": true,
+        "reader_clipped": false,
+        "more": false,
+        "next_offset": null
+      }
+    },
+    "handoff": {
+      "branch": "codex/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+      "common_git_dir": "/mnt/d/Coding Projects/ushso/.git",
+      "dirty": true,
+      "files": [
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "apps/web/src/components/ResultCard.test.ts",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 3,
+          "owners": [],
+          "path": "apps/web/src/components/ResultCard.tsx",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "apps/web/src/lib/catalogAdapter.test.ts",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 7,
+          "owners": [],
+          "path": "apps/web/src/lib/catalogAdapter.ts",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "apps/web/src/lib/researcherGuidance.test.tsx",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 7,
+          "owners": [],
+          "path": "apps/web/src/lib/researcherGuidance.ts",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 2,
+          "owners": [],
+          "path": "apps/web/src/pages/DatasetDetailsPage.test.tsx",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 3,
+          "owners": [],
+          "path": "apps/web/src/pages/DatasetDetailsPage.tsx",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 39,
+          "owners": [],
+          "path": "docs/research-program/handoffs/PR-005.json",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 6,
+          "owners": [],
+          "path": "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 8,
+          "owners": [],
+          "path": "tests/research-program/freshness-and-grain.test.mjs",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 4,
+          "owners": [],
+          "path": "tests/wp1-repository-abstraction.test.mjs",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 3,
+          "owners": [],
+          "path": "verification/research-program/pr-005/README.md",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4-worker-retry/cmd-c005-4-worker-functional-retry.stderr",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4-worker-retry/cmd-c005-4-worker-functional-retry.stdout",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4-worker-retry/cmd-c005-4-worker-functional-retry.stdout.gz",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4-worker-retry/commands.json",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4-worker/cmd-c005-4-worker-functional.stderr",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4-worker/cmd-c005-4-worker-functional.stdout",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4-worker/cmd-c005-4-worker-functional.stdout.gz",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4-worker/cmd-c005-4-worker.stderr",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4-worker/cmd-c005-4-worker.stdout",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4-worker/cmd-c005-4-worker.stdout.gz",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4-worker/commands.json",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/cmd-c005-4-freshness.stderr",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/cmd-c005-4-freshness.stdout",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/cmd-c005-4-handoff.stderr",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/cmd-c005-4-handoff.stdout",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/cmd-c005-4-retrieval.stderr",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/cmd-c005-4-retrieval.stdout",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/cmd-c005-4-web.stderr",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/cmd-c005-4-web.stdout",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/cmd-c005-4-wp1.stderr",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/cmd-c005-4-wp1.stdout",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/commands.json",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/proposed-wp11-current-input-pins.json",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/semantics/controller-semantics-v3.stderr",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/semantics/controller-semantics-v3.stderr.gz",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/semantics/controller-semantics-v3.stdout",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/semantics/controller-semantics-v3.stdout.gz",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/semantics/receipt.json",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/semantics/semantics.json",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/semantics/ui-entry.tsx",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/semantics/ui.stderr",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/semantics/ui.stderr.gz",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 1,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/semantics/ui.stdout",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 0,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/c-005-4/semantics/ui.stdout.gz",
+          "status": "A",
+          "tracked": true
+        },
+        {
+          "hunks": 7,
+          "owners": [],
+          "path": "verification/research-program/pr-005/evidence/index.json",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 3,
+          "owners": [],
+          "path": "verification/research-program/pr-005/task-binding.json",
+          "status": "M",
+          "tracked": true
+        },
+        {
+          "hunks": 4,
+          "owners": [],
+          "path": "worker/public-query-service.mjs",
+          "status": "M",
+          "tracked": true
+        }
+      ],
+      "generated_at": "2026-09-11T14:48:58.519145Z",
+      "git_status": "## codex/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+      "head_sha": "afb90565456a429e73527f2bb99daf9cf174aa3c",
+      "merge_base": "941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9",
+      "ownership": {
+        "policy_sha256": null,
+        "required": false,
+        "source": null
+      },
+      "receipt_path": "/home/plumbob/.local/state/worktree-bootstrap/repositories/ushso-375cca760f7dab38/tasks/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b/handoffs/20260911T144858Z-75a6d3d2.json",
+      "repository_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621-worktrees/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+      "schema": "worktree-bootstrap-handoff/v1",
+      "start_sha": "941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9",
+      "summary": {
+        "changed_files": 50,
+        "changed_hunks": 116,
+        "ownership_violations": []
+      },
+      "task": "ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+      "tool": {
+        "implementation_sha256": "4138a49e42148db9e5c63dfd5386fdac235f19e445453e702f342b1a7002b813",
+        "version": "1.1.0"
+      },
+      "workspace_verification": {
+        "branch": "codex/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+        "errors": [],
+        "node_modules_roots": [
+          "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621-worktrees/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b/node_modules"
+        ],
+        "ok": true,
+        "repository_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621-worktrees/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+        "start_sha": "941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9",
+        "task": "ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+        "verified_at": "2026-09-11T14:48:58.459295Z",
+        "writer_lock": null
+      }
+    },
+    "state": "succeeded",
+    "deadline": {
+      "expected_duration_ms": 2700000,
+      "duration_margin": 1.2,
+      "timeout_ms": 3240000,
+      "deadline_at": "2026-09-11T15:10:08.411Z",
+      "deadline_source": "margin",
+      "extensions": [],
+      "remaining_ms": 1016276
+    }
+  },
+  "runtime": {
+    "task_id": "ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+    "process_group": null,
+    "process_start_ticks": "723802820",
+    "process_boundary": {
+      "version": 1,
+      "boundary": "systemd-user-service-cgroup",
+      "unit": "codex-co-engineer-0cca98bd89fe439c9587dfc703f678c5.service",
+      "description": "codex-co-engineer-task:0cca98bd89fe439c9587dfc703f678c5",
+      "invocation_id": "42e2b1bcb12343feafc1ecf07e4e5f2c",
+      "control_group": "/user.slice/user-1000.slice/user@1000.service/app.slice/codex-co-engineer-0cca98bd89fe439c9587dfc703f678c5.service"
+    },
+    "updated_at": "2026-09-11T14:52:35.849Z",
+    "lifecycle_proof": {
+      "status": "normal",
+      "boundary": "inactive_empty",
+      "lock": "unlocked",
+      "code": null,
+      "recovered": false,
+      "git": null
+    }
+  },
+  "progress": {
+    "event_cursor": "1062499",
+    "last_event": {
+      "type": "status",
+      "text": "fs/read_text_file failed read_text_file: /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621-worktrees/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b/verification/research-program/pr-005/evidence/c-005-4/_emit_handoff.py"
+    },
+    "new_event_count": 0,
+    "more_events": false,
+    "waited_ms": 0,
+    "wait_reason": "terminal",
+    "wait_until": "progress"
+  },
+  "state": "succeeded",
+  "summary": {
+    "task_id": "ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+    "state": "succeeded",
+    "status": "completed",
+    "provider": "grok",
+    "message": "The delegated task completed.",
+    "error_code": null,
+    "failed_stage": "end_turn",
+    "retryable": false,
+    "suggested_action": "Inspect the receipt, handoff, and resulting commits before merging.",
+    "last_successful_stage": "prompt_dispatched",
+    "last_event": {
+      "type": "status",
+      "text": "fs/read_text_file failed read_text_file: /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621-worktrees/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b/verification/research-program/pr-005/evidence/c-005-4/_emit_handoff.py"
+    },
+    "deadline": {
+      "expected_duration_ms": 2700000,
+      "duration_margin": 1.2,
+      "timeout_ms": 3240000,
+      "deadline_at": "2026-09-11T15:10:08.411Z",
+      "deadline_source": "margin",
+      "extensions": [],
+      "remaining_ms": 1016276
+    },
+    "event_cursor": "1062499",
+    "wait_reason": "terminal",
+    "capabilities": {
+      "live_progress": true,
+      "same_session_reply": true,
+      "restart_recovery": true,
+      "cancellation_confirmation": true,
+      "detailed_tool_events": true,
+      "evidence": "local",
+      "notes": "ACP persistent session. Same-session reply is supported while the local worker is alive."
+    },
+    "evidence": {
+      "task_id": "ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+      "files": [
+        "task.json",
+        "events.jsonl",
+        "runtime.json",
+        "worker.log",
+        "attention.json"
+      ]
+    }
+  },
+  "diagnostic": {
+    "task_id": "ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+    "provider": "grok",
+    "session_id": "01a090d3-680d-7c81-9531-70b96da476fa",
+    "provider_run_id": null,
+    "question_id": null,
+    "state": "succeeded",
+    "status": "completed",
+    "error_code": "ok",
+    "message": "The delegated task completed.",
+    "failed_stage": "end_turn",
+    "retryable": false,
+    "suggested_action": "Inspect the receipt, handoff, and resulting commits before merging.",
+    "started_at": "2026-09-11T14:16:08.866Z",
+    "last_activity_at": "2026-09-11T14:52:35.848Z",
+    "alert_at": "2026-09-11T14:48:55.218Z",
+    "finished_at": "2026-09-11T14:48:55.218Z",
+    "last_successful_stage": "prompt_dispatched",
+    "last_event": {
+      "type": "status",
+      "text": "fs/read_text_file failed read_text_file: /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621-worktrees/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b/verification/research-program/pr-005/evidence/c-005-4/_emit_handoff.py"
+    },
+    "transport": "acp",
+    "process_boundary": {
+      "version": 1,
+      "boundary": "systemd-user-service-cgroup",
+      "unit": "codex-co-engineer-0cca98bd89fe439c9587dfc703f678c5.service",
+      "description": "codex-co-engineer-task:0cca98bd89fe439c9587dfc703f678c5",
+      "invocation_id": "42e2b1bcb12343feafc1ecf07e4e5f2c",
+      "control_group": "/user.slice/user-1000.slice/user@1000.service/app.slice/codex-co-engineer-0cca98bd89fe439c9587dfc703f678c5.service"
+    },
+    "cancellation": {
+      "status": null,
+      "cancel_requested": false
+    },
+    "cleanup": {
+      "status": "normal",
+      "boundary": "inactive_empty",
+      "lock": "unlocked"
+    },
+    "git": {
+      "source_repo": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621",
+      "cwd": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621-worktrees/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+      "worktree_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621-worktrees/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+      "branch": "codex/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+      "start_sha": "941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9",
+      "resulting_commit": null,
+      "remote_branch": "codex/ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+      "pull_request": null,
+      "validation": null,
+      "workspace_kind": "managed-worktree",
+      "workspace_mode": "managed"
+    },
+    "deadline": {
+      "expected_duration_ms": 2700000,
+      "duration_margin": 1.2,
+      "timeout_ms": 3240000,
+      "deadline_at": "2026-09-11T15:10:08.411Z",
+      "deadline_source": "margin",
+      "extensions": [],
+      "remaining_ms": 1016276
+    },
+    "capabilities": {
+      "live_progress": true,
+      "same_session_reply": true,
+      "restart_recovery": true,
+      "cancellation_confirmation": true,
+      "detailed_tool_events": true,
+      "evidence": "local",
+      "notes": "ACP persistent session. Same-session reply is supported while the local worker is alive."
+    },
+    "evidence": {
+      "task_id": "ce-ushso-pr005-grok-r2-2026-pr005-freshness-r2-029d2d4b27dc-4eaf084b",
+      "files": [
+        "task.json",
+        "events.jsonl",
+        "runtime.json",
+        "worker.log",
+        "attention.json"
+      ]
+    },
+    "dispatch_uncertain": false,
+    "wait_reason": "terminal"
+  },
+  "diagnostics": null,
+  "capabilities": {
+    "live_progress": true,
+    "same_session_reply": true,
+    "restart_recovery": true,
+    "cancellation_confirmation": true,
+    "detailed_tool_events": true,
+    "evidence": "local",
+    "notes": "ACP persistent session. Same-session reply is supported while the local worker is alive."
+  },
+  "view": "summary"
+}

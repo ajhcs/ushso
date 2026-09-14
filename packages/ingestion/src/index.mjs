@@ -18,3 +18,4 @@ export * from './retention-gc.mjs';
 export * from './in-memory-control-plane.mjs';
 export * from './message-contract.mjs';
 export * from './postgres-control-store.mjs';
+export * from './source-budget.mjs';

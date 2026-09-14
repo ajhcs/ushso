@@ -1,0 +1,56 @@
+{
+  "format": "ushso.pr005-pr007-producer-terminal.v1",
+  "recorded_at": "2026-09-11 13:55:19 UTC",
+  "run_id": "ushso-pr005-pr007-grok-20260911",
+  "cursor": "72",
+  "status": "completed",
+  "accepted": false,
+  "tasks": [
+    {
+      "pr_id": "PR-005",
+      "task_id": "ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621",
+      "status": "completed",
+      "state": "succeeded",
+      "provider": "grok",
+      "model": "grok-4",
+      "head_sha": "941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9",
+      "base_sha": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+      "branch": "codex/ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621",
+      "finished_at": "2026-09-11T13:44:08.034Z",
+      "cleanup": {
+        "status": "normal",
+        "boundary": "inactive_empty",
+        "lock": "unlocked"
+      },
+      "provider_report": "PR-005 is committed on the assigned worktree for Astra review. Tree is clean. Nothing was pushed.\n\n**Head:** `941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9` (tree `4d3bc23a2e4c97a9fd044bf3157f83a347995407`)  \n**Base:** `15b351a92af729f9ba07359fd210123fdfd76bb3` (tree `c46c95ad838b78d4a26c86454be82f3835c49e51`)  \n**Dependency merge:** PR-004 `463f092f71c0ed1ef2aa5baa29b186e5697d04ce` (producer head `78d164e816049c45193b17c2267f64c8fb783399` is not relabeled as that merge)\n\n| Commit | SHA | Subject |\n|---|---|---|\n| C-005-1 | `47c739b1d370f3d61c093fe2f11d9d97958e6a9f` | Use an explicit observation clock |\n| C-005-2 | `5e51fea2033eb775c74f5425260b5cd21508e5e9` | Stop promoting inferred unit tags as typical units |\n| C-005-3 | `941c9cd02a3a87c4239e6b75cdccbf4c8ec095e9` | Explain freshness scope in the UI |\n\n**Behavior:** Public requests inject evaluation time into freshness projection. Direct retrieve without `now` stays frozen at corpus/`1970`, so lexical and direct-base byte-parity remain deterministic. Typical unit follows the observation-grain claim; HCRIS grain stays unresolved; inferred `unit_of_analysis` tags are search aids only. Dataset/UI show last successful catalog-metadata check, latest catalog-metadata attempt, stale/overdue status, and payload check not-attempted. Catalog metadata success is not payload access.\n\n**Checks:** freshness/grain, wp1, `npm run test:web` (153), and `npm run test:retrieval` (105) passed. Handoff validates (`producer_checked`, pending `head_sha`). F06/F07 reproduced on the accepted base and do not reproduce after the owned changes.\n\n**Blocker / proposed delta:** `npm run test:worker` exits 1 only on the out-of-scope WP11 historical pin for owned `apps/web/src/components/ResultCard.test.ts` (`16226fad…` → `a9415f9c66580fafb9f5ba2572d829b86344c1990044ebcd48d109739c18ea9d`). Functional worker/direct-base tests passed. Pin update belongs to PR-085/WP11, not this PR.\n\nHandoff: `docs/research-program/handoffs/PR-005.json`  \nBinding: `verification/research-program/pr-005/task-binding.json`  \nEvidence: `verification/research-program/pr-005/`\n\nGit identity used for commits: Cole Lyons `<clyons@ajhcs.org>`. Interface: Grok 4.6; assignment model label grok-4 (not a serving-model attestation). This lane did not implement PR-007.",
+      "partial": true,
+      "independent_review": "pending",
+      "handoff_dirty_flag": true,
+      "handoff_git_status": "## codex/ce-ushso-pr005-pr007-grok-2-grok-pr005-freshness-bc035ae77aee-88a2a621"
+    },
+    {
+      "pr_id": "PR-007",
+      "task_id": "ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f",
+      "status": "completed",
+      "state": "succeeded",
+      "provider": "grok",
+      "model": "grok-4",
+      "head_sha": "994779418cdf4ac2bcc023da66eb1b05aae696d6",
+      "base_sha": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+      "branch": "codex/ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f",
+      "finished_at": "2026-09-11T13:42:49.969Z",
+      "cleanup": {
+        "status": "normal",
+        "boundary": "inactive_empty",
+        "lock": "unlocked"
+      },
+      "provider_report": "PR-007 is implemented on the managed worktree. The tree is clean. Nothing was pushed.\n\n**Branch:** `codex/ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f`  \n**Base:** `15b351a92af729f9ba07359fd210123fdfd76bb3` (tree `c46c95ad838b78d4a26c86454be82f3835c49e51`)  \n**Actual head:** `994779418cdf4ac2bcc023da66eb1b05aae696d6` (tree `a43b03107213253bca7f1031908e89df31aa7ec1`)  \n**PR-004 dependency merge:** `463f092f71c0ed1ef2aa5baa29b186e5697d04ce` (producer head `78d164e816049c45193b17c2267f64c8fb783399` is recorded separately, not as the merge)\n\n**Commits**\n\n| ID | SHA | Subject |\n|---|---|---|\n| C-007-1 | `2d064cb021c5088ed7a002b892410c630ad151c0` | Define release and distribution identity rules |\n| C-007-2 | `28adea899459c42d4568baeab3e5b031a2649585` | Resolve exact source relationships |\n| C-007-3 | `994779418cdf4ac2bcc023da66eb1b05aae696d6` | Add generation identity mapping |\n\nThe producer handoff keeps `head_sha` and the C-007-3 `sha` null so the packet cannot contain its own future hash. Controller binds this actual head.\n\n**Behavior**\n- Publisher identifiers, locators, typed date roles, and hash-scoped identity when no stable release ID exists. Rolling endpoints, replacement files, multiple distributions, and conflicting dates stay unmerged.\n- Catalog/resources captures bind with evidence pointers. One-to-many distributions stay distinct. An ambiguous or URL-only input never fabricates an exact release. Existing `obs:asset:…` IDs are unchanged.\n- Human manifest `85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e` and machine generation `live-2026-09-03-85b50522b420` return the same product context (3434/3430/4). Stale or mismatched pins return typed restart guidance. Dictionary applicability remains unresolved and is not approval.\n\n**Checks**\n- `node --test tests/research-program/release-binding.test.mjs` — 12 passed\n- `node verification/research-program/pr-007/verify.mjs` — ok\n- `npm test --prefix packages/identity` — 20 passed\n- `node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-007.json` — accepted, pending head typed\n\n**Proposed out-of-scope delta:** refresh `packages/identity/manifests/package-manifest.json` and `validation/validation-receipt.json` (file_count, payload_bytes, digests). Those files are outside write_scope; `npm run validate --prefix packages/identity` will fail until they are updated.\n\nHandoff: `docs/research-program/handoffs/PR-007.json`. Evidence: `verification/research-program/pr-007/`. Next consumer: Astra review; controller publishes.",
+      "partial": true,
+      "independent_review": "pending",
+      "handoff_dirty_flag": true,
+      "handoff_git_status": "## codex/ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f"
+    }
+  ]
+}

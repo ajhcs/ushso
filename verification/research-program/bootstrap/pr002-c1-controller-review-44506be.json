@@ -1,0 +1,52 @@
+{
+  "format": "ushso.pr002.c1-controller-review.v1",
+  "reviewer": "codex-root",
+  "head": "44506be8052e1054641048de68893fc41526b664",
+  "tree": "e7b12a01b49ab66c5f5205f3b14407da30804e46",
+  "status": "changes_requested",
+  "producer_verifier_replay": {
+    "command": [
+      "python3",
+      "-B",
+      "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c1-controller-review/producer-replay/verify.py",
+      "--repo",
+      "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ce-ushso-pr002-c1-recovery--grok-c1-recovery-7c8a9fe5dfc7-d648775d"
+    ],
+    "started_at": "2026-09-10T17:51:22.227261+00:00",
+    "finished_at": "2026-09-10T17:51:22.998660+00:00",
+    "exit_code": 0,
+    "stdout_sha256": "e882cf76cf22f81dd96d6c2ba92e359ab13e2db870a34d9e601f4a33935bb154",
+    "note": "Identical verifier/library/catalog/build-receipt copied to task scratch because verifier writes to its own directory; producer tree remained unchanged."
+  },
+  "findings": [
+    {
+      "id": "C1-RELATION-EVIDENCE",
+      "severity": "blocking",
+      "path": "verification/research-program/pr-002/c1_lib.py",
+      "issue": "Census suffix stripping and CDC title-prefix matching emit definitive annual_variant/GIS/geography relation labels without publisher relationship evidence or inferred/candidate state.",
+      "required": "Preserve these as candidate relations only with explicit inference basis and unresolved publisher identity; enforce source identity, keep exact record/shard/evidence pointers, prohibit canonical merge/release binding. Do not change the100product selection or infer scientific interchangeability."
+    },
+    {
+      "id": "C1-MRF-FREEZE-ORDER",
+      "severity": "blocking",
+      "path": "verification/research-program/pr-002/c1_lib.py",
+      "issue": "INTAKE_LIMITS says PR046 and PR049 select pilot entities later, contradicting the C0023 pre-endpoint frozen selection contract.",
+      "required": "C0023 freezes25hospitals/10payercandidates; PR046/049 consume those IDs and resolve locators without endpoint-driven replacement."
+    },
+    {
+      "id": "C1-COMMAND-TIMES",
+      "severity": "blocking",
+      "path": "docs/research-program/handoffs/PR-002.json",
+      "issue": "Source-copy observed_at17:33Z predates recovery run start17:35:17Z; rounded other times are not identified as estimates.",
+      "required": "Preserve the original handoff/hash as failed evidence, use actual captured provider event timestamps or explicitly mark event-unavailable rather than guess. Retain actual command exits and bind exact reviewed commit via an external review receipt."
+    },
+    {
+      "id": "C1-REPLAY-OUTPUT",
+      "severity": "review_fix",
+      "path": "verification/research-program/pr-002/verify.py",
+      "issue": "Independent verifier replay overwrites a committed producer receipt with currentHEAD, invalidating handoff hashes and dirtying the candidate.",
+      "required": "Support an explicit receipt output path (or read-only default), preserve producer receipts and document exact replay command. Hash the catalog before executing it so the declared integrity check precedes interpretation."
+    }
+  ],
+  "acceptance_scope": "C0021 only; C0022/C0023 and allR01-R16 remain unaccepted."
+}

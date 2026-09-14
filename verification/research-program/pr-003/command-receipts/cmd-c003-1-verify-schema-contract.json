@@ -1,0 +1,55 @@
+{
+  "format": "ushso.pr003.c003-1.command-receipt.v1",
+  "id": "cmd-c003-1-verify-schema-contract",
+  "kind": "schema_contract_check",
+  "command": "node verification/research-program/pr-003/verify-schema-contract.mjs",
+  "cwd": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-deepseek-20260910t220020z",
+  "started_at": "2026-09-10T22:08:18.096Z",
+  "completed_at": "2026-09-10T22:08:18.270Z",
+  "exit_code": 0,
+  "expected": "exit 0 with ok=true: handoff.valid.json accepted and all three rejection fixtures rejected for their declared reason",
+  "actual": "exit 0 with ok=true; valid accepted; reject-claimed-pass-without-command rejected; reject-missing-artifact rejected; reject-stale-dependency-sha rejected",
+  "fixtures": [
+    "verification/research-program/pr-003/fixtures/task-binding.json",
+    "verification/research-program/pr-003/fixtures/handoff.valid.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-claimed-pass-without-command.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-missing-artifact.json",
+    "verification/research-program/pr-003/fixtures/handoff.reject-stale-dependency-sha.json"
+  ],
+  "observed": {
+    "ok": true,
+    "task_binding_schema_valid": true,
+    "valid": {
+      "schema_valid": true,
+      "semantic_errors": [],
+      "rejected": false
+    },
+    "reject-claimed-pass-without-command": {
+      "schema_valid": false,
+      "rejected": true,
+      "rule": "claimed_pass_without_command_result",
+      "schema_errors": [
+        "/acceptance_results/0/command_ids minItems must NOT have fewer than 1 items",
+        "/acceptance_results/0 if must match \"then\" schema"
+      ]
+    },
+    "reject-missing-artifact": {
+      "schema_valid": true,
+      "rejected": true,
+      "rule": "missing_artifact",
+      "semantic_errors": [
+        "missing_artifact: C-003-1 references unknown artifact artifact-not-present"
+      ]
+    },
+    "reject-stale-dependency-sha": {
+      "schema_valid": true,
+      "rejected": true,
+      "rule": "stale_dependency_sha",
+      "semantic_errors": [
+        "stale_dependency_sha: PR-002 expected 5647e81457b606bb36456e75c48f990ce21e9c6c got b142309da45d98a9d5e553a05b7a9003a0424854"
+      ]
+    }
+  },
+  "sanitized": true,
+  "raw_log_retained_in_git": false
+}

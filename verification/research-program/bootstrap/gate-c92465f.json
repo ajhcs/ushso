@@ -1,0 +1,158 @@
+{
+  "format": "ushso.research-program-bootstrap-gate-summary.v1",
+  "source_receipt_sha256": "22257ae119a6b7a26d0e7a1462c5bfcfb96832a50af871b049d8d373c3baac50",
+  "run_id": "20260910T151617Z-acbebf5e6fad",
+  "candidate": {
+    "candidate_key": "bf904d9793e0c1f2b54ea41aed346a78844394454ae36c1e7ad7ce65866a6893",
+    "head_sha": "c92465f97df11a1e231983237f27e8c86db792b2",
+    "tree_sha": "5c6d64f4e18b19482226dca2bd02ab1dbd6d9d08"
+  },
+  "started_at": "2026-09-10T15:16:17.715889Z",
+  "finished_at": "2026-09-10T15:23:12.194869Z",
+  "verdict": "passed",
+  "first_pass_failures": [],
+  "policy": {
+    "sha256": "068273993ddb6692eb5ac77a07d9ab7a10a5ee670efdf3b236ba1064de297478",
+    "plan_fingerprint": "d63b3c8f70adc0b6a849f21f947542e0be56442ab8a713822115b2de338f43ae",
+    "orchestrator": {
+      "implementation_sha256": "2b20af24ae9224e9e06c1c42678d1b3bdae79ddad442b7a5f93052d5417cee62",
+      "version": "1.0.0"
+    }
+  },
+  "stages": [
+    {
+      "name": "preflight",
+      "status": "passed",
+      "command": null,
+      "attempt_count": 1,
+      "exit_codes": [
+        0
+      ]
+    },
+    {
+      "name": "bootstrap",
+      "status": "passed",
+      "command": [
+        "npx",
+        "--yes",
+        "npm@11.19.1",
+        "ci",
+        "--ignore-scripts"
+      ],
+      "attempt_count": 1,
+      "exit_codes": [
+        0
+      ]
+    },
+    {
+      "name": "dependency-tree",
+      "status": "passed",
+      "command": [
+        "npx",
+        "--yes",
+        "npm@11.19.1",
+        "ls",
+        "ajv",
+        "--all"
+      ],
+      "attempt_count": 1,
+      "exit_codes": [
+        0
+      ]
+    },
+    {
+      "name": "tests",
+      "status": "passed",
+      "command": [
+        "npm",
+        "run",
+        "test"
+      ],
+      "attempt_count": 1,
+      "exit_codes": [
+        0
+      ]
+    },
+    {
+      "name": "build",
+      "status": "passed",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "attempt_count": 1,
+      "exit_codes": [
+        0
+      ]
+    },
+    {
+      "name": "local-e2e",
+      "status": "passed",
+      "command": [
+        "node",
+        "scripts/release-gate-e2e.mjs"
+      ],
+      "attempt_count": 1,
+      "exit_codes": [
+        0
+      ]
+    },
+    {
+      "name": "release-audit",
+      "status": "passed",
+      "command": [
+        "npm",
+        "run",
+        "release:audit"
+      ],
+      "attempt_count": 1,
+      "exit_codes": [
+        0
+      ]
+    },
+    {
+      "name": "cloudflare-dry-run",
+      "status": "passed",
+      "command": [
+        "npm",
+        "run",
+        "cf:dry-run:artifact"
+      ],
+      "attempt_count": 1,
+      "exit_codes": [
+        0
+      ]
+    },
+    {
+      "name": "retain-deployable-artifacts",
+      "status": "passed",
+      "command": null,
+      "attempt_count": 1,
+      "exit_codes": [
+        0
+      ]
+    },
+    {
+      "name": "receipt",
+      "status": "passed",
+      "command": null,
+      "attempt_count": 1,
+      "exit_codes": [
+        0
+      ]
+    }
+  ],
+  "retained_artifact_count": 41869,
+  "worker_artifact": {
+    "path": ".wrangler-dry-run/index.js",
+    "sha256": "6ccf49bfef83817d5f005f46233d79fd3fa21f2594b48e55fcd53a43616003e6",
+    "size_bytes": 316062
+  },
+  "limitations": [
+    "Qualification applies only to the exact candidate identified above. Subsequent commits are not covered by this gate.",
+    "No production deployment was performed. This is not R01-R16 research acceptance.",
+    "Gate evidence independence describes the separate execution environment. Independent review of controller-authored changes is recorded separately.",
+    "Full receipt and build artifacts remain in local release-gate custody; this summary deliberately omits the bulk static artifact manifest and environment."
+  ]
+}

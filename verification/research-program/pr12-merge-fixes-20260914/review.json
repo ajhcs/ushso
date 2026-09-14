@@ -1,0 +1,73 @@
+{
+  "format": "ushso.pr12-evidence-fix-review.v1",
+  "fix_commit": "9fa7411157817e8f0bd7cee4312abf429e9e2a54",
+  "original_review_head": "c60293036f5bcdf20df751bc5674aee725026962",
+  "author": "Codex root merge-fix task",
+  "independent_review": {
+    "reviewer": "separate native agent /root/evidence_dependency_review",
+    "status": "approved",
+    "scope": "substantive enrichment patch",
+    "focused_tests_passed": 18,
+    "additional_numeric_probes_passed": 4,
+    "limitations": [
+      "not full release qualification",
+      "not scientific acceptance"
+    ]
+  },
+  "review_correction": "The first independent pass found .5 to 5 and Unicode minus removal still accepted; corrected and separately re-reviewed before approval.",
+  "commands": [
+    {
+      "command": "node --test --test-isolation=none tests/research-program/residual-task.test.mjs tests/research-program/claim-validation.test.mjs tests/research-program/evaluate-enrichment.test.mjs tests/research-program/review-queue.test.mjs",
+      "exit_code": 0,
+      "passed": 18
+    },
+    {
+      "command": "node scripts/research-program/evaluate-enrichment.mjs",
+      "exit_code": 0,
+      "unchanged_from_prior_replay": true
+    }
+  ],
+  "revalidated_prior_scopes": {
+    "PR-025": [
+      "focused-residual"
+    ],
+    "PR-026": [
+      "focused-claims",
+      "residual-task"
+    ],
+    "PR-027": [
+      "focused-eval",
+      "claim-validation",
+      "cli"
+    ],
+    "PR-028": [
+      "claim-validation",
+      "review-queue"
+    ]
+  },
+  "historical_receipts": "Preserved unchanged; this receipt supersedes applicability of their enrichment validation results to the corrected implementation. It does not retroactively change original executions or approve source/scientific/publication claims.",
+  "input_sha256": {
+    "evaluation/enrichment/tasks.public.json": "92b8697d5d5c4f664aea067a8d7832ddf84db495ec46dcda361d7a5cf2ac956d",
+    "evaluation/enrichment/labels.held-out.json": "61fc1ed0876acdbc80adfe9bb1d1f6b3bad2915808ae34c476de2b004165d04b",
+    "evaluation/enrichment/recorded-outputs.json": "50421ca4ad2ddfed19f781c88e05b5afb589bffc0d3f179d7508fe9d5c60e90e"
+  },
+  "implementation_sha256": {
+    "packages/enrichment/task-builder.mjs": "914b8a944febd12eeb52496347d5e4ce589c0f15ba4c7d1c76ab7aad2ff706a8",
+    "packages/enrichment/validate-claims.mjs": "b02a7a939fd5798fac19a8d701fac8149624a91c1c5ca8755ab18506757187d3",
+    "packages/enrichment/extract.mjs": "5851ad2f69340abbae050f1d69ecb22cbcb7e67576f13955b2d43c15b880dc4c",
+    "tests/research-program/claim-validation.test.mjs": "01c30556e1929d78f7667827757c0b30a7762fc252f08383d86ec800d328df9c",
+    "tests/research-program/residual-task.test.mjs": "5c5bac783d040d924bf39aaf465204010f50934261db75f5291da4e70e7dc17e"
+  },
+  "evidence_sha256": {
+    "original-probe-observations.json": "df39305c1072a62fa3b2e4a1940f4a7c77ce99062561a6585e64416735330431",
+    "original-regression-failures.log": "89182da46440172b06c59df4b7c643870d731ee14da3cd77b9ca50a66656bf52",
+    "focused-tests.log": "eff2606061a70147a527c85ff9881910ed1d0d5f956bfd1f7cdb996c90378e0e",
+    "enrichment-replay.json": "71bdc54776cf87b0ba8fea06a8e859ccbf425d2a8262c5234aedfcab20e0ad07"
+  },
+  "publication_eligible": false,
+  "r14_accepted": false,
+  "selected_model": null,
+  "live_source_requests": 0,
+  "model_requests": 0,
+  "production_changes": 0
+}

@@ -1,0 +1,232 @@
+{
+  "ci_boundary": {
+    "current_draft": {
+      "approval": null,
+      "approval_status": "absent_for_current_subject",
+      "production_eligibility": false,
+      "release_gate_pass": false,
+      "release_ready": false,
+      "status": "pending_authorized_review",
+      "technical_status": "PASS"
+    },
+    "meaning": "A complete original pair is a valid PASS path and a complete reviewed PR003 pair is a valid PASS path; acceptance does not issue current approval or release qualification."
+  },
+  "ci_pair_semantics": {
+    "complete_original_historical_pair": {
+      "9c_actual": {
+        "package.json": {
+          "bytes": 3555,
+          "path": "package.json",
+          "present": true,
+          "sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c"
+        },
+        "tests/contract-package-inventory.test.mjs": {
+          "bytes": 7809,
+          "path": "tests/contract-package-inventory.test.mjs",
+          "present": true,
+          "sha256": "2bdf766d6c69875160330d8bdf44fbd8d21bbfec43a9b7671c9d233e3ddc4bfa"
+        }
+      },
+      "acceptance": "accepted by transition guard when both reviewed paths match historical_sha256",
+      "package.json": {
+        "bytes": 3555,
+        "sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c"
+      },
+      "state": "historical",
+      "tests/contract-package-inventory.test.mjs": {
+        "bytes": 7809,
+        "sha256": "2bdf766d6c69875160330d8bdf44fbd8d21bbfec43a9b7671c9d233e3ddc4bfa"
+      }
+    },
+    "complete_reviewed_pr003_pair": {
+      "acceptance": "accepted by transition guard when both reviewed paths validate reviewed current hashes and semantics",
+      "package.json": {
+        "bytes": 3666,
+        "path": "package.json",
+        "present": true,
+        "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e"
+      },
+      "state": "reviewed_current",
+      "tests/contract-package-inventory.test.mjs": {
+        "bytes": 7842,
+        "path": "tests/contract-package-inventory.test.mjs",
+        "present": true,
+        "sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b"
+      }
+    },
+    "mixed_pairs": {
+      "acceptance": "both directions reject because transitionStates.size becomes 2 and CI_CURRENT_REVIEWED_PR003_PARTIAL_TRANSITION is asserted",
+      "directions": [
+        "historical package.json + reviewed inventory test",
+        "reviewed package.json + historical inventory test"
+      ],
+      "executed_here": false,
+      "source_proof": "scripts/verify-ci-attestation.mjs transitionStates.size === 1 guard",
+      "state": "rejected"
+    }
+  },
+  "ci_source": {
+    "source_commit": "9c8cba903d296238e145d331512f2a63583278bf",
+    "source_files": [
+      {
+        "byte_identical": true,
+        "path": "scripts/verify-ci-attestation.mjs",
+        "pr085_9c": {
+          "bytes": 22582,
+          "path": "scripts/verify-ci-attestation.mjs",
+          "present": true,
+          "sha256": "914ad3b3b0d65ff8ba901669d0081f099758442ddfcd328e71aa0d0222fc2b75"
+        },
+        "pr085_final_4f9": {
+          "bytes": 22582,
+          "path": "scripts/verify-ci-attestation.mjs",
+          "present": true,
+          "sha256": "914ad3b3b0d65ff8ba901669d0081f099758442ddfcd328e71aa0d0222fc2b75"
+        }
+      },
+      {
+        "byte_identical": true,
+        "path": "verification/testing/ci/v1.4.0/tests/ci-integration.test.mjs",
+        "pr085_9c": {
+          "bytes": 4124,
+          "path": "verification/testing/ci/v1.4.0/tests/ci-integration.test.mjs",
+          "present": true,
+          "sha256": "2cd934cc10d17c99c415994af11c73c29872a0059d4d9ab5a64dc7e8e0ad15ec"
+        },
+        "pr085_final_4f9": {
+          "bytes": 4124,
+          "path": "verification/testing/ci/v1.4.0/tests/ci-integration.test.mjs",
+          "present": true,
+          "sha256": "2cd934cc10d17c99c415994af11c73c29872a0059d4d9ab5a64dc7e8e0ad15ec"
+        }
+      }
+    ],
+    "source_sha256": "914ad3b3b0d65ff8ba901669d0081f099758442ddfcd328e71aa0d0222fc2b75",
+    "static_assertions": {
+      "historical_state_supported": true,
+      "mixed_pair_rejected": true,
+      "pending_approval_boundary_present": true,
+      "reviewed_current_state_supported": true
+    }
+  },
+  "corrected_source_identities": {
+    "ancestor_check": {
+      "ancestor_of": "d1c42eab33e1c21edf805036464f2b64667a489a",
+      "commit": "0b28d036f1df4b5248732bc62f68edd79f14d06f",
+      "exit_code": 0
+    },
+    "final_pr003_component": {
+      "commit": "d1c42eab33e1c21edf805036464f2b64667a489a",
+      "parents": [
+        "b41c27db36b58b4bda16ded02bde3211ca02fb9d"
+      ],
+      "subject": "docs(research): record PR003 R4 wildcard evidence",
+      "tree": "d765aa66a6bc360a3c03a86eaf54b6366ccb2be1"
+    },
+    "requested_pr003_r3": {
+      "commit": "0b28d036f1df4b5248732bc62f68edd79f14d06f",
+      "parents": [
+        "56ec38e3bb4c1af0e558a76c996816a7a604132f"
+      ],
+      "subject": "docs(research): record PR003 R3 evidence and provenance",
+      "tree": "6e2de2232e2aa0f19055751d70e5a904a38216f9"
+    }
+  },
+  "correction_reason": {
+    "cause": "The original audit artifact contained a one-character transcription typo in the final hexadecimal character (e instead of f); its failed cat-file lookup was therefore a lookup of the mistyped identifier.",
+    "correct_value": "0b28d036f1df4b5248732bc62f68edd79f14d06f",
+    "corrected_interpretation": "The requested PR003 R3 commit is present, was independently dereferenced, and is an ancestor of final PR003 d1c.",
+    "prior_field": "requested_pr003_commit",
+    "prior_value": "0b28d036f1df4b5248732bc62f68edd79f14d06e"
+  },
+  "format": "ushso.selected-successor-input-audit-correction.v1",
+  "generated_at": "2026-09-11T03:52:41.740775Z",
+  "limitations": [
+    "No npm/package validator or CI verifier execution was performed for this correction; source-level transition semantics and exact Git bytes were checked.",
+    "No network, provider, hosted runtime, private evaluator, repository, approval, or production action was used."
+  ],
+  "original_artifacts_preserved": {
+    "REPORT.md": {
+      "bytes": 9074,
+      "expected_sha256": "6aa597f736b81d7fc5f578225ff0578a9b2d023293fb359592a6c9dc2719328c",
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/selected-successor-input-audit/REPORT.md",
+      "sha256": "6aa597f736b81d7fc5f578225ff0578a9b2d023293fb359592a6c9dc2719328c",
+      "unchanged": true
+    },
+    "audit-receipt.json": {
+      "bytes": 8444,
+      "expected_sha256": "f59706bcbaf7f6a8f64013b2c421c822b8ca9d0d93632fc85ce1a239dec2395b",
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/selected-successor-input-audit/audit-receipt.json",
+      "sha256": "f59706bcbaf7f6a8f64013b2c421c822b8ca9d0d93632fc85ce1a239dec2395b",
+      "unchanged": true
+    },
+    "audit-selected-successors.py": {
+      "bytes": 43663,
+      "expected_sha256": "c8d7ef4909407cc4fa4a1167b3894a36fd31bad35dc9b7f6e415555504de4408",
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/selected-successor-input-audit/audit-selected-successors.py",
+      "sha256": "c8d7ef4909407cc4fa4a1167b3894a36fd31bad35dc9b7f6e415555504de4408",
+      "unchanged": true
+    },
+    "composition-inputs.json": {
+      "bytes": 31238,
+      "expected_sha256": "38d29f8647f8563d7ecbe71a8350f5f60a2240472594f0a1176beb35895872ef",
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/selected-successor-input-audit/composition-inputs.json",
+      "sha256": "38d29f8647f8563d7ecbe71a8350f5f60a2240472594f0a1176beb35895872ef",
+      "unchanged": true
+    },
+    "discovered-suites.json": {
+      "bytes": 17883,
+      "expected_sha256": "a3dbf741b8fd400001971b2f7fc81ea6c7a5a1cb892718739c9139ab69ea540d",
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/selected-successor-input-audit/discovered-suites.json",
+      "sha256": "a3dbf741b8fd400001971b2f7fc81ea6c7a5a1cb892718739c9139ab69ea540d",
+      "unchanged": true
+    },
+    "selected-pin-audit.json": {
+      "bytes": 63109,
+      "expected_sha256": "aad7c7d6b969d94f54d93eaf5226be7d16774f4a46c4570d356aceda46cad3b1",
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/selected-successor-input-audit/selected-pin-audit.json",
+      "sha256": "aad7c7d6b969d94f54d93eaf5226be7d16774f4a46c4570d356aceda46cad3b1",
+      "unchanged": true
+    }
+  },
+  "pr003_byte_comparison": [
+    {
+      "byte_identical": true,
+      "correct_requested_r3": {
+        "bytes": 3666,
+        "path": "package.json",
+        "present": true,
+        "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e"
+      },
+      "final_pr003": {
+        "bytes": 3666,
+        "path": "package.json",
+        "present": true,
+        "sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e"
+      },
+      "path": "package.json"
+    },
+    {
+      "byte_identical": true,
+      "correct_requested_r3": {
+        "bytes": 7842,
+        "path": "tests/contract-package-inventory.test.mjs",
+        "present": true,
+        "sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b"
+      },
+      "final_pr003": {
+        "bytes": 7842,
+        "path": "tests/contract-package-inventory.test.mjs",
+        "present": true,
+        "sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b"
+      },
+      "path": "tests/contract-package-inventory.test.mjs"
+    }
+  ],
+  "unchanged_findings": [
+    "WP0 historical technical evidence still has package-lock and runner pin drift.",
+    "WP11 historical technical evidence still has package-lock pin drift and its approval remains subject-bound.",
+    "Program ledger WP5/WP11 raw file SHA fields remain stale; canonical WP11 receipt digest is separate.",
+    "WP14/WP8, internal manifests and package identities retain the original results."
+  ]
+}

@@ -92,3 +92,217 @@ test('dictionary extraction requires matching publisher asset identity and retai
  const [d]=extractDictionaries([o],[q]);assert.equal(d.columns.length,1);assert.equal(d.columns[0].name,'count');assert.equal(d.payload_schema_verified,false);assert.equal(d.release_binding,'unresolved');assert.equal(d.publication_authorized,false);
  assert.deepEqual(extractDictionaries([o],[{...q,source_native_id:'wrong'}]),[]);
 });
+
+import { spawnSync } from 'node:child_process';
+const captureClock = () => new Date('2026-09-12T00:00:01.000Z');
+const fixtureLocator = 'https://catalog.example.gov/data.json';
+test('C2 capture injected clock covers every legacy outcome and leaves default policy intact', async () => {
+  const url = 'https://data.cdc.gov/api/views/abcd-1234.json';
+  const cases = [
+    [
+      'captured',
+      url,
+      () => new Response('{"ok":true}', { headers: { 'content-type': 'application/json' } }),
+      {}
+    ],
+    [
+      'http_failed',
+      url,
+      () => new Response('{}', { status: 503, headers: { 'content-type': 'application/json' } }),
+      {}
+    ],
+    ['blocked_locator', fixtureLocator, () => assert.fail('blocked delivery'), {}],
+    [
+      'response_too_large',
+      url,
+      () => new Response('123', { headers: { 'content-type': 'text/plain' } }),
+      { maxBytes: 2 }
+    ],
+    [
+      'unsupported_content_type',
+      url,
+      () => new Response('x', { headers: { 'content-type': 'image/png' } }),
+      {}
+    ],
+    [
+      'unsupported_text_encoding',
+      url,
+      () => new Response(new Uint8Array([255]), { headers: { 'content-type': 'text/plain' } }),
+      {}
+    ],
+    [
+      'fetch_failed',
+      url,
+      () => {
+        throw Error('controlled refusal');
+      },
+      {}
+    ]
+  ];
+  for (const [status, locator, fetchImpl, options] of cases) {
+    const result = await capture(locator, { fetchImpl, clock: captureClock, ...options });
+    assert.equal(result.status, status);
+    assert.equal(result.captured_at, captureClock().toISOString());
+    assert.equal('recorded_at' in result, false);
+  }
+  const timed = await capture(url, {
+    clock: captureClock,
+    timeoutMs: 1,
+    fetchImpl: (_url, { signal }) =>
+      new Promise((_, reject) =>
+        signal.addEventListener('abort', () => reject(Error('aborted')), { once: true })
+      )
+  });
+  assert.equal(timed.status, 'timed_out');
+  assert.equal(timed.captured_at, captureClock().toISOString());
+  assert.equal(metadataUrl(fixtureLocator), null);
+});
+test('L2 custom locator policies require the same explicitly supplied callable fetch value', async () => {
+  let policies = 0,
+    bridges = 0,
+    globalCalls = 0;
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => {
+    globalCalls++;
+    return new Response('{}', { headers: { 'content-type': 'application/json' } });
+  };
+  const policy = (url) => {
+      policies++;
+      return url;
+    },
+    bridge = async () => {
+      bridges++;
+      return new Response('{}', { headers: { 'content-type': 'application/json' } });
+    };
+  try {
+    for (const options of [
+      {},
+      { fetchImpl: undefined },
+      { fetchImpl: null },
+      { fetchImpl: 3 },
+      Object.create({ fetchImpl: bridge })
+    ]) {
+      options.locatorPolicy = policy;
+      options.clock = captureClock;
+      assert.equal(
+        (await capture(fixtureLocator, options)).safe_detail_code,
+        'LOCATOR_POLICY_REQUIRES_INJECTED_FETCH'
+      );
+    }
+    let reads = 0;
+    const changing = {
+      locatorPolicy: policy,
+      clock: captureClock,
+      get fetchImpl() {
+        return ++reads === 1 ? undefined : bridge;
+      }
+    };
+    assert.equal((await capture(fixtureLocator, changing)).status, 'blocked_locator');
+    assert.equal(reads, 1);
+    assert.equal(policies, 0);
+    assert.equal(bridges, 0);
+    assert.equal(globalCalls, 0);
+    assert.equal(
+      (
+        await capture(fixtureLocator, {
+          locatorPolicy: policy,
+          fetchImpl: bridge,
+          clock: captureClock
+        })
+      ).status,
+      'captured'
+    );
+    assert.equal(bridges, 1);
+    assert.equal(
+      (await capture('https://data.cdc.gov/api/views/abcd-1234.json', { clock: captureClock }))
+        .status,
+      'captured'
+    );
+    assert.equal(globalCalls, 1);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+test('L3 custom policy rejects rewritten, noncanonical and fragment locators before transport', async () => {
+  let calls = 0;
+  const bridge = async () => {
+    calls++;
+    return new Response('{}', { headers: { 'content-type': 'application/json' } });
+  };
+  for (const value of [
+    null,
+    true,
+    {},
+    new URL(fixtureLocator),
+    Promise.resolve(fixtureLocator),
+    fixtureLocator + '?cursor=other'
+  ])
+    assert.equal(
+      (
+        await capture(fixtureLocator, {
+          clock: captureClock,
+          fetchImpl: bridge,
+          locatorPolicy: () => value
+        })
+      ).status,
+      'blocked_locator'
+    );
+  for (const url of [
+    fixtureLocator + '#',
+    fixtureLocator + '#part',
+    'https://user:pass@catalog.example.gov/data.json',
+    'https://CATALOG.example.gov/data.json',
+    'https://catalog.example.gov:443/data.json'
+  ])
+    assert.equal(
+      (
+        await capture(url, {
+          clock: captureClock,
+          fetchImpl: bridge,
+          locatorPolicy: (value) => value
+        })
+      ).status,
+      'blocked_locator'
+    );
+  assert.equal(
+    (
+      await capture(fixtureLocator, {
+        clock: captureClock,
+        fetchImpl: bridge,
+        locatorPolicy: () => {
+          throw Error('refused');
+        }
+      })
+    ).status,
+    'blocked_locator'
+  );
+  assert.equal(calls, 0);
+  const cursor = fixtureLocator + '?cursor=page-2';
+  assert.equal(
+    (
+      await capture(cursor, {
+        clock: captureClock,
+        fetchImpl: bridge,
+        locatorPolicy: (value) => (value === cursor ? value : null)
+      })
+    ).status,
+    'captured'
+  );
+  assert.equal(calls, 1);
+});
+test('L3 native process rejected asynchronous policies settle as typed blocks without unhandled rejection', () => {
+  const moduleUrl = new URL('../scripts/research/refresh.mjs', import.meta.url).href;
+  for (const expression of ["async()=>{throw Error('controlled refusal')}", 'async url=>url']) {
+    const code = `import {capture} from ${JSON.stringify(moduleUrl)};let calls=0;const result=await capture(${JSON.stringify(fixtureLocator)},{fetchImpl:()=>{calls++;throw Error('unexpected');},locatorPolicy:${expression}});await new Promise(resolve=>setImmediate(resolve));console.log(JSON.stringify({status:result.status,code:result.safe_detail_code,calls}));`;
+    const child = spawnSync(process.execPath, ['--input-type=module', '-e', code], {
+      encoding: 'utf8'
+    });
+    assert.equal(child.status, 0, child.stderr);
+    assert.deepEqual(JSON.parse(child.stdout), {
+      status: 'blocked_locator',
+      code: 'LOCATOR_POLICY_REJECTED',
+      calls: 0
+    });
+    assert.equal(child.stderr, '');
+  }
+});

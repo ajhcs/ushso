@@ -1,0 +1,143 @@
+{
+  "format": "ushso.pr002.c002-3.selection-spec.v1",
+  "status": "frozen_for_review",
+  "selection_status": "pending_root_adjudication",
+  "created_at": "2026-09-10T18:32:03.061270Z",
+  "purpose": "Deterministic directory-only candidate selection for the future bounded MRF pilot and expansion intake. This is a frozen input proposal, not endpoint evidence, TiC qualification, scientific approval, or a production cohort.",
+  "dependency_context": {
+    "pr001_accepted_merge_sha": "035465f3f16d15f02467679d96451d4440a36ca8",
+    "dependency_use": "Recorded for provenance only; no repository files are changed by this preparation."
+  },
+  "source_scope": {
+    "hospital": {
+      "projection_file": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/cohort-inputs/hospital-directory-identities.json",
+      "metadata_file": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/cohort-inputs/hospital-directory-metadata.json",
+      "authoritative_source_url": "https://data.cms.gov/provider-data/sites/default/files/resources/893c372430d9d71a1c52737d01239d47_1785189955/Hospital_General_Information.csv",
+      "source_role": "CMS Hospital General Information public directory; facility identity, place, hospital type, and hospital ownership only.",
+      "source_metadata_url": "https://data.cms.gov/provider-data/api/1/metastore/schemas/dataset/items/xubh-q36u",
+      "directory_only_fields": [
+        "Facility ID",
+        "Facility Name",
+        "City/Town",
+        "State",
+        "Hospital Type",
+        "Hospital Ownership"
+      ],
+      "excluded_fields_and_reason": "Ratings, quality measures, phone numbers, and any payload/endpoint fields are not used."
+    },
+    "payer": {
+      "projection_file": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/cohort-inputs/payer-directory-identities.json",
+      "workbook_file": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/cohort-inputs/payer-issuer-directory.xlsx",
+      "authoritative_source_url": "https://www.cms.gov/files/document/py2026finalqisissuerlist.xlsx",
+      "source_role": "CMS PY2026 Final QIS Issuer List public directory; HIOS issuer identity/legal name/state and QIS flags.",
+      "directory_only_fields": [
+        "HIOS Issuer ID",
+        "Issuer Legal Name",
+        "State",
+        "Required to Submit QIS Form",
+        "Required to Submit Implementation Plan Form",
+        "Required to Submit Progress Report Form",
+        "Number of Progress Report Submissions Required"
+      ],
+      "qis_limitation": "QIS workbook membership is retained as source metadata and is not a Transparency in Coverage reporting-entity or file-binding determination."
+    },
+    "endpoint_results_seen": false,
+    "endpoint_selection_or_performance_optimization": false
+  },
+  "input_artifacts": [
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/cohort-inputs/input-index.json",
+      "sha256": "defd18e1fd72671b6c842845eeb2b6ef102526befd9c26cf251fa117dfc39587"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/cohort-inputs/hospital-directory-identities.json",
+      "sha256": "3cf22001c0d1d831174f6aabe678c2adf508d8cc41911a13c220ed276c619fdd"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/cohort-inputs/hospital-directory-metadata.json",
+      "sha256": "31eea397b8bfe8207168cefda23256eb9cb3d5e49158d221eda8465a2d8e5f8c"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/cohort-inputs/payer-directory-identities.json",
+      "sha256": "7ecd1fe538ba0d49d04d6b418541ff1824f4aba5dc3f6aa78242e63e028df26c"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/cohort-inputs/payer-issuer-directory.xlsx",
+      "sha256": "09a5d4a33b5825feb3f4943e3cb6ebd9577b8665dd6def15ac01e12b273b5f0b"
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/cohort-inputs/receipts-20260910T155046Z.json",
+      "sha256": "09d4ac6b29f6d8c041053bbb956d46a34c2cfef6c78157c53b2712b1aa88e9c1"
+    }
+  ],
+  "normalization_and_identity": {
+    "raw_values": "Retain exact source strings in fixtures. Selection uses stripped strings for required-field and duplicate checks only.",
+    "hospital_id": "Preserve Facility ID as a string, require six ASCII digits, and require uniqueness across directory_rows.",
+    "hospital_state": "Preserve source State, require exactly two uppercase ASCII letters, and treat every source code as a jurisdiction category without manual endpoint-based exclusions.",
+    "hospital_ownership": "Use exact stripped Hospital Ownership value as the ownership category; do not infer parent systems, mergers, control, or legal equivalence.",
+    "payer_hios_id": "Preserve HIOS Issuer ID as a string, require five ASCII digits, and require uniqueness across directory_rows.",
+    "payer_state": "Preserve source State, require exactly two uppercase ASCII letters.",
+    "payer_legal_name": "Retain exact source legal name. For duplicate screening only, compare stripped case-folded names; do not infer parent-company sameness from text."
+  },
+  "seed_and_tiebreak": {
+    "seed": "ushso-pr002-c002-3-directory-selection-20260910-v1",
+    "hash": "sha256",
+    "hospital_tie_material": "seed\\0hospital\\0Facility ID\\0State\\0Facility Name\\0Hospital Ownership",
+    "payer_tie_material": "seed\\0payer\\0HIOS Issuer ID\\0State\\0Issuer Legal Name",
+    "final_tiebreak": "Lower lowercase hexadecimal tie hash, then lower source ID, wins. No input order or name familiarity is used as an implicit tie-break."
+  },
+  "hospital_selection": {
+    "target_count": 25,
+    "directory_eligibility": [
+      "All six projection fields are present and non-empty after stripping.",
+      "Facility ID matches ^[0-9]{6}$ and is unique.",
+      "State matches ^[A-Z]{2}$.",
+      "No endpoint, MRF, price, quality, rating, or performance result is read or considered."
+    ],
+    "priority_order": [
+      "Maximize a newly represented State code; this produces 25 distinct source jurisdictions when at least 25 are eligible.",
+      "Among new-state candidates, maximize a newly represented exact Hospital Ownership category.",
+      "Prefer lower current State frequency, then lower current ownership frequency.",
+      "Break remaining ties by the seeded SHA-256 tie hash and Facility ID."
+    ],
+    "per_round_sort_key": "(-new_state, -new_ownership, current_state_count, current_ownership_count, tie_hash, Facility ID), ascending",
+    "selection_rule": "Repeat the per-round sort over unselected eligible rows until 25 rows are frozen; never replace a frozen row because a later endpoint or eligibility observation is unfavorable.",
+    "diversity_policy": "State/jurisdiction spread is the hard first priority; ownership spread is a deterministic secondary priority. The output reports achieved distinct counts for root adjudication."
+  },
+  "payer_selection": {
+    "target_count": 10,
+    "directory_eligibility": [
+      "HIOS Issuer ID, Issuer Legal Name, and State are present and non-empty after stripping.",
+      "HIOS Issuer ID matches ^[0-9]{5}$ and is unique.",
+      "State matches ^[A-Z]{2}$.",
+      "All QIS columns are retained as raw directory metadata; QIS membership is not used as TiC qualification.",
+      "No endpoint, MRF, price, provider-reference, or reporting-file result is read or considered."
+    ],
+    "priority_order": [
+      "Maximize a newly represented State code; this produces 10 distinct source jurisdictions when at least 10 are eligible.",
+      "Among new-state candidates, maximize a newly represented exact stripped case-folded legal name.",
+      "Prefer lower current State frequency, then lower current exact-name frequency.",
+      "Break remaining ties by the seeded SHA-256 tie hash and HIOS Issuer ID."
+    ],
+    "per_round_sort_key": "(-new_state, -new_legal_name, current_state_count, current_legal_name_count, tie_hash, HIOS Issuer ID), ascending",
+    "selection_rule": "Repeat the per-round sort over unselected eligible rows until 10 rows are frozen; preserve every selected HIOS ID if later unavailable or ineligible and do not substitute.",
+    "diversity_policy": "State spread and distinct authoritative legal names/HIOS IDs are the directory-only goals. Text similarity is not used to merge issuers or claim ten qualified TiC reporting entities."
+  },
+  "frozen_output_contract": {
+    "status": "pending_root_adjudication",
+    "must_include": [
+      "exact source IDs",
+      "exact source values",
+      "authoritative URL",
+      "source artifact SHA-256",
+      "source row/cell locator",
+      "selection rank and tie hash",
+      "directory-only limitations",
+      "unresolved downstream binding questions"
+    ],
+    "preserve_unavailable_candidates": true,
+    "substitution_policy": "No substitutions after this candidate set is frozen. PR-046 and PR-049 consume IDs only after independent source/file eligibility checks.",
+    "scientific_qualification": "Not established by this package.",
+    "missing_family_mapping": "Twelve missing source families remain a separate bounded intake mapping task; this directory-only selection package does not invent family membership or endpoint support."
+  }
+}

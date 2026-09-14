@@ -1,0 +1,157 @@
+{
+  "format": "ushso.research-program.pr001-crosswalk-review.v1",
+  "verdict": "ACTION_REQUIRED_WITH_LIMITATIONS",
+  "reviewed_commit": "1b572930ce010373de2e19dabb5faf27cfef5c69",
+  "reviewed_tree": "eac26fb9274bd8e8c575cebb4c134f1c35088eb4",
+  "base_commit": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+  "base_tree": "35de194e7182a67a0275cc180f2b021da184aacd",
+  "crosswalk_path": "docs/research-program/legacy-crosswalk.json",
+  "crosswalk_sha256": "cdd61ef5a1d075991596b50d2ba6c769ca4b2e4535a9500bb278ce789bde1a6a",
+  "mode": "bounded_read_only",
+  "findings": [
+    {
+      "id": "CW-001",
+      "priority": "P1",
+      "title": "SEMP custody is not encoded in the crosswalk",
+      "artifact": "docs/research-program/legacy-crosswalk.json",
+      "crosswalk_lines": [12, 128, 130, 143, 147, 149, 151, 479, 484],
+      "finding": "The four cited SEMP files are absent from the reviewed C2 commit and production-base tree. They exist only as untracked files in the preserved original checkout, where their bytes match the cited hashes. The crosswalk gives relative repository paths and says its source clauses are checked in; it does not state local-only custody, the original workspace revision, or the missing-from-base condition. The companion evidence discloses untracked generated views at line 85 but does not cover the canonical model and schema. The same checked-in-custody overstatement also applies to the two plan/execution paths at lines 18-26, which are likewise original-checkout-only.",
+      "source_proof": {
+        "production_base_docs_semp": "git ls-tree -r --name-only 45210704b8de2d7b1360b6d32657cd17791bdd77 docs/semp returned no paths",
+        "original_workspace_head": "e93ac2b5ad66cc6528182cced7e95fb3929841a9",
+        "original_workspace_tree": "305316a6b2257dcb6a61d4f849c0b31142c2c3d2",
+        "original_status": [
+          "?? docs/semp/model/ushso-system-model.json",
+          "?? docs/semp/model/ushso-system-model.schema.json",
+          "?? docs/semp/generated/manifest.json",
+          "?? docs/semp/tools/generate-views.mjs",
+          "?? docs/master-plan/2026-09-10/prs/PR-001.md",
+          "?? docs/master-plan/2026-09-10/EXECUTION.md"
+        ],
+        "hashes": [
+          {"path": "docs/semp/model/ushso-system-model.json", "bytes": 807375, "sha256": "08b256f4c8c1f650ad4805d18dede4482b47b6c31cfff1b25802283855dbd875", "matches_crosswalk": true},
+          {"path": "docs/semp/model/ushso-system-model.schema.json", "bytes": 171596, "sha256": "fc1a2b595e69adc6672f5b8390fbfd3083526ba46836d3064ee1f536b51f0e63", "matches_crosswalk": true},
+          {"path": "docs/semp/generated/manifest.json", "bytes": 6611, "sha256": "e86feced23f0fbd70fa13c3eaab3ade8ffe20d33bde1a5c47de4ed10f0b0ee70", "matches_crosswalk": true},
+          {"path": "docs/semp/tools/generate-views.mjs", "bytes": 200550, "sha256": "8052450f8d59eea1dcdc9a9a88aa40d6153249cf2d01e4996038853b2b038046", "matches_crosswalk": true},
+          {"path": "docs/master-plan/2026-09-10/prs/PR-001.md", "sha256": "ed7950bfd65c59f9164d4be3d9a11b02886a288cdbcc0ae1ba8ba37b0e347b9a", "matches_crosswalk": true},
+          {"path": "docs/master-plan/2026-09-10/EXECUTION.md", "sha256": "4118d4f46a7ebec45749676881c753529593842792a439cfb5e53e50bc1fdfc3", "matches_crosswalk": true}
+        ],
+        "manifest_proof": "Original SEMP model lines 3-18 carry MODEL-USHSO-SEMP-001, version 0.5.1, candidate/proposed/not_approved/not_requested states; generated manifest lines 1-16 bind the model, schema, generator, and hashes.",
+        "companion_evidence": "verification/research-program/pr-001/crosswalk-evidence.json:38-45 hashes SEMP files through absolute original-checkout paths; :83-87 says generated views remain untracked but does not state canonical-model/schema custody."
+      },
+      "action": "Add explicit source_root, source_workspace_head, retained workspace-manifest SHA, present_in_base=false, and local_only custody/disposition for every external SEMP and plan source; qualify the checked-in-source wording and generated_semp_views_changed field so they cannot be read as production-base provenance."
+    },
+    {
+      "id": "CW-002",
+      "priority": "P2",
+      "title": "SEMP gate, transition, and decision-work-package IDs have no destination or retained constraint",
+      "artifact": "docs/research-program/legacy-crosswalk.json",
+      "crosswalk_lines": [153, 154, 166, 168, 169, 170, 171, 172, 174, 178, 486],
+      "finding": "The planning-baseline and program/subject entries at lines 154-166 each carry a disposition and destination_prs. The 12 GATE IDs, 13 GTR IDs, and 11 DWP IDs at lines 168-170 are bare arrays with neither per-ID destinations nor an explicit retained constraint. The package_disposition at line 172 clearly scopes the release_packages array at line 171, and the disposition at line 178 scopes source/evidence/conflict IDs; neither supplies a disposition for gates, transitions, or decision work packages. The verification statement at line 486 checks production_boundaries only.",
+      "source_proof": {
+        "original_semp_model": "The cited IDs are present in the original-only SEMP model under review_gates.gates (12), review_transitions (13), and decision_and_evidence_readiness.work_packages (11).",
+        "structural_check": "All 16 work-package rows, all 13 production-boundary rows, and all 8 ADR rows have non-empty destination/constraint or disposition fields; only the three SEMP ID arrays lack that treatment."
+      },
+      "action": "Add group-level or per-ID destination_prs plus retained constraints/dispositions for GATE, GTR, and DWP entries, or explicitly document an inherited destination/constraint rule that covers each array."
+    }
+  ],
+  "positive_verification": {
+    "crosswalk_shape": {
+      "json_parse": true,
+      "work_packages": 16,
+      "adrs": 8,
+      "production_boundaries": 13,
+      "unmerged_refs": 12,
+      "all_work_packages_have_destinations_and_constraints": true,
+      "all_production_boundaries_have_destinations_and_constraints": true,
+      "all_adrs_have_destinations_and_key_clauses": true,
+      "adr_0007_explicitly_mapped": true
+    },
+    "adr_hashes": {
+      "all_match": true,
+      "source_tree": "1b572930ce010373de2e19dabb5faf27cfef5c69",
+      "entries": [
+        {"id": "ADR-0000", "path": "docs/adr/0000-adr-policy-and-repository-shape.md", "sha256": "eaa3a03a910ea408338ea4ec72ef707b04b952d66b7889ca5ac60f5950fd7bb9", "source_lines": "79-105"},
+        {"id": "ADR-0001", "path": "docs/adr/0001-product-and-truth-boundary.md", "sha256": "a9b1fb0cb41aafd0522e63c2fb670b608fcaed3930ddc340e2219d869d250f5b", "source_lines": "63-75,94-119"},
+        {"id": "ADR-0002", "path": "docs/adr/0002-contract-versioning-and-shared-semantics.md", "sha256": "68086fa37872cc0c300439bd2991213eaa51782b3c7c30675b370742058f4687", "source_lines": "36-54,91-100,139-144"},
+        {"id": "ADR-0003", "path": "docs/adr/0003-identity-family-and-join-semantics.md", "sha256": "7fd3661ad4b0ade317178fe0f9625295cec718daffb40e1ba38a60faaef7195f", "source_lines": "53-75,128-144"},
+        {"id": "ADR-0004", "path": "docs/adr/0004-postgresql-cloudflare-and-immutable-publication.md", "sha256": "f34f32b2bfc2e2807d8bd39744316dec0f60fa47667eaac96aad1df68becc837", "source_lines": "32-46,178-190,227-237"},
+        {"id": "ADR-0005", "path": "docs/adr/0005-postgresql-search-backend-and-benchmark-escalation.md", "sha256": "8ef67e93315269567d7e0a163f45b28ae1c680de1743389ba7b49d51ce34c69f", "source_lines": "25-29,57-79"},
+        {"id": "ADR-0006", "path": "docs/adr/0006-retrieval-historical-schema-compatibility.md", "sha256": "a3b460d8bc4b358d2eaafdcde3350550b856d0df699b2e88cd46f913cf949360", "source_lines": "69-86"},
+        {"id": "ADR-0007", "path": "docs/adr/0007-versioned-wp14-successor-attestation.md", "sha256": "0c86749c849a003560c42ab38963d3ec6904fc76610ee4b23520546abd07f5e5", "source_lines": "8-28"}
+      ],
+      "clause_result": "Each key_clauses summary is supported by the cited source ranges; no ADR clause contradiction was found."
+    },
+    "adr_index": {
+      "path": "docs/adr/README.md",
+      "sha256": "fd1ba5a68ddf22d6977f0f00b8895e5ffbbf515dfc226b99eb9de5d7bd2f85cd",
+      "source_lines": "9-20",
+      "result": "README indexes ADR-0000 through ADR-0006 and omits existing ADR-0007; C2 maps ADR-0007 explicitly with a disposition and destinations."
+    },
+    "release_control_hashes": {
+      "all_match": true,
+      "entries": [
+        {"path": "docs/CLOUDFLARE_GO_LIVE.md", "sha256": "f5e63325aa06d1b273447258fe29ff0e3aa2b308a58aff4d5f600ff59db3eee2", "source_lines": "3-6,17-43,45-73"},
+        {"path": "docs/RELEASE_GATE_AND_AUTHORIZATION_RECONCILIATION.md", "sha256": "a2d3bee53fb9d57e6e074cc01ddb11686e84d389b19694882a6ad9bb23a577c2", "source_lines": "1-7,27-55,98-99,204-219"},
+        {"path": "docs/WP14_CUTOVER_RETIREMENT_RUNBOOK.md", "sha256": "4922bafed42b8c063ed58c41826357e2013154c1c178c139775a2d35e5db0a63", "source_lines": "1-9,54-82,153-159,183-187"},
+        {"path": "docs/research-automation/README.md", "sha256": "b8653400871dccd071449ea339ee71fe166bbb04a023cb6ed50e3d2db095a640", "source_lines": "1-5,22-32"},
+        {"path": "docs/research-automation/SCIENTIFIC-CONFLICT-PREVIEW.md", "sha256": "2139037d0ea48f6bde203872fe5b62c6a402b3348833e553ef0763e17acbbb68", "source_lines": "1-3,14-18,27-40"}
+      ],
+      "clause_result": "The cited release-control documents support unresolved release status, static fallback, no-promotion, evidence-only, and review-only dispositions."
+    },
+    "authorization_register_hashes": {
+      "all_match": true,
+      "entries": [
+        {"path": "verification/external-authorization/v1.0.0/register.json", "sha256": "335b7d3516594d2372cc545b16bf6bbc18e7f69420b4485f659b52a1cdff923b"},
+        {"path": "verification/external-authorization/v1.1.0/register.json", "sha256": "4e372ca7cc0f42378d8893600aaf6c2f68154e9a3a84a7cb361b95116a97a1db"}
+      ],
+      "result": "C2 retains the v1.1 AUTH-10 expiry/branch-scope limitation and does not alter either register."
+    },
+    "semp_hashes_and_states": {
+      "all_cited_hashes_match_original_checkout": true,
+      "production_base_present": false,
+      "model_projection": {
+        "model_id": "MODEL-USHSO-SEMP-001",
+        "version": "0.5.1",
+        "status": "candidate",
+        "lifecycle_state": "proposed",
+        "approval_state": "not_approved",
+        "authorization_state": "not_requested",
+        "as_of": "2026-09-04"
+      },
+      "generated_manifest_projection": {
+        "model_sha256": "08b256f4c8c1f650ad4805d18dede4482b47b6c31cfff1b25802283855dbd875",
+        "schema_sha256": "fc1a2b595e69adc6672f5b8390fbfd3083526ba46836d3064ee1f536b51f0e63",
+        "generator_sha256": "8052450f8d59eea1dcdc9a9a88aa40d6153249cf2d01e4996038853b2b038046",
+        "manifest_sha256": "e86feced23f0fbd70fa13c3eaab3ade8ffe20d33bde1a5c47de4ed10f0b0ee70"
+      }
+    },
+    "runtime_boundary_mapping": {
+      "boundary_count": 13,
+      "boundaries_with_destinations": 13,
+      "boundaries_with_constraints": 13,
+      "runtime_identity_recheck": "Not recaptured; separately verified evidence was relied on per task scope.",
+      "spot_proof": [
+        "45210704b8de2d7b1360b6d32657cd17791bdd77:wrangler.jsonc:5,31-36 supports worker entrypoint and review flags.",
+        "45210704b8de2d7b1360b6d32657cd17791bdd77:worker/index.mjs:230-240 and worker/static-composition.mjs:4-22 support review routes and static repositories.",
+        "45210704b8de2d7b1360b6d32657cd17791bdd77:packages/machine-toolkit/public-webmcp-tool.json:12-26 supports read-only/no-payload and disabled planner state."
+      ]
+    }
+  },
+  "commands": [
+    "git show 1b572930ce010373de2e19dabb5faf27cfef5c69:docs/research-program/legacy-crosswalk.json | nl -ba",
+    "git show 1b572930ce010373de2e19dabb5faf27cfef5c69:verification/research-program/pr-001/crosswalk-evidence.json | nl -ba",
+    "git show 1b572930ce010373de2e19dabb5faf27cfef5c69:<source-path> | sha256sum (all ADR and release-control paths)",
+    "/home/plumbob/bin/with-dev-storage python3 - (load C2 crosswalk; hash cited ADR/release files from the commit; hash SEMP and plan files only from the original checkout when absent from the commit)",
+    "git ls-tree -r --name-only 45210704b8de2d7b1360b6d32657cd17791bdd77 docs/semp",
+    "git status --short --untracked-files=all -- docs/semp/<four cited files> docs/master-plan/2026-09-10/<two cited files> (original checkout)",
+    "jq -c '<small SEMP model projections>' /mnt/d/Coding Projects/ushso/docs/semp/model/ushso-system-model.json",
+    "git show 45210704b8de2d7b1360b6d32657cd17791bdd77:<runtime-path> | nl -ba | rg (spot-check runtime boundaries)"
+  ],
+  "limits": [
+    "No repository, Git, source, provider, network, runtime configuration, or artifact writes were performed; the target worktree already had unrelated staged/untracked changes.",
+    "No full tests, build, release gate, runtime identity recapture, or archive rehash was performed.",
+    "SEMP and plan hashes establish local byte identity only; absence from the reviewed/base tree leaves custody and reproducibility unresolved until explicitly recorded or committed."
+  ],
+  "receipt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/bootstrap-review/pr001-crosswalk-review.json"
+}

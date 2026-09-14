@@ -13,6 +13,26 @@ const NODE_TEST = /\.test\.(?:cjs|js|mjs)$/u
 const MAX_CHILD_OUTPUT_BYTES = 64 * 1024 * 1024
 const CHILD_TIMEOUT_MS = 180_000
 const sealedArtifactRoots = ['contracts', 'docs/feedback', 'evaluation', 'verification']
+const reviewedWp0CurrentAttestation = Object.freeze({
+  alias: 'wp0',
+  path: 'verification/wp0/v1.4.0',
+  version: '1.4.0',
+  validateCommand: 'node tools/verify.mjs --validate',
+})
+const reviewedCiV14CurrentAttestation = Object.freeze({
+  alias: 'ci-verification',
+  path: 'verification/testing/ci/v1.4.0',
+  version: '1.4.0',
+  validateCommand: 'node tools/validate-package.mjs --validate',
+})
+const reviewedWp11CurrentAttestation = Object.freeze({
+  alias: 'wp11',
+  path: 'verification/wp11/v1.3.0',
+  version: '1.3.0',
+  name: '@ushso/wp11-verification-v1.3.0',
+  packageId: '@ushso/wp11-verification-v1.3.0@1.3.0',
+  validateCommand: 'node tools/verify.mjs --validate',
+})
 
 const verificationSuiteDefinitions = Object.freeze([
   { alias: 'evaluator-v2', root: 'evaluation/harness', major: 2, scripts: ['test', 'validate'] },
@@ -290,6 +310,14 @@ export function assertSuccessfulChildExecution(execution, label) {
   if (!hasNumericStatus) throw new Error(`${label}: child process returned no numeric exit status`)
 }
 
+export function usesReviewedWp0CurrentAttestation(descriptor, scriptName) {
+  return scriptName === 'validate'
+    && descriptor?.alias === reviewedWp0CurrentAttestation.alias
+    && descriptor?.path === reviewedWp0CurrentAttestation.path
+    && descriptor?.version === reviewedWp0CurrentAttestation.version
+    && descriptor?.scripts?.validate === reviewedWp0CurrentAttestation.validateCommand
+}
+
 function offlineEnvironment() {
   const environment = {}
   for (const name of ['PATH', 'HOME', 'USERPROFILE', 'SystemRoot', 'WINDIR', 'COMSPEC', 'PATHEXT', 'TMPDIR', 'TMP', 'TEMP', 'RUNNER_TEMP', 'GITHUB_ACTIONS', 'LANG', 'LC_ALL']) {
@@ -344,13 +372,13 @@ function spawnWithBoundedFileCapture(command, arguments_, options) {
   }
 }
 
-function executePackageScript(descriptor, scriptName) {
+function executePackageScript(descriptor, scriptName, { timeoutMs = CHILD_TIMEOUT_MS } = {}) {
   assertSafeScript(descriptor, scriptName)
   const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
   const execution = spawnWithBoundedFileCapture(npmCommand, ['run', scriptName, '--prefix', descriptor.path], {
     cwd: repositoryRoot,
     env: offlineEnvironment(),
-    timeout: CHILD_TIMEOUT_MS,
+    timeout: timeoutMs,
     windowsHide: true,
   })
   if (execution.stdout) process.stdout.write(execution.stdout)
@@ -359,6 +387,98 @@ function executePackageScript(descriptor, scriptName) {
   const parsedTestCount = scriptName === 'test' ? parseNodeTestCount(`${execution.stdout ?? ''}\n${execution.stderr ?? ''}`) : null
   if (scriptName === 'test' && parsedTestCount <= 0) throw new Error(`${descriptor.path}: Node test output reported zero parsed tests`)
   return { script: scriptName, status: 'PASS', parsed_test_count: parsedTestCount }
+}
+
+export function executeWp0CurrentAttestation(descriptor, { verifierPath = resolve(repositoryRoot, 'scripts/verify-wp0-attestation.mjs'), timeoutMs = CHILD_TIMEOUT_MS } = {}) {
+  if (!usesReviewedWp0CurrentAttestation(descriptor, 'validate')) {
+    throw new Error(descriptor.path + ': current WP0 attestation route is not reviewed for this suite/version')
+  }
+  assertSafeScript(descriptor, 'validate')
+  const execution = spawnWithBoundedFileCapture(process.execPath, [verifierPath], {
+    cwd: repositoryRoot,
+    env: offlineEnvironment(),
+    timeout: timeoutMs,
+    windowsHide: true,
+  })
+  if (execution.stdout) process.stdout.write(execution.stdout)
+  if (execution.stderr) process.stderr.write(execution.stderr)
+  assertSuccessfulChildExecution(execution, descriptor.path + ':current-attestation')
+  return { script: 'validate', status: 'PASS', parsed_test_count: null, verification: 'wp0-current-ci-attestation' }
+}
+
+export function usesReviewedCiV14CurrentAttestation(descriptor, scriptName) {
+  return scriptName === 'validate'
+    && descriptor?.alias === reviewedCiV14CurrentAttestation.alias
+    && descriptor?.path === reviewedCiV14CurrentAttestation.path
+    && descriptor?.version === reviewedCiV14CurrentAttestation.version
+    && descriptor?.scripts?.validate === reviewedCiV14CurrentAttestation.validateCommand
+}
+
+export function executeCiV14CurrentAttestation(
+  descriptor,
+  { verifierPath = resolve(repositoryRoot, 'scripts/verify-ci-attestation.mjs'), timeoutMs = CHILD_TIMEOUT_MS } = {},
+) {
+  if (!usesReviewedCiV14CurrentAttestation(descriptor, 'validate')) {
+    throw new Error(descriptor.path + ': current CI v1.4 attestation route is not reviewed for this suite/version')
+  }
+  assertSafeScript(descriptor, 'validate')
+  const execution = spawnWithBoundedFileCapture(process.execPath, [verifierPath], {
+    cwd: repositoryRoot,
+    env: offlineEnvironment(),
+    timeout: timeoutMs,
+    windowsHide: true,
+  })
+  if (execution.stdout) process.stdout.write(execution.stdout)
+  if (execution.stderr) process.stderr.write(execution.stderr)
+  assertSuccessfulChildExecution(execution, descriptor.path + ':current-attestation')
+  return { script: 'validate', status: 'PASS', parsed_test_count: null, verification: 'ci-v14-current-attestation' }
+}
+
+export function usesReviewedWp11CurrentAttestation(descriptor, scriptName) {
+  return scriptName === 'validate'
+    && descriptor?.alias === reviewedWp11CurrentAttestation.alias
+    && descriptor?.path === reviewedWp11CurrentAttestation.path
+    && descriptor?.version === reviewedWp11CurrentAttestation.version
+    && descriptor?.name === reviewedWp11CurrentAttestation.name
+    && descriptor?.scripts?.validate === reviewedWp11CurrentAttestation.validateCommand
+}
+
+export function executeWp11CurrentAttestation(
+  descriptor,
+  { verifierPath = resolve(repositoryRoot, 'scripts/verify-wp11-attestation.mjs'), timeoutMs = CHILD_TIMEOUT_MS } = {},
+) {
+  if (!usesReviewedWp11CurrentAttestation(descriptor, 'validate')) {
+    throw new Error(descriptor.path + ': current WP11 attestation route is not reviewed for this suite/version')
+  }
+  assertSafeScript(descriptor, 'validate')
+  const execution = spawnWithBoundedFileCapture(process.execPath, [verifierPath], {
+    cwd: repositoryRoot,
+    env: offlineEnvironment(),
+    timeout: timeoutMs,
+    windowsHide: true,
+  })
+  if (execution.stdout) process.stdout.write(execution.stdout)
+  if (execution.stderr) process.stderr.write(execution.stderr)
+  assertSuccessfulChildExecution(execution, descriptor.path + ':current-attestation')
+  return { script: 'validate', status: 'PASS', parsed_test_count: null, verification: 'wp11-current-attestation' }
+}
+
+function executeReviewedOrStrict(descriptor, script, {
+  currentAttestationVerifierPath,
+  currentCiAttestationVerifierPath,
+  currentWp11AttestationVerifierPath,
+  childTimeoutMs,
+} = {}) {
+  if (usesReviewedWp0CurrentAttestation(descriptor, script)) {
+    return executeWp0CurrentAttestation(descriptor, { verifierPath: currentAttestationVerifierPath, timeoutMs: childTimeoutMs })
+  }
+  if (usesReviewedCiV14CurrentAttestation(descriptor, script)) {
+    return executeCiV14CurrentAttestation(descriptor, { verifierPath: currentCiAttestationVerifierPath, timeoutMs: childTimeoutMs })
+  }
+  if (usesReviewedWp11CurrentAttestation(descriptor, script)) {
+    return executeWp11CurrentAttestation(descriptor, { verifierPath: currentWp11AttestationVerifierPath, timeoutMs: childTimeoutMs })
+  }
+  return executePackageScript(descriptor, script, { timeoutMs: childTimeoutMs })
 }
 
 function resolveRepositoryHead() {
@@ -390,7 +510,10 @@ function executeMovingTreeAttestation(descriptor) {
   return { script: 'attestation', status: 'PASS' }
 }
 
-export async function runPackageSuites(descriptors) {
+export async function runPackageSuites(
+  descriptors,
+  { currentAttestationVerifierPath, currentCiAttestationVerifierPath, currentWp11AttestationVerifierPath, childTimeoutMs = CHILD_TIMEOUT_MS } = {},
+) {
   const results = []
   const failures = []
   for (const descriptor of descriptors) {
@@ -425,7 +548,12 @@ export async function runPackageSuites(descriptors) {
       let executionResult
       let executionError
       try {
-        executionResult = executePackageScript(descriptor, script)
+        executionResult = executeReviewedOrStrict(descriptor, script, {
+          currentAttestationVerifierPath,
+          currentCiAttestationVerifierPath,
+          currentWp11AttestationVerifierPath,
+          childTimeoutMs,
+        })
       } catch (error) {
         executionError = error
       }

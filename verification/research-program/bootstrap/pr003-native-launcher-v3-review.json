@@ -1,0 +1,120 @@
+{
+  "format": "ushso.pr003.native-deepseek-launch-review.v3",
+  "reviewer": "luna-max-independent-v3-review",
+  "reviewed_at": "2026-09-10T19:29:53.177175984Z",
+  "status": "passed_p1_correction_dependency_gated",
+  "review_boundary": "Independent re-review of PR003-LAUNCH-006 cleanup finalization only; no PR003 dispatch or full PR002 acceptance.",
+  "finding_ids": ["PR003-LAUNCH-006"],
+  "findings": [
+    {
+      "id": "PR003-LAUNCH-006",
+      "severity": "P1",
+      "status": "resolved",
+      "title": "Success finalizer now requires known acceptable cleanup",
+      "evidence": [
+        "native-pr003-launcher.v3.sh.template:142-157 cleanup_observation_is_acceptable predicate",
+        "native-pr003-launcher.v3.sh.template:207-217 success requests become environment_blocked when cleanup is unavailable or active",
+        "native-pr003-launcher.v3.sh.template:261-302 nonzero exit and unfinalized record when cleanup or receipt is not acceptable",
+        "cmd-0002 clean success, cmd-0003 unavailable cleanup, cmd-0004 active lock/process, cmd-0014 active process with released lock",
+        "cmd-0015 native exit 17 and cmd-0011 native exit 17 with unavailable post-command cleanup"
+      ],
+      "required_behavior_verified": {
+        "clean_cleanup": "succeeded/complete/exit 0",
+        "unavailable_cleanup": "environment_blocked/unfinalized/exit 2",
+        "active_lock_or_process": "environment_blocked/unfinalized/exit 2",
+        "truthful_native_failure": "failed with exit 2; clean cleanup complete, unknown cleanup unfinalized"
+      }
+    }
+  ],
+  "inputs": {
+    "native-pr003-launcher.v3.sh.template": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/dsh-models/native-pr003-launcher.v3.sh.template",
+      "sha256": "f0f5687045325e890dabf7e05ca7566502258b475c775362939800f18a185ad4"
+    },
+    "native-pr003-prompts.v2.md": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/dsh-models/native-pr003-prompts.v2.md",
+      "sha256": "f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d"
+    },
+    "native-pr003-prompts.v3.md": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/dsh-models/native-pr003-prompts.v3.md",
+      "sha256": "f3ae24ec04a5b8c92920fa1210399bd214ad9aa3bb4ad4773e930302fb10d07d"
+    },
+    "native-pr003-launcher.v3-report.md": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/dsh-models/native-pr003-launcher.v3-report.md",
+      "sha256": "7d73ceeef6ceca0f482af7d964fa0a44bd1e9f9f2a9b00c189c03672ec792cfb"
+    },
+    "native-pr003-launcher.v3-validation.log": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/dsh-models/native-pr003-launcher.v3-validation.log",
+      "sha256": "f4c083fb71791b663be6f0063218b5c2b5066b15b390d16946f28e6251c96783"
+    },
+    "native-pr003-launcher.v3-finalizer-test-receipt.json": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/dsh-models/native-pr003-launcher.v3-finalizer-test-receipt.json",
+      "sha256": "a29e82c4889150b6370692ff8e4fba01c16d7a5024cb0a1d99eb6b5a67bbf182"
+    },
+    "native-pr003-launch-command.v3.template": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/dsh-models/native-pr003-launch-command.v3.template",
+      "sha256": "6b6c20666fa188a11449834ad75d52b7d2407dbf9002c82f414101c3fbd65ee8"
+    },
+    "native-pr003-agentctl-receipt.v3.template.json": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/dsh-models/native-pr003-agentctl-receipt.v3.template.json",
+      "sha256": "97aeee9868c81c30e98051ca5bf568cffb02747a6bdc993594b8548302ae8bc7"
+    }
+  },
+  "patch": {
+    "path": "/home/plumbob/.config/codex-co-engineer/dsh-deepseek-v4.1-flash.patch.yml",
+    "expected_sha256": "6359c435ef965b85bd8d0b340d5fd3530ab38d7531f046f591c3df97d1e15d66",
+    "actual_sha256": "6359c435ef965b85bd8d0b340d5fd3530ab38d7531f046f591c3df97d1e15d66",
+    "hash_matches": true
+  },
+  "dependency_gate": {
+    "full_pr002_acceptance": "unsatisfied",
+    "pr003_dispatch_allowed": false,
+    "controller_must_supply_accepted_pr002_handoff_and_manifest": true
+  },
+  "observed_commands": [
+    {"id": "cmd-0001-28824dcf", "kind": "review", "exit_code": 0, "observation": "v3 launcher bash syntax passed"},
+    {"id": "cmd-0002-12737954", "kind": "test", "exit_code": 0, "observation": "clean cleanup produced succeeded/complete with unlocked lock and zero worktree-cwd processes"},
+    {"id": "cmd-0003-8c7df3b0", "kind": "test", "exit_code": 2, "observation": "unavailable lock evidence produced environment_blocked/unfinalized"},
+    {"id": "cmd-0004-d4c339ad", "kind": "test", "exit_code": 2, "observation": "active lock and process evidence produced environment_blocked/unfinalized"},
+    {"id": "cmd-0008-c227ce35", "kind": "test", "exit_code": 2, "observation": "fake native DSH exit 17 remained failed with clean cleanup and complete finalization"},
+    {"id": "cmd-0011-fe570580", "kind": "test", "exit_code": 2, "observation": "fake native exit 17 with unavailable cleanup remained failed/unfinalized"},
+    {"id": "cmd-0013-392ce8b3", "kind": "review", "exit_code": 0, "observation": "v3 input hashes, prompt identity, cleanup predicate, validation log and no-live-mutation claims passed"},
+    {"id": "cmd-0014-194ce4c3", "kind": "test", "exit_code": 2, "observation": "active process with released lock produced environment_blocked/unfinalized"},
+    {"id": "cmd-0015-242d7618", "kind": "review", "exit_code": 0, "observation": "all dynamic finalizer case assertions passed"}
+  ],
+  "evidence_artifacts": {
+    "clean_result_sha256": "10ad1553adde3cbaaa14e4bec20d155c1a715c3537ad02f497a1b3d69c62de93",
+    "clean_observation_sha256": "4460cd2f63839056de73b496ae129a9deb6103d8acb0862fd4061e2b3f152985",
+    "unavailable_result_sha256": "4bb48e111fbd3313464dfa508bdea0a9824438057af3ea19ae0ef3cc2ac97fa6",
+    "unavailable_observation_sha256": "d3060f38e403b3b24e67bf425b0efed6dbb346d57227786b73f991eff9bad4a8",
+    "active_result_sha256": "e2b537d5250050a608f0916225c7879568f28e5b0816f1a9e2290cdd2af2e219",
+    "active_observation_sha256": "07acfa7d140101dd2f2429e253a0e6491ad187cbe00fd314b9bc87cc8c2745e1",
+    "process_active_result_sha256": "e539b3e4034153ff09d97c3cfbebaa5d1921a13a3a5155be7d1e813d0c83ab75",
+    "process_active_observation_sha256": "c344e7d3eff398cb00ec2deb63f806e2ee0f7025f919a38cd29d5ea4f2c03843",
+    "native_failure_result_sha256": "8e047f2a46bf9bfc14ed25979ec6cdfcd6a1bab4f2d10a85a167290c11ac0861",
+    "native_failure_observation_sha256": "66b936ec21a35c7a21920be6140f4eb7b60bd8fed08fbb146e72801c3d7ba5a8",
+    "native_post_unavailable_result_sha256": "6dc82c176c19fcf8d48f8ceab36cb04b8d0e35873b99c5f13cd6c7c5eb733e84",
+    "native_post_unavailable_observation_sha256": "2984c67a8a3e1d84a64e0546dc4d8141257c2cc908902520844c2e52c211713e"
+  },
+  "scope": {
+    "read_only_review": true,
+    "source_launcher_executed_only_at_gate": true,
+    "mock_launcher_copy_executed": true,
+    "outer_controller_cwd_outside_mock_worktree": true,
+    "provider_contacted": false,
+    "network_used": false,
+    "git_metadata_written": false,
+    "worktree_created_or_modified": false,
+    "repository_or_config_edited": false,
+    "private_evaluator_or_other_private_inputs_read": false,
+    "process_kill_performed": false,
+    "process_group_control_claim": false
+  },
+  "limits": [
+    "Dynamic checks used fake commands and a copied launcher in scratch; no real provider, DSH dispatch, worktree-bootstrap lock or Git checkpoint was exercised.",
+    "Full PR002 acceptance and selector documents remain unavailable; PR003 dispatch must stay blocked.",
+    "Cleanup is a bounded observation snapshot before lifecycle finish; no claim is made about races after that observation.",
+    "Superseded setup probes were nonce/input/path harness errors and are retained in the durable agentctl receipt; they are not findings against v3."
+  ],
+  "self_hash_note": "This receipt cannot embed its own final SHA; report the external digest after writing."
+}

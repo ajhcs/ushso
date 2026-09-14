@@ -63,3 +63,30 @@ node evaluation/baseline/v0.1.0/tools/validate-baseline.mjs
 
 The machine-readable report is
 `evaluation/baseline/v0.1.0/outputs/evaluation-report.json`.
+
+## Current-generation retrieval evaluation (PR-039)
+
+The current-generation evaluator is `ushso.retrieval-eval.v1`. It pins corpus
+`ushso-live-catalog-2026-09-03` generation `live-2026-09-03-85b50522b420`
+(3434 records) separately from the historical **143-record v1.0.1** baseline
+above. Comparisons reject mismatched cohorts or generations rather than
+reporting misleading improvements.
+
+Machine-readable results:
+`evaluation/research-program/retrieval-eval/result.json`.
+
+Methods:
+`evaluation/research-program/retrieval-eval/METHODS.md`.
+
+Known absent named sources remain in the full-universe denominator and reduce
+coverage; they do not vanish. Producer tests and independent reviewer labels are
+reported separately. Held-out labels are not used in producer scoring. R07
+remains incomplete: failing domains have bounded remediation tasks instead of a
+passing summary.
+
+Reproduce:
+
+```bash
+node scripts/research-program/evaluate-retrieval.mjs
+node --test tests/research-program/evaluate-retrieval.test.mjs
+```

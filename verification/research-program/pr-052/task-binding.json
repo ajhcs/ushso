@@ -1,0 +1,80 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr052-price-semantics-20260914",
+  "slice_id": "C-052-1",
+  "pr_id": "PR-052",
+  "title": "Validate price dimensions and sample quality",
+  "owner": "/root/pr052_price_semantics",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr052-price-semantics-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr052-price-semantics-20260914",
+  "objective": "Price previews state their scope and block invalid comparisons.",
+  "outcome": "A gross charge, discounted cash price, negotiated amount and allowed amount remain different measures. Algorithm, percentage and per-diem values remain non-comparable. Missing or negative/zero values are investigated by documented semantics, not universally dropped or treated as valid prices. A passing sample does not imply legal compliance, complete hospital reporting or comparable patient costs. Current pinned CMS definitions are used, not an obsolete generic MRF schema. Ledger-named packages/identity/mrf/ is not used because identity is WP7-sealed. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-032",
+    "PR-047",
+    "PR-048",
+    "PR-050",
+    "PR-051"
+  ],
+  "owned_paths": [
+    "packages/connectors/mrf/price-semantics.mjs",
+    "evaluation/research-program/mrf-validation/",
+    "tests/research-program/price-semantics.test.mjs",
+    "docs/research-program/price-semantics.md",
+    "verification/research-program/pr-052/",
+    "docs/research-program/handoffs/PR-052.json"
+  ],
+  "commits": [
+    {
+      "id": "C-052-1",
+      "subject": "Define comparable price context",
+      "instructions": "Require code system/version/modifiers, service setting, charge/rate type, payer/plan/network, unit, provider context and effective period as applicable.",
+      "verification": "A gross charge, discounted cash price, negotiated amount and allowed amount remain different measures."
+    },
+    {
+      "id": "C-052-2",
+      "subject": "Add quality and compatibility checks",
+      "instructions": "Flag missing required context, malformed dates, invalid values, duplicate exact rows and conflicting rates. Keep full-file validity separate from sampled checks.",
+      "verification": "Missing or negative/zero values are investigated by documented semantics, not universally dropped or treated as valid prices."
+    },
+    {
+      "id": "C-052-3",
+      "subject": "Produce sample-validation summaries",
+      "instructions": "Report parsed rows, checked fields, unresolved references, failed rules, byte scope and excluded comparisons. Preserve 2026 schema-specific field differences.",
+      "verification": "A passing sample does not imply legal compliance, complete hospital reporting or comparable patient costs."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/price-semantics.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-052.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-052/",
+  "binding": {
+    "base_sha": "a1aa840b2f4130c364299b20438545220353aa67",
+    "base_tree": "6d94661da0796b81c45ab203d7ccb6aa1ea89005",
+    "dependency_merge_shas": {
+      "PR-032": "6fe431f855c2bb65c97cdb0526ef8ed54ea6a74a",
+      "PR-047": "70e2bc44364daaaffe3fbc806e11c9fa06e4bb6b",
+      "PR-048": "e698f55cec1de955c3ed283c18fae741d89acbf4",
+      "PR-050": "50a49d7288fd306d5eae05d98300e412c91db046",
+      "PR-051": "6ad983fd52c1bf33819fd64a97ef20bca4f1e834"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

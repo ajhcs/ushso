@@ -1,0 +1,112 @@
+{
+  "format": "ushso.pr001-input-identity-review.v1",
+  "verdict": "PASS_WITH_LIMITATIONS",
+  "mode": "read_only",
+  "reviewed_target_head": "3605db992c90e8e075e186beffaf66249d236ac9",
+  "reviewed_target_tree": "f7e10df562ac410c12ddde988a0dfb1980cf9536",
+  "reviewed_base_commit": "45210704b8de2d7b1360b6d32657cd17791bdd77",
+  "reviewed_base_tree": "35de194e7182a67a0275cc180f2b021da184aacd",
+  "target_worktree": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910",
+  "checks": {
+    "original_workspace_preservation": {
+      "manifest_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/original-workspace-manifest.json",
+      "manifest_sha256": "3946fa64ea2803477195f999aca4b58c00be467fb3cdec552f9dd374542decd7",
+      "manifest_root": "/mnt/d/Coding Projects/ushso",
+      "manifest_captured_at": "2026-09-10T15:02:52.581748+00:00",
+      "manifest_captured_head": "e93ac2b5ad66cc6528182cced7e95fb3929841a9",
+      "manifest_diff_sha256": "11d06f5640a0670adb380bbbde917f4d7e31f8cc18e2c2b8260e554c32ec0a9a",
+      "declared_file_count": 1483,
+      "declared_bytes": 112691813,
+      "checked": 1483,
+      "observed_bytes": 112691813,
+      "missing": 0,
+      "mismatch_count": 0,
+      "all_hashes_match": true,
+      "command": "/home/plumbob/bin/with-dev-storage python3 - (stdin: load original-workspace-manifest.json and compare every listed path's bytes and SHA256)",
+      "result": "All 1,483 declared modified/untracked files matched the retained manifest."
+    },
+    "locked_research_asset_identity": {
+      "lock_git_object": "45210704b8de2d7b1360b6d32657cd17791bdd77:config/research-assets.lock.json",
+      "lock_format": "ushso.research-assets-lock.v1",
+      "archive": {
+        "path": "/mnt/d/cache/plumbob/ushso-research-assets/research-assets-153f7b8c8934095882e46f134334ddb5f6ef29a03aed8358d71878f92ac4a76f.tar.gz",
+        "locked_sha256": "153f7b8c8934095882e46f134334ddb5f6ef29a03aed8358d71878f92ac4a76f",
+        "observed_sha256": "153f7b8c8934095882e46f134334ddb5f6ef29a03aed8358d71878f92ac4a76f",
+        "locked_bytes": 163540588,
+        "observed_bytes": 163540588,
+        "matches_lock": true
+      },
+      "dictionary_package": {
+        "id": "dictionary-review-package",
+        "prefix": "research-dictionaries-v1",
+        "manifest_path": "research-dictionaries-v1/manifest.json",
+        "locked_manifest_sha256": "0f10c6b764d054cd15324c4a1d93d6da191d86b792976d9573cdf27feceecb6b",
+        "locked_tree_sha256": "f06d3190d5fc4a3a36b51dd2c1d722d0e790e6c628213fb7cd9c700f1d3d79e5",
+        "locked_file_count": 41715,
+        "locked_bytes": 1310115812,
+        "locked_generation": "live-2026-09-03-85b50522b420",
+        "locked_record_count": 2905,
+        "lock_status": {
+          "review_status": "pending_owner_review",
+          "publication_authorized": false,
+          "scientific_applicability": "unresolved"
+        },
+        "archive_manifest": {
+          "member_path": "research-dictionaries-v1/manifest.json",
+          "observed_sha256": "0f10c6b764d054cd15324c4a1d93d6da191d86b792976d9573cdf27feceecb6b",
+          "matches_lock": true,
+          "format": "ushso.dictionary-review-package.v1",
+          "generation": "live-2026-09-03-85b50522b420",
+          "review_status": "pending_owner_review",
+          "publication_authorized": false,
+          "canonical_records_changed": 0,
+          "record_count": 2905,
+          "page_count": 34081,
+          "variable_count": 1573847,
+          "maximum_page_bytes": 65535
+        },
+        "staged_manifest": {
+          "path": "/mnt/d/tmp/plumbob/release-gate-state/repositories/ushso-375cca760f7dab38/runs/20260910T151617Z-acbebf5e6fad/artifacts/files/apps/web/dist/research-dictionaries-v1/manifest.json",
+          "observed_sha256": "0f10c6b764d054cd15324c4a1d93d6da191d86b792976d9573cdf27feceecb6b",
+          "matches_lock": true,
+          "format": "ushso.dictionary-review-package.v1",
+          "generation": "live-2026-09-03-85b50522b420",
+          "review_status": "pending_owner_review",
+          "publication_authorized": false,
+          "canonical_records_changed": 0,
+          "record_count": 2905,
+          "page_count": 34081,
+          "variable_count": 1573847,
+          "maximum_page_bytes": 65535
+        }
+      },
+      "commands": [
+        "git show 45210704b8de2d7b1360b6d32657cd17791bdd77:config/research-assets.lock.json | jq -c '{format,source,packages:[.packages[]|select(.id==\"dictionary-review-package\")|{kind,id,prefix,manifest_path,manifest_sha256,tree_sha256,file_count,bytes,generation,status,record_count}],cloudflare}'",
+        "/home/plumbob/bin/with-dev-storage sha256sum /mnt/d/cache/plumbob/ushso-research-assets/research-assets-153f7b8c8934095882e46f134334ddb5f6ef29a03aed8358d71878f92ac4a76f.tar.gz",
+        "/home/plumbob/bin/with-dev-storage python3 - (stdin: git-show the lock; hash the archive; stream only research-dictionaries-v1/manifest.json from the archive; hash and project the staged manifest)"
+      ],
+      "result": "The lock, retained archive, streamed archive manifest member, and staged manifest agree on the requested asset identity."
+    }
+  },
+  "review_boundary": {
+    "dictionary_is_public_review_asset_input": true,
+    "interpretation": "The dictionary package is an exposed review input; this does not make its proposals canonical facts or scientifically qualified.",
+    "review_status": "pending_owner_review",
+    "publication_authorized": false,
+    "scientific_applicability": "unresolved",
+    "canonical_records_changed": 0,
+    "scientific_acceptance_established": false,
+    "supporting_base_path": "45210704b8de2d7b1360b6d32657cd17791bdd77:docs/research/INTEGRATION-REVIEW-20260908.md"
+  },
+  "limits": [
+    "No bulk extraction: only the single dictionary manifest member was streamed from the compressed archive; no archive files were written.",
+    "No build, tests, release gate, network/provider/source traffic, runtime configuration change, or Git write was performed.",
+    "Preservation verification compared the current original workspace against the retained snapshot manifest and did not restore or mutate it.",
+    "Hash and count agreement establishes identity and integrity only; it does not establish scientific applicability, schema fitness, payload access, endpoint identity, product acceptance, or publication permission."
+  ],
+  "repository_write_check": {
+    "git_status": "## codex/research-program-integration-20260910...origin/codex/research-program-integration-20260910 [ahead 1]",
+    "source_changes_made": false,
+    "receipt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/bootstrap-review/pr001-input-identity-review.json"
+  }
+}

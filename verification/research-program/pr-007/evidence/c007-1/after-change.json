@@ -1,0 +1,39 @@
+{
+  "slice_id": "C-007-1",
+  "kind": "after_change_pass",
+  "base_sha": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+  "recorded_at": "2026-09-11T13:28:12.086Z",
+  "commands": [
+    {
+      "id": "cmd-c007-1-focused",
+      "command": "node --test tests/research-program/release-binding.test.mjs",
+      "started_at": "2026-09-11T13:28:03.178Z",
+      "completed_at": "2026-09-11T13:28:03.477Z",
+      "exit_code": 0,
+      "actual": "7 passed"
+    },
+    {
+      "id": "cmd-c007-1-identity-package",
+      "command": "npm test --prefix packages/identity",
+      "started_at": "2026-09-11T13:28:11.739Z",
+      "completed_at": "2026-09-11T13:28:12.086Z",
+      "exit_code": 0,
+      "actual": "20 passed"
+    }
+  ],
+  "observed": {
+    "rolling_url_is_not_exact": true,
+    "replacement_identities_remain_distinct": true,
+    "multiple_distributions_remain_distinct": true,
+    "conflicting_date_roles_not_merged": true,
+    "hash_scoped_when_no_stable_release_id": true,
+    "existing_asset_ids_unchanged": true
+  },
+  "failed_or_skipped_checks": [
+    {
+      "id": "identity-package-seal",
+      "status": "skipped",
+      "detail": "packages/identity/manifests/package-manifest.json and validation/validation-receipt.json are outside write_scope. Adding src/schema files changes the artifact seal; proposed delta is recorded for the controller rather than silently rewriting the frozen receipt."
+    }
+  ]
+}

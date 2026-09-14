@@ -1,0 +1,262 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-036",
+  "status": "producer_checked",
+  "owner": "/root/pr036_join_evidence",
+  "reviewer": "Astra/root",
+  "base_sha": "25881f8b9a2f4a5bad804cf51835a4eec6abb219",
+  "head_sha": "87b24c20967c13f51c689141f8cada59756df97f",
+  "dependency_merge_shas": {
+    "PR-032": "6fe431f855c2bb65c97cdb0526ef8ed54ea6a74a",
+    "PR-035": "33b1167894a6a6db2c7de0a3db03479c3d262417"
+  },
+  "branch": "codex/ushso-pr036-join-evidence-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/join-evidence.mjs",
+    "evaluation/research-program/joins/",
+    "tests/research-program/join-evidence.test.mjs",
+    "docs/research-program/join-evidence.md",
+    "verification/research-program/pr-036/",
+    "docs/research-program/handoffs/PR-036.json"
+  ],
+  "problem": "Successful SQL could be treated as join validation. Row multiplication, leading-zero loss and unmatched rows could go undetected. A tiny sample could report a universal match rate. Incompatible temporal/universe contexts could remain open. Machine and UI consumers could receive different compatibility. HCRIS-to-NPPES could claim CCN=NPI. R08 could be treated as complete with fewer than fifteen qualified routes. Editing sealed identity join-routes.mjs would break WP7.",
+  "resulting_behavior": "Join evidence lives in packages/enrichment/join-evidence.mjs with fifteen priority-route fixtures under evaluation/research-program/joins/. Fixtures detect row multiplication, leading-zero loss and unmatched rows rather than treating SQL success as enough. Sampled metrics cannot report a universal match rate from a tiny sample. Incompatible contexts remain blocked. Machine and UI consumers receive identical compatibility objects. HCRIS-to-NPPES cannot claim CCN=NPI. R08 remains incomplete if fewer than fifteen routes are qualified. Sealed packages/identity/src/join-routes.mjs (6287 bytes) is unchanged.",
+  "commits": [
+    {
+      "id": "C-036-1",
+      "subject": "Build join validation fixtures",
+      "sha": "2cd53cff9816cdcce2be2ee0a2fb9028b881fc6c"
+    },
+    {
+      "id": "C-036-2",
+      "subject": "Compute scoped linkage metrics",
+      "sha": "2cd53cff9816cdcce2be2ee0a2fb9028b881fc6c"
+    },
+    {
+      "id": "C-036-3",
+      "subject": "Publish qualified routes and caveats",
+      "sha": "87b24c20967c13f51c689141f8cada59756df97f"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "join-evidence",
+      "id": "packages/enrichment/join-evidence.mjs",
+      "location": "local",
+      "sha256": "c86e66aee67dcf492af905e7743256b80de0901ca60330d4f64ff452d01ecd0e"
+    },
+    {
+      "kind": "join-fixtures",
+      "id": "evaluation/research-program/joins/priority-routes.json",
+      "location": "local",
+      "sha256": "7dcb4654d6f0bf0447776458f39f1850255a8f607e0fd9316c3956d85613fcb3"
+    },
+    {
+      "kind": "join-evidence-tests",
+      "id": "tests/research-program/join-evidence.test.mjs",
+      "location": "local",
+      "sha256": "647b47537b777b5cfc7047dbe54a50fb8b464bd4219ea1d0b8068dd7f27ec9ad"
+    },
+    {
+      "kind": "join-evidence-docs",
+      "id": "docs/research-program/join-evidence.md",
+      "location": "local",
+      "sha256": "a72edff07576b9355329feedfd44fd4ec0aeb1afb5412a607e2c5f2b9cbf3636"
+    },
+    {
+      "kind": "sealed-join-routes-unchanged",
+      "id": "packages/identity/src/join-routes.mjs",
+      "location": "local",
+      "sha256": "89a325c4d8ae94be562d7eb9ec69191d694f5dd60ac9953f5cd24ab103584ede"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c036-focused",
+      "command": "node --test tests/research-program/join-evidence.test.mjs",
+      "started_at": "2026-09-14T11:40:19.076689Z",
+      "completed_at": "2026-09-14T11:40:19.184613Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 join-evidence tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c036-focused-event",
+        "path": "verification/research-program/pr-036/producer-20260914/commands/focused-joins/event.json",
+        "sha256": "2664ad29d9100f2a79cfac38a4348157064b8072f6f75dc8f9da1fd305420c82",
+        "bytes": 1033
+      }
+    },
+    {
+      "id": "cmd-c036-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T11:40:19.185008Z",
+      "completed_at": "2026-09-14T11:40:19.243944Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c036-identity-event",
+        "path": "verification/research-program/pr-036/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "8db86fe02e2779dfac432d880542ce0e51871394925cc7ca69664a46bbf2e6fd",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr036-artifact-0",
+      "path": "verification/research-program/pr-036/task-binding.json",
+      "bytes": 3745,
+      "sha256": "3943e6fc0d0af18dda3056a0a77ab33c755b433ce56a6dc1313aac04bf22fd7d"
+    },
+    {
+      "id": "pr036-artifact-1",
+      "path": "verification/research-program/pr-036/dispatch.json",
+      "bytes": 2286,
+      "sha256": "733ecd1878e07a3d3401372bf3ecdf0746c77c34c31a567e933f3cb407c2cbf8"
+    },
+    {
+      "id": "pr036-artifact-2",
+      "path": "verification/research-program/pr-036/producer-20260914/commands/focused-joins/receipt.json",
+      "bytes": 457,
+      "sha256": "604a594385a0b613dfe94c3bc945c11cc3773b0cd2dad663d38aef89be90ad20"
+    },
+    {
+      "id": "pr036-artifact-3",
+      "path": "verification/research-program/pr-036/producer-20260914/commands/focused-joins/stdout.log",
+      "bytes": 510,
+      "sha256": "85299de17b734828568d1463a4399344621ce0e242d683e153412958130f3662"
+    },
+    {
+      "id": "pr036-artifact-4",
+      "path": "verification/research-program/pr-036/producer-20260914/commands/focused-joins/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr036-artifact-5",
+      "path": "verification/research-program/pr-036/producer-20260914/commands/focused-joins/event.json",
+      "bytes": 1033,
+      "sha256": "2664ad29d9100f2a79cfac38a4348157064b8072f6f75dc8f9da1fd305420c82"
+    },
+    {
+      "id": "pr036-artifact-6",
+      "path": "verification/research-program/pr-036/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "21a94373bc187a553733c3aa2b1b53fecbacaab5ab11d6c8d5b4aace46898e0a"
+    },
+    {
+      "id": "pr036-artifact-7",
+      "path": "verification/research-program/pr-036/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr036-artifact-8",
+      "path": "verification/research-program/pr-036/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr036-artifact-9",
+      "path": "verification/research-program/pr-036/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "8db86fe02e2779dfac432d880542ce0e51871394925cc7ca69664a46bbf2e6fd"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-036-1",
+      "status": "producer_checked",
+      "result": "Fixtures detect row multiplication, leading-zero loss and unmatched rows rather than just successful SQL.",
+      "command_ids": [
+        "cmd-c036-focused"
+      ]
+    },
+    {
+      "id": "C-036-2",
+      "status": "producer_checked",
+      "result": "No route reports a universal match rate from a tiny sample. Incompatible contexts remain blocked.",
+      "command_ids": [
+        "cmd-c036-focused"
+      ]
+    },
+    {
+      "id": "C-036-3",
+      "status": "producer_checked",
+      "result": "Machine/UI consumers receive identical compatibility. HCRIS-to-NPPES cannot claim CCN=NPI. R08 is incomplete below 15 qualified routes. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c036-focused",
+        "cmd-c036-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "sealed-identity-join-routes",
+      "status": "accepted",
+      "detail": "packages/identity/src/join-routes.mjs was not edited. identity validate passes."
+    },
+    {
+      "id": "r08-complete",
+      "status": "accepted",
+      "detail": "R08 remains incomplete until fifteen routes are independently qualified. This assignment records that incompleteness rather than claiming R08."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Join-evidence modeling is not R08/R11 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-join-evidence-review",
+      "status": "pending",
+      "detail": "Independent review of tiny-sample refusal, CCN=NPI prohibition and R08 incompleteness remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "ledger-owned-paths-named-sealed-packages",
+      "status": "risk",
+      "detail": "The original ledger named packages/identity/src/join-routes.mjs. Implementation is in enrichment plus evaluation/research-program/joins/ to preserve the identity artifact seal."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of tiny-sample refusal, CCN=NPI prohibition and R08 incompleteness, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-036 source and replay focused join-evidence and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

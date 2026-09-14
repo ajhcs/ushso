@@ -1,0 +1,106 @@
+{
+  "head": "c60293036f5bcdf20df751bc5674aee725026962",
+  "cases": [
+    {
+      "name": "unsupported_literal_value",
+      "expected": "rejected_or_review",
+      "actual": {
+        "format": "ushso.claim-validation.v1",
+        "status": "accepted",
+        "retry": false,
+        "reasons": [],
+        "hash": "6230f7379deeb5708dd2ab81f1ae44be6fc6145aba527699f49a298850a97739",
+        "proposal": {
+          "format": "ushso.extraction-proposal.v1",
+          "field": "count",
+          "value": "999999",
+          "passage_ids": [
+            "1.0"
+          ],
+          "quotation": "Published count is 12.",
+          "span": {
+            "start": 0,
+            "end": 22
+          },
+          "claim_type": "literal",
+          "uncertainty": "certain",
+          "abstention_reason": null,
+          "record_id": "review:synthetic",
+          "raw_response": "{\"field\":\"count\",\"value\":\"999999\",\"passage_ids\":[\"1.0\"],\"quotation\":\"Published count is 12.\",\"span\":{\"start\":0,\"end\":22},\"claim_type\":\"literal\",\"uncertainty\":\"certain\",\"abstention_reason\":null}",
+          "schema_valid": true,
+          "scientific_certified": false
+        },
+        "raw_response": "{\"field\":\"count\",\"value\":\"999999\",\"passage_ids\":[\"1.0\"],\"quotation\":\"Published count is 12.\",\"span\":{\"start\":0,\"end\":22},\"claim_type\":\"literal\",\"uncertainty\":\"certain\",\"abstention_reason\":null}",
+        "model": "openai/gpt-4.1-mini",
+        "validators": [
+          "ushso.claim-validator.v1"
+        ],
+        "rejected_fields": [],
+        "resolvable_citation": true,
+        "quote_match": true,
+        "scientific_certified": false,
+        "schema_valid": true,
+        "traceable_without_model": true
+      }
+    },
+    {
+      "name": "wrong_passage_and_invalid_span",
+      "expected": "rejected",
+      "actual": {
+        "format": "ushso.claim-validation.v1",
+        "status": "accepted",
+        "retry": false,
+        "reasons": [],
+        "hash": "82c8dca5f2a875826af1ed85c3d4e96ced2d8526f3d42410c55fd139c19cbe87",
+        "proposal": {
+          "format": "ushso.extraction-proposal.v1",
+          "field": "unit",
+          "value": "percent",
+          "passage_ids": [
+            "1.0"
+          ],
+          "quotation": "percent",
+          "span": {
+            "start": 999,
+            "end": 1006
+          },
+          "claim_type": "unit",
+          "uncertainty": "certain",
+          "abstention_reason": null,
+          "record_id": "review:synthetic",
+          "raw_response": "{\"field\":\"unit\",\"value\":\"percent\",\"passage_ids\":[\"1.0\"],\"quotation\":\"percent\",\"span\":{\"start\":999,\"end\":1006},\"claim_type\":\"unit\",\"uncertainty\":\"certain\",\"abstention_reason\":null}",
+          "schema_valid": true,
+          "scientific_certified": false
+        },
+        "raw_response": "{\"field\":\"unit\",\"value\":\"percent\",\"passage_ids\":[\"1.0\"],\"quotation\":\"percent\",\"span\":{\"start\":999,\"end\":1006},\"claim_type\":\"unit\",\"uncertainty\":\"certain\",\"abstention_reason\":null}",
+        "model": "openai/gpt-4.1-mini",
+        "validators": [
+          "ushso.claim-validator.v1"
+        ],
+        "rejected_fields": [],
+        "resolvable_citation": true,
+        "quote_match": true,
+        "scientific_certified": false,
+        "schema_valid": true,
+        "traceable_without_model": true
+      }
+    },
+    {
+      "name": "page_local_context",
+      "expected": {
+        "header": "Adult rate",
+        "denominator": "Adults"
+      },
+      "actual": {
+        "chunk_id": "2.0",
+        "page": 2,
+        "field": "rate",
+        "header": "Child rate",
+        "denominator": "Children",
+        "overlap_id": null,
+        "text": "Child rate\nChildren\nAdult measure",
+        "token_estimate": 9
+      }
+    }
+  ]
+}

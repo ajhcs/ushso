@@ -1,0 +1,31 @@
+✔ A1/L1 approved exact fixture descriptor and route produce a strict collection job (231.708017ms)
+✔ A2 invalid identity, route, scope, extra fields and unapproved context block admission (8.193721ms)
+✔ A3 canonical key ordering preserves identity; stale hashes block; approved revision changes identity (8.470502ms)
+✔ A4 real, paused and activated foreign descriptors cannot enter the fixture lane (6.581391ms)
+✔ A5 repeated actual scheduler slots converge on one run and workflow outbox (8.910484ms)
+✔ A6 selections and reservations give child identities while rejecting duplicates and loose limits (8.912843ms)
+✔ A2 correction: sparse selected arrays and hidden or accessor JSON fields never admit (5.30069ms)
+✔ C8 codec retains Maps, undefined and referenced bytes; unsupported types fail (2.377731ms)
+✖ D1 actual collector composes two durable pages, strict receipts and selected fixture completion (201.319002ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 647.768366
+
+✖ failing tests:
+
+test at tests/research-program/job-lifecycle.test.mjs:93:1
+✖ D1 actual collector composes two durable pages, strict receipts and selected fixture completion (201.319002ms)
+  Error [LocalCollectionError]: PARENT_OUTBOX_NOT_FOUND
+      at requireLocal (file:///mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr010-local-jobs-20260912/packages/ingestion/src/collection-job.mjs:12:71)
+      at schedule (file:///mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr010-local-jobs-20260912/packages/ingestion/src/local-collector-adapter.mjs:197:5)
+      at async Object.execute (file:///mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr010-local-jobs-20260912/packages/ingestion/src/local-collector-adapter.mjs:251:7)
+      at async TestContext.<anonymous> (file:///mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr010-local-jobs-20260912/tests/research-program/job-lifecycle.test.mjs:96:16)
+      at async Test.run (node:internal/test_runner/test:1125:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:787:7) {
+    code: 'PARENT_OUTBOX_NOT_FOUND'
+  }

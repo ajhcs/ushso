@@ -1,0 +1,53 @@
+{
+  "format": "ushso.independent-premerge-helper-review.v1",
+  "recorded_at": "2026-09-12T04:40:37.643362Z",
+  "reviewer": "native Codex subagent /root/publication_readiness",
+  "subject": {
+    "helper": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/merge-reviewed-combined.py",
+    "sha256": "fbb63b76c412427cce3c7dbd10b3fbca347a2b93f0bf153f0d81165682d3a3e6",
+    "preserved_bytes": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/integration-acceptance/merge-helper.final-reviewed.py",
+    "candidate_head": "954a237a8984d06f5ea0ab15f83c71ce210bf09a",
+    "candidate_tree": "a781e9801224af92b51389fb898f0b67ab261982"
+  },
+  "verdict": "no_actionable_findings_on_corrected_merge_helper",
+  "findings": [],
+  "initial_review": {
+    "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/integration-acceptance/premerge-helper-review.initial.json",
+    "sha256": "0fbb8841416ca3a5a34f890cabda1966ddf978f1540324d5ae6fc2b9a950e283"
+  },
+  "resolved_findings": [
+    {
+      "id": "MERGE-P2-1",
+      "title": "Fresh CI check reads a historical attempt without checking the current run",
+      "status": "resolved"
+    },
+    {
+      "id": "MERGE-P2-2",
+      "title": "Pause is not checked before each new subprocess/API read",
+      "status": "resolved"
+    },
+    {
+      "id": "MERGE-P2-3",
+      "title": "Applied merges lose canonical receipt when the command reports a transport failure",
+      "status": "resolved"
+    }
+  ],
+  "verified_corrections": [
+    "Fresh current run and attempt-1 state both require the exact head, current attempt 1, completion and success before named job checks.",
+    "Each ordinary command/API read checks the pause flag. The explicitly marked post-merge readback is bounded to recording the already-issued bundle operation; it issues no new mutation.",
+    "A confirmed applied merge records its canonical merge object/receipt even if the CLI exit is nonzero; the transport failure is retained and no retry is issued."
+  ],
+  "checks_without_findings": [
+    "Exact head/tree/base/repository/worktree identity checks and writer lock verification are present.",
+    "Explicit normal merge uses --match-head-commit for954; no auto/admin/squash/rebase/delete flags or main/#12 mutation.",
+    "The helper records mark-ready and merge-command outcomes before subsequent work, and checks actual merge tree/parents."
+  ],
+  "limits": [
+    "Static review and AST parse only; helper not executed and no merge decision authored by this reviewer.",
+    "Execution still requires the completed exact hosted receipt and a controller decision binding its real hashes and both job checkout observations. The controller owns that judgment.",
+    "Current helper hash and reviewed head/tree/base must remain unchanged; changed code or evidence bindings need scoped recheck.",
+    "The helper checks the base before and after a normal GitHub merge; controller ownership must keep the integration base stable during the operation.",
+    "The user usage-reset stop condition remains active."
+  ],
+  "public_mutations_performed_by_this_review": 0
+}

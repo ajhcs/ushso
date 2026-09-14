@@ -1,0 +1,58 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {createHash} from 'node:crypto';
+import {createRequire} from 'node:module';
+import {pathToFileURL} from 'node:url';
+import {spawnSync} from 'node:child_process';
+import assert from 'node:assert/strict';
+
+const repo=process.argv[2], out=process.argv[3];
+assert(path.isAbsolute(repo)&&path.isAbsolute(out));
+await fs.mkdir(out,{recursive:true});
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const git=(...args)=>{const r=spawnSync('git',args,{cwd:repo,encoding:'utf8'});assert.equal(r.status,0,r.stderr);return r.stdout.trim();};
+const head=git('rev-parse','HEAD');assert.equal(head,'15b351a92af729f9ba07359fd210123fdfd76bb3');assert.equal(git('status','--porcelain'),'');
+const esbuild=createRequire(path.join(repo,'package.json'))('esbuild');
+const source=`import {loadAcceptedDiscoveryFixture} from './apps/web/src/data/acceptedDiscoveryFixture.ts';
+import {adaptDiscoveryResponse} from './apps/web/src/lib/catalogAdapter.ts';
+import {buildResearcherGuidance} from './apps/web/src/lib/researcherGuidance.ts';
+const response=await loadAcceptedDiscoveryFixture();
+const before=JSON.stringify(response);
+const dataset=adaptDiscoveryResponse(response).records.find(x=>x.canonicalResult.record.title.includes('HCRIS'));
+if(!dataset)throw new Error('HCRIS fixture missing');
+const guidance=buildResearcherGuidance(dataset);
+const field=guidance.useCard.fields.find(x=>x.label==='Typical unit');
+console.log(JSON.stringify({record_id:dataset.canonicalResult.record.record_id,title:dataset.canonicalResult.record.title,card_grain:dataset.grain,detail_typical_unit:field,input_unchanged:JSON.stringify(response)===before}));`;
+await fs.writeFile(path.join(out,'guidance-entry.ts'),source);
+const bundle=path.join(out,'guidance-baseline.mjs');
+await esbuild.build({stdin:{contents:source,resolveDir:repo,sourcefile:'controller-guidance-entry.ts',loader:'ts'},bundle:true,platform:'node',format:'esm',outfile:bundle,logLevel:'silent'});
+const child=spawnSync(process.execPath,[bundle],{cwd:repo,encoding:'utf8'});
+await fs.writeFile(path.join(out,'guidance.stdout'),child.stdout);await fs.writeFile(path.join(out,'guidance.stderr'),child.stderr);assert.equal(child.status,0,child.stderr);
+const guidance=JSON.parse(child.stdout);assert.equal(guidance.card_grain,'Observation grain unresolved');assert.equal(guidance.detail_typical_unit.evidenceState,'source_asserted');assert.equal(guidance.input_unchanged,true);
+const {createRetrievalEngine}=await import(pathToFileURL(path.join(repo,'packages/retrieval/tools/retrieval-core-v1.2.mjs')));
+const {StaticSearchBackend}=await import(pathToFileURL(path.join(repo,'packages/search/static-search-backend.mjs')));
+const {createStaticPublicationReadContext}=await import(pathToFileURL(path.join(repo,'packages/registry/publication-read-context.mjs')));
+const corpusDir=path.join(repo,'packages/retrieval/versions/v1.2.0/corpus');
+let record,sourcePath;
+for(const file of (await fs.readdir(corpusDir)).filter(x=>/^records-\d+\.jsonl$/.test(x)).sort()){
+ const lines=(await fs.readFile(path.join(corpusDir,file),'utf8')).trim().split(/\r?\n/);
+ record=lines.map(JSON.parse).find(x=>x.record_id==='obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17');
+ if(record){sourcePath=path.relative(repo,path.join(corpusDir,file));break;}
+}
+assert(record,'pinned Hospital Provider Cost Report record missing');
+const originalRecordHash=hash(JSON.stringify(record));const input=structuredClone(record);input.freshness_verification.next_review_due='2026-09-05T00:00:00Z';
+const inputHash=hash(JSON.stringify(input));
+const vocabulary=JSON.parse(await fs.readFile(path.join(repo,'packages/retrieval/versions/v1.1.0/fixtures/controlled-vocabulary.json'),'utf8'));
+const corpus={corpus_id:'controller-clock-regression-fixture',corpus_version:'1.2.0',published_at:'2026-09-03T00:00:00Z',manifest_sha256:null};
+const engine=createRetrievalEngine({records:[input],vocabulary,joinRoutes:[],corpus});
+const query={question:'Hospital Provider Cost Report',limit:5};
+const frozen=engine.retrieve(query);const advanced=engine.retrieve(query,{now:'2026-09-10T00:00:00Z'});
+assert.equal(frozen.results.length,1);assert.equal(advanced.results.length,1);
+assert.equal(frozen.results[0].metadata.freshness.freshness_state,'within_review_window');assert.equal(advanced.results[0].metadata.freshness.freshness_state,'overdue');
+const backend=new StaticSearchBackend({loadEngine:async()=>engine});
+const publication=createStaticPublicationReadContext(corpus);
+const request=new Request('https://ushso.example/api/discovery');
+const routed=await backend.searchAssets({publication,request,env:{},signal:request.signal,query,now:'2026-09-10T00:00:00Z'});
+assert.equal(routed.results[0].metadata.freshness.freshness_state,'within_review_window');assert.equal(hash(JSON.stringify(input)),inputHash);assert.equal(hash(JSON.stringify(record)),originalRecordHash);
+const receipt={format:'ushso.pr005-independent-baseline.v1',at:new Date().toISOString(),head,tree:git('rev-parse','HEAD^{tree}'),guidance,clock:{source_path:sourcePath,source_record_id:record.record_id,source_record_sha256:originalRecordHash,controlled_fixture_record_sha256:inputHash,controlled_changes:['deadline=2026-09-05','fixture corpus clock=2026-09-03'],frozen:frozen.results[0].metadata.freshness,explicit_advanced:advanced.results[0].metadata.freshness,backend_advanced_clock_dropped:routed.results[0].metadata.freshness,source_and_fixture_unchanged:true},script_sha256:hash(await fs.readFile(new URL(import.meta.url))),limitations:['Controlled regression observations, not fresh payload access or scientific fitness.','The fixture deadline and corpus clock are explicit controller inputs; original source observations were not changed.']};
+assert.equal(git('status','--porcelain'),'');await fs.writeFile(path.join(out,'receipt.json'),JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify({status:'baseline_defects_reproduced',head,guidance_state:guidance.detail_typical_unit.evidenceState,card_grain:guidance.card_grain,default_clock:frozen.results[0].metadata.freshness.freshness_state,explicit_clock:advanced.results[0].metadata.freshness.freshness_state,backend_clock:routed.results[0].metadata.freshness.freshness_state,receipt:path.join(out,'receipt.json')}));

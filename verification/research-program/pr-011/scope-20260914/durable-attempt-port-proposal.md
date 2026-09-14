@@ -1,0 +1,7 @@
+PR011 needs two additional ingestion paths: local-collector-adapter.mjs for strict replay and derived attempt views, and local-collection-store.mjs for one exact internal journal kind. Its existing http-outcomes test path can cover the real persistence behavior. The current store and journal remain the sole authority.
+
+The public evidence methods and fixture-observation context in proposal.json are proposed additions, not existing APIs. M010 currently admits only the catalog fixture and catalog_metadata, with one immutable attempt per child. Preserve that behavior. Keep catalog validation, documentation reachability, payload validation and browser/CORS evidence in separate subject/kind/origin series. Unsupported live kinds stay unavailable; retained Census/EPA observations remain historical and unresolved, never approved collection routes.
+
+Derive latest_attempt and last_good from validated durable records and intent order. Later failure updates latest_attempt while preserving same-kind last-good. Unknown delivery remains unresolved;304 preserves original capture provenance; late results cannot regress order or cross kinds. The proposal lists decisive process-restart, crash, semantic-tamper and cross-kind checks.
+
+This is scratch-only scope preparation. The actual joint accepted dependencies, separate PR011 continuation and exact two-path amendment remain prerequisites to implementation. No source, schema, plan, ledger, tests, jobs, network or production changes occurred.

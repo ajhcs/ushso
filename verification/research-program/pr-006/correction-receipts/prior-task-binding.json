@@ -1,0 +1,87 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr006-facets-isolation-20260911",
+  "pr_id": "PR-006",
+  "title": "Implement bounded facet availability, filtered fallback roundtrips and readable labels",
+  "owner": "/root/pr006_facet_contract_decision",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr006-facets-isolation-20260911",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr006-facets-isolation-20260911",
+  "objective": "Keep the frozen discovery result contract while making canonical facets honest and usable across live and accepted fixture paths, including unresolved values, narrowed/empty responses and captured labels absent from the current page.",
+  "outcome": "UI-only availability/reasons and count-free include-unknown controls are derived from current result scope; fixture filtering roundtrips locally; retrieval-core changes only existing facet label strings; frozen contracts and both reference engines remain byte-preserved.",
+  "dependencies": [
+    "PR-004",
+    "PR-005"
+  ],
+  "owned_paths": [
+    "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+    "packages/retrieval/tests/lexical-index.test.mjs",
+    "tests/direct-base-regression.test.mjs",
+    "tests/research-program/isolation-and-facets.test.mjs",
+    "apps/web/src/data/facets.ts",
+    "apps/web/src/data/facets.test.ts",
+    "apps/web/src/pages/SearchResultsPage.tsx",
+    "apps/web/src/pages/SearchResultsPage.test.tsx",
+    "apps/web/src/pages/SourcesPage.tsx",
+    "apps/web/src/pages/SourcesPage.test.tsx",
+    "apps/web/src/components/FacetSidebar.tsx",
+    "apps/web/src/components/FacetSidebar.test.tsx",
+    "apps/web/src/types/catalog.ts",
+    "apps/web/src/providers/discoveryProvider.ts",
+    "apps/web/src/providers/discoveryProvider.test.ts",
+    "verification/research-program/pr-006/",
+    "docs/research-program/handoffs/PR-006.json"
+  ],
+  "commits": [
+    {
+      "id": "C-006-1",
+      "subject": "Preserve isolated catalog record accounting",
+      "instructions": "Reconcile the accepted 3434 corpus denominator, 3430 searchable rows and exact four CDC records with typed partial results without changing source bytes or schema pins.",
+      "verification": "The isolation regression reports the exact baseline counts, IDs, hashes and partial response."
+    },
+    {
+      "id": "C-006-2",
+      "subject": "Bound facet availability to current results",
+      "instructions": "Project the five canonical dimensions into shared UI facets, preserve selected/removable controls through narrowed and empty responses, expose scoped availability reasons and apply canonical filters in the fixture provider without changing the frozen response schema.",
+      "verification": "Focused web tests cover unknown-only/uniform states, no-count absent controls, selected removal, same-dimension OR, cross-dimension AND and fixture filtering."
+    },
+    {
+      "id": "C-006-3",
+      "subject": "Add facet labels and fixture roundtrip evidence",
+      "instructions": "Resolve existing live facet option label strings from complete matching records, isolate intentional label differences in both reference comparisons and record the complete producer handoff.",
+      "verification": "Retrieval parity and isolation tests pass; C0063 proves page-absent captured labels and unchanged non-label response fields; full web and retrieval suites pass."
+    }
+  ],
+  "check_commands": [
+    "node --test packages/retrieval/tests/lexical-index.test.mjs",
+    "node --test tests/direct-base-regression.test.mjs",
+    "node --test tests/research-program/isolation-and-facets.test.mjs",
+    "npm run test:web",
+    "npm run test:retrieval",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-006.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-006/",
+  "binding": {
+    "base_sha": "c58787297fc543b3fdd31736e1c96ed1af29ffd8",
+    "base_tree": "caab4b676bbeed085e087d63523317edccdd69ac",
+    "dependency_merge_shas": {
+      "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+      "PR-005": "4fa2e0b5c8ee210cff9750a59e69df4b4a527fdc"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "producer_checked"
+}

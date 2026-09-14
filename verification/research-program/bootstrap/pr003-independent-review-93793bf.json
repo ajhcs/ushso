@@ -1,0 +1,189 @@
+{
+  "format": "ushso.pr003.c1-c2-independent-review.v1",
+  "reviewed_at": "2026-09-10T22:32:59.427Z",
+  "verdict": "changes_requested",
+  "scope": {
+    "candidate_sha": "93793bf8266c4977e8e108c456f269a8fec086b6",
+    "candidate_tree": "7ad1f62a4087ef6aa8a1024493d6806ad9312ad0",
+    "candidate_parent": "601072e92a76623438313cdaa20f8bc1c66e929c",
+    "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+    "base_tree": "e2b9df441f1109187909d9ec2aeef7d8c7ca7bbf",
+    "repository": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr003-deepseek-20260910t220020z",
+    "review_mode": "immutable git-show snapshots plus isolated scratch replay; live producer worktree was not edited"
+  },
+  "reviewed_contract": {
+    "packet": "docs/master-plan/2026-09-10/prs/PR-003.md at e5c44249b9d2448df2e4b6d466077658e42a009d",
+    "schemas": [
+      "docs/research-program/handoffs/schema/task.schema.json",
+      "docs/research-program/handoffs/schema/handoff.schema.json"
+    ],
+    "checker": "scripts/research-program/check-handoff.mjs",
+    "focused_tests": "tests/research-program/handoff.test.mjs",
+    "c1_checker": "verification/research-program/pr-003/verify-schema-contract.mjs"
+  },
+  "positive_and_integrity_checks": [
+    {
+      "id": "candidate_graph",
+      "command": "git show -s --format='%H %T %P' 93793bf8266c4977e8e108c456f269a8fec086b6",
+      "exit_code": 0,
+      "actual": "candidate 93793bf8266c4977e8e108c456f269a8fec086b6 tree 7ad1f62a4087ef6aa8a1024493d6806ad9312ad0 parent 601072e92a76623438313cdaa20f8bc1c66e929c"
+    },
+    {
+      "id": "candidate_artifact_hashes",
+      "command": "python3 hash-audit.py",
+      "exit_code": 0,
+      "actual": "48/48 candidate artifact, receipt, fixture, source-identity and dependency-ancestry checks passed; c003-1 and c003-2 index hashes match candidate bytes"
+    },
+    {
+      "id": "c1_schema_contract",
+      "command": "node verification/research-program/pr-003/verify-schema-contract.mjs in an isolated candidate-937 sandbox",
+      "exit_code": 0,
+      "actual": "ok=true; task binding valid, one valid packet accepted, and the three C1 rejection fixtures rejected"
+    },
+    {
+      "id": "historical_handoff_preservation",
+      "command": "git diff --quiet e5c44249b9d2448df2e4b6d466077658e42a009d 93793bf8266c4977e8e108c456f269a8fec086b6 -- docs/research-program/handoffs/PR-001.json docs/research-program/handoffs/PR-002.json",
+      "exit_code": 0,
+      "actual": "PR-001.json and PR-002.json are unchanged by the candidate"
+    },
+    {
+      "id": "producer_focused_receipt",
+      "source": "verification/research-program/pr-003/command-receipts/cmd-c003-2-focused-suite.json",
+      "recorded_exit_code": 0,
+      "recorded_actual": "9 tests passed according to the producer receipt; this independent review did not overwrite that receipt"
+    }
+  ],
+  "adversarial_replay": {
+    "artifact": "adversarial-results.json",
+    "command": "node run-adversarial.mjs against isolated candidate-937 sandbox",
+    "exit_code": 0,
+    "cases": 10,
+    "expected_rejection_cases_accepted": [
+      "success_with_nonzero_exit",
+      "empty_evidence_arrays",
+      "root_level_source_hash_wrong",
+      "source_symlink_outside",
+      "changed_file_symlink_outside",
+      "source_hash_omitted",
+      "duplicate_command_id_conflicting",
+      "unbound_command_event_source",
+      "unknown_status_and_null_owner",
+      "base_without_sibling_task_binding"
+    ],
+    "interpretation": "These are contract probes against the candidate implementation, not claims about production data or independent scientific acceptance."
+  },
+  "findings": [
+    {
+      "id": "PR003-C1C2-IR-001",
+      "severity": "high",
+      "status": "changes_requested",
+      "title": "A success claim accepts a command with a nonzero or failed result",
+      "locations": [
+        "docs/research-program/handoffs/schema/handoff.schema.json:L137-L152",
+        "scripts/research-program/check-handoff.mjs:L535-L564",
+        "verification/research-program/pr-003/verify-schema-contract.mjs:L107-L128"
+      ],
+      "evidence": "The schema requires only a non-empty command result; exit_code, completion_status, timestamps and expected/actual are optional. Both validators only test that command.result is non-empty. In the adversarial success_with_nonzero_exit case, exit_code=1 and completion_status=failed still returned ok=true/outcome=accepted.",
+      "impact": "A producer_checked or passed acceptance result can be backed by an actually failed command.",
+      "recommendation": "For success states require exit_code=0 when numeric, or an explicit recognized success completion status when no numeric exit exists; reject conflicts and add a negative fixture. Require actual command timing and expected/actual evidence for completed checks."
+    },
+    {
+      "id": "PR003-C1C2-IR-002",
+      "severity": "high",
+      "status": "changes_requested",
+      "title": "Repository source identity hashing has incomplete locality and symlink enforcement",
+      "locations": [
+        "docs/research-program/handoffs/schema/handoff.schema.json:L126-L135",
+        "scripts/research-program/check-handoff.mjs:L447-L503"
+      ],
+      "evidence": "The checker skips any source identity without sha256 (L452-L453), classifies only IDs containing '/' or starting '.' as repository paths (L454-L460), and hashes a contained lexical path without realpath containment (L464-L475). A root-level root-source.txt with a wrong SHA, an omitted SHA, and a repository symlink to an outside file all returned ok=true in the adversarial replay.",
+      "impact": "Invalid or absent source evidence can be accepted, and an outside file can satisfy a repository-path identity through a symlink.",
+      "recommendation": "Make local versus external source identity explicit, require SHA and resolved containment for every local path, and reject outside symlink targets. Add root-level, omitted-hash and symlink negative fixtures."
+    },
+    {
+      "id": "PR003-C1C2-IR-003",
+      "severity": "high",
+      "status": "changes_requested",
+      "title": "Changed-file containment is lexical only",
+      "locations": [
+        "scripts/research-program/check-handoff.mjs:L505-L526"
+      ],
+      "evidence": "evaluateChangedFiles calls resolveContainedPath and then existsAsFile, but never realpath-checks the result. A changed_files entry pointing to a symlink outside the repository returned ok=true and changed_file_containment=passed.",
+      "impact": "The implementation contradicts its own header claim of lexical and symlink-resolved containment and allows an outside path to be presented as a changed repository file.",
+      "recommendation": "Resolve each changed path and enforce realRoot containment before accepting it; retain a separate typed deletion outcome for genuinely absent paths."
+    },
+    {
+      "id": "PR003-C1C2-IR-004",
+      "severity": "high",
+      "status": "changes_requested",
+      "title": "A completed handoff with no evidence arrays is accepted",
+      "locations": [
+        "docs/research-program/handoffs/schema/handoff.schema.json:L33-L89",
+        "scripts/research-program/check-handoff.mjs:L535-L593"
+      ],
+      "evidence": "commands, artifacts, acceptance_results, changed_files, commits and source_identities have no minItems requirements, and status is only a non-empty string. The empty_evidence_arrays case set all evidence arrays empty while retaining status producer_checked; checker returned ok=true with no findings. unknown_status_and_null_owner also returned ok=true because status is unconstrained and owner is nullable.",
+      "impact": "A packet can advertise a completed producer state without a command, acceptance result, artifact or attributable owner.",
+      "recommendation": "Constrain handoff status to the protocol state enum, require a non-null owner for producer states, and impose status-specific minimum evidence (at least acceptance/command/artifact records for success claims). Preserve explicit blocked/unresolved packets with required reasons."
+    },
+    {
+      "id": "PR003-C1C2-IR-005",
+      "severity": "medium",
+      "status": "changes_requested",
+      "title": "Duplicate IDs and command event_source are not bound",
+      "locations": [
+        "docs/research-program/handoffs/schema/handoff.schema.json:L63-L70",
+        "docs/research-program/handoffs/schema/handoff.schema.json:L137-L153",
+        "scripts/research-program/check-handoff.mjs:L530-L531",
+        "scripts/research-program/check-handoff.mjs:L579-L592"
+      ],
+      "evidence": "The schemas do not require unique command or artifact IDs. The checker converts both arrays to Maps, silently keeping the last duplicate. A duplicate conflicting command ID and a command event_source object pointing to a nonexistent artifact both returned ok=true; event_source is never cross-referenced or hashed.",
+      "impact": "A command or artifact reference can become ambiguous, and an embedded command evidence pointer can be fabricated without resolution.",
+      "recommendation": "Reject duplicate IDs before Map construction and either resolve event_source against artifacts or remove the unused field. Add conflicting-duplicate and unbound-event-source fixtures."
+    },
+    {
+      "id": "PR003-C1C2-IR-006",
+      "severity": "high",
+      "status": "changes_requested",
+      "title": "Ledger fallback leaves the handoff base SHA unbound",
+      "locations": [
+        "scripts/research-program/check-handoff.mjs:L348-L368",
+        "scripts/research-program/check-handoff.mjs:L639-L659",
+        "docs/research-program/execution-ledger.json:L417-L427 at candidate"
+      ],
+      "evidence": "When no sibling task-binding exists, resolveAuthorities falls back to ledger dependency SHAs with effective.base_sha=null. evaluateDependencyBinding then marks base_sha_binding not_applicable and only checks that the claimed base is a local commit with dependency ancestry. Moving the valid packet outside its sibling task-binding directory and changing base_sha from e5c44249 to local commit 601072e9 returned ok=true.",
+      "impact": "A new handoff can claim an arbitrary local base while still passing dependency checks, undermining exact base/dependency binding."
+      ,"recommendation": "Require a sibling task binding for post-schema handoffs, or add and compare an exact base SHA in the authoritative ledger. Retain an explicit historical compatibility path for PR001/PR002 rather than silently weakening new packets."
+    },
+    {
+      "id": "PR003-C1C2-IR-007",
+      "severity": "medium",
+      "status": "changes_requested",
+      "title": "Command timing, exits and expected/actual observations are optional",
+      "locations": [
+        "docs/research-program/handoffs/schema/handoff.schema.json:L137-L153",
+        "verification/research-program/pr-003/fixtures/handoff.valid.json:command cmd-c003-1-verify-schema-contract"
+      ],
+      "evidence": "The handoff schema permits started_at and completed_at to be null or omitted, and exit_code, completion_status, expected and actual to be omitted. The valid C1 handoff fixture uses null timestamps even though the protocol requires retained command timing and exit evidence; separate producer receipts carry timing.",
+      "impact": "The handoff itself can omit the evidence needed to audit when and how its acceptance claim was produced.",
+      "recommendation": "Require timestamps and expected/actual fields for executed commands, and require either numeric exit_code or an explicit typed completion status. Permit null only for documented provider cases with a durable external event source."
+    }
+  ],
+  "compatibility_and_limits": {
+    "historical_handoffs": "PR001.json and PR002.json were not modified. Their pre-existing extra fields are intentionally outside this new schema; no retroactive rewrite or acceptance claim was made.",
+    "c2_receipt_head": "c003-2-evidence-index.json records head_sha_at_validation=601072e92a76623438313cdaa20f8bc1c66e929c, the C1 parent, while candidate C2 files are committed in 93793bf. Producer receipts are preserved; final review should bind/replay the immutable 937 tree.",
+    "focused_test_limit": "Running node --test in the isolated scratch sandbox reached 8/9 assertions but its CLI child-process test failed with spawnSync EPERM from the sandbox. The producer receipt records 9/9; this environmental failure is retained and not assigned as a code defect.",
+    "scope_exclusions": [
+      "No live worktree edits or commands that mutate it",
+      "No provider/network calls",
+      "No private evaluator or cohort-input reads",
+      "No C3 review; C3 handoff/test integration remains outside this C1/C2 review"
+    ]
+  },
+  "artifacts": {
+    "receipt": "independent-review-receipt.json",
+    "adversarial": "adversarial-results.json",
+    "hash_audit": "hash-audit.json",
+    "candidate_diff": "candidate-diff-name-status.txt"
+  },
+  "sanitized": true
+}

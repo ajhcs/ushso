@@ -1,0 +1,105 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "pr007-reference-integrity-r4",
+  "pr_id": "PR-007",
+  "title": "Bind products to releases and distributions",
+  "owner": "Grok",
+  "reviewer": "Astra",
+  "branch": "codex/ce-ushso-pr007-grok-r4-2026-pr007-reference-integrit-bfaaaef7381e-4bb679e1",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ce-ushso-pr005-pr007-grok-2-grok-pr007-release-bindi-bc035ae77aee-709c2d6f-worktrees/.ce-ushso-pr007-grok-r2-2026-pr007-release-binding-r2-19a9a5334632-6a4e1dad-worktrees/.ce-ushso-pr007-grok-r3-2026-pr007-core-identity-r3-3c83dda64b73-db15c5c6-worktrees/ce-ushso-pr007-grok-r4-2026-pr007-reference-integrit-bfaaaef7381e-4bb679e1",
+  "objective": "Correct independently reproduced stale core fingerprints and inconsistent nested release/distribution product context relationships on PR007. Original logical base 15b351a92af729f9ba07359fd210123fdfd76bb3 and accepted dependency PR004 463f092f71c0ed1ef2aa5baa29b186e5697d04ce remain the PR provenance; continuation execution base is 03dda1e74d4fb30496329592fe4cc4b38084609a. Preserve C0071-3 and R2/R3 commits.",
+  "outcome": "Source-native identities can supply actual context IDs to clients.",
+  "dependencies": [
+    "PR-004"
+  ],
+  "owned_paths": [
+    "packages/identity/src/**",
+    "packages/identity/schemas/**",
+    "packages/registry/**",
+    "tests/research-program/release-binding.test.mjs",
+    "packages/identity/manifests/package-manifest.json",
+    "packages/identity/validation/validation-receipt.json",
+    "docs/research-program/handoffs/PR-007.json",
+    "verification/research-program/pr-007/**"
+  ],
+  "commits": [
+    {
+      "id": "C-007-1",
+      "subject": "Define release and distribution identity rules",
+      "instructions": "Reuse the existing source/release/distribution contracts; add publisher identifiers, locator, release/revision date roles and hash-scoped identity when a publisher supplies no stable release ID.",
+      "verification": "Fixtures cover rolling endpoints, a replacement file, multiple distributions and conflicting dates without merging them."
+    },
+    {
+      "id": "C-007-2",
+      "subject": "Resolve exact source relationships",
+      "instructions": "Implement deterministic binding from captured catalog/resources records to releases and distributions. Preserve ambiguous and unresolved alternatives with evidence pointers.",
+      "verification": "One-to-many publisher distributions remain distinct; an ambiguous URL never produces a fabricated exact binding."
+    },
+    {
+      "id": "C-007-3",
+      "subject": "Add generation identity mapping",
+      "instructions": "Publish one explicit map between human manifest identity, machine generation and dictionary/source revision. Reject inconsistent cross-generation references.",
+      "verification": "Human-to-machine source lookup returns the same product context; stale or mismatched pins yield typed restart guidance."
+    },
+    {
+      "id": "C-007-4-R2",
+      "subject": "Correct release identity, source binding, and generation map",
+      "instructions": "Correct independently reproduced identity, binding and generation defects. Refresh the current identity package seal from actual bytes. Preserve frozen contract pins and original three planned commits.",
+      "verification": "Independent semantics cases pass; npm run validate --prefix packages/identity matches current package bytes."
+    },
+    {
+      "id": "C-007-6-R3",
+      "subject": "Correct core ownership, envelope validation, and Unicode identity encoding",
+      "instructions": "Correct R007-6 through R007-8 across the public contract. Bind release/entity/asset/source ownership; reuse frozen core schemas; make qualified identity encoding unambiguous.",
+      "verification": "Independent 14-case semantics and extra v2 probe pass; npm run validate --prefix packages/identity matches current package bytes."
+    },
+    {
+      "id": "C-007-7-R3",
+      "subject": "Record PR007 core-identity correction evidence and handoff",
+      "instructions": "Retain initial and R2 failed and passing artifacts. Record R3 command receipts, extra probe replay, and producer handoff. Do not claim root acceptance.",
+      "verification": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-007.json"
+    },
+    {
+      "id": "C-007-8-R4",
+      "subject": "Correct stale core fingerprints and nested binding relationships",
+      "instructions": "Correct R007-9 and R007-10 across the public contract. Check actual canonical content fingerprints without rewriting provenance. Reject inconsistent nested release/distribution relationships before product context. Preserve unresolved, rolling, and one-to-many forms.",
+      "verification": "Independent 14-case, extra v3, and relationship probes pass; npm run validate --prefix packages/identity matches current package bytes."
+    },
+    {
+      "id": "C-007-9-R4",
+      "subject": "Record PR007 reference-integrity correction evidence and handoff",
+      "instructions": "Retain prior negative and positive artifacts, including the R3 relationship-probe failures and the v3 fingerprint fixture refinement. Record R4 command receipts and producer handoff. Do not claim root acceptance.",
+      "verification": "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-007.json"
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/release-binding.test.mjs",
+    "npm test --prefix packages/identity",
+    "npm run validate --prefix packages/identity",
+    "node verification/research-program/pr-007/verify.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-007.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-007/",
+  "binding": {
+    "base_sha": "15b351a92af729f9ba07359fd210123fdfd76bb3",
+    "base_tree": "c46c95ad838b78d4a26c86454be82f3835c49e51",
+    "dependency_merge_shas": {
+      "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "producer_checked"
+}

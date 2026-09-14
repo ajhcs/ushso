@@ -1,0 +1,70 @@
+{
+  "schema_version": "ushso.pr085.wp11-v1.3-runner-negative-fixtures.v1",
+  "runner": {
+    "path": "scripts/run-contract-suites.mjs",
+    "route": "wp11 / verification/wp11/v1.3.0 / @ushso/wp11-verification-v1.3.0@1.3.0 / node tools/verify.mjs --validate",
+    "test_only_override": "currentWp11AttestationVerifierPath and childTimeoutMs; omitted by CLI defaults"
+  },
+  "cases": [
+    {
+      "id": "future-wp11-v1.4-normal-strict",
+      "route": "normal executePackageScript",
+      "observed_test_child_exit_code": 0,
+      "observed_parsed_test_count": 1,
+      "observed_validate_child_exit_code": 17,
+      "observed_validate_status": "FAIL",
+      "observed_verification": null,
+      "observed_result_ok": false
+    },
+    {
+      "id": "wrong-package-normal-strict",
+      "route": "normal executePackageScript",
+      "observed_validate_child_exit_code": 19,
+      "observed_validate_status": "FAIL",
+      "observed_verification": null,
+      "observed_result_ok": false
+    },
+    {
+      "id": "altered-validate-command-normal-strict",
+      "route": "normal executePackageScript",
+      "observed_validate_child_exit_code": 23,
+      "observed_validate_status": "FAIL",
+      "observed_verification": null,
+      "observed_result_ok": false
+    },
+    {
+      "id": "nonmatching-path-normal-strict",
+      "route": "normal executePackageScript",
+      "observed_validate_child_exit_code": 29,
+      "observed_validate_status": "FAIL",
+      "observed_verification": null,
+      "observed_result_ok": false
+    },
+    {
+      "id": "current-wp11-child-error",
+      "route": "exact current route",
+      "observed_child_exit_code": 1,
+      "observed_validate_status": "FAIL",
+      "observed_result_ok": false
+    },
+    {
+      "id": "current-wp11-child-timeout",
+      "route": "exact current route",
+      "observed_signal": "SIGTERM",
+      "observed_validate_status": "FAIL",
+      "observed_result_ok": false
+    },
+    {
+      "id": "zero-test-child",
+      "route": "normal executePackageScript",
+      "observed_parsed_test_count": 0,
+      "observed_status": "FAIL",
+      "observed_result_ok": false
+    }
+  ],
+  "sealed_historical_files_unchanged": true,
+  "direct_validate_exit_code": 1,
+  "direct_validate_failure": "SUCCESSOR_APPROVAL_STALE_SUBJECT",
+  "direct_issue_nonzero": true,
+  "no_approval_artifact_written": true
+}

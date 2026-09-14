@@ -1,0 +1,138 @@
+{
+  "format": "ushso.pr003.integrity-independent-semantic-review.v1",
+  "head_sha": "dc7267bf1c872f1457fa927e2d0403051575f474",
+  "tree_sha": "25fc70a620c2bad2e1c932dcb55c8a16d3464c1c",
+  "reviewer": "root Astra",
+  "started_at": "2026-09-11T00:44:16.084148+00:00",
+  "completed_at": "2026-09-11T00:44:16.592285+00:00",
+  "exit_code": 1,
+  "module_schema_sha256": {
+    "scripts/research-program/check-handoff.mjs": "7588aa8b337496d24ca1cd00205256f03d28d3b290ba382156d3999272bb3e05",
+    "docs/research-program/handoffs/schema/handoff.schema.json": "fcc03794837731594a9172c902637b01b83b87376b198e02c4456e45ff7b2bfc",
+    "docs/research-program/handoffs/schema/task.schema.json": "538998cf577ee5806804865152f32b42688a0e5899265dcd0d6fc8d91f4c3d85"
+  },
+  "case_count": 9,
+  "cases": [
+    {
+      "label": "valid-control",
+      "expected_ok": true,
+      "actual_ok": false,
+      "passed": false,
+      "rules": [
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit"
+      ]
+    },
+    {
+      "label": "missing-command-outcome",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "schema_invalid",
+        "command_observed_outcome_missing",
+        "claimed_pass_without_command_result",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit"
+      ]
+    },
+    {
+      "label": "failed-command-success-claim",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "command_outcome_conflict",
+        "command_outcome_mismatch",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit"
+      ]
+    },
+    {
+      "label": "unknown-head",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit",
+        "head_sha_not_local_commit"
+      ]
+    },
+    {
+      "label": "missing-nested-receipt",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "artifact_missing_on_disk",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit"
+      ]
+    },
+    {
+      "label": "duplicate-command-id",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "duplicate_command_id",
+        "duplicate_artifact_id",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit"
+      ]
+    },
+    {
+      "label": "contradictory-completion-status",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "command_outcome_conflict",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit"
+      ]
+    },
+    {
+      "label": "invalid-command-clock",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "schema_invalid",
+        "schema_invalid",
+        "command_timestamp_invalid",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit"
+      ]
+    },
+    {
+      "label": "reversed-command-clocks",
+      "expected_ok": false,
+      "actual_ok": false,
+      "passed": true,
+      "rules": [
+        "command_timing_order_invalid",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit",
+        "source_git_path_missing_at_commit"
+      ]
+    }
+  ],
+  "script_sha256": "20c0b20af5cacea98449c7cb6c5791c76933f6fe53fdcc64adb451945cef4ae0",
+  "stdout_sha256": "59ccc6ea9ff70c2c7546485ae9be88164f5ba73b7c851fcea345855055439af6",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "scope": "Exact committed module/schema and copied referenced fixtures. Local read-only Git queries use existing worktree Git directory; no repository or Git metadata was mutated.",
+  "status": "changes_requested",
+  "limitations": [
+    "Not a final-head or full-suite acceptance. Producer may add subsequent correction commits."
+  ]
+}

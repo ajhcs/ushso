@@ -1,0 +1,74 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr036-join-evidence-20260914",
+  "slice_id": "C-036-1",
+  "pr_id": "PR-036",
+  "title": "Validate and publish priority join routes",
+  "owner": "/root/pr036_join_evidence",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr036-join-evidence-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr036-join-evidence-20260914",
+  "objective": "At least fifteen intended joins have inspectable compatibility evidence.",
+  "outcome": "Join validation fixtures record input counts, eligible key counts, uniqueness, nulls, mapping multiplicity and expected outputs, including one valid and one incompatible temporal/universe case. Fixtures detect row multiplication, leading-zero loss and unmatched rows rather than just successful SQL execution. Scoped linkage metrics separate sampled checks from full-release checks. No route reports a universal match rate from a tiny sample. Incompatible contexts remain blocked. Machine/UI consumers receive identical compatibility and limits. HCRIS-to-NPPES cannot claim CCN=NPI. R08 remains incomplete if fewer than fifteen routes are qualified. Sealed packages/identity/src/join-routes.mjs is not edited.",
+  "dependencies": [
+    "PR-032",
+    "PR-035"
+  ],
+  "owned_paths": [
+    "packages/enrichment/join-evidence.mjs",
+    "evaluation/research-program/joins/",
+    "tests/research-program/join-evidence.test.mjs",
+    "docs/research-program/join-evidence.md",
+    "verification/research-program/pr-036/",
+    "docs/research-program/handoffs/PR-036.json"
+  ],
+  "commits": [
+    {
+      "id": "C-036-1",
+      "subject": "Build join validation fixtures",
+      "instructions": "For each selected route, record input counts, eligible key counts, uniqueness, nulls, mapping multiplicity and expected outputs. Include one valid and one incompatible temporal/universe case.",
+      "verification": "Fixtures detect row multiplication, leading-zero loss and unmatched rows rather than just successful SQL execution."
+    },
+    {
+      "id": "C-036-2",
+      "subject": "Compute scoped linkage metrics",
+      "instructions": "Report matched/unmatched denominators, join expansion and exclusion reasons. Separate sampled checks from full-release checks and preserve evidence hashes.",
+      "verification": "No route reports a universal match rate from a tiny sample; incompatible contexts remain blocked."
+    },
+    {
+      "id": "C-036-3",
+      "subject": "Publish qualified routes and caveats",
+      "instructions": "Promote reviewed route metadata through the same generation and expose direct/two-hop paths only where supported. Recheck all fifteen priority routes.",
+      "verification": "Machine/UI consumers receive identical compatibility and limits; HCRIS-to-NPPES cannot claim CCN=NPI."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/join-evidence.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-036.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-036/",
+  "binding": {
+    "base_sha": "25881f8b9a2f4a5bad804cf51835a4eec6abb219",
+    "base_tree": "df977383edcff6e1a19fe2fac7a8da27b3e94109",
+    "dependency_merge_shas": {
+      "PR-032": "6fe431f855c2bb65c97cdb0526ef8ed54ea6a74a",
+      "PR-035": "33b1167894a6a6db2c7de0a3db03479c3d262417"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

@@ -1,0 +1,111 @@
+{
+  "format": "ushso.restricted-route-registry.v1",
+  "generation": "live-2026-09-03-85b50522b420",
+  "families": [
+    {
+      "family_id": "ahrq-hcup",
+      "named_source_id": "ahrq-hcup",
+      "discovery_question": "Find HCUP",
+      "official_documentation": "https://hcup-us.ahrq.gov/databases.jsp",
+      "payload_access": "restricted",
+      "terms_inferred": false,
+      "products": [
+        {
+          "product_id": "hcup-nis",
+          "access_class": "central_distributor",
+          "catalog_access": "not_indexed",
+          "license_access": "dua_required",
+          "payload_access": "restricted",
+          "fee": "unknown",
+          "eligibility": "unknown"
+        }
+      ],
+      "workflow": [
+        {
+          "id": "hcup-read-docs",
+          "action": "Open HCUP databases documentation and identify the exact database product.",
+          "citation": "https://hcup-us.ahrq.gov/databases.jsp",
+          "official_url": "https://hcup-us.ahrq.gov/databases.jsp",
+          "expected_artifact": "product_identity",
+          "turnaround": "unknown",
+          "fee": "unknown",
+          "eligibility": "unknown",
+          "collects_eligibility_or_credentials": false
+        }
+      ]
+    },
+    {
+      "family_id": "ahrq-meps",
+      "named_source_id": "ahrq-meps",
+      "discovery_question": "Find MEPS public use files",
+      "official_documentation": "https://meps.ahrq.gov/mepsweb/data_stats/download_data_files.jsp",
+      "payload_access": "mixed",
+      "terms_inferred": false,
+      "products": [
+        {
+          "product_id": "meps-puf",
+          "access_class": "public_use_file",
+          "catalog_access": "not_indexed",
+          "license_access": "public_use",
+          "payload_access": "public_download",
+          "fee": "none_documented",
+          "eligibility": "public"
+        },
+        {
+          "product_id": "meps-restricted",
+          "access_class": "restricted_research_files",
+          "catalog_access": "not_indexed",
+          "license_access": "data_use_agreement",
+          "payload_access": "restricted",
+          "fee": "unknown",
+          "eligibility": "unknown"
+        }
+      ],
+      "workflow": [
+        {
+          "id": "meps-choose-product",
+          "action": "Distinguish public-use files from restricted MEPS products before requesting access.",
+          "citation": "https://meps.ahrq.gov/mepsweb/data_stats/download_data_files.jsp",
+          "official_url": "https://meps.ahrq.gov/mepsweb/data_stats/download_data_files.jsp",
+          "expected_artifact": "product_class",
+          "turnaround": "unknown",
+          "fee": "unknown",
+          "eligibility": "unknown",
+          "collects_eligibility_or_credentials": false
+        }
+      ]
+    },
+    {
+      "family_id": "aha-annual-survey",
+      "named_source_id": "aha-annual-survey",
+      "discovery_question": "AHA Annual Survey",
+      "official_documentation": "https://www.ahadata.com/aha-annual-survey-database",
+      "payload_access": "paid",
+      "terms_inferred": false,
+      "products": [
+        {
+          "product_id": "aha-annual-survey-database",
+          "access_class": "paid_or_restricted",
+          "catalog_access": "not_indexed",
+          "license_access": "unknown",
+          "payload_access": "paid",
+          "fee": "unknown",
+          "eligibility": "unknown"
+        }
+      ],
+      "workflow": [
+        {
+          "id": "aha-read-vendor-page",
+          "action": "Open the AHA Annual Survey Database documentation. Do not infer license, fee, or eligibility terms.",
+          "citation": "https://www.ahadata.com/aha-annual-survey-database",
+          "official_url": "https://www.ahadata.com/aha-annual-survey-database",
+          "expected_artifact": "vendor_documentation",
+          "turnaround": "unknown",
+          "fee": "unknown",
+          "eligibility": "unknown",
+          "collects_eligibility_or_credentials": false
+        }
+      ]
+    }
+  ]
+}

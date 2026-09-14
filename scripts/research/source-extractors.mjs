@@ -1,3 +1,4 @@
+import { createVariableContext, createVariableIdentity, createVariableProvenance } from '../../packages/identity/src/index.mjs';
 import {createHash} from 'node:crypto';
 import {isDeepStrictEqual} from 'node:util';
 export const hash = value => createHash('sha256').update(value).digest('hex');
@@ -138,4 +139,500 @@ export function verifyClaim(claim,captures,record,generation) {
   const permitted=extractRecord(record,{metadata,variables,geography},generation).claims;
   if(!permitted.some(c=>isDeepStrictEqual(c,claim)))throw Error('CLAIM_SCOPE_OR_IDENTITY');
   return true;
+}
+
+export const VERSIONED_VARIABLE_TRANSFORMATIONS = Object.freeze({
+  cdc: Object.freeze({ name: 'cdc_variable_identity', version: '1.0.0' }),
+  census: Object.freeze({ name: 'census_variable_identity', version: '1.0.0' }),
+  cms: Object.freeze({ name: 'cms_variable_identity', version: '1.0.0' }),
+});
+const VERSIONED_TRANSFORMATION_KINDS = Object.freeze(Object.fromEntries(Object.entries(VERSIONED_VARIABLE_TRANSFORMATIONS).map(([kind, transformation]) => [transformation.name, kind])));
+
+function versionedKind(kind) {
+  const value = String(kind ?? '').toLowerCase();
+  if (value === 'cdc' || value === 'cdc-socrata') return 'cdc';
+  if (value === 'census' || value === 'census-api') return 'census';
+  if (value === 'cms' || value === 'cms-data-catalog') return 'cms';
+  throw Error('UNSUPPORTED_VERSIONED_VARIABLE_KIND');
+}
+
+function requireVersionedCapture(capture, { requireBytes = false } = {}) {
+  if (!object(capture) || !text(capture.url) || !/^[a-f0-9]{64}$/.test(capture.sha256 ?? '')) throw Error('VARIABLE_CAPTURE_REQUIRED');
+  if (capture.status !== 'captured') throw Error('VARIABLE_CAPTURE_NOT_SUCCESSFUL');
+  if (capture.data === undefined) throw Error('VARIABLE_CAPTURE_DATA_REQUIRED');
+  if (requireBytes && typeof capture.text !== 'string') throw Error('VARIABLE_CAPTURE_BYTES_REQUIRED');
+  return capture;
+}
+
+function versionedEvidenceIds(capture, options = {}) {
+  const supplied = Array.isArray(options.evidence_ids) ? options.evidence_ids : [];
+  const fromCapture = typeof capture.evidence_id === 'string' ? [capture.evidence_id] : [];
+  const fallback = supplied.length || fromCapture.length ? [] : [`evidence:variable-capture:${capture.sha256.slice(0, 24)}`];
+  return [...new Set([...supplied, ...fromCapture, ...fallback])].sort((left, right) => left.localeCompare(right));
+}
+
+function versionedEntries(value, kind) {
+  if (kind === 'cdc') {
+    if (!Array.isArray(value)) {
+      if (object(value) && Array.isArray(value.columns)) value = value.columns;
+      else throw Error('MALFORMED_VERSIONED_COLUMNS');
+    }
+    return value.map((entry, index) => ({ entry, pointer: `/columns/${index}` })).filter(({ entry }) => object(entry) && typeof entry.fieldName === 'string' && entry.fieldName.length > 0 && !entry.fieldName.startsWith(':'));
+  }
+  if (kind === 'census') {
+    if (object(value) && object(value.variables)) value = value.variables;
+    if (!object(value)) throw Error('MALFORMED_VERSIONED_VARIABLES');
+    return Object.entries(value).filter(([, entry]) => object(entry)).map(([name, entry]) => ({ entry: { ...entry, __wire_name: name }, pointer: `/variables/${escape(name)}` }));
+  }
+  if (object(value) && Array.isArray(value.variables)) {
+    return value.variables.map((entry, index) => ({ entry, pointer: `/variables/${index}` })).filter(({ entry }) => object(entry));
+  }
+  if (Array.isArray(value)) return value.map((entry, index) => ({ entry, pointer: `/variables/${index}` })).filter(({ entry }) => object(entry));
+  throw Error('MALFORMED_VERSIONED_CMS_VARIABLES');
+}
+
+function literalCodeInput(raw) {
+  if (raw === undefined || raw === null) return undefined;
+  if (object(raw) && Object.hasOwn(raw, 'item')) raw = raw.item;
+  if (Array.isArray(raw)) {
+    const values = raw.map((entry) => {
+      if (typeof entry === 'string') return entry;
+      if (typeof entry === 'number' || typeof entry === 'boolean') return String(entry);
+      if (object(entry) && typeof entry.code !== 'undefined') return { code: String(entry.code), label: entry.label ?? null };
+      return entry;
+    });
+    return values.length ? values : undefined;
+  }
+  if (object(raw)) return Object.keys(raw).length ? raw : undefined;
+  return undefined;
+}
+
+function fieldType(entry, kind) {
+  return text(entry.dataTypeName) ?? text(entry.predicateType) ?? text(entry.publisher_type) ?? text(entry.data_type) ?? text(entry.publisher_format) ?? (kind === 'cms' ? text(entry.type) : null);
+}
+
+function fieldWireName(entry, kind) {
+  if (Object.hasOwn(entry, 'wire_name')) return entry.wire_name;
+  if (kind === 'cdc') return entry.fieldName ?? null;
+  if (kind === 'census') return entry.__wire_name ?? null;
+  // CMS parser names are documented layout names, not independently verified payload wire names.
+  // An exact or reviewed-alias CMS mapping requires separately supplied wire-name evidence
+  // (an explicit wire_name field together with an explicit mapping). Until then wire stays null.
+  return null;
+}
+
+function fieldDocumentedName(entry, wireName, kind) {
+  if (entry.documented_name !== undefined && entry.documented_name !== null) return entry.documented_name;
+  // Preserve CMS parser names as documented names even though they are not wire names.
+  // CDC/Census keep their native-key behavior: documented falls back to the wire name first.
+  if (kind === 'cms') {
+    const cmsDocumented = entry.name ?? entry.variable_name;
+    if (typeof cmsDocumented === 'string' && cmsDocumented.length > 0) return cmsDocumented;
+  }
+  return wireName ?? entry.label ?? entry.term_name ?? null;
+}
+
+function fieldLabel(entry) {
+  return entry.label ?? entry.name ?? entry.term_name ?? entry.termName ?? null;
+}
+
+function fieldDefinition(entry) {
+  return entry.definition ?? entry.description ?? entry.publisher_definition ?? null;
+}
+
+function fieldCodes(entry, kind) {
+  if (kind === 'census' && object(entry.values) && Object.hasOwn(entry.values, 'item')) return entry.values.item;
+  return entry.code_values ?? entry.allowed_values ?? entry.values ?? null;
+}
+
+function fieldObservedType(entry, options, index, evidenceIds) {
+  const supplied = typeof options.observedTypeFor === 'function' ? options.observedTypeFor(entry, index) : entry.observed_type ?? entry.observedType;
+  if (object(supplied)) return { ...supplied, evidence_ids: supplied.evidence_ids ?? options.evidence_ids ?? evidenceIds };
+  if (typeof supplied === 'string' && supplied.length > 0) return { state: 'observed', value: supplied, evidence_ids: options.evidence_ids ?? evidenceIds };
+  return { state: 'unknown', value: null, evidence_ids: [] };
+}
+
+function fieldUnit(entry, options, index, evidenceIds) {
+  const supplied = typeof options.unitFor === 'function' ? options.unitFor(entry, index) : entry.unit ?? entry.measurement_unit;
+  if (object(supplied)) return { ...supplied, evidence_ids: supplied.evidence_ids ?? evidenceIds };
+  if (typeof supplied === 'string' && supplied.length > 0) return { state: 'documented', value: supplied, evidence_ids: evidenceIds };
+  if (entry.unit_state) return { state: entry.unit_state, value: entry.unit_value ?? null, rationale: entry.unit_rationale ?? null, evidence_ids: evidenceIds };
+  return { state: 'unknown', value: null, evidence_ids: [] };
+}
+
+function fieldMapping(entry, options, index, wireName, documentedName) {
+  const supplied = typeof options.mappingFor === 'function' ? options.mappingFor(entry, index, wireName) : entry.mapping;
+  if (supplied) return supplied;
+  if (wireName === null) return { state: 'unmatched', documented_name: documentedName, wire_name: null, candidate_wire_names: [], evidence_ids: [] };
+  if (documentedName !== wireName) throw Error('VERSIONED_VARIABLE_MAPPING_REQUIRED');
+  return { state: 'exact', documented_name: wireName, wire_name: wireName, candidate_wire_names: [], evidence_ids: [] };
+}
+
+function fieldContext(options, entry, index) {
+  const supplied = typeof options.contextFor === 'function' ? options.contextFor(entry, index) : options.context_binding ?? options.context;
+  if (supplied) return supplied;
+  return { state: 'unresolved', binding_state: 'unresolved', reason: 'release, distribution and schema binding were not supplied with this dictionary capture' };
+}
+
+function fieldLimitations(entry, kind, source) {
+  const limitations = ['Literal publisher documentation does not certify payload schema, release continuity, measurement units, join compatibility or scientific fitness.'];
+  if (kind === 'cms' && (source.status === 'partial' || source.unparsed_pages?.length || entry.continuation_pending)) limitations.push('CMS parser output is partial; continuation or unparsed pages remain unresolved.');
+  if (entry.eligible_for_schema_promotion === false) limitations.push('The source parser marks this row ineligible for schema promotion pending review.');
+  return limitations;
+}
+
+function cmsSuppliedMapping(entry, options, index, wireName) {
+  const supplied = typeof options.mappingFor === 'function' ? options.mappingFor(entry, index, wireName) : entry.mapping;
+  return supplied ?? null;
+}
+
+function cmsMappingEvidenceIds(supplied) {
+  if (!supplied || !Array.isArray(supplied.evidence_ids)) return [];
+  return supplied.evidence_ids.filter((id) => typeof id === 'string' && id.length > 0);
+}
+
+function variableIdentityFromEntry(entry, kind, index, pointer, capture, options, evidenceIds) {
+  let wireName = fieldWireName(entry, kind);
+  const documentedName = fieldDocumentedName(entry, wireName, kind);
+  let mapping = fieldMapping(entry, options, index, wireName, documentedName);
+  // CMS exact/reviewed-alias mappings require an explicit mapping object with
+  // non-empty mapping evidence plus an explicit wire_name field. Wire spelling
+  // alone (derived exact with empty evidence) stays unresolved.
+  if (kind === 'cms' && (mapping.state === 'exact' || mapping.state === 'reviewed_alias')) {
+    const supplied = cmsSuppliedMapping(entry, options, index, wireName);
+    const hasExplicitWire = Object.hasOwn(entry, 'wire_name') && typeof entry.wire_name === 'string' && entry.wire_name.length > 0;
+    const hasEvidence = cmsMappingEvidenceIds(supplied).length > 0 && cmsMappingEvidenceIds(mapping).length > 0;
+    if (supplied === null || !hasExplicitWire || !hasEvidence) {
+      wireName = null;
+      mapping = { state: 'unmatched', documented_name: documentedName, wire_name: null, candidate_wire_names: [], evidence_ids: [] };
+    }
+  }
+  if ((typeof wireName !== 'string' || wireName.length === 0) && (typeof documentedName !== 'string' || documentedName.length === 0)) throw Error('VERSIONED_VARIABLE_NAME_MISSING');
+  const transformation = VERSIONED_VARIABLE_TRANSFORMATIONS[kind];
+  const rawEntry = kind === 'census' ? Object.fromEntries(Object.entries(entry).filter(([key]) => key !== '__wire_name')) : entry;
+  const sourceTypeValue = fieldType(entry, kind);
+  const sourceType = sourceTypeValue ? { state: 'documented', value: sourceTypeValue, evidence_ids: evidenceIds } : { state: 'unknown', value: null, evidence_ids: [] };
+  const observedType = fieldObservedType(entry, options, index, evidenceIds);
+  const context = fieldContext(options, entry, index);
+  const publisherConcept = entry.concept ?? entry.publisher_concept ?? null;
+  const definition = fieldDefinition(entry);
+  const provenance = createVariableProvenance({
+    capture,
+    pointer,
+    raw: rawEntry,
+    transformation,
+    evidence_ids: evidenceIds,
+  });
+  return createVariableIdentity({
+    context_binding: context,
+    wire_name: wireName,
+    documented_name: documentedName,
+    publisher_label: fieldLabel(entry),
+    publisher_concept: publisherConcept,
+    definition,
+    source_type: sourceType,
+    observed_type: observedType,
+    semantic_role: typeof options.semanticRoleFor === 'function' ? options.semanticRoleFor(entry, index) : entry.semantic_role ?? 'unknown',
+    unit: fieldUnit(entry, options, index, evidenceIds),
+    code_values: literalCodeInput(fieldCodes(entry, kind)) === undefined
+      ? undefined
+      : { state: 'documented', values: literalCodeInput(fieldCodes(entry, kind)), evidence_ids: evidenceIds },
+    missingness: literalCodeInput(entry.missingness ?? entry.missing_values) === undefined
+      ? undefined
+      : { state: 'documented', values: literalCodeInput(entry.missingness ?? entry.missing_values), evidence_ids: evidenceIds },
+    mapping,
+    provenance,
+    evidence_ids: evidenceIds,
+    evidence_state: options.evidence_state ?? 'documented',
+    limitations: [...fieldLimitations(entry, kind, capture.data ?? {})],
+  });
+}
+
+export function extractVersionedVariables(value, kind, options = {}) {
+  const normalizedKind = versionedKind(kind);
+  const capture = requireVersionedCapture(options.capture);
+  const entries = versionedEntries(value, normalizedKind);
+  const evidenceIds = versionedEvidenceIds(capture, options);
+  const mappedOptions = { ...options, raw: value };
+  return entries.map(({ entry, pointer }, index) => variableIdentityFromEntry(entry, normalizedKind, index, pointer, capture, mappedOptions, evidenceIds));
+}
+
+export const extractVariableIdentities = extractVersionedVariables;
+export const extractVariableIdentity = extractVersionedVariables;
+
+export function extractVariableIdentityBundle(value, kind, options = {}) {
+  const normalizedKind = versionedKind(kind);
+  const variables = extractVersionedVariables(value, normalizedKind, options);
+  const transformation = VERSIONED_VARIABLE_TRANSFORMATIONS[normalizedKind];
+  return {
+    schema_version: 'ushso.variable-identity.v1.2.0',
+    source_kind: normalizedKind,
+    transformation,
+    variables,
+    source_acceptance: 'unresolved',
+    publication_authorized: false,
+    promotion_eligible: false,
+  };
+}
+
+function captureForClaim(claim, captures) {
+  if (captures instanceof Map) return captures.get(claim.provenance?.source_locator) ?? null;
+  return captures ?? null;
+}
+
+export function verifyVariableIdentity(claim, captures, options = {}) {
+  if (!object(claim) || !object(claim.provenance)) throw Error('VARIABLE_CLAIM_MALFORMED');
+  const capture = requireVersionedCapture(captureForClaim(claim, captures), { requireBytes: true });
+  if (claim.publication_authorized !== false || claim.promotion_eligible !== false) throw Error('UNAUTHORIZED_VARIABLE_APPROVAL');
+  if (capture.sha256 !== claim.provenance.capture_sha256) throw Error('VARIABLE_CAPTURE_BINDING');
+  if (hash(capture.text) !== capture.sha256) throw Error('VARIABLE_CAPTURE_BINDING');
+  if (capture.data !== undefined && JSON.stringify(JSON.parse(capture.text)) !== JSON.stringify(capture.data)) throw Error('VARIABLE_CAPTURE_BODY_MISMATCH');
+  const raw = pointerValue(capture.data, claim.provenance.pointer);
+  if (raw === undefined || hash(JSON.stringify(raw)) !== claim.provenance.raw_value_sha256) throw Error('VARIABLE_PASSAGE_BINDING');
+  const kind = VERSIONED_TRANSFORMATION_KINDS[claim.provenance.transformation?.name];
+  if (!kind || claim.provenance.transformation.version !== VERSIONED_VARIABLE_TRANSFORMATIONS[kind].version) throw Error('UNKNOWN_VERSIONED_TRANSFORMATION');
+
+  const claimContext = createVariableContext(claim.context_binding ?? {});
+  const resolvedClaim = claimContext.state === 'resolved';
+  const suppliedContext = options.context_binding;
+  if (resolvedClaim && suppliedContext === undefined) throw Error('VARIABLE_TRUSTED_CONTEXT_REQUIRED');
+  const trustedContext = suppliedContext === undefined ? claimContext : createVariableContext(suppliedContext);
+  if (resolvedClaim) {
+    if (trustedContext.state !== 'resolved' || trustedContext.binding_state !== 'exact') throw Error('VARIABLE_TRUSTED_CONTEXT_UNRESOLVED');
+    if (!isDeepStrictEqual(trustedContext, claimContext)) throw Error('VARIABLE_TRUSTED_CONTEXT_MISMATCH');
+  }
+  const trustedEvidenceIds = Array.isArray(options.evidence_ids)
+    ? options.evidence_ids
+    : versionedEvidenceIds(capture);
+  if (resolvedClaim && trustedEvidenceIds.length === 0) throw Error('VARIABLE_TRUSTED_EVIDENCE_REQUIRED');
+  // A resolved replay defaults to documented capture evidence. The claim's
+  // evidence state/IDs are never used to authorize a resolved context.
+  const trustedEvidenceState = options.evidence_state ?? (resolvedClaim ? 'documented' : claim.evidence_state);
+  const collection = kind === 'cdc' ? capture.data.columns : kind === 'census' ? capture.data.variables : capture.data;
+  const expected = extractVersionedVariables(collection, kind, {
+    ...options,
+    // A caller hook cannot override the independently trusted replay context.
+    contextFor: undefined,
+    capture,
+    context_binding: trustedContext,
+    evidence_ids: trustedEvidenceIds,
+    evidence_state: trustedEvidenceState,
+  }).find((item) => item.provenance.pointer === claim.provenance.pointer);
+  if (!expected || !isDeepStrictEqual(expected, claim)) throw Error('UNSUPPORTED_VERSIONED_VALUE');
+  return true;
+}
+
+export function verifyVersionedVariables(claims, captures, options = {}) {
+  if (!Array.isArray(claims)) throw Error('VARIABLE_CLAIMS_MALFORMED');
+  for (const claim of claims) verifyVariableIdentity(claim, captures, options);
+  return true;
+}
+const SUPPRESSED_MARKERS = Object.freeze(['.', '-', '*', '**', 'NA', 'N/A', 'null', 'suppressed', 'missing']);
+
+export async function blockedFetch() {
+  const error = new Error('FIELD_MEANING_LIVE_NETWORK_FORBIDDEN');
+  error.code = 'FIELD_MEANING_LIVE_NETWORK_FORBIDDEN';
+  throw error;
+}
+
+function asCodeString(value) {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    const error = new Error('CODE_MUST_REMAIN_STRING');
+    error.code = 'CODE_MUST_REMAIN_STRING';
+    throw error;
+  }
+  if (typeof value !== 'string') {
+    const error = new Error('CODE_MUST_REMAIN_STRING');
+    error.code = 'CODE_MUST_REMAIN_STRING';
+    throw error;
+  }
+  return value;
+}
+
+function isSuppressedOrMissing(code) {
+  if (typeof code !== 'string') return false;
+  return SUPPRESSED_MARKERS.includes(code) || SUPPRESSED_MARKERS.includes(code.trim());
+}
+
+export function extractCodebookEvidence({ source, release, pointer, table, labels = null } = {}) {
+  if (!Array.isArray(table)) {
+    const error = new Error('CODEBOOK_TABLE_REQUIRED');
+    error.code = 'CODEBOOK_TABLE_REQUIRED';
+    throw error;
+  }
+  const rows = table.map((entry, index) => {
+    const raw = object(entry) ? entry : { code: entry };
+    const code = asCodeString(raw.code ?? raw.value ?? raw.item);
+    if (code === null) {
+      const error = new Error('CODE_MUST_REMAIN_STRING');
+      error.code = 'CODE_MUST_REMAIN_STRING';
+      throw error;
+    }
+    const numericLook = /^[0-9]+$/.test(code);
+    const suppressed = isSuppressedOrMissing(code) || raw.suppressed === true || raw.missing === true;
+    if (suppressed && (raw.numeric_value === 0 || raw.as_number === 0)) {
+      const error = new Error('SUPPRESSED_NOT_ZERO');
+      error.code = 'SUPPRESSED_NOT_ZERO';
+      throw error;
+    }
+    return Object.freeze({
+      code,
+      label: typeof raw.label === 'string' ? raw.label : (labels && typeof labels[code] === 'string' ? labels[code] : null),
+      suppressed,
+      missing: suppressed || raw.missing === true,
+      numeric_looking: numericLook,
+      numeric_value: null,
+      pointer: typeof pointer === 'string' ? `${pointer}/${index}` : `/${index}`,
+    });
+  });
+  return Object.freeze({
+    format: 'ushso.codebook-evidence.v1',
+    source: source ?? null,
+    release: release ?? null,
+    pointer: pointer ?? null,
+    rows: Object.freeze(rows),
+    publication_authorized: false,
+    scientific_approval: false,
+  });
+}
+
+export function inferUnitFromFieldName(name) {
+  const error = new Error('UNIT_INFERRED_FROM_NAME');
+  error.code = 'UNIT_INFERRED_FROM_NAME';
+  error.field_name = name ?? null;
+  throw error;
+}
+
+export function representConservativeMeaning({
+  source,
+  release,
+  role,
+  label = null,
+  concept = null,
+  definition = null,
+  unit = null,
+  unitState = null,
+  unitRationale = null,
+  denominator = null,
+  evidenceIds = [],
+} = {}) {
+  if (unitState === 'inferred_from_name' || unit === 'inferred_from_name') inferUnitFromFieldName(label);
+  const conceptIsNotDefinition = concept !== null && (definition === null || definition === concept);
+  const descriptionEqualsLabel = typeof definition === 'string' && typeof label === 'string' && definition === label;
+  let unitRecord;
+  if (unitState === 'not_applicable') {
+    if (role !== 'identifier') {
+      const error = new Error('UNIT_NOT_APPLICABLE_REQUIRES_IDENTIFIER');
+      error.code = 'UNIT_NOT_APPLICABLE_REQUIRES_IDENTIFIER';
+      throw error;
+    }
+    unitRecord = Object.freeze({
+      state: 'not_applicable',
+      value: null,
+      rationale: unitRationale ?? 'Identifier fields have no physical unit.',
+      evidence_ids: Object.freeze([...evidenceIds]),
+    });
+  } else if (typeof unit === 'string' && unit.length > 0) {
+    unitRecord = Object.freeze({
+      state: 'documented',
+      value: unit,
+      rationale: unitRationale ?? 'Literal documented unit statement.',
+      evidence_ids: Object.freeze([...evidenceIds]),
+    });
+  } else if (role === 'rate' && (denominator === null || denominator === undefined || denominator === '')) {
+    unitRecord = Object.freeze({
+      state: 'missing',
+      value: null,
+      rationale: unitRationale ?? 'Rate without a documented denominator remains incomplete.',
+      evidence_ids: Object.freeze([...evidenceIds]),
+      incomplete: true,
+    });
+  } else {
+    unitRecord = Object.freeze({
+      state: unitState ?? 'unknown',
+      value: null,
+      rationale: unitRationale,
+      evidence_ids: Object.freeze([...evidenceIds]),
+    });
+  }
+  const completeness = role === 'rate' && unitRecord.incomplete ? 'incomplete'
+    : (unitRecord.state === 'documented' || unitRecord.state === 'not_applicable' || role === 'identifier' ? 'documented' : 'incomplete');
+  return Object.freeze({
+    source: source ?? null,
+    release: release ?? null,
+    role: role ?? 'unknown',
+    label,
+    concept,
+    definition,
+    concept_is_not_definition: conceptIsNotDefinition,
+    description_equals_label: descriptionEqualsLabel,
+    unit: unitRecord,
+    completeness,
+    publication_authorized: false,
+    scientific_approval: false,
+  });
+}
+
+export function reportFieldMeaningCoverage(fields = []) {
+  const rows = fields.map((field, index) => {
+    const meaning = field.meaning ?? field;
+    return Object.freeze({
+      id: field.id ?? meaning.id ?? `field-${index}`,
+      source: meaning.source ?? field.source ?? 'unknown',
+      release: meaning.release ?? field.release ?? 'unknown',
+      role: meaning.role ?? field.role ?? 'unknown',
+      description_equals_label: meaning.description_equals_label === true,
+      unsupported_unit: meaning.unit?.state === 'unknown' || meaning.unit?.state === 'missing' || meaning.unit?.unsupported === true,
+      conflicting_codebook: field.conflicting_codebook === true,
+      missing_definition: meaning.definition === null || meaning.definition === undefined || meaning.definition === '',
+      concept_only: meaning.concept_is_not_definition === true && (meaning.definition === null || meaning.definition === meaning.concept),
+      completeness: meaning.completeness ?? 'unknown',
+    });
+  });
+  const countBy = (key) => {
+    const map = new Map();
+    for (const row of rows) {
+      const value = row[key];
+      map.set(value, (map.get(value) ?? 0) + 1);
+    }
+    return Object.freeze(Object.fromEntries([...map.entries()].sort()));
+  };
+  const flagged = (predicate) => rows.filter(predicate).map((row) => row.id);
+  const bySource = countBy('source');
+  const censusCount = bySource.census ?? bySource['census-api'] ?? 0;
+  const cmsCount = bySource.cms ?? bySource['cms-data-catalog'] ?? 0;
+  const cdcCount = bySource.cdc ?? bySource['cdc-socrata'] ?? 0;
+  const missingCmsCdc = rows.filter((row) => (row.source === 'cms' || row.source === 'cms-data-catalog' || row.source === 'cdc' || row.source === 'cdc-socrata') && (row.missing_definition || row.unsupported_unit));
+  return Object.freeze({
+    format: 'ushso.field-meaning-coverage.v1',
+    record_count: rows.length,
+    rows: Object.freeze(rows),
+    totals: Object.freeze({
+      fields: rows.length,
+      description_equals_label: rows.filter((row) => row.description_equals_label).length,
+      unsupported_unit: rows.filter((row) => row.unsupported_unit).length,
+      conflicting_codebook: rows.filter((row) => row.conflicting_codebook).length,
+      missing_definition: rows.filter((row) => row.missing_definition).length,
+    }),
+    by_source: bySource,
+    by_role: countBy('role'),
+    by_release: countBy('release'),
+    groups: Object.freeze({
+      description_equals_label: Object.freeze(flagged((row) => row.description_equals_label)),
+      unsupported_unit: Object.freeze(flagged((row) => row.unsupported_unit)),
+      conflicting_codebook: Object.freeze(flagged((row) => row.conflicting_codebook)),
+      missing_definition: Object.freeze(flagged((row) => row.missing_definition)),
+    }),
+    census_cannot_hide_cms_cdc: Object.freeze({
+      census_count: censusCount,
+      cms_count: cmsCount,
+      cdc_count: cdcCount,
+      cms_cdc_missing_semantics: Object.freeze(missingCmsCdc.map((row) => row.id)),
+      hidden: false,
+    }),
+    reconciled: rows.length === (Object.values(bySource).reduce((sum, n) => sum + n, 0)),
+    publication_authorized: false,
+    live_source_traffic: false,
+  });
 }

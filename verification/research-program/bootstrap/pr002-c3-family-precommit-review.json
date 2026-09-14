@@ -1,0 +1,148 @@
+{
+  "schema": "ushso.pr002.c3-family-contract-review.v1",
+  "reviewer": "Luna Max",
+  "review_kind": "bounded independent precommit review",
+  "status": "precommit_review_only_no_final_acceptance",
+  "independence_boundary": "Reviewed the frozen partial payload only. This is not final C3 acceptance, not a rerun of provider work, and not an approval of the cancelled Grok recovery run.",
+  "scope": {
+    "partial_payload_root": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c3-partial-recovery/payload",
+    "manifest": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-c3-partial-recovery/manifest.json",
+    "manifest_sha256": "1154f83fde1315b768c7a72849fcddc185012612279d1f7f07959225f21be485",
+    "base_commit": "997070bd94864fabedf73acecd422c6e15a3ed7e",
+    "base_tree": "c05b9a74630b715b05304044a24d6e66489a9808",
+    "inspection_worktree": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910",
+    "repository_changes": false,
+    "tests_or_providers_run": false,
+    "private_evaluator_inputs_opened": false
+  },
+  "findings": [
+    {
+      "id": "C3-FAMILY-MAPPING-001",
+      "severity": "pass_with_boundary",
+      "result": "pass",
+      "evidence": [
+        "payload/evaluation/research-program/cohorts.json:59805-60112",
+        "payload/verification/research-program/pr-002/c3_lib.py:101-224,622-658",
+        "base docs/master-plan/2026-09-10/MASTER-PLAN.md:39-52",
+        "base docs/master-plan/2026-09-10/prs/PR-043.md:27-43",
+        "base docs/master-plan/2026-09-10/prs/PR-044.md:27-43",
+        "base docs/master-plan/2026-09-10/prs/PR-045.md:27-43"
+      ],
+      "observation": "The exact twelve master-plan families are present once, in the intended 5/4/3 mapping: HRSA AHRF, NPPES, SAMHSA, CMS T-MSIS/TAF and CDC/ATSDR SVI to PR-043; PHC4, state APCD, state facility licensure and rural hospital closure tracking to PR-044; AHRQ HCUP, AHRQ MEPS and AHA Annual Survey to PR-045. Each family carries C-<n>-1, C-<n>-2 and C-<n>-3 intake commit names. The family set is still an intake pointer frame, so this does not satisfy R09.",
+      "required_correction": null
+    },
+    {
+      "id": "C3-SOURCE-BOUNDARY-001",
+      "severity": "pass_with_downstream_guard",
+      "result": "pass",
+      "evidence": [
+        "payload/evaluation/research-program/cohorts.json:59805-60112",
+        "payload/verification/research-program/pr-002/c3_lib.py:622-658,918-954",
+        "payload/verification/research-program/pr-002/c3-negative-fixtures.json:42-47",
+        "base docs/research-program/acceptance.md:133-144"
+      ],
+      "observation": "All twelve family records set locator_status=unverified_locator, publisher_access_claimed=false and schema_qualification_claimed=false, and retain family-specific unknowns. The state APCD pointer is marked a secondary navigation directory; the state-licensure pointer is explicitly federal certification context rather than state-license evidence; TAF, HCUP, MEPS and AHA restrictions/unknown terms remain visible. The copied publisher and candidate_official_locator fields at c3_lib.py:632-636 remain semantically safe only while consumers honor this frame; they are not independently verified source assertions.",
+      "required_correction": "Before any public route publication, retain an explicit candidate/unverified publisher identity state (or equivalent consumer contract) so downstream cards cannot render copied publisher/locator fields as verified. PR-043/044/045 must promote them only after their own evidence-backed intake checks."
+    },
+    {
+      "id": "C3-MRF-DENOMINATOR-001",
+      "severity": "pass_with_downstream_requirement",
+      "result": "pass",
+      "evidence": [
+        "payload/evaluation/research-program/cohorts.json:67-150,2401",
+        "payload/verification/research-program/pr-002/c3_lib.py:537-619,833-915",
+        "payload/verification/research-program/pr-002/c3-build-receipt.json:19-77",
+        "payload/verification/research-program/pr-002/c3-negative-fixtures.json:7-32",
+        "base docs/research-program/acceptance.md:146-163",
+        "base docs/master-plan/2026-09-10/prs/PR-046.md:1-16",
+        "base docs/master-plan/2026-09-10/prs/PR-049.md:1-16"
+      ],
+      "observation": "The exact ordered 25 hospital and 10 payer IDs match the C3 build receipt, are unique, and remain in later denominators. freeze_before_endpoint_results=true and endpoint_results_seen=false; replacement, silent deduplication and silent substitution are false; denominator_may_not_shrink=true. The consumer contract assigns hospital locators to PR-046 and payer locators to PR-049 with typed unresolved bindings. This is an IDs-only frame and does not satisfy R10 locator/disposition or parsed-sample targets.",
+      "required_correction": "PR-046/049 must consume these IDs without replacement and add per-ID locator/disposition evidence. They must not treat the selection-source URL/hash as an MRF locator or payload result."
+    },
+    {
+      "id": "C3-MRF-VERIFIER-GUARD-001",
+      "severity": "required_before_final_acceptance",
+      "result": "finding",
+      "evidence": [
+        "payload/verification/research-program/pr-002/c3_lib.py:907-914",
+        "payload/verification/research-program/pr-002/verify.py:199-217"
+      ],
+      "observation": "The emitted mrf_selection carries the correct no-substitution and denominator flags, but the checked verifier predicates do not assert silent_substitution_allowed=false or denominator_may_not_shrink=true. The c3_lib validator also does not require freeze_before_endpoint_results=true or selection_consumed_not_recomputed=true in assert_pilot_identities; verify.py checks only the freeze flag, counts, consumer PRs, replacement flags and ID uniqueness. A mutated payload could therefore retain a passing producer check while weakening the denominator contract.",
+      "required_correction": "Extend the final C3 validator/replay checks to assert all immutable MRF contract flags, at minimum freeze_before_endpoint_results, selection_consumed_not_recomputed, silent_substitution_allowed=false and denominator_may_not_shrink=true, plus typed consumer bindings. Keep a negative fixture for each mutation."
+    },
+    {
+      "id": "C3-R-STATUS-001",
+      "severity": "pass_with_boundary",
+      "result": "pass",
+      "evidence": [
+        "payload/evaluation/research-program/cohorts.json:59787-59803",
+        "payload/docs/research-program/acceptance.md:1-27,139-163,230-241",
+        "payload/verification/research-program/pr-002/c3-verify-receipt.json:1-63",
+        "base docs/research-program/acceptance.md:3,29-235"
+      ],
+      "observation": "The payload acceptance mapping contains exactly R01-R16 and every value is unaccepted. The C3 acceptance overlay preserves the same state in all sixteen markdown rows while updating only the R09/R10 frame descriptions. Producer verification reports ok=true and all 58 checks true, including R-status, C3 family, C3 pilot and C1 projection checks; that producer receipt remains evidence, not independent acceptance.",
+      "required_correction": null
+    }
+  ],
+  "independent_static_checks": {
+    "manifest_and_selected_payload_hashes": "passed",
+    "family_count_and_exact_mapping": "passed",
+    "all_family_candidate_boundaries": "passed",
+    "mrf_counts_order_uniqueness_and_flags": "passed",
+    "mrf_item_unresolved_bindings_and_denominator_retention": "passed",
+    "r01_r16_json_and_markdown_unaccepted": "passed",
+    "producer_receipt_failed_checks_empty": "observed",
+    "tests_run": false
+  },
+  "limitations": [
+    "The manifest records the source run as cancelled, snapshot_only=true and independently_accepted=false (manifest.json:7-17).",
+    "Hospital original CSV bytes are not retained; only the original capture hash/URL and an uncommitted identity projection are available (cohorts.json:source_retention; c3_lib.py:246-253,595-603). This is adequate for the frozen candidate identity review but limits exact later source-row re-resolution.",
+    "No publisher/network/provider calls or endpoint results were made; candidate locators remain unverified by design.",
+    "No raw holdout prompts or labels were inspected."
+  ],
+  "source_hashes": {
+    "base_tree": "c05b9a74630b715b05304044a24d6e66489a9808",
+    "base/docs/master-plan/2026-09-10/MASTER-PLAN.md": {
+      "sha256": "eaa8adc671eb44c176ff899f2ee138ec6f2e420444170c32ff757bac9a716aff",
+      "git_blob": "3e84d4ff7d3b21eab7fc3a1645a7aee26868d23e",
+      "bytes": 28292
+    },
+    "base/docs/master-plan/2026-09-10/PR-INDEX.md": {
+      "sha256": "06db9ed4f17b08deb4817bbbf28521281ecab6271dd8cfaceed22c5ee70fe145",
+      "git_blob": "5af97530bcdafc8750c436a072811af018a19211",
+      "bytes": 22814
+    },
+    "base/docs/master-plan/2026-09-10/prs/PR-043.md": {
+      "sha256": "3182fe48ab77e8c700566995274cfb9dd65d42d7e4c9cd3eb6deb88ec77a865c",
+      "git_blob": "d1e1fbba8b029840527f251269c7cc0131cc4fa6",
+      "bytes": 4190
+    },
+    "base/docs/master-plan/2026-09-10/prs/PR-044.md": {
+      "sha256": "502931b2189796e244b81d327844753756eff94f38ff18acb638a0a35d5a2868",
+      "git_blob": "4000d3520675e0b1824ba474bfe09347ac205a21",
+      "bytes": 3922
+    },
+    "base/docs/master-plan/2026-09-10/prs/PR-045.md": {
+      "sha256": "1c5f336b38492f655dc88dcc7949d6d60862565652b61bec8db218098498ff45",
+      "git_blob": "8bf48c39d675987ee40173b5eba3246c6ec8356f",
+      "bytes": 3909
+    },
+    "base/docs/research-program/acceptance.md": {
+      "sha256": "630c94f9b708271c20b14049413dd116328c1349759fcf604fc1e1336fcd4117",
+      "git_blob": "a25fe7f5ddf81f5f5cc802f2eaca66bb38fbe0c3",
+      "bytes": 29747
+    },
+    "payload/docs/research-program/acceptance.md": "625271093e73108959d56f7647107b96ea3398c8555c59a654a53717721a4cc7",
+    "payload/evaluation/research-program/cohorts.json": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+    "payload/verification/research-program/pr-002/c3_lib.py": "1e8ac301604673a1bf3bba02b04277997fb1973cb31af00067c973c90613932d",
+    "payload/verification/research-program/pr-002/c3-build-receipt.json": "d51401788fcc98623c1eabb7adbdd0e5f8e5fdb96cb402d844d658b1e508d876",
+    "payload/verification/research-program/pr-002/c3-negative-fixtures.json": "d9217b4fd858d9d125de74480e10ad06a197afafc02ed11389bcd9c8c5c8d9b4",
+    "payload/verification/research-program/pr-002/c3-verify-receipt.json": "f1230a6289b0e4ff0a99ec55cc1a8c5b881285bfd9f7c4abf036692491dd5b8d"
+  },
+  "required_corrections_summary": [
+    "Harden the C3 verifier against mutation of no-substitution and denominator-retention flags before final acceptance.",
+    "Keep copied publisher/locator fields explicitly candidate/unverified in every downstream publication consumer.",
+    "Require PR-046/049 to add actual MRF locator/disposition evidence while retaining all frozen IDs."
+  ]
+}

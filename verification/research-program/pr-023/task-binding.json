@@ -1,0 +1,71 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr023-provider-policy-20260914",
+  "slice_id": "C-023-1",
+  "pr_id": "PR-023",
+  "title": "Control provider data policy and evaluated fallbacks",
+  "owner": "/root/pr023_provider_policy",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr023-provider-policy-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr023-provider-policy-20260914",
+  "objective": "Only approved public evidence reaches an explicitly selected model endpoint.",
+  "outcome": "A changed or unavailable model enters review; a latest alias cannot replace the evaluated model unnoticed. Excluded material never reaches the fake network transport; logging does not reintroduce it. A privacy-incompatible fallback is refused even when cheaper; an unevaluated free router does not become the default. Muse Contributor data-use terms are explicit in the operator configuration. No source URL, endpoint or provider is selected from untrusted document instructions.",
+  "dependencies": [
+    "PR-022"
+  ],
+  "owned_paths": [
+    "packages/enrichment/provider-policy.mjs",
+    "packages/enrichment/model-snapshot.json",
+    "tests/research-program/provider-policy.test.mjs",
+    "verification/research-program/pr-023/",
+    "docs/research-program/handoffs/PR-023.json"
+  ],
+  "commits": [
+    {
+      "id": "C-023-1",
+      "subject": "Snapshot model and endpoint capabilities",
+      "instructions": "Read the public catalog and provider endpoint metadata at configuration time. Store exact model IDs, prices/overrides, supported parameters and data-use policy version.",
+      "verification": "A changed or unavailable model enters review; a latest alias cannot replace the evaluated model unnoticed."
+    },
+    {
+      "id": "C-023-2",
+      "subject": "Enforce evidence eligibility",
+      "instructions": "Accept approved public documentation captures only. Reject secrets, private queries, restricted content and unapproved contributor transmission using the collection classification.",
+      "verification": "Fixtures ensure excluded material never reaches the fake network transport; logging does not reintroduce it."
+    },
+    {
+      "id": "C-023-3",
+      "subject": "Implement a bounded fallback policy",
+      "instructions": "Allow only evaluated models/providers with equal-or-stricter data policy and an accepted maximum price. Record the actual selection for each attempt.",
+      "verification": "A privacy-incompatible fallback is refused even when cheaper; an unevaluated free router does not become the default."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/provider-policy.test.mjs",
+    "node --test tests/research-program/openrouter-client.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-023.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-023/",
+  "binding": {
+    "base_sha": "f83428f8d25f6d239ed24a51917e941210f299a4",
+    "base_tree": "9516113931e05d13c4ff2d7656b79151513143df",
+    "dependency_merge_shas": {
+      "PR-022": "00b2c0a5073b21f9d0c7f365a72d1432bbd18014"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

@@ -1,0 +1,25 @@
+{
+  "format": "ushso.pr-001-controller-crosswalk-review.v1",
+  "reviewed_head": "cc7faac838a27a7db525c02acf29cc239737fd02",
+  "reviewer": "codex-root",
+  "checked_at": "2026-09-10T16:37:32.817563+00:00",
+  "verdict": "changes_requested",
+  "findings": [
+    {
+      "id": "PR001-CUSTODY-1",
+      "severity": "medium",
+      "file": "docs/research-program/legacy-crosswalk.json",
+      "field": "source_inventory.semp",
+      "problem": "SEMP model/schema/generator/manifest paths are relative to an unspecified repository while the source files exist only in the preserved original dirty checkout. The crosswalk provides no original-checkout or selected-base-absence marker.",
+      "evidence": {
+        "path": "docs/semp/model/ushso-system-model.json",
+        "exists_in_selected_base": false,
+        "exists_in_reviewed_head": false,
+        "actual_local_root": "/mnt/d/Coding Projects/ushso",
+        "actual_source_sha256": "08b256f4c8c1f650ad4805d18dede4482b47b6c31cfff1b25802283855dbd875"
+      },
+      "requested_change": "Identify the original preserved source checkout and its captured HEAD/manifest, absence from the selected base, and the SEMP path resolution rule. Preserve hashes and do not import or promote the SEMP tree."
+    }
+  ],
+  "scope": "Identity/artifact checks pass independently; this source-custody finding blocks PR-001 integration pending correction."
+}

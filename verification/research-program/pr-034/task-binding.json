@@ -1,0 +1,75 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr034-identifier-systems-20260914",
+  "slice_id": "C-034-1",
+  "pr_id": "PR-034",
+  "title": "Preserve identifier systems and key constraints",
+  "owner": "/root/pr034_identifier_systems",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr034-identifier-systems-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr034-identifier-systems-20260914",
+  "objective": "Keys are typed by identifier system, entity and validity period.",
+  "outcome": "CCN, NPI, FIPS/GEOID, source report IDs, tax identifiers and plan identifiers keep source-specific formatting, entity role and leading zeros. CCN and NPI are never interchangeable; equal strings from different systems do not establish identity. Candidate, composite, foreign-key and display-label roles require documentation or scoped sample evidence. Observed uniqueness is not full-release uniqueness. Composite facility/report/year keys remain composite. An identifier match outside its applicability period is ambiguous or incompatible, not exact. No automatic name-based merge is added. All key checks report sampled versus full-release evidence scope. Sealed packages/identity/src/exact-identifier-policy.mjs and schema-catalog.mjs are not edited.",
+  "dependencies": [
+    "PR-007",
+    "PR-008",
+    "PR-031"
+  ],
+  "owned_paths": [
+    "packages/enrichment/identifier-systems.mjs",
+    "tests/research-program/identifier-systems.test.mjs",
+    "docs/research-program/identifier-systems.md",
+    "verification/research-program/pr-034/",
+    "docs/research-program/handoffs/PR-034.json"
+  ],
+  "commits": [
+    {
+      "id": "C-034-1",
+      "subject": "Define identifier-system metadata",
+      "instructions": "Represent CCN, NPI, FIPS/GEOID, source report IDs, tax identifiers and plan identifiers with source-specific formatting and entity role. Preserve leading zeros.",
+      "verification": "CCN and NPI are never interchangeable; equal strings from different systems do not establish identity."
+    },
+    {
+      "id": "C-034-2",
+      "subject": "Attach key roles to exact fields",
+      "instructions": "Record candidate key, composite key, foreign key or display label only with documentation or scoped sample evidence. Separate observed uniqueness from full-release uniqueness.",
+      "verification": "A sample unique identifier is not certified globally; composite facility/report/year keys remain composite."
+    },
+    {
+      "id": "C-034-3",
+      "subject": "Validate identity and historical scope",
+      "instructions": "Add retired/reused IDs, changed geography vintage and multiple identifiers per organization to fixtures. Keep human-reviewed resolution decisions versioned.",
+      "verification": "An identifier match outside its applicability period becomes ambiguous or incompatible, not exact."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/identifier-systems.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-034.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-034/",
+  "binding": {
+    "base_sha": "8ff333a0ce844ce361327f1a0a81f1b9fcd4e91e",
+    "base_tree": "0bc0431fedaded532053282a1f429a75d32274e6",
+    "dependency_merge_shas": {
+      "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+      "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+      "PR-031": "3b2d681103d80d571d44cd3e364a4327f8e046a9"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

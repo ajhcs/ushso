@@ -1,0 +1,250 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-022",
+  "status": "producer_checked",
+  "owner": "/root/pr022_openrouter_client",
+  "reviewer": "Astra/root",
+  "base_sha": "7fbc8fe1a79f4ba6470da81a7c6a37c9023d458e",
+  "head_sha": "ce97b1474ec4c24dcaaebbd89f722a5f026622c9",
+  "dependency_merge_shas": {
+    "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+    "PR-021": "ed08e8ee861622b99d5d7c3150d68304ecc95881"
+  },
+  "branch": "codex/ushso-pr022-openrouter-client-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/openrouter-client.mjs",
+    "packages/enrichment/provider-schema.json",
+    "tests/research-program/openrouter-client.test.mjs",
+    "verification/research-program/pr-022/",
+    "docs/research-program/handoffs/PR-022.json"
+  ],
+  "problem": "Residual extraction depended on launching an external coding harness. Missing credentials, unsupported structured outputs or a missing exact model could fail open. Provider transport success could be treated as claim acceptance. The public Worker request path could import a model client. Paid OpenRouter calls could run without a provisioned budget/key.",
+  "resulting_behavior": "createProviderRequest binds model/endpoint identity, prompt hash, evidence IDs, JSON schema, token limits and timeout. Credentials are read only through an injected secretProvider.getSecret port and never placed on the request object. Missing credentials, unsupported structured outputs and a missing exact model fail closed with no silent fallback. executeOpenRouterRequest uses an injected transport, requires paidCallsEnabled, and rejects malformed JSON, truncated output, provider errors and schema-valid but unsupported fields without publishing claims. runResidualJob connects the PR-021 residual-job port to the adapter and refuses to launch dsh. worker/index.mjs does not import packages/enrichment. PAID_CALLS_ENABLED remains false. Provider transport success is not claim acceptance. Live fetch is forbidden.",
+  "commits": [
+    {
+      "id": "C-022-1",
+      "subject": "Define the provider request contract",
+      "sha": "a1b957067c81043c5714f77d8f515aa4110f2fca"
+    },
+    {
+      "id": "C-022-2",
+      "subject": "Implement the bounded OpenRouter client",
+      "sha": "a1b957067c81043c5714f77d8f515aa4110f2fca"
+    },
+    {
+      "id": "C-022-3",
+      "subject": "Replace the extraction shell dependency",
+      "sha": "ce97b1474ec4c24dcaaebbd89f722a5f026622c9"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "openrouter-client",
+      "id": "packages/enrichment/openrouter-client.mjs",
+      "location": "local",
+      "sha256": "7b641e134cfb71d5bc2599efdf84d73e35a5dd14e8eae7beba1c6aa8b4650e37"
+    },
+    {
+      "kind": "provider-schema",
+      "id": "packages/enrichment/provider-schema.json",
+      "location": "local",
+      "sha256": "78d41f65b9db0783f08699a4c8efcd073048fd84b63e8c0fef40f399dbcc4682"
+    },
+    {
+      "kind": "openrouter-tests",
+      "id": "tests/research-program/openrouter-client.test.mjs",
+      "location": "local",
+      "sha256": "1ea63d8a36ccc1cd05dc81a6da2c101e6444db97c799346f2416b3eb1946b6ac"
+    },
+    {
+      "kind": "worker-no-enrichment-import",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "0be15165ba0deb5d3cc94e9d02f5bf63394aea84a74f474d26854bceadf760c4"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c022-focused",
+      "command": "node --test tests/research-program/openrouter-client.test.mjs",
+      "started_at": "2026-09-14T06:54:12.412858Z",
+      "completed_at": "2026-09-14T06:54:13.604486Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 openrouter-client tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c022-focused-event",
+        "path": "verification/research-program/pr-022/producer-20260914/commands/focused-openrouter/event.json",
+        "sha256": "318bada958926ba5222d63357f89dac2fc77fee6c253152e0c84774ac737a13d",
+        "bytes": 1056
+      }
+    },
+    {
+      "id": "cmd-c022-qualify",
+      "command": "node --test tests/research-program/qualify-deterministic.test.mjs",
+      "started_at": "2026-09-14T06:54:13.604874Z",
+      "completed_at": "2026-09-14T06:54:17.800401Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "4/4 qualify-deterministic tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c022-qualify-event",
+        "path": "verification/research-program/pr-022/producer-20260914/commands/qualify-deterministic/event.json",
+        "sha256": "9f35d278709cce0d41c2d63e9c93e98fb0cfcde13fec9a34da771c851588c1d4",
+        "bytes": 1073
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr022-artifact-0",
+      "path": "verification/research-program/pr-022/task-binding.json",
+      "bytes": 3660,
+      "sha256": "9942f4b40a6eaaee2260260b3197183c30d5668d8187781edf0759f8d3bf678a"
+    },
+    {
+      "id": "pr022-artifact-1",
+      "path": "verification/research-program/pr-022/dispatch.json",
+      "bytes": 2464,
+      "sha256": "1ccedd991f538958094e55758389295ff83e00a22c092a1b7dabe1d3f7d60d4a"
+    },
+    {
+      "id": "pr022-artifact-2",
+      "path": "verification/research-program/pr-022/producer-20260914/commands/focused-openrouter/receipt.json",
+      "bytes": 466,
+      "sha256": "389cda60a831d71068d35e44144d7598629508016b0a2028ea632d07e1a2bbfa"
+    },
+    {
+      "id": "pr022-artifact-3",
+      "path": "verification/research-program/pr-022/producer-20260914/commands/focused-openrouter/stdout.log",
+      "bytes": 463,
+      "sha256": "a2a1da1b419d0edcd1f5a542060e4af8547ec0395b22b8358d939ee2e6893f23"
+    },
+    {
+      "id": "pr022-artifact-4",
+      "path": "verification/research-program/pr-022/producer-20260914/commands/focused-openrouter/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr022-artifact-5",
+      "path": "verification/research-program/pr-022/producer-20260914/commands/focused-openrouter/event.json",
+      "bytes": 1056,
+      "sha256": "318bada958926ba5222d63357f89dac2fc77fee6c253152e0c84774ac737a13d"
+    },
+    {
+      "id": "pr022-artifact-6",
+      "path": "verification/research-program/pr-022/producer-20260914/commands/qualify-deterministic/receipt.json",
+      "bytes": 473,
+      "sha256": "87970d5d5e691a308eafd3274ab04ca405bc1f89e5099403b384816baf0d89ce"
+    },
+    {
+      "id": "pr022-artifact-7",
+      "path": "verification/research-program/pr-022/producer-20260914/commands/qualify-deterministic/stdout.log",
+      "bytes": 533,
+      "sha256": "9cefdde69cc4c55c7942423669b34f542184dc78bc3e9a2468251807d3552b54"
+    },
+    {
+      "id": "pr022-artifact-8",
+      "path": "verification/research-program/pr-022/producer-20260914/commands/qualify-deterministic/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr022-artifact-9",
+      "path": "verification/research-program/pr-022/producer-20260914/commands/qualify-deterministic/event.json",
+      "bytes": 1073,
+      "sha256": "9f35d278709cce0d41c2d63e9c93e98fb0cfcde13fec9a34da771c851588c1d4"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-022-1",
+      "status": "producer_checked",
+      "result": "Missing credentials, unsupported structured outputs and a missing exact model fail closed with no silent fallback.",
+      "command_ids": [
+        "cmd-c022-focused"
+      ]
+    },
+    {
+      "id": "C-022-2",
+      "status": "producer_checked",
+      "result": "Malformed JSON, truncated output, provider error and unsupported fields are rejected without publishing claims. Paid calls stay disabled by default.",
+      "command_ids": [
+        "cmd-c022-focused"
+      ]
+    },
+    {
+      "id": "C-022-3",
+      "status": "producer_checked",
+      "result": "A fake-provider residual job passes without a harness. Worker does not import the model client. Residual-queue tests remain green.",
+      "command_ids": [
+        "cmd-c022-focused",
+        "cmd-c022-qualify"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-openrouter-http",
+      "status": "accepted",
+      "detail": "Tests inject a fake transport. blockedFetch forbids live OpenRouter HTTP. Paid calls remain disabled."
+    },
+    {
+      "id": "paid-budget-provisioning",
+      "status": "skipped",
+      "detail": "Selected budget/key are not provisioned. Actual paid calls remain disabled."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-openrouter-review",
+      "status": "pending",
+      "detail": "Independent review of the request contract, bounded client and residual-job port remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "paid-calls-unprovisioned",
+      "status": "risk",
+      "detail": "The adapter is wired and fail-closed, but no production OpenRouter key or budget is provisioned."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of the request contract, bounded client and residual-job port, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-022 source and replay focused openrouter-client and qualify-deterministic tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

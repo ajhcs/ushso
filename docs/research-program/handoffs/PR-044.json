@@ -1,0 +1,292 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-044",
+  "status": "producer_checked",
+  "owner": "/root/pr044_state_source_intake",
+  "reviewer": "Astra/root",
+  "base_sha": "484beae15d84d7ac2498f0c3b9e19de5c6826b4e",
+  "head_sha": "ef713d4035f48aa1ce766de9170e9389ab4100a2",
+  "dependency_merge_shas": {
+    "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+    "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7",
+    "PR-037": "ac2dcebbead2498f6df77f503d5484b81da8319f"
+  },
+  "branch": "codex/ushso-pr044-state-source-intake-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/connectors/source-registry/state-intake.mjs",
+    "packages/connectors/source-registry/state-families.json",
+    "evaluation/research-program/state-intake/",
+    "tests/research-program/state-source-intake.test.mjs",
+    "docs/research-program/source-coverage.md",
+    "verification/research-program/pr-044/",
+    "docs/research-program/handoffs/PR-044.json"
+  ],
+  "problem": "PHC4, APCD, facility licensure and closure tracking could lack explicit state scope. One state's coverage could imply all-state completeness. Publisher authority could be inferred from a familiar title. Scraping a public page could bypass an application or DUA. Pennsylvania finance could claim identical PHC4/HCRIS reporting definitions or unrestricted payload access. A small state pilot could be converted into a national completeness claim. Nongovernmental Sheps Center operator identity could be replaced by CMS enrollment files.",
+  "resulting_behavior": "State intake lives in packages/connectors/source-registry/state-intake.mjs with four frozen family records. One state's coverage never implies all-state completeness. Publisher authority is not inferred from a familiar title. Known portal/API boundaries have fixtures and budgets; scraping does not bypass an application or DUA. The Pennsylvania finance task returns PHC4 alongside HCRIS without identical reporting definitions or unrestricted payload access. No national completeness claim is derived from a small state pilot. Sheps Center operator identity is preserved. Frozen named-source-registry.v1.0.0.json, connector src, retrieval ranking and coverage accounting artifacts are unchanged. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-044-1",
+      "subject": "Define jurisdiction-scoped intake",
+      "sha": "5bcd11a21f5a02f6fd9e2cc93cc8320624ce32ef"
+    },
+    {
+      "id": "C-044-2",
+      "subject": "Add bounded portal configurations",
+      "sha": "5bcd11a21f5a02f6fd9e2cc93cc8320624ce32ef"
+    },
+    {
+      "id": "C-044-3",
+      "subject": "Publish state-aware family cards",
+      "sha": "ef713d4035f48aa1ce766de9170e9389ab4100a2"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "state-intake",
+      "id": "packages/connectors/source-registry/state-intake.mjs",
+      "location": "local",
+      "sha256": "4591b5561435bd33648e8e960c9f288a3ff17fe64bcaee507a450cab90eea1fd"
+    },
+    {
+      "kind": "state-families",
+      "id": "packages/connectors/source-registry/state-families.json",
+      "location": "local",
+      "sha256": "55f4b7b40101d97c5361ee88c7a630f13e1d991f9f86831ce6df463b287c93ab"
+    },
+    {
+      "kind": "state-intake-tests",
+      "id": "tests/research-program/state-source-intake.test.mjs",
+      "location": "local",
+      "sha256": "08e2fa7bc42a50b669ad8b24887993715b53c9a4eaf216ef2962d663a31b2525"
+    },
+    {
+      "kind": "source-coverage-docs",
+      "id": "docs/research-program/source-coverage.md",
+      "location": "local",
+      "sha256": "079e0927b0a71d3f2fdcc66b470f74736aaeaa7d7fc772df6a3201f4fae7c2d7"
+    },
+    {
+      "kind": "state-intake-index",
+      "id": "evaluation/research-program/state-intake/index.json",
+      "location": "local",
+      "sha256": "ba791d8393ffc46d79c765e75db878fc15b9c520c666bf6f500da3167840e9b5"
+    },
+    {
+      "kind": "named-source-registry-unchanged",
+      "id": "packages/retrieval/fixtures/named-source-registry.v1.0.0.json",
+      "location": "local",
+      "sha256": "5ffe387422e96036f353d92b340a98f344920988fff3cff3d0b272601cb7f39d"
+    },
+    {
+      "kind": "federal-intake-unchanged",
+      "id": "packages/connectors/source-registry/federal-intake.mjs",
+      "location": "local",
+      "sha256": "a9013ac91048f996828f8d2c3c1f1cf2728a5651b3aa1b337c3f40afee031801"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c044-focused",
+      "command": "node --test tests/research-program/state-source-intake.test.mjs tests/research-program/named-sources.test.mjs tests/research-program/federal-source-intake.test.mjs",
+      "started_at": "2026-09-14T14:16:00.680036Z",
+      "completed_at": "2026-09-14T14:16:00.848419Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "9/9 state-intake, named-source and federal-intake tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c044-focused-event",
+        "path": "verification/research-program/pr-044/producer-20260914/commands/focused-intake/event.json",
+        "sha256": "5396bb8b57d542a181c34ff6c5ef3028aadacbdbc040bac29d44c9af15f8a096",
+        "bytes": 1189
+      }
+    },
+    {
+      "id": "cmd-c044-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T14:16:00.848818Z",
+      "completed_at": "2026-09-14T14:16:00.907672Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c044-identity-event",
+        "path": "verification/research-program/pr-044/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "0ecdebe39096d41c8fbac9d202c04a5a5804e70166e2b5f7fa9c71fbb8c339bd",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr044-artifact-0",
+      "path": "verification/research-program/pr-044/task-binding.json",
+      "bytes": 4165,
+      "sha256": "9a137674549abaa452ba3f167ee49656f98b12545b9b2d60bbc206ed9c7a94f2"
+    },
+    {
+      "id": "pr044-artifact-1",
+      "path": "verification/research-program/pr-044/dispatch.json",
+      "bytes": 3116,
+      "sha256": "cf62b09ae97d9462eeab5a55a02745fd6f01bd0ff5c6b4f3096a4796762ace1c"
+    },
+    {
+      "id": "pr044-artifact-2",
+      "path": "verification/research-program/pr-044/producer-20260914/commands/focused-intake/receipt.json",
+      "bytes": 579,
+      "sha256": "1315c60f7a4fda39125b288fb02fd99aa6764c9d55721d084c485eaf4650e4fc"
+    },
+    {
+      "id": "pr044-artifact-3",
+      "path": "verification/research-program/pr-044/producer-20260914/commands/focused-intake/stdout.log",
+      "bytes": 1302,
+      "sha256": "5eb9febfc18cdcf5b5848ed365f1290f1d0413489dd96a67d88239a7fc5f5db0"
+    },
+    {
+      "id": "pr044-artifact-4",
+      "path": "verification/research-program/pr-044/producer-20260914/commands/focused-intake/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr044-artifact-5",
+      "path": "verification/research-program/pr-044/producer-20260914/commands/focused-intake/event.json",
+      "bytes": 1189,
+      "sha256": "5396bb8b57d542a181c34ff6c5ef3028aadacbdbc040bac29d44c9af15f8a096"
+    },
+    {
+      "id": "pr044-artifact-6",
+      "path": "verification/research-program/pr-044/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "d69ae643de02e5836cbd8f1e29376ea0f68d947f28a472e61e8e01af90d1969b"
+    },
+    {
+      "id": "pr044-artifact-7",
+      "path": "verification/research-program/pr-044/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr044-artifact-8",
+      "path": "verification/research-program/pr-044/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr044-artifact-9",
+      "path": "verification/research-program/pr-044/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "0ecdebe39096d41c8fbac9d202c04a5a5804e70166e2b5f7fa9c71fbb8c339bd"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-044-1",
+      "status": "producer_checked",
+      "result": "One state's coverage never implies all-state completeness. Publisher authority is not inferred from a familiar title.",
+      "command_ids": [
+        "cmd-c044-focused"
+      ]
+    },
+    {
+      "id": "C-044-2",
+      "status": "producer_checked",
+      "result": "Known portal/API boundaries have fixtures and budgets. Scraping does not bypass an application or DUA.",
+      "command_ids": [
+        "cmd-c044-focused"
+      ]
+    },
+    {
+      "id": "C-044-3",
+      "status": "producer_checked",
+      "result": "Pennsylvania finance returns PHC4 alongside HCRIS without identical reporting definitions or unrestricted payload access. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c044-focused",
+        "cmd-c044-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "named-source-registry-untouched",
+      "status": "accepted",
+      "detail": "packages/retrieval/fixtures/named-source-registry.v1.0.0.json was not edited (9748 bytes)."
+    },
+    {
+      "id": "connector-src-untouched",
+      "status": "accepted",
+      "detail": "packages/connectors/src was not edited."
+    },
+    {
+      "id": "retrieval-ranking-untouched",
+      "status": "accepted",
+      "detail": "Live retrieval ranking files were not edited."
+    },
+    {
+      "id": "national-completeness-from-pilot",
+      "status": "accepted",
+      "detail": "A Massachusetts APCD or Pennsylvania licensure row cannot claim national completeness."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "State intake is not R09 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-state-intake-review",
+      "status": "pending",
+      "detail": "Independent review of jurisdiction scope, familiar-title authority refusal and PHC4-plus-HCRIS cards remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "selected-jurisdictions-are-not-the-family",
+      "status": "risk",
+      "detail": "APCD and licensure families remain family-level named sources. Selected US-MA/US-PA rows are pilots, not national completeness."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of jurisdiction scope, familiar-title authority refusal and PHC4-plus-HCRIS cards, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-044 source and replay focused state-intake, named-source, federal-intake and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

@@ -8,7 +8,7 @@ import { createSearchReceipt } from '../lib/searchReceipt'
 import { assertDiscoveryResult } from '../providers/discoveryProvider'
 import type { DatasetRecord } from '../types/catalog'
 import type { DiscoveryResult, DiscoverySort } from '../types/discovery'
-import { displayedRecordIds, OrderedResultCards, SearchIdentityNote } from './SearchResultsPage'
+import { buildSearchFacetSections, displayedRecordIds, OrderedResultCards, SearchIdentityNote } from './SearchResultsPage'
 
 function renderedCardsMarkup(records: DatasetRecord[]) {
   return renderToStaticMarkup(createElement(
@@ -47,6 +47,32 @@ function responseInOrder(source: DiscoveryResult, records: DatasetRecord[], sort
 }
 
 describe('search result display and receipt ordering', () => {
+  it('keeps selected live controls through a narrowed response and uses no fabricated unknown count', async () => {
+    const source = await loadAcceptedDiscoveryFixture()
+    assertDiscoveryResult(source)
+    const records = adaptDiscoveryResponse(source).records.slice(0, 1)
+    const response = structuredClone(source)
+    response.facets = {
+      count_basis: 'records',
+      collection_scope: 'all_matching_records_before_pagination',
+      approximate: false,
+      sections: [{
+        id: 'geography',
+        label: 'Geography',
+        options: [{ value: 'US-PA', label: 'US-PA', count: 1 }],
+      }],
+    }
+    response.total_matches = 1
+    const geography = buildSearchFacetSections(response, records, ['geography:unknown'])
+      .find((section) => section.id === 'geography')
+    const unknown = geography?.options.find((option) => option.value === 'unknown')
+
+    expect(unknown?.label).toBe('Include records with unresolved geography (if present)')
+    expect(unknown?.count).toBeUndefined()
+    expect(geography?.options.find((option) => option.value === 'US-PA')?.label).toBe('Pennsylvania')
+    expect(geography?.options.find((option) => option.value === 'unknown')).toBeDefined()
+  })
+
   it('displays the response ranking version and catalog pin without inventing a missing version', async () => {
     const response = await loadAcceptedDiscoveryFixture()
     assertDiscoveryResult(response)

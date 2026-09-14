@@ -1,0 +1,37 @@
+{
+  "format": "ushso.pr002.c2-controller-handoff-supplement.v1",
+  "reviewer": "codex-root",
+  "head_sha": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+  "status": "changes_requested",
+  "finding": {
+    "id": "PR002-C2-005",
+    "priority": "P1",
+    "path": "docs/research-program/handoffs/PR-002.json",
+    "problem": "Two artifacts entries retain historical hashes at unqualified current paths after the C2 builder/verifier changed. Prior commit identities that are now known remain null.",
+    "mismatches": [
+      {
+        "path": "verification/research-program/pr-002/build.py",
+        "listed_sha256": "82ee85101acb0f20df39582abfe8485e945a6bc5d33c9da017be5ea172084836",
+        "actual_at_reviewed_head_sha256": "f7fd6d57d7fbe01d0d61ed02081695f95f34b3563294f3732448c7180f141d25"
+      },
+      {
+        "path": "verification/research-program/pr-002/verify.py",
+        "listed_sha256": "5537f1a6071f876149689d484495486ca42a5421715f226dab5c598ece49b6bb",
+        "actual_at_reviewed_head_sha256": "227ac85ad4fafdbcc28b309a453dab7cdce3d4f98dcbc97ffaa8483b3f6cdf33"
+      }
+    ],
+    "required_change": "Keep historical hashes with explicit immutable commit bindings; update current artifact references to match final bytes. Fill known C1-correction and C2 commit/tree identities. Only the newly authored correction needs external final SHA/tree binding to avoid self-reference. Verify all current and historical references under their stated bindings."
+  },
+  "known_commit_bindings": {
+    "C1-REVIEW-CORRECTION": {
+      "sha": "ef9c2569b78dd26f0436d2ea945a8e1b791b8698",
+      "tree": "a7db2e54b04891793e6ae9882826d12d7c74b32a"
+    },
+    "C-002-2": {
+      "sha": "8fe6e6b2e997e4a3ed59aece64492684f489bec8",
+      "tree": "7358d73c50e7db7431eb101243f784605ed93a9b"
+    }
+  },
+  "prior_review_sha256": "98876a428eba081dbc27980e14233a9f3582b83da5578d40df382baa7a0afab0",
+  "scope": "Supplement to the 81-check/three-replay review; those checks did not validate all handoff artifact references. No C2/C3 or R01-R16 acceptance."
+}

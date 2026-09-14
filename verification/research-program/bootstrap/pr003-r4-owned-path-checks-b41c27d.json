@@ -1,0 +1,131 @@
+{
+  "format": "ushso.pr003.r4-owned-path-semantic-check.v1",
+  "reviewer": "root Astra",
+  "head_sha": "b41c27db36b58b4bda16ded02bde3211ca02fb9d",
+  "tree_sha": "1b41ecf3174f968852a5f54f59a998dac92e34c5",
+  "module_sha256": "9a691294228356d56d012c66aa0af1cb1f1db5c9142f9960670b78275027d2b5",
+  "checked_at": "2026-09-11T03:04:58.006Z",
+  "results": [
+    {
+      "id": "exact-control",
+      "pattern": "tests/one.mjs",
+      "path": "tests/one.mjs",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "directory-control",
+      "pattern": "tests/",
+      "path": "tests/one.mjs",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "terminal-globstar-control",
+      "pattern": "tests/**",
+      "path": "tests/nested/one.mjs",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "single-star",
+      "pattern": "tests/*.mjs",
+      "path": "tests/one.mjs",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "globstar",
+      "pattern": "tests/**/*.mjs",
+      "path": "tests/nested/one.mjs",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "globstar-zero-directories",
+      "pattern": "tests/**/*.mjs",
+      "path": "tests/one.mjs",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "root-star",
+      "pattern": "*.mjs",
+      "path": "one.mjs",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "single-star-boundary",
+      "pattern": "tests/*.mjs",
+      "path": "tests/nested/one.mjs",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "id": "compound-terminal-globstar",
+      "pattern": "tests/*/**",
+      "path": "tests/unit/one.mjs",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "compound-terminal-globstar-zero-descendants",
+      "pattern": "tests/*/**",
+      "path": "tests/unit",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "compound-terminal-globstar-boundary",
+      "pattern": "tests/*/**",
+      "path": "other/unit/one.mjs",
+      "expected": false,
+      "actual": false,
+      "passed": true
+    },
+    {
+      "id": "compound-middle-and-terminal-globstar",
+      "pattern": "docs/**/fixtures/**",
+      "path": "docs/pr003/fixtures/nested/one.json",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "compound-zero-middle-directories",
+      "pattern": "docs/**/fixtures/**",
+      "path": "docs/fixtures/one.json",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "compound-terminal-directory",
+      "pattern": "tests/*/",
+      "path": "tests/unit/one.mjs",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    },
+    {
+      "id": "regex-metacharacter-literal",
+      "pattern": "tests/[unit]/*.mjs",
+      "path": "tests/[unit]/one.mjs",
+      "expected": true,
+      "actual": true,
+      "passed": true
+    }
+  ],
+  "status": "passed"
+}

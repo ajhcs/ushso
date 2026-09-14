@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/research-program/receipts/v1.0.0/evidence-receipt.schema.json",
+  "title": "USHSO research-program evidence receipt",
+  "description": "Standalone additive receipt. It cites immutable ingestion.v1.0.0 metadata-fetch and capture-reference records by value when present and does not add properties to those released contracts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "receipt_id",
+    "request_type",
+    "route_match",
+    "observation_label",
+    "source_id",
+    "descriptor_id",
+    "endpoint_id",
+    "template_id",
+    "configuration_revision",
+    "descriptor_hash",
+    "purpose",
+    "expected_content_classes",
+    "safe_final_locator",
+    "redirect_count",
+    "observed_status",
+    "observed_media_type",
+    "observed_bytes",
+    "truncated",
+    "observed_rejected_body_sha256",
+    "capture",
+    "underlying_records",
+    "parser",
+    "connector_identity",
+    "attempt_outcome",
+    "payload_access_verified",
+    "schema_validated",
+    "next_action",
+    "observed_at",
+    "truth_boundaries"
+  ],
+  "properties": {
+    "contract_version": { "const": "ushso.research-program.evidence-receipt.v1.0.0" },
+    "receipt_id": { "$ref": "#/$defs/OpaqueId" },
+    "request_type": {
+      "enum": [
+        "catalog_metadata",
+        "documentation",
+        "schema",
+        "access_probe",
+        "pre_egress",
+        "historical_observation"
+      ]
+    },
+    "route_match": {
+      "enum": [
+        "matched_descriptor_route",
+        "unmatched_historical_observation",
+        "pre_egress_block"
+      ]
+    },
+    "observation_label": { "type": ["string", "null"], "maxLength": 128 },
+    "source_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] },
+    "descriptor_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] },
+    "endpoint_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] },
+    "template_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] },
+    "configuration_revision": { "type": ["integer", "null"], "minimum": 1 },
+    "descriptor_hash": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["algorithm", "hash_basis", "hash_version", "sha256"],
+          "properties": {
+            "algorithm": { "const": "sha256" },
+            "hash_basis": { "enum": ["ushso-canonical-json.v1", "exact_published_bytes"] },
+            "hash_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "sha256": { "$ref": "#/$defs/Sha256" }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "purpose": {
+      "anyOf": [
+        { "enum": ["catalog_metadata", "documentation", "schema", "access_probe"] },
+        { "type": "null" }
+      ]
+    },
+    "expected_content_classes": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "enum": [
+          "catalog_item_record",
+          "catalog_collection",
+          "data_dictionary",
+          "schema_description",
+          "documentation_page",
+          "access_status_headers"
+        ]
+      }
+    },
+    "safe_final_locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host", "path"],
+      "properties": {
+        "host": { "type": ["string", "null"], "maxLength": 253 },
+        "path": { "type": ["string", "null"], "maxLength": 1000, "pattern": "^/[^?#]*$" }
+      }
+    },
+    "redirect_count": { "type": ["integer", "null"], "minimum": 0, "maximum": 5 },
+    "observed_status": { "type": ["integer", "null"], "minimum": 100, "maximum": 599 },
+    "observed_media_type": { "type": ["string", "null"], "maxLength": 150 },
+    "observed_bytes": { "type": ["integer", "null"], "minimum": 0, "maximum": 104857600 },
+    "truncated": { "type": "boolean" },
+    "observed_rejected_body_sha256": { "anyOf": [{ "$ref": "#/$defs/Sha256" }, { "type": "null" }] },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capture_ref_id",
+        "raw_sha256",
+        "semantic_sha256",
+        "compressed_bytes",
+        "decompressed_bytes",
+        "classification"
+      ],
+      "properties": {
+        "capture_ref_id": { "anyOf": [{ "$ref": "#/$defs/OpaqueId" }, { "type": "null" }] },
+        "raw_sha256": { "anyOf": [{ "$ref": "#/$defs/Sha256" }, { "type": "null" }] },
+        "semantic_sha256": { "anyOf": [{ "$ref": "#/$defs/Sha256" }, { "type": "null" }] },
+        "compressed_bytes": { "type": ["integer", "null"], "minimum": 1, "maximum": 52428800 },
+        "decompressed_bytes": { "type": ["integer", "null"], "minimum": 1, "maximum": 104857600 },
+        "classification": {
+          "anyOf": [
+            { "enum": ["catalog_metadata", "documentation", "schema_metadata", "access_observation_metadata"] },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "underlying_records": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata_fetch", "capture_reference"],
+      "properties": {
+        "metadata_fetch": { "type": ["object", "null"] },
+        "capture_reference": { "type": ["object", "null"] }
+      }
+    },
+    "parser": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "identity"],
+      "properties": {
+        "state": { "enum": ["not_run", "ran", "failed"] },
+        "identity": { "type": ["string", "null"], "maxLength": 128 }
+      }
+    },
+    "connector_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["connector_name", "connector_version"],
+      "properties": {
+        "connector_name": { "type": ["string", "null"], "maxLength": 64 },
+        "connector_version": { "type": ["string", "null"], "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" }
+      }
+    },
+    "attempt_outcome": {
+      "enum": [
+        "captured",
+        "not_modified",
+        "access_only",
+        "pre_egress_blocked",
+        "typed_failure",
+        "truncated_incomplete"
+      ]
+    },
+    "payload_access_verified": { "const": false },
+    "schema_validated": { "type": "boolean" },
+    "next_action": {
+      "enum": [
+        "none",
+        "reuse_capture",
+        "pause_source",
+        "retry",
+        "quarantine",
+        "typed_observation"
+      ]
+    },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "truth_boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "http_status_is_not_content_success",
+        "catalog_membership_is_not_payload_access",
+        "truncated_bytes_do_not_imply_schema_success"
+      ],
+      "properties": {
+        "http_status_is_not_content_success": { "const": true },
+        "catalog_membership_is_not_payload_access": { "const": true },
+        "truncated_bytes_do_not_imply_schema_success": { "const": true }
+      }
+    }
+  },
+  "$defs": {
+    "OpaqueId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{1,31}_[A-Za-z0-9][A-Za-z0-9._:-]{1,126}$"
+    },
+    "Sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

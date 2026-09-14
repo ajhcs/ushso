@@ -1,0 +1,47 @@
+{
+  "format": "ushso.pr006.c0062-facets-ui.v1",
+  "status": "producer_checked",
+  "decision": "UI-only availability and reason metadata with no discovery-result schema change",
+  "api_boundary": {
+    "contract_version": "observatory-discovery-result.v1.0.0",
+    "response_fields_changed": false,
+    "count_semantics": "Existing option counts remain records in all_matching_records_before_pagination. UI-only controls omit count when the current response does not contain the value.",
+    "filter_semantics": "Canonical section/value tokens use source, geography, access_status, unit_of_analysis, and capability; values retain canonical record IDs. Same-section selections are OR; sections are AND."
+  },
+  "behavior": {
+    "unknown_controls": [
+      "geography:unknown",
+      "access_status:unknown"
+    ],
+    "unknown_label": "Include records with unresolved geography (if present)",
+    "selected_tokens": "Selected tokens are retained and removable when narrowed responses omit their current value, including zero-result responses.",
+    "availability_reasons": "Unknown-only geography and uniform public_catalog access receive scoped current-result explanations; the UI makes no global absence or payload-access claim.",
+    "fallback_scope": "Fixture counts are explicitly bounded to the accepted response records."
+  },
+  "owned_paths": [
+    "apps/web/src/data/facets.ts",
+    "apps/web/src/data/facets.test.ts",
+    "apps/web/src/pages/SearchResultsPage.tsx",
+    "apps/web/src/pages/SearchResultsPage.test.tsx",
+    "apps/web/src/pages/SourcesPage.tsx",
+    "apps/web/src/pages/SourcesPage.test.tsx",
+    "apps/web/src/components/FacetSidebar.tsx",
+    "apps/web/src/components/FacetSidebar.test.tsx",
+    "apps/web/src/types/catalog.ts",
+    "apps/web/src/providers/discoveryProvider.ts",
+    "apps/web/src/providers/discoveryProvider.test.ts"
+  ],
+  "checks": [
+    "npm run typecheck --workspace @ushso/observatory-web",
+    "npm run test:web -- --run src/data/facets.test.ts src/providers/discoveryProvider.test.ts src/components/FacetSidebar.test.tsx src/pages/SearchResultsPage.test.tsx src/pages/SourcesPage.test.tsx"
+  ],
+  "test_result": "29 focused web tests passed",
+  "preserved": [
+    "apps/web/src/types/discovery.ts",
+    "packages/retrieval/schemas/discovery-result.schema.json",
+    "tests/fixtures/direct-base-control.mjs",
+    "packages/retrieval/fixtures/retrieval-core-before-lexical-index.txt",
+    "legacy facet aliases in DatasetFamily.facetValues"
+  ]
+}
+

@@ -1,0 +1,95 @@
+{
+  "format": "ushso.coengineer.grok-deadline-diagnosis.v1",
+  "generated_at": "2026-09-10",
+  "scope": "Read-only deadline/extension/end_turn route diagnosis for installed Co-Engineer 3.4.2.",
+  "conclusion": {
+    "supported": [
+      "inspectTask extension fields persist a later task deadline and extension event",
+      "the worker deadline watch rereads the task record on task-directory changes",
+      "controller waiters reread and use an updated task deadline"
+    ],
+    "limitation": "runAcpTask captures timeoutMs once and passes it into the already-created ACPX runtime/turn; the bundled runtime creates a fixed per-prompt withTimeout timer and exposes no inspected retroactive update path",
+    "uncertainty": "The permitted receipts do not distinguish natural provider end_turn from ACPX timeout fallback or establish whether the outer worker watch rearmed on the historical extension. Timeout expiry, failed extension propagation, and authentication failure are unproven."
+  },
+  "receipts": [
+    {
+      "path": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910/verification/research-program/bootstrap/pr002-c2-c3-deadline-extension.json",
+      "sha256": "6e40880f2aa1e4697086ab5bb93ce1e601ae43fc9cfb078199793f23adc58c55"
+    },
+    {
+      "path": "/mnt/d/worktrees/plumbob/ushso-research-program-20260910/verification/research-program/bootstrap/pr002-grok-c2-partial-completion.json",
+      "sha256": "d63b93c51ea78e2b132d24ed8b4aca30d64915a0ade0278ab9ec1f02c8661fa8"
+    }
+  ],
+  "timeline": {
+    "started_at": "2026-09-10T18:54:26.245Z",
+    "original_deadline_at": "2026-09-10T19:12:25.771Z",
+    "extension_at": "2026-09-10T19:06:32.268Z",
+    "extended_deadline_at": "2026-09-10T19:36:32.268Z",
+    "finished_at": "2026-09-10T19:12:27.828Z",
+    "extension_before_original_deadline_seconds": 353.503,
+    "finish_after_original_deadline_seconds": 2.057,
+    "finish_before_extended_deadline_seconds": 1444.44
+  },
+  "source_evidence": [
+    {
+      "path": "/home/plumbob/.codex/plugins/cache/coengineer-plumbob-release/codex-co-engineer/3.4.2/mcp/v3/supervisor.mjs",
+      "lines": "1044-1055; 2673-2683",
+      "supports": "Extension API persists the computed deadline and event."
+    },
+    {
+      "path": "/home/plumbob/.codex/plugins/cache/coengineer-plumbob-release/codex-co-engineer/3.4.2/mcp/v3/deadline.mjs",
+      "lines": "100-137",
+      "supports": "Extension validation and deadline computation from extension time."
+    },
+    {
+      "path": "/home/plumbob/.codex/plugins/cache/coengineer-plumbob-release/codex-co-engineer/3.4.2/mcp/v3/acp-worker.mjs",
+      "lines": "390-395; 462-487; 1595-1611; 1682-1702; 1737-1744",
+      "supports": "One-time timeout capture, dynamic outer worker watch, and fixed timeout passed to ACP runtime/turn."
+    },
+    {
+      "path": "/home/plumbob/.codex/plugins/cache/coengineer-plumbob-release/codex-co-engineer/3.4.2/assets/acpx-runtime.mjs",
+      "lines": "65; 89-91",
+      "supports": "Fixed withTimeout timer, timeout passed to runPromptTurn, and stopReason propagation; generated bundle lines are intentionally minified."
+    },
+    {
+      "path": "/home/plumbob/.codex/plugins/cache/coengineer-plumbob-release/codex-co-engineer/3.4.2/mcp/v3/task-store.mjs",
+      "lines": "274-297; 717-862",
+      "supports": "Atomic task-record update and dynamic waiter deadline rereads."
+    }
+  ],
+  "source_sha256": {
+    "acp-worker.mjs": "38eec6f9322b2afb0c1beb848399b33c190b9ac3d8176adb0584178556c9dcfd",
+    "deadline.mjs": "32ad2aa23647d28c54e071af0b946e4f9979d20597350858c9e17b2cb98806ea",
+    "supervisor.mjs": "65f0a7fe856479ff0c6412972437ba596a5bf3ce6347914c1bfea78a60506ea2",
+    "task-store.mjs": "dd5744ab3ad9784d059e6c51dba4a062fa5114ed99a209df97860cf763394376",
+    "acpx-runtime.mjs": "069bdae5541dd53876dfa806c2c3dbb2bd9bdbc1d3763fdbcd1f0e5e1efaf3b6"
+  },
+  "controls": {
+    "provider_process_inspected": false,
+    "active_task_inspected": false,
+    "prompt_or_thought_stream_read": false,
+    "secret_read": false,
+    "repository_or_runtime_modified": false,
+    "network_used": false
+  },
+  "control_references": {
+    "skill": {
+      "path": "/home/plumbob/.codex/plugins/cache/coengineer-plumbob-release/codex-co-engineer/3.4.2/skills/control-codex-co-engineer-agents/SKILL.md",
+      "lines": "81-87; 105-126",
+      "supports": "Pre-expiry strictly-later extension rule and wait/provider lifecycle boundary."
+    },
+    "host_notes": [
+      {
+        "path": "/home/plumbob/.codex/memories/plumbob-server/agent-harnesses.md",
+        "lines": "5-19",
+        "supports": "Contemporaneous runtime failure was generic and did not establish authentication or a more specific cause; provider completion is not acceptance."
+      },
+      {
+        "path": "/home/plumbob/.codex/memories/plumbob-server/codex-stock-setup.md",
+        "lines": "1-3; 15",
+        "supports": "Stock-runtime and no-unsolicited-tuning context."
+      }
+    ]
+  }
+}

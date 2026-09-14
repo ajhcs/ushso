@@ -1,0 +1,79 @@
+{
+  "reviewed_at": "2026-09-12T04:13:28.460914Z",
+  "candidate_head": "954a237a8984d06f5ea0ab15f83c71ce210bf09a",
+  "candidate_tree": "a781e9801224af92b51389fb898f0b67ab261982",
+  "scanner": "gitleaks 8.30.0",
+  "scanner_exit_code": 1,
+  "raw_finding_count": 4,
+  "confirmed_secret_findings": 0,
+  "findings": [
+    {
+      "rule_id": "generic-api-key",
+      "object_id": "dfae7b23d428418c43eca6045597232193b2d72f",
+      "paths": [
+        "verification/research-program/bootstrap/corrected-components-8a9b921-911aff5/downstream-preparation/pr009-controller-topology-input-inventory.json.gz"
+      ],
+      "line": 27,
+      "end_line": 27,
+      "fingerprint": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publication-readiness/audit-954a237/scanner-inputs/dfae7b23d428418c43eca6045597232193b2d72f.txt:generic-api-key:27",
+      "disposition": "false_positive_non_secret_candidate_identity",
+      "reason": "The matching candidate_key is a 64-character SHA-256 identity in a release-gate candidate object, alongside head/tree/changed-path fields; it is not authentication material."
+    },
+    {
+      "rule_id": "generic-api-key",
+      "object_id": "ecbcd4b9f7a04ebfeba00a3802239dd94ece2b68",
+      "paths": [
+        "verification/research-program/bootstrap/pr006-pr008-gate-corrections-20260911/failed-gate.json.gz"
+      ],
+      "line": 8,
+      "end_line": 8,
+      "fingerprint": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publication-readiness/audit-954a237/scanner-inputs/ecbcd4b9f7a04ebfeba00a3802239dd94ece2b68.txt:generic-api-key:8",
+      "disposition": "false_positive_non_secret_candidate_identity",
+      "reason": "The matching candidate_key is a 64-character SHA-256 identity in a release-gate candidate object, alongside head/tree/changed-path fields; it is not authentication material."
+    },
+    {
+      "rule_id": "generic-api-key",
+      "object_id": "fa541bef49d3ae8698ac53d56160cac6c8b565ee",
+      "paths": [
+        "verification/research-program/bootstrap/gate-980895d-artifact-correction/failed-gate.json.gz"
+      ],
+      "line": 8,
+      "end_line": 8,
+      "fingerprint": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publication-readiness/audit-954a237/scanner-inputs/fa541bef49d3ae8698ac53d56160cac6c8b565ee.txt:generic-api-key:8",
+      "disposition": "false_positive_non_secret_candidate_identity",
+      "reason": "The matching candidate_key is a 64-character SHA-256 identity in a release-gate candidate object, alongside head/tree/changed-path fields; it is not authentication material."
+    },
+    {
+      "rule_id": "generic-api-key",
+      "object_id": "dad29df19c6fa6721254c0f12daee7489974744e",
+      "paths": [
+        "verification/research-program/bootstrap/corrected-components-e3af8dd/local-gate.json.gz"
+      ],
+      "line": 251223,
+      "end_line": 251223,
+      "fingerprint": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/publication-readiness/audit-954a237/scanner-inputs/dad29df19c6fa6721254c0f12daee7489974744e.txt:generic-api-key:251223",
+      "disposition": "false_positive_non_secret_candidate_identity",
+      "reason": "The matching candidate_key is a 64-character SHA-256 identity in a release-gate candidate object, alongside head/tree/changed-path fields; it is not authentication material."
+    }
+  ],
+  "credential_field_review": "Only package dependency names named cookie and prose authorization records matched; no token/header values were present.",
+  "images": {
+    "count": 8,
+    "verdict": "All eight decompressed PNG objects visually inspected; synthetic fixtures/public catalog UI, no personal data or credentials observed.",
+    "objects": [
+      "e305ece75023983bacb2120980de95ffa2142f0c",
+      "5ff70aada586f48d625401b5e9e9f0581852c39c",
+      "23953d9233ad382ec833933812c2bfbf47dcc2b6",
+      "4b4f5cbee59513432f462f9db78ae71039d14520",
+      "d12af797ae7dacc7e5d96c3ec934b9ee8ff2091a",
+      "9c331cdf8fb19f3554a7c7be9b85e2a96f22f6df",
+      "9b5af8a5060e71652b5c67a0745d2ba350afd10d",
+      "0f60ba8b4f95ea3de22eecb3f9bdad4d449401f6"
+    ]
+  },
+  "limitations": [
+    "A bounded content scanner and manual artifact review are not a proof of absence for every possible secret encoding.",
+    "Local filesystem paths and internal task/provider identifiers remain in 195 objects as historical provenance. No historical bytes were altered.",
+    "This audit does not qualify the code or authorize public mutation."
+  ]
+}

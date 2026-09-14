@@ -1,0 +1,105 @@
+{
+  "format": "ushso.pr006.c0063-labels-parity.v1",
+  "status": "producer_checked",
+  "decision": "Existing live facet option labels may be humanized from complete pre-pagination matches; no discovery-result response field, option value, count, order, filter, ranking, or pagination semantics changed.",
+  "native_interface": {
+    "configured_selection": "gpt-5.6-luna/max",
+    "interface": "native Codex collaboration",
+    "producer_self_label": "Codex, GPT-6",
+    "identity_boundary": "The configured Luna Max interface is recorded separately from the generic producer self-label; this artifact does not attest to a serving-model identity beyond the dispatch selection."
+  },
+  "live_engine": {
+    "changed_field": "facets.sections[].options[].label only",
+    "captured_label_scope": "Source and capability labels are resolved from all complete matching records before pagination.",
+    "fallback_labels": "Known access, geography, unit, capability and source values use existing readable vocabulary; conflicting or missing captured labels retain a bounded static/raw label.",
+    "unchanged": [
+      "option.value",
+      "option.count",
+      "section IDs and order",
+      "facet filter parsing",
+      "same-dimension OR and cross-dimension AND",
+      "ranking",
+      "pagination",
+      "query/results/join_routes/warnings response shape"
+    ]
+  },
+  "fixture_roundtrip": {
+    "records": 3,
+    "initial": {
+      "total_matches": 3,
+      "page_size": 1,
+      "geography": {
+        "state": 2,
+        "US-PA": 1,
+        "unknown": 1
+      },
+      "access_status": {
+        "public_catalog": 1,
+        "public_direct": 1,
+        "unknown": 1
+      }
+    },
+    "same_dimension_or": {
+      "filters": {
+        "geography": [
+          "US-PA",
+          "unknown"
+        ]
+      },
+      "total_matches": 2,
+      "result_ids": [
+        "fixture:facet:pa",
+        "fixture:facet:unknown"
+      ],
+      "hidden_value": "US-CA"
+    },
+    "cross_dimension_and": {
+      "filters": {
+        "geography": [
+          "US-PA",
+          "unknown"
+        ],
+        "access_status": [
+          "public_catalog"
+        ]
+      },
+      "total_matches": 1,
+      "result_ids": [
+        "fixture:facet:pa"
+      ]
+    },
+    "page_absent_labels": {
+      "source": "Beta captured source",
+      "capability": "Beta captured concept",
+      "geography": "California",
+      "access_status": "Public catalog metadata; payload access unresolved"
+    },
+    "fallback_filtering": "FixtureDiscoveryProvider applies the same canonical filters locally, updates result/ranking/pagination/sections metadata, recomputes current fixture-scope counts, and leaves absent unknown controls count-free for the shared adapter."
+  },
+  "parity": {
+    "references": [
+      "tests/fixtures/direct-base-control.mjs",
+      "packages/retrieval/fixtures/retrieval-core-before-lexical-index.txt"
+    ],
+    "comparison_boundary": "Both comparison tests replace only facet option labels with a sentinel and deep-compare every remaining response field and input immutability.",
+    "expected_label_cases": "C0063 asserts captured source/capability labels for values absent from the first page plus readable geography/access labels."
+  },
+  "checks": [
+    "node --test packages/retrieval/tests/lexical-index.test.mjs",
+    "node --test tests/direct-base-regression.test.mjs",
+    "node --test tests/research-program/isolation-and-facets.test.mjs",
+    "npm run test:web",
+    "npm run test:retrieval"
+  ],
+  "preserved": [
+    "packages/retrieval/schemas/discovery-result.schema.json",
+    "apps/web/src/types/discovery.ts",
+    "tests/fixtures/direct-base-control.mjs",
+    "packages/retrieval/fixtures/retrieval-core-before-lexical-index.txt",
+    "historical corpus/manifests/fingerprints and all source capture bytes"
+  ],
+  "limitations": [
+    "Fixture counts are bounded to accepted response records after local filtering and are not a live catalog count.",
+    "The producer did not claim browser/participant qualification, live publisher payload access, private holdout access, or scientific acceptance."
+  ]
+}

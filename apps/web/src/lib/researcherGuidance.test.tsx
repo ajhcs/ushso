@@ -5,7 +5,7 @@ import { ResearcherDecisionSummary } from '../components/ResearcherDecisionSumma
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
 import { assertDiscoveryResult } from '../providers/discoveryProvider'
 import { adaptDiscoveryResponse } from './catalogAdapter'
-import { buildResearcherGuidance } from './researcherGuidance'
+import { buildResearcherGuidance, refuseBestForFromTopicTags } from './researcherGuidance'
 
 const response = await loadAcceptedDiscoveryFixture()
 assertDiscoveryResult(response)
@@ -19,6 +19,7 @@ describe('researcher decision guidance', () => {
       'Not sufficient for',
       'Key analytic cautions',
       'Typical unit',
+      'Inferred unit tags (search aid only)',
       'Known breaks in series',
       'Update frequency and expected lag',
       'Suppression and completeness',
@@ -30,6 +31,43 @@ describe('researcher decision guidance', () => {
     expect(guidance.useCard.fields.every((field) => field.values.length > 0 && field.evidenceIds.length > 0)).toBe(true)
     expect(guidance.reviewStatus).toBe('pending_external_researcher_review')
     expect(JSON.stringify(guidance)).not.toMatch(/analysis_result|market_share|financial_benchmark|computed_estimate/)
+  })
+
+  it('does not promote inferred unit_of_analysis tags as source-asserted typical units', () => {
+    const hcris = adaptDiscoveryResponse(response).records.find((record) =>
+      record.canonicalResult.record_id.includes('hcris') || record.title.toLowerCase().includes('hospital provider cost report') || record.canonicalResult.record.unit_of_analysis.includes('hospital'),
+    )
+    expect(hcris).toBeDefined()
+    const grain = hcris!.canonicalResult.metadata?.dimensions.observation_grain
+    expect(grain?.state ?? 'unresolved').toBe('unresolved')
+    const typical = buildResearcherGuidance(hcris!).useCard.fields.find((field) => field.label === 'Typical unit')
+    expect(typical?.evidenceState).toBe('unresolved')
+    expect(typical?.values.join(' ')).toMatch(/unresolved/i)
+    expect(typical?.values.join(' ')).not.toMatch(/Hospital|Facility|Provider|State/)
+    const inferred = buildResearcherGuidance(hcris!).useCard.fields.find((field) => field.label === 'Inferred unit tags (search aid only)')
+    expect(inferred?.evidenceState).toBe('inferred')
+    expect(inferred?.values.length).toBeGreaterThan(0)
+  })
+
+  it.each(['inferred', 'unavailable'] as const)('keeps %s observation grain out of Typical unit', (state) => {
+    const claimed = structuredClone(dataset)
+    claimed.canonicalResult.metadata = {
+      ...claimed.canonicalResult.metadata,
+      dimensions: {
+        observation_grain: { values: ['hospital'], state },
+        sampled_entity: { values: [], state: 'unresolved' },
+        reporting_organization: { values: [], state: 'unresolved' },
+        population_universe: { values: [], state: 'unresolved' },
+        geographic_dimensions: { values: [], state: 'unresolved' },
+        inferred_search_tags: claimed.canonicalResult.record.unit_of_analysis.map((value) => `unit_of_analysis:${value}`),
+      },
+    } as typeof claimed.canonicalResult.metadata
+    const typical = buildResearcherGuidance(claimed).useCard.fields.find((field) => field.label === 'Typical unit')
+    const inferred = buildResearcherGuidance(claimed).useCard.fields.find((field) => field.label === 'Inferred unit tags (search aid only)')
+    expect(typical?.evidenceState).not.toBe('source_asserted')
+    expect(typical?.values).toEqual(['Observation grain is unresolved.'])
+    expect(inferred?.values.join(' ')).toMatch(/Hospital/)
+    expect(inferred?.values.join(' ')).toMatch(/not a resolved typical unit/)
   })
 
   it('keeps access and retrieval explanatory, typed, and non-executing', () => {
@@ -69,5 +107,14 @@ describe('researcher decision guidance', () => {
     const markup = renderToStaticMarkup(createElement(ResearcherDecisionSummary, { dataset: unsafe }))
     expect(guidance.retrievalRecipe.steps[0].url).toBeNull()
     expect(markup).not.toContain(url)
+  })
+
+  it('cannot declare Best for from topic tags alone', () => {
+    expect(refuseBestForFromTopicTags(['hospitals', 'finance'], ['hospitals', 'finance'])).toEqual([
+      'Best for cannot be declared from topic tags alone; documented use evidence is required.',
+    ])
+    const guidance = buildResearcherGuidance(dataset)
+    const best = guidance.useCard.fields.find((field) => field.label === 'Best for')
+    expect(best?.values.join(' ')).not.toMatch(/^Best for hospital$/i)
   })
 })

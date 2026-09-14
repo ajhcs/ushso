@@ -1,0 +1,287 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-043",
+  "status": "producer_checked",
+  "owner": "/root/pr043_federal_source_intake",
+  "reviewer": "Astra/root",
+  "base_sha": "ee747da2b368b2d4d8e043262ea02fc30ed049c6",
+  "head_sha": "389af0a9b1c0af8de56ad43643023067cf411ee1",
+  "dependency_merge_shas": {
+    "PR-013": "861a7808fec20e5e7795bb8f8082f82717e01f11",
+    "PR-014": "8878aa2cc8bd9b36995d429774f377e3de66aca7",
+    "PR-015": "df5f7f9b8460b6b118f5a4699673b9c96c15b07b",
+    "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7",
+    "PR-037": "ac2dcebbead2498f6df77f503d5484b81da8319f"
+  },
+  "branch": "codex/ushso-pr043-federal-source-intake-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/connectors/source-registry/",
+    "evaluation/research-program/source-intake/",
+    "tests/research-program/federal-source-intake.test.mjs",
+    "docs/research-program/federal-source-intake.md",
+    "verification/research-program/pr-043/",
+    "docs/research-program/handoffs/PR-043.json"
+  ],
+  "problem": "HRSA AHRF, NPPES, SAMHSA, T-MSIS/TAF and SVI lacked evidence-backed intake dispositions. TAF restricted research files could be confused with public Medicaid summary products. Adding a route could assert access to restricted TAF data. Unsupported protocols could become unbounded scrapers. ASPE catalog SVI could be treated as ATSDR SVI. Synar tables could satisfy SAMHSA facility services. NPI could be treated as CCN. Catalog membership could be invented. Frozen named-source-registry.v1.0.0.json or connector src could be edited.",
+  "resulting_behavior": "Federal intake lives in packages/connectors/source-registry/ with five frozen family records. Every locator is publisher-supported. TAF restricted research files are not public Medicaid summaries, and adding a route never asserts TAF access. Each family has a literal configuration and fixture. An unsupported protocol produces a specific extension task rather than a scraper. Original NPPES/AHRF/SAMHSA/SVI questions identify the intended family; ASPE catalog record ypqf-r5qs is not ATSDR SVI. Catalog membership is not invented. Frozen packages/retrieval/fixtures/named-source-registry.v1.0.0.json (9748 bytes) and packages/connectors/src are unchanged. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-043-1",
+      "subject": "Capture exact publisher intake records",
+      "sha": "11f6f83215a217b969c2cd3ccf727bf00921dc96"
+    },
+    {
+      "id": "C-043-2",
+      "subject": "Configure existing adapters per source",
+      "sha": "11f6f83215a217b969c2cd3ccf727bf00921dc96"
+    },
+    {
+      "id": "C-043-3",
+      "subject": "Publish and evaluate the new routes",
+      "sha": "389af0a9b1c0af8de56ad43643023067cf411ee1"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "federal-intake",
+      "id": "packages/connectors/source-registry/federal-intake.mjs",
+      "location": "local",
+      "sha256": "a9013ac91048f996828f8d2c3c1f1cf2728a5651b3aa1b337c3f40afee031801"
+    },
+    {
+      "kind": "federal-families",
+      "id": "packages/connectors/source-registry/federal-families.json",
+      "location": "local",
+      "sha256": "16e733943deee0804addebe20e48bde01a47248951ebc050ce4ca6de376b8687"
+    },
+    {
+      "kind": "federal-intake-tests",
+      "id": "tests/research-program/federal-source-intake.test.mjs",
+      "location": "local",
+      "sha256": "aeb2f61643993dc6cd15e0a2ab81a2dfdb6fbb3f197eca5fd17b0fbd88f2690f"
+    },
+    {
+      "kind": "federal-intake-docs",
+      "id": "docs/research-program/federal-source-intake.md",
+      "location": "local",
+      "sha256": "77da882979511685d63b0d604b6b9f9934becb7af8073c8c5292ec522e19dce1"
+    },
+    {
+      "kind": "source-intake-index",
+      "id": "evaluation/research-program/source-intake/index.json",
+      "location": "local",
+      "sha256": "329865817dba5d1eac1506382bd47808dbe98782b6ad1516ca9d832e81ffed81"
+    },
+    {
+      "kind": "named-source-registry-unchanged",
+      "id": "packages/retrieval/fixtures/named-source-registry.v1.0.0.json",
+      "location": "local",
+      "sha256": "5ffe387422e96036f353d92b340a98f344920988fff3cff3d0b272601cb7f39d"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c043-focused",
+      "command": "node --test tests/research-program/federal-source-intake.test.mjs tests/research-program/named-sources.test.mjs",
+      "started_at": "2026-09-14T14:00:38.543065Z",
+      "completed_at": "2026-09-14T14:00:38.693598Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "6/6 federal-intake and named-source tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c043-focused-event",
+        "path": "verification/research-program/pr-043/producer-20260914/commands/focused-intake/event.json",
+        "sha256": "59a511402259807126bc63cfb718a50ea448f06540b38ef830cff8275fe3171e",
+        "bytes": 1115
+      }
+    },
+    {
+      "id": "cmd-c043-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T14:00:38.693914Z",
+      "completed_at": "2026-09-14T14:00:38.748155Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c043-identity-event",
+        "path": "verification/research-program/pr-043/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "a65175311f480d90ba1fe41dc7f83b18caa46a8d176f5db9360fe58c23ea09ed",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr043-artifact-0",
+      "path": "verification/research-program/pr-043/task-binding.json",
+      "bytes": 4211,
+      "sha256": "5d11863fc6111645c355ebf8058f9115c0844b827ef6519963fdcf379f9c97bc"
+    },
+    {
+      "id": "pr043-artifact-1",
+      "path": "verification/research-program/pr-043/dispatch.json",
+      "bytes": 3104,
+      "sha256": "5c7ea351cde598cb9de422f35cc7efcd6c38ae54e49a6232b58aa666bce90b55"
+    },
+    {
+      "id": "pr043-artifact-2",
+      "path": "verification/research-program/pr-043/producer-20260914/commands/focused-intake/receipt.json",
+      "bytes": 519,
+      "sha256": "7e4cf9482e52d989c3b2f3d32e182236fe8ae93e4ce21388cbac7d5658486f28"
+    },
+    {
+      "id": "pr043-artifact-3",
+      "path": "verification/research-program/pr-043/producer-20260914/commands/focused-intake/stdout.log",
+      "bytes": 888,
+      "sha256": "4fae2b954455d7687d55a1fd604a924f54a354061d5270e949ef12e47389a414"
+    },
+    {
+      "id": "pr043-artifact-4",
+      "path": "verification/research-program/pr-043/producer-20260914/commands/focused-intake/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr043-artifact-5",
+      "path": "verification/research-program/pr-043/producer-20260914/commands/focused-intake/event.json",
+      "bytes": 1115,
+      "sha256": "59a511402259807126bc63cfb718a50ea448f06540b38ef830cff8275fe3171e"
+    },
+    {
+      "id": "pr043-artifact-6",
+      "path": "verification/research-program/pr-043/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "c4e83c37b57bbfe846662c6d9cb5698933c23b054036be22472821c9b4810ca0"
+    },
+    {
+      "id": "pr043-artifact-7",
+      "path": "verification/research-program/pr-043/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr043-artifact-8",
+      "path": "verification/research-program/pr-043/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr043-artifact-9",
+      "path": "verification/research-program/pr-043/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "a65175311f480d90ba1fe41dc7f83b18caa46a8d176f5db9360fe58c23ea09ed"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-043-1",
+      "status": "producer_checked",
+      "result": "Every locator is publisher-supported. TAF restricted research files are not public summary products.",
+      "command_ids": [
+        "cmd-c043-focused"
+      ]
+    },
+    {
+      "id": "C-043-2",
+      "status": "producer_checked",
+      "result": "Each family has a literal configuration and fixture. Unsupported protocols become extension tasks, not scrapers.",
+      "command_ids": [
+        "cmd-c043-focused"
+      ]
+    },
+    {
+      "id": "C-043-3",
+      "status": "producer_checked",
+      "result": "Original NPPES/AHRF/SAMHSA/SVI questions identify the intended family. Restrictions remain visible. ASPE SVI is not ATSDR SVI. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c043-focused",
+        "cmd-c043-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "named-source-registry-untouched",
+      "status": "accepted",
+      "detail": "packages/retrieval/fixtures/named-source-registry.v1.0.0.json was not edited (9748 bytes)."
+    },
+    {
+      "id": "connector-src-untouched",
+      "status": "accepted",
+      "detail": "packages/connectors/src was not edited; intake lives beside the package under source-registry/."
+    },
+    {
+      "id": "taf-access-asserted",
+      "status": "accepted",
+      "detail": "Adding a TAF route never asserts restricted-file access."
+    },
+    {
+      "id": "catalog-membership-invented",
+      "status": "accepted",
+      "detail": "Five families remain not_indexed without invented catalog membership."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Federal intake is not R09 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-federal-intake-review",
+      "status": "pending",
+      "detail": "Independent review of TAF/public-summary split, publisher locators and ASPE-vs-ATSDR remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "ledger-named-named-source-registry",
+      "status": "risk",
+      "detail": "The original ledger named packages/retrieval/fixtures/named-source-registry.v1.0.0.json. Implementation reuses it read-only and records intake beside connectors under source-registry/ so CORPUS_STAGE_DRIFT cannot recur."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of TAF/public-summary split, publisher locators and ASPE-vs-ATSDR, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-043 source and replay focused federal-intake, named-source and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

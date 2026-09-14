@@ -1,0 +1,71 @@
+{
+  "format": "ushso.pr004.functional-history-replay.v1",
+  "reviewer": "root Astra",
+  "head_sha": "2976d98f39b782f6742b3f2f78cd919d8fce8d2d",
+  "tree_sha": "8324f55810f9ae4bf09ea87c09b6003ea05393b1",
+  "source_sha256": {
+    "packages/coverage/research-program/v1.0.0/src/completeness.mjs": "ef2e4e53758bdba0d97e0cfe77f472ae6a02d8959f867f0d3b04e3fcdb093b78",
+    "packages/normalization/src/field-observation.mjs": "e19e966d34f413fa58108d6396ef0e6142afc68d0f5a42e319a4d5a435eeaa82"
+  },
+  "commands": [
+    {
+      "name": "supplemental-fixed",
+      "script_sha256": "fbc78024921b601292bc099a0765b631d7f0acb6e04d7d02417950ce895637f8",
+      "argv": [
+        "node",
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/2976d98-functional/supplemental-fixed.mjs",
+        "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+      ],
+      "started_at": "2026-09-11T02:13:13.654177+00:00",
+      "completed_at": "2026-09-11T02:13:13.720796+00:00",
+      "exit_code": 0,
+      "stdout_sha256": "50097d652eccb1d0cfd738e2619e379e4bd5ab0c649116c3f334f34e0ef44e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cases": [
+        {
+          "case": "separate prior and current observations without an explicit history chain",
+          "build_and_assert_passed": true,
+          "input_success_attempt_count": 1,
+          "vector_attempt_state": "failed",
+          "vector_history_count": 1,
+          "old_evidence_in_catalog": true,
+          "pass": true
+        },
+        {
+          "case": "impossible timestamp rejected",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "name": "flat-nested-revisions",
+      "script_sha256": "1aef0dbbd3df18789b514e8288efb6c52e7467ee698fcf9423e9ef7f46c6bdad",
+      "argv": [
+        "node",
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/2976d98-functional/flat-nested-revisions.mjs",
+        "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+      ],
+      "started_at": "2026-09-11T02:13:13.720847+00:00",
+      "completed_at": "2026-09-11T02:13:13.784885+00:00",
+      "exit_code": 1,
+      "stdout_sha256": "e50b4b784e3de11b438a90b636a76b7eb1ec2463f1a9e722b6b55429023b140a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cases": [
+        {
+          "label": "nested-control",
+          "passed": true,
+          "revision_count": 3
+        },
+        {
+          "label": "flat-and-nested-identical-revisions",
+          "passed": false,
+          "error": "TypeError: FIELD_OBSERVATION_REVISION_CONFLICT:record:unlinked\u0000source:unlinked\u0000payload.access\u0000revision:b",
+          "code": "field_observation_revision_conflict"
+        }
+      ]
+    }
+  ],
+  "disposition": "changes_requested",
+  "finding": "Mixed flat and nested representations of identical three-revision history falsely conflict because ancestry containers enter revision payload equality.",
+  "scope": "Read-only independent functional checks. Separate evidence sealing, artifact rebuild and final acceptance remain pending."
+}

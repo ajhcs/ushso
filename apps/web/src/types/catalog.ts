@@ -46,6 +46,15 @@ export interface DatasetVerification {
   dataThrough: string | null
   nextReviewDue: string | null
   liveVerified: boolean
+  lastSuccessfulMetadataCheck: string | null
+  latestAttemptAt: string | null
+  latestAttemptOutcome: string
+  latestAttemptScope: 'catalog_metadata'
+  payloadCheckState: 'not_attempted' | 'unknown' | 'succeeded' | 'failed' | 'restricted' | 'unavailable'
+  payloadCheckNote: string
+  staleStatus: 'stale_historical_success' | 'review_overdue' | 'not_stale' | 'unknown'
+  freshnessState: 'deadline_unknown' | 'overdue' | 'within_review_window' | 'unknown'
+  evaluatedAt: string | null
   evidence: DatasetVerificationEvidence[]
 }
 
@@ -102,7 +111,8 @@ export interface DatasetRecord extends DatasetFamily {
 export interface FacetOption {
   value: string
   label: string
-  count: number
+  /** Counts are omitted for UI-only include-unknown controls. */
+  count?: number
   disabled?: boolean
 }
 
@@ -112,6 +122,9 @@ export interface FacetSectionConfig {
   options: FacetOption[]
   collapsed?: boolean
   expandable?: boolean
+  /** Browser-only availability metadata; never sent in the frozen API response. */
+  availability?: 'available' | 'unavailable'
+  availabilityReason?: string
 }
 
 export interface CatalogSearchResponse {

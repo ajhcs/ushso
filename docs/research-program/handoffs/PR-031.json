@@ -1,0 +1,317 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-031",
+  "status": "producer_checked",
+  "owner": "/root/pr031_grain_and_time",
+  "reviewer": "Astra/root",
+  "base_sha": "7cfa9f43d3b2d6d171181ee09a5bd6b7382462a2",
+  "head_sha": "fa5f339a0978e36c094eba7afa1093e133a44569",
+  "dependency_merge_shas": {
+    "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+    "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+    "PR-029": "ddb8f4cc88106ab937220a2c231ed62928ae101f",
+    "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7"
+  },
+  "branch": "codex/ushso-pr031-grain-and-time-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/grain-and-time.mjs",
+    "tests/research-program/grain-and-time.test.mjs",
+    "docs/research-program/grain-and-time.md",
+    "verification/research-program/pr-031/",
+    "docs/research-program/handoffs/PR-031.json"
+  ],
+  "problem": "HCRIS facility/report/year and PLACES county/measure/year could collapse into a generic hospital or person tag. Undocumented dimensions could be inferred. A metadata-modified date could fill observation end. A projection to 2100 could be treated as observed future data. Overlapping ACS periods and rolling releases could be flattened. Incompatible fiscal and calendar years could be treated as equivalent. Editing sealed identity researcher-guidance or normalization src would break WP7/normalization artifact seals.",
+  "resulting_behavior": "Grain and time live in packages/enrichment/grain-and-time.mjs. Observation grain, sampled entity, reporting organization, universe and geographic dimension are separate evidenced fields with explicit unknown states. HCRIS facility/report/year and PLACES county/measure/year cannot collapse into generic hospital/person tags. Date roles bind only from captured statements. A metadata-modified date cannot fill observation end. A projection to 2100 is not observed future data. Overlapping ACS periods and rolling releases are preserved. Incompatible reporting periods yield INCOMPATIBLE_REPORTING_PERIODS; there is no automatic fiscal-to-calendar equivalence. Source-native terms remain visible alongside normalized fields. Sealed packages/identity/src and packages/normalization/src are unchanged.",
+  "commits": [
+    {
+      "id": "C-031-1",
+      "subject": "Define distinct research dimensions",
+      "sha": "83428bd88800b80d1ab616f7bd286192387113d0"
+    },
+    {
+      "id": "C-031-2",
+      "subject": "Bind date roles to evidence",
+      "sha": "83428bd88800b80d1ab616f7bd286192387113d0"
+    },
+    {
+      "id": "C-031-3",
+      "subject": "Add context-specific scientific checks",
+      "sha": "fa5f339a0978e36c094eba7afa1093e133a44569"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "grain-and-time",
+      "id": "packages/enrichment/grain-and-time.mjs",
+      "location": "local",
+      "sha256": "408bc9bb20d7e5cc9f8932c078fed48229f47e6c779bcbae3e58b2df998a0b82"
+    },
+    {
+      "kind": "grain-and-time-tests",
+      "id": "tests/research-program/grain-and-time.test.mjs",
+      "location": "local",
+      "sha256": "1f2509b914cacb9aebabd210f2e4571cb3631e17d00d8694189567a12fe41854"
+    },
+    {
+      "kind": "grain-and-time-docs",
+      "id": "docs/research-program/grain-and-time.md",
+      "location": "local",
+      "sha256": "fd8da8dbed6978dd04bb48bdafa6b594b31b93efe4d09fdb49b9f0ba66727ab6"
+    },
+    {
+      "kind": "sealed-researcher-guidance-unchanged",
+      "id": "packages/identity/src/researcher-guidance.mjs",
+      "location": "local",
+      "sha256": "209589f51b138ff752b90f5531a54d6f7f8b9e97952e65846d1e6c277abf49de"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "sealed-normalization-index-unchanged",
+      "id": "packages/normalization/src/index.mjs",
+      "location": "local",
+      "sha256": "7d1b9af8a2c119ce1351a985dbe75ea2f7dd8d3efe773e1d4ef93665be703e5e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c031-focused",
+      "command": "node --test tests/research-program/grain-and-time.test.mjs",
+      "started_at": "2026-09-14T10:13:20.795926Z",
+      "completed_at": "2026-09-14T10:13:20.888070Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 grain-and-time tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c031-focused-event",
+        "path": "verification/research-program/pr-031/producer-20260914/commands/focused-grain/event.json",
+        "sha256": "cee71dd490603e8dd482241f8e1b3e1ddc66f7fea972e267fad31a101c198f77",
+        "bytes": 1035
+      }
+    },
+    {
+      "id": "cmd-c031-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T10:13:20.888426Z",
+      "completed_at": "2026-09-14T10:13:20.940059Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c031-identity-event",
+        "path": "verification/research-program/pr-031/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "d9577627a71ef853d9aef9ca8c30b0ffb6f7607f2155e8388f23de9c5e05a501",
+        "bytes": 1027
+      }
+    },
+    {
+      "id": "cmd-c031-norm",
+      "command": "node packages/normalization/tools/validate-package.mjs",
+      "started_at": "2026-09-14T10:13:20.940438Z",
+      "completed_at": "2026-09-14T10:13:24.543219Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed normalization package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c031-norm-event",
+        "path": "verification/research-program/pr-031/producer-20260914/commands/normalization-validate/event.json",
+        "sha256": "7cd4f5b356055f2ee2cd2685899cce4e3c7fd7775865b6681eaeaa7241709fe2",
+        "bytes": 1061
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr031-artifact-0",
+      "path": "verification/research-program/pr-031/task-binding.json",
+      "bytes": 4031,
+      "sha256": "12909bfec059379b8028131502415fcf07349479226dd98e5662aa7fd4759e73"
+    },
+    {
+      "id": "pr031-artifact-1",
+      "path": "verification/research-program/pr-031/dispatch.json",
+      "bytes": 2543,
+      "sha256": "8193a12b9deabb4d5b1416b5220b3acaf9f5cf61baaf534bf41ef6baa51a5964"
+    },
+    {
+      "id": "pr031-artifact-2",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/focused-grain/receipt.json",
+      "bytes": 458,
+      "sha256": "352577b36a891f03635658ee8a8c1ee39c32fbe58b49201041c90544ea67bccd"
+    },
+    {
+      "id": "pr031-artifact-3",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/focused-grain/stdout.log",
+      "bytes": 521,
+      "sha256": "4ce5a14033a65c8cfc482d518456d1bb0eb214a708e5801eb46cac5d2ef4c37f"
+    },
+    {
+      "id": "pr031-artifact-4",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/focused-grain/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr031-artifact-5",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/focused-grain/event.json",
+      "bytes": 1035,
+      "sha256": "cee71dd490603e8dd482241f8e1b3e1ddc66f7fea972e267fad31a101c198f77"
+    },
+    {
+      "id": "pr031-artifact-6",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "01fba93e2f353e9ca7ebec9ee1a54c7aed21e9706e494e576a420b31c47f1019"
+    },
+    {
+      "id": "pr031-artifact-7",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr031-artifact-8",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr031-artifact-9",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "d9577627a71ef853d9aef9ca8c30b0ffb6f7607f2155e8388f23de9c5e05a501"
+    },
+    {
+      "id": "pr031-artifact-10",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/normalization-validate/receipt.json",
+      "bytes": 457,
+      "sha256": "c74aa9173d162519c9853fffb887536d24a0a8596a78f46e20af1f4bc9aeab37"
+    },
+    {
+      "id": "pr031-artifact-11",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/normalization-validate/stdout.log",
+      "bytes": 2970,
+      "sha256": "90acf902c536110f1d3a2a0c950209b67cad3806533ca99a4d32ff2b5c7dccb7"
+    },
+    {
+      "id": "pr031-artifact-12",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/normalization-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr031-artifact-13",
+      "path": "verification/research-program/pr-031/producer-20260914/commands/normalization-validate/event.json",
+      "bytes": 1061,
+      "sha256": "7cd4f5b356055f2ee2cd2685899cce4e3c7fd7775865b6681eaeaa7241709fe2"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-031-1",
+      "status": "producer_checked",
+      "result": "HCRIS facility/report/year and PLACES county/measure/year cannot collapse into generic hospital/person tags. Undocumented dimensions are unknown.",
+      "command_ids": [
+        "cmd-c031-focused"
+      ]
+    },
+    {
+      "id": "C-031-2",
+      "status": "producer_checked",
+      "result": "A metadata-modified date cannot fill observation end. A projection to 2100 is not observed future data. ACS overlap and rolling releases are preserved.",
+      "command_ids": [
+        "cmd-c031-focused"
+      ]
+    },
+    {
+      "id": "C-031-3",
+      "status": "producer_checked",
+      "result": "Incompatible reporting periods yield a specific caution/blocker. There is no automatic fiscal-to-calendar equivalence. Sealed identity and normalization packages validate.",
+      "command_ids": [
+        "cmd-c031-focused",
+        "cmd-c031-identity",
+        "cmd-c031-norm"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "sealed-identity-src",
+      "status": "accepted",
+      "detail": "packages/identity/src including researcher-guidance.mjs was not edited. identity validate passes."
+    },
+    {
+      "id": "sealed-normalization-src",
+      "status": "accepted",
+      "detail": "packages/normalization/src was not edited. validate-package.mjs passes."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Grain/time modeling is not R02/R04/R05 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-grain-time-review",
+      "status": "pending",
+      "detail": "Independent review of grain collapse rejection, date-role binding and fiscal/calendar non-equivalence remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "ledger-owned-paths-named-sealed-packages",
+      "status": "risk",
+      "detail": "The original ledger named packages/identity/src/researcher-guidance.mjs and packages/normalization/. Implementation is in enrichment to preserve artifact seals, following the PR-028/PR-029/PR-030 WP7 lesson."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of grain collapse rejection, date-role binding and fiscal/calendar non-equivalence, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-031 source and replay focused grain-and-time, identity and normalization validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

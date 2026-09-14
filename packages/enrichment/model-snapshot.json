@@ -1,0 +1,66 @@
+{
+  "format": "ushso.model-snapshot.v1",
+  "captured_at": "2026-09-14T00:00:00.000Z",
+  "source": "configuration-time fixture; not a live OpenRouter catalog fetch",
+  "live_catalog_fetched": false,
+  "muse_contributor": {
+    "product": "Muse Spark 1.3 Contributor",
+    "terms_url": "https://openrouter.ai/meta/muse-spark-1.3-contributor",
+    "data_collection_url": "https://openrouter.ai/docs/guides/privacy/data-collection",
+    "data_use": "Contributor training is opt-in and incompatible with USHSO residual extraction unless an operator explicitly accepts those terms.",
+    "operator_acceptance": false,
+    "eligible_for_ushso_residuals": false
+  },
+  "evaluated_model": {
+    "id": "openai/gpt-4.1-mini",
+    "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+    "provider": "openai",
+    "price_prompt_per_million": 0.15,
+    "price_completion_per_million": 0.6,
+    "max_price_prompt_per_million": 0.4,
+    "max_price_completion_per_million": 1.2,
+    "structured_outputs": true,
+    "data_use_policy_version": "openrouter-privacy-2026-09-10",
+    "trains_on_inputs": false,
+    "privacy_rank": 2,
+    "aliases": [
+      "openai/gpt-4.1-mini-latest",
+      "openrouter/auto"
+    ]
+  },
+  "fallbacks": [
+    {
+      "id": "openai/gpt-4.1-mini",
+      "evaluated": true,
+      "trains_on_inputs": false,
+      "privacy_rank": 2,
+      "price_prompt_per_million": 0.15
+    },
+    {
+      "id": "anthropic/claude-3.5-haiku",
+      "evaluated": true,
+      "trains_on_inputs": false,
+      "privacy_rank": 2,
+      "price_prompt_per_million": 0.8
+    },
+    {
+      "id": "meta/muse-spark-1.3-contributor",
+      "evaluated": true,
+      "trains_on_inputs": true,
+      "privacy_rank": 0,
+      "price_prompt_per_million": 0.01
+    },
+    {
+      "id": "openrouter/free-router",
+      "evaluated": false,
+      "trains_on_inputs": true,
+      "privacy_rank": 0,
+      "price_prompt_per_million": 0
+    }
+  ],
+  "operator": {
+    "muse_contributor_terms_accepted": false,
+    "allow_untrusted_document_instructions": false,
+    "max_price_prompt_per_million": 0.4
+  }
+}

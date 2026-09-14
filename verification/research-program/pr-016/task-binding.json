@@ -1,0 +1,78 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr016-parser-routing-20260914",
+  "slice_id": "C-016-1",
+  "pr_id": "PR-016",
+  "title": "Route difficult documentation to resumable parsers",
+  "owner": "/root/pr016_parser_routing",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr016-parser-routing-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr016-parser-routing-20260914",
+  "objective": "Existing document parsers cover known document families with explicit residual queues.",
+  "outcome": "A parser is selected by validated format/layout evidence; unsupported/scanned documents remain residual tasks. Restart mid-document shows no lost or duplicate fields; changed source bytes invalidate incompatible checkpoints. The coverage report accounts for parser defect, missing source, encrypted/scanned content and ambiguous layout without live source traffic.",
+  "dependencies": [
+    "PR-013",
+    "PR-014",
+    "PR-015"
+  ],
+  "owned_paths": [
+    "scripts/research/cms-grid-parser.mjs",
+    "scripts/research/collect-pdf-windows.mjs",
+    "scripts/research/research-python.mjs",
+    "tests/research-program/parser-routing.test.mjs",
+    "verification/research-program/pr-016/",
+    "docs/research-program/handoffs/PR-016.json"
+  ],
+  "commits": [
+    {
+      "id": "C-016-1",
+      "subject": "Build a parser capability registry",
+      "instructions": "Map captured document signatures/layout families to existing CSV, XLSX, text-PDF and grid parsers. Use exact version/hash inputs and known CMS cause-ledger fixtures.",
+      "verification": "A parser is selected by validated format/layout evidence; unsupported/scanned documents remain residual tasks."
+    },
+    {
+      "id": "C-016-2",
+      "subject": "Connect bounded page-window resume",
+      "instructions": "Reuse existing PDF window capture and parser checkpoints. Record page/table/row positions and parser-specific defects; cap OCR work separately if enabled.",
+      "verification": "Restart mid-document and show no lost or duplicate fields; changed source bytes invalidate incompatible checkpoints."
+    },
+    {
+      "id": "C-016-3",
+      "subject": "Emit a document extraction coverage report",
+      "instructions": "Reprocess retained CMS/CDC/Census documents without source traffic. Group failures by parser defect, missing source, encrypted/scanned content or ambiguous layout.",
+      "verification": "The report accounts for those groups and does not convert residual work into payload success."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/parser-routing.test.mjs",
+    "node --test tests/research-program/cms-resources.test.mjs",
+    "node --test tests/research-program/cdc-view.test.mjs",
+    "node --test tests/research-program/census-api.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-016.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-016/",
+  "binding": {
+    "base_sha": "b9490a0b55ba98d7a466222de5f870282c33a73f",
+    "base_tree": "68e6a9ecfa550493f21d3482e1aa520d3aa614f4",
+    "dependency_merge_shas": {
+      "PR-013": "861a7808fec20e5e7795bb8f8082f82717e01f11",
+      "PR-014": "8878aa2cc8bd9b36995d429774f377e3de66aca7",
+      "PR-015": "df5f7f9b8460b6b118f5a4699673b9c96c15b07b"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

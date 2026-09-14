@@ -1,0 +1,1648 @@
+{
+  "format": "ushso.pr-evidence.v1",
+  "pr_id": "PR-004",
+  "status": "producer_checked",
+  "recorded_at": "2026-09-11T00:35:45.341Z",
+  "implementation": {
+    "provider_label": "Luna Max",
+    "actor": "luna-max-pr004",
+    "task_id": "ushso-pr004-field-states-20260910",
+    "branch": "codex/ushso-pr004-field-states-20260910",
+    "base_sha": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+    "base_tree": "e2b9df441f1109187909d9ec2aeef7d8c7ca7bbf",
+    "head_sha": null,
+    "head_tree": null,
+    "head_binding": "C-004-4 is committed after this evidence is written; root binds the immutable final head and tree. No self-referential commit hash is recorded here.",
+    "planned_commits": [
+      {
+        "id": "C-004-1",
+        "sha": "dafe6f5ea6d86eb94c47d911e6f601a38cf968c5",
+        "tree": "7bf13af088b220b0aea7861e19002cae7dfab3b1",
+        "parent": "e5c44249b9d2448df2e4b6d466077658e42a009d",
+        "subject": "Add versioned field observation states"
+      },
+      {
+        "id": "C-004-2",
+        "sha": "21b1b12ba3707d89afb967b7b97133277d73044c",
+        "tree": "f55f83f9761698fb4db5087ef8103bc7a8092cb8",
+        "parent": "dafe6f5ea6d86eb94c47d911e6f601a38cf968c5",
+        "subject": "Project exact field coverage from ledger membership"
+      },
+      {
+        "id": "C-004-3",
+        "sha": null,
+        "tree": null,
+        "parent": "21b1b12ba3707d89afb967b7b97133277d73044c",
+        "subject": "Add offline completeness artifact and review-hardened state semantics",
+        "head_binding": "root binds final immutable commit"
+      },
+      {
+        "id": "C-004-4",
+        "sha": null,
+        "tree": null,
+        "parent": "5727370e1f23be5c1662a4ae0d5f3cc5143de706",
+        "subject": "Bind completeness provenance and independent context",
+        "head_binding": "Root binds the final immutable correction commit."
+      }
+    ]
+  },
+  "dependencies": {
+    "PR-001": {
+      "merge_sha": "035465f3f16d15f02467679d96451d4440a36ca8"
+    },
+    "PR-002": {
+      "merge_sha": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+      "integration_handoff_path": "verification/research-program/pr-002/controller/integration-handoff.json",
+      "integration_handoff_sha256": "5380b58c5d69515efb3cbfebdb1dac63492b780cdeae918f3d18c0538ad136a6",
+      "integration_manifest_path": "verification/research-program/pr-002/controller/integration-artifact-manifest.json",
+      "integration_manifest_sha256": "7b451a76ccc9cd1a8ac402263799aa9174228c1b32a83dfc2c3fc97a571a8567"
+    }
+  },
+  "changed_paths": [
+    "packages/coverage/index.mjs",
+    "packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json",
+    "packages/coverage/research-program/v1.0.0/src/completeness.mjs",
+    "packages/normalization/manifests/package-manifest.json",
+    "packages/normalization/schemas/field-observation.schema.json",
+    "packages/normalization/src/field-observation.mjs",
+    "packages/normalization/src/index.mjs",
+    "tests/research-program/field-states.test.mjs",
+    "docs/research-program/handoffs/PR-004.json",
+    "verification/research-program/pr-004/build-completeness-view.mjs",
+    "verification/research-program/pr-004/completeness-view.json",
+    "verification/research-program/pr-004/evidence.json",
+    "verification/research-program/pr-004/verify.mjs"
+  ],
+  "source_identities": {
+    "baseline": {
+      "path": "docs/research-program/baseline.json",
+      "sha256": "09f8f507697da7d40e1cea452e39c5f07c45a16ffd1ca8a7f723de61c40961dc",
+      "purpose": "PR-001 exact release and corpus baseline"
+    },
+    "accepted_cohorts": {
+      "path": "evaluation/research-program/cohorts.json",
+      "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+      "purpose": "PR-002 accepted frozen membership and generation"
+    },
+    "corpus": {
+      "corpus_id": "ushso-live-catalog-2026-09-03",
+      "version": "1.2.0",
+      "generation": "live-2026-09-03-85b50522b420",
+      "manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e",
+      "record_count": 3434,
+      "searchable_record_count": 3430,
+      "search_document_count": 0,
+      "source_slices": {
+        "cms-data-catalog": 159,
+        "cdc-socrata": 1472,
+        "census-api": 1803
+      },
+      "isolated_records": [
+        {
+          "record_id": "obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b",
+          "reason": "description must be a non-empty string"
+        },
+        {
+          "record_id": "obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250",
+          "reason": "description must be a non-empty string"
+        },
+        {
+          "record_id": "obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e",
+          "reason": "description must be a non-empty string"
+        },
+        {
+          "record_id": "obs:asset:cdc-socrata:va9e-d8re-c845d9bfb921e339",
+          "reason": "description must be a non-empty string"
+        }
+      ]
+    },
+    "tracked_implementation_files": [
+      {
+        "path": "packages/coverage/index.mjs",
+        "sha256": "5c4459f6b75de6ed518039a290778978b974a1cbd4920e7cb4e9ecdfda672d9a",
+        "bytes": 157
+      },
+      {
+        "path": "packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json",
+        "sha256": "fb4c38e72fdb1a9e686f7d238cc3fdaf5ddd78f836349560a57f7f0bfb5c3639",
+        "bytes": 15662
+      },
+      {
+        "path": "packages/coverage/research-program/v1.0.0/src/completeness.mjs",
+        "sha256": "c4fd448c99d2bdda8e6f0403544476288533cb8b1427e2ec3662ef7bf82d9ac0",
+        "bytes": 57363
+      },
+      {
+        "path": "packages/normalization/manifests/package-manifest.json",
+        "sha256": "ce26fe7a26265ce9c13a7d9b98a0b6acab4d60327aa5febaed68b1d164ac0a03",
+        "bytes": 9490
+      },
+      {
+        "path": "packages/normalization/schemas/field-observation.schema.json",
+        "sha256": "96ee40618f8f8703a4cb6797abecea3ba0120314d6751e033dc64dfc1d3ea007",
+        "bytes": 15216
+      },
+      {
+        "path": "packages/normalization/src/field-observation.mjs",
+        "sha256": "6e18c72101e3a12b69be025512eb6d76ca54f2ff5ed3d6a29fd80f3682ed2639",
+        "bytes": 49946
+      },
+      {
+        "path": "packages/normalization/src/index.mjs",
+        "sha256": "7d1b9af8a2c119ce1351a985dbe75ea2f7dd8d3efe773e1d4ef93665be703e5e",
+        "bytes": 409
+      },
+      {
+        "path": "tests/research-program/field-states.test.mjs",
+        "sha256": "63338e398202f64adbb99b11d601fbfc7ef309fbaf2056e77df62d89b1afeb8d",
+        "bytes": 34053
+      },
+      {
+        "path": "verification/research-program/pr-004/build-completeness-view.mjs",
+        "sha256": "8c9aba55062777b1423714bc31a02c1368d0a5b7dcf6f85f9785540df55c89a4",
+        "bytes": 6399
+      },
+      {
+        "path": "verification/research-program/pr-004/completeness-view.json",
+        "sha256": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
+        "bytes": 49808256
+      },
+      {
+        "path": "verification/research-program/pr-004/verify.mjs",
+        "sha256": "dfc458fb4e5752b7f00049ad6e29806fb24fe527e526c013d516b2d476e1fcf8",
+        "bytes": 10799
+      }
+    ],
+    "locked_research_assets": {
+      "lock_path": "config/research-assets.lock.json",
+      "lock_sha256": "75f362a1545f469a74bef00b7d7126fd03ffbfc79e4e6421bafe9fcf62db6c3b",
+      "archive_sha256": "153f7b8c8934095882e46f134334ddb5f6ef29a03aed8358d71878f92ac4a76f",
+      "archive_bytes": 163540588,
+      "archive_url": "https://github.com/ajhcs/ushso/releases/download/research-assets-153f7b8c89340958/research-assets-153f7b8c8934095882e46f134334ddb5f6ef29a03aed8358d71878f92ac4a76f.tar.gz",
+      "dictionary_review_manifest_sha256": "0f10c6b764d054cd15324c4a1d93d6da191d86b792976d9573cdf27feceecb6b",
+      "dictionary_review_tree_sha256": "f06d3190d5fc4a3a36b51dd2c1d722d0e790e6c628213fb7cd9c700f1d3d79e5",
+      "dictionary_review_record_count": 2905,
+      "dictionary_review_page_count": 34081,
+      "dictionary_review_variable_count": 1573847,
+      "dictionary_review_status": "pending_owner_review",
+      "publication_authorized": false,
+      "scientific_applicability": "unresolved"
+    },
+    "coverage_inputs": {
+      "membership_hash": "sha256:0b69f22d8dc2e4010716b871f80ef3a93ee019de4a032e3d37a77422758b266f",
+      "record_count": 3434,
+      "source_membership_count": 3434,
+      "source_counts": {
+        "cdc-socrata": 1472,
+        "census-api": 1803,
+        "cms-data-catalog": 159
+      },
+      "isolated_count": 4,
+      "vector_encoding": "compact-v1"
+    }
+  },
+  "dictionary_evidence": {
+    "canonical_v1_2": {
+      "status": "absent_from_published_corpus",
+      "manifest_path": null,
+      "claim": "No canonical dictionary manifest or search-document shard is promoted in the v1.2 corpus."
+    },
+    "public_proposal_assets": {
+      "status": "served_as_pending_review_assets",
+      "route": "/api/research/v1/dictionary-review",
+      "manifest_sha256": "0f10c6b764d054cd15324c4a1d93d6da191d86b792976d9573cdf27feceecb6b",
+      "record_count": 2905,
+      "page_count": 34081,
+      "variable_count": 1573847,
+      "publication_authorized": false,
+      "schema_applicability": "unresolved"
+    },
+    "audit_inventory": {
+      "csv_path": "/mnt/d/Coding Projects/ushso/docs/reviews/2026-09-10-product-data-audit/evidence/dictionary-completeness.csv",
+      "csv_sha256": "66305284c61924ea96f9ef7a62545d5cea28bc3819d2ae5cac97e8b1f3430ee9",
+      "csv_bytes": 623628,
+      "data_rows": 3434,
+      "dictionary_present_rows": 2905,
+      "dictionary_not_present_rows": 529,
+      "raw_page_count": 34081,
+      "raw_page_status": "local_evidence_only",
+      "claim_boundary": "The audit inventory is retained evidence for later qualification and is not a canonical release dictionary, schema, or scientific promotion."
+    }
+  },
+  "artifact": {
+    "path": "verification/research-program/pr-004/completeness-view.json",
+    "artifact_id": "urn:ushso:completeness-view:7b6d763bfc652aa094b7d68c76ebc534de401c1e",
+    "artifact_digest": "sha256:7b6d763bfc652aa094b7d68c76ebc534de401c1e5904738932231b7824b42fab",
+    "file_sha256": "47be5a2e5bb63a0bb3effa78977abaa653882156f2057c57efe40f7aa65d8a74",
+    "bytes": 49808256,
+    "input_digest": "sha256:89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+    "vector_encoding": "compact-v1",
+    "generated_at": "2026-09-10T15:32:40.000Z",
+    "as_of": "2026-09-10T15:32:40.000Z",
+    "record_count": 3434,
+    "source_membership_count": 3434,
+    "isolated_count": 4,
+    "vector_field_count": 13736,
+    "metric_count": 25,
+    "evidence_catalog_count": 3434,
+    "access_scope_count": 9,
+    "identifier_binding": "Each source vector field observation stores the publisher-native identifier in value.value; record_id remains the stable USHSO observation identifier.",
+    "provenance_binding": "Compact observations retain access_facts and core_contracts; access-summary evidence IDs resolve through the artifact evidence_catalog with record/source/field/revision bindings and source locators.",
+    "integrity_description": "Content-addressed by artifact_digest and independently bound to input_digest, membership hash, cohort, generation, and as_of by the offline consumer; no cryptographic signature is claimed."
+  },
+  "interfaces_for_PR005": {
+    "normalization_module": "packages/normalization/src/field-observation.mjs",
+    "normalization_exports": [
+      "FIELD_OBSERVATION_VERSION",
+      "ACCESS_SUMMARY_VERSION",
+      "VALUE_STATES",
+      "EVIDENCE_STATES",
+      "APPLICABILITY_STATES",
+      "ATTEMPT_STATES",
+      "FIELD_ROLES",
+      "OPERATIONS",
+      "validateFieldObservation",
+      "assertFieldObservation",
+      "createFieldObservation",
+      "appendFieldObservationRevision",
+      "deriveFieldObservation",
+      "buildAccessSummary"
+    ],
+    "coverage_module": "packages/coverage/research-program/v1.0.0/src/completeness.mjs",
+    "coverage_exports": [
+      "COMPLETENESS_VIEW_VERSION",
+      "COMPLETENESS_ARTIFACT_VERSION",
+      "READINESS_STATES",
+      "VALUE_PARTITIONS",
+      "APPLICABILITY_PARTITIONS",
+      "ATTEMPT_PARTITIONS",
+      "membershipHash",
+      "buildCompletenessView",
+      "assertCompletenessView",
+      "createOfflineCompletenessConsumer"
+    ],
+    "consumer_contract": "PR-005 consumes field observations and the offline completeness artifact by exact digest; aggregate metrics remain supplemental to the full vector."
+  },
+  "review_context": {
+    "c1_c2_independent_receipt": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/c1-c2-independent/receipt.json",
+      "sha256": "de247827b50eadba6b5cc1c784acf9b5548f16872b2fc025747a2f1f9016ef07",
+      "findings_addressed": [
+        "as-of selection excluded future source/attempt/access/browser facts",
+        "history retains complete evidence/access/browser/core provenance and can be derived without current row",
+        "attempted outcomes require endpoint/resource and operation-specific scope; browser uses browser_read",
+        "candidate/ambiguous/disputed evidence cannot yield ready",
+        "membership summary, source vectors and metrics are recomputed; exact denominator/partition/rate context is checked"
+      ]
+    },
+    "additional_reproducer": {
+      "script_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/additional-cases.mjs",
+      "script_sha256": "73ad8ad3b3175c72da69a1594b3d4b0643b4fd4a706156564fa0cf1791a80f42",
+      "historical_snapshot_manifest_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/preliminary-snapshot/manifest.json",
+      "historical_snapshot_manifest_sha256": "43d4c511b635e8fcb187815a6cb4313e49fcc99d23f686d89c35933f36520631",
+      "historical_output_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/preliminary-snapshot/additional-cases.stdout",
+      "historical_output_sha256": "991a3b975f04ba10207d0765726ff778d7d2a3156bc4cfec6df2daab71b9b98e",
+      "historical_result": {
+        "credential_order": {
+          "forward": "not_required",
+          "reverse": "conflicting",
+          "order_invariant": false
+        },
+        "latest_attempt": {
+          "expected_id": "observation:recorded-earlier-new-attempt",
+          "actual_attempt_id": "observation:recorded-late-old-attempt",
+          "pass": false
+        },
+        "invalid_calendar_date": {
+          "accepted": true,
+          "error": null
+        },
+        "historical_head": "21b1b12ba3707d89afb967b7b97133277d73044c"
+      },
+      "final_result": {
+        "credential_order": {
+          "forward": "conflicting",
+          "reverse": "conflicting",
+          "order_invariant": true
+        },
+        "latest_attempt": {
+          "expected_id": "observation:recorded-earlier-new-attempt",
+          "actual_attempt_id": "observation:recorded-earlier-new-attempt",
+          "pass": true
+        },
+        "invalid_calendar_date": {
+          "accepted": false,
+          "error": "field_observation_invalid"
+        }
+      }
+    },
+    "review_disposition": "C3 historical evidence is preserved. The C4 correction addresses IR001 retained-history identity/evidence bindings, IR002 lossless compact access/core/evidence-catalog provenance, IR003 timestamp/as-of validation, the caller-supplied access-summary mismatch, and source-native identifier labeling. Root must replay the final immutable head and decide independent acceptance.",
+    "access_summary_binding": {
+      "finding_receipt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/c3-preliminary-20260910t2324/receipt.json",
+      "finding_receipt_sha256": "cf19522b40a0f49009a7ba9581294f294be65756086e6a6615066a695705b29e",
+      "script_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/access-summary-binding.mjs",
+      "script_sha256": "be25c0f7a2eb14c5e4c0eed5ed3c08d0fefe36f5396f5e7c1d673ff7ab3c184b",
+      "finding": "The prior C3 implementation accepted a payload-success access summary built from a separate success observation even when the artifact vector contained only an unattempted payload observation.",
+      "disposition": "buildCompletenessView now recomputes and binds a supplied summary to the exact observations, and assertCompletenessView validates full and compact serialized summaries against the expanded vector. Historical successful checks remain eligible when retained in validated observation history.",
+      "final_replay": "cmd-0049-776ce687, cmd-0050-12bae875, and standalone cmd-0061-05becffb passed the full/compact binding regression, offline replay, and unbound-success reproducer."
+    },
+    "identifier_binding_correction": {
+      "finding": "The artifact builder previously labeled row.record_id as a source-native identifier.",
+      "disposition": "The builder now records row.native_id as the publisher-native identifier and states that record_id is the stable USHSO observation identifier.",
+      "verification": "verify.mjs checks every artifact identifier observation against the frozen cohort native_id."
+    },
+    "c4_independent_receipt": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/receipt.json",
+      "sha256_at_evidence_generation": "23d84f009e5168e80a5a0f3fa3810db80d23bcfef43d4892bf35e2ed46fa34fe",
+      "task_id": "ushso-pr004-field-states-correction-20260911",
+      "scope_note": "The correction lifecycle declared the implementation, tests, verification, and handoff paths; package-manifest was observed outside the initial declaration and is included here as an intended tracked correction path.",
+      "final_passes": [
+        "cmd-0018-3c9e99ad",
+        "cmd-0019-110c9186",
+        "cmd-0020-4f593743",
+        "cmd-0021-88f5b2b5",
+        "cmd-0022-4b482cbb",
+        "cmd-0023-4d09a421",
+        "cmd-0024-217b5d6a",
+        "cmd-0025-0ace1db4",
+        "cmd-0026-47d149b7",
+        "cmd-0027-e8c3d729",
+        "cmd-0028-b91244f3",
+        "cmd-0029-887c273a",
+        "cmd-0030-97830656"
+      ]
+    },
+    "c3_independent_review": {
+      "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/c3-independent/receipt.json",
+      "sha256": "7d770b2cd02df6a6d3314b6a9fd2eaaa6211758276d6bb12c1bc73aeb0d755d8",
+      "historical_only": true,
+      "disposition": "Retained as the source of IR001/IR002/IR003 findings; it is not acceptance of this correction head."
+    },
+    "correction_dispositions": {
+      "IR001_retained_history": "History is validated and replayed with explicit record_id, source_id, field_id, revision_id, recorded_at, evidence_refs, access facts, browser facts, and core contracts; successful historical checks remain eligible only when bound to retained validated history.",
+      "IR002_compact_provenance": "Compact observations retain access_facts and core_contracts; the artifact evidence_catalog covers membership/current/history/access/credential/cost/usage/browser refs and bindings. Compact access projections use IDs while catalog expansion recovers source locators.",
+      "IR003_time_binding": "as_of and generated_at are validated ISO timestamps; every included observation, nested access/browser/evidence clock is valid and no later than as_of. generated_at may be later than as_of.",
+      "access_summary_binding": "Builder and assertion recompute access summaries from exact observations; independent expected input context is required by createOfflineCompletenessConsumer, so an unattempted vector cannot inherit a separate success summary.",
+      "source_native_identifier": "Record rows retain row.native_id as the publisher-native identifier and record_id as the stable USHSO observation identifier."
+    }
+  },
+  "commands": {
+    "agentctl_receipt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/receipt.json",
+    "agentctl_receipt_sha256_at_evidence_generation": "d7a8d3fbcbca2fda5175ce66f1604d120f8ac60a5f97faf619c895599ab53258",
+    "agentctl_task_id": "ushso-pr004-field-states-correction-20260911",
+    "agentctl_decisive_commands": [
+      {
+        "argv": [
+          "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+          "run",
+          "manifest",
+          "--prefix",
+          "packages/normalization"
+        ],
+        "duration_ms": 199,
+        "ended_at": "2026-09-11T00:13:54.085Z",
+        "exit_code": 0,
+        "id": "cmd-0018-3c9e99ad",
+        "interrupted": false,
+        "kind": "command",
+        "label": "refresh normalization manifest for corrected source",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:13:53.886Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0018-3c9e99ad/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 101,
+          "bytes_total": 101,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "8ea2561d747ad6d97c4db4e2b41523879d5a2cf5e89378b7bea445701af3b491",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0018-3c9e99ad/stdout.log",
+          "redacted": true,
+          "retained_sha256": "8ea2561d747ad6d97c4db4e2b41523879d5a2cf5e89378b7bea445701af3b491",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:13:54.085Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+          "run",
+          "validate",
+          "--prefix",
+          "packages/normalization"
+        ],
+        "duration_ms": 3721,
+        "ended_at": "2026-09-11T00:14:04.525Z",
+        "exit_code": 0,
+        "id": "cmd-0019-110c9186",
+        "interrupted": false,
+        "kind": "test",
+        "label": "normalization validation after manifest refresh",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:14:00.804Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0019-110c9186/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 3044,
+          "bytes_total": 3044,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "ad7e86599a0a5ae5ddce2cd5bf38ea635cbcdd4c6614e88bb8c31cb0b42f1907",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0019-110c9186/stdout.log",
+          "redacted": true,
+          "retained_sha256": "ad7e86599a0a5ae5ddce2cd5bf38ea635cbcdd4c6614e88bb8c31cb0b42f1907",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:14:04.525Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "node",
+          "--input-type=module",
+          "-e",
+          "import fs from 'node:fs'; JSON.parse(fs.readFileSync('packages/normalization/schemas/field-observation.schema.json','utf8')); JSON.parse(fs.readFileSync('packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json','utf8')); await import('./packages/normalization/src/field-observation.mjs'); await import('./packages/coverage/research-program/v1.0.0/src/completeness.mjs'); console.log('schema-json-and-module-import-pass')"
+        ],
+        "duration_ms": 35,
+        "ended_at": "2026-09-11T00:15:20.154Z",
+        "exit_code": 0,
+        "id": "cmd-0020-4f593743",
+        "interrupted": false,
+        "kind": "command",
+        "label": "final schema and module syntax checks",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:15:20.118Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0020-4f593743/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 35,
+          "bytes_total": 35,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "adbff1cd50594502c188f9d9257e6312e4c7252f63e58eb5c9575aafebb0e40a",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0020-4f593743/stdout.log",
+          "redacted": true,
+          "retained_sha256": "adbff1cd50594502c188f9d9257e6312e4c7252f63e58eb5c9575aafebb0e40a",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:15:20.154Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+          "test",
+          "--prefix",
+          "packages/normalization"
+        ],
+        "duration_ms": 16093,
+        "ended_at": "2026-09-11T00:15:43.927Z",
+        "exit_code": 0,
+        "id": "cmd-0021-88f5b2b5",
+        "interrupted": false,
+        "kind": "test",
+        "label": "final normalization package test suite",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:15:27.834Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0021-88f5b2b5/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 3066,
+          "bytes_total": 3066,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "5675d1daebeb464042755a2afebbcef6c5262a6a0ea337617ec216e7dd38db98",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0021-88f5b2b5/stdout.log",
+          "redacted": true,
+          "retained_sha256": "5675d1daebeb464042755a2afebbcef6c5262a6a0ea337617ec216e7dd38db98",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:15:43.927Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+          "run",
+          "validate",
+          "--prefix",
+          "packages/normalization"
+        ],
+        "duration_ms": 3491,
+        "ended_at": "2026-09-11T00:15:53.072Z",
+        "exit_code": 0,
+        "id": "cmd-0022-4b482cbb",
+        "interrupted": false,
+        "kind": "test",
+        "label": "final normalization offline validation",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:15:49.581Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0022-4b482cbb/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 3044,
+          "bytes_total": 3044,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "ad7e86599a0a5ae5ddce2cd5bf38ea635cbcdd4c6614e88bb8c31cb0b42f1907",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0022-4b482cbb/stdout.log",
+          "redacted": true,
+          "retained_sha256": "ad7e86599a0a5ae5ddce2cd5bf38ea635cbcdd4c6614e88bb8c31cb0b42f1907",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:15:53.072Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "node",
+          "verification/research-program/pr-004/build-completeness-view.mjs"
+        ],
+        "duration_ms": 13708,
+        "ended_at": "2026-09-11T00:16:18.619Z",
+        "exit_code": 0,
+        "id": "cmd-0023-4d09a421",
+        "interrupted": false,
+        "kind": "command",
+        "label": "final completeness artifact generation",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:16:04.911Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0023-4d09a421/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 336,
+          "bytes_total": 336,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "249f69db2d638d60373fe1e9305066f84c3ec2463c7a7089d1b11567a33ee681",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0023-4d09a421/stdout.log",
+          "redacted": true,
+          "retained_sha256": "249f69db2d638d60373fe1e9305066f84c3ec2463c7a7089d1b11567a33ee681",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:16:18.619Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "node",
+          "verification/research-program/pr-004/verify.mjs"
+        ],
+        "duration_ms": 17785,
+        "ended_at": "2026-09-11T00:16:42.838Z",
+        "exit_code": 0,
+        "id": "cmd-0024-217b5d6a",
+        "interrupted": false,
+        "kind": "test",
+        "label": "final offline completeness artifact replay",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:16:25.054Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0024-217b5d6a/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 457,
+          "bytes_total": 457,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "b7f1e9471a7b6b079369f935542c13b17ce81940fe95ade4ea61c629c27a10fc",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0024-217b5d6a/stdout.log",
+          "redacted": true,
+          "retained_sha256": "b7f1e9471a7b6b079369f935542c13b17ce81940fe95ade4ea61c629c27a10fc",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:16:42.838Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "node",
+          "--test",
+          "tests/research-program/field-states.test.mjs"
+        ],
+        "duration_ms": 18038,
+        "ended_at": "2026-09-11T00:17:15.955Z",
+        "exit_code": 0,
+        "id": "cmd-0025-0ace1db4",
+        "interrupted": false,
+        "kind": "test",
+        "label": "final focused field-state and completeness suite",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:16:57.917Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0025-0ace1db4/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 1275,
+          "bytes_total": 1275,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "4e4c7b527fd5ad936240a3cda6e079a568a32997405709991eb621a940491a86",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0025-0ace1db4/stdout.log",
+          "redacted": true,
+          "retained_sha256": "4e4c7b527fd5ad936240a3cda6e079a568a32997405709991eb621a940491a86",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:17:15.955Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "node",
+          "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/correction-review/history-access-current.mjs"
+        ],
+        "duration_ms": 53,
+        "ended_at": "2026-09-11T00:17:25.858Z",
+        "exit_code": 0,
+        "id": "cmd-0026-47d149b7",
+        "interrupted": false,
+        "kind": "review",
+        "label": "final retained-history access replay",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:17:25.806Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0026-47d149b7/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 926,
+          "bytes_total": 926,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "a12d7c66c5cdbf54de20f8dada3f921208bb5d076b83af2b578e9b351b8d4cd1",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0026-47d149b7/stdout.log",
+          "redacted": true,
+          "retained_sha256": "a12d7c66c5cdbf54de20f8dada3f921208bb5d076b83af2b578e9b351b8d4cd1",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:17:25.858Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "node",
+          "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/correction-review/compact-completeness-current.mjs"
+        ],
+        "duration_ms": 62,
+        "ended_at": "2026-09-11T00:17:26.226Z",
+        "exit_code": 0,
+        "id": "cmd-0027-e8c3d729",
+        "interrupted": false,
+        "kind": "review",
+        "label": "final compact membership evidence replay",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:17:26.164Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0027-e8c3d729/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 204,
+          "bytes_total": 204,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "f0dce8800c8356ec9c6d906f2a3d68643b7d1b525c39074b691db8c11a21bdde",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0027-e8c3d729/stdout.log",
+          "redacted": true,
+          "retained_sha256": "f0dce8800c8356ec9c6d906f2a3d68643b7d1b525c39074b691db8c11a21bdde",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:17:26.226Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "node",
+          "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/correction-review/compact-provenance-current.mjs"
+        ],
+        "duration_ms": 39,
+        "ended_at": "2026-09-11T00:17:26.579Z",
+        "exit_code": 0,
+        "id": "cmd-0028-b91244f3",
+        "interrupted": false,
+        "kind": "review",
+        "label": "final compact provenance replay",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:17:26.541Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0028-b91244f3/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 638,
+          "bytes_total": 638,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "5c8bf516a3fc3dc328b0954859ff02609cd95fdf24df585f4a6f574f0dcd76e0",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0028-b91244f3/stdout.log",
+          "redacted": true,
+          "retained_sha256": "5c8bf516a3fc3dc328b0954859ff02609cd95fdf24df585f4a6f574f0dcd76e0",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:17:26.579Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "node",
+          "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/correction-review/additional-cases-current.mjs",
+          "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910/packages/normalization/src/field-observation.mjs"
+        ],
+        "duration_ms": 57,
+        "ended_at": "2026-09-11T00:17:35.080Z",
+        "exit_code": 0,
+        "id": "cmd-0029-887c273a",
+        "interrupted": false,
+        "kind": "review",
+        "label": "final temporal and conflict replay",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:17:35.023Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0029-887c273a/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 639,
+          "bytes_total": 639,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "db11e6f4c0f3833bd013bb48b55fcdd702025f89a78de7611ca02ca6413cdea7",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0029-887c273a/stdout.log",
+          "redacted": true,
+          "retained_sha256": "db11e6f4c0f3833bd013bb48b55fcdd702025f89a78de7611ca02ca6413cdea7",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:17:35.080Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "argv": [
+          "node",
+          "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/access-summary-binding.mjs",
+          "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        ],
+        "duration_ms": 56,
+        "ended_at": "2026-09-11T00:17:35.463Z",
+        "exit_code": 0,
+        "id": "cmd-0030-97830656",
+        "interrupted": false,
+        "kind": "review",
+        "label": "final unbound access summary replay",
+        "launch_error": null,
+        "shell": false,
+        "started_at": "2026-09-11T00:17:35.406Z",
+        "stderr": {
+          "bytes_retained": 0,
+          "bytes_total": 0,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0030-97830656/stderr.log",
+          "redacted": true,
+          "retained_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        "stdout": {
+          "bytes_retained": 181,
+          "bytes_total": 181,
+          "capture_mode": "redacted_prefix",
+          "omitted": false,
+          "original_sha256": "97b17b1df9dc5e905607e034c480ec92fd6c8ed87ccbf6486b069b0fe6efeb6a",
+          "path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/logs/cmd-0030-97830656/stdout.log",
+          "redacted": true,
+          "retained_sha256": "97b17b1df9dc5e905607e034c480ec92fd6c8ed87ccbf6486b069b0fe6efeb6a",
+          "truncated": false
+        },
+        "timed_out": false,
+        "working_directory": {
+          "absolute_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+          "algorithm": "sha256",
+          "device": 2144,
+          "digest": "3826b457c77f967745af7b35b80a740c158c9d221e7c1ca904d4f4ae1b647c95",
+          "inode": 41301043,
+          "resolved_path": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910"
+        },
+        "completed_at": "2026-09-11T00:17:35.463Z",
+        "structured_expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "structured_observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      }
+    ],
+    "failed_historical_commands": [
+      {
+        "id": "cmd-0001-0af30068",
+        "exit_code": 1,
+        "reason": "initial C1 fixture failure before correction"
+      },
+      {
+        "id": "cmd-0002-490d92ad",
+        "exit_code": 1,
+        "reason": "C1 retry before fixture correction"
+      },
+      {
+        "id": "cmd-0005-02082c01",
+        "exit_code": 1,
+        "reason": "initial C2 fixture failure before correction"
+      },
+      {
+        "id": "cmd-0006-68ce9124",
+        "exit_code": 1,
+        "reason": "C2 retry before fixture correction"
+      },
+      {
+        "id": "cmd-0010-54f13c88",
+        "exit_code": 1,
+        "reason": "initial schema compatibility run before retry"
+      },
+      {
+        "id": "cmd-0017-1c09d86e",
+        "exit_code": 1,
+        "reason": "field-state suite before final artifact regeneration"
+      },
+      {
+        "id": "cmd-0021-523d7d4a",
+        "exit_code": 1,
+        "reason": "stale-expiry fixture before compact artifact regeneration"
+      },
+      {
+        "id": "cmd-0026-2375e8b4",
+        "exit_code": 1,
+        "reason": "review correction fixture exposed attempted/evidence temporal mismatch"
+      },
+      {
+        "id": "cmd-0027-0cb0f187",
+        "exit_code": 1,
+        "reason": "review correction fixture exposed remaining temporal mismatch"
+      },
+      {
+        "id": "cmd-0028-bed8b818",
+        "exit_code": 1,
+        "reason": "review correction fixture exposed stale-clock ordering mismatch"
+      },
+      {
+        "id": "cmd-0029-078fc891",
+        "exit_code": 1,
+        "reason": "review correction fixture still had stale-clock test fixture mismatch"
+      },
+      {
+        "id": "cmd-0030-885cdda8",
+        "exit_code": 1,
+        "reason": "review correction fixture still had stale-clock test fixture mismatch"
+      },
+      {
+        "id": "cmd-0042-c6a500cc",
+        "exit_code": 1,
+        "reason": "access-summary binding regression before test fixture correction"
+      },
+      {
+        "id": "cmd-0043-40ef57ae",
+        "exit_code": 1,
+        "reason": "access-summary tamper regression before evidence fixture correction"
+      }
+    ],
+    "skipped_or_controller_owned": [
+      "full integrated npm test/build/cf:dry-run release gate",
+      "network/runtime/provider checks and production deployment",
+      "independent final acceptance/publication/merge"
+    ],
+    "agentctl_correction_scope": {
+      "comparison": {
+        "evaluated_paths": 8,
+        "outside_declared_scope": [
+          "packages/normalization/manifests/package-manifest.json"
+        ],
+        "status": "outside_scope_observed"
+      },
+      "declared": "bounded PR004 IR001-IR003 correction, verification, artifact, and handoff",
+      "declared_paths": [
+        "docs/research-program/handoffs/PR-004.json",
+        "packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json",
+        "packages/coverage/research-program/v1.0.0/src/completeness.mjs",
+        "packages/normalization/src/field-observation.mjs",
+        "tests/research-program/field-states.test.mjs",
+        "verification/research-program/pr-004/**"
+      ]
+    },
+    "structured_handoff_commands": [
+      {
+        "id": "cmd-0018-3c9e99ad",
+        "command": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm run manifest --prefix packages/normalization",
+        "started_at": "2026-09-11T00:13:53.886Z",
+        "completed_at": "2026-09-11T00:13:54.085Z",
+        "exit_code": 0,
+        "result": "Normalization package manifest was refreshed after the final field-observation source change.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0019-110c9186",
+        "command": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm run validate --prefix packages/normalization",
+        "started_at": "2026-09-11T00:14:00.804Z",
+        "completed_at": "2026-09-11T00:14:04.525Z",
+        "exit_code": 0,
+        "result": "Normalization validation passed after the manifest refresh.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0020-4f593743",
+        "command": "node --input-type=module -e 'import fs from '\"'\"'node:fs'\"'\"'; JSON.parse(fs.readFileSync('\"'\"'packages/normalization/schemas/field-observation.schema.json'\"'\"','\"'\"'utf8'\"'\"')); JSON.parse(fs.readFileSync('\"'\"'packages/coverage/research-program/v1.0.0/schemas/completeness-view.schema.json'\"'\"','\"'\"'utf8'\"'\"')); await import('\"'\"'./packages/normalization/src/field-observation.mjs'\"'\"'); await import('\"'\"'./packages/coverage/research-program/v1.0.0/src/completeness.mjs'\"'\"'); console.log('\"'\"'schema-json-and-module-import-pass'\"'\"')'",
+        "started_at": "2026-09-11T00:15:20.118Z",
+        "completed_at": "2026-09-11T00:15:20.154Z",
+        "exit_code": 0,
+        "result": "Both JSON schemas parsed and the normalization and coverage modules imported successfully.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0021-88f5b2b5",
+        "command": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm test --prefix packages/normalization",
+        "started_at": "2026-09-11T00:15:27.834Z",
+        "completed_at": "2026-09-11T00:15:43.927Z",
+        "exit_code": 0,
+        "result": "Pinned npm normalization tests passed: 32 tests.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0022-4b482cbb",
+        "command": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm run validate --prefix packages/normalization",
+        "started_at": "2026-09-11T00:15:49.581Z",
+        "completed_at": "2026-09-11T00:15:53.072Z",
+        "exit_code": 0,
+        "result": "Pinned npm normalization validation passed.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0023-4d09a421",
+        "command": "node verification/research-program/pr-004/build-completeness-view.mjs",
+        "started_at": "2026-09-11T00:16:04.911Z",
+        "completed_at": "2026-09-11T00:16:18.619Z",
+        "exit_code": 0,
+        "result": "Offline compact completeness artifact rebuilt from the accepted frozen cohort.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0024-217b5d6a",
+        "command": "node verification/research-program/pr-004/verify.mjs",
+        "started_at": "2026-09-11T00:16:25.054Z",
+        "completed_at": "2026-09-11T00:16:42.838Z",
+        "exit_code": 0,
+        "result": "Offline completeness verifier passed its independent digest, count, metric, and identifier checks.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0025-0ace1db4",
+        "command": "node --test tests/research-program/field-states.test.mjs",
+        "started_at": "2026-09-11T00:16:57.917Z",
+        "completed_at": "2026-09-11T00:17:15.955Z",
+        "exit_code": 0,
+        "result": "Focused field-state suite passed: 12 tests.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0026-47d149b7",
+        "command": "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/correction-review/history-access-current.mjs",
+        "started_at": "2026-09-11T00:17:25.806Z",
+        "completed_at": "2026-09-11T00:17:25.858Z",
+        "exit_code": 0,
+        "result": "Retained-history replay passed with explicit record, source, revision, recorded, and evidence bindings.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0027-e8c3d729",
+        "command": "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/correction-review/compact-completeness-current.mjs",
+        "started_at": "2026-09-11T00:17:26.164Z",
+        "completed_at": "2026-09-11T00:17:26.226Z",
+        "exit_code": 0,
+        "result": "Compact completeness replay passed with exact membership and evidence-catalog bindings.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0028-b91244f3",
+        "command": "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/correction-review/compact-provenance-current.mjs",
+        "started_at": "2026-09-11T00:17:26.541Z",
+        "completed_at": "2026-09-11T00:17:26.579Z",
+        "exit_code": 0,
+        "result": "Compact provenance replay passed; access/core facts remain serialized and source locators are recoverable from the bound catalog.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0029-887c273a",
+        "command": "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/correction-review/additional-cases-current.mjs /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910/packages/normalization/src/field-observation.mjs",
+        "started_at": "2026-09-11T00:17:35.023Z",
+        "completed_at": "2026-09-11T00:17:35.080Z",
+        "exit_code": 0,
+        "result": "Credential conflict, attempt-clock ordering, and impossible-calendar-date replays passed.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0030-97830656",
+        "command": "node /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/access-summary-binding.mjs /mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+        "started_at": "2026-09-11T00:17:35.406Z",
+        "completed_at": "2026-09-11T00:17:35.463Z",
+        "exit_code": 0,
+        "result": "Unbound payload-success access summary was rejected; no forged success was exposed.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0031-ccdc7db5",
+        "command": "node --input-type=module -e 'import fs from '\"'\"'node:fs'\"'\"'; import Ajv2020 from '\"'\"'ajv/dist/2020.js'\"'\"'; const schema=JSON.parse(fs.readFileSync('\"'\"'/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-grok-partial-review/files/docs/research-program/handoffs/schema/handoff.schema.json'\"'\"','\"'\"'utf8'\"'\"')); const handoff=JSON.parse(fs.readFileSync('\"'\"'docs/research-program/handoffs/PR-004.json'\"'\"','\"'\"'utf8'\"'\"')); const ajv=new Ajv2020({allErrors:true}); const validate=ajv.compile(schema); if(!validate(handoff)){ console.error(JSON.stringify(validate.errors)); process.exit(1); } console.log(JSON.stringify({status:'\"'\"'pass'\"'\"',source:'\"'\"'PR003 corrected handoff schema'\"'\"',command_count:handoff.commands.length,source_identity_count:handoff.source_identities.length,artifact_count:handoff.artifacts.length}));'",
+        "started_at": "2026-09-11T00:36:26.503Z",
+        "completed_at": "2026-09-11T00:36:26.636Z",
+        "exit_code": 0,
+        "result": "PR003 corrected handoff schema accepted the final typed packet with all required typed fields, source identities, and repository artifacts.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      },
+      {
+        "id": "cmd-0032-98f8a0d7",
+        "command": "git diff --check",
+        "started_at": "2026-09-11T00:38:47.059Z",
+        "completed_at": "2026-09-11T00:38:47.501Z",
+        "exit_code": 0,
+        "result": "Final working-tree diff passed git diff --check.",
+        "expected_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        },
+        "observed_outcome": {
+          "kind": "observed_exit",
+          "exit_code": 0
+        }
+      }
+    ],
+    "historical_receipt_preservation": {
+      "c3_receipt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-state/tasks/ushso-pr004-field-states-20260910/receipt.json",
+      "c3_independent_review_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004-controller-review/c3-independent/receipt.json",
+      "correction_failures_remain_in_receipt": true
+    },
+    "handoff_contract_check": {
+      "id": "cmd-0031-ccdc7db5",
+      "argv": [
+        "node",
+        "--input-type=module",
+        "-e",
+        "import fs from 'node:fs'; import Ajv2020 from 'ajv/dist/2020.js'; const schema=JSON.parse(fs.readFileSync('/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr003-grok-partial-review/files/docs/research-program/handoffs/schema/handoff.schema.json','utf8')); const handoff=JSON.parse(fs.readFileSync('docs/research-program/handoffs/PR-004.json','utf8')); const ajv=new Ajv2020({allErrors:true}); const validate=ajv.compile(schema); if(!validate(handoff)){ console.error(JSON.stringify(validate.errors)); process.exit(1); } console.log(JSON.stringify({status:'pass',source:'PR003 corrected handoff schema',command_count:handoff.commands.length,source_identity_count:handoff.source_identities.length,artifact_count:handoff.artifacts.length}));"
+      ],
+      "started_at": "2026-09-11T00:36:26.503Z",
+      "completed_at": "2026-09-11T00:36:26.636Z",
+      "exit_code": 0,
+      "stdout_sha256": "5277f9e8cc99ff68a0766c229e8737dd789d3eb2ceddf13638cf902c6971d56e",
+      "stderr_sha256": "502b10ce289fbe0434a5fb6f24c1487f688f1675757aa461c3ef697d19a86950",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "result": "PR003 corrected handoff schema accepted the final typed packet."
+    },
+    "final_diff_check": {
+      "id": "cmd-0032-98f8a0d7",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "started_at": "2026-09-11T00:38:47.059Z",
+      "completed_at": "2026-09-11T00:38:47.501Z",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "result": "Final working-tree diff passed git diff --check."
+    }
+  },
+  "acceptance": {
+    "focused_field_suite": {
+      "command_id": "cmd-0049-776ce687",
+      "exit_code": 0,
+      "result": "11 tests passed, including full and compact access-summary binding"
+    },
+    "normalization_manifest_refresh": {
+      "command_id": "cmd-0045-5f0fa96c",
+      "exit_code": 0,
+      "result": "normalization manifest refreshed after final source changes"
+    },
+    "normalization_tests": {
+      "command_id": "cmd-0046-9c3ba1d7",
+      "exit_code": 0,
+      "result": "32 tests passed"
+    },
+    "normalization_validation": {
+      "command_id": "cmd-0047-f361f242",
+      "exit_code": 0,
+      "result": "offline deterministic preflight passed"
+    },
+    "artifact_build": {
+      "command_id": "cmd-0048-c03234b1",
+      "exit_code": 0,
+      "result": "3434 records, 3434 source memberships, 4 isolated; artifact digest refreshed"
+    },
+    "offline_replay": {
+      "command_id": "cmd-0050-12bae875",
+      "exit_code": 0,
+      "result": "exact baseline/dictionary/arithmetic, native identifier, and artifact checks passed"
+    },
+    "additional_review_reproducer": {
+      "command_id": "cmd-0051-7f86289f",
+      "exit_code": 0,
+      "result": "credential order invariant, attempt clock selected, invalid calendar date rejected"
+    },
+    "schema_json_and_module_import": {
+      "command_id": "cmd-0052-9c25c7e1",
+      "exit_code": 0,
+      "result": "schema-json-and-module-import-pass"
+    },
+    "access_summary_binding_reproducer": {
+      "command_id": "cmd-0061-05becffb",
+      "exit_code": 0,
+      "result": "unbound success summary rejected with access_summary_not_bound; no success exposed"
+    },
+    "correction_schema_and_modules": {
+      "command_id": "cmd-0020-4f593743",
+      "exit_code": 0,
+      "result": "Both JSON schemas parsed and implementation modules imported."
+    },
+    "correction_normalization_tests": {
+      "command_id": "cmd-0021-88f5b2b5",
+      "exit_code": 0,
+      "result": "32 normalization tests passed after manifest refresh."
+    },
+    "correction_artifact_and_verifier": {
+      "command_id": "cmd-0023-4d09a421",
+      "exit_code": 0,
+      "result": "Artifact rebuilt and offline verifier passed with input digest and exact cohort context."
+    },
+    "correction_history_and_provenance_replays": {
+      "command_id": "cmd-0026-47d149b7",
+      "paired_command_ids": [
+        "cmd-0027-e8c3d729",
+        "cmd-0028-b91244f3"
+      ],
+      "exit_code": 0,
+      "result": "Retained history and compact provenance replays passed with lossless binding."
+    },
+    "correction_temporal_and_forged_summary_replays": {
+      "command_id": "cmd-0029-887c273a",
+      "paired_command_ids": [
+        "cmd-0030-97830656"
+      ],
+      "exit_code": 0,
+      "result": "Temporal/date and caller-summary mismatch replays passed."
+    },
+    "handoff_contract_check": {
+      "command_id": "cmd-0031-ccdc7db5",
+      "exit_code": 0,
+      "result": "PR003 corrected handoff schema accepted the final typed packet."
+    },
+    "final_diff_check": {
+      "command_id": "cmd-0032-98f8a0d7",
+      "exit_code": 0,
+      "result": "Final correction diff has no whitespace errors."
+    }
+  },
+  "limitations": [
+    "R01-R16 scientific requirements remain unaccepted; this PR supplies observation and coverage infrastructure only.",
+    "The artifact records payload access and schema applicability as unknown/not_attempted; no payload or schema qualification is claimed.",
+    "The public dictionary route carries pending proposal assets, while canonical v1.2 has no dictionary promotion; schema applicability and scientific suitability remain unresolved.",
+    "Browser/CORS observations are contextual and no browser operation is claimed for this artifact.",
+    "The corpus generation and retained safety flags are historical release assertions; this PR does not establish new freshness or scientific validity.",
+    "Compact observations preserve access_facts and core_contracts. Compact access-summary projections carry evidence IDs; the bound evidence_catalog preserves complete source locators and record/source/field/revision bindings.",
+    "The artifact is hash-bound/content-addressed; it is not cryptographically signed. Self-integrity does not replace independently supplied cohort, membership, generation, as-of, and input-digest context.",
+    "The full integrated npm test/build/cf:dry-run gate was run by root against older integration candidate 38e5c5f and does not cover this PR-004 head; root must rerun it after final-head binding.",
+    "Root must bind final C-004-4 head/tree, independently replay the final head, and perform integrated release/publication decisions."
+  ],
+  "worktree_and_lifecycle": {
+    "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr004-field-states-20260910",
+    "writer_task": "ushso-pr004-field-states-20260910",
+    "writer_lock": "held by active correction wrapper until normal close; verify release after agentctl finish and wrapper exit",
+    "lifecycle_state": "working",
+    "lifecycle_started_at": "2026-09-11T00:03:32.047Z",
+    "lifecycle_receipt_path": "/mnt/d/tmp/plumbob/ushso-research-program-20260910/pr004/agentctl-correction-state/tasks/ushso-pr004-field-states-correction-20260911/receipt.json",
+    "correction_task_id": "ushso-pr004-field-states-correction-20260911",
+    "original_three_commit_head": "5727370e1f23be5c1662a4ae0d5f3cc5143de706"
+  },
+  "handoff_schema_migration": {
+    "validator_contract": "PR003 corrected handoff contract",
+    "status": "producer_checked",
+    "commands_use": "command, started_at, completed_at, expected_outcome, observed_outcome, exit_code, result",
+    "source_identities_use": "kind, id, location, and sha256 for local identities",
+    "pending_head_use": "unresolved_claims entry head-sha-pending-controller-commit with typed status unresolved",
+    "content_addressing": "Artifact is hash-bound/content-addressed; no signature claim.",
+    "historical_c3_packet": "Preserved through immutable Git and external receipt references; it is not rewritten as a fresh run.",
+    "schema_check_command_id": "cmd-0031-ccdc7db5",
+    "diff_check_command_id": "cmd-0032-98f8a0d7"
+  }
+}

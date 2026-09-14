@@ -1,0 +1,12 @@
+{
+  "format": "ushso.coengineer-admission-correction.v1",
+  "run_id": "ushso-wp11-design-review-grok-20260911",
+  "original_request": "wp11-design-review-request.json",
+  "initial_error": "out_of_range: The run request collection is outside the supported bound.",
+  "cause": "The installed request compiler requires review role write_scope to contain zero paths. The controller incorrectly requested a repository review-report directory.",
+  "initial_dispatch_occurred": false,
+  "correction": "Keep role review and use an empty write_scope. Return the review report through the provider result rather than writing or committing files.",
+  "source": "codex-co-engineer/3.4.2/mcp/v3/run-request-compiler.mjs:285",
+  "corrected_request": "wp11-design-review-request-read-only.json",
+  "authorization_changed": false
+}

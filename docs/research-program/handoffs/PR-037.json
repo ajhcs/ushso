@@ -1,0 +1,383 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-037",
+  "status": "producer_checked",
+  "owner": "/root/pr037_named_sources",
+  "reviewer": "Astra/root",
+  "base_sha": "b688f3778eb788639639a186a3413d3215564d05",
+  "head_sha": "3e82bbd91ffcf412e62ac05c942fa7bb6eb2ea0f",
+  "dependency_merge_shas": {
+    "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+    "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7"
+  },
+  "branch": "codex/ushso-pr037-named-sources-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/named-sources.mjs",
+    "packages/retrieval/fixtures/named-source-registry.v1.0.0.json",
+    "tests/research-program/named-sources.test.mjs",
+    "docs/research-program/named-sources.md",
+    "apps/web/public/corpus-v1.1.0/named-source-registry.json",
+    "verification/research-program/pr-037/",
+    "docs/research-program/handoffs/PR-037.json"
+  ],
+  "problem": "Exact named-source requests could resolve to unrelated catalog descriptions mentioning similar words. Not-yet-indexed identities could invent catalog membership. Title equality could delete or merge records among the 579 repeated-title cases. An unavailable named source could be fabricated as an exact match. Catalog membership and source-family recognition could be conflated. Editing sealed identity family-graph.mjs or fingerprint-sealed question-parser.mjs would break WP7 / retrieval algorithm fingerprints.",
+  "resulting_behavior": "Named-source resolution lives in packages/enrichment/named-sources.mjs with an expanded packages/retrieval/fixtures/named-source-registry.v1.0.0.json covering the core cohort and twelve expansion families. MEPS/HCUP/NPPES/PHC4 exact-name fixtures cannot resolve to unrelated descriptions mentioning similar words. Not-yet-indexed identities do not invent catalog membership. The 579 repeated-title cases are accounted for; title equality alone never deletes or merges a record. Unavailable named sources return a bounded coverage-gap explanation, not a fabricated exact match. Catalog membership and source-family recognition remain distinct. Sealed packages/identity/src/family-graph.mjs (4322 bytes) and fingerprint-sealed packages/retrieval/tools/question-parser.mjs (10068 bytes) are unchanged. Staged apps/web/public/corpus-v1.1.0/named-source-registry.json is identical to the expanded fixture so corpus staging cannot drift.",
+  "commits": [
+    {
+      "id": "C-037-1",
+      "subject": "Expand the source-name registry",
+      "sha": "0a2ce204cfae1af546228bcec43c4f3094855744"
+    },
+    {
+      "id": "C-037-2",
+      "subject": "Group evidenced releases and views",
+      "sha": "0a2ce204cfae1af546228bcec43c4f3094855744"
+    },
+    {
+      "id": "C-037-3",
+      "subject": "Return exact versus contextual results",
+      "sha": "6e1c17031e7be5cf7d79181b10be486ae64744e8"
+    },
+    {
+      "id": "C-037-4",
+      "subject": "Keep staged named-source registry identical to the expanded fixture",
+      "sha": "3e82bbd91ffcf412e62ac05c942fa7bb6eb2ea0f"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "named-sources",
+      "id": "packages/enrichment/named-sources.mjs",
+      "location": "local",
+      "sha256": "603648dfebe4a97fd2d3dcc6ac8e6a52ce23f5966132be5ef798ad700502bb34"
+    },
+    {
+      "kind": "named-source-registry",
+      "id": "packages/retrieval/fixtures/named-source-registry.v1.0.0.json",
+      "location": "local",
+      "sha256": "5ffe387422e96036f353d92b340a98f344920988fff3cff3d0b272601cb7f39d"
+    },
+    {
+      "kind": "named-sources-tests",
+      "id": "tests/research-program/named-sources.test.mjs",
+      "location": "local",
+      "sha256": "8da71815cb4615e25c93137f3ad2b4847e82dbf3f5a604ccc03535bd42fcc67e"
+    },
+    {
+      "kind": "named-sources-docs",
+      "id": "docs/research-program/named-sources.md",
+      "location": "local",
+      "sha256": "2caa61a2c4e08131b54cf6895427ab049831b3ccb448832b81286b736dec1607"
+    },
+    {
+      "kind": "sealed-family-graph-unchanged",
+      "id": "packages/identity/src/family-graph.mjs",
+      "location": "local",
+      "sha256": "28eeb0a674404e9583335aeeb0a0ab925ddc19d4f4a3a4730dff74aed0a958bd"
+    },
+    {
+      "kind": "fingerprint-sealed-question-parser-unchanged",
+      "id": "packages/retrieval/tools/question-parser.mjs",
+      "location": "local",
+      "sha256": "736a5d9e57ca7e572954a59f8fd6e06d82a8d186e95ef69ea090224b95ae38e8"
+    },
+    {
+      "kind": "staged-named-source-registry",
+      "id": "apps/web/public/corpus-v1.1.0/named-source-registry.json",
+      "location": "local",
+      "sha256": "5ffe387422e96036f353d92b340a98f344920988fff3cff3d0b272601cb7f39d"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c037-focused",
+      "command": "node --test tests/research-program/named-sources.test.mjs",
+      "started_at": "2026-09-14T12:08:05.330442Z",
+      "completed_at": "2026-09-14T12:08:05.454857Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 named-sources tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c037-focused-event",
+        "path": "verification/research-program/pr-037/producer-20260914/commands/focused-named/event.json",
+        "sha256": "d61d4d42537902449ca7431557d9f5938e9133796dec5a30fcba066ffe3ea551",
+        "bytes": 1033
+      }
+    },
+    {
+      "id": "cmd-c037-retrieval-named",
+      "command": "node --test packages/retrieval/tests/release-contract.test.mjs packages/retrieval/tests/production-acceptance.test.mjs",
+      "started_at": "2026-09-14T12:08:05.455300Z",
+      "completed_at": "2026-09-14T12:08:09.822053Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Existing retrieval named-source tests pass against the expanded registry.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c037-retrieval-named-event",
+        "path": "verification/research-program/pr-037/producer-20260914/commands/retrieval-named/event.json",
+        "sha256": "272433a31d9e82c7e17b024dee74969f5b3524997869a40488a70e09b58787af",
+        "bytes": 1152
+      }
+    },
+    {
+      "id": "cmd-c037-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T12:08:09.822491Z",
+      "completed_at": "2026-09-14T12:08:09.885436Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c037-identity-event",
+        "path": "verification/research-program/pr-037/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "1ef5872d39ed929dd201b76ede655c0114a55436bf99006398186b06a67c9d1f",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "verification/research-program/pr-037/task-binding.json",
+      "bytes": 3984,
+      "sha256": "05d1c1ad480acee9d4a022a27c38f8ab1305fcc042a7d100d6aa7d737442d201",
+      "id": "pr037-artifact-0"
+    },
+    {
+      "path": "verification/research-program/pr-037/dispatch.json",
+      "bytes": 2781,
+      "sha256": "2f3f6ab6ae9466a356659180674b19764a91ee4d8c64c3dc6464f14b4ce6d9a6",
+      "id": "pr037-artifact-1"
+    },
+    {
+      "path": "apps/web/public/corpus-v1.1.0/named-source-registry.json",
+      "bytes": 9748,
+      "sha256": "5ffe387422e96036f353d92b340a98f344920988fff3cff3d0b272601cb7f39d",
+      "id": "pr037-artifact-2"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/focused-named/receipt.json",
+      "bytes": 457,
+      "sha256": "d715eab7ae31ee0c693003ccf07b7c2ca412bc865183f3a80863bddb6888bccb",
+      "id": "pr037-artifact-3"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/focused-named/stdout.log",
+      "bytes": 479,
+      "sha256": "14f11605e83bb0a88a31ed0ef2c3620554721381843f5d0ba4ed72ef09674f2c",
+      "id": "pr037-artifact-4"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/focused-named/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "id": "pr037-artifact-5"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/focused-named/event.json",
+      "bytes": 1033,
+      "sha256": "d61d4d42537902449ca7431557d9f5938e9133796dec5a30fcba066ffe3ea551",
+      "id": "pr037-artifact-6"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/retrieval-named/receipt.json",
+      "bytes": 528,
+      "sha256": "f16f86c76702241523eb50cad3b393ec414148df974aa810d70cc32ab143405b",
+      "id": "pr037-artifact-7"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/retrieval-named/stdout.log",
+      "bytes": 2671,
+      "sha256": "f61c51308922cfe7cb2520a91c4b49385b88a04ae5204581ade24fa596406107",
+      "id": "pr037-artifact-8"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/retrieval-named/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "id": "pr037-artifact-9"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/retrieval-named/event.json",
+      "bytes": 1152,
+      "sha256": "272433a31d9e82c7e17b024dee74969f5b3524997869a40488a70e09b58787af",
+      "id": "pr037-artifact-10"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "5648112c985b92795e828353a02157d9558b1649ecca66c4d7577e2bc83be3dc",
+      "id": "pr037-artifact-11"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79",
+      "id": "pr037-artifact-12"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "id": "pr037-artifact-13"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "1ef5872d39ed929dd201b76ede655c0114a55436bf99006398186b06a67c9d1f",
+      "id": "pr037-artifact-14"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914-fix-stage/commands/focused-named/receipt.json",
+      "bytes": 413,
+      "sha256": "ff77d0f8d9ea9d19f773292b73f86d4af93bbf59cabf233dc8366c2b6a1520b3",
+      "id": "pr037-artifact-15"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914-fix-stage/commands/focused-named/stdout.log",
+      "bytes": 478,
+      "sha256": "0041119b7b21fbbb2d7a53bc08c45fe22972c1b5f419c351302b17d5d4cdcf10",
+      "id": "pr037-artifact-16"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914-fix-stage/commands/focused-named/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "id": "pr037-artifact-17"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914-fix-stage/commands/identity-validate/receipt.json",
+      "bytes": 394,
+      "sha256": "9fa9ecf336caae4375a7ec844603d96b2a04a3b6dbaa8ab6e09338007689a4f6",
+      "id": "pr037-artifact-18"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914-fix-stage/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79",
+      "id": "pr037-artifact-19"
+    },
+    {
+      "path": "verification/research-program/pr-037/producer-20260914-fix-stage/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "id": "pr037-artifact-20"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-037-1",
+      "status": "producer_checked",
+      "result": "MEPS/HCUP/NPPES/PHC4 exact-name fixtures cannot resolve to unrelated descriptions mentioning similar words. Expansion families are recorded without inventing catalog membership.",
+      "command_ids": [
+        "cmd-c037-focused",
+        "cmd-c037-retrieval-named"
+      ]
+    },
+    {
+      "id": "C-037-2",
+      "status": "producer_checked",
+      "result": "The 579 repeated-title cases are accounted for. Title equality alone never deletes or merges a record.",
+      "command_ids": [
+        "cmd-c037-focused"
+      ]
+    },
+    {
+      "id": "C-037-3",
+      "status": "producer_checked",
+      "result": "An unavailable named source returns a specific bounded coverage explanation, not a fabricated exact match. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c037-focused",
+        "cmd-c037-identity"
+      ]
+    },
+    {
+      "id": "C-037-4",
+      "status": "producer_checked",
+      "result": "Staged public named-source registry matches the expanded fixture. CORPUS_STAGE_DRIFT cannot recur from this copy.",
+      "command_ids": [
+        "cmd-c037-focused"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "sealed-identity-family-graph",
+      "status": "accepted",
+      "detail": "packages/identity/src/family-graph.mjs was not edited. identity validate passes."
+    },
+    {
+      "id": "fingerprint-sealed-question-parser",
+      "status": "accepted",
+      "detail": "packages/retrieval/tools/question-parser.mjs was not edited (10068 bytes). Named-source resolution is implemented in enrichment plus the registry fixture."
+    },
+    {
+      "id": "retrieval-package-validate",
+      "status": "skipped",
+      "detail": "packages/retrieval/tools/validate-package.mjs already fails on the integration base with result-schema required-property mismatches independent of this registry expansion. Existing retrieval named-source tests pass."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Named-source modeling is not R04/R07/R09 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-named-source-review",
+      "status": "pending",
+      "detail": "Independent review of exact-name refusal, 579 repeated titles and coverage-gap explanations remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "ledger-owned-paths-named-sealed-packages",
+      "status": "risk",
+      "detail": "The original ledger named packages/identity/src/family-graph.mjs and packages/retrieval/tools/question-parser.mjs. Implementation is in enrichment plus the named-source registry fixture to preserve identity and retrieval algorithm seals."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of exact-name refusal, 579 repeated titles and coverage-gap explanations, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-037 source and replay focused named-source, retrieval named-source, and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

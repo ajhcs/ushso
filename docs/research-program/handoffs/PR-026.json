@@ -1,0 +1,249 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-026",
+  "status": "producer_checked",
+  "owner": "/root/pr026_claim_validation",
+  "reviewer": "Astra/root",
+  "base_sha": "fdc5b5a43d0b790354242d5a165b9d4c55cbdc73",
+  "head_sha": "87b71660c2ec66375e95bd11ed297374fa09411e",
+  "dependency_merge_shas": {
+    "PR-025": "3aa52e83951d32c330417258b9637d6b5178c785"
+  },
+  "branch": "codex/ushso-pr026-claim-validation-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/extract.mjs",
+    "packages/enrichment/validate-claims.mjs",
+    "tests/research-program/claim-validation.test.mjs",
+    "verification/research-program/pr-026/",
+    "docs/research-program/handoffs/PR-026.json"
+  ],
+  "problem": "Schema-valid model JSON could introduce unknown fields, citations or record IDs. Quote matching could be treated as scientific certification. Unsupported claims could be retried until a preferred answer appeared. Accepted proposals could lack resolvable citations.",
+  "resulting_behavior": "parseConstrainedExtraction requires field, value, passage IDs, quotation/span, claim type, uncertainty and abstention reason, limited to the requested task scope. Unknown field, citation or record ID fails even when JSON is syntactically valid. validateClaim checks quoted spans against immutable captures, flags a correct quote with the wrong semantic role for review, and never treats quote matching as scientific certification. Invented units/definitions and unresolvable citations are schema-valid hallucinations and fail. Unsupported claims remain rejected across reruns. Syntax/transport failures are retryable; unsupported claims are not. Accepted literals are traceable without calling the model again. 100% of accepted proposals have resolvable citations.",
+  "commits": [
+    {
+      "id": "C-026-1",
+      "subject": "Define constrained extraction outputs",
+      "sha": "06abdc024debaf5d5b0bde251de63a71e0039866"
+    },
+    {
+      "id": "C-026-2",
+      "subject": "Check source support deterministically",
+      "sha": "06abdc024debaf5d5b0bde251de63a71e0039866"
+    },
+    {
+      "id": "C-026-3",
+      "subject": "Record acceptance and rejection evidence",
+      "sha": "87b71660c2ec66375e95bd11ed297374fa09411e"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "extract",
+      "id": "packages/enrichment/extract.mjs",
+      "location": "local",
+      "sha256": "a6ca7b990e3baafa0566e3a735c17871902bea23ab2a63fbcebd1a72f217e36d"
+    },
+    {
+      "kind": "validate-claims",
+      "id": "packages/enrichment/validate-claims.mjs",
+      "location": "local",
+      "sha256": "60ff09743472a0d4fc7e67e6c0eb91d05e6c1d33393cbf66e960665aded78979"
+    },
+    {
+      "kind": "claim-validation-tests",
+      "id": "tests/research-program/claim-validation.test.mjs",
+      "location": "local",
+      "sha256": "4b09d1dd878cdf91ac5ac740b1945a0e688da2f17f4acffa1f02fff9b6a591e3"
+    },
+    {
+      "kind": "task-builder-consume",
+      "id": "packages/enrichment/task-builder.mjs",
+      "location": "local",
+      "sha256": "09514cd7b6c7b5c0713d83039cc0138ddc0ecf929ec94d12bc97f3f89bf4932b"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c026-focused",
+      "command": "node --test tests/research-program/claim-validation.test.mjs",
+      "started_at": "2026-09-14T08:03:40.054252Z",
+      "completed_at": "2026-09-14T08:03:40.158523Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 claim-validation tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c026-focused-event",
+        "path": "verification/research-program/pr-026/producer-20260914/commands/focused-claims/event.json",
+        "sha256": "b7d13228b09a66bf678c0d7546f02b88386cbdd14f069af7333c205d7a3d303a",
+        "bytes": 1042
+      }
+    },
+    {
+      "id": "cmd-c026-residual",
+      "command": "node --test tests/research-program/residual-task.test.mjs",
+      "started_at": "2026-09-14T08:03:40.158891Z",
+      "completed_at": "2026-09-14T08:03:40.262608Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 residual-task tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c026-residual-event",
+        "path": "verification/research-program/pr-026/producer-20260914/commands/residual-task/event.json",
+        "sha256": "d4d416483d5242d5c79df7c87597880a7f9f69f6e88cfe16c692b2d573cd3b77",
+        "bytes": 1033
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr026-artifact-0",
+      "path": "verification/research-program/pr-026/task-binding.json",
+      "bytes": 3519,
+      "sha256": "6c50cf1d9deebb1ec00cd837b522bd7e1bb9e84823aaf71414790902100956a4"
+    },
+    {
+      "id": "pr026-artifact-1",
+      "path": "verification/research-program/pr-026/dispatch.json",
+      "bytes": 1945,
+      "sha256": "916ca91eb7ae2975da642ca5b48f6a45338ad04e692be147916e8b71c9c45cdc"
+    },
+    {
+      "id": "pr026-artifact-2",
+      "path": "verification/research-program/pr-026/producer-20260914/commands/focused-claims/receipt.json",
+      "bytes": 461,
+      "sha256": "07070bc3739eedcd99a51a21f897f9631f7f0f82218e8a52d1c4e41f7fe7aa57"
+    },
+    {
+      "id": "pr026-artifact-3",
+      "path": "verification/research-program/pr-026/producer-20260914/commands/focused-claims/stdout.log",
+      "bytes": 430,
+      "sha256": "b52b08af59e70601b2ee0a6161a7b88f5fb1ea539c462f08f56a7b0cc36f488b"
+    },
+    {
+      "id": "pr026-artifact-4",
+      "path": "verification/research-program/pr-026/producer-20260914/commands/focused-claims/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr026-artifact-5",
+      "path": "verification/research-program/pr-026/producer-20260914/commands/focused-claims/event.json",
+      "bytes": 1042,
+      "sha256": "b7d13228b09a66bf678c0d7546f02b88386cbdd14f069af7333c205d7a3d303a"
+    },
+    {
+      "id": "pr026-artifact-6",
+      "path": "verification/research-program/pr-026/producer-20260914/commands/residual-task/receipt.json",
+      "bytes": 457,
+      "sha256": "776fe214b96e4b18cc6596f0da7a3729b14e32d32ce2419ffd86d65d6ce24c0f"
+    },
+    {
+      "id": "pr026-artifact-7",
+      "path": "verification/research-program/pr-026/producer-20260914/commands/residual-task/stdout.log",
+      "bytes": 434,
+      "sha256": "a180151253aba8e6a6e1c4d3e3018173eef0976775e7f9fbd0805f8c5b65d814"
+    },
+    {
+      "id": "pr026-artifact-8",
+      "path": "verification/research-program/pr-026/producer-20260914/commands/residual-task/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr026-artifact-9",
+      "path": "verification/research-program/pr-026/producer-20260914/commands/residual-task/event.json",
+      "bytes": 1033,
+      "sha256": "d4d416483d5242d5c79df7c87597880a7f9f69f6e88cfe16c692b2d573cd3b77"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-026-1",
+      "status": "producer_checked",
+      "result": "A model cannot introduce an unknown field, citation or record ID even when its JSON is syntactically valid.",
+      "command_ids": [
+        "cmd-c026-focused"
+      ]
+    },
+    {
+      "id": "C-026-2",
+      "status": "producer_checked",
+      "result": "Correct quote with wrong semantic role is flagged for review. Quote matching alone never certifies scientific correctness. A schema-valid hallucination fails claim validation.",
+      "command_ids": [
+        "cmd-c026-focused"
+      ]
+    },
+    {
+      "id": "C-026-3",
+      "status": "producer_checked",
+      "result": "Unsupported claims remain rejected across reruns. Accepted literals are traceable without calling the model. Residual-task tests remain green.",
+      "command_ids": [
+        "cmd-c026-focused",
+        "cmd-c026-residual"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-openrouter-http",
+      "status": "accepted",
+      "detail": "Claim validation is fixture-only. Paid calls remain disabled."
+    },
+    {
+      "id": "scientific-correctness-certification",
+      "status": "accepted",
+      "detail": "Quote matching never sets scientific_certified. Domain/owner scientific acceptance remains unissued."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-claim-validation-review",
+      "status": "pending",
+      "detail": "Independent review of constrained extraction and claim validation remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "quote-support-is-literal-inclusion",
+      "status": "risk",
+      "detail": "Citation support is exact span/substring matching against immutable capture bytes, not semantic entailment."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of constrained extraction and claim validation, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-026 source and replay focused claim-validation and residual-task tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

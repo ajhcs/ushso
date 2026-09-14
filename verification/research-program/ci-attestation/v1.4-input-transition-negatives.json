@@ -1,0 +1,57 @@
+{
+  "schema_version": "ushso.pr085.ci-v1.4-input-transition-negatives.v1",
+  "status": "PASS",
+  "focused_command": {
+    "id": "cmd-0039-f2390da5",
+    "label": null,
+    "started_at": "2026-09-11T02:31:23.466Z",
+    "completed_at": "2026-09-11T02:31:25.421Z",
+    "duration_ms": 1955,
+    "exit_code": 0,
+    "stdout": {
+      "bytes": 13474,
+      "sha256": "626c3caf8e35b58032d21d28b6375c7a58b4574c6c8a337370c48c51c69842a0",
+      "truncated": false
+    },
+    "stderr": {
+      "bytes": 480,
+      "sha256": "2b93bdb0ba6f59fc4ab32a5760784fa4cf5a633738c88c46dcc636d55339d103",
+      "truncated": false
+    },
+    "tests": 10
+  },
+  "cases": [
+    {
+      "id": "reviewed-package-with-historical-inventory",
+      "reviewed_path": "package.json",
+      "historical_path": "tests/contract-package-inventory.test.mjs",
+      "reviewed_source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "reviewed_sha256": "b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e",
+      "historical_source_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "historical_sha256": "2bdf766d6c69875160330d8bdf44fbd8d21bbfec43a9b7671c9d233e3ddc4bfa",
+      "expected_result": "reject",
+      "observed_result": "reject",
+      "observed_error": "CI_CURRENT_REVIEWED_PR003_PARTIAL_TRANSITION"
+    },
+    {
+      "id": "historical-package-with-reviewed-inventory",
+      "reviewed_path": "tests/contract-package-inventory.test.mjs",
+      "historical_path": "package.json",
+      "reviewed_source_commit": "bf46d92b0e4fc91457bd3eb78aa1742ae84038f2",
+      "reviewed_sha256": "5ab3deb8457c1a66fc313011bb0d96039c90f5ae35e1e08a9d34c9ab24d6c24b",
+      "historical_source_commit": "30fa0c59ecd4d3d1dd1f56cd8422c6c470e45cb0",
+      "historical_sha256": "25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c",
+      "expected_result": "reject",
+      "observed_result": "reject",
+      "observed_error": "CI_CURRENT_REVIEWED_PR003_PARTIAL_TRANSITION"
+    }
+  ],
+  "contract": "The two reviewed PR-003 root inputs are an atomic state: both historical bytes or both exact reviewed bytes are accepted; a mixed pair is rejected.",
+  "boundaries": {
+    "historical_receipts_unchanged": true,
+    "arbitrary_current_drift_accepted": false,
+    "current_subject_approval_issued": false,
+    "private_evaluator_inputs_read": false,
+    "provider_or_network_calls": false
+  }
+}

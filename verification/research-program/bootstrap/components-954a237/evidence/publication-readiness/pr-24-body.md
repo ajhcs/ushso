@@ -1,0 +1,12 @@
+Variable identities separate literal wire fields from publisher labels, concepts and scientific meaning. CMS exact/reviewed-alias mappings now require an explicit wire field and nonempty mapping evidence; unsupported mappings remain unmatched with null wire names, and unresolved context cannot mint resolved IDs.
+
+- Assignment: PR-008; P1 / 1C; R02/R05; F10/F11/F12.
+- Owner: Luna Max in the original packet; Astra finalized correction metadata, which received a separate review.
+- Original integration base: `a00630c712e3a4e64354a77d268cb168fa3f528a`; dependency PR-007 `17f9271372ecdf29f6b818ad9caaa5332258f4fd`.
+- Producer head: `09e312c9fb8767656ba6f6dcb0f996510098842d`; branch `codex/ushso-pr008-variable-identity-20260911`. Combined review head: `954a237a8984d06f5ea0ab15f83c71ce210bf09a`.
+- Identities: additive machine-toolkit v1.2 variable package; source/asset/release/distribution/schema/field-revision context remains explicit. Frozen v1.0/v1.1 contracts and legacy extraction remain unchanged. The eleven HCRIS identifier discrepancies remain unresolved; field counts do not approve mappings.
+- Verification: `node --test tests/cms-layout.test.mjs tests/research-extractors.test.mjs tests/research-program/variable-identity.test.mjs` exited 0 with 40 tests passed. The corrected handoff validator passed; its earlier UTC-spelling failure is retained.
+- [Handoff](https://github.com/ajhcs/ushso/blob/09e312c9fb8767656ba6f6dcb0f996510098842d/docs/research-program/handoffs/PR-008.json); [Correction finalization](https://github.com/ajhcs/ushso/blob/09e312c9fb8767656ba6f6dcb0f996510098842d/verification/research-program/pr-008/astra-correction-20260912/finalization.json). These bind exact commands and source/artifact hashes.
+- Exact combined review: 23 custom probes and 12 Chrome cases passed; separate metadata review found no actionable issues. Final review receipts are retained locally; durable publication links and combined hosted CI remain pending. The combined local gate passed all ten stages on the first attempt with one build on 954a237/tree a781e980 (run 20260912T040526Z-9d0ca8f43f35).
+- Earlier parent-binding, missing-package and gate failures remain historical evidence. The package/lock continuation is bounded by PR-086; old approvals are not broadened.
+- Current state: keep draft. Publication and promotion stay disabled for unresolved variables. No migration, scientific approval, payload-access qualification or deployment is asserted. No credentials, PHI, production environment contents or private evaluation inputs are included.

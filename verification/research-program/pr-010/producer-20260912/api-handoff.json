@@ -1,0 +1,55 @@
+{
+  "format": "ushso.pr010.local-api.v1",
+  "source_head_sha": "1318cda5c76cd3262c7668fb7f56fab842876c6f",
+  "entry_point": {
+    "module": "packages/ingestion/src/local-collector-adapter.mjs",
+    "exports": [
+      "localRuntimePins(fixture)",
+      "createLocalCollector({stateDir, fixture?, readOnly?, fault?, onDelivery?, responseFor?})",
+      "previewLocalFixture(fixtureId?)",
+      "createExactCaptureBridge({compiled, execute, timeoutMs})",
+      "localFailure(error)"
+    ],
+    "collector_methods": [
+      "admit(input?)",
+      "schedule(job)",
+      "execute(childId)",
+      "status(childId)",
+      "seedFixtureReuse({childId,priorChildId})",
+      "openDatabase()",
+      "inspect()",
+      "close()"
+    ],
+    "persistence": "Returned store is the existing LocalCollectionStore; all fixture lifecycle writes use its journal/object ports. Future evidence kinds require explicit scope/allowlist ownership amendment."
+  },
+  "store": {
+    "module": "packages/ingestion/src/local-collection-store.mjs",
+    "exports": [
+      "encodeLocalValue(value,putBytes?)",
+      "decodeLocalValue(encoded,getBytes)",
+      "valueDigest(value)",
+      "localScratchRoot()",
+      "LocalCollectionStore"
+    ],
+    "interfaces": [
+      "LocalCollectionStore.open(directory,{pins,readOnly?,fault?})",
+      "record(kind,operationId,payload,result)",
+      "mutation(kind,payload,reduce)",
+      "transactionRecord(label,mutate)",
+      "getObject(sha256)",
+      "putObject(bytes)",
+      "find(operationId)",
+      "byKind(kind)",
+      "assertUsable(write?)",
+      "poison()",
+      "close()"
+    ],
+    "scope": "Linux fixture-only OS lock, bounded content-addressed objects and whole-operation journal commits. No general PR011 kind is registered; do not duplicate this journal."
+  },
+  "limitations": [
+    "No exactly-once external request guarantee. An intent without verified response stays charged and terminal unresolved.",
+    "Broader research update-cycle and PDF orchestration are not integrated.",
+    "In-memory origin-governor token state is not durable; persisted fixture reservation and synthetic global ordinal bound recovery.",
+    "No live network, managed database/storage, paid inference, payload acquisition, publication or production activation."
+  ]
+}

@@ -1,0 +1,325 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-086",
+  "status": "independently_verified",
+  "owner": "/root/pr086_wp5_v11_lock_continuation",
+  "reviewer": "Astra/root",
+  "base_sha": "fbbab7893ba647eb4ef10fb22f2df79608115d95",
+  "head_sha": "49e87dd207d084d8ab3ff74da13a088f0cac916b",
+  "dependency_merge_shas": {
+    "PR-003": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
+    "PR-085": "34ca9dd1d68896a091fe18116bcff8abf8bed33b"
+  },
+  "branch": "codex/ushso-pr086-wp5-v11-lock-20260912",
+  "github_pr_url": null,
+  "changed_files": [
+    "scripts/verify-wp11-attestation.mjs",
+    "tests/wp11-attestation.test.mjs",
+    "verification/research-program/ci-attestation/wp11-v1.3.0/policy.json",
+    "verification/research-program/pr-086/",
+    "docs/research-program/handoffs/PR-086.json"
+  ],
+  "problem": "The independently reviewed H087 WP5 v1.1 workspace lock was rejected by the old WP11 current-input adapter as unreviewed drift. Historical WP11 approval must stay bound to its original subject.",
+  "resulting_behavior": "The exact H087 lock is accepted only as pr087_wp5_v11_workspace_lock_transition after independently reviewed receipt 23d37ad1. PR008/PR085/historical lock states remain. Current and wrapper approvals remain null. Direct frozen WP11 SUCCESSOR_APPROVAL_STALE_SUBJECT remains a distinct historical boundary.",
+  "commits": [
+    {
+      "id": "C-086-4",
+      "subject": "Bind independently reviewed PR087 WP5 v1.1 lock",
+      "sha": "49e87dd207d084d8ab3ff74da13a088f0cac916b"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "pr087-immutable-source",
+      "id": "H087",
+      "location": "external",
+      "git_commit": "33b3146dec73984087b49724cc18e690310b0b1d",
+      "git_path": "package-lock.json",
+      "sha256": "7001c1d478ff1468464abe40990ff183f639fc60e769e20a0189638878f4d3a3"
+    },
+    {
+      "kind": "pr087-lock-review-receipt",
+      "id": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-review/review.json",
+      "location": "external",
+      "git_commit": "66558038f266429575368caeec7c10223e9a1ed8",
+      "git_path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-review/review.json",
+      "sha256": "23d37ad10dc490c3cca94fc23d4fe15dc2895314812d492f6392e0526453083b"
+    },
+    {
+      "kind": "wp11-verifier",
+      "id": "scripts/verify-wp11-attestation.mjs",
+      "location": "local",
+      "sha256": "0900e29b4b20c7233206aadd03b9bf1ea7b55b5bb0beebc15de8fa416de9de75"
+    },
+    {
+      "kind": "wp11-tests",
+      "id": "tests/wp11-attestation.test.mjs",
+      "location": "local",
+      "sha256": "cc2803ad98ece9af5d7728be050f5c9a1c8ef43ccad6bc904ae97a22a2ce653f"
+    },
+    {
+      "kind": "wp11-policy",
+      "id": "verification/research-program/ci-attestation/wp11-v1.3.0/policy.json",
+      "location": "local",
+      "sha256": "3323c1eb854e3e8676f67cf0bf4b0db270817d25e19c3d9e0f9dce4bd1dc498c"
+    },
+    {
+      "kind": "pr008-review-receipt",
+      "id": "verification/research-program/pr-086/pr008-lock-review-072241e/review.json",
+      "location": "local",
+      "sha256": "a4d52b75b44f7d3340e8a91ad0dc4716ce4d513b84d18edf8b4ebca656e94b3a"
+    },
+    {
+      "kind": "independent-review",
+      "id": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/independent-review.json",
+      "location": "local",
+      "sha256": "262d4e75fde5bcbe51a2613f0432771c55edd246d8b78710e0443dcf9b73c194"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c086-pr087-focused",
+      "command": "node --test tests/wp11-attestation.test.mjs",
+      "started_at": "2026-09-14T00:13:25.479923Z",
+      "completed_at": "2026-09-14T00:13:35.262150Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "21/21 focused WP11 attestation tests pass on 49e87dd.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c086-pr087-focused-event",
+        "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/focused-tests/event.json",
+        "sha256": "10ebc2a8e21dbffae35193ec195e128429ade0e5d002701b34f5512282f1a059",
+        "bytes": 1114
+      }
+    },
+    {
+      "id": "cmd-c086-pr087-adapter",
+      "command": "node scripts/verify-wp11-attestation.mjs",
+      "started_at": "2026-09-14T00:13:35.262756Z",
+      "completed_at": "2026-09-14T00:13:35.496222Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Current adapter PASS; package-lock role pr087_wp5_v11_workspace_lock_transition; current/wrapper approval null.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c086-pr087-adapter-event",
+        "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/current-adapter/event.json",
+        "sha256": "434fda23567b1fd33a1926412672f1d97beb97962b63dba62f8a26d412e1a433",
+        "bytes": 1168
+      }
+    },
+    {
+      "id": "cmd-c086-pr087-suite",
+      "command": "node scripts/run-contract-suites.mjs --suite wp11",
+      "started_at": "2026-09-14T00:13:35.496622Z",
+      "completed_at": "2026-09-14T00:13:36.753395Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Root --suite wp11 PASS; frozen WP11 package 4/4 plus adapter validate PASS.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c086-pr087-suite-event",
+        "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/suite-wp11/event.json",
+        "sha256": "0b5b8d14c19ea1e394ee4dd468108daf5d1c82198b1f808cbb38063828bef930",
+        "bytes": 1140
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr086-pr087-artifact-0",
+      "path": "verification/research-program/pr-086/task-binding.json",
+      "sha256": "12ca73176a05096efc4cef60926db0e4e6055b42dc907578165843dd07389fc0",
+      "bytes": 2907
+    },
+    {
+      "id": "pr086-pr087-artifact-1",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/independent-review.json",
+      "sha256": "262d4e75fde5bcbe51a2613f0432771c55edd246d8b78710e0443dcf9b73c194",
+      "bytes": 11740
+    },
+    {
+      "id": "pr086-pr087-artifact-2",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-review/review.json",
+      "sha256": "23d37ad10dc490c3cca94fc23d4fe15dc2895314812d492f6392e0526453083b",
+      "bytes": 4014
+    },
+    {
+      "id": "pr086-pr087-artifact-3",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/prior-pr086-archive/task-binding.json",
+      "sha256": "8690dc40c78c901e8cd62f6d1e9bf6530cc50240f2f07d70af76fbc2d577930f",
+      "bytes": 4484
+    },
+    {
+      "id": "pr086-pr087-artifact-4",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/prior-pr086-archive/handoff-PR-086.json",
+      "sha256": "299d5185c9f02100237ae5434a59bfcf9c9688b6759c0d2054a67906fafb5f84",
+      "bytes": 31116
+    },
+    {
+      "id": "pr086-pr087-artifact-5",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/prior-pr086-archive/prior-pr086-ledger-row.json",
+      "sha256": "71204f7894d3b45b430632d220b3e3535006a87ca516a807cb0915e84b7845aa",
+      "bytes": 4641
+    },
+    {
+      "id": "pr086-pr087-artifact-6",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/focused-tests/receipt.json",
+      "sha256": "fbdb255aa2dba647e77727c5920b54bda10875ad65f9451c333ece831202045d",
+      "bytes": 499
+    },
+    {
+      "id": "pr086-pr087-artifact-7",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/focused-tests/stdout.log",
+      "sha256": "daed599ec58f1ab43d7f39aff6c77b72c5be33a4771560fcb584cea1482557d7",
+      "bytes": 24466
+    },
+    {
+      "id": "pr086-pr087-artifact-8",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/focused-tests/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr086-pr087-artifact-9",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/focused-tests/event.json",
+      "sha256": "10ebc2a8e21dbffae35193ec195e128429ade0e5d002701b34f5512282f1a059",
+      "bytes": 1114
+    },
+    {
+      "id": "pr086-pr087-artifact-10",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/current-adapter/receipt.json",
+      "sha256": "a4062a5e821f2f7741a5abace4cb2a2a57b5a8866153f0fa5bce6ab052426e24",
+      "bytes": 491
+    },
+    {
+      "id": "pr086-pr087-artifact-11",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/current-adapter/stdout.log",
+      "sha256": "fa77b1c02351b3c919943e03862d37f714ba78ae48ef784d290c20e8c8a4526b",
+      "bytes": 18926
+    },
+    {
+      "id": "pr086-pr087-artifact-12",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/current-adapter/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr086-pr087-artifact-13",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/current-adapter/event.json",
+      "sha256": "434fda23567b1fd33a1926412672f1d97beb97962b63dba62f8a26d412e1a433",
+      "bytes": 1168
+    },
+    {
+      "id": "pr086-pr087-artifact-14",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/suite-wp11/receipt.json",
+      "sha256": "d7cf9bfc0712db098aad35d8682003034ccc04a1ddd0a5c27c727fdf2b304bf7",
+      "bytes": 509
+    },
+    {
+      "id": "pr086-pr087-artifact-15",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/suite-wp11/stdout.log",
+      "sha256": "96b41538aa6f881b4185b9c58d4c15cfe4f86a597c63f5ee6c135f4a94cfb5d9",
+      "bytes": 19589
+    },
+    {
+      "id": "pr086-pr087-artifact-16",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/suite-wp11/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr086-pr087-artifact-17",
+      "path": "verification/research-program/pr-086/pr087-wp5-v1.1-lock-continuation/commands/suite-wp11/event.json",
+      "sha256": "0b5b8d14c19ea1e394ee4dd468108daf5d1c82198b1f808cbb38063828bef930",
+      "bytes": 1140
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-086-4",
+      "status": "independently_verified",
+      "result": "Three-path PR087 lock continuation independently reviewed on 49e87dd. Focused tests 21/21, current adapter PASS, suite wp11 PASS. Current/wrapper approval remain null.",
+      "command_ids": [
+        "cmd-c086-pr087-focused",
+        "cmd-c086-pr087-adapter",
+        "cmd-c086-pr087-suite"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "direct-frozen-wp11-stale-subject",
+      "status": "accepted",
+      "detail": "Direct frozen WP11 --validate still fails SUCCESSOR_APPROVAL_STALE_SUBJECT on current bytes. This is the distinct historical boundary, not the old adapter unreviewed-drift rejection."
+    },
+    {
+      "id": "joint-pr010-pr087-pr086-gate",
+      "status": "skipped",
+      "detail": "Combined exact local gate and hosted CI remain root-owned downstream checks on one joint composition."
+    },
+    {
+      "id": "current-approval",
+      "status": "pending",
+      "detail": "Current technical and wrapper approvals remain null pending PR082/release qualification."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "pending-joint-acceptance",
+      "status": "pending",
+      "detail": "Focused current-input review is not research integration, PR011 readiness, or R01-R16 acceptance."
+    },
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    }
+  ],
+  "risks": [
+    {
+      "id": "no-global-pr086-pr087-backedge",
+      "status": "risk",
+      "detail": "H087 is an independently reviewed immutable source input. This continuation does not add a global PR086 to PR087 ledger dependency edge or substitute H087 for an accepted merge identity."
+    }
+  ],
+  "next_consumer": "Astra/root for joint PR010+PR087+PR086 composition, local gate, hosted CI and research integration.",
+  "next_action": "Qualify one joint PR010+PR087+PR086 candidate through the declared local gate and hosted CI before recording research-integration acceptance identities.",
+  "independent_review": {
+    "status": "independently_verified",
+    "reviewed_head_sha": "49e87dd207d084d8ab3ff74da13a088f0cac916b",
+    "decisive_checks": [
+      "Diff vs 66558038 is exactly the three authorized behavior/test paths.",
+      "Independently recomputed lock object delta: two additions, 356 unchanged, no removals or top-level changes.",
+      "Focused WP11 tests 21/21, current adapter PASS with role pr087_wp5_v11_workspace_lock_transition, suite wp11 PASS.",
+      "Direct frozen WP11 SUCCESSOR_APPROVAL_STALE_SUBJECT remains fail-closed.",
+      "Current/wrapper approval remain null; PR008/PR085/historical states preserved."
+    ],
+    "limitations": [
+      "This is not current WP11 approval, combined acceptance, release qualification, research integration, or production change.",
+      "Joint local gate and hosted CI remain required before integration acceptance identities are recorded."
+    ]
+  }
+}

@@ -1,0 +1,249 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-023",
+  "status": "producer_checked",
+  "owner": "/root/pr023_provider_policy",
+  "reviewer": "Astra/root",
+  "base_sha": "f83428f8d25f6d239ed24a51917e941210f299a4",
+  "head_sha": "dfefc0cb3d30f87311090444ffb97d33075f72b5",
+  "dependency_merge_shas": {
+    "PR-022": "00b2c0a5073b21f9d0c7f365a72d1432bbd18014"
+  },
+  "branch": "codex/ushso-pr023-provider-policy-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/provider-policy.mjs",
+    "packages/enrichment/model-snapshot.json",
+    "tests/research-program/provider-policy.test.mjs",
+    "verification/research-program/pr-023/",
+    "docs/research-program/handoffs/PR-023.json"
+  ],
+  "problem": "A latest alias or unevaluated free router could replace the evaluated model. Secrets, private queries, restricted content or unapproved contributor transmission could reach a provider transport. A cheaper privacy-incompatible Muse Contributor fallback could be selected. Muse Contributor data-use terms were not explicit in operator configuration. Untrusted document instructions could select a source URL, endpoint or provider.",
+  "resulting_behavior": "loadModelSnapshot stores exact evaluated model IDs, prices, supported parameters and data-use policy version from a configuration-time fixture. A changed or unavailable model enters review. openai/gpt-4.1-mini-latest and openrouter/auto cannot replace the evaluated model. classifyEvidence/filterEligibleEvidence accept approved public documentation only; secrets, private queries, restricted content, unapproved contributor transmission and untrusted instructions never reach the fake transport, and logs redact secrets. selectFallback allows only evaluated models with equal-or-stricter data policy and an accepted maximum price. A cheaper Muse Contributor fallback is refused. An unevaluated free router is not the default. Muse Contributor terms are explicit and not operator-accepted. Paid calls remain disabled. Live fetch is forbidden.",
+  "commits": [
+    {
+      "id": "C-023-1",
+      "subject": "Snapshot model and endpoint capabilities",
+      "sha": "cde27e8d95853e6e3e89cc82d03f52904785208d"
+    },
+    {
+      "id": "C-023-2",
+      "subject": "Enforce evidence eligibility",
+      "sha": "cde27e8d95853e6e3e89cc82d03f52904785208d"
+    },
+    {
+      "id": "C-023-3",
+      "subject": "Implement a bounded fallback policy",
+      "sha": "dfefc0cb3d30f87311090444ffb97d33075f72b5"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "provider-policy",
+      "id": "packages/enrichment/provider-policy.mjs",
+      "location": "local",
+      "sha256": "f1b54bb86be367cff3091b81c59ee90328aec7fce3e18fb4622fef66835472e0"
+    },
+    {
+      "kind": "model-snapshot",
+      "id": "packages/enrichment/model-snapshot.json",
+      "location": "local",
+      "sha256": "a36d475f8f80677d0d71c210a5cf937bdeb95ad685cc9465418ec88254182039"
+    },
+    {
+      "kind": "provider-policy-tests",
+      "id": "tests/research-program/provider-policy.test.mjs",
+      "location": "local",
+      "sha256": "e1ffeca11640bdf08368a9d72aede1a82164961b923558617f55d4d2f8147216"
+    },
+    {
+      "kind": "openrouter-client-consume",
+      "id": "packages/enrichment/openrouter-client.mjs",
+      "location": "local",
+      "sha256": "7b641e134cfb71d5bc2599efdf84d73e35a5dd14e8eae7beba1c6aa8b4650e37"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c023-focused",
+      "command": "node --test tests/research-program/provider-policy.test.mjs",
+      "started_at": "2026-09-14T07:11:19.662200Z",
+      "completed_at": "2026-09-14T07:11:19.759982Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "4/4 provider-policy tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c023-focused-event",
+        "path": "verification/research-program/pr-023/producer-20260914/commands/focused-policy/event.json",
+        "sha256": "f0836197e6c48e24d9cc4b875045818448ae5a06e076bddcbbbd06488eef2a98",
+        "bytes": 1040
+      }
+    },
+    {
+      "id": "cmd-c023-openrouter",
+      "command": "node --test tests/research-program/openrouter-client.test.mjs",
+      "started_at": "2026-09-14T07:11:19.760373Z",
+      "completed_at": "2026-09-14T07:11:21.110043Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 openrouter-client tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c023-openrouter-event",
+        "path": "verification/research-program/pr-023/producer-20260914/commands/openrouter-client/event.json",
+        "sha256": "69bf9470b9ada32501904e6acdd8083c90cab5301bb7a971f49d1bc7b7f7af28",
+        "bytes": 1053
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr023-artifact-0",
+      "path": "verification/research-program/pr-023/task-binding.json",
+      "bytes": 3475,
+      "sha256": "a9b455c37ea31afdd96a94acc714e1fac7f06d1e5e028e63eb02db015dee62d4"
+    },
+    {
+      "id": "pr023-artifact-1",
+      "path": "verification/research-program/pr-023/dispatch.json",
+      "bytes": 2413,
+      "sha256": "55ea496cfd327d44683990fc5586b113f59fed1418dd5179fb1dcda6fc563a92"
+    },
+    {
+      "id": "pr023-artifact-2",
+      "path": "verification/research-program/pr-023/producer-20260914/commands/focused-policy/receipt.json",
+      "bytes": 460,
+      "sha256": "bb8d1598e3f716d14bcbede4140900e33105991b3cb5db420c1cce478986283b"
+    },
+    {
+      "id": "pr023-artifact-3",
+      "path": "verification/research-program/pr-023/producer-20260914/commands/focused-policy/stdout.log",
+      "bytes": 475,
+      "sha256": "41ac729fc3f7533ed56cac090f1c0d1ed01978ef8069af94a2a680731ae38bd2"
+    },
+    {
+      "id": "pr023-artifact-4",
+      "path": "verification/research-program/pr-023/producer-20260914/commands/focused-policy/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr023-artifact-5",
+      "path": "verification/research-program/pr-023/producer-20260914/commands/focused-policy/event.json",
+      "bytes": 1040,
+      "sha256": "f0836197e6c48e24d9cc4b875045818448ae5a06e076bddcbbbd06488eef2a98"
+    },
+    {
+      "id": "pr023-artifact-6",
+      "path": "verification/research-program/pr-023/producer-20260914/commands/openrouter-client/receipt.json",
+      "bytes": 465,
+      "sha256": "77634cca15765e6b56bd459ae26edd3745da1b4ac9d1be6d4c87189070a26ebd"
+    },
+    {
+      "id": "pr023-artifact-7",
+      "path": "verification/research-program/pr-023/producer-20260914/commands/openrouter-client/stdout.log",
+      "bytes": 465,
+      "sha256": "75ac37c619852fff16c0a8388d7394a70eb7b9db6f8037e3b02c5e28b68cecdf"
+    },
+    {
+      "id": "pr023-artifact-8",
+      "path": "verification/research-program/pr-023/producer-20260914/commands/openrouter-client/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr023-artifact-9",
+      "path": "verification/research-program/pr-023/producer-20260914/commands/openrouter-client/event.json",
+      "bytes": 1053,
+      "sha256": "69bf9470b9ada32501904e6acdd8083c90cab5301bb7a971f49d1bc7b7f7af28"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-023-1",
+      "status": "producer_checked",
+      "result": "A changed or unavailable model enters review. A latest alias cannot replace the evaluated model unnoticed.",
+      "command_ids": [
+        "cmd-c023-focused"
+      ]
+    },
+    {
+      "id": "C-023-2",
+      "status": "producer_checked",
+      "result": "Excluded material never reaches the fake transport. Logs do not reintroduce secrets.",
+      "command_ids": [
+        "cmd-c023-focused"
+      ]
+    },
+    {
+      "id": "C-023-3",
+      "status": "producer_checked",
+      "result": "A privacy-incompatible cheaper fallback is refused. An unevaluated free router is not the default. OpenRouter client tests remain green.",
+      "command_ids": [
+        "cmd-c023-focused",
+        "cmd-c023-openrouter"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-openrouter-catalog",
+      "status": "accepted",
+      "detail": "Snapshot is a configuration-time fixture. live_catalog_fetched is false. blockedFetch forbids live HTTP."
+    },
+    {
+      "id": "muse-contributor-operator-acceptance",
+      "status": "accepted",
+      "detail": "Muse Contributor terms are explicit and operator_acceptance remains false."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-provider-policy-review",
+      "status": "pending",
+      "detail": "Independent review of the snapshot, evidence eligibility and fallback policy remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "snapshot-is-fixture-not-live-catalog",
+      "status": "risk",
+      "detail": "Exact IDs and prices are pinned in model-snapshot.json. A later live catalog change is a review event, not an automatic update."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of the snapshot, evidence eligibility and fallback policy, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-023 source and replay focused provider-policy and openrouter-client tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr033-source-cards-20260914",
+  "slice_id": "C-033-1",
+  "pr_id": "PR-033",
+  "title": "Generate useful source cards from accepted facts",
+  "owner": "/root/pr033_source_cards",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr033-source-cards-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr033-source-cards-20260914",
+  "objective": "Source pages answer practical research questions with concise, supported facts.",
+  "outcome": "Source cards require purpose, coverage, grain, example variables, access steps, tested state, limits and citation. Documented use, reviewed recommendation and unsupported use are separate. A card cannot declare Best for from topic tags alone; missing essential facts produce an explicit incomplete status. HCRIS/PLACES examples have evidence-bound descriptions. Each source-claim sentence resolves to evidence. Exact release/schema/example IDs and beginner/expert guides are attached. Material limitations are retained without turning every unknown into a full page section. Sealed packages/identity/src/researcher-guidance.mjs is not edited.",
+  "dependencies": [
+    "PR-030",
+    "PR-031",
+    "PR-032"
+  ],
+  "owned_paths": [
+    "packages/enrichment/source-card.mjs",
+    "apps/web/src/lib/researcherGuidance.ts",
+    "apps/web/src/lib/researcherGuidance.test.tsx",
+    "tests/research-program/source-card.test.mjs",
+    "docs/research-program/source-cards.md",
+    "verification/research-program/pr-033/",
+    "docs/research-program/handoffs/PR-033.json"
+  ],
+  "commits": [
+    {
+      "id": "C-033-1",
+      "subject": "Define a source-card view",
+      "instructions": "Require plain-language purpose, coverage, grain, example variables, access steps, tested state, limits and citation. Separate documented use, reviewed recommendation and unsupported use.",
+      "verification": "A card cannot declare Best for from topic tags alone; missing essential facts produce an explicit incomplete status."
+    },
+    {
+      "id": "C-033-2",
+      "subject": "Generate cards for representative domains",
+      "instructions": "Create evidence-bound cards for finance, staffing/quality, public health and survey/population products using accepted canonical fields. Reuse text rather than copying generic warning paragraphs.",
+      "verification": "Each sentence that makes a source claim resolves to evidence; a reviewer can compare the rendered card with the publisher passage."
+    },
+    {
+      "id": "C-033-3",
+      "subject": "Connect cards to examples and guides",
+      "instructions": "Attach exact release/schema/example IDs and the relevant beginner/expert guide. Keep detailed provenance expandable.",
+      "verification": "A reader can move from purpose to variables to a tested access step without searching through repeated caveats."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/source-card.test.mjs",
+    "npm test --workspace @ushso/observatory-web -- src/lib/researcherGuidance.test.tsx",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-033.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-033/",
+  "binding": {
+    "base_sha": "8cd2d7dbfc12a3ed03a2757e8eced9b9959f82c4",
+    "base_tree": "a5481f58c8d683bd88bb67993627e71c37739d00",
+    "dependency_merge_shas": {
+      "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7",
+      "PR-031": "3b2d681103d80d571d44cd3e364a4327f8e046a9",
+      "PR-032": "6fe431f855c2bb65c97cdb0526ef8ed54ea6a74a"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

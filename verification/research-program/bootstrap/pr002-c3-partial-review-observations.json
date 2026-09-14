@@ -1,0 +1,65 @@
+{
+  "schema": "ushso.pr002.c3-precommit-observations.v1",
+  "created_at": "2026-09-10T20:48:57.331210+00:00",
+  "source_snapshot_sha256": "1154f83fde1315b768c7a72849fcddc185012612279d1f7f07959225f21be485",
+  "source_status": "unaccepted_partial_run_not_final_candidate",
+  "script_sha256": "5dcb4aceaa721fe0ab3d82be8d5f5e483c315622b5efba63f7d0d4e1d8ef70da",
+  "base_sha": "997070bd94864fabedf73acecd422c6e15a3ed7e",
+  "unchanged_payload_pilot_assertion_passes": true,
+  "negative_replays": [
+    {
+      "case": "hospital_native_identity_mismatch",
+      "expected": "reject_mismatched_frozen_binding",
+      "errors": [],
+      "incorrectly_accepted": true
+    },
+    {
+      "case": "hospital_projection_row_mismatch",
+      "expected": "reject_mismatched_frozen_binding",
+      "errors": [],
+      "incorrectly_accepted": true
+    },
+    {
+      "case": "payer_wire_cell_value_mismatch",
+      "expected": "reject_mismatched_frozen_binding",
+      "errors": [],
+      "incorrectly_accepted": true
+    },
+    {
+      "case": "payer_workbook_row_mismatch",
+      "expected": "reject_mismatched_frozen_binding",
+      "errors": [],
+      "incorrectly_accepted": true
+    },
+    {
+      "case": "payer_native_identity_mismatch",
+      "expected": "reject_mismatched_frozen_binding",
+      "errors": [],
+      "incorrectly_accepted": true
+    },
+    {
+      "case": "hospital_display_name_mismatch",
+      "expected": "reject_mismatched_frozen_binding",
+      "errors": [],
+      "incorrectly_accepted": true
+    }
+  ],
+  "findings": [
+    {
+      "id": "PR002-C3-PRE-001",
+      "status": "confirmed_on_partial_snapshot_final_candidate_pending",
+      "paths": [
+        "verification/research-program/pr-002/c3_lib.py:833",
+        "verification/research-program/pr-002/verify.py:254"
+      ],
+      "problem": "The pilot validator compares only part of each sealed record, and the default verifier does not compare the complete C3 overlay with its deterministic reconstruction. Native identity values, displayed identity names, projection row indexes and retained workbook row/wire fields can disagree with the sealed evidence without rejection.",
+      "requested_correction": "Validate the complete deterministic pilot record/selection contract (and expansion-family overlay) against sealed inputs, preserving explicit error reasons; exercise mismatched native identity and row/cell metadata in both hospital and payer negative fixtures. Verify the full generated acceptance document matches current hashes, in addition to row-level checks."
+    }
+  ],
+  "limitations": [
+    "No final candidate acceptance is claimed.",
+    "These are local metadata validation fixtures, not network, payload access, or scientific measurement.",
+    "The frozen snapshot and provider worktrees were not modified.",
+    "Root will re-evaluate final Grok changes before disposition."
+  ]
+}

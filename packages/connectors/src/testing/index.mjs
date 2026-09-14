@@ -3,3 +3,4 @@ export * from './fixtures.mjs';
 export * from './fixture-matrix.mjs';
 export * from './reconciliation-audit.mjs';
 export * from './wave-fixtures.mjs';
+export * from './example-runner.mjs';

@@ -1,0 +1,114 @@
+{
+  "format": "ushso.pr085.ci-v14-independent-functional-checks.v1",
+  "reviewer": "root Astra",
+  "head_sha": "d1826358b0b1e5f8db97b787b5bf74de5e50926b",
+  "tree_sha": "5fec5290858bafddd6d5c4a291c36e5ea169ea0b",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr085-controller-review-20260911",
+  "source_sha256": {
+    "scripts/verify-ci-attestation.mjs": "719bff54e8d5cd5fcb5569ead2bf9c1d3a74282387092afee8c940bc031f048a",
+    "scripts/run-contract-suites.mjs": "9cc9efb8f29bf6a9ba93fe619e7fd1d0e519fce5cb0f37bf8747f199611cb647",
+    "tests/ci-attestation.test.mjs": "cdc1314328b67294f8ba299cb43a01876cbd3d7d1f191370620faa5e69abdc8c",
+    "verification/testing/ci/v1.4.0/tools/ci-inventory.mjs": "4e51bd9273e2febf8009c868ed8a41f34c9ff3cc3998141b6d8cca493f2bc8dd",
+    "verification/testing/ci/v1.4.0/tools/validate-package.mjs": "0413b0a140ec4e339199be1494d9146a7191e7e5d689b2cbeb5de68a8500bc41"
+  },
+  "protected_sha256": {
+    "package-lock.json": "37e4a9ec1fba9ab254aa7a596e1a0e3f73919cf5358717dc6e06e0478be6b20c",
+    "evaluation/research-program/cohorts.json": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+    "evaluation/research-program/tasks.json": "4fc5c7fe2a5b51da4bf5ae8e348949a33f26c1758d7a18065e7c5611d1efcedc",
+    "docs/research-program/acceptance.md": "625271093e73108959d56f7647107b96ea3398c8555c59a654a53717721a4cc7"
+  },
+  "commands": [
+    {
+      "label": "locked-install",
+      "started_at": "2026-09-11T02:18:13.504546+00:00",
+      "completed_at": "2026-09-11T02:18:17.346731+00:00",
+      "tool_helper_sha256": "4138a49e42148db9e5c63dfd5386fdac235f19e445453e702f342b1a7002b813",
+      "exit_code": 0,
+      "result": [
+        {
+          "argv": [
+            "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+            "ci",
+            "--ignore-scripts",
+            "--no-audit",
+            "--no-fund"
+          ],
+          "authority": "independent-committed-workspace-lock-review",
+          "duration_seconds": 3.816,
+          "exit_code": 0
+        }
+      ],
+      "passed": true
+    },
+    {
+      "label": "ci-attestation-focused",
+      "argv": [
+        "node",
+        "--test",
+        "tests/ci-attestation.test.mjs"
+      ],
+      "started_at": "2026-09-11T02:18:17.434600+00:00",
+      "completed_at": "2026-09-11T02:18:19.437107+00:00",
+      "exit_code": 0,
+      "reported_test_count": 9,
+      "expected_outcome": "positive-tests",
+      "stdout_sha256": "2ab770fd13d5c56f193b06c66b7f1250f0e31090b829a474b9630d6827ef54eb",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "label": "ci-v14-package-tests",
+      "argv": [
+        "/mnt/d/tmp/plumbob/ushso-research-program-20260910/tooling/node_modules/.bin/npm",
+        "test",
+        "--prefix",
+        "verification/testing/ci/v1.4.0"
+      ],
+      "started_at": "2026-09-11T02:18:19.437181+00:00",
+      "completed_at": "2026-09-11T02:18:19.745349+00:00",
+      "exit_code": 0,
+      "reported_test_count": 5,
+      "expected_outcome": "positive-tests",
+      "stdout_sha256": "76cee185cd483d526ca7035a1e56ff08fd67f84456648ef487b9db9baeef9867",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "label": "current-ci-attestation",
+      "argv": [
+        "node",
+        "scripts/verify-ci-attestation.mjs"
+      ],
+      "started_at": "2026-09-11T02:18:19.745400+00:00",
+      "completed_at": "2026-09-11T02:18:19.843674+00:00",
+      "exit_code": 0,
+      "reported_test_count": null,
+      "expected_outcome": "attestation",
+      "stdout_sha256": "3f12be82fd28065f1e052fe797b6dcecad8549458f3527d9cae89c071f679409",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true
+    },
+    {
+      "label": "direct-ci-v14-validate",
+      "argv": [
+        "node",
+        "verification/testing/ci/v1.4.0/tools/validate-package.mjs",
+        "--validate"
+      ],
+      "started_at": "2026-09-11T02:18:19.843741+00:00",
+      "completed_at": "2026-09-11T02:18:19.936718+00:00",
+      "exit_code": 2,
+      "reported_test_count": null,
+      "expected_outcome": "pending-approval",
+      "stdout_sha256": "64f796613e1d8fe56b45435d4eb2fbfdbd6287f5582a6b45cfa6f55ce60a809c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": false
+    }
+  ],
+  "status": "changes_requested",
+  "limitations": [
+    "Exact functional component only; producer final evidence/handoff and separate semantic review remain pending.",
+    "No actual combined PR003/PR004 integration gate or hosted CI acceptance.",
+    "Direct CI validation remains pending without an authorized approval; technical checks do not transfer historical release authority."
+  ]
+}

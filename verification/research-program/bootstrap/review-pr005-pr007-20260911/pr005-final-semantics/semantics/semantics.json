@@ -1,0 +1,318 @@
+{
+  "format": "ushso.pr005-independent-semantics.v1",
+  "at": "2026-09-11T14:08:24.527Z",
+  "source_path": "packages/retrieval/versions/v1.2.0/corpus/records-0003.jsonl",
+  "source_record_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+  "source_record_sha256": "5a9dc7f03ee5266d4f33f89152b3fe7a3d9b5008cea3674fe3a84ff71f4c7e88",
+  "controlled_fixture_sha256": "cef05c5c53a8672d685d9e59662c05996c8f3f39547fd8dc1cab4d1acd966ecd",
+  "source_unchanged": true,
+  "script_sha256": "f7ee540b1c749e54ca9be40a6488fc7b1decf4497816f3746c4ced1fee9b3c07",
+  "cases": [
+    {
+      "id": "explicit-clock",
+      "description": "The service forwards an explicit clock without changing source observations",
+      "pass": true,
+      "actual": {
+        "search": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false."
+        },
+        "dataset": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false.",
+          "evaluated_at": "2026-09-10T00:00:00.000Z",
+          "last_successful_metadata_check": "2026-09-03T22:22:33.908Z",
+          "latest_attempt": {
+            "at": "2026-09-03T22:22:33.908Z",
+            "outcome": "succeeded",
+            "scope": "catalog_metadata"
+          },
+          "catalog_metadata_check": {
+            "state": "current_verified",
+            "at": "2026-09-03T22:22:33.908Z",
+            "scope": "catalog_metadata"
+          },
+          "payload_check": {
+            "state": "not_attempted",
+            "at": null,
+            "scope": "payload",
+            "note": "Catalog metadata observation is not a payload-access check."
+          },
+          "stale_status": "review_overdue"
+        },
+        "browse": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false."
+        }
+      },
+      "status": "passed"
+    },
+    {
+      "id": "frozen-clock",
+      "description": "Offline retrieval retains the pinned corpus clock",
+      "pass": true,
+      "actual": {
+        "at": "2026-09-03T00:00:00.000Z",
+        "freshness": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "within_review_window",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review deadline has not passed."
+        }
+      },
+      "status": "passed"
+    },
+    {
+      "id": "projection-parity",
+      "description": "Search and both browse paths expose the same attempt fields as dataset lookup",
+      "pass": false,
+      "actual": {
+        "search": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false."
+        },
+        "browse": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false."
+        },
+        "legacyBrowse": null,
+        "dataset": {
+          "verification_status": "current_verified",
+          "last_checked": "2026-09-03T22:22:33.908Z",
+          "next_review_due": "2026-09-05T00:00:00Z",
+          "freshness_state": "overdue",
+          "failed_refresh_state": "none_recorded",
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false.",
+          "evaluated_at": "2026-09-10T00:00:00.000Z",
+          "last_successful_metadata_check": "2026-09-03T22:22:33.908Z",
+          "latest_attempt": {
+            "at": "2026-09-03T22:22:33.908Z",
+            "outcome": "succeeded",
+            "scope": "catalog_metadata"
+          },
+          "catalog_metadata_check": {
+            "state": "current_verified",
+            "at": "2026-09-03T22:22:33.908Z",
+            "scope": "catalog_metadata"
+          },
+          "payload_check": {
+            "state": "not_attempted",
+            "at": null,
+            "scope": "payload",
+            "note": "Catalog metadata observation is not a payload-access check."
+          },
+          "stale_status": "review_overdue"
+        }
+      },
+      "status": "failed"
+    },
+    {
+      "id": "request-date-clock",
+      "description": "The ordinary client Date header does not replace server evaluation time",
+      "pass": false,
+      "actual": {
+        "resolved": "2026-09-04T12:00:00.000Z",
+        "server_before": "2026-09-11T14:08:24.184Z",
+        "server_after": "2026-09-11T14:08:24.185Z"
+      },
+      "status": "failed"
+    },
+    {
+      "id": "unknown-observation-not-success",
+      "description": "An unknown catalog verification outcome is not labelled a last successful metadata check",
+      "pass": false,
+      "actual": {
+        "verification_status": "unknown",
+        "last_checked": "2026-09-03T00:00:00Z",
+        "next_review_due": null,
+        "freshness_state": "deadline_unknown",
+        "failed_refresh_state": "failed",
+        "note": "No review deadline is documented; historical verification evidence is unchanged.",
+        "evaluated_at": "2026-09-10T00:00:00.000Z",
+        "last_successful_metadata_check": "2026-09-03T00:00:00Z",
+        "latest_attempt": {
+          "at": null,
+          "outcome": "failed",
+          "scope": "catalog_metadata"
+        },
+        "catalog_metadata_check": {
+          "state": "unknown",
+          "at": "2026-09-03T00:00:00Z",
+          "scope": "catalog_metadata"
+        },
+        "payload_check": {
+          "state": "not_attempted",
+          "at": null,
+          "scope": "payload",
+          "note": "Catalog metadata observation is not a payload-access check."
+        },
+        "stale_status": "not_stale"
+      },
+      "status": "failed"
+    },
+    {
+      "id": "control-grain-unresolved",
+      "description": "The HCRIS-style unresolved grain stays unresolved",
+      "pass": true,
+      "actual": {
+        "label": "Typical unit",
+        "values": [
+          "Observation grain is unresolved."
+        ],
+        "evidenceState": "unresolved",
+        "evidenceIds": [
+          "evidence:cms-data-catalog:bf696c5e94f4146abe7ad61b"
+        ]
+      },
+      "status": "passed"
+    },
+    {
+      "id": "control-supported-grain",
+      "description": "Explicit supported observation grain is retained",
+      "pass": true,
+      "actual": {
+        "source_asserted": {
+          "label": "Typical unit",
+          "values": [
+            "Hospital"
+          ],
+          "evidenceState": "source_asserted",
+          "evidenceIds": [
+            "evidence:cms-data-catalog:bf696c5e94f4146abe7ad61b"
+          ]
+        },
+        "verified_first_party": {
+          "label": "Typical unit",
+          "values": [
+            "Hospital"
+          ],
+          "evidenceState": "verified_first_party",
+          "evidenceIds": [
+            "evidence:cms-data-catalog:bf696c5e94f4146abe7ad61b"
+          ]
+        }
+      },
+      "status": "passed"
+    },
+    {
+      "id": "grain-inferred",
+      "description": "Unsupported grain values are not rendered as resolved observation units",
+      "pass": false,
+      "actual": {
+        "card_grain": "Hospital",
+        "detail_unit": {
+          "label": "Typical unit",
+          "values": [
+            "Hospital"
+          ],
+          "evidenceState": "inferred",
+          "evidenceIds": [
+            "evidence:cms-data-catalog:bf696c5e94f4146abe7ad61b"
+          ]
+        }
+      },
+      "status": "failed"
+    },
+    {
+      "id": "grain-unavailable",
+      "description": "Unsupported grain values are not rendered as resolved observation units",
+      "pass": false,
+      "actual": {
+        "card_grain": "Hospital",
+        "detail_unit": {
+          "label": "Typical unit",
+          "values": [
+            "Hospital"
+          ],
+          "evidenceState": "unavailable",
+          "evidenceIds": [
+            "evidence:cms-data-catalog:bf696c5e94f4146abe7ad61b"
+          ]
+        }
+      },
+      "status": "failed"
+    },
+    {
+      "id": "explicit-null-attempt",
+      "description": "Explicit unknown success and attempt timestamps remain unknown through the UI",
+      "pass": false,
+      "actual": {
+        "verification": {
+          "status": "current_verified",
+          "method": "first_party_live",
+          "metadataObservedAt": "2026-09-03T22:22:33.908Z",
+          "dataThrough": "2023-12-31",
+          "nextReviewDue": "2026-09-05T00:00:00Z",
+          "liveVerified": true,
+          "lastSuccessfulMetadataCheck": "2026-09-03T22:22:33.908Z",
+          "latestAttemptAt": "2026-09-03T22:22:33.908Z",
+          "latestAttemptOutcome": "failed",
+          "latestAttemptScope": "catalog_metadata",
+          "payloadCheckState": "not_attempted",
+          "payloadCheckNote": "Catalog metadata observation is not a payload-access check.",
+          "staleStatus": "review_overdue",
+          "freshnessState": "overdue",
+          "evaluatedAt": "2026-09-10T00:00:00.000Z",
+          "evidence": [
+            {
+              "evidenceId": "evidence:cms-data-catalog:bf696c5e94f4146abe7ad61b",
+              "claim": "The live first-party Centers for Medicare & Medicaid Services Data Catalog returned this metadata record during a bounded catalog enumeration.",
+              "state": "verified_first_party",
+              "limitations": [
+                "Verification applies to catalog metadata presence and the captured metadata fields only.",
+                "No dataset rows, files, query results, authentication workflow, or restricted payload were requested.",
+                "The record landing page and every distribution were not individually executed by this enumeration."
+              ],
+              "sources": [
+                {
+                  "provenanceId": "provenance:cms-data-catalog:bf696c5e94f4146abe7ad61b",
+                  "kind": "catalog_metadata",
+                  "locator": "https://data.cms.gov/data.json",
+                  "observedAt": "2026-09-03T22:22:33.908Z",
+                  "captureState": "captured_hashed",
+                  "contentSha256": "bf696c5e94f4146abe7ad61b230921c515d13a9133ce22b870385e1502d970ba"
+                }
+              ]
+            }
+          ]
+        },
+        "detail": {
+          "label": "Review overdue since September 5, 2026 at 12:00 AM",
+          "overdue": true,
+          "note": "Review is overdue; this does not by itself mean the preserved metadata is false.",
+          "lastSuccessful": "2026-09-03T22:22:33.908Z",
+          "latestAttempt": "2026-09-03T22:22:33.908Z",
+          "latestAttemptOutcome": "failed",
+          "payloadNote": "Catalog metadata observation is not a payload-access check.",
+          "stale": false
+        },
+        "card_freshness": "Last successful metadata check Sep 3, 2026",
+        "card_attempt": "Latest catalog-metadata attempt Sep 3, 2026 (failed)"
+      },
+      "status": "failed"
+    }
+  ],
+  "accepted": false
+}

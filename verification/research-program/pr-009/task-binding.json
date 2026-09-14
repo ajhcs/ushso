@@ -1,0 +1,80 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr009-successor-20260912",
+  "pr_id": "PR-009",
+  "title": "Set evidence storage and verification operating bounds",
+  "owner": "/root/publication_readiness",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr009-successor-20260912",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr009-successor-20260912",
+  "objective": "Verify and correct the preserved PR009 policy and evidence-receipt engineering on accepted dependencies; preserve unresolved measured-topology qualification and disabled activation.",
+  "outcome": "Corrected policy and receipt source committed ae9e54c; 81 producer tests, ADR audit and 42-leaf reviewer-harness feedback pass on that clean source identity. Original nine tests and initial failures retained. Independent final review and acceptance remain pending; C0091 qualification unresolved and activation false.",
+  "dependencies": [
+    "PR-003",
+    "PR-004",
+    "PR-007",
+    "PR-008"
+  ],
+  "owned_paths": [
+    "docs/adr/0008-operating-bounds-and-evidence-receipts.md",
+    "scripts/research-program/policy.json",
+    "scripts/research-program/operating-bounds.mjs",
+    "scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json",
+    "scripts/research-program/receipts/v1.0.0/README.md",
+    "tests/research-program/operating-bounds.test.mjs",
+    "tests/research-program/fixtures/pr009-census-negative/",
+    "verification/research-program/pr-009/",
+    "docs/research-program/handoffs/PR-009.json"
+  ],
+  "commits": [
+    {
+      "id": "C-009-1",
+      "subject": "Reconcile the architecture decisions",
+      "instructions": "Write a successor ADR for the cheapest measured control-plane/publication topology using existing PostgreSQL interfaces. Compare retained publication measurements and timestamped public prices with explicit workload, rights and recovery constraints; mark missing actual usage, bill and capacity facts as unresolved rather than inventing a cheapest result. Preserve the current static public runtime. Identify retained metadata storage versus a separately gated aggregate sample store; do not create paid resources or production bindings. A partial policy/receipt implementation does not by itself satisfy the measured topology decision. Owner direction is \"Cheap as possible don't orrry about that for now\". Record cost minimization using existing infrastructure first and a null, owner-deferred numeric budget. This is neither a zero-dollar cap nor paid-resource authorization. Keep measured_cheapest_new_topology null while actual account/workload/cost/capacity/recovery/rights evidence is missing. Missing numeric budget alone does not block the independently reviewable pure policy/receipt engineering. C-009-1 remains an unresolved architecture qualification; its original measured-decision requirement is not satisfied by this staged engineering scope.",
+      "verification": "List exact earlier ADR clauses superseded; no paid resource or production binding is created by a documentation decision. Retain the historical C-009-1-topology-unmeasured documentation observation and add C-009-1-measured-topology-qualification with status unresolved. Keep ADR 0008 Proposed/in_progress, earlier accepted ADR bytes unchanged, and the current static public runtime and all disabled activation boundaries intact. PR077/PR078 may supply later evidence to this still-owned qualification; no reverse dependency is added."
+    },
+    {
+      "id": "C-009-2",
+      "subject": "Define request and retention budgets",
+      "instructions": "Define scripts/research-program/policy.json and a pure operating-bounds.mjs validator/composer using existing connector and ingestion exports as read-only dependencies. Specify descriptor/route IDs, per-source concurrency, timeout, redirect, raw/expanded-byte, row, retry and retention limits. Keep activation false; reject arbitrary user URLs and unauthorized operation classes. Ninety days is the active raw metadata/documentation default, with explicit evidenced shorter/longer source-policy overrides; retain existing dependency-aware GC and 365-day security/audit protections. Keep aggregate/sample rights and privacy decisions separate. No connector/ingestion code, live request, receipt persistence, DB, queue, workflow or deletion activation is owned here.",
+      "verification": "Policy fixtures reject missing/foreign route identities, arbitrary URLs, unbounded limits, unauthorized retention classes and activation. Use actual current descriptor, response-bound, retry and retention semantics without creating duplicate execution logic. Underlying strict ingestion records validate unchanged; no matching contract version may be assumed without schema validation."
+    },
+    {
+      "id": "C-009-3",
+      "subject": "Implement the evidence receipt contract",
+      "instructions": "Add a self-contained strict JSON Schema 2020-12 receipt at scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json plus its boundary README and registered operating-bounds.test.mjs. Compose request type/expected-content basis, safe final locator, scoped actual bytes/hash, source/parser identity, attempt outcome and next action without secrets or body content. Preserve all released ingestion contracts, connector/ingestion packages and WP5 v1.0.0 bytes. Consume the retained Census fixture as an unmatched historical negative observation: do not fabricate approved metadata route IDs, original expectations, connector execution or an unrecorded redirect count. Durable persistence remains PR010/011 scope.",
+      "verification": "Replay the committed retained Census 200-HTML body/hash as an access/content failure with unknown redirect count, not capture/payload/schema success. Test accepted capture, 304 reuse, access-only, pre-egress, typed failure and truncation separately. Truncated bytes never imply complete schema validation. Independently validate underlying strict records, identity/hash/size consistency and absent-secret/body boundaries; no transport or persistent side effect occurs."
+    }
+  ],
+  "check_commands": [
+    "node --test verification/wp0/v1.0.0/tests/adr-documentation.test.mjs",
+    "node --test tests/research-program/operating-bounds.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-009.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-009/",
+  "binding": {
+    "base_sha": "b3fdf5f3145538c8316e0565a130b4c6987a000f",
+    "base_tree": "84b2bb356c447c061a2067fba95908290f9dbc51",
+    "dependency_merge_shas": {
+      "PR-003": "c70b0790ca439d56bb2c9936d53837c6f68b6d57",
+      "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+      "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+      "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "producer_checked"
+}

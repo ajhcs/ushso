@@ -1,0 +1,76 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr037-named-sources-20260914",
+  "slice_id": "C-037-1",
+  "pr_id": "PR-037",
+  "title": "Resolve named sources and release families",
+  "owner": "/root/pr037_named_sources",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr037-named-sources-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr037-named-sources-20260914",
+  "objective": "Exact named-source requests distinguish the product family from related catalog text.",
+  "outcome": "Reviewed names/acronyms and exact product anchors cover the core cohort and twelve expansion families. Not-yet-indexed identities are recorded without inventing catalog membership. MEPS/HCUP/NPPES/PHC4 exact-name fixtures cannot resolve to unrelated descriptions mentioning similar words. Family relations come from source-native links and documented series; the 579 repeated-title cases are accounted for and title equality alone never deletes or merges a record. Named-source matches have their own result state. An unavailable named source returns a specific bounded coverage explanation, not a fabricated exact match. Catalog membership and source-family recognition remain distinct. Sealed packages/identity/src/family-graph.mjs and fingerprint-sealed packages/retrieval/tools/question-parser.mjs are not edited.",
+  "dependencies": [
+    "PR-007",
+    "PR-030"
+  ],
+  "owned_paths": [
+    "packages/enrichment/named-sources.mjs",
+    "packages/retrieval/fixtures/named-source-registry.v1.0.0.json",
+    "tests/research-program/named-sources.test.mjs",
+    "docs/research-program/named-sources.md",
+    "apps/web/public/corpus-v1.1.0/named-source-registry.json",
+    "verification/research-program/pr-037/",
+    "docs/research-program/handoffs/PR-037.json"
+  ],
+  "commits": [
+    {
+      "id": "C-037-1",
+      "subject": "Expand the source-name registry",
+      "instructions": "Add reviewed names/acronyms and exact product anchors for the core cohort and twelve expansion families. Record not-yet-indexed identities without inventing catalog membership.",
+      "verification": "MEPS/HCUP/NPPES/PHC4 exact-name fixtures cannot resolve to unrelated descriptions mentioning similar words."
+    },
+    {
+      "id": "C-037-2",
+      "subject": "Group evidenced releases and views",
+      "instructions": "Build family relations from source-native links and documented series, with ambiguous title matches remaining candidates.",
+      "verification": "The 579 repeated-title cases are accounted for; title equality alone never deletes or merges a record."
+    },
+    {
+      "id": "C-037-3",
+      "subject": "Return exact versus contextual results",
+      "instructions": "Give named-source matches their own result state and offer source-intake/authoritative route information when absent. Keep broader context separately labeled.",
+      "verification": "An unavailable named source returns a specific bounded coverage explanation, not a fabricated exact match."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/named-sources.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node packages/retrieval/tools/validate-package.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-037.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-037/",
+  "binding": {
+    "base_sha": "b688f3778eb788639639a186a3413d3215564d05",
+    "base_tree": "2f514d0c2a47e4386ff3513608bee20add5a43bb",
+    "dependency_merge_shas": {
+      "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+      "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

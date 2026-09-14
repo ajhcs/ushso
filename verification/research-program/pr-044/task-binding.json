@@ -1,0 +1,77 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr044-state-source-intake-20260914",
+  "slice_id": "C-044-1",
+  "pr_id": "PR-044",
+  "title": "Add state finance, APCD and facility-source routes",
+  "owner": "/root/pr044_state_source_intake",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr044-state-source-intake-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr044-state-source-intake-20260914",
+  "objective": "PHC4, APCD, facility licensure and closure tracking are represented with explicit state scope.",
+  "outcome": "Four frozen state-aware families have precise geographic and access scope. One state's coverage never implies all-state completeness. Publisher authority is not inferred from a familiar title. A known portal/API boundary has a fixture and budget; scraping a public page does not bypass an application or DUA. The Pennsylvania finance task returns PHC4 alongside HCRIS without claiming identical reporting definitions or unrestricted payload access. No national completeness claim is derived from a small state pilot. Nongovernmental Sheps Center operator identity is preserved. Frozen named-source-registry, connector src, retrieval ranking and coverage accounting artifacts are not edited. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-012",
+    "PR-030",
+    "PR-037"
+  ],
+  "owned_paths": [
+    "packages/connectors/source-registry/state-intake.mjs",
+    "packages/connectors/source-registry/state-families.json",
+    "evaluation/research-program/state-intake/",
+    "tests/research-program/state-source-intake.test.mjs",
+    "docs/research-program/source-coverage.md",
+    "verification/research-program/pr-044/",
+    "docs/research-program/handoffs/PR-044.json"
+  ],
+  "commits": [
+    {
+      "id": "C-044-1",
+      "subject": "Define jurisdiction-scoped intake",
+      "instructions": "Identify authoritative PHC4 products and selected state APCD/licensure sources from the frozen cohort. Preserve nongovernmental closure-tracking operator and methodology identity where applicable.",
+      "verification": "One state's coverage never implies all-state completeness; publisher authority is not inferred from a familiar title."
+    },
+    {
+      "id": "C-044-2",
+      "subject": "Add bounded portal configurations",
+      "instructions": "Reuse existing Socrata/CKAN/DCAT/HTML/PDF adapters for documented routes. Preserve request/application paths when public machine access is unavailable.",
+      "verification": "A known portal/API boundary has a fixture and budget; scraping a public page does not bypass an application or DUA."
+    },
+    {
+      "id": "C-044-3",
+      "subject": "Publish state-aware family cards",
+      "instructions": "Expose state coverage, product types, reporting periods and supported access instructions. Record gaps by jurisdiction and source class.",
+      "verification": "The Pennsylvania finance task returns PHC4 alongside HCRIS without claiming identical reporting definitions or unrestricted payload access."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/state-source-intake.test.mjs tests/research-program/named-sources.test.mjs tests/research-program/federal-source-intake.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-044.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-044/",
+  "binding": {
+    "base_sha": "484beae15d84d7ac2498f0c3b9e19de5c6826b4e",
+    "base_tree": "8d075aba18b677dbc0d3e6d8e42de73fc5a57424",
+    "dependency_merge_shas": {
+      "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+      "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7",
+      "PR-037": "ac2dcebbead2498f6df77f503d5484b81da8319f"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

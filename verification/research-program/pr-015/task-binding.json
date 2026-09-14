@@ -1,0 +1,78 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr015-census-api-20260914",
+  "slice_id": "C-015-1",
+  "pr_id": "PR-015",
+  "title": "Support Census metadata and keyed sample requests",
+  "owner": "/root/pr015_census_api",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr015-census-api-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr015-census-api-20260914",
+  "objective": "Census product/vintage/geography metadata and key requirements are explicit without placing secrets in evidence URLs, browser assets or model inputs.",
+  "outcome": "ACS five-year, ACS one-year and time-series fixtures remain distinct with no false observation-period inference. A Census key may be received only through the existing secret-provider port. Missing keys produce a documented access step. Keyless HTML remains authentication-required. Keyed fixture succeeds and retained logs redact query credentials. Geography hierarchy, allowed predicates and variable labels/concepts are parsed without treating them as definitions. A bounded sample recipe is emitted only when required inputs are satisfied.",
+  "dependencies": [
+    "PR-007",
+    "PR-008",
+    "PR-011",
+    "PR-012"
+  ],
+  "owned_paths": [
+    "scripts/research/source-extractors.mjs",
+    "packages/connectors/",
+    "tests/research-program/census-api.test.mjs",
+    "verification/research-program/pr-015/",
+    "docs/research-program/handoffs/PR-015.json"
+  ],
+  "commits": [
+    {
+      "id": "C-015-1",
+      "subject": "Resolve Census metadata links",
+      "instructions": "Bind variables, geography, groups, examples and vintage links to exact catalog entries. Preserve aggregate versus microdata products and rolling series.",
+      "verification": "ACS five-year, ACS one-year and time-series fixtures remain distinct, with no false observation-period inference."
+    },
+    {
+      "id": "C-015-2",
+      "subject": "Add a source-scoped credential adapter",
+      "instructions": "Allow the collector to receive a Census key through the existing secret-provider port; never place it in evidence URLs, browser assets or model inputs. Missing keys produce a documented access step.",
+      "verification": "The audit\u2019s keyless HTML response remains authentication-required; keyed fixture succeeds and all retained logs redact query credentials."
+    },
+    {
+      "id": "C-015-3",
+      "subject": "Extract documented query dimensions",
+      "instructions": "Parse geography hierarchy, allowed predicates and variable labels/concepts without treating them as definitions. Emit a bounded sample recipe only when required inputs are satisfied.",
+      "verification": "A Pennsylvania aggregate example uses its exact supported variables/geography and records the source\u2019s required access conditions."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/census-api.test.mjs",
+    "node --test tests/research-extractors.test.mjs",
+    "node --test tests/research-program/http-outcomes.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-015.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-015/",
+  "binding": {
+    "base_sha": "ba9f592bf94dfbde200971573428dcd316fa537a",
+    "base_tree": "1fe3eb75ba29d6d394b05b4feef6c31331c6a113",
+    "dependency_merge_shas": {
+      "PR-007": "0d730aaf07b89bb16fb66fc224841a2d66c80d49",
+      "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+      "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74",
+      "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

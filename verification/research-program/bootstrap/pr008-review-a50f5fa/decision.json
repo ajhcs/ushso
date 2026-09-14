@@ -1,0 +1,44 @@
+{
+  "format": "ushso.independent-pr-review.v1",
+  "pr_id": "PR-008",
+  "reviewer": "Astra/root",
+  "recorded_at": "2026-09-11T18:47:59.555126+00:00",
+  "producer_head": "a50f5fae017f894d8bc46be001e6c5d12853db01",
+  "producer_tree": "1ff528f5fa7780c086620d813e8ae48b4efe011a",
+  "original_base": "a00630c712e3a4e64354a77d268cb168fa3f528a",
+  "disposition": "changes_requested",
+  "implementation_integrated": false,
+  "packet_checks_passed": 8,
+  "artifact_bindings_passed": 73,
+  "original_semantic_cases": {
+    "passed": 21,
+    "failed": 0
+  },
+  "new_parent_chain_cases": {
+    "passed": 3,
+    "failed": 6
+  },
+  "previous_review": "verification/research-program/bootstrap/pr008-review-e433eff/index.json",
+  "confirmed_corrections": [
+    "Original context mismatch, explicit unresolved field helper, unknown/missing measurement units and capture status/body checks pass independently.",
+    "Full producer correction streams and original controller failures are tracked in the producer branch."
+  ],
+  "findings": [
+    {
+      "id": "PR008-R2-PARENT-CHAIN",
+      "detail": "resolveVariableContext accepts partial source/asset-only evidence, foreign nested source or asset, a conflicting release list, and foreign parent releases in both top-level and nested selected distributions. Require complete independent parent edges and reject all supplied contradictory relationships; selecting the first non-null fact is insufficient.",
+      "failing_cases": [
+        "source-asset-facts-without-release-distribution-chain",
+        "actual-binding-nested-foreign-asset",
+        "actual-binding-nested-foreign-source",
+        "actual-binding-conflicting-release-list",
+        "actual-binding-distribution-foreign-parent-release",
+        "actual-binding-nested-distribution-foreign-parent-release"
+      ],
+      "correction_owner": "/root/pr008_variable_scope_review"
+    }
+  ],
+  "corrections_dispatched": true,
+  "original_packet": "verification/research-program/bootstrap/pr008-scope-20260911/dispatch-packet.json",
+  "scope": "Offline actual PR007 binder output derived from a synthetic single-distribution fixture; release identity schema validated and released core snapshot shape retained without added parent fields. No publisher access or scientific qualification."
+}

@@ -1,0 +1,63 @@
+{
+  "format": "ushso.pr003.c003-1.schema-contract-check.v1",
+  "node": "v24.14.0",
+  "validator": "ajv/dist/2020.js",
+  "ok": true,
+  "results": [
+    {
+      "id": "task-binding",
+      "fixture": "verification/research-program/pr-003/fixtures/task-binding.json",
+      "schema_valid": true,
+      "schema_errors": []
+    },
+    {
+      "id": "valid",
+      "fixture": "verification/research-program/pr-003/fixtures/handoff.valid.json",
+      "schema_valid": true,
+      "schema_errors": [],
+      "semantic_errors": [],
+      "rejected": false,
+      "expected_rejected": false,
+      "case_ok": true
+    },
+    {
+      "id": "reject-claimed-pass-without-command",
+      "fixture": "verification/research-program/pr-003/fixtures/handoff.reject-claimed-pass-without-command.json",
+      "schema_valid": false,
+      "schema_errors": [
+        "/acceptance_results/0/command_ids minItems must NOT have fewer than 1 items",
+        "/acceptance_results/0 if must match \"then\" schema"
+      ],
+      "semantic_errors": [
+        "claimed_pass_without_command_result: C-003-1 has no command_ids"
+      ],
+      "rejected": true,
+      "expected_rejected": true,
+      "case_ok": true
+    },
+    {
+      "id": "reject-missing-artifact",
+      "fixture": "verification/research-program/pr-003/fixtures/handoff.reject-missing-artifact.json",
+      "schema_valid": true,
+      "schema_errors": [],
+      "semantic_errors": [
+        "missing_artifact: C-003-1 references unknown artifact artifact-not-present"
+      ],
+      "rejected": true,
+      "expected_rejected": true,
+      "case_ok": true
+    },
+    {
+      "id": "reject-stale-dependency-sha",
+      "fixture": "verification/research-program/pr-003/fixtures/handoff.reject-stale-dependency-sha.json",
+      "schema_valid": true,
+      "schema_errors": [],
+      "semantic_errors": [
+        "stale_dependency_sha: PR-002 expected 5647e81457b606bb36456e75c48f990ce21e9c6c got b142309da45d98a9d5e553a05b7a9003a0424854"
+      ],
+      "rejected": true,
+      "expected_rejected": true,
+      "case_ok": true
+    }
+  ]
+}

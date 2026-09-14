@@ -1,0 +1,851 @@
+{
+  "format": "ushso.pr010-interface-proposal.v3",
+  "recorded_at": "2026-09-12T14:14:47.680330+00:00",
+  "author": "/root/pr010_contract_review",
+  "status": "locator_corrected_proposal_pending_controller_review_adoption_and_actual_PR009_binding",
+  "reviewed_producer": {
+    "head": "27d0b0d7c31d8825b91d899dc280cd843af21465",
+    "tree": "aef0428057d73645fab00f4d3aecb3418296f79b",
+    "repo": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr009-successor-20260912",
+    "clean": true,
+    "acceptance_claimed": false
+  },
+  "future_dispatch": {
+    "base_sha": null,
+    "PR009_component_merge_sha": null,
+    "PR009_integration_merge_sha": null,
+    "reason": "Root is handling PR009 acceptance separately. This preparation has not independently inspected its final merge; bind actual accepted identities, live ledger, ancestry and artifact hashes only in the controller adoption/dispatch receipt."
+  },
+  "owned_file_changes": [
+    {
+      "path": "packages/ingestion/src/collection-job.mjs",
+      "change": "Add strict collection-job admission, injected approved registry resolution, exact canonical descriptor hash and route/scope verification, immutable child-job identity, budget envelope. Import existing validators and scheduler identity functions; do not alter scheduler run key."
+    },
+    {
+      "path": "packages/ingestion/src/local-collection-store.mjs",
+      "change": "Add a bounded fixture-local immutable journal/object adapter with whole scheduler transaction records, shared poison latch, strict tagged result codec, per-child connector run state, parent/child reconciliation and kernel-lock requirement."
+    },
+    {
+      "path": "packages/ingestion/src/local-collector-adapter.mjs",
+      "change": "Actually invoke refresh.capture with clock plus exact precompiled fixture locatorPolicy and explicit bounded bridge; independently guard bridge locator/cursor. Enforce deadline/cancellation fences, consume collector output, and compose frozen scheduler/connector/capture ports with one connector repository per child."
+    },
+    {
+      "path": "packages/ingestion/src/local-job-cli.mjs",
+      "change": "Add preview default and explicit fixture execution/resume/status; fixed fixture-ID registry, exact state directory, typed outcomes, no URL/network/provider/secret options. Acquire OS-held lock through local flock before any mutating execution."
+    },
+    {
+      "path": "packages/ingestion/src/local-fixture-catalog.mjs",
+      "change": "Define the exact existing source_fixture_catalog / catalog.example.gov /data.json descriptor with admitted tight bounds, fixed cursor pages and selected record IDs. Use the retained compatibility-probe descriptor as the selected baseline. Pin canonical bytes; global source/route allowlists remain unchanged."
+    },
+    {
+      "path": "packages/ingestion/package.json",
+      "change": "Add package-local job:preview/job:fixture command scripts only; preserve dependencies and lockfile."
+    },
+    {
+      "path": "packages/ingestion/README.md",
+      "change": "Document exact local CLI, storage durability and unresolved-intent behavior, synthetic source boundary, fixture-only status, no managed acceptance, storage cleanup/retention scope."
+    },
+    {
+      "path": "tests/research-program/job-lifecycle.test.mjs",
+      "change": "Add positive and negative admission, actual scheduler duplicate identity, fresh-process crash/restart, durable reference integrity, typed outcomes and disabled-boundary tests."
+    },
+    {
+      "path": "scripts/research/refresh.mjs",
+      "change": "Only exported capture(url, options): add optional clock and locatorPolicy ports, keep clock default () => new Date() and locatorPolicy default exactly metadataUrl; replace existing captured_at reads with clock. For a custom policy require an explicitly supplied own callable options.fetchImpl (omitted, undefined and non-callable rejected before policy/timer/transport effects), require a synchronous canonical exact-input locator result and return typed blocked_locator with stable safe_detail_code for invalid custom configuration. Preserve default metadataUrl behavior, global allowed-host set, default live fetch behavior, existing status/body/hash/timeout cleanup rules and all unrelated CLI/provider/collector logic."
+    },
+    {
+      "path": "tests/research-automation.test.mjs",
+      "change": "Only targeted regressions for injected capture clock and custom locatorPolicy/explicit-fetch pairing, exact canonical locator rejection and unchanged legacy defaults/host/secret/redirect/body boundaries. Preserve existing cases and unrelated tool/dictionary checks."
+    }
+  ],
+  "owned_scope_assessment": "Ten proposed implementation/test files. Explicit two-path amendment now includes capture clock plus locatorPolicy and paired explicit-fetch guard, rather than the prior clock-only scope. All global allowlists, frozen connector primitives/contracts/WP5, SQL/grants and default live collector behavior remain unchanged.",
+  "controller_decision_needed": [
+    "Adopt the attached two-path clock + locatorPolicy ownership amendment and exact frozen fixture route. Custom locatorPolicy requires an explicitly supplied callable fetchImpl; capture guard and bridge guard must independently bind the exact canonical compiled locator including cursor.",
+    "Adopt the existing resolver contract, fixed synthetic fixture registry and separate canonical descriptor digest; bind the actual accepted PR009 policy/schema/source artifacts.",
+    "Adopt distinct parent scheduler, child collection-job and child connector-execution identities plus one bounded logical attempt per child with explicit unresolved terminal outcomes.",
+    "Adopt the whole-transaction journal/poison/codec/admission-recovery contracts below; retain all original crash tests and add the corrected decisive cases.",
+    "Adopt package-local CLI scripts and only fixture-local file writes with OS locking. Keep broader research orchestration and all managed/production activation unqualified.",
+    "Adopt one independent MemoryRunRepository per child, a fixture-injected origin-governor clock with journal-authoritative reservation bounds, and enforced bridge/transport cancellation with late-completion fencing. These are local fixture requirements, not managed pacing/durability claims."
+  ],
+  "contracts": {
+    "resolver": {
+      "signature": "resolveApprovedDescriptor({ sourceId, descriptorId, configurationRevision, endpointId, templateId, scopeId }) -> Promise<{kind:\"resolved\", descriptor, registeredDescriptorSha256, hashBasis:\"ushso-canonical-json.v1\", approvalScope:\"fixture_only\", registryEvidenceRef} | {kind:\"blocked\", code, nextAction}>",
+      "trust": "Registry injected by the composition root and hash-pinned in the dispatch/fixture manifest; never accept caller-supplied descriptor JSON or caller-computed digest as registry evidence. The fixture CLI exposes fixed fixture IDs only. A managed resolver is unimplemented and separately owned.",
+      "checks": [
+        "JSON-only exact schema-valid descriptor via existing validateDescriptor and strict released descriptor schema",
+        "exact source_id, descriptor_id and configuration_revision equal requested identity",
+        "recomputed SHA256 of approved ushso-canonical-json.v1 UTF-8 canonical descriptor equals registered digest and job expected digest",
+        "requested scope belongs to source and covers endpoint; endpoint owns template; compileManifestRequest verifies parameter/method/purpose/target class restrictions",
+        "actual descriptor and policy bounds constrain finite positive job reservation; no arbitrary URLs, foreign routes, loose bounds, external activation or unsupported capture classes",
+        "persist source/revision-to-digest binding; a different digest under the same immutable source/revision is conflict, not a silently admitted update"
+      ]
+    },
+    "job_identity": {
+      "format": "ushso.collection-job.v1",
+      "identity_fields": [
+        "source_id",
+        "descriptor_id",
+        "configuration_revision",
+        "descriptor_hash including named basis/version",
+        "endpoint_id",
+        "template_id",
+        "scope_id",
+        "scheduled_slot",
+        "mode",
+        "sorted unique selected_record_ids",
+        "capture_class",
+        "immutable budget_reservation including reservation_id and policy_sha256",
+        "collector/parser identity",
+        "fixture_manifest_sha256"
+      ],
+      "key": "Separately named deterministic collection job ID; retain exact existing runIdempotencyKey and deterministicRunId as parent scheduling identity. Child selected-record/capture-class/reservation identity must not overwrite the parent run. Mutable progress/remaining budget/timestamps after admission are excluded from the immutable key.",
+      "exact_mapping": {
+        "parent_input": "{endpointId, scheduledSlot, mode, configurationRevision}; call unchanged runIdempotencyKey and deterministicRunId.",
+        "child_id": "collection_<64 lowercase hex SHA256 of ushso-canonical-json.v1 canonical identity fields>; selected_record_ids are sorted, unique, nonempty and drawn from the approved fixture manifest. Unknown selections fail before effects.",
+        "execution_run_id": "run_<32 lowercase hex from existing deterministicOpaqueId(\"run\", {kind:\"ushso.collection-execution.v1\", collectionJobId})>. It is distinct from the scheduler parent runId and remains stable on resume.",
+        "binding_record": "{collection_job_id, parent_run_id, parent_run_idempotency_key, execution_run_id, descriptor_sha256, reservation_id, selected_record_ids, attempt:1}. Capture/fetch/connector checkpoints use execution_run_id; durable envelopes preserve both IDs. Never relabel the child execution as an actual scheduler/managed run. Each child owns a separate MemoryRunRepository instance and journal replay namespace, including its source-keyed memberships and checkpoints; sharing only the scheduler parent is permitted.",
+        "attempt": "The initial fixture lane supports one logical attempt (1) per child; process restarts resume that same unsettled attempt and its persisted request outcomes. Start and terminal outcome have distinct immutable journal records. Once settled complete_fixture, typed_failure or partial_unresolved, the attempt cannot be restarted or overwritten. An interrupted but verified replayable prefix is still unsettled; status exposes partial with its checkpoint. An intent whose delivery outcome cannot be proven is settled partial_unresolved, retains its evidence, and never automatically redelivers. Additional retries/new attempts are explicitly unsupported pending later retry policy work.",
+        "selection_semantics": "The connector enumerates the complete bounded synthetic catalog in its own child execution namespace; selected IDs determine which record dispositions the child promises. Before membership/checkpoint commit, require all requested IDs to occur in the verified complete fixture population and record one selected disposition each. Do not filter a full-membership page chain and present it as complete source coverage. Any extra catalog observations remain visibly unselected fixture metadata; only local downstream intents are retained.",
+        "change_behavior": "Two admitted subsets under the same parent have distinct child/execution IDs and separate page/outcome state. A changed descriptor under the same source/revision is conflict. A valid separately registered new revision produces a distinct parent and child; an existing state directory pinned to an older descriptor/fixture revision cannot be silently migrated."
+      }
+    },
+    "fixture_scope": {
+      "source_policy": "Validate accepted PR009 real-source policy with original paused descriptors unchanged. Do not feed an activated clone to that validator or reuse the real descriptor hash after mutation. The legacy metadataUrl default continues to reject catalog.example.gov; the narrow explicitly injected custom policy is required for this fixture call only.",
+      "execution_descriptor": "Exactly source_fixture_catalog using the existing catalog.example.gov /data.json route from the frozen fixture allowlist, active only inside the separately hash-pinned synthetic registry/fixture lane. No other source_fixture_* alias is admitted. All real PR009 descriptors remain paused and excluded from execution.",
+      "policy_relationship": "Carry accepted PR009 policy digest, preserve all its activation flags false, and consume limits/receipt validation. Add an explicit PR010 local_fixture_persistence capability only in the local adapter envelope. Do not claim PR009 activated receipt writes, live source authorization, managed persistence or source scientific approval."
+    },
+    "durability": {
+      "mode": "single-host Linux filesystem fixture journal; no managed/distributed/recovery qualification",
+      "writer_lock": "Use installed /usr/bin/flock with no-fork/nonblocking mode around the actual writer process; kernel releases lock on exit/SIGKILL. Never emulate a lease by blindly unlinking a PID lockfile. Unsupported lock/filesystem capability is typed blocked, with no fallback to weak locking.",
+      "storage": "User-selected task-owned strict descendant of the prescribed scratch root; mount and realpath confinement; immutable hash-addressed bounded fixture bodies/metadata and numbered journal records with exact previous-record digest. Reject links/escapes and hash/identity mismatches.",
+      "commit": "Write same-directory exclusive temporary artifact, flush file, install immutable final name atomically without replacing conflicting bytes, flush parent directory, then acknowledge. Derive state only from contiguous verified committed records; temporary/incomplete tails confer no success.",
+      "existing_semantics": "Replay allowlisted committed scheduler seed/transaction operations into a fresh createInMemoryControlPlane; replay allowlisted connector repository mutations into a fresh MemoryRunRepository. These remain deterministic local reducers, while filesystem journal is the persistence authority. Journal records bind reducer source hashes; unsupported operations and failed transactions are not committed. Do not expose arbitrary method replay. A persistence failure poisons/discards current adapter rather than continuing from uncommitted memory.",
+      "request_lifecycle": [
+        "After durable child binding/attempt start, persist one request_intent under {collectionJobId,executionRunId,attempt:1,connectorRequestKey}, exact route/configuration/selected IDs, immutable reservation and both clock slots before fixture transport.",
+        "The actual research capture invokes its bridge. The bridge invokes the strict bounded client; fixture transport records the requested manifest key and persists the bounded response bytes, status and safe headers before returning success. A committed response can be reread without another fixture delivery. An intent without a verified response after death is partial_unresolved and cannot automatically redeliver.",
+        "The unchanged capture protocol uses durable hash-addressed object and capture-reference ports with the pinned recorded clock. Persist strict fetch outcome and request-ledger observations before returning the bridge response; a typed result never discards an already committed capture reference.",
+        "The real research capture reads that exact decoded response and returns its own outcome. Verify its exact body hash, decoded size, URL, status and observation clock; persist its safe projection and strict PR009 receipt together in one wrapper_outcome record before reporting fetch success to the runner.",
+        "If a durable wrapper_outcome exists, verify its objects/pins and return it without transport. If only response or strict capture/outcome exists, reinvoke the real research capture against the verified cached strict response and original clocks, then finish the missing wrapper commit. Do not fabricate a prior successful research outcome.",
+        "Commit parsed page plus next request/cursor as one record. Only complete verified enumeration containing the selected records may commit checkpoint/membership/local downstream intents and a single final attempt_outcome. Preserve the distinction between collected fixture metadata, selected record dispositions and public coverage."
+      ],
+      "journal_record": {
+        "schema": "{format:\"ushso.local-collection-journal.v1\", sequence, previous_record_sha256, kind, operation_id, pins_digest, payload, result_digest}",
+        "sequence": "Strictly contiguous positive integers. Digest is SHA256 over ushso-canonical-json.v1 canonical record bytes excluding any self-digest field. Exact duplicate operation_id with identical payload/result is idempotent; a conflicting duplicate blocks.",
+        "bounds": "All envelope/object lengths, journal record count, child count, page count and deliveries have finite explicit limits derived from the fixture manifest and accepted policy. Reserve delivery and byte upper bounds before transport; replay of previously committed response objects consumes no new delivery reservation, but local replay work also has an explicit finite bound. Exceeding a bound returns partial/blocked and never deletes history.",
+        "readers": "A read-only status loads only the verified committed prefix and exact referenced objects; gaps, conflicting numbered records or missing references block rather than guessing the newest state. A temporary file is never a commit."
+      },
+      "scheduler_transactions": {
+        "open_database": "Wrap createInMemoryControlPlane.openDatabase. Expose all required interface method names for existing assertControlStore compatibility, but only selected operations are supported and every unsupported operation throws typed unsupported_operation before mutation.",
+        "allowed_seeds": [
+          "seedSource, only on explicit first admission of the pinned fixture source; never reseed a reconstructed source to force a duplicate scheduling test"
+        ],
+        "allowed_transactions": {
+          "scheduler-lease-due": [
+            "leaseDueSources"
+          ],
+          "scheduler-source": [
+            "ensureRunAndWorkflowOutbox"
+          ],
+          "scheduler-source-failure": [
+            "recordScheduleDispatchFailure"
+          ]
+        },
+        "atomic_algorithm": [
+          "Check shared adapter poison latch, writer lock and pinned inputs.",
+          "Within the underlying memory transaction, record ordered allowed method calls with encoded original arguments and normalized/encoded results. Buffer the complete callback; do not persist per-method successes.",
+          "If callback or underlying transaction fails before commit, discard the buffer and append no successful transaction record.",
+          "After memory transaction resolves, atomically install and fsync one journal record for the entire transaction and its returned business result. Only then resolve the wrapped transaction to the scheduler.",
+          "Any storage/validation failure after memory mutation permanently poisons this adapter instance before propagating an error. Every existing and subsequently opened client, seed, transaction, mutator, result inspection used for execution and fixture transport checks the same latch. close() remains allowed solely for cleanup. The scheduler catch path therefore cannot record a failure transaction against uncommitted memory."
+        ],
+        "replay": "Instantiate a fresh control plane, replay one whole journal transaction inside its existing transaction method using the recorded ordered calls, compare every encoded result and the final result digest, and close the client. Use original scheduler now/scheduledSlot/lease inputs. Replay no live callbacks, external I/O or operation names not in the allowlist. Business equality excludes clientLifecycle diagnostics, which are checked separately for closed clients before each fixture delivery.",
+        "failure_after_commit_response": "The existing memory fault injector can throw after its own commit. Such an ambiguous memory response also poisons/discards the adapter; it does not append a successful journal transaction. Fresh replay remains bounded by actual disk commits."
+      },
+      "poison_contract": {
+        "code": "local_store_poisoned",
+        "scope": "One shared state/poison latch across the full adapter, all openDatabase clients, connector/object/reference/request ports and any later client factories.",
+        "read_behavior": "No success-bearing reads from poisoned in-memory state. Only cleanup and safe diagnostic reporting are allowed; a separate fresh read-only process can inspect the committed prefix.",
+        "restart": "Requires a new adapter instance rebuilt entirely from verified disk records. No in-process reset flag or automatic rollback of journal history."
+      },
+      "codec": {
+        "format": "ushso.local-value.v1",
+        "grammar": {
+          "null": "{t:\"null\"}",
+          "boolean": "{t:\"boolean\",v:boolean}",
+          "finite_number": "{t:\"number\",v:number}; reject NaN, infinity and negative zero ambiguity by canonical normalization",
+          "string": "{t:\"string\",v:string}",
+          "undefined": "{t:\"undefined\"}; only at explicitly permitted internal result positions, never admitted descriptor/job JSON",
+          "array": "{t:\"array\",v:[encoded values]}",
+          "object": "{t:\"object\",v:[[own property name,encoded value],...]}; keys sorted, reject duplicate/prototype-sensitive names and unsupported prototypes",
+          "map": "{t:\"map\",v:[[encoded key,encoded value],...]}; preserve insertion order and reject duplicate keys; current allowed reducer keys are strings",
+          "bytes": "{t:\"bytes_ref\",sha256,byte_length}; separately verified immutable object only"
+        },
+        "projection": "Persist operation-specific argument/result projections containing only fields required to replay the exact reducer behavior. beginRun must retain whether pages is an array or Map and all committed page entries; compare its encoded return in the same operation sequence. Do not compare raw JSON.stringify(structuredClone(result)) hashes. Objects required by commitPage may be stored as separate hash-addressed structured metadata and rehydrated; never inline raw response text in the journal envelope.",
+        "unsupported": "Reject functions, symbols, accessors, unknown tagged variants, arbitrary classes and malformed/oversized values before journal commit. No eval or callback deserialization.",
+        "semantic_pins": "Pin the actual final adapter code, reused runtime import closure, strict schemas, fixture/descriptor/policy bytes and Node/lockfile identity. Baseline source-pins.json inventories the current static relative module closure only; refresh.mjs and new source hashes must be regenerated at the final producer identity."
+      },
+      "parent_child_reconciliation": {
+        "records": [
+          "child_admitted: immutable child spec, reserved limits, deterministic expected parent ID/key and execution ID, descriptor/fixture/policy pins. Must be durably committed before any scheduler transaction.",
+          "scheduler_transaction: exact whole transaction record, including parent run/outbox creation or duplicate result.",
+          "child_bound: exact child/parent/execution/reservation mapping after independently locating the expected committed parent run and workflow_start_requested outbox in replayed state.",
+          "attempt_started: bounded logical attempt 1; no fixture request can precede child_bound."
+        ],
+        "recovery": "Reload child_admitted records and replay actual committed scheduler transactions first. For an admitted unbound child, compute its unchanged expected parent ID and inspect the replayed runKeys/runs/outbox for exact endpoint/slot/mode/revision and lineage agreement. If the parent exists, bind the child without reseeding or treating dispatchScheduledSlot runs=[] as absence. If no committed parent exists, the scheduler may process its existing due source/expired lease using explicit recorded now; it must not invent a committed run or force-reset a lease.",
+        "duplicates": "Same child admission is idempotent and cannot reserve twice. A distinct admitted subset may bind the same parent, while keeping a distinct execution ID and connector repository state. Parent work/outbox is not marked published or delivered by a child fixture completion.",
+        "decisive_crash": "Kill after the scheduler-source record is fsynced but before child_bound, then restart with a fresh control plane and demonstrate exactly one parent, one workflow intent, one child mapping and one reservation. Also preserve an admitted child with a committed lease but absent parent without bypassing lease expiry."
+      },
+      "connector_repository": {
+        "implementation": "Create a separate fresh MemoryRunRepository for each collection_job_id and replay only that child's tagged records into it. Its run IDs remain the separate execution_run_id. This isolates not only run/page state but also the frozen reducer's source_id-keyed membership and checkpoint maps; no child can overwrite another child's source checkpoint. Keep one shared actual scheduler control-plane parent and shared immutable object storage where hashes agree.",
+        "allowed_mutations": [
+          "beginRun",
+          "setConditional",
+          "seedReusableCapture for explicit pinned fixture prior evidence only",
+          "commitPage",
+          "failRun",
+          "sealEnumeration",
+          "commitMembershipAndCheckpoint"
+        ],
+        "atomic_commit": "Each successful operation is one immutable record with its exact argument/result projection. For commitPage this includes page observations and next-request/cursor atomically. For final commit it includes membership, checkpoint and the complete local downstream intent references atomically. Reject missing selected IDs or an incomplete fixture population before final membership/checkpoint commit.",
+        "read_ports": [
+          "getResume",
+          "getCommittedPage",
+          "conditionalFor",
+          "reuseCapturePage"
+        ],
+        "limits": "Read ports derive only from the verified replayed reducer state and referenced objects. A failed persistence after any mutation poisons the shared adapter. A terminal failed/partial_unresolved attempt cannot reset failRun state or begin a replacement attempt through this CLI.",
+        "child_record_binding": "Every connector mutation/read, reusable capture seed and result envelope carries collection_job_id plus execution_run_id. Dispatch it only to the matching child repository. Membership/checkpoint/output objects are retained by child ID and exact operation hash; returning a checkpoint from another child is a typed binding failure even when source_id matches."
+      },
+      "clock_pinning": {
+        "request_record": "Persist {observation_at, capture_recorded_at, runner_clock_at, fixture_clock_basis} in request intent before fixture delivery. Both timestamps are valid UTC ISO strings and capture_recorded_at >= observation_at.",
+        "fixture_basis": "fixture-logical-clock.v1. Derive observation_at deterministically from the admitted scheduled_slot and bounded page ordinal; derive capture_recorded_at as observation_at + 1 millisecond. Persist the actual values and reject a changed derivation/pin. Supply observation_at to BoundedHttpClient and the new research capture clock, and capture_recorded_at to R2CaptureProtocol.",
+        "resume": "For an existing request, reload all original clock values before reprocessing a durable response or capture. Never use the restart wall clock to reconstruct the capture ID. Runner deadline checks use the admitted bounded fixture logical clock; real timeout AbortControllers remain bounded by the selected timeout.",
+        "limit": "These clocks establish deterministic synthetic fixture identity, not measured live request latency, distributed lease validity or operating-cost qualification.",
+        "governor_clock": "Instantiate the existing MemoryOriginGovernor with clock: () => the current persisted fixture observation clock in milliseconds. Its default Date.now clock must not be used in this lane. Its private pacing state is process-local; no durable managed pacing claim follows."
+      },
+      "reservation_bounds": {
+        "authority": "Journaled immutable child reservation and request admission records govern finite delivery/byte/page and aggregate local journal bounds across process restarts. The existing governor's fresh private state cannot grant more deliveries or release/recharge a committed reservation.",
+        "charging": "Atomically reserve each new request once before transport under child/attempt/request key, and account aggregate reservations before new child admission. Verify the committed prefix on restart. A cached response/outcome replay sends zero deliveries and reuses the existing charge; a response of unknown delivery outcome keeps its charge and cannot be automatically refetched. Do not reconstruct remaining budget from fresh Maps or reset counters with process startup.",
+        "governor": "Reuse MemoryOriginGovernor with the persisted fixture clock for in-process pacing only. Paired journal reservation checks remain mandatory before every fresh transport send, including after restart. Bound local replay work separately and retain typed exhaustion instead of deleting history.",
+        "verification": "Death after reservation and after delivery response must not erase a charge; repeating resume/recreating the governor cannot exceed the same job or aggregate journal upper bound. Record that fixture success is not distributed/managed origin pacing qualification."
+      }
+    },
+    "cli": {
+      "commands": [
+        "node packages/ingestion/src/local-job-cli.mjs preview --fixture catalog-two-page-v1",
+        "node packages/ingestion/src/local-job-cli.mjs run-fixture --fixture catalog-two-page-v1 --state-dir ABSOLUTE_TASK_SCRATCH",
+        "node packages/ingestion/src/local-job-cli.mjs resume --state-dir ABSOLUTE_TASK_SCRATCH",
+        "node packages/ingestion/src/local-job-cli.mjs status --state-dir ABSOLUTE_TASK_SCRATCH"
+      ],
+      "preview": "No filesystem mutation, fixture fetch, scheduler transaction, network, DB or service activation. Print immutable selected IDs, source/revision/digest, planned upper bounds and activation boundary.",
+      "execution": "Explicit fixture operation acquires OS lock and performs only task-owned local file writes and fixed synthetic fixture transport. Output selected/running/partial/complete_fixture state, job/attempt IDs, journal/checkpoint path and unresolved reason. complete_fixture is not public coverage, live source access or managed run publication.",
+      "invalid_input": "Typed JSON status blocked/invalid, stable safe code/next action and nonzero exit; no secret or arbitrary input echo. Partial/interrupted operation remains resumable but not successful."
+    },
+    "research_collector": {
+      "entrypoint": "scripts/research/refresh.mjs::capture",
+      "proposed_signature": "capture(url, options = {}), where options = { fetchImpl = fetch, maxBytes = 2 * 1024 * 1024, timeoutMs = 20000, clock = () => new Date(), locatorPolicy = metadataUrl }; retain original options object to verify an own explicitly supplied callable fetchImpl for custom policy.",
+      "clock_scope": "The actual function has captured_at only. Its one new clock option supplies every existing captured_at timestamp branch; no recorded_at property or second unused clock parameter is added to this legacy interface. Existing defaults and call sites remain compatible. R2CaptureProtocol already has an independent clock port for its distinct recorded_at field.",
+      "call_chain": [
+        "DeterministicConnectorRunner invokes local collector adapter execute(context).",
+        "Before any job effects at admission and before each new request intent, the adapter validates exact approved source_fixture_catalog descriptor/hash, selected route/scope and frozen request shape using actual validateDescriptor/compileManifestRequest. It invokes real capture(compiled.url.href, {fetchImpl: manifestBoundBridge, locatorPolicy: exactCompiledLocatorPolicy, maxBytes, timeoutMs, clock: observationClock}).",
+        "Capture first enforces custom-policy/explicit-fetch pairing and exact canonical returned locator. The bridge separately checks its incoming URL/cursor and expected options against the same immutable compiled request, then invokes unchanged BoundedHttpClient.execute(context) through fixture resolver/transport and durable ports with a bounded deadline/cancellation context. It reloads a verified outcome when available and never duplicates fixture delivery to satisfy the collector.",
+        "For a captured strict result, the bridge returns a Response over exactly its decoded body bytes with its observed status and safe content type, and a decoded content-length. It does not propagate compressed Content-Encoding or pretend decoded length is wire length.",
+        "The adapter consumes the real research capture result and compares its decoded bytes/hash, URL, status, captured_at and MIME semantics to the strict fetch/capture and admitted request. Only agreement plus released-record and PR009 receipt validation may create the durable wrapper success and return the strict result to the runner."
+      ],
+      "mismatch": "A legacy captured result cannot override strict classification failure, and strict captured cannot hide a legacy bound/encoding/hash/status disagreement. Persist both safe typed outcomes and mark the attempt partial/failed with a stable collector_outcome_mismatch code, retaining any already durable capture reference. Do not synthesize a successful collector result in the adapter.",
+      "typed_strict_failure": "The bridge retains the original strict failure, returning a compatible bounded failed HTTP response only when an actual response exists, otherwise throwing a safe local error. The real collector failure result is retained; the adapter returns the original strict failure and cannot report complete_fixture.",
+      "not_modified": "Invoke the actual collector for this case too. A strict 304 uses new Response(null, {status: 304, headers: safeContentTypeHeaders}) with a null body; the unchanged collector returns http_failed with status 304, empty-body hash/zero bytes and its observation clock. Retain that exact legacy result as its documented 304 limitation. The adapter may return strict not_modified only after verifying zero new bytes and the prior capture/page with its original provenance. Never turn that legacy result into captured or create a new capture reference.",
+      "fixture_locator": "Use exactly source_fixture_catalog, allowed_hosts=[\"catalog.example.gov\"], endpoint_fixture_catalog with base https://catalog.example.gov, route_fixture_catalog GET catalog_metadata /data.json, allowed_parameters=[\"cursor\"]. First compiled locator is https://catalog.example.gov/data.json; page two is https://catalog.example.gov/data.json?cursor=page-2. Keep the existing global fixture source/host/path tuple allowlist unchanged. The tight descriptor is retained at probe/fixture-descriptor.json and passed actual validation/compilation; it is purely synthetic and has no real network port.",
+      "excluded_entrypoints": [
+        "runBoundedUpdate",
+        "refresh.mjs main/CLI/provider path",
+        "PDF/layout/CMS batch orchestration"
+      ],
+      "evidence": "Record the capture function source hash, exact argument/bridge identity, its returned safe result and body-object hash reference. A fresh-process test must prove the collector output is actually consumed: a genuine legacy oversized or invalid-UTF8 response cannot pass solely because the underlying strict record is schema-valid.",
+      "locator_policy": {
+        "signature": "locatorPolicy(inputUrl: string) -> string | null; synchronous only. Default is the existing exported metadataUrl function, unchanged.",
+        "default_branch": "When locatorPolicy is omitted, undefined, or exactly metadataUrl, preserve the current truthy metadataUrl admission check and existing input/fetch/result behavior. Do not impose new canonical-input equality on ordinary default calls, add fixture hosts to metadataUrl, change normalization of accepted legacy inputs or activate any new live route.",
+        "paired_port_guard": "A custom policy is any selected locatorPolicy other than metadataUrl. Before invoking that policy or allocating a timeout/fetch operation, require Object.hasOwn(options, \"fetchImpl\") and typeof options.fetchImpl === \"function\". An omitted, undefined, inherited-only, null or non-callable fetchImpl returns blocked_locator with safe_detail_code LOCATOR_POLICY_REQUIRES_INJECTED_FETCH. Never allow destructuring fallback to global fetch to satisfy this requirement. A custom non-callable policy returns blocked_locator with LOCATOR_POLICY_INVALID.",
+        "result_guard": "For custom policy, accept only a primitive nonempty string from a synchronous call. Require inputUrl itself to be the exact canonical https URL string, no credentials or fragment, finite approved length, and result === inputUrl === new URL(result).href. Null, booleans, objects/URL objects, Promises, throws, noncanonical strings and rewritten locators return blocked_locator with stable safe_detail_code LOCATOR_POLICY_REJECTED. No coercion, awaiting or redirect/rewrite behavior is selected.",
+        "fixture_policy": "The ingestion adapter first runs actual validateDescriptor and compileManifestRequest against the exact pinned fixture descriptor/request, including source/endpoint/template/scope and cursor. It builds a closure that returns that one compiled.url.href only when the candidate is byte-for-byte equal; all other candidates return null. Its closure and injected bridge are internal composition dependencies, never CLI options.",
+        "separate_bridge_guard": "The explicit fetch bridge independently requires the incoming URL to equal the original immutable precompiled.href including the complete query/cursor, and checks the same request/job/descriptor pins and expected bounded legacy method/options. It must not trust the policy return as its own authorization, recompile a caller-substituted request or follow arbitrary locators. A changed page cursor is a different request with a freshly compiled/pinned policy closure, not a broad host permission.",
+        "typed_block_shape": "Retain legacy status blocked_locator and captured_at; add safe_detail_code only to new custom-policy/paired-port rejection paths. Preserve default blocked result shape. Such a result has no body, capture reference or success implication.",
+        "trust_limit": "The paired-port guard prevents accidental fallback to default live fetch; it is not a sandbox against arbitrary code injected by a trusted composer. The selected CLI/composition additionally exposes no real fetch/DNS/socket/provider port and must prove zero live calls."
+      },
+      "cancellation": {
+        "port_fact": "Frozen BoundedHttpClient passes request.timeoutMs to its injected transport; it does not create an AbortController or guarantee timeout settlement for an ignoring transport. The legacy capture timer aborts its own signal; that timer alone is insufficient for an injected bridge.",
+        "selected_contract": "The bridge creates one per-execution cancellation/deadline context from the incoming legacy AbortSignal and the minimum of selected timeout, bounded-client transport timeout and remaining fixture limit. It rejects an already-aborted signal before delivery and enforces a bounded settlement deadline itself. The fixture transport is constructed with that context; it checks it before delivery and before response acknowledgement/persistence.",
+        "late_completion_fence": "Cancellation/timeout revokes the request execution token used by all subsequent capture/reference/ledger/wrapper/page commits. Late resolution from a deliberately signal-ignoring fixture Promise cannot perform new delivery, promote an outcome, return runner success or mutate page/checkpoint state. Finish only an already-issued indivisible file operation, retain its immutable prefix/object for reconciliation, then serialize a safe typed timeout/partial outcome. Never leave an unhandled detached rejection or falsely report cancellation prevented an already-issued delivery.",
+        "limits": "Immutable verified responses existing before cancellation remain evidence. An unresolved delivery is partial_unresolved without automatic refetch. The test must measure bounded return using a real timer, release the delayed fake transport afterwards and prove no late success/state advance; checking only signal.aborted is insufficient."
+      }
+    },
+    "clocks": {
+      "request_record": "Persist {observation_at, capture_recorded_at, runner_clock_at, fixture_clock_basis} in request intent before fixture delivery. Both timestamps are valid UTC ISO strings and capture_recorded_at >= observation_at.",
+      "fixture_basis": "fixture-logical-clock.v1. Derive observation_at deterministically from the admitted scheduled_slot and bounded page ordinal; derive capture_recorded_at as observation_at + 1 millisecond. Persist the actual values and reject a changed derivation/pin. Supply observation_at to BoundedHttpClient and the new research capture clock, and capture_recorded_at to R2CaptureProtocol.",
+      "resume": "For an existing request, reload all original clock values before reprocessing a durable response or capture. Never use the restart wall clock to reconstruct the capture ID. Runner deadline checks use the admitted bounded fixture logical clock; real timeout AbortControllers remain bounded by the selected timeout.",
+      "limit": "These clocks establish deterministic synthetic fixture identity, not measured live request latency, distributed lease validity or operating-cost qualification.",
+      "governor_clock": "Instantiate the existing MemoryOriginGovernor with clock: () => the current persisted fixture observation clock in milliseconds. Its default Date.now clock must not be used in this lane. Its private pacing state is process-local; no durable managed pacing claim follows."
+    }
+  },
+  "decisive_test_plan": [
+    {
+      "id": "A1",
+      "case": "Actual resolver accepts one pinned fixture descriptor and compiles its selected route; strict schema, canonical hash and registered hash all agree."
+    },
+    {
+      "id": "A2",
+      "case": "Missing registry item, wrong source/descriptor/revision/scope/endpoint/template, unapproved context, malformed descriptor or extra/unsupported request field blocks before scheduler/transport/writes."
+    },
+    {
+      "id": "A3",
+      "case": "Canonical object key ordering yields same digest; changed descriptor content with old expected digest is rejected. Same source/revision with changed digest conflicts; valid new revision yields distinct job and parent run."
+    },
+    {
+      "id": "A4",
+      "case": "Real paused descriptors stay paused and cannot execute through synthetic fixture lane; active clone of a real descriptor is rejected despite schema validity."
+    },
+    {
+      "id": "A5",
+      "case": "Duplicate schedule delivery uses actual unchanged createScheduler/ensureRunAndWorkflowOutbox and durable journal; one parent run/outbox and one logical collection job/reservation survive fresh process reload."
+    },
+    {
+      "id": "A6",
+      "case": "Selected IDs are sorted/deduplicated or duplicates explicitly rejected; changed selection, capture class or immutable reservation yields separate child job without relabeling parent revision key. Reject unbounded/looser limits."
+    },
+    {
+      "id": "D1",
+      "case": "Two-page fixture produces selected/running/partial/complete_fixture observations; validate PR009 receipts and released fetch/capture/checkpoint records; retain exact source/descriptor/selected IDs and source bytes hashes."
+    },
+    {
+      "id": "D2",
+      "case": "Use subprocess death at runner after_fetch_before_page_commit after durable wrapper outcome, then new process/ports on same directory. Fixture transport delivery counter does not repeat first request; same captured ref retained; final coverage cannot skip page two."
+    },
+    {
+      "id": "D3",
+      "case": "Kill after_page_commit_before_resume, then new process. Existing committed page drives resume; no duplicate fixture delivery, page, capture or downstream intent."
+    },
+    {
+      "id": "D4",
+      "case": "Kill after bounded fixture response was durably recorded and inside capture protocol after object write/before reference commit. Resume from recorded response with original clock; no fixture delivery and no manufactured prior successful capture."
+    },
+    {
+      "id": "D5",
+      "case": "Pending request intent with no verified response after process death returns partial/unresolved with retained references, no automatic refetch and no success. Do not overclaim exactly-once external requests."
+    },
+    {
+      "id": "D6",
+      "case": "Kill after seal/before membership-checkpoint commit and after final atomic commit; only complete verified chain may advance checkpoint; retry final commit is idempotent."
+    },
+    {
+      "id": "D7",
+      "case": "Missing/tampered body, metadata/receipt, descriptor or fixture/reducer pin, wrong source/request capture ref, broken sequence/previous hash and conflicting duplicate page produce typed blocked/partial; do not reset or silently discard records."
+    },
+    {
+      "id": "D8",
+      "case": "Interrupted temporary artifact or failed file/directory sync does not acknowledge success; fresh reader sees only verified committed prefix or blocks. No false completion from memory state."
+    },
+    {
+      "id": "D9",
+      "case": "Two actual competing writer processes: exactly one obtains lock; second returns writer_busy. SIGKILL releases kernel lock and new process resumes without lock-file deletion."
+    },
+    {
+      "id": "D10",
+      "case": "304 reuse keeps original capture run/connector provenance, zero new response bytes and exact reusable captured-page hash; typed/access/truncated outcomes never qualify complete enumeration."
+    },
+    {
+      "id": "B1",
+      "case": "Dry-run creates zero files and sends zero requests; unknown fixture, arbitrary URL/source/path escape/symlink or unsupported mode fails closed."
+    },
+    {
+      "id": "B2",
+      "case": "Instrument real composition to prove every DB-shaped transaction/client closes before fixture delivery; no network/platform send inside transaction. Public worker, scheduler-worker and harvest-worker default disabled behavior unchanged."
+    },
+    {
+      "id": "B3",
+      "case": "Receipt/journal serialization rejects secret/body fields and stores only bounded synthetic bodies separately; verify zero real DNS/fetch/socket/DB/queue/Workflow/R2/provider calls. Exact frozen WP5/contracts/SQL/source policy bytes unchanged."
+    },
+    {
+      "id": "C1",
+      "case": "Actual collector integration: execute refresh.capture in the production-shaped local adapter call chain; assert its returned URL/status/decoded body hash and clock are consumed. An oversized/invalid-UTF8 legacy result or deliberately mismatched bridge bytes cannot become complete_fixture."
+    },
+    {
+      "id": "C2",
+      "case": "Existing capture clock regressions: deterministic captured_at for success, blocked locator, oversized body, unsupported content type/encoding and failed transport; pre-existing host/secret/redirect/body limits and default calls stay compatible. No second recorded_at field is added to the legacy return. Add custom locator policy guards only under the explicit new scope; no global hostname or default live behavior change."
+    },
+    {
+      "id": "C3",
+      "case": "Kill after real collector wrapper outcome is fsynced before runner commit, restart fresh and retain both collector and strict capture references with no additional fixture delivery."
+    },
+    {
+      "id": "C4",
+      "case": "Kill after capture reference commit but before strict/wrapper outcome commit; resume from the durable response with both original clocks and exact capture ID. Repeat the earlier before-reference window. Do not invent a prior wrapper success."
+    },
+    {
+      "id": "C5",
+      "case": "Execute two allowed nonempty selected-ID subsets for the same parent key; prove distinct child/execution IDs, independent page/outcome state, correct selected dispositions, one parent run/outbox and no duplicate reservation."
+    },
+    {
+      "id": "C6",
+      "case": "Kill after whole scheduler-source disk commit before child association; a fresh scheduler may return zero due runs, yet recovery binds the actual already committed parent and retains exactly one child/reservation. Also cover lease committed with no parent without reseeding/bypassing the lease."
+    },
+    {
+      "id": "C7",
+      "case": "Fail inside a multi-call buffered scheduler transaction and verify no partial record; fail journal sync after memory commit and verify all existing/new clients plus the scheduler failure-handler transaction and fixture transport refuse work with local_store_poisoned. Fresh replay uses only disk commits."
+    },
+    {
+      "id": "C8",
+      "case": "Persist/replay existing-run beginRun results after committed pages, including Map shape and entry order; tampered/missing byte references and wrong tagged result types fail. Raw Map-to-empty-object loss cannot compare equal."
+    },
+    {
+      "id": "C9",
+      "case": "Attempt settlement is idempotent: repeated completion/resume preserves one terminal outcome, failed/partial_unresolved attempts cannot be silently retried, and a recoverable process interruption retains the same logical attempt and original evidence."
+    },
+    {
+      "id": "C10",
+      "case": "304 through the actual collector preserves its exact legacy http_failed/304 limitation and zero bytes while the strict receipt retains prior capture provenance. No new capture, false legacy captured status or automatically refetched unknown intent is created. The Response constructor must use a null body for status 304."
+    },
+    {
+      "id": "L1",
+      "case": "Run actual validateDescriptor and compileManifestRequest with the selected exact source_fixture_catalog descriptor and both first/cursor routes; defaults and positive frozen allowlist must remain compatible. The retained preparation probe passes 15 existing-module checks, but final producer must validate its own exact descriptor bytes."
+    },
+    {
+      "id": "L2",
+      "case": "A custom policy with omitted, explicit undefined, inherited-only, null or non-callable fetchImpl returns typed blocked before policy/transport/global-fetch calls. Explicit callable paired bridge may admit the fixture; default metadataUrl behavior and ordinary default calls remain unchanged."
+    },
+    {
+      "id": "L3",
+      "case": "Exact custom policy admits only its canonical compiled locator including cursor. Wrong path, wrong cursor, extra query, fragment/credential/noncanonical spelling, rewritten output, boolean/object/URL/Promise output or throwing policy blocks without transport."
+    },
+    {
+      "id": "L4",
+      "case": "Instrument capture guard and bridge guard separately: a permissive/wrong policy cannot make the bridge execute another locator/cursor, and a correct bridge cannot override a capture guard rejection. No arbitrary route/policy option exists on the CLI."
+    },
+    {
+      "id": "L5",
+      "case": "Inject fixture clock into origin governor; crash/restart and recreate it repeatedly while checking journal reservations and actual delivery counters never exceed per-child or aggregate bounds. An unknown delivery retains its charge and stays unresolved."
+    },
+    {
+      "id": "L6",
+      "case": "Timeout/cancel a deliberately signal-ignoring delayed fixture response. Bridge returns bounded typed outcome; release the delayed promise later and show no late success, capture promotion or page/checkpoint change. Test pre-aborted signal before effects and null-body 304 response construction."
+    },
+    {
+      "id": "L7",
+      "case": "Run/reload two child repositories with the same fixture source and shared parent scheduling key. Their membership/checkpoint maps remain independent; tampered cross-child reads/records/attempt outcomes are rejected despite matching source IDs."
+    }
+  ],
+  "preserved_paths": [
+    "packages/connectors/**",
+    "contracts/ingestion/**",
+    "verification/wp5/v1.0.0/**",
+    "db/**",
+    "scripts/research-program/policy.json",
+    "scripts/research-program/operating-bounds.mjs",
+    "services/scheduler-worker/**",
+    "services/harvest-worker/**",
+    "package.json",
+    "package-lock.json",
+    "scripts/research/** except the narrowly adopted refresh.mjs::capture clock + paired explicit-fetch locatorPolicy seam",
+    "tests/update-cycle.test.mjs",
+    "tests/research-automation.test.mjs existing unrelated tests"
+  ],
+  "source_pins": [
+    {
+      "path": "db/migrations/0001_registry_sources_endpoints_scopes.sql",
+      "sha256": "7cd5d8cf2fbdb5a87d9344ad5218329c3d793b093ba674ffd00c4660c491a1f6",
+      "bytes": 12151
+    },
+    {
+      "path": "db/migrations/0002_ingest_runs_jobs_captures.sql",
+      "sha256": "d503c3c2283d4c1edc34ae8688a8586197ca55af950575fdc0f49c6b83c26c97",
+      "bytes": 79189
+    },
+    {
+      "path": "docs/adr/0008-operating-bounds-and-evidence-receipts.md",
+      "sha256": "e9e7b1f2dabf409046f9df94f523a474666a451ed091e707d614b8a33a6b2b8d",
+      "bytes": 16023
+    },
+    {
+      "path": "docs/master-plan/2026-09-10/MASTER-PLAN.md",
+      "sha256": "4049f3bceafd6ac62787819cee38ebfa0228e19bd76328af0d8160f808824f02",
+      "bytes": 30439
+    },
+    {
+      "path": "docs/master-plan/2026-09-10/prs/PR-010.md",
+      "sha256": "888097f9a760ad1cd1834b10dc8bf2d1c544e491265d1577e6a5b9d6095f108f",
+      "bytes": 5078
+    },
+    {
+      "path": "docs/master-plan/2026-09-10/prs/PR-011.md",
+      "sha256": "d7a68918daacbe5063d6b1c3c158792cbe2b715dbcf17c7029a8e32b8ffa482c",
+      "bytes": 4747
+    },
+    {
+      "path": "docs/master-plan/2026-09-10/prs/PR-012.md",
+      "sha256": "8db98c58a031d7ca6801142c4a6ad9ac6d936e70b9341ac150feb8c218bb8761",
+      "bytes": 4014
+    },
+    {
+      "path": "packages/connectors/package.json",
+      "sha256": "0a8a1f416280705e85e80e5da2f6d816834c08f5bf23f9762dfd0c48ef932f6c",
+      "bytes": 390
+    },
+    {
+      "path": "packages/connectors/src/adapters/base.mjs",
+      "sha256": "ee7f8423da5b62f331d832882e1a9259e08cbf53a71064e86a02d2de17a74a51",
+      "bytes": 7800
+    },
+    {
+      "path": "packages/connectors/src/adapters/dcat-data-json.mjs",
+      "sha256": "1d3135c98a047d963fa2465a5c1050fabc40974ce1c7994723504f6af1b0b861",
+      "bytes": 2604
+    },
+    {
+      "path": "packages/connectors/src/bounded-http-client.mjs",
+      "sha256": "552d95a9b490ececde7fb77517b0991dc388b7a014359d9f755f2b29256b3eb4",
+      "bytes": 30820
+    },
+    {
+      "path": "packages/connectors/src/canonical.mjs",
+      "sha256": "ba524d6baa275bc5ca05e4b3cc9dac9dda02cda0992a2b8f8cf2ec762da9cb48",
+      "bytes": 1799
+    },
+    {
+      "path": "packages/connectors/src/capture-protocol.mjs",
+      "sha256": "8431a9f82f3d307c2f31cd64427eba1597a8df00e7f885b6392dc7c70344536d",
+      "bytes": 10212
+    },
+    {
+      "path": "packages/connectors/src/content-classifier.mjs",
+      "sha256": "d8090a7eb1889cdaa8af3d0a3b5d7b23ef1de6d60e5d4dc029fca4a5306979c9",
+      "bytes": 14314
+    },
+    {
+      "path": "packages/connectors/src/deletion-policy.mjs",
+      "sha256": "2740268f9b479c40ac8f192e71177340818f69b0ef516e7419e4e0e6fce67a9f",
+      "bytes": 1655
+    },
+    {
+      "path": "packages/connectors/src/errors.mjs",
+      "sha256": "ace5e4d07cd58cea6c18cfe09ed366b429cb03fc97b8c80c2c3abf04d2c794c6",
+      "bytes": 1415
+    },
+    {
+      "path": "packages/connectors/src/network-policy.mjs",
+      "sha256": "a648c6d73377a053a9b09839ccef371365765d2bd87dde55b9db417f729288ad",
+      "bytes": 4277
+    },
+    {
+      "path": "packages/connectors/src/origin-governor.mjs",
+      "sha256": "302f092e5f76c73266f89a5dbade411f528ae1347e6cee37bf4ede99c33cce52",
+      "bytes": 2894
+    },
+    {
+      "path": "packages/connectors/src/pinned-streaming-transport.mjs",
+      "sha256": "f4b8cfdfce55fcfdd7e853d17c4992c474e16e2f646226e90c5ddebabb72ca08",
+      "bytes": 2314
+    },
+    {
+      "path": "packages/connectors/src/route-manifest.mjs",
+      "sha256": "be3787542b8c27ed3d7f294ae88789c9530717f2741cfd862ee5a24f46197bfc",
+      "bytes": 30103
+    },
+    {
+      "path": "packages/connectors/src/runner.mjs",
+      "sha256": "50af43de5732a562fc506cae854c634998ca43b6d283b270d542d7891c171bf6",
+      "bytes": 7629
+    },
+    {
+      "path": "packages/connectors/src/source-route-allowlist.mjs",
+      "sha256": "15eb8c87e94722e83aa006540ce96fccbc3c1cccf664df76157499943a64fe16",
+      "bytes": 8810
+    },
+    {
+      "path": "packages/connectors/src/testing/fixtures.mjs",
+      "sha256": "a97fb601b72c507ba33309e3cca45e18e595b814566e855814214ab76ce62668",
+      "bytes": 7355
+    },
+    {
+      "path": "packages/connectors/src/testing/index.mjs",
+      "sha256": "6d67b24df5c165714a72a39086c585ca2169d4870176e1834be90303758e8cbe",
+      "bytes": 187
+    },
+    {
+      "path": "packages/connectors/src/testing/memory-ports.mjs",
+      "sha256": "33843172e8f9e0d2fb5258b2d5a13167b3794ee73c713f721cf4d00928f7ad93",
+      "bytes": 12790
+    },
+    {
+      "path": "packages/ingestion/README.md",
+      "sha256": "33d2dc33e5a124114655a327153a9cff35137c78d0674788820e2ebd2a62bc98",
+      "bytes": 4471
+    },
+    {
+      "path": "packages/ingestion/package.json",
+      "sha256": "52f6f2d8cd754575b098933b98bc253adfb8602bfe2cb61997d70db620802501",
+      "bytes": 416
+    },
+    {
+      "path": "packages/ingestion/src/audit-principal.mjs",
+      "sha256": "a06495cfcf473ccde6b91552a7cd49768ba9104eba96e1bce194f19aebee75e8",
+      "bytes": 1600
+    },
+    {
+      "path": "packages/ingestion/src/common.mjs",
+      "sha256": "b9d881927621a993557e791490d316b688cdbfadb5961ff3ba2a8f06555b8b51",
+      "bytes": 2476
+    },
+    {
+      "path": "packages/ingestion/src/failure-policy.mjs",
+      "sha256": "0dd6bb7afe0eeef6c3aaa422054f71b26b9954dac5a4cf766209cb1d6a741e85",
+      "bytes": 5115
+    },
+    {
+      "path": "packages/ingestion/src/in-memory-control-plane.mjs",
+      "sha256": "bbdb163c998411b4c518d69e086a091925f2836ff32446cd0a06751b9a20d9dd",
+      "bytes": 103628
+    },
+    {
+      "path": "packages/ingestion/src/ports.mjs",
+      "sha256": "3f832c244528602ac5dbfa7769b5906ff72610859ecd2ab5ca440c5b9739394c",
+      "bytes": 2313
+    },
+    {
+      "path": "packages/ingestion/src/postgres-control-store.mjs",
+      "sha256": "00cd03bf6e1b81ceb1eb15073370fa6c7cff022cca2bbfc306483a7b8c5918c1",
+      "bytes": 136532
+    },
+    {
+      "path": "packages/ingestion/src/queue-consumer.mjs",
+      "sha256": "edeb6e052bf5dd0de181c24e108a96272f6ca7cf5da3dda05ec5c83ab9b2711d",
+      "bytes": 16231
+    },
+    {
+      "path": "packages/ingestion/src/redaction.mjs",
+      "sha256": "0d42af1a5c7d912c93284ae7e74dc9bf568ffa110fe7a0b2b9d05db76eee8ebc",
+      "bytes": 1885
+    },
+    {
+      "path": "packages/ingestion/src/scheduler.mjs",
+      "sha256": "62155eefa91e4678477839c309b084afb9557f273bfe5281236fbc0b9c44dbeb",
+      "bytes": 6677
+    },
+    {
+      "path": "packages/retrieval/tools/catalog-contract.mjs",
+      "sha256": "bbba437c0ba61a774fe02d8a2f3436900756ae4715ad05c0cc36894ee70df160",
+      "bytes": 18832
+    },
+    {
+      "path": "packages/retrieval/tools/external-url-policy.mjs",
+      "sha256": "79105a2fb2e76108bbaa3423dc2e02281264e3d8cd653ef4ab83d1dfb4446ba0",
+      "bytes": 2494
+    },
+    {
+      "path": "packages/retrieval/tools/record-semantics.mjs",
+      "sha256": "32f4b1a2f8ae94e99ffb2f353cab01cf0e4bb157ded6405c2d1b1fe15b89047b",
+      "bytes": 2404
+    },
+    {
+      "path": "scripts/research-program/operating-bounds.mjs",
+      "sha256": "f9da46ab59d2ab2a9bc6c173d7698426a8558c3742e68105b0150dcfc4f36eaa",
+      "bytes": 34119
+    },
+    {
+      "path": "scripts/research-program/policy.json",
+      "sha256": "6230fe7b10aa5da20d9426cf4fcce39f0565e306ec512cbc791428544088fbda",
+      "bytes": 28532
+    },
+    {
+      "path": "scripts/research-program/receipts/v1.0.0/README.md",
+      "sha256": "8a37d54a7f591ad1bc420c23d8c84ef20f2f245ed5e68b82c335b9a3843d359e",
+      "bytes": 2807
+    },
+    {
+      "path": "scripts/research-program/receipts/v1.0.0/evidence-receipt.schema.json",
+      "sha256": "b0785f439b2ba525ad3b72ef7832adeb9eb6eccc5454a6eedaabdfbc746375eb",
+      "bytes": 7262
+    },
+    {
+      "path": "scripts/research/refresh.mjs",
+      "sha256": "7ab7a36ac28b20c4e56351e32c0812eb24dc362b6d9a5e0cf9c682b5d190cd3b",
+      "bytes": 12411
+    },
+    {
+      "path": "scripts/research/source-extractors.mjs",
+      "sha256": "c9d519a79074a8a8235d15c6d6e9ac5a51c80c33245c10f9ebf569dddbed04cc",
+      "bytes": 29676
+    },
+    {
+      "path": "scripts/research/update-cycle.mjs",
+      "sha256": "9f3e946ce6eedbf51b1699c28db254817906290ba5594ea36ba08c8474ecf863",
+      "bytes": 14986
+    },
+    {
+      "path": "services/harvest-worker/index.mjs",
+      "sha256": "38222bcd96419731f94ab7b48200c003c41fb0a49cced965cfaedf070e8435cf",
+      "bytes": 4453
+    },
+    {
+      "path": "services/harvest-worker/worker.mjs",
+      "sha256": "d1764dd656f4780263b93e9d827cdbeb5c02d9ab55caae3c7d4f1f808255209a",
+      "bytes": 1274
+    },
+    {
+      "path": "services/scheduler-worker/index.mjs",
+      "sha256": "ae445ee6be8366c13d701394968739c4c1ab4b267ee9eb6fd488b61da7a2586b",
+      "bytes": 3451
+    },
+    {
+      "path": "services/scheduler-worker/worker.mjs",
+      "sha256": "2aea3088068da001995da070ec987da6d606a5cb51d02702e512430611a780df",
+      "bytes": 562
+    },
+    {
+      "path": "tests/research-automation.test.mjs",
+      "sha256": "54f99173c6013692a2c9a0f59f415e088c73e7070e74d9cfcd0c2fad98c2ecc0",
+      "bytes": 10003
+    },
+    {
+      "path": "tests/update-cycle.test.mjs",
+      "sha256": "4c268379d03616d19bb8cda7dd7b226bae56439b542d2c2c6938575fc2c9ef33",
+      "bytes": 8569
+    }
+  ],
+  "tests_executed": true,
+  "repository_edits": false,
+  "dispatch_performed": false,
+  "requirements_accepted": [],
+  "supersedes_for_review_only": [
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/final-proposal/PROPOSAL.md",
+      "sha256": "e7b803dc0ef73277d972cce1989e00799eb317c7a672713566b30b450f373d7f",
+      "bytes": 9965
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/final-proposal/proposal.json",
+      "sha256": "d9d24538944833c6a4aaaaa5239039365d3853684947d9b98860e696b811531f",
+      "bytes": 23559
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/independent-review/review.json",
+      "sha256": "ac27bb07974f998b3b978f40158fd784ce6772894d26dde61bb375f69fc71157",
+      "bytes": 22802
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/corrected-proposal/PROPOSAL.md",
+      "sha256": "bdc54405fe6f501137bc254b2e4511e4634402f1e79ec5e151f18d4c8d70f578",
+      "bytes": 10308
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/corrected-proposal/proposal.json",
+      "sha256": "c3cd6f374e82042b355fb4139f4e975882fa4fee5d31041b665c0bd49b954082",
+      "bytes": 54078
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/corrected-proposal/scope-amendment.json",
+      "sha256": "1bb0b34a5f30bdc286eea2f50fc5ca1c29cb2d6ba36673cae8bc53e90b2e0553",
+      "bytes": 2943
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/corrected-proposal/manifest.json",
+      "sha256": "149b72760c1f0ff452ba2c2e104c735b4aa2e8817a1c682667bc2eda002d6476",
+      "bytes": 1814
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/corrected-proposal-independent-review/REVIEW.md",
+      "sha256": "3f8c965309f8796b41fb10793e58805bb4740a2fe424776c0133bbc8f54a7da3",
+      "bytes": 3556
+    },
+    {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/corrected-proposal-independent-review/review.json",
+      "sha256": "c8712b791b2c74ee153ad25a093bfd98a780f9a2028b980dc116971633bc26c7",
+      "bytes": 18533
+    }
+  ],
+  "scope_amendment": {
+    "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/locator-corrected-proposal/scope-amendment.json",
+    "sha256": "a44929a94bba846a57b4c9aee7173bc716b0b25007134ca5f202818dbb9b57da",
+    "bytes": 4050
+  },
+  "planned_validation_commands": [
+    {
+      "command": "node --test tests/research-program/job-lifecycle.test.mjs",
+      "purpose": "Actual collector integration, durable journal, child identity, process-death boundaries and disabled composition."
+    },
+    {
+      "command": "node --test tests/research-automation.test.mjs tests/update-cycle.test.mjs",
+      "purpose": "Direct clock seam plus unchanged existing collector/default update-cycle behavior; editing update-cycle code/tests is not granted."
+    },
+    {
+      "command": "npm test --prefix packages/ingestion",
+      "purpose": "Affected existing scheduler/control-plane regression suite."
+    },
+    {
+      "command": "Default live-ledger PR010 handoff validation and exact artifact/ownership checks",
+      "purpose": "Only after controller binds the actual accepted base and dependency merge."
+    },
+    {
+      "command": "Repository release gate including npm test/build/cf:dry-run",
+      "purpose": "One exact-candidate integration/release gate after producer and independent decisive checks; no extra pre-gate build."
+    }
+  ],
+  "test_plan_status": "The 36 implementation regression groups are planned and have not run. One authorized scratch-only compatibility probe of existing modules passed 15/15 checks; its initial pre-check harness EPERM and corrected wrapper receipt are retained.",
+  "review_conditions_addressed": {
+    "PR010-CONTRACT-01": "Actual refresh.capture invocation, consumed result and narrow two-path ownership amendment selected.",
+    "REPLAY-01": "Whole-transaction journal records and poison-all-client contract selected.",
+    "REPLAY-02": "Separate deterministic child execution IDs and bounded attempt semantics selected.",
+    "REPLAY-03": "Both observation and recording slots pinned using the real existing/new clock ports.",
+    "REPLAY-04": "Strict tagged value codec and explicit reducer projections selected; current import closure separately pinned.",
+    "REPLAY-05": "Durable admission/expected parent lookup/association recovery algorithm selected.",
+    "V2-LOCATOR-P2": "Replaced invalid production-host synthetic path with exact frozen source_fixture_catalog/catalog.example.gov/data.json route, confirmed by actual validator/compiler probe. Selected clock + locatorPolicy/explicit-fetch guard ownership, canonical returned locator and independent bridge check.",
+    "V2-IMPLEMENTATION-DETAILS": "Origin governor fixture clock, journal-authoritative restart bounds, enforced deadline/cancellation and late-result fence, null-body304, and one separate connector repository per child selected."
+  },
+  "source_pin_manifest": {
+    "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/locator-corrected-proposal/source-pins.json",
+    "sha256": "7f47dd412d5dc80337f432115c340300e103868a65792501644eef6c542b3e44",
+    "bytes": 15303
+  },
+  "runtime_static_relative_import_closure_count": 28,
+  "worktree_creation": false,
+  "live_requests": false,
+  "compatibility_probe": {
+    "status": "passed_existing_module_compatibility_only",
+    "results": {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/locator-corrected-proposal/probe/results.json",
+      "sha256": "77dbeabba95df7d76cc63b0da8ff647e437195e85ee8a9e72747510e0974630d",
+      "bytes": 3242
+    },
+    "command_receipt": {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/locator-corrected-proposal/probe/attempt-2-receipt.json",
+      "sha256": "6d33b49c8a080134518ad2c824f22c24911c04f2b947f7b9b52cb4db0644d2a8",
+      "bytes": 13226
+    },
+    "probe_source": {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/locator-corrected-proposal/probe/route-compatibility.mjs",
+      "sha256": "e78e4ff5b98a5582af8b5036e6f468824e07ab23cca0ee4b5f6ee7fa758c9934",
+      "bytes": 5888
+    },
+    "fixture_descriptor": {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/locator-corrected-proposal/probe/fixture-descriptor.json",
+      "sha256": "ba9e94b9230496b2e0da0c1cf7c280044d179aff038bd046c6bc7fa6e3e1ea61",
+      "bytes": 3606
+    },
+    "fixture_descriptor_canonical_sha256": "688657fa60077bf18d63085f0ae02c6956f8dbd5d1fbc57c034a88db997bad0c",
+    "hash_basis": "ushso-canonical-json.v1",
+    "compiled_requests": {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/locator-corrected-proposal/probe/compiled-requests.json",
+      "sha256": "45af848e809b84afeedc024158be61c69f3c9bac1ce9baf8d12c4428cd71c88d",
+      "bytes": 711
+    },
+    "total_checks": 15,
+    "passed_checks": 15,
+    "live_calls": 0,
+    "fixture_deliveries": 0,
+    "initial_harness_failure_retained": {
+      "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr010-interface-preparation/locator-corrected-proposal/probe/attempt-1-result.json",
+      "sha256": "206c44446de4ddae4b4b6861164f8885c2a362f4a9dbcad317a38fa6f8de71f6",
+      "bytes": 501
+    },
+    "limit": "The new locatorPolicy/clock seam is proposed, not implemented or executed. Probe validates frozen fixture compatibility and unchanged legacy default rejection only."
+  },
+  "contract_probe_executed": true,
+  "implementation_tests_executed": false
+}

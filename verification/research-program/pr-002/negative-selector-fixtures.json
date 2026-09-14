@@ -1,0 +1,127 @@
+{
+  "format": "ushso.research-program.pr-002.negative-selector-fixtures.v1",
+  "commit_id": "C-002-2",
+  "purpose": "Public schema and holdout-boundary fixtures. They do not contain raw holdout prompts or labels.",
+  "fixtures": [
+    {
+      "id": "NEG-TITLE-SIMILARITY-PRODUCT-UPGRADE",
+      "selector": "Treat a similar catalog title or directory membership as a product/release upgrade.",
+      "expected": "reject",
+      "reason": "Existing product/release anchors stay source-native. Title similarity and directory membership cannot upgrade them."
+    },
+    {
+      "id": "NEG-GIS-DIRECTORY-AS-REPRESENTATIVE",
+      "selector": "Promote a GIS-friendly redistribution to the product representative.",
+      "expected": "reject",
+      "reason": "C1 related_candidates remain inference-only; they are not extra products or release bindings."
+    },
+    {
+      "id": "NEG-CATALOG-AS-RETRIEVAL-DENOMINATOR",
+      "selector": "Score R07 against the 3,434 catalog record IDs.",
+      "expected": "reject",
+      "reason": "The 3,434 IDs are catalog accounting, not a retrieval relevance denominator."
+    },
+    {
+      "id": "NEG-TASKS-AS-R14-GOLD",
+      "selector": "Treat the 40 retrieval tasks as the R14 scientific-claim gold set.",
+      "expected": "reject",
+      "reason": "R14 requires a later independent claim frame from PR-020 residual evidence. The 40 tasks are an R07 input freeze."
+    },
+    {
+      "id": "NEG-HOLDOUT-RAW-QUERY",
+      "selector": "Copy raw holdout questions, answer IDs, or private labels into tasks.json or Git.",
+      "expected": "reject",
+      "reason": "Holdout labels remain inaccessible to implementer tuning. Public contract is the opaque task index plus hash of the sealed manifest."
+    },
+    {
+      "id": "NEG-DELETE-DIFFICULT-MEMBER",
+      "selector": "Improve a metric by deleting a difficult cohort member, task, or selected pilot ID.",
+      "expected": "reject",
+      "reason": "Original denominators are fixed. Unavailable or unresolved members stay in the denominator."
+    },
+    {
+      "id": "NEG-MODEL-AGREEMENT-LABELS",
+      "selector": "Use model agreement or implementer consensus as gold labels.",
+      "expected": "reject",
+      "reason": "Independent blind judgments are required. Uncertainty blocks acceptance."
+    },
+    {
+      "id": "NEG-PROTOCOL-AS-MATERIALIZED-FRAME",
+      "selector": "Mark the R14 denominator frozen because this protocol exists.",
+      "expected": "reject",
+      "reason": "A protocol is not a materialized residual frame, sample, or label freeze."
+    },
+    {
+      "id": "NEG-149-IID-THRESHOLD",
+      "selector": "Adopt the illustrative 149 iid count as an R14 sample-size or CI threshold.",
+      "expected": "reject",
+      "reason": "The 149-observation illustration is not an adopted threshold."
+    },
+    {
+      "id": "NEG-ENFORCEMENT-AS-MRF",
+      "selector": "Substitute a hospital price-transparency enforcement dataset for a selected rate file.",
+      "expected": "reject",
+      "reason": "R10 parsed-sample targets cannot be met by enforcement datasets."
+    },
+    {
+      "id": "NEG-QIS-AS-TIC-ENTITY",
+      "selector": "Treat a HIOS issuer or QIS workbook row as proof of a TiC reporting entity or file.",
+      "expected": "reject",
+      "reason": "Issuer identity is a selected candidate. File locators remain unresolved until PR-049."
+    },
+    {
+      "id": "NEG-FEDERAL-CERT-AS-STATE-LICENSE",
+      "selector": "Treat CMS certification as state facility licensure evidence.",
+      "expected": "reject",
+      "reason": "State facility licensure requires a state authority."
+    },
+    {
+      "id": "NEG-APCD-DIRECTORY-AS-SOURCE",
+      "selector": "Treat a secondary APCD directory as the APCD source family.",
+      "expected": "reject",
+      "reason": "Secondary directories are navigation only."
+    },
+    {
+      "id": "NEG-ASPE-SVI-AS-ATSDR",
+      "selector": "Treat HHS ASPE SVI (ypqf-r5qs) or a similar SVI title as CDC/ATSDR SVI.",
+      "expected": "reject",
+      "reason": "Similar baseline SVI titles do not prove the exact CDC/ATSDR family."
+    },
+    {
+      "id": "NEG-CCN-EQUALS-NPI",
+      "selector": "Join facility identity by CCN=NPI or name-only equality.",
+      "expected": "reject",
+      "reason": "Those shortcuts are forbidden matches and unsupported join routes."
+    },
+    {
+      "id": "NEG-CHARGE-AS-BILL",
+      "selector": "Treat a published hospital charge or negotiated rate as a patient expected bill or utilization-weighted payment.",
+      "expected": "reject",
+      "reason": "Price-definition negatives are in the public contract; they are critical forbidden matches for R07."
+    },
+    {
+      "id": "NEG-MATERNAL-AS-INFANT",
+      "selector": "Substitute infant mortality evidence for a maternal-mortality intention.",
+      "expected": "reject",
+      "reason": "Maternal versus infant mortality is a named public negative-case type."
+    },
+    {
+      "id": "NEG-HCRIS-AS-PHC4",
+      "selector": "Treat HCRIS and PHC4 as interchangeable hospital-finance grains.",
+      "expected": "reject",
+      "reason": "HCRIS/PHC4 is a named public negative-case type; reporting scopes differ."
+    },
+    {
+      "id": "NEG-SIMULATED-R12-R15",
+      "selector": "Satisfy R12 or R15 with generated participants, dates, or simulated cycles.",
+      "expected": "reject",
+      "reason": "R12 needs actual participants. R15 needs two actual scheduled cycles and 14 actual elapsed days."
+    },
+    {
+      "id": "NEG-PAID-ENRICHMENT-WITHOUT-BUDGET",
+      "selector": "Call a paid product model from this metadata freeze.",
+      "expected": "reject",
+      "reason": "Paid enrichment requires a selected product budget and credentials. This commit makes no model calls."
+    }
+  ]
+}

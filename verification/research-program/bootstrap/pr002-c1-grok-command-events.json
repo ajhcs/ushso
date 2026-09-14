@@ -1,0 +1,264 @@
+{
+  "format": "ushso.pr002.grok-c1-command-event-extract.v1",
+  "extracted_at": "2026-09-10T18:01:23.883406+00:00",
+  "task_id": "ce-ushso-pr002-c1-recovery--grok-c1-recovery-7c8a9fe5dfc7-d648775d",
+  "source_events_sha256": "71e405504ca26fcf2e3b7ba5f99dc8234cdfab946f8620332e6d8e806f2e438e",
+  "source_event_count": 2738,
+  "scope": "Selected command dispatch timestamps and bounded terminal updates only; no provider thought stream. Completed tool status is not an independently captured numeric process exit. Root replay supplies exact verifier exit.",
+  "events": [
+    {
+      "source_line": 872,
+      "at": "2026-09-10T17:40:08.490Z",
+      "tool_call_id": "call-90e2498d-68be-4149-90fb-d65f389e317f-51",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: python3 -c \"import subprocess; print(subprocess.check_output(['git','rev-parse','HEAD^{tree}'],text=True).strip())\"\npython3 -c \"import hashlib,pathlib; p=pathlib.Path('packages/retrieval/versions/v1.2.0/corpus/corpus.json'); print('corpus.json', hashlib.sha256(p.read_bytes()).hexdigest(), p.stat().st_size)\"\nmkdir -p verification/research-program/pr-002 evaluation/research-program\ncp -a /mnt/d/tmp/plumbob/ushso-research-program-20260910/pr002-grok-partial/product_catalog.py verification/research-program/pr-002/product_catalog.py\npython3 -c \"import hashlib,pathlib; p=pathlib.Path('verification/research-program/pr-002/product_catalog.py'); h=hashlib.sha256(p.read_bytes()).hexdigest(); print(h, p.stat().st_size); assert h=='5183f7ac32aeaaa0402965c9658ca1e048ebcbaea18a57cc20a542850e222684'\"\nls -l verification/research-program/pr-002/"
+    },
+    {
+      "source_line": 880,
+      "at": "2026-09-10T17:40:08.749Z",
+      "tool_call_id": "call-90e2498d-68be-4149-90fb-d65f389e317f-51",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): 691d0a375144bd9d215988d7f70c604af505abf9\ncorpus.json 56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633 1110\n5183f7ac32aeaaa0402965c9658ca1e048ebcbaea18a57cc20a542850e222684 73829\ntotal 76\n-rw-rw-r-- 1 plumbob plumbob 73829 Sep 10 17:33 product_catalog.py"
+    },
+    {
+      "source_line": 1206,
+      "at": "2026-09-10T17:43:48.416Z",
+      "tool_call_id": "call-2e43d814-0ddd-4ffa-97dd-5b916b0b07b9-60",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: python3 verification/research-program/pr-002/build.py --repo ."
+    },
+    {
+      "source_line": 1214,
+      "at": "2026-09-10T17:43:48.997Z",
+      "tool_call_id": "call-2e43d814-0ddd-4ffa-97dd-5b916b0b07b9-60",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): {\n  \"cohorts_sha256\": \"3d50afef67780b131d6a2556ada07021510ffe7dd7107d4d539381e5a4e5d1fe\",\n  \"bytes\": 1945622,\n  \"failed_selectors\": [],\n  \"unsupported_selectors\": [],\n  \"cms_duplicate_title_groups\": [],\n  \"selector_counts\": {\n    \"cms_title\": 63,\n    \"intake\": 14,\n    \"census_dataset\": 13,\n    \"cdc_native\": 10\n  },\n  \"isolated\": [\n    \"obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b\",\n    \"obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250\",\n    \"obs:asset:cdc-socrata:4ckf-c7xz-8a5026e46b58641e\"\u2026"
+    },
+    {
+      "source_line": 1240,
+      "at": "2026-09-10T17:43:55.883Z",
+      "tool_call_id": "call-10b95282-8fb4-4c98-a009-961ecb1277d0-61",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: python3 verification/research-program/pr-002/verify.py --repo ."
+    },
+    {
+      "source_line": 1248,
+      "at": "2026-09-10T17:43:56.995Z",
+      "tool_call_id": "call-10b95282-8fb4-4c98-a009-961ecb1277d0-61",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): {\n  \"ok\": true,\n  \"failed_checks\": [],\n  \"cohorts_sha256\": \"3d50afef67780b131d6a2556ada07021510ffe7dd7107d4d539381e5a4e5d1fe\",\n  \"product_count\": 100,\n  \"selector_counts\": {\n    \"cms_title\": 63,\n    \"intake\": 14,\n    \"census_dataset\": 13,\n    \"cdc_native\": 10\n  },\n  \"failed_selectors\": [],\n  \"unsupported_selectors\": [],\n  \"cms_duplicate_title_groups\": [],\n  \"isolated\": [\n    \"obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b\",\n    \"obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250\",\n    \"obs:asse\u2026"
+    },
+    {
+      "source_line": 1258,
+      "at": "2026-09-10T17:44:09.393Z",
+      "tool_call_id": "call-b09b855d-83cb-441d-9049-10e1f38c743f-62",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: python3 - <<'PY'\nimport hashlib, json\nfrom pathlib import Path\nfrom collections import Counter\nfiles = [\n \"evaluation/research-program/cohorts.json\",\n \"verification/research-program/pr-002/product_catalog.py\",\n \"verification/research-program/pr-002/c1_lib.py\",\n \"verification/research-program/pr-002/build.py\",\n \"verification/research-program/pr-002/verify.py\",\n \"verification/research-program/pr-002/c1-build-receipt.json\",\n]\nfor p in files:\n    path=Path(p)\n    print(f\"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.stat().st_size:8}  {p}\")\nc=json.loads(Path(\"evaluation/research-program/cohorts.json\").read_text())\nprint(\"status\", c[\"status\"], \"pending\", c[\"pending\"])\nprint(\"program_keys unique\", len({p['program_key'] for p in c['products']}))\nprint(\"named_priority\", sum(1 for p in c['products'] if p['named_priority']))\nprint(\"access\", Counter(p['access_expectation'] for p in c['products']))\nprint(\"anchor status\", Counter(p['anchor']['status'] for p in c['products']))\nprint(\"related totals\", sum(len(p['anchor']['related_releases']) for p in c['products']))\nfor p in c['products']:\n    n=len(p['anchor']['related_releases'])\n    if n:\n        rel=Counter(x['relation'] for x in p['anchor']['related_releases'])\n        print(f\"  {p['product_key']}: {n} {dict(rel)}\")\nprint(\"limits with text:\")\nfor p in c['products']:\n    if p['anchor']['unresolved_identity_limits']:\n        print(p['product_key'], p['anchor']['unresolved_identity_limits'])\nprint(\"baseline isolated\", [x['record_id'] for x in c['baseline_records'] if x['isolated']])\nprint(\"acceptance\", c['acceptance'])\nprint(\"json parse ok\")\nPY"
+    },
+    {
+      "source_line": 1266,
+      "at": "2026-09-10T17:44:09.589Z",
+      "tool_call_id": "call-b09b855d-83cb-441d-9049-10e1f38c743f-62",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): 3d50afef67780b131d6a2556ada07021510ffe7dd7107d4d539381e5a4e5d1fe   1945622  evaluation/research-program/cohorts.json\n5183f7ac32aeaaa0402965c9658ca1e048ebcbaea18a57cc20a542850e222684     73829  verification/research-program/pr-002/product_catalog.py\n78686945af30f7dd8295d41b2102e30f8cf5f47578aa887094f32cd59cdf9adb     13893  verification/research-program/pr-002/c1_lib.py\n82ee85101acb0f20df39582abfe8485e945a6bc5d33c9da017be5ea172084836      2439  verification/research-program/pr-002/build.py\nf948d\u2026"
+    },
+    {
+      "source_line": 1337,
+      "at": "2026-09-10T17:44:36.119Z",
+      "tool_call_id": "call-85a21e24-a0a2-4f22-b9fd-59799ff3e0b9-64",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: python3 -m py_compile verification/research-program/pr-002/c1_lib.py verification/research-program/pr-002/build.py verification/research-program/pr-002/verify.py verification/research-program/pr-002/product_catalog.py\npython3 verification/research-program/pr-002/verify.py --repo .\npython3 -m json.tool evaluation/research-program/cohorts.json >/dev/null\npython3 -m json.tool verification/research-program/pr-002/c1-build-receipt.json >/dev/null\npython3 -m json.tool verification/research-program/pr-002/c1-verify-receipt.json >/dev/null\necho compile_and_json_ok\npython3 -c \"\nimport hashlib, pathlib\nfor p in [\n 'verification/research-program/pr-002/verify.py',\n 'verification/research-program/pr-002/c1-verify-receipt.json',\n 'verification/research-program/pr-002/c1-build-receipt.json',\n]:\n    path=pathlib.Path(p)\n    print(hashlib.sha256(path.read_bytes()).hexdigest(), path.stat().st_size, p)\n\""
+    },
+    {
+      "source_line": 1345,
+      "at": "2026-09-10T17:44:37.288Z",
+      "tool_call_id": "call-85a21e24-a0a2-4f22-b9fd-59799ff3e0b9-64",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): {\n  \"ok\": true,\n  \"failed_checks\": [],\n  \"cohorts_sha256\": \"3d50afef67780b131d6a2556ada07021510ffe7dd7107d4d539381e5a4e5d1fe\",\n  \"product_count\": 100,\n  \"selector_counts\": {\n    \"cms_title\": 63,\n    \"intake\": 14,\n    \"census_dataset\": 13,\n    \"cdc_native\": 10\n  },\n  \"failed_selectors\": [],\n  \"unsupported_selectors\": [],\n  \"cms_duplicate_title_groups\": [],\n  \"isolated\": [\n    \"obs:asset:cdc-socrata:2g2d-yfx9-060a56b0e1f5e82b\",\n    \"obs:asset:cdc-socrata:38b4-r9iv-82269ee71b664250\",\n    \"obs:asse\u2026"
+    },
+    {
+      "source_line": 1369,
+      "at": "2026-09-10T17:44:56.519Z",
+      "tool_call_id": "call-aac07894-528d-4e8c-8a59-0a5504f18c9a-65",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: date -u +%Y-%m-%dT%H:%M:%SZ\npython3 -c \"import json,pathlib; json.loads(pathlib.Path('verification/research-program/pr-002/c1-verify-receipt.json').read_text()); print('verify-receipt-keys-ok')\"\nls -la verification/research-program/pr-002/\ngit check-ignore -v verification/research-program/pr-002/__pycache__ 2>/dev/null || true\nfind verification/research-program/pr-002 -name '__pycache__' -o -name '*.pyc'"
+    },
+    {
+      "source_line": 1377,
+      "at": "2026-09-10T17:44:56.700Z",
+      "tool_call_id": "call-aac07894-528d-4e8c-8a59-0a5504f18c9a-65",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): 2026-09-10T17:44:56Z\nverify-receipt-keys-ok\ntotal 128\ndrwx------ 3 plumbob plumbob  4096 Sep 10 17:44 .\ndrwx------ 6 plumbob plumbob  4096 Sep 10 17:40 ..\n-rw------- 1 plumbob plumbob  2439 Sep 10 17:43 build.py\n-rw------- 1 plumbob plumbob  1033 Sep 10 17:43 c1-build-receipt.json\n-rw------- 1 plumbob plumbob 13893 Sep 10 17:42 c1_lib.py\n-rw------- 1 plumbob plumbob  2534 Sep 10 17:44 c1-verify-receipt.json\n-rw-rw-r-- 1 plumbob plumbob 73829 Sep 10 17:33 product_catalog.py\ndrwx------ 2 plumbob \u2026"
+    },
+    {
+      "source_line": 1536,
+      "at": "2026-09-10T17:46:15.178Z",
+      "tool_call_id": "call-967503f7-f587-42dd-be15-2d6ef734fa06-69",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: python3 - <<'PY'\nimport hashlib, json\nfrom pathlib import Path\nh=json.loads(Path('docs/research-program/handoffs/PR-002.json').read_text())\nprint('handoff parse ok', 'status', h['status'])\nmismatch=[]\nfor art in h['artifacts']:\n    p=Path(art['path'])\n    sha=hashlib.sha256(p.read_bytes()).hexdigest()\n    if sha!=art['sha256']:\n        mismatch.append((art['path'], art['sha256'], sha, p.stat().st_size))\n    else:\n        print('ok', art['path'])\nprint('mismatches', mismatch)\nprint('handoff sha', hashlib.sha256(Path('docs/research-program/handoffs/PR-002.json').read_bytes()).hexdigest(), Path('docs/research-program/handoffs/PR-002.json').stat().st_size)\nPY\npython3 -m json.tool docs/research-program/handoffs/PR-002.json >/dev/null\ngit diff --check\nrm -rf verification/research-program/pr-002/__pycache__\necho cleaned"
+    },
+    {
+      "source_line": 1544,
+      "at": "2026-09-10T17:46:15.400Z",
+      "tool_call_id": "call-967503f7-f587-42dd-be15-2d6ef734fa06-69",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): handoff parse ok status partial_C1_complete\nok evaluation/research-program/cohorts.json\nok verification/research-program/pr-002/product_catalog.py\nok verification/research-program/pr-002/c1_lib.py\nok verification/research-program/pr-002/build.py\nok verification/research-program/pr-002/verify.py\nok verification/research-program/pr-002/c1-build-receipt.json\nok verification/research-program/pr-002/c1-verify-receipt.json\nmismatches []\nhandoff sha 08140c4cc3af1fb77958554422cebc5400a0aa184a13efbd5beb\u2026"
+    },
+    {
+      "source_line": 1569,
+      "at": "2026-09-10T17:46:43.769Z",
+      "tool_call_id": "call-11793f4f-b0cb-4b57-8cc1-fdf4a3970c3b-70",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: git add -- \\\n  evaluation/research-program/cohorts.json \\\n  docs/research-program/handoffs/PR-002.json \\\n  verification/research-program/pr-002/build.py \\\n  verification/research-program/pr-002/c1-build-receipt.json \\\n  verification/research-program/pr-002/c1-verify-receipt.json \\\n  verification/research-program/pr-002/c1_lib.py \\\n  verification/research-program/pr-002/product_catalog.py \\\n  verification/research-program/pr-002/verify.py\ngit diff --cached --name-only\necho '---'\ngit diff --cached --check\necho '--- status ---'\ngit status --short\npython3 verification/research-program/pr-002/verify.py --repo . >/tmp/c1-verify-out.json\npython3 -c \"import json; print(json.load(open('/tmp/c1-verify-out.json'))['ok'], json.load(open('/tmp/c1-verify-out.json'))['failed_checks'])\""
+    },
+    {
+      "source_line": 1577,
+      "at": "2026-09-10T17:46:44.829Z",
+      "tool_call_id": "call-11793f4f-b0cb-4b57-8cc1-fdf4a3970c3b-70",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): docs/research-program/handoffs/PR-002.json\nevaluation/research-program/cohorts.json\nverification/research-program/pr-002/build.py\nverification/research-program/pr-002/c1-build-receipt.json\nverification/research-program/pr-002/c1-verify-receipt.json\nverification/research-program/pr-002/c1_lib.py\nverification/research-program/pr-002/product_catalog.py\nverification/research-program/pr-002/verify.py\n---\n--- status ---\nA  docs/research-program/handoffs/PR-002.json\nA  evaluation/research-program/coho\u2026"
+    },
+    {
+      "source_line": 1611,
+      "at": "2026-09-10T17:46:51.041Z",
+      "tool_call_id": "call-46128106-05b1-4636-95b2-b19db97737e9-71",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: git commit -m \"$(cat <<'EOF'\ndocs(research): define cohort identities (PR-002 C-002-1)\nEOF\n)\"\npython3 -c \"\nimport subprocess\nhead=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()\nparent=subprocess.check_output(['git','rev-parse','HEAD^'],text=True).strip()\ntree=subprocess.check_output(['git','rev-parse','HEAD^{tree}'],text=True).strip()\nprint('head', head)\nprint('parent', parent)\nprint('tree', tree)\n\"\ngit log -1 --format='%H%n%P%n%s%n%an <%ae>'\ngit status --short\ngit diff --name-only HEAD~1..HEAD\ngit rev-parse HEAD\ngit cat-file -p HEAD | head -20"
+    },
+    {
+      "source_line": 1615,
+      "at": "2026-09-10T17:46:51.043Z",
+      "tool_call_id": "call-46128106-05b1-4636-95b2-b19db97737e9-71",
+      "tag": "tool_call_update",
+      "status": "failed",
+      "command_or_bounded_result": "tool call (failed): Tool `run_terminal_command` failed: Terminal error: IO Error: Internal error: {\n  \"details\": \"spawn ENAMETOOLONG\"\n}"
+    },
+    {
+      "source_line": 1656,
+      "at": "2026-09-10T17:46:54.001Z",
+      "tool_call_id": "call-5b696172-c17f-4745-9ea3-52e3a4511240-72",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: git status --short\ngit log -1 --oneline\ngit diff --cached --name-only"
+    },
+    {
+      "source_line": 1664,
+      "at": "2026-09-10T17:46:54.158Z",
+      "tool_call_id": "call-5b696172-c17f-4745-9ea3-52e3a4511240-72",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): A  docs/research-program/handoffs/PR-002.json\nA  evaluation/research-program/cohorts.json\nA  verification/research-program/pr-002/build.py\nA  verification/research-program/pr-002/c1-build-receipt.json\nA  verification/research-program/pr-002/c1-verify-receipt.json\nA  verification/research-program/pr-002/c1_lib.py\nA  verification/research-program/pr-002/product_catalog.py\nA  verification/research-program/pr-002/verify.py\n?? verification/research-program/pr-002/__pycache__/\n83f7d1b Record Grok coh\u2026"
+    },
+    {
+      "source_line": 1735,
+      "at": "2026-09-10T17:46:58.425Z",
+      "tool_call_id": "call-f24b6107-2384-434b-a9be-72b10a3107a2-73",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: rm -rf verification/research-program/pr-002/__pycache__\ngit commit -m \"docs(research): define cohort identities (PR-002 C-002-1)\""
+    },
+    {
+      "source_line": 1743,
+      "at": "2026-09-10T17:46:58.602Z",
+      "tool_call_id": "call-f24b6107-2384-434b-a9be-72b10a3107a2-73",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): [codex/ce-ushso-pr002-c1-recovery--grok-c1-recovery-7c8a9fe5dfc7-d648775d 44506be] docs(research): define cohort identities (PR-002 C-002-1)\n 8 files changed, 52381 insertions(+)\n create mode 100644 docs/research-program/handoffs/PR-002.json\n create mode 100644 evaluation/research-program/cohorts.json\n create mode 100644 verification/research-program/pr-002/build.py\n create mode 100644 verification/research-program/pr-002/c1-build-receipt.json\n create mode 100644 verification/research-program/p\u2026"
+    },
+    {
+      "source_line": 1785,
+      "at": "2026-09-10T17:47:02.880Z",
+      "tool_call_id": "call-1c158f29-84bd-481c-87d8-a314cde7561b-74",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: git rev-parse HEAD\ngit rev-parse HEAD^\ngit log -1 --format='%H %P %T %s'\ngit status --short\ngit diff --name-only HEAD^ HEAD\npython3 -c \"import hashlib,pathlib,subprocess,json; head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(); tree=subprocess.check_output(['git','log','-1','--format=%T'],text=True).strip(); print('head',head); print('tree',tree); print('parent',subprocess.check_output(['git','log','-1','--format=%P'],text=True).strip())\""
+    },
+    {
+      "source_line": 1789,
+      "at": "2026-09-10T17:47:02.884Z",
+      "tool_call_id": "call-1c158f29-84bd-481c-87d8-a314cde7561b-74",
+      "tag": "tool_call_update",
+      "status": "failed",
+      "command_or_bounded_result": "tool call (failed): Tool `run_terminal_command` failed: Terminal error: IO Error: Internal error: {\n  \"details\": \"spawn ENAMETOOLONG\"\n}"
+    },
+    {
+      "source_line": 1830,
+      "at": "2026-09-10T17:47:15.609Z",
+      "tool_call_id": "call-59249ccb-ffab-46f4-b9fb-6167675579c4-75",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: git log -1 --format='%H %P %T %s'"
+    },
+    {
+      "source_line": 1838,
+      "at": "2026-09-10T17:47:15.782Z",
+      "tool_call_id": "call-59249ccb-ffab-46f4-b9fb-6167675579c4-75",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): 44506be8052e1054641048de68893fc41526b664 83f7d1bad39acb6a7eede95a404179c511296efa e7b12a01b49ab66c5f5205f3b14407da30804e46 docs(research): define cohort identities (PR-002 C-002-1)"
+    },
+    {
+      "source_line": 1865,
+      "at": "2026-09-10T17:47:19.704Z",
+      "tool_call_id": "call-5dd34fd3-96bd-4132-b90c-7f16106b69c8-76",
+      "tag": "tool_call",
+      "status": null,
+      "command_or_bounded_result": "run_terminal_command: git status --short\ngit show --stat --oneline HEAD"
+    },
+    {
+      "source_line": 1873,
+      "at": "2026-09-10T17:47:19.870Z",
+      "tool_call_id": "call-5dd34fd3-96bd-4132-b90c-7f16106b69c8-76",
+      "tag": "tool_call_update",
+      "status": "completed",
+      "command_or_bounded_result": "tool call (completed): 44506be docs(research): define cohort identities (PR-002 C-002-1)\n docs/research-program/handoffs/PR-002.json         |   252 +\n evaluation/research-program/cohorts.json           | 50105 +++++++++++++++++++\n verification/research-program/pr-002/build.py      |    56 +\n .../research-program/pr-002/c1-build-receipt.json  |    31 +\n .../research-program/pr-002/c1-verify-receipt.json |    81 +\n verification/research-program/pr-002/c1_lib.py     |   329 +\n .../research-program/pr-002/product_catalo\u2026"
+    }
+  ],
+  "terminal_cleanup": [
+    {
+      "at": "2026-09-10T17:47:36.329Z",
+      "type": "terminal",
+      "status": "completed",
+      "stop_reason": "end_turn"
+    },
+    {
+      "at": "2026-09-10T17:47:36.330Z",
+      "type": "cleanup",
+      "status": "pending",
+      "acp_close": "closed",
+      "wtb_handoff": "not_applicable"
+    },
+    {
+      "at": "2026-09-10T17:47:37.886Z",
+      "type": "cleanup",
+      "status": "pending",
+      "acp_close": "closed",
+      "wtb_handoff": "recorded"
+    },
+    {
+      "at": "2026-09-10T17:47:39.176Z",
+      "type": "cleanup",
+      "status": "normal",
+      "boundary": "inactive_empty",
+      "lock": "unlocked",
+      "code": null
+    }
+  ]
+}
