@@ -1,0 +1,285 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-038",
+  "status": "producer_checked",
+  "owner": "/root/pr038_relevance",
+  "reviewer": "Astra/root",
+  "base_sha": "ae6a06748978476bbec5c4c7131864d206ee8138",
+  "head_sha": "94cf19d05862ef200665b2c23616707bd3017b34",
+  "dependency_merge_shas": {
+    "PR-031": "3b2d681103d80d571d44cd3e364a4327f8e046a9",
+    "PR-032": "6fe431f855c2bb65c97cdb0526ef8ed54ea6a74a",
+    "PR-037": "ac2dcebbead2498f6df77f503d5484b81da8319f"
+  },
+  "branch": "codex/ushso-pr038-relevance-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/relevance.mjs",
+    "evaluation/research-program/relevance/",
+    "tests/research-program/relevance.test.mjs",
+    "docs/research-program/relevance.md",
+    "verification/research-program/pr-038/",
+    "docs/research-program/handoffs/PR-038.json"
+  ],
+  "problem": "An explicit without-Census filter could fail to exclude Census sources, or could exclude unrelated records that merely mention the word census. Maternal mortality could promote infant mortality as the leading compatible result. Title-only answers could be treated as scientific matches. PSI could stand in for readmissions, quality stars for provider relief, and enforcement actions for rate filings. A later observation year could silently satisfy a requested year. The nonsense-plus-Pennsylvania query could return geography-only hits. Held-out labels could leak into ranking. Editing fingerprint-sealed question-parser.mjs or retrieval-core-v1.2.mjs would break retrieval algorithm fingerprints and subject-shortcircuit byte-parity.",
+  "resulting_behavior": "Relevance policy lives in packages/enrichment/relevance.mjs with fixtures under evaluation/research-program/relevance/. Near-miss fixtures identify forbidden, uncertain and contextual matches; no test expects a title-only answer. An explicit without-Census filter excludes Census by source identity, not the word census in unrelated prose. Maternal mortality does not promote infant data as the leading compatible result. Ranking reasons agree with actual filters. The nonsense-plus-Pennsylvania query remains a scoped zero. Held-out reviewer labels are unused. Fingerprint-sealed packages/retrieval/tools/question-parser.mjs (10068 bytes), retrieval-core-v1.2.mjs (48161 bytes) and controlled-vocabulary.json (11268 bytes) are unchanged.",
+  "commits": [
+    {
+      "id": "C-038-1",
+      "subject": "Add scientific near-miss fixtures",
+      "sha": "101f0d55f0cfae43e85371bedded8f1681c2e16e"
+    },
+    {
+      "id": "C-038-2",
+      "subject": "Refine deterministic intent and ranking",
+      "sha": "101f0d55f0cfae43e85371bedded8f1681c2e16e"
+    },
+    {
+      "id": "C-038-3",
+      "subject": "Preserve explanations and bounded zero results",
+      "sha": "94cf19d05862ef200665b2c23616707bd3017b34"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "relevance",
+      "id": "packages/enrichment/relevance.mjs",
+      "location": "local",
+      "sha256": "e751cca717512846f00f8cfad6ea2508e006ed239a7cf648d3ec351fa8cd7d53"
+    },
+    {
+      "kind": "relevance-fixtures",
+      "id": "evaluation/research-program/relevance/near-misses.json",
+      "location": "local",
+      "sha256": "c296a400036c9bcee63d7a71fb99587ed657f44161c1737981e68172ec97b1de"
+    },
+    {
+      "kind": "relevance-tests",
+      "id": "tests/research-program/relevance.test.mjs",
+      "location": "local",
+      "sha256": "931fdb458d43aa6b349bd13f72b55b8a9635dcc9a22d6466334225e344822396"
+    },
+    {
+      "kind": "relevance-docs",
+      "id": "docs/research-program/relevance.md",
+      "location": "local",
+      "sha256": "e78efcdecb547221ff0b5d7715b7fde28d94824eafbf4ce62e9518a623511f72"
+    },
+    {
+      "kind": "fingerprint-sealed-question-parser-unchanged",
+      "id": "packages/retrieval/tools/question-parser.mjs",
+      "location": "local",
+      "sha256": "736a5d9e57ca7e572954a59f8fd6e06d82a8d186e95ef69ea090224b95ae38e8"
+    },
+    {
+      "kind": "retrieval-core-v12-unchanged",
+      "id": "packages/retrieval/tools/retrieval-core-v1.2.mjs",
+      "location": "local",
+      "sha256": "b42ef12b6efda9e10c02f8b8ef4589fb7c2bcfd1f77e38c321b15081c220d23a"
+    },
+    {
+      "kind": "controlled-vocabulary-unchanged",
+      "id": "packages/retrieval/fixtures/controlled-vocabulary.json",
+      "location": "local",
+      "sha256": "e3cf00dc343b74428948276c0206a05f35ea06c0ea61788019ce727bb4720642"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c038-focused",
+      "command": "node --test tests/research-program/relevance.test.mjs",
+      "started_at": "2026-09-14T12:42:39.460127Z",
+      "completed_at": "2026-09-14T12:42:39.557517Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 relevance tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c038-focused-event",
+        "path": "verification/research-program/pr-038/producer-20260914/commands/focused-relevance/event.json",
+        "sha256": "938d59210cae0ec229838988f81adc39ee429c5ef7494e3efc70cd49bc6b279e",
+        "bytes": 1037
+      }
+    },
+    {
+      "id": "cmd-c038-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T12:42:39.557852Z",
+      "completed_at": "2026-09-14T12:42:39.613028Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c038-identity-event",
+        "path": "verification/research-program/pr-038/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "7a7e99ba1e3ea3765cc73b934452b44c1436f5532d4f99d3b2ab2b7d92831a03",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr038-artifact-0",
+      "path": "verification/research-program/pr-038/task-binding.json",
+      "bytes": 3872,
+      "sha256": "71fa9f5e422c1c9793272f8eeb5a041005f1c8d2859cf1a66db211f5d028e498"
+    },
+    {
+      "id": "pr038-artifact-1",
+      "path": "verification/research-program/pr-038/dispatch.json",
+      "bytes": 2786,
+      "sha256": "d4554ca83ed017c559f5d80b53c1e2e1f3ba8a94b12e00cb01c22b053e5c63c1"
+    },
+    {
+      "id": "pr038-artifact-2",
+      "path": "verification/research-program/pr-038/producer-20260914/commands/focused-relevance/receipt.json",
+      "bytes": 457,
+      "sha256": "29dcc987fd179bf1c8f3722dc14c003ff9a08285f5d8d1768b7a3759e5bdc3b8"
+    },
+    {
+      "id": "pr038-artifact-3",
+      "path": "verification/research-program/pr-038/producer-20260914/commands/focused-relevance/stdout.log",
+      "bytes": 517,
+      "sha256": "74b4b7cd3553836f4b3356bac1c232ec4748efb99798177429abca9cbb0cf2de"
+    },
+    {
+      "id": "pr038-artifact-4",
+      "path": "verification/research-program/pr-038/producer-20260914/commands/focused-relevance/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr038-artifact-5",
+      "path": "verification/research-program/pr-038/producer-20260914/commands/focused-relevance/event.json",
+      "bytes": 1037,
+      "sha256": "938d59210cae0ec229838988f81adc39ee429c5ef7494e3efc70cd49bc6b279e"
+    },
+    {
+      "id": "pr038-artifact-6",
+      "path": "verification/research-program/pr-038/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "ee6597ad38d8214985643a37a575ab4b20ac106d6b5ff92a56c307ce3745150a"
+    },
+    {
+      "id": "pr038-artifact-7",
+      "path": "verification/research-program/pr-038/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr038-artifact-8",
+      "path": "verification/research-program/pr-038/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr038-artifact-9",
+      "path": "verification/research-program/pr-038/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "7a7e99ba1e3ea3765cc73b934452b44c1436f5532d4f99d3b2ab2b7d92831a03"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-038-1",
+      "status": "producer_checked",
+      "result": "Fixtures identify forbidden, uncertain and contextual matches. No test expects a title-only answer.",
+      "command_ids": [
+        "cmd-c038-focused"
+      ]
+    },
+    {
+      "id": "C-038-2",
+      "status": "producer_checked",
+      "result": "An explicit without-Census filter excludes Census by source identity. Maternal mortality does not promote infant data.",
+      "command_ids": [
+        "cmd-c038-focused"
+      ]
+    },
+    {
+      "id": "C-038-3",
+      "status": "producer_checked",
+      "result": "The nonsense-plus-Pennsylvania query remains a scoped zero. Ranking reasons agree with actual filters. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c038-focused",
+        "cmd-c038-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "fingerprint-sealed-question-parser",
+      "status": "accepted",
+      "detail": "packages/retrieval/tools/question-parser.mjs was not edited (10068 bytes)."
+    },
+    {
+      "id": "retrieval-core-v12-byte-parity",
+      "status": "accepted",
+      "detail": "packages/retrieval/tools/retrieval-core-v1.2.mjs was not edited (48161 bytes). Live ranking remains unchanged; scientific near-miss policy is implemented in enrichment."
+    },
+    {
+      "id": "controlled-vocabulary",
+      "status": "accepted",
+      "detail": "packages/retrieval/fixtures/controlled-vocabulary.json was not edited (11268 bytes)."
+    },
+    {
+      "id": "held-out-labels",
+      "status": "accepted",
+      "detail": "packages/retrieval/fixtures/relevance-review.v1.0.0.json was not used for ranking."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Relevance modeling is not R07 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-relevance-review",
+      "status": "pending",
+      "detail": "Independent review of Census exclusions, maternal/infant non-promotion and scoped zeros remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "ledger-owned-paths-named-sealed-packages",
+      "status": "risk",
+      "detail": "The original ledger named packages/retrieval/tools/question-parser.mjs, retrieval-core-v1.2.mjs and controlled-vocabulary.json. Implementation is in enrichment plus evaluation/research-program/relevance/ to preserve retrieval algorithm fingerprints and subject-shortcircuit byte-parity."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of Census exclusions, maternal/infant non-promotion and scoped zeros, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-038 source and replay focused relevance and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

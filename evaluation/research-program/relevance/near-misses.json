@@ -1,0 +1,183 @@
+{
+  "format": "ushso.relevance-fixtures.v1",
+  "generation": "live-2026-09-03-85b50522b420",
+  "held_out_labels_used": false,
+  "cases": [
+    {
+      "case_id": "maternal-vs-infant-mortality",
+      "question": "maternal mortality rates",
+      "candidates": [
+        {
+          "record_id": "cdc-nvss-maternal-mortality",
+          "title": "Maternal Mortality Rates",
+          "description": "CDC NVSS maternal deaths per live births.",
+          "source_id": "cdc-nvss",
+          "measure": "maternal_mortality"
+        },
+        {
+          "record_id": "cdc-nvss-infant-mortality",
+          "title": "Infant Mortality Rates",
+          "description": "CDC NVSS infant deaths per live births.",
+          "source_id": "cdc-nvss",
+          "measure": "infant_mortality"
+        }
+      ],
+      "forbidden_leading": [
+        "cdc-nvss-infant-mortality"
+      ],
+      "expected": {
+        "leading": "cdc-nvss-maternal-mortality",
+        "infant_state": "forbidden"
+      }
+    },
+    {
+      "case_id": "readmissions-vs-psi",
+      "question": "hospital readmissions",
+      "candidates": [
+        {
+          "record_id": "cms-readmissions",
+          "title": "Hospital Readmissions Reduction",
+          "description": "CMS readmission rates for selected conditions.",
+          "source_id": "cms-hrrp",
+          "measure": "readmissions"
+        },
+        {
+          "record_id": "ahrq-psi",
+          "title": "Patient Safety Indicators",
+          "description": "AHRQ PSI composite including selected hospital harms.",
+          "source_id": "ahrq-qi",
+          "measure": "psi"
+        }
+      ],
+      "expected": {
+        "leading": "cms-readmissions",
+        "psi_state": "contextual"
+      }
+    },
+    {
+      "case_id": "provider-relief-vs-quality",
+      "question": "provider relief fund payments",
+      "candidates": [
+        {
+          "record_id": "hrsa-prf",
+          "title": "Provider Relief Fund payments",
+          "description": "HRSA PRF payment disclosures.",
+          "source_id": "hrsa-prf",
+          "measure": "relief_payments"
+        },
+        {
+          "record_id": "cms-star",
+          "title": "Hospital quality star ratings",
+          "description": "CMS overall hospital quality stars.",
+          "source_id": "cms-quality",
+          "measure": "quality_stars"
+        }
+      ],
+      "expected": {
+        "leading": "hrsa-prf",
+        "quality_state": "forbidden"
+      }
+    },
+    {
+      "case_id": "insurer-rate-vs-enforcement",
+      "question": "insurer premium rate filings",
+      "candidates": [
+        {
+          "record_id": "cms-rate-review",
+          "title": "Health insurance rate review filings",
+          "description": "Proposed premium rate filings.",
+          "source_id": "cms-rate-review",
+          "measure": "premium_rates"
+        },
+        {
+          "record_id": "cms-mlr-enforcement",
+          "title": "MLR enforcement actions",
+          "description": "Medical loss ratio enforcement outcomes.",
+          "source_id": "cms-mlr",
+          "measure": "enforcement"
+        }
+      ],
+      "expected": {
+        "leading": "cms-rate-review",
+        "enforcement_state": "uncertain"
+      }
+    },
+    {
+      "case_id": "observation-period-mismatch",
+      "question": "hospital occupancy 2019",
+      "candidates": [
+        {
+          "record_id": "hcris-2019",
+          "title": "Hospital occupancy 2019",
+          "description": "HCRIS occupancy for fiscal 2019.",
+          "source_id": "cms-hcris",
+          "observation_year": 2019
+        },
+        {
+          "record_id": "hcris-2023",
+          "title": "Hospital occupancy",
+          "description": "HCRIS occupancy without requested year evidence.",
+          "source_id": "cms-hcris",
+          "observation_year": 2023
+        }
+      ],
+      "expected": {
+        "leading": "hcris-2019",
+        "later_state": "uncertain"
+      }
+    },
+    {
+      "case_id": "without-census",
+      "question": "county uninsured estimates without Census",
+      "candidates": [
+        {
+          "record_id": "census-sahie",
+          "title": "SAHIE uninsured estimates",
+          "description": "Census Small Area Health Insurance Estimates.",
+          "source_id": "census-sahie",
+          "publisher": "U.S. Census Bureau"
+        },
+        {
+          "record_id": "cdc-places",
+          "title": "PLACES uninsured adults",
+          "description": "CDC PLACES county uninsured adults.",
+          "source_id": "cdc-places",
+          "publisher": "CDC"
+        },
+        {
+          "record_id": "fac-census-note",
+          "title": "Federal Audit Clearinghouse",
+          "description": "Coverage is threshold-based and not a census of healthcare organizations.",
+          "source_id": "federal-audit-clearinghouse",
+          "publisher": "GSA"
+        }
+      ],
+      "expected": {
+        "excluded": [
+          "census-sahie"
+        ],
+        "retained": [
+          "cdc-places",
+          "fac-census-note"
+        ]
+      }
+    },
+    {
+      "case_id": "nonsense-pennsylvania",
+      "question": "Pennsylvania flibbertigibbet qzxwvu",
+      "candidates": [
+        {
+          "record_id": "pa-eddie",
+          "title": "Pennsylvania EDDIE portal",
+          "description": "Birth and death collections.",
+          "source_id": "pa-open-data",
+          "geography": "US-PA"
+        }
+      ],
+      "expected": {
+        "result_count": 0,
+        "state": "scoped_zero"
+      }
+    }
+  ]
+}
