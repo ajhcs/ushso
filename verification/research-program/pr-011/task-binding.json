@@ -1,0 +1,80 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr011-http-outcomes-20260914",
+  "slice_id": "C-011-1",
+  "pr_id": "PR-011",
+  "title": "Validate HTTP content and source access outcomes",
+  "owner": "/root/pr011_http_outcomes",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr011-http-outcomes-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr011-http-outcomes-20260914",
+  "objective": "Type normal source failures so HTTP 200 and reachability cannot contaminate metadata or become payload/API success. Persist sanitized latest-attempt/last-good evidence on the existing PR010 journal without a second store.",
+  "outcome": "Census Missing Key HTTP 200 HTML cannot be JSON success. EPA developer-directory 301 to Widgets cannot yield an actionable API recipe. Later typed failure updates latest_attempt while preserving same-kind last-good.",
+  "dependencies": [
+    "PR-009",
+    "PR-010",
+    "PR-087"
+  ],
+  "owned_paths": [
+    "packages/connectors/src/content-classifier.mjs",
+    "packages/connectors/src/bounded-http-client.mjs",
+    "packages/connectors/src/pinned-streaming-transport.mjs",
+    "scripts/research/document-integrity.mjs",
+    "tests/research-program/http-outcomes.test.mjs",
+    "packages/ingestion/src/local-collector-adapter.mjs",
+    "packages/ingestion/src/local-collection-store.mjs",
+    "verification/research-program/pr-011/",
+    "docs/research-program/handoffs/PR-011.json"
+  ],
+  "commits": [
+    {
+      "id": "C-011-1",
+      "subject": "Define content-aware response classification",
+      "instructions": "Extend existing classifier/client/transport. Separate authentication-required, unavailable, content-mismatch and transient failures. Validate final resource role against requested documentation/API/data role after redirects; retain requested URL, redirect chain and final destination. Use the pinned Census Missing Key and EPA Widgets retained observations.",
+      "verification": "Census HTTP 200 text/html Missing Key makes JSON success impossible. EPA requested data-data-products#apis resolving to /developers/widgets is destination_resource_role_mismatch; reachability is not an actionable recipe."
+    },
+    {
+      "id": "C-011-2",
+      "subject": "Enforce read and expansion bounds",
+      "instructions": "Apply time/byte/row/redirect caps before passing bytes to parsers; stop and preserve the reason when a limit is reached. Reuse source policy validation. Local fixtures only.",
+      "verification": "A source ignoring requested limits, an interrupted response and compressed data exceeding the expanded-byte cap fail closed with typed reasons."
+    },
+    {
+      "id": "C-011-3",
+      "subject": "Persist useful attempt evidence",
+      "instructions": "Add exact journal kind attempt_evidence to the existing LocalCollectionStore KINDS allowlist. Add recordAttemptEvidence and evidenceStatus on createLocalCollector. Derive latest_attempt/last_good from the one immutable stream and durable intent order. Keep documentation_reachability, payload_validation, browser_cors_observation and catalog_metadata_validation as separate series. Do not invent a second journal or in-memory authority.",
+      "verification": "A later same-kind failure updates latest_attempt and retains byte-identical last-good proof across process restart. Cross-kind success never supplies another kind's last-good. Current fixture admission remains one attempt per child for source_fixture_catalog."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/http-outcomes.test.mjs",
+    "node --test tests/research-program/job-lifecycle.test.mjs",
+    "node --test packages/connectors/tests/contracts.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-011.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-011/",
+  "binding": {
+    "base_sha": "0f54db33f7893388645f0b1740343b0801b69000",
+    "base_tree": "30d788e9583fd6a4a267b4732c5f9103fe715326",
+    "dependency_merge_shas": {
+      "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+      "PR-010": "f109bdef60c7cd711f8442e820c6c4c06d120776",
+      "PR-087": "f109bdef60c7cd711f8442e820c6c4c06d120776"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}

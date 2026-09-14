@@ -1,0 +1,44 @@
+{
+  "recorded_at": "2026-09-12T18:13:55.600670+00:00",
+  "scope": "Read-only preparation; no PR011 implementation or dispatch. Actual accepted PR010/PR087 joint dependencies remain unavailable.",
+  "inspected_source_head": "1318cda5c76cd3262c7668fb7f56fab842876c6f",
+  "actual_component_origin": "e268652c5e92876a3540809595636c4795ebec6f",
+  "source_pins": [
+    {
+      "path": "packages/connectors/src/content-classifier.mjs",
+      "sha256": "d8090a7eb1889cdaa8af3d0a3b5d7b23ef1de6d60e5d4dc029fca4a5306979c9"
+    },
+    {
+      "path": "packages/connectors/src/bounded-http-client.mjs",
+      "sha256": "552d95a9b490ececde7fb77517b0991dc388b7a014359d9f755f2b29256b3eb4"
+    },
+    {
+      "path": "packages/connectors/src/pinned-streaming-transport.mjs",
+      "sha256": "f4b8cfdfce55fcfdd7e853d17c4992c474e16e2f646226e90c5ddebabb72ca08"
+    },
+    {
+      "path": "scripts/research/document-integrity.mjs",
+      "sha256": "1dccc8e50a8ac3bfaa613adc40bb813abe7040c4f101c860a4848b118a8d0408"
+    },
+    {
+      "path": "packages/ingestion/src/local-collector-adapter.mjs",
+      "sha256": "e88fba008b558c62f6380f47b828566a0ddb4b16f53f2b210f7d6f4d52547f01"
+    },
+    {
+      "path": "packages/ingestion/src/local-collection-store.mjs",
+      "sha256": "ba58fc8ba262d252c5ba88ee0d7b86856117360a27e184ce014cd8d6275c9d8a"
+    },
+    {
+      "path": "packages/ingestion/src/collection-job.mjs",
+      "sha256": "bd73171b3781413c0a5e5cd9f5c143bbdd5e73471a212afda14dbce6f5ca22d9"
+    }
+  ],
+  "observations": [
+    "classifyResponse already checks MIME, fatal UTF8, HTML/login/challenge indicators, schema/profile and structural/cardinality limits. PR011 should extend these actual ports and preserve metadata-only boundaries.",
+    "BoundedHttpClient already classifies status failures, records redacted redirect/failure ledger events and returns typed failures with null capture/body. It currently omits a rich sanitized per-attempt observation result. Its strict metadataFetch records should not receive arbitrary extra fields.",
+    "LocalCollector settle stores immutable attempt_outcome for each child with attempt:1; replay requires exact complete/failure/unresolved shape. status/inspect expose per-child outcomes. There is no declared durable latest-attempt/last-good observation API.",
+    "The existing durable store and adapter replay must remain the authority; a second journal or an in-memory map would not satisfy persistence. Extending the adapter/replay for bounded attempt evidence may require its exact path in a narrow PR011 ownership amendment before implementation.",
+    "Original five PR011 behavior/test paths remain adopted. Do not infer authorization to alter ingestion ownership or released contracts from broad task evidence ownership. Document reachability, payload validation and browser/CORS evidence must remain separate kinds and must not promote actionable recipes from reachability alone."
+  ],
+  "next_review": "Determine the minimum actual public/internal port seam and field model needed for durable attempt evidence, including restart/latest-failure/prior-success/cross-kind invariants, without inventing exports or replacing existing persistence. This is a proposal question, not an approved API."
+}

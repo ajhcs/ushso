@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-14T00:55:32.999620Z",
+  "updated_at": "2026-09-14T01:10:37.782241Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "dac28833f472624d09f6ec678d49ad9e9c4884c68662806d17a11655693cb85d",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -2149,7 +2149,7 @@
         "verification/research-program/bootstrap/pr009-scope-20260911/operating-inputs.json",
         "verification/research-program/bootstrap/pr009-scope-20260911/census-negative/manifest.json"
       ],
-      "next_action": "Controller adopts exact PR010 resolver, local fixture persistence and CLI interface contracts; then bind actual accepted dependency identities against the live ledger before bounded dispatch.",
+      "next_action": "PR009 engineering remains integrated at 80996a8. A separate PR-011 consumer continuation is adopted without reopening C-009-2/C-009-3 source. C0091 remains unresolved.",
       "scope_independent_review": "verification/research-program/bootstrap/pr009-scope-independent-review-12e8876/index.json",
       "dispatch_input_actions": [
         "Bind exact target Census fixture filenames, gzip and decoded hashes."
@@ -2247,7 +2247,7 @@
         "sha256": "e5e10ca6b28eb8403525e838424c72c750c655ca4a12b5bfec76f4a2227f5494",
         "bytes": 4191
       },
-      "next_action": "PR010 component M010 e268652 is integrated through research-integration merge f109bdef. This is not PR011 readiness. C0091 remains unresolved.",
+      "next_action": "PR010 is integrated through f109bdef. PR-011 is bound to that group identity. This is not R acceptance or PR012 dispatch.",
       "scope_amendments": [
         {
           "path": "verification/research-program/bootstrap/pr010-cursor-interface-adoption-20260912/decision.json",
@@ -2260,20 +2260,26 @@
     },
     {
       "pr_id": "PR-011",
-      "status": "planned",
-      "owner": null,
+      "status": "ready",
+      "owner": "/root/pr011_http_outcomes",
       "dependencies": [
         "PR-009",
         "PR-010",
         "PR-087"
       ],
-      "dependency_merge_shas": {},
+      "dependency_merge_shas": {
+        "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+        "PR-010": "f109bdef60c7cd711f8442e820c6c4c06d120776",
+        "PR-087": "f109bdef60c7cd711f8442e820c6c4c06d120776"
+      },
       "owned_paths": [
         "packages/connectors/src/content-classifier.mjs",
         "packages/connectors/src/bounded-http-client.mjs",
         "packages/connectors/src/pinned-streaming-transport.mjs",
         "scripts/research/document-integrity.mjs",
         "tests/research-program/http-outcomes.test.mjs",
+        "packages/ingestion/src/local-collector-adapter.mjs",
+        "packages/ingestion/src/local-collection-store.mjs",
         "verification/research-program/pr-011/",
         "docs/research-program/handoffs/PR-011.json"
       ],
@@ -2284,14 +2290,9 @@
       "github_pr_url": null,
       "blockers": [
         {
-          "id": "PR011-ACCEPTED-CURRENT-GROUP",
-          "kind": "dependency",
-          "detail": "Actual accepted PR010 and PR087 group identities remain pending; component-only M010 is insufficient."
-        },
-        {
           "id": "PR011-DURABLE-ATTEMPT-INTERFACE",
-          "kind": "interface_scope",
-          "detail": "Require actual accepted PR010/PR087 group identities and independent review of exact durable failed-attempt interfaces. The five named behavior/test files are the current proposal; any necessary ingestion path/API needs a separate narrow ownership amendment before editing. Do not guess exports, add a second journal or claim memory durability."
+          "kind": "independent_review",
+          "detail": "Independent review of the exact durable failed-attempt interfaces remains required after producer implementation. Ownership amendment for the two ingestion paths is adopted; do not guess further exports."
         }
       ],
       "scope_proposals": {
@@ -2305,13 +2306,24 @@
           "prior_row_commit": "1e5342f4b0671c2e67f22bcf202bbb2c33b8ee0f",
           "prior_row_path": "verification/research-program/bootstrap/pr087-current-technical-adoption-20260912/history/pr011-ledger-row.json",
           "reason": "Current successor moves before PR011; original provisional sequence remains historical."
+        },
+        {
+          "recorded_at": "2026-09-14T01:10:37.782241Z",
+          "kind": "bind_accepted_group_and_two_path_amendment",
+          "prior_row": "verification/research-program/pr-011/scope-20260914/prior-pr011-ledger-row.json",
+          "group_merge": "f109bdef60c7cd711f8442e820c6c4c06d120776",
+          "proposal_sha256": "deb5c5688390cd17774830c345704772d4ff9d86733e1b00acff9b84146d92cc"
         }
       ],
       "current_scope_adoption": {
-        "path": "verification/research-program/bootstrap/pr087-current-technical-adoption-20260912/decision.json",
-        "sha256": "9de67d906c5277daa5bb49904cc9f00e027d08d6eacc62069a1d917c485ce645",
-        "bytes": 1739
-      }
+        "path": "verification/research-program/bootstrap/pr011-dispatch-20260914/decision.json"
+      },
+      "base_sha": "0f54db33f7893388645f0b1740343b0801b69000",
+      "base_tree": "30d788e9583fd6a4a267b4732c5f9103fe715326",
+      "task_id": "ushso-pr011-http-outcomes-20260914",
+      "branch": "codex/ushso-pr011-http-outcomes-20260914",
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr011-http-outcomes-20260914",
+      "next_action": "Create isolated PR-011 worktree from this bound head and implement C-011-1/2/3. Independent review of exact durable failed-attempt interfaces remains required before integration."
     },
     {
       "pr_id": "PR-012",
@@ -4448,7 +4460,7 @@
         "sha256": "9de67d906c5277daa5bb49904cc9f00e027d08d6eacc62069a1d917c485ce645",
         "bytes": 1739
       },
-      "next_action": "PR087 H087/P087 is integrated through research-integration merge f109bdef. Current WP5 subjects remain unapproved. This is not PR011 readiness or R acceptance.",
+      "next_action": "PR087 is integrated through f109bdef. PR-011 is bound to that group identity. Current WP5 subjects remain unapproved.",
       "branch": "codex/ushso-pr087-current-wp5-20260912",
       "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/.ushso-pr010-component-assembly-20260912-worktrees/ushso-pr087-current-wp5-20260912",
       "base_sha": "e268652c5e92876a3540809595636c4795ebec6f",

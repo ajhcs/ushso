@@ -1,0 +1,164 @@
+{
+  "format": "ushso.pr011-durable-attempt-port-scope-proposal.v1",
+  "status": "proposed_for_controller_review_not_adopted_or_dispatched",
+  "recorded_at": "2026-09-12T18:20:14.616314+00:00",
+  "actual_component_origin": "e268652c5e92876a3540809595636c4795ebec6f",
+  "inspected_source_head": "1318cda5c76cd3262c7668fb7f56fab842876c6f",
+  "future_PR011_accepted_base": null,
+  "root_observations": {
+    "path": "/mnt/d/tmp/plumbob/ushso-epic-execution-20260912/pr011-scope-readiness/current-port-review/root-observations.json",
+    "sha256": "fee3e0afc479c48eef4a1b045a903c60b15b02db1bcfd084447b80e8f638ef5a"
+  },
+  "current_adopted_dependencies": [
+    "PR-009",
+    "PR-010",
+    "PR-087"
+  ],
+  "minimum_additional_owned_paths": [
+    {
+      "path": "packages/ingestion/src/local-collector-adapter.mjs",
+      "purpose": "Add the strict sanitized observation reducer/writer and read-only latest-attempt/last-good projection, extending the existing replay authority and shared lifecycle fencing."
+    },
+    {
+      "path": "packages/ingestion/src/local-collection-store.mjs",
+      "purpose": "Add one explicitly named local journal kind for typed attempt evidence to the closed KINDS allowlist. Preserve the existing journal envelope, codec, object bounds, sequence/hash chain, exclusive commit, shared poison and OS lock."
+    }
+  ],
+  "already_owned_paths": [
+    "packages/connectors/src/content-classifier.mjs",
+    "packages/connectors/src/bounded-http-client.mjs",
+    "packages/connectors/src/pinned-streaming-transport.mjs",
+    "scripts/research/document-integrity.mjs",
+    "tests/research-program/http-outcomes.test.mjs",
+    "verification/research-program/pr-011/",
+    "docs/research-program/handoffs/PR-011.json"
+  ],
+  "why_two_additions": [
+    "LocalCollectionStore.appendUnlocked currently rejects kinds outside its closed KINDS. Reusing request_ledger or attempt_outcome as an arbitrary generic bag would conflate their existing meanings and bypass strict replay requirements.",
+    "createLocalCollector has no durable public latest-attempt/last-good evidence API. Its private replay is the existing authority and must validate the new observation kind instead of a second persistence layer.",
+    "The existing owned http-outcomes.test.mjs can exercise the real store/adapter, so no extra test path is needed. No collection-job, local-fixture-catalog, CLI, released schema, SQL or service path is proposed."
+  ],
+  "actual_existing_symbols": [
+    {
+      "path": "packages/ingestion/src/local-collector-adapter.mjs",
+      "symbol": "createLocalCollector",
+      "line": 194,
+      "existing_ports": [
+        "admit",
+        "schedule",
+        "execute",
+        "status",
+        "seedFixtureReuse",
+        "store",
+        "openDatabase",
+        "inspect",
+        "close"
+      ]
+    },
+    {
+      "path": "packages/ingestion/src/local-collector-adapter.mjs",
+      "symbol": "replay (private)",
+      "line": 403,
+      "role": "Rebuilds/validates state from the one LocalCollectionStore record stream; attempt_outcome is compared with exact complete/failure/unresolved projections."
+    },
+    {
+      "path": "packages/ingestion/src/local-collector-adapter.mjs",
+      "symbol": "executePage (private)",
+      "line": 896,
+      "role": "Durable request_intent -> response -> strict_outcome -> wrapper_outcome with unchanged full-query identity, bound delivery and crash recovery."
+    },
+    {
+      "path": "packages/ingestion/src/local-collector-adapter.mjs",
+      "symbol": "settle (private)",
+      "line": 1236,
+      "role": "One immutable outcome:<child> with attempt1; repeated execute returns that terminal. Do not reopen it or invent attempt2."
+    },
+    {
+      "path": "packages/ingestion/src/local-collection-store.mjs",
+      "symbol": "LocalCollectionStore.record / mutation / appendUnlocked",
+      "lines": [
+        583,
+        586,
+        531
+      ],
+      "role": "Existing exclusive fsync-backed append, idempotency conflict checks and mutation failure poison."
+    },
+    {
+      "path": "packages/connectors/src/bounded-http-client.mjs",
+      "symbol": "BoundedHttpClient.execute / #quarantine / #appendSuccessLedger",
+      "lines": [
+        149,
+        449,
+        474
+      ],
+      "role": "Already returns typed failures and writes redacted request-ledger outcomes; released metadataFetch remains strict. Rich observation is a separate result/port, not additional fields inside metadataFetch."
+    },
+    {
+      "path": "scripts/research/document-integrity.mjs",
+      "symbol": "verifyDocumentCache",
+      "line": 2,
+      "role": "Currently validates exact document URL, PDF/text digests and parser identity only; it is not an HTTP attempt registry or browser/payload verifier."
+    }
+  ],
+  "proposed_interface_not_existing": {
+    "internal_record_kind": "attempt_evidence (new exact local kind; name remains subject to controller adoption)",
+    "adapter_port": "A new bounded recordAttemptEvidence plus read-only evidenceStatus on the createLocalCollector result; these names are proposals, not present exports.",
+    "writer_authority": "An observation is accepted only from the composition-owned execution/fixture observation context after exact subject/intent or retained-artifact origin validation. Do not expose a caller-controlled status/approval upsert.",
+    "low_level_layering": "Pure connector classification/sanitization stays in currently owned connector files. The composition adapter persists it; connectors must not import ingestion or research orchestration.",
+    "result_location": "The bounded HTTP client may expose an additional sanitized attempt observation beside its strict metadataFetch result. No extras enter any released ingestion/receipt record.",
+    "read_projection": "Reconstruct the per-series history from immutable validated records on every open. In-memory indexes are disposable reducers, never authoritative storage.",
+    "record_proposal": {
+      "version": "new bounded local evidence payload version, separate from released record schemas",
+      "origin": "Exactly one of local_fixture_execution or retained_observation_fixture; retain the evidence basis and do not merge their series.",
+      "subject_key": "source identity + exact descriptor/config/schema role if resolved + logical record/route identity + evidence kind + origin class; unresolved retained source identities stay unresolved.",
+      "attempt_identity": "Execution lane derives child/execution/request IDs and attempt order from the existing durable intent. Retained-fixture lane requires a composition-pinned immutable artifact registry and explicit fixed fixture attempt identity; artifact hashes do not grant source authorization.",
+      "kind": "catalog_metadata_validation, documentation_reachability, payload_validation or browser_cors_observation; exact kind is part of all keys.",
+      "observation": "Bounded safe status/classification/detail-code, transmitted locator projection, observed HTTP status/media/byte accounting/redirect count and observed/recorded times. Unknown observations remain null/typed unavailable, distinct from observed zero. Persist digests/references, not body/header/credential/free-form error dumps.",
+      "proof": "References to preceding durable response/strict outcome/capture objects or the exact registered retained fixture; explicitly name validator/profile evidence. Never accept a bare success boolean.",
+      "activation": "publication_authorized:false, promotion_authorized:false, production_composition:false; no scientific or policy approval fields."
+    }
+  },
+  "kind_and_fixture_boundaries": [
+    "M010 admission still allows only source_fixture_catalog/catalog_metadata/full_membership and one attempt per child. Do not widen admission, routes, payload access or browser execution for this evidence feature.",
+    "A captured catalog response can advance only catalog_metadata_validation last-good. Metadata must not be labeled payload_validation merely because JSON parsing passed.",
+    "Documentation reachability means an observed document response matching the declared role; HTTP200 alone and EPA redirects to an unrelated Widgets page do not satisfy it. Browser/CORS needs actual browser-specific evidence; server-side HTTP response headers cannot imply it.",
+    "Payload validation requires the explicitly named payload contract and compatible authorization/evidence basis. In the current metadata-only execution lane, payload/browser capabilities remain typed unavailable or unresolved; this proposal adds no executor for them.",
+    "Census/EPA retained fixtures remain offline, historical and source-context-unresolved as originally recorded. Do not register their original remote URLs as approved local collection routes or rename them source_fixture_catalog.",
+    "If durable retained-fixture ingestion is desired, the adapter needs an explicit composition-owned fixture observation registry pinned into its runtime/header context, built from the already owned document-integrity/test composition. This is a proposed interface, not an existing export. If implementing it requires changing the fixed fixture catalog or admission files, stop for another exact ownership decision rather than silently expanding this two-path proposal."
+  ],
+  "latest_attempt_and_last_good": [
+    "Define a series with exact subject identity, validation profile, evidence kind and origin class. Never aggregate across documentation/payload/browser/catalog kinds, sources, schema roles or changed configurations.",
+    "Use the durable intent order for execution attempts, not response arrival order or caller-supplied timestamps. latest_attempt is the greatest committed attempt identity/order in that series; a late completion of an older attempt cannot regress it.",
+    "last_good is the greatest qualified success in the same series with exact proof references. A later typed failure, block, unavailable, unknown delivery or negative-content result updates latest_attempt but retains that prior success and its original capture clock/digest.",
+    "A304 can reference the existing same-kind/identity last-good evidence with its old provenance; it is not a new body or a new approval. No prior qualified same-kind evidence means no last-good value.",
+    "No cross-child retry machinery is introduced: later fixture refreshes use independently admitted child identities/scheduled slots, while an existing child terminal remains immutable attempt1. PR012 retry/reconciliation scope stays separate.",
+    "A crash after unknown delivery has a durable intent but no proved response; latest-attempt remains partial_unresolved/unknown, never successful or silently retried. A stored response can be reclassified/replayed without another delivery.",
+    "Prefer one append whose immutable result contains the validated attempt projection and any derived same-series last-good reference, or derive both solely on read. Do not maintain two separately committed mutable latest/good records."
+  ],
+  "decisive_future_checks": [
+    "Fresh process1 records proven same-kind success; process2 records a failed later fixture attempt; process3 sees latest failure and byte-identical original last-good proof. Repeat across crash boundaries.",
+    "Cross-kind negative matrix: document success cannot supply payload/browser last-good; catalog success cannot supply payload; older success and latest failure from another source/config/profile/origin never join.",
+    "Census HTTP200 HTML expecting JSON remains typed unexpected content. EPA observed301->200 unrelated role fails with real recorded redirect count/final locator; matching-role document fixture is a positive control. Neither becomes payload/browser proof.",
+    "Unknown original redirect counts, omitted original query and absent status/bytes stay unknown, not fabricated zeros. Locator projection removes secrets/userinfo/query/fragment without changing existing query-sensitive request identity.",
+    "SIGKILL before intent, after intent/no response, after durable response and before/after evidence append: no lost committed evidence, no duplicate delivery, exact idempotent resume, no false last-good promotion.",
+    "Rehash a journal with changed kind/source/request/profile/proof reference, status, last-good link or attempt order; semantic replay rejects despite internally valid hash chain.",
+    "Storage failure poisons all shared clients. Late callback after cancel/timeout/close cannot append evidence or overwrite a newer projection. Two writers and bound object/record sizes retain existing controls.",
+    "304 reuse keeps prior same-kind provenance and rejects absent, foreign or wrong-kind prior evidence; no new body/capture claimed.",
+    "Duplicate exact observation is idempotent; same operation ID with altered safe content fails. Sparse/extra/accessor fields and unsanitized errors/headers/secrets fail before append.",
+    "Current fixture CLI/admission/current41 lifecycle behavior remains unchanged; live/public/managed/browser/payload execution and promotion remain disabled."
+  ],
+  "controller_conditions_before_implementation": [
+    "Accept the exact PR010+PR087+PR086 joint composition with independent review, local gate and hosted CI; use actual accepted identities in the live PR011 binding.",
+    "Adopt a separate PR011 engineering continuation for PR009 APIs while retaining C0091 unresolved; the existing PR009 continuation names PR010 only.",
+    "Approve the exact two ingestion paths and the finalized observation context/identity/kind contracts; the existing broad task evidence directory does not grant ingestion ownership.",
+    "Pin actual accepted PR087 semantic inventory and current-technical behavior. Subsequent owned PR011 source changes must change the current unapproved technical subject; no historical acceptance transfers.",
+    "No plan/ledger/handoff/binding/source changes or PR011 dispatch are made by this proposal."
+  ],
+  "source_provenance_note": "The old SCOPE.md is retained historical preparation and contains a superseded PR011-before-PR087 graph. This proposal uses the actual adopted plan: PR011 depends009/010/087. It does not rewrite that historical note.",
+  "tests_executed": [],
+  "repository_writes": false,
+  "second_journal": false,
+  "source_jobs_network_or_production": false,
+  "acceptance_or_dispatch": false,
+  "released_schema_widening": false
+}
