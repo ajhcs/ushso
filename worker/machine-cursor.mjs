@@ -3,6 +3,9 @@ import { canonicalJson, snapshotDigest } from '../packages/machine-toolkit/src/j
 const TTL_MS = 15 * 60 * 1000;
 const encoder = new TextEncoder();
 const fail = () => { throw new Error('MACHINE_CURSOR_RESTART_REQUIRED'); };
+// Cursor bindings include capability, generation, manifest and the remainder of the
+// query. A foreign tool, collection, or snapshot therefore cannot continue; callers
+// must restart without the cursor instead of silently beginning a new generation.
 function encode(bytes) {
   return btoa(String.fromCharCode(...bytes)).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
 }
