@@ -1,0 +1,73 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr012-source-budget-20260914",
+  "slice_id": "C-012-1",
+  "pr_id": "PR-012",
+  "title": "Enforce source quotas, retries and resumable scheduling",
+  "owner": "/root/pr012_source_budget",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr012-source-budget-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr012-source-budget-20260914",
+  "objective": "Thousands of checks respect publisher limits and survive retries without unbounded queues or double-spending the last reservation.",
+  "outcome": "Budget exhaustion is an explicit incomplete run. Concurrent workers cannot both spend the last reservation. Cancellation releases only unused reservations. Transient 429/5xx/timeout retries are bounded with Retry-After. Credential/parser/scientific ambiguity is not blindly retried. Resumed runs emit a denominator report and cannot overwrite a newer capture.",
+  "dependencies": [
+    "PR-010",
+    "PR-011"
+  ],
+  "owned_paths": [
+    "packages/ingestion/",
+    "services/scheduler-worker/",
+    "tests/research-program/source-budget.test.mjs",
+    "verification/research-program/pr-012/",
+    "docs/research-program/handoffs/PR-012.json"
+  ],
+  "commits": [
+    {
+      "id": "C-012-1",
+      "subject": "Reserve source request budgets",
+      "instructions": "Add per-host concurrency and daily request/byte reservations with UTC periods and a source-specific override table. Reuse the durable lease store.",
+      "verification": "Concurrent workers cannot both spend the last reservation; cancellation releases only unused reservations."
+    },
+    {
+      "id": "C-012-2",
+      "subject": "Classify and schedule retries",
+      "instructions": "Retry documented transient timeouts/429/5xx with bounded attempts and Retry-After. Route credential, parser and scientific ambiguity to specific queues without blind retries.",
+      "verification": "Fixture traces show the exact maximum request count and delay schedule for each outcome."
+    },
+    {
+      "id": "C-012-3",
+      "subject": "Reconcile resumed source runs",
+      "instructions": "Track completed, waiting, failed and skipped records with source-generation pins. Emit a denominator report after a restart or partial run.",
+      "verification": "Repeated completion/retry messages remain idempotent; a newer source capture cannot be overwritten by an older resumed job."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/source-budget.test.mjs",
+    "node --test tests/research-program/job-lifecycle.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-012.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-012/",
+  "binding": {
+    "base_sha": "5483163eaa3627a42c5a7e3fc77627ed86aa272e",
+    "base_tree": "94e87668d31b540d0216c712e7251a51a3875f2c",
+    "dependency_merge_shas": {
+      "PR-010": "f109bdef60c7cd711f8442e820c6c4c06d120776",
+      "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
