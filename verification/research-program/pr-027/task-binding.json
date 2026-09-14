@@ -1,0 +1,77 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr027-enrichment-eval-20260914",
+  "slice_id": "C-027-1",
+  "pr_id": "PR-027",
+  "title": "Evaluate DeepSeek and Muse on held-out extraction tasks",
+  "owner": "/root/pr027_enrichment_eval",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr027-enrichment-eval-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr027-enrichment-eval-20260914",
+  "objective": "Model choice is based on correct accepted claims and review cost.",
+  "outcome": "Independently adjudicated labels include critical-error categories and reviewer disagreement. Model output is not its own gold standard. Offline harness works without credentials. A live attempt reports exact model/endpoint and total spend without calling the network. A model failing a task class is disabled for that class. Neither cheap tokens nor inter-model agreement overrides the \u22650.98 precision / zero critical-error gate. Evaluation is reproducible from retained inputs/outputs. A failed model gate leaves deterministic collection operational.",
+  "dependencies": [
+    "PR-002",
+    "PR-024",
+    "PR-026"
+  ],
+  "owned_paths": [
+    "evaluation/enrichment/",
+    "scripts/research-program/evaluate-enrichment.mjs",
+    "docs/research-program/model-selection.md",
+    "tests/research-program/evaluate-enrichment.test.mjs",
+    "verification/research-program/pr-027/",
+    "docs/research-program/handoffs/PR-027.json"
+  ],
+  "commits": [
+    {
+      "id": "C-027-1",
+      "subject": "Create independently adjudicated tasks",
+      "instructions": "Use representative CMS tables, CDC definitions, Census labels, units, date roles and deliberately insufficient evidence. Keep held-out labels outside implementer prompts.",
+      "verification": "Labels include critical-error categories and reviewer disagreement; model output is not its own gold standard."
+    },
+    {
+      "id": "C-027-2",
+      "subject": "Run paired bounded evaluation",
+      "instructions": "Compare the two exact model IDs with the same captured passages and output schema under a selected pilot budget. Save tokens, actual price, latency, abstentions and rejected claims.",
+      "verification": "Offline harness works without credentials; any live test reports exact model/endpoint and total spend."
+    },
+    {
+      "id": "C-027-3",
+      "subject": "Select the initial task-specific policy",
+      "instructions": "Report claim precision, useful coverage, critical errors and cost including review effort. Require \u22650.98 held-out precision and zero critical errors before routine publication eligibility.",
+      "verification": "A model failing a task class is disabled for that class; neither cheap tokens nor inter-model agreement overrides the gate."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/evaluate-enrichment.test.mjs",
+    "node --test tests/research-program/claim-validation.test.mjs",
+    "node scripts/research-program/evaluate-enrichment.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-027.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-027/",
+  "binding": {
+    "base_sha": "83e8193580f3fb16038e4f689d52f2d77367ea5d",
+    "base_tree": "50adfe1175c849c804c888f6f4bd5eaee05cb0bc",
+    "dependency_merge_shas": {
+      "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+      "PR-024": "467f4fbd91f54f1e0d7603162b510647591d2b63",
+      "PR-026": "d50de58bbb834d3924a3a223e14a3444a420611a"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
