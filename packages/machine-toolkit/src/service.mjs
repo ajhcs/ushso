@@ -1,3 +1,4 @@
+export { buildResearchPacket, validateResearchPacket } from '../../registry/research-packet.mjs';
 import { cloneJson, snapshotDigest } from './json.mjs';
 import { validateInput } from './input-validation.mjs';
 import { FALSE_TRUTH_BOUNDARY, assertOutputBound, validateCanonicalCore } from './safety.mjs';
