@@ -1,9 +1,8 @@
-import { LAST_GOOD_GENERATION } from '../coverage/research-program/v1.0.0/src/qualify-deterministic.mjs';
 import { HCRIS_HOSPITAL_COST_REPORT_ID } from './asset-context-collections.mjs';
 import { PHC4_PUBLIC_FINANCIAL_REPORTS_ID } from './comparison-dimensions.mjs';
 
 export const QUALIFIED_JOIN_ROUTES_VERSION = 'ushso.qualified-join-routes.v1';
-export { LAST_GOOD_GENERATION };
+export const LAST_GOOD_GENERATION = 'live-2026-09-03-85b50522b420';
 
 function freeze(value) {
   return Object.freeze(value);

@@ -1,12 +1,11 @@
 import { createHash } from 'node:crypto';
-import { LAST_GOOD_GENERATION } from '../coverage/research-program/v1.0.0/src/qualify-deterministic.mjs';
+export const LAST_GOOD_GENERATION = 'live-2026-09-03-85b50522b420';
 import { matchQualifiedRoute } from './qualified-access-routes.mjs';
 import { matchQualifiedVariableContext } from './qualified-variable-contexts.mjs';
 import { comparisonFact, documentedComparisonProfile } from './comparison-dimensions.mjs';
 import { inspectJoinRoutes } from './qualified-join-routes.mjs';
 
 export const RESEARCH_PACKET_FORMAT = 'ushso.research-evidence-packet.v1';
-export { LAST_GOOD_GENERATION };
 
 const SECRET_KEYS = freezeSet(['authorization', 'cookie', 'password', 'api_key', 'api_key_value', 'token', 'access_token', 'signed_url', 'presigned_url', 'credential', 'credentials']);
 
