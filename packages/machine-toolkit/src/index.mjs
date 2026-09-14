@@ -15,6 +15,17 @@ export { FALSE_TRUTH_BOUNDARY, prohibitedOutputIssues, validateCanonicalCore } f
 export { responseSchemaIssues } from './response-schema.mjs';
 export { assertCanonicalService, createDomainErrorCore, createMachineToolkit } from './service.mjs';
 export {
+  RECOVERY_EXAMPLES,
+  RECOVERY_GUIDANCE,
+  interpretClientEnvelope,
+  isCompletedResearchTask,
+  isNonretryableDomainCode,
+  isRetryableDomainCode,
+  recoveryGuidance,
+  restartRequiredForCode,
+  shouldRetryEnvelope
+} from './client-recovery.mjs';
+export {
   createWebMcpToolset,
   registerObservatoryToolkitWebMcp,
   registerObservatoryToolkitWebMcpCandidateForLocalVerification

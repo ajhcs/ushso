@@ -2,6 +2,7 @@ import { cloneJson, snapshotDigest } from './json.mjs';
 import { validateInput } from './input-validation.mjs';
 import { FALSE_TRUTH_BOUNDARY, assertOutputBound, validateCanonicalCore } from './safety.mjs';
 import { PUBLIC_CAPABILITY_FLAGS, TOOL_BY_CAPABILITY, TOOL_DEFINITIONS } from './manifest.mjs';
+import { recoveryGuidance, restartRequiredForCode } from './client-recovery.mjs';
 
 const METHOD_NAMES = Object.freeze(TOOL_DEFINITIONS.map((tool) => tool.serviceMethod));
 const STABLE_ID = /^[A-Za-z0-9][A-Za-z0-9._~:/-]{0,127}$/u;
@@ -51,9 +52,10 @@ function normalizeContext(context, now) {
 }
 
 function errorMessages(code) {
+  const recovered = recoveryGuidance(code);
+  if (recovered) return [recovered.safe_message, recovered.corrective_guidance];
   switch (code) {
     case 'invalid_input': return ['The request does not conform to the bounded machine-toolkit input contract.', 'Correct the public input fields and retry.'];
-    case 'cursor_expired': return ['The continuation cursor cannot be used for this traversal.', 'Restart the request without a cursor, preserving any valid generation pin.'];
     case 'response_limit_exceeded': return ['The complete safety-atomic response exceeds this capability output limit.', 'Narrow the request or use a documented cursor; no partial safety section was returned.'];
     case 'planner_unavailable': return ['The research-plan compiler is not enabled in the public capability manifest.', 'Use the inspection capabilities while plan_research remains disabled.'];
     case 'route_not_documented': return ['No verified release, distribution and access-route identity is documented for this request.', 'Call get_asset for documented collection IDs, or inspect the publisher documentation. Do not retry the same undocumented identifiers.'];
@@ -93,7 +95,7 @@ export function createDomainErrorCore({ capability, code, input = {}, context, r
     next_cursor: null,
     continuation_expires_at: null,
     generation_retention_expires_at: context.generation_retention_expires_at,
-    restart_required: restartRequired,
+    restart_required: restartRequired || restartRequiredForCode(code),
     rate_limit: { ...context.rate_limit, retry_after_seconds: retryAfterSeconds },
     truth_boundary: { ...FALSE_TRUTH_BOUNDARY }
   };
