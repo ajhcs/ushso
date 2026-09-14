@@ -5,7 +5,7 @@
   "owner": "/root/pr037_named_sources",
   "reviewer": "Astra/root",
   "base_sha": "b688f3778eb788639639a186a3413d3215564d05",
-  "head_sha": "6e1c17031e7be5cf7d79181b10be486ae64744e8",
+  "head_sha": "3e82bbd91ffcf412e62ac05c942fa7bb6eb2ea0f",
   "dependency_merge_shas": {
     "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
     "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7"
@@ -17,11 +17,12 @@
     "packages/retrieval/fixtures/named-source-registry.v1.0.0.json",
     "tests/research-program/named-sources.test.mjs",
     "docs/research-program/named-sources.md",
+    "apps/web/public/corpus-v1.1.0/named-source-registry.json",
     "verification/research-program/pr-037/",
     "docs/research-program/handoffs/PR-037.json"
   ],
   "problem": "Exact named-source requests could resolve to unrelated catalog descriptions mentioning similar words. Not-yet-indexed identities could invent catalog membership. Title equality could delete or merge records among the 579 repeated-title cases. An unavailable named source could be fabricated as an exact match. Catalog membership and source-family recognition could be conflated. Editing sealed identity family-graph.mjs or fingerprint-sealed question-parser.mjs would break WP7 / retrieval algorithm fingerprints.",
-  "resulting_behavior": "Named-source resolution lives in packages/enrichment/named-sources.mjs with an expanded packages/retrieval/fixtures/named-source-registry.v1.0.0.json covering the core cohort and twelve expansion families. MEPS/HCUP/NPPES/PHC4 exact-name fixtures cannot resolve to unrelated descriptions mentioning similar words. Not-yet-indexed identities do not invent catalog membership. The 579 repeated-title cases are accounted for; title equality alone never deletes or merges a record. Unavailable named sources return a bounded coverage-gap explanation, not a fabricated exact match. Catalog membership and source-family recognition remain distinct. Sealed packages/identity/src/family-graph.mjs (4322 bytes) and fingerprint-sealed packages/retrieval/tools/question-parser.mjs (10068 bytes) are unchanged.",
+  "resulting_behavior": "Named-source resolution lives in packages/enrichment/named-sources.mjs with an expanded packages/retrieval/fixtures/named-source-registry.v1.0.0.json covering the core cohort and twelve expansion families. MEPS/HCUP/NPPES/PHC4 exact-name fixtures cannot resolve to unrelated descriptions mentioning similar words. Not-yet-indexed identities do not invent catalog membership. The 579 repeated-title cases are accounted for; title equality alone never deletes or merges a record. Unavailable named sources return a bounded coverage-gap explanation, not a fabricated exact match. Catalog membership and source-family recognition remain distinct. Sealed packages/identity/src/family-graph.mjs (4322 bytes) and fingerprint-sealed packages/retrieval/tools/question-parser.mjs (10068 bytes) are unchanged. Staged apps/web/public/corpus-v1.1.0/named-source-registry.json is identical to the expanded fixture so corpus staging cannot drift.",
   "commits": [
     {
       "id": "C-037-1",
@@ -37,6 +38,11 @@
       "id": "C-037-3",
       "subject": "Return exact versus contextual results",
       "sha": "6e1c17031e7be5cf7d79181b10be486ae64744e8"
+    },
+    {
+      "id": "C-037-4",
+      "subject": "Keep staged named-source registry identical to the expanded fixture",
+      "sha": "3e82bbd91ffcf412e62ac05c942fa7bb6eb2ea0f"
     }
   ],
   "source_identities": [
@@ -75,6 +81,12 @@
       "id": "packages/retrieval/tools/question-parser.mjs",
       "location": "local",
       "sha256": "736a5d9e57ca7e572954a59f8fd6e06d82a8d186e95ef69ea090224b95ae38e8"
+    },
+    {
+      "kind": "staged-named-source-registry",
+      "id": "apps/web/public/corpus-v1.1.0/named-source-registry.json",
+      "location": "local",
+      "sha256": "5ffe387422e96036f353d92b340a98f344920988fff3cff3d0b272601cb7f39d"
     }
   ],
   "commands": [
@@ -259,6 +271,14 @@
       "command_ids": [
         "cmd-c037-focused",
         "cmd-c037-identity"
+      ]
+    },
+    {
+      "id": "C-037-4",
+      "status": "producer_checked",
+      "result": "Staged public named-source registry matches the expanded fixture. CORPUS_STAGE_DRIFT cannot recur from this copy.",
+      "command_ids": [
+        "cmd-c037-focused"
       ]
     }
   ],
