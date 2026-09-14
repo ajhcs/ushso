@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/enrichment/task.schema.json",
+  "title": "USHSO residual evidence task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "task_type",
+    "record_id",
+    "field",
+    "status",
+    "model_extraction",
+    "source_bytes",
+    "chunks"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "minLength": 3
+    },
+    "task_type": {
+      "type": "string",
+      "enum": [
+        "prose_definition",
+        "table_extraction",
+        "scientific_ambiguity",
+        "missing_evidence",
+        "access_blockade"
+      ]
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 3
+    },
+    "field": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "accepted",
+        "abstain",
+        "return_to_parsing"
+      ]
+    },
+    "model_extraction": {
+      "type": "boolean"
+    },
+    "adjudication_proposal": {
+      "type": "boolean"
+    },
+    "source_bytes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_release": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "chunks": {
+      "type": "array"
+    },
+    "token_estimate": {
+      "type": "integer"
+    },
+    "cannot_conclude": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "asks_to_guess_missing_document": {
+      "type": "boolean"
+    },
+    "asks_to_authorize_access": {
+      "type": "boolean"
+    },
+    "processes_entire_corpus": {
+      "type": "boolean"
+    }
+  }
+}
