@@ -1,0 +1,76 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr038-relevance-20260914",
+  "slice_id": "C-038-1",
+  "pr_id": "PR-038",
+  "title": "Correct research relevance and exclusion behavior",
+  "owner": "/root/pr038_relevance",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr038-relevance-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr038-relevance-20260914",
+  "objective": "Search respects important scientific distinctions and explicit user constraints.",
+  "outcome": "Scientific near-miss fixtures identify forbidden, uncertain, and contextual matches; no test expects a title-only answer. Exact phrase, named-source, exclusion and supported-dimension logic apply before broad source priors. An explicit without-Census filter excludes Census by source identity, not the word census in unrelated prose. Maternal mortality does not promote infant data as the leading compatible result. Ranking reasons agree with actual filters and evidence. The nonsense-plus-Pennsylvania query remains a scoped zero. Held-out reviewer labels stay outside ranking. Fingerprint-sealed packages/retrieval/tools/question-parser.mjs, retrieval-core-v1.2.mjs byte-parity surface, and controlled-vocabulary.json are not edited.",
+  "dependencies": [
+    "PR-031",
+    "PR-032",
+    "PR-037"
+  ],
+  "owned_paths": [
+    "packages/enrichment/relevance.mjs",
+    "evaluation/research-program/relevance/",
+    "tests/research-program/relevance.test.mjs",
+    "docs/research-program/relevance.md",
+    "verification/research-program/pr-038/",
+    "docs/research-program/handoffs/PR-038.json"
+  ],
+  "commits": [
+    {
+      "id": "C-038-1",
+      "subject": "Add scientific near-miss fixtures",
+      "instructions": "Use maternal/infant mortality, readmissions/PSI, provider relief/quality, insurer rate/enforcement and requested observation-period counterexamples from the audit.",
+      "verification": "Fixtures identify which matches are forbidden, uncertain or merely contextual; no test expects a title-only answer."
+    },
+    {
+      "id": "C-038-2",
+      "subject": "Refine deterministic intent and ranking",
+      "instructions": "Apply exact phrase, named-source, exclusion and supported dimension logic before broad source priors. Separate missing context from confirmed compatibility.",
+      "verification": "An explicit without Census filter excludes Census; maternal mortality does not promote infant data as the leading compatible result."
+    },
+    {
+      "id": "C-038-3",
+      "subject": "Preserve explanations and bounded zero results",
+      "instructions": "Return concise reasons for exact, uncertain, contextual and excluded candidates using the same ranking logic. Keep known missing-source guidance.",
+      "verification": "The nonsense-plus-Pennsylvania query remains a scoped zero; ranking reasons agree with actual filters and evidence."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/relevance.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-038.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-038/",
+  "binding": {
+    "base_sha": "ae6a06748978476bbec5c4c7131864d206ee8138",
+    "base_tree": "7ee63da8719b5224ceca900a6c3bfaf14e50c30f",
+    "dependency_merge_shas": {
+      "PR-031": "3b2d681103d80d571d44cd3e364a4327f8e046a9",
+      "PR-032": "6fe431f855c2bb65c97cdb0526ef8ed54ea6a74a",
+      "PR-037": "ac2dcebbead2498f6df77f503d5484b81da8319f"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
