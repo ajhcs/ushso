@@ -57,6 +57,7 @@ function errorMessages(code) {
     case 'response_limit_exceeded': return ['The complete safety-atomic response exceeds this capability output limit.', 'Narrow the request or use a documented cursor; no partial safety section was returned.'];
     case 'planner_unavailable': return ['The research-plan compiler is not enabled in the public capability manifest.', 'Use the inspection capabilities while plan_research remains disabled.'];
     case 'route_not_documented': return ['No verified release, distribution and access-route identity is documented for this request.', 'Call get_asset for documented collection IDs, or inspect the publisher documentation. Do not retry the same undocumented identifiers.'];
+    case 'schema_context_required': return ['No verified release, distribution and schema identity is documented for this request.', 'Call get_asset for documented collection IDs, then request get_variables with those exact IDs. A supplied schema identifier does not establish dictionary applicability.'];
     default: return ['The bounded metadata service could not safely return this result.', 'Retry later without changing a valid generation pin.'];
   }
 }
