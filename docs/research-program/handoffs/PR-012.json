@@ -1,0 +1,309 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-012",
+  "status": "producer_checked",
+  "owner": "/root/pr012_source_budget",
+  "reviewer": "Astra/root",
+  "base_sha": "5483163eaa3627a42c5a7e3fc77627ed86aa272e",
+  "head_sha": "a83070a50d5fc21999bc54fd55cf3a2e4894859e",
+  "dependency_merge_shas": {
+    "PR-010": "f109bdef60c7cd711f8442e820c6c4c06d120776",
+    "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74"
+  },
+  "branch": "codex/ushso-pr012-source-budget-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/ingestion/src/source-budget.mjs",
+    "packages/ingestion/src/index.mjs",
+    "tests/research-program/source-budget.test.mjs",
+    "verification/research-program/pr-012/",
+    "docs/research-program/handoffs/PR-012.json"
+  ],
+  "problem": "Thousands of source checks could double-spend the last reservation, retry credential/parser failures blindly, or resume an older generation over a newer capture. Scheduler composition must remain disabled.",
+  "resulting_behavior": "createSourceBudget exclusive UTC daily request/byte reservations and per-host concurrency cannot be double-spent. Cancellation releases only unused remainder. 429 Retry-After is exact; harvest_page timeout/5xx retries are bounded; credential/parser/schema_drift are not blindly retried. Resume reports completed/waiting/failed/skipped by source generation; older generations cannot overwrite newer. Budget exhaustion is an explicit incomplete run. Scheduler worker default remains WP4_SCHEDULER_COMPOSITION_DISABLED.",
+  "commits": [
+    {
+      "id": "C-012-1",
+      "subject": "Reserve source request budgets",
+      "sha": "702696449e524d96fa3b6dbb8673a3a11ef36f3f"
+    },
+    {
+      "id": "C-012-2",
+      "subject": "Classify and schedule retries",
+      "sha": "702696449e524d96fa3b6dbb8673a3a11ef36f3f"
+    },
+    {
+      "id": "C-012-3",
+      "subject": "Reconcile resumed source runs",
+      "sha": "a83070a50d5fc21999bc54fd55cf3a2e4894859e"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "source-budget",
+      "id": "packages/ingestion/src/source-budget.mjs",
+      "location": "local",
+      "sha256": "2e4147e3612609d227d7b62d32719cd3e8c582e97078110f4f113088b0b1f2ad"
+    },
+    {
+      "kind": "ingestion-index",
+      "id": "packages/ingestion/src/index.mjs",
+      "location": "local",
+      "sha256": "c3ceda77f3b617455b2238e5b8a13acecca277b0ff913c87be168d09efafe6c1"
+    },
+    {
+      "kind": "source-budget-tests",
+      "id": "tests/research-program/source-budget.test.mjs",
+      "location": "local",
+      "sha256": "d5022f83fb62922581441149c81f07033c5671de367be3fc9781e3cf610a0420"
+    },
+    {
+      "kind": "failure-policy",
+      "id": "packages/ingestion/src/failure-policy.mjs",
+      "location": "local",
+      "sha256": "0dd6bb7afe0eeef6c3aaa422054f71b26b9954dac5a4cf766209cb1d6a741e85"
+    },
+    {
+      "kind": "origin-control",
+      "id": "packages/ingestion/src/origin-control.mjs",
+      "location": "local",
+      "sha256": "b501e050c851715591683617695860d917187593ab62ae769046e70945bbc828"
+    },
+    {
+      "kind": "scheduler-worker-default",
+      "id": "services/scheduler-worker/worker.mjs",
+      "location": "local",
+      "sha256": "2aea3088068da001995da070ec987da6d606a5cb51d02702e512430611a780df"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c012-focused",
+      "command": "node --test tests/research-program/source-budget.test.mjs",
+      "started_at": "2026-09-14T02:20:56.107802Z",
+      "completed_at": "2026-09-14T02:20:56.214437Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "13/13 focused source-budget tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c012-focused-event",
+        "path": "verification/research-program/pr-012/producer-20260914/commands/focused-source-budget/event.json",
+        "sha256": "e1eb2af72b86194f33ceacf803b4da8f1d7a6d7a24a1778c382f7da205ed0900",
+        "bytes": 1068
+      }
+    },
+    {
+      "id": "cmd-c012-lifecycle",
+      "command": "node --test tests/research-program/job-lifecycle.test.mjs",
+      "started_at": "2026-09-14T02:20:56.214868Z",
+      "completed_at": "2026-09-14T02:21:29.109836Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "41/41 job-lifecycle tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c012-lifecycle-event",
+        "path": "verification/research-program/pr-012/producer-20260914/commands/job-lifecycle/event.json",
+        "sha256": "88ab927fdd89d87a5f171bfff833ed1d3ea3cc15358044a2dffde1a2548b4902",
+        "bytes": 1036
+      }
+    },
+    {
+      "id": "cmd-c012-http",
+      "command": "node --test tests/research-program/http-outcomes.test.mjs",
+      "started_at": "2026-09-14T02:21:29.110275Z",
+      "completed_at": "2026-09-14T02:21:30.102240Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "10/10 HTTP outcomes tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c012-http-event",
+        "path": "verification/research-program/pr-012/producer-20260914/commands/http-outcomes/event.json",
+        "sha256": "7d8dc2393d5fb7139645b3d4675dc5f2f6a2d47f58378a2f5f28d9aec07dc227",
+        "bytes": 1035
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr012-artifact-0",
+      "path": "verification/research-program/pr-012/task-binding.json",
+      "sha256": "57bb317355b0ab09027343f3baa431a3ecc309f68c4bdae8809377a8601540c0",
+      "bytes": 3370
+    },
+    {
+      "id": "pr012-artifact-1",
+      "path": "verification/research-program/pr-012/dispatch.json",
+      "sha256": "284f8d81d04ca0f038ad13099cae05f6b5f6828bcddfec761b1f13f076bdbb2e",
+      "bytes": 2197
+    },
+    {
+      "id": "pr012-artifact-2",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/focused-source-budget/receipt.json",
+      "sha256": "bdde60a9d47470e9eb9a582702e465594aceb301613ce81bfdcd467f8a901fbd",
+      "bytes": 466
+    },
+    {
+      "id": "pr012-artifact-3",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/focused-source-budget/stdout.log",
+      "sha256": "4ac0d25ec4462640cd700c998498fc5ecd5cd3832b118aa1366b9867f3c5bbba",
+      "bytes": 1081
+    },
+    {
+      "id": "pr012-artifact-4",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/focused-source-budget/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr012-artifact-5",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/focused-source-budget/event.json",
+      "sha256": "e1eb2af72b86194f33ceacf803b4da8f1d7a6d7a24a1778c382f7da205ed0900",
+      "bytes": 1068
+    },
+    {
+      "id": "pr012-artifact-6",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/job-lifecycle/receipt.json",
+      "sha256": "16823a852953c0e91589c37578dcbf5b8e4a3b16767cf8d00dbebf57a5c40ff8",
+      "bytes": 458
+    },
+    {
+      "id": "pr012-artifact-7",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/job-lifecycle/stdout.log",
+      "sha256": "26e583b82bb88313fbbfc11f63aa11fcbec69a07655e7550b006697a82894823",
+      "bytes": 4444
+    },
+    {
+      "id": "pr012-artifact-8",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/job-lifecycle/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr012-artifact-9",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/job-lifecycle/event.json",
+      "sha256": "88ab927fdd89d87a5f171bfff833ed1d3ea3cc15358044a2dffde1a2548b4902",
+      "bytes": 1036
+    },
+    {
+      "id": "pr012-artifact-10",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/http-outcomes/receipt.json",
+      "sha256": "be4ac6dd73a5b25c6c372d0692f20f8152f63613db92cd181083edae55fb33de",
+      "bytes": 457
+    },
+    {
+      "id": "pr012-artifact-11",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/http-outcomes/stdout.log",
+      "sha256": "0d30dbddedc6790359d185db3ef4e8a9bc94aa18dae5aad82afa3c5554c1bd59",
+      "bytes": 988
+    },
+    {
+      "id": "pr012-artifact-12",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/http-outcomes/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr012-artifact-13",
+      "path": "verification/research-program/pr-012/producer-20260914/commands/http-outcomes/event.json",
+      "sha256": "7d8dc2393d5fb7139645b3d4675dc5f2f6a2d47f58378a2f5f28d9aec07dc227",
+      "bytes": 1035
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-012-1",
+      "status": "producer_checked",
+      "result": "Last remaining daily request/byte cannot be spent twice; cancellation releases only unused remainder; UTC day boundary; host concurrency exclusive; exhaustion is incomplete.",
+      "command_ids": [
+        "cmd-c012-focused"
+      ]
+    },
+    {
+      "id": "C-012-2",
+      "status": "producer_checked",
+      "result": "429 Retry-After exact delay; timeout/5xx follow harvest_page bounds; credential/parser/schema_drift are not blindly retried.",
+      "command_ids": [
+        "cmd-c012-focused"
+      ]
+    },
+    {
+      "id": "C-012-3",
+      "status": "producer_checked",
+      "result": "Resume denominator report is idempotent; older source generation cannot overwrite newer. job-lifecycle and HTTP outcomes remain green. Scheduler worker remains composition-disabled.",
+      "command_ids": [
+        "cmd-c012-focused",
+        "cmd-c012-lifecycle",
+        "cmd-c012-http"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "postgres-daily-budget-store",
+      "status": "skipped",
+      "detail": "Daily/host budgets are an exclusive in-memory source-budget module. PORT_METHODS.controlStore was not expanded, so Postgres was not required to implement new methods. Durable lease/retry remain on the existing control plane."
+    },
+    {
+      "id": "scheduler-worker-production-composition",
+      "status": "accepted",
+      "detail": "services/scheduler-worker/worker.mjs default remains WP4_SCHEDULER_COMPOSITION_DISABLED."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-source-budget-review",
+      "status": "pending",
+      "detail": "Independent review of exclusive reservation, retry classification and resume generation pins remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "in-memory-budget-authority",
+      "status": "risk",
+      "detail": "PR-012 tests prove exclusive in-memory source-budget behavior. They do not claim a new Postgres schema or production scheduler composition."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of exclusive budgets, bounded retries and resume generation pins, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-012 source and replay focused source-budget, job-lifecycle and HTTP outcomes. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
