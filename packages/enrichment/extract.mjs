@@ -38,7 +38,7 @@ export function parseConstrainedExtraction(raw, task) {
   if (!(typeof payload.value === 'string' || payload.value === null)) fail('RESPONSE_SCHEMA_INVALID');
   if (!Array.isArray(payload.passage_ids) || payload.passage_ids.some((id) => typeof id !== 'string')) fail('RESPONSE_SCHEMA_INVALID');
   if (typeof payload.quotation !== 'string') fail('RESPONSE_SCHEMA_INVALID');
-  if (!isPlainObject(payload.span) || typeof payload.span.start !== 'number' || typeof payload.span.end !== 'number') fail('RESPONSE_SCHEMA_INVALID');
+  if (!isPlainObject(payload.span) || !Number.isSafeInteger(payload.span.start) || !Number.isSafeInteger(payload.span.end) || payload.span.start < 0 || payload.span.end < payload.span.start) fail('RESPONSE_SCHEMA_INVALID');
   if (!CLAIM_TYPES.includes(payload.claim_type)) fail('RESPONSE_SCHEMA_INVALID');
   if (!UNCERTAINTY.includes(payload.uncertainty)) fail('RESPONSE_SCHEMA_INVALID');
   if (!(typeof payload.abstention_reason === 'string' || payload.abstention_reason === null)) fail('RESPONSE_SCHEMA_INVALID');

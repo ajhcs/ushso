@@ -10,6 +10,7 @@ export const TASK_TYPES = Object.freeze({
 });
 
 export const DEFAULT_TOKEN_BUDGET = 1800;
+export const TASK_BUILDER_VERSION = 'pr025-task-builder.v2';
 
 function freeze(value) {
   return Object.freeze(value);
@@ -47,14 +48,23 @@ export function chunkPassages({
   field,
   header,
   denominator,
+  sourceBytes,
 } = {}) {
   if (!Array.isArray(pages) || pages.length === 0) fail('PAGES_REQUIRED');
-  const headerText = header ?? pages[0]?.header ?? null;
-  const denominatorText = denominator ?? pages[0]?.denominator ?? null;
+  if (!Number.isSafeInteger(tokenBudget) || tokenBudget <= 0) fail('INVALID_TOKEN_BUDGET');
+  // Coordinates refer to the unmodified capture, never the prompt's prefixes.
+  const capture = sourceBytes ?? pages.map((page) => String(page.text ?? '')).join('\n');
+  let sourceCursor = 0;
   const chunks = [];
   let overlapId = 0;
-  for (const page of pages) {
+  for (const [pageIndex, page] of pages.entries()) {
     const body = String(page.text ?? '');
+    const pageStart = capture.indexOf(body, sourceCursor);
+    if (pageStart < 0) fail('PAGE_NOT_IN_SOURCE');
+    sourceCursor = pageStart + body.length;
+    // Page-local context wins; shared context must be explicitly supplied.
+    const headerText = Object.hasOwn(page, 'header') ? page.header : (header ?? null);
+    const denominatorText = Object.hasOwn(page, 'denominator') ? page.denominator : (denominator ?? null);
     const prefix = [headerText, denominatorText].filter(Boolean).join('\n');
     const window = tokenBudget * 4;
     let start = 0;
@@ -64,8 +74,9 @@ export function chunkPassages({
       const overlap = start > 0 ? body.slice(Math.max(0, start - 80), start) : '';
       const text = [prefix, overlap ? `[overlap ${overlapId}]${overlap}` : '', slice].filter(Boolean).join('\n');
       chunks.push(freeze({
-        chunk_id: `${page.page ?? 1}.${part}`,
-        page: page.page ?? 1,
+        chunk_id: `${page.page ?? pageIndex + 1}.${part}`,
+        page: page.page ?? pageIndex + 1,
+        source_span: freeze({ start: pageStart + Math.max(0, start - (overlap ? 80 : 0)), end: pageStart + start + slice.length }),
         field,
         header: headerText,
         denominator: denominatorText,
@@ -80,8 +91,7 @@ export function chunkPassages({
   }
   const fields = chunks.map((chunk) => chunk.field);
   if (new Set(fields).size !== 1) fail('FIELD_DOUBLE_COUNT');
-  if (headerText && chunks.some((chunk) => chunk.header !== headerText)) fail('HEADER_LOST');
-  if (denominatorText && chunks.some((chunk) => chunk.denominator !== denominatorText)) fail('DENOMINATOR_LOST');
+  if (new Set(chunks.map((chunk) => chunk.chunk_id)).size !== chunks.length) fail('DUPLICATE_PASSAGE_ID');
   return freeze(chunks);
 }
 
@@ -100,7 +110,7 @@ export function buildResidualTask(input = {}) {
   else if (input.oversized === true || input.low_information === true) status = 'return_to_parsing';
   else if (!sourceBytes) status = 'abstain';
   const chunks = status === 'accepted' && Array.isArray(input.pages)
-    ? chunkPassages({ pages: input.pages, field: input.field, header: input.header, denominator: input.denominator, tokenBudget: input.tokenBudget })
+    ? chunkPassages({ pages: input.pages, field: input.field, header: input.header, denominator: input.denominator, tokenBudget: input.tokenBudget, sourceBytes })
     : freeze([]);
   if (status === 'accepted' && !sourceBytes) fail('SOURCE_BYTES_REQUIRED');
   const taskId = input.task_id ?? `task:${createHash('sha256').update(JSON.stringify({
@@ -108,11 +118,14 @@ export function buildResidualTask(input = {}) {
     field: input.field,
     type,
     source: sourceBytes,
+    source_release: input.source_release ?? null,
+    chunks,
+    builder: TASK_BUILDER_VERSION,
   })).digest('hex').slice(0, 24)}`;
   const identity = taskIdentity({
     sourceBytes: sourceBytes ?? '',
-    parserVersion: 'pr025-task-builder',
-    prompt: type,
+    parserVersion: TASK_BUILDER_VERSION,
+    prompt: JSON.stringify({ type, chunks, source_release: input.source_release ?? null }),
     schemaVersion: 'ushso.residual-task.v1',
     model: 'none-until-accepted-extraction',
     providerPolicyVersion: 'openrouter-privacy-2026-09-10',

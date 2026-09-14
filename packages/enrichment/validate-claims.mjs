@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { parseConstrainedExtraction } from './extract.mjs';
 
-export const VALIDATOR_ID = 'ushso.claim-validator.v1';
+export const VALIDATOR_ID = 'ushso.claim-validator.v2';
 
 function freeze(value) {
   return Object.freeze(value);
@@ -13,19 +13,41 @@ function fail(code, detail) {
   throw error;
 }
 
-function captureText(task) {
-  const chunks = (task.chunks ?? []).map((chunk) => chunk.text).join('\n');
-  return String(task.source_bytes ?? chunks ?? '');
+function validSpan(span, length) {
+  return Number.isSafeInteger(span?.start) && Number.isSafeInteger(span?.end)
+    && span.start >= 0 && span.end > span.start && span.end <= length;
 }
 
-export function quoteSupported(task, quotation, span) {
-  const text = captureText(task);
-  if (!quotation) return false;
-  if (typeof span?.start === 'number' && typeof span?.end === 'number' && span.end >= span.start) {
-    const sliced = text.slice(span.start, span.end);
-    if (sliced === quotation) return true;
+/** Spans are UTF-16 offsets into the immutable source_bytes string. */
+export function quoteSupported(task, quotation, span, passageIds = ['source']) {
+  const text = task.source_bytes;
+  if (typeof text !== 'string' || !quotation || !validSpan(span, text.length)
+    || text.slice(span.start, span.end) !== quotation || !passageIds.length) return false;
+  return passageIds.every((id) => {
+    if (id === 'source') return true;
+    const matches = (task.chunks ?? []).filter((chunk) => chunk.chunk_id === id);
+    if (matches.length !== 1) return false;
+    const range = matches[0].source_span;
+    return validSpan(range, text.length) && range.start <= span.start && range.end >= span.end;
+  });
+}
+
+// Literal extraction may select a whole term from a quotation, but cannot turn
+// 120 into 12, -12 into 12, or a value elsewhere in the capture into evidence.
+function quotedValueSupported(proposal) {
+  const { value, quotation } = proposal;
+  if (typeof value !== 'string' || !value.trim()) return false;
+  const numeric = /^[+\-−]?(?:\d|\.\d)/u.test(value);
+  const boundary = numeric ? /[\p{L}\p{N}\p{Pd}_%+−﹢＋]/u : /[\p{L}\p{N}_]/u;
+  let offset = quotation.indexOf(value);
+  while (offset !== -1) {
+    const before = offset === 0 ? '' : quotation[offset - 1];
+    const after = quotation[offset + value.length] ?? '';
+    const numericContinuation = numeric && (/[.,]/.test(before) || (/[.,]/.test(after) && /\d/.test(quotation[offset + value.length + 1] ?? '')));
+    if (!boundary.test(before) && !boundary.test(after) && !numericContinuation) return true;
+    offset = quotation.indexOf(value, offset + 1);
   }
-  return text.includes(quotation);
+  return false;
 }
 
 export function semanticRoleMatches(task, proposal) {
@@ -37,10 +59,7 @@ export function semanticRoleMatches(task, proposal) {
 }
 
 export function inventedUnitOrDefinition(task, proposal) {
-  const text = captureText(task);
-  if (!proposal.value) return false;
-  if ((proposal.claim_type === 'unit' || proposal.claim_type === 'definition') && !text.includes(proposal.value)) return true;
-  return false;
+  return (proposal.claim_type === 'unit' || proposal.claim_type === 'definition') && !quotedValueSupported(proposal);
 }
 
 export function retryableFailure(code) {
@@ -77,16 +96,18 @@ export function validateClaim({ task, raw, model = 'openai/gpt-4.1-mini', prior 
     });
   }
   const reasons = [];
-  const supported = quoteSupported(task, proposal.quotation, proposal.span);
+  const supported = quoteSupported(task, proposal.quotation, proposal.span, proposal.passage_ids);
   if (!supported) reasons.push('UNRESOLVABLE_CITATION');
   if (inventedUnitOrDefinition(task, proposal)) reasons.push('INVENTED_UNIT_OR_DEFINITION');
+  if (proposal.claim_type !== 'abstention' && !quotedValueSupported(proposal)) reasons.push('UNSUPPORTED_QUOTED_VALUE');
+  if (proposal.claim_type === 'abstention') reasons.push('ABSTENTION');
   const role = semanticRoleMatches(task, proposal);
   if (role === false) reasons.push('WRONG_SEMANTIC_ROLE');
   if (role === 'review') reasons.push('SEMANTIC_ROLE_REVIEW');
-  const hallucination = proposal.schema_valid === true && (!supported || reasons.includes('INVENTED_UNIT_OR_DEFINITION') || proposal.passage_ids.length === 0);
+  const hallucination = proposal.schema_valid === true && (!supported || reasons.includes('UNSUPPORTED_QUOTED_VALUE') || proposal.passage_ids.length === 0);
   if (hallucination) reasons.push('SCHEMA_VALID_HALLUCINATION');
   const reviewOnly = reasons.length === 1 && reasons[0] === 'WRONG_SEMANTIC_ROLE' && supported;
-  const status = reasons.length === 0 ? 'accepted' : (reviewOnly || reasons.includes('SEMANTIC_ROLE_REVIEW') && supported && !reasons.includes('UNRESOLVABLE_CITATION') && !reasons.includes('INVENTED_UNIT_OR_DEFINITION') && !reasons.includes('SCHEMA_VALID_HALLUCINATION') ? 'review' : 'rejected');
+  const status = reasons.length === 0 ? 'accepted' : (reviewOnly || reasons.every((reason) => ['WRONG_SEMANTIC_ROLE', 'SEMANTIC_ROLE_REVIEW'].includes(reason)) ? 'review' : 'rejected');
   if (status === 'accepted' && !supported) fail('ACCEPTED_WITHOUT_CITATION');
   const hash = proposalHash(proposal);
   if (prior && prior.hash === hash && prior.status === 'rejected') {

@@ -86,3 +86,50 @@ test('accepted tasks have source bytes and a stable ID; incomplete context absta
   assert.ok(manifest.task_count < 3434);
   assert.throws(() => buildResidualTask({ record_id: 'x', field: 'y', entire_corpus: true, source_bytes: 'z' }), { code: 'TASK_NOT_ENTIRE_CORPUS' });
 });
+
+
+test('different tables preserve page-local context and do not inherit the first page implicitly', () => {
+  const chunks = chunkPassages({field:'rate',pages:[
+    {page:1,text:'Child measure',header:'Child rate',denominator:'Children'},
+    {page:2,text:'Adult measure',header:'Adult rate',denominator:'Adults'},
+    {page:3,text:'Unresolved measure'},
+  ]});
+  assert.deepEqual(chunks.map(({header,denominator}) => ({header,denominator})),[
+    {header:'Child rate',denominator:'Children'},
+    {header:'Adult rate',denominator:'Adults'},
+    {header:null,denominator:null},
+  ]);
+  assert.equal(chunks[1].text,'Adult rate\nAdults\nAdult measure');
+  const explicit = chunkPassages({field:'rate',header:'Shared',denominator:'Shared population',pages:[
+    {text:'A'}, {text:'B',header:'Local',denominator:null},
+  ]});
+  assert.equal(explicit[0].header,'Shared');
+  assert.equal(explicit[1].header,'Local');
+  assert.equal(explicit[1].denominator,null);
+  assert.notEqual(explicit[0].chunk_id,explicit[1].chunk_id);
+});
+
+test('chunk ranges bind the original capture including overlaps, excluding injected context', () => {
+  const first = 'First page';
+  const second = 'Second page '.repeat(20);
+  const source = 'Capture start\n'+first+'\n'+second;
+  const chunks = chunkPassages({field:'value',header:'Prompt context',sourceBytes:source,tokenBudget:20,pages:[{page:1,text:first},{page:2,text:second}]});
+  assert.equal(source.slice(chunks[0].source_span.start,chunks[0].source_span.end),first);
+  assert.ok(chunks.filter(row=>row.page===2).every(row=>row.source_span.start>=source.indexOf(second)));
+  assert.ok(chunks.some(row=>row.overlap_id));
+  assert.throws(()=>chunkPassages({field:'value',sourceBytes:source,pages:[{text:'Not captured'}]}),{code:'PAGE_NOT_IN_SOURCE'});
+  for (const tokenBudget of [0,-1,0.5,Infinity]) assert.throws(()=>chunkPassages({field:'value',pages:[{text:'x'}],tokenBudget}),{code:'INVALID_TOKEN_BUDGET'});
+  assert.throws(()=>chunkPassages({field:'value',pages:[{page:1,text:'a'},{page:1,text:'b'}]}),{code:'DUPLICATE_PASSAGE_ID'});
+});
+
+test('page context and release changes invalidate the task cache identity', () => {
+  const input = {record_id:'review:identity',field:'rate',source_bytes:'Rate',source_release:'v1',pages:[{text:'Rate',header:'Children',denominator:'Children'}]};
+  const initial = buildResidualTask(input);
+  for (const changed of [{...input,source_release:'v2'},{...input,pages:[{text:'Rate',header:'Adults',denominator:'Adults'}]}]) {
+    const next = buildResidualTask(changed);
+    assert.notEqual(initial.task_id,next.task_id);
+    assert.notEqual(initial.identity,next.identity);
+    const explicitId = 'task:caller-supplied';
+    assert.notEqual(buildResidualTask({...input,task_id:explicitId}).identity,buildResidualTask({...changed,task_id:explicitId}).identity);
+  }
+});
