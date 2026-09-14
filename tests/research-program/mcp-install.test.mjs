@@ -282,9 +282,13 @@ test('actual packaged stdio JSON-RPC performs source inspection, typed negatives
     });
   } finally {
     await origin.close();
-    const evidenceDir = path.join(root, 'verification/research-program/pr-060/producer-20260914');
+    const retain = process.env.USHSO_PR060_RETAIN_JOURNEY === '1';
+    const evidenceDir = retain
+      ? path.join(root, 'verification/research-program/pr-060/producer-20260914')
+      : await fs.mkdtemp(path.join(os.tmpdir(), 'ushso-pr060-journey-'));
     await fs.mkdir(evidenceDir, { recursive: true });
     await fs.writeFile(path.join(evidenceDir, 'stdio-journey.json'), `${JSON.stringify({ plugin_version: pluginPackage.version, origin: origin.origin, transcript }, null, 2)}\n`);
+    if (!retain) await fs.rm(evidenceDir, { recursive: true, force: true });
     await fs.rm(installRoot, { recursive: true, force: true });
   }
 });
