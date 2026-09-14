@@ -1,0 +1,76 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr035-crosswalks-20260914",
+  "slice_id": "C-035-1",
+  "pr_id": "PR-035",
+  "title": "Ingest authoritative crosswalks and mapping evidence",
+  "owner": "/root/pr035_crosswalks",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr035-crosswalks-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr035-crosswalks-20260914",
+  "objective": "Cross-source linkage candidates have authoritative mapping and version context.",
+  "outcome": "Priority CCN/NPI/facility and geographic-vintage crosswalks store publisher, release, rights and exact download/access route. Each route\u2019s intended entity and key system must match the research task; absence of a crosswalk is explicit. One-to-many mappings, unmatched keys and date scope are preserved. Source-native IDs are kept without heuristic identity merging. A many-to-many or ambiguous mapping cannot collapse to one preferred row silently. Candidate routes remain candidate until scoped validation and review are complete. Mapping files are data products with their own versions. A shared field name alone cannot produce a route. Sealed packages/identity/src/family-graph.mjs and join-routes.mjs are not edited.",
+  "dependencies": [
+    "PR-012",
+    "PR-019",
+    "PR-034"
+  ],
+  "owned_paths": [
+    "packages/enrichment/crosswalks.mjs",
+    "scripts/research-program/crosswalks.mjs",
+    "tests/research-program/crosswalks.test.mjs",
+    "docs/research-program/crosswalks.md",
+    "verification/research-program/pr-035/",
+    "docs/research-program/handoffs/PR-035.json"
+  ],
+  "commits": [
+    {
+      "id": "C-035-1",
+      "subject": "Register priority crosswalk sources",
+      "instructions": "Select documented CCN/NPI/facility and geographic-vintage crosswalks for the frozen tasks. Store publisher, release, rights and exact download/access route.",
+      "verification": "Each route\u2019s intended entity and key system matches the research task; absence of a crosswalk is explicit."
+    },
+    {
+      "id": "C-035-2",
+      "subject": "Parse bounded mapping evidence",
+      "instructions": "Use shared collectors/parsers and preserve one-to-many mappings, unmatched keys and date scope. Keep source-native IDs without heuristic identity merging.",
+      "verification": "A many-to-many or ambiguous mapping cannot collapse to one preferred row silently."
+    },
+    {
+      "id": "C-035-3",
+      "subject": "Create evidence-bearing route candidates",
+      "instructions": "Attach mapping transforms, cardinality expectation, universe, time constraints and required review to each route.",
+      "verification": "A candidate route remains candidate until its scoped validation and review are complete."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/crosswalks.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-035.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-035/",
+  "binding": {
+    "base_sha": "e1c2ccf5b4c80b2f549c94106c4583e1e6fd06be",
+    "base_tree": "21dd2e4a1931c70721e08e180a392e9f6b3bc3cd",
+    "dependency_merge_shas": {
+      "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+      "PR-019": "94d7d904800de12df7c9fe5e9a6fdc252e4687e9",
+      "PR-034": "a8437e36ecf102af6f3bc86cf539a0d6b1739796"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
