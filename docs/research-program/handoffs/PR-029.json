@@ -1,0 +1,413 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-029",
+  "status": "producer_checked",
+  "owner": "/root/pr029_promotion",
+  "reviewer": "Astra/root",
+  "base_sha": "a4aea2c787cff97576d92e5bec27c7b51e2bdcb0",
+  "head_sha": "ffb4a7d458e30dc1d2f98a38b70a2f9e815134fe",
+  "dependency_merge_shas": {
+    "PR-004": "463f092f71c0ed1ef2aa5baa29b186e5697d04ce",
+    "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+    "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+    "PR-028": "7658a28f932dcb8f9f8fe89033455f3a7eecc748"
+  },
+  "branch": "codex/ushso-pr029-promotion-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/promotion.mjs",
+    "scripts/research/claim-selector.mjs",
+    "tests/research-program/promotion.test.mjs",
+    "docs/research-program/promotion-rules.md",
+    "verification/research-program/pr-029/",
+    "docs/research-program/handoffs/PR-029.json"
+  ],
+  "problem": "Inferred scientific statements could be treated as literal observations. Stale approvals, incomplete source runs or changed field hashes could promote. Rollback could destroy newer attempt history. Automated rules could be treated as source-access or legal authorization. Editing sealed normalization or identity sources would break WP7/normalization artifact seals.",
+  "resulting_behavior": "Promotion classes live in packages/enrichment/promotion.mjs. Validated literal publisher metadata can promote under an approved field/source rule without a click per field. Inferred scientific statements, identity merges and ambiguous mappings cannot receive literal-observation status. Stale approvals, incomplete source runs and changed field hashes cannot promote; unaffected accepted claims remain available. Rollback restores prior public facts and retains newer attempt/review history. Scientific and technical acceptance are separate. Automated rules cannot authorize source access or legal rights. Last-good generation remains live-2026-09-03-85b50522b420. Sealed packages/normalization/src and packages/identity/src/review-ledger.mjs are unchanged.",
+  "commits": [
+    {
+      "id": "C-029-1",
+      "subject": "Define promotion classes",
+      "sha": "89a0fff0150f756bbd3ffca5a2cbe1941c5c9485"
+    },
+    {
+      "id": "C-029-2",
+      "subject": "Apply exact accepted claim revisions",
+      "sha": "89a0fff0150f756bbd3ffca5a2cbe1941c5c9485"
+    },
+    {
+      "id": "C-029-3",
+      "subject": "Produce reversible promotion diffs",
+      "sha": "ffb4a7d458e30dc1d2f98a38b70a2f9e815134fe"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "promotion",
+      "id": "packages/enrichment/promotion.mjs",
+      "location": "local",
+      "sha256": "8b533e79296b8c138cd0ebbc9a8c777c22735b3422b7c223d0d22e0573f5e8cc"
+    },
+    {
+      "kind": "claim-selector",
+      "id": "scripts/research/claim-selector.mjs",
+      "location": "local",
+      "sha256": "f557ae09fef8727c703dd29b1733184671d208c4fbe76fcb1ffce52db2de46ff"
+    },
+    {
+      "kind": "promotion-tests",
+      "id": "tests/research-program/promotion.test.mjs",
+      "location": "local",
+      "sha256": "dc916beb4915328de00d1c68f443e9c0068017c67963a2e121e54111a36b718c"
+    },
+    {
+      "kind": "promotion-rules",
+      "id": "docs/research-program/promotion-rules.md",
+      "location": "local",
+      "sha256": "ef939e11d67fead92da8deab137b73b2a05cd17ecd48e8120e8313968a292962"
+    },
+    {
+      "kind": "sealed-review-ledger-unchanged",
+      "id": "packages/identity/src/review-ledger.mjs",
+      "location": "local",
+      "sha256": "0074cb272fcad200c9b33ba80e55b07af8538f6df451e9a468d9211066dcaa99"
+    },
+    {
+      "kind": "sealed-normalization-index-unchanged",
+      "id": "packages/normalization/src/index.mjs",
+      "location": "local",
+      "sha256": "7d1b9af8a2c119ce1351a985dbe75ea2f7dd8d3efe773e1d4ef93665be703e5e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c029-focused",
+      "command": "node --test tests/research-program/promotion.test.mjs",
+      "started_at": "2026-09-14T09:15:55.892149Z",
+      "completed_at": "2026-09-14T09:15:55.994228Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 promotion tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c029-focused-event",
+        "path": "verification/research-program/pr-029/producer-20260914/commands/focused-promotion/event.json",
+        "sha256": "19eeca8d15380740fed752dd4cde69203958752329bd21a07032ecb5f109e3ff",
+        "bytes": 1037
+      }
+    },
+    {
+      "id": "cmd-c029-selector",
+      "command": "node --test tests/claim-selector.test.mjs",
+      "started_at": "2026-09-14T09:15:55.994676Z",
+      "completed_at": "2026-09-14T09:15:56.099025Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Existing claim-selector tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c029-selector-event",
+        "path": "verification/research-program/pr-029/producer-20260914/commands/claim-selector/event.json",
+        "sha256": "eb79d2440c5efe50a0a1f562a48f0194a72da5719f2c24614c0080559042e429",
+        "bytes": 1026
+      }
+    },
+    {
+      "id": "cmd-c029-review",
+      "command": "node --test tests/research-program/review-queue.test.mjs",
+      "started_at": "2026-09-14T09:15:56.099373Z",
+      "completed_at": "2026-09-14T09:15:56.196596Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Claim-review queue tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c029-review-event",
+        "path": "verification/research-program/pr-029/producer-20260914/commands/review-queue/event.json",
+        "sha256": "07f467e6ac16bb9d8f12540c40f991eda62826618d4d3f721862859051809b41",
+        "bytes": 1030
+      }
+    },
+    {
+      "id": "cmd-c029-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T09:15:56.196986Z",
+      "completed_at": "2026-09-14T09:15:56.252386Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c029-identity-event",
+        "path": "verification/research-program/pr-029/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "09bae14fce9f88b7583929ed79346e806c7d5205e0c22de3d5ec149bd00dffe6",
+        "bytes": 1027
+      }
+    },
+    {
+      "id": "cmd-c029-norm",
+      "command": "node packages/normalization/tools/validate-package.mjs",
+      "started_at": "2026-09-14T09:15:56.252697Z",
+      "completed_at": "2026-09-14T09:16:00.212085Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed normalization package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c029-norm-event",
+        "path": "verification/research-program/pr-029/producer-20260914/commands/normalization-validate/event.json",
+        "sha256": "41143712d0ba2818c14ad9d9e0de08bc89f4868e9d919e9d8d611a7b41a34430",
+        "bytes": 1061
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr029-artifact-0",
+      "path": "verification/research-program/pr-029/task-binding.json",
+      "bytes": 4055,
+      "sha256": "9f6ae3288f9849f472fed89c424c4bbf1397bc5964f4e09458f803567e3cb664"
+    },
+    {
+      "id": "pr029-artifact-1",
+      "path": "verification/research-program/pr-029/dispatch.json",
+      "bytes": 2660,
+      "sha256": "b8d9540e42180931ca152e3e24310b159030c7b0ce7413661960bc8cfa601dc9"
+    },
+    {
+      "id": "pr029-artifact-2",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/focused-promotion/receipt.json",
+      "bytes": 457,
+      "sha256": "02ce354e5166abbc88535ea9315a120936b68d9b7ad303e24dff5db557187b50"
+    },
+    {
+      "id": "pr029-artifact-3",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/focused-promotion/stdout.log",
+      "bytes": 489,
+      "sha256": "1a2ad270be934da0fe57b4d2966f4599392588cdcd0a553d3497dd2bf1d4001c"
+    },
+    {
+      "id": "pr029-artifact-4",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/focused-promotion/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr029-artifact-5",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/focused-promotion/event.json",
+      "bytes": 1037,
+      "sha256": "19eeca8d15380740fed752dd4cde69203958752329bd21a07032ecb5f109e3ff"
+    },
+    {
+      "id": "pr029-artifact-6",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/claim-selector/receipt.json",
+      "bytes": 442,
+      "sha256": "04ef415c2290048b230ea86829fdae510fc6e42e438a29c7804c623c0502e608"
+    },
+    {
+      "id": "pr029-artifact-7",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/claim-selector/stdout.log",
+      "bytes": 820,
+      "sha256": "d4f1e37f568f5c6ef747897e9540c1ad518460b01e74dc33bab7789c66b38e43"
+    },
+    {
+      "id": "pr029-artifact-8",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/claim-selector/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr029-artifact-9",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/claim-selector/event.json",
+      "bytes": 1026,
+      "sha256": "eb79d2440c5efe50a0a1f562a48f0194a72da5719f2c24614c0080559042e429"
+    },
+    {
+      "id": "pr029-artifact-10",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/review-queue/receipt.json",
+      "bytes": 455,
+      "sha256": "74d3b2c4c427afac8818ed819acb4ae1192c17904c2dcbfe547b47597ba81134"
+    },
+    {
+      "id": "pr029-artifact-11",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/review-queue/stdout.log",
+      "bytes": 495,
+      "sha256": "55e37a24a58c799b81ac065f10ffe2aeb525e5baaf010beea5bc666181370108"
+    },
+    {
+      "id": "pr029-artifact-12",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/review-queue/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr029-artifact-13",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/review-queue/event.json",
+      "bytes": 1030,
+      "sha256": "07f467e6ac16bb9d8f12540c40f991eda62826618d4d3f721862859051809b41"
+    },
+    {
+      "id": "pr029-artifact-14",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "73e5adfa5262cf3414d74fb5f8063967d130a4ffe17c72ef7ae852006e301095"
+    },
+    {
+      "id": "pr029-artifact-15",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr029-artifact-16",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr029-artifact-17",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "09bae14fce9f88b7583929ed79346e806c7d5205e0c22de3d5ec149bd00dffe6"
+    },
+    {
+      "id": "pr029-artifact-18",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/normalization-validate/receipt.json",
+      "bytes": 457,
+      "sha256": "db3e690462645d8e336495c4d60120249bc2d6ff73c084a063071d2c8b7bca59"
+    },
+    {
+      "id": "pr029-artifact-19",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/normalization-validate/stdout.log",
+      "bytes": 2970,
+      "sha256": "90acf902c536110f1d3a2a0c950209b67cad3806533ca99a4d32ff2b5c7dccb7"
+    },
+    {
+      "id": "pr029-artifact-20",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/normalization-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr029-artifact-21",
+      "path": "verification/research-program/pr-029/producer-20260914/commands/normalization-validate/event.json",
+      "bytes": 1061,
+      "sha256": "41143712d0ba2818c14ad9d9e0de08bc89f4868e9d919e9d8d611a7b41a34430"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-029-1",
+      "status": "producer_checked",
+      "result": "Inferred scientific statements cannot receive literal-observation status. Literals do not all need a separate human click.",
+      "command_ids": [
+        "cmd-c029-focused"
+      ]
+    },
+    {
+      "id": "C-029-2",
+      "status": "producer_checked",
+      "result": "Stale approvals, incomplete source runs and changed field hashes cannot promote. Unaffected accepted claims remain. Existing claim-selector tests pass.",
+      "command_ids": [
+        "cmd-c029-focused",
+        "cmd-c029-selector"
+      ]
+    },
+    {
+      "id": "C-029-3",
+      "status": "producer_checked",
+      "result": "Rollback restores prior public facts and retains newer attempt history. Sealed identity and normalization packages validate.",
+      "command_ids": [
+        "cmd-c029-focused",
+        "cmd-c029-identity",
+        "cmd-c029-norm"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "sealed-normalization-src",
+      "status": "accepted",
+      "detail": "packages/normalization/src was not edited. validate-package.mjs passes."
+    },
+    {
+      "id": "sealed-identity-review-ledger",
+      "status": "accepted",
+      "detail": "packages/identity/src/review-ledger.mjs was not edited. identity validate passes."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Technical promotion is not scientific acceptance. R01/R02/R05/R14 remain unaccepted."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-promotion-review",
+      "status": "pending",
+      "detail": "Independent review of promotion classes, stale-approval rejection and rollback remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "ledger-owned-paths-named-sealed-packages",
+      "status": "risk",
+      "detail": "The original ledger named packages/normalization/ and review-ledger.mjs. Implementation is in enrichment to preserve artifact seals, following the PR-028 WP7 lesson."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of promotion classes, stale-approval rejection and rollback, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-029 source and replay focused promotion, claim-selector, identity and normalization validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
