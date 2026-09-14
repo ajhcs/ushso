@@ -1,0 +1,78 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr014-cdc-view-20260914",
+  "slice_id": "C-014-1",
+  "pr_id": "PR-014",
+  "title": "Bind CDC view metadata and columns",
+  "owner": "/root/pr014_cdc_view",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr014-cdc-view-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr014-cdc-view-20260914",
+  "objective": "CDC view, column and documentation identities are consistently linked without treating a visual/dashboard catalog entry as a queryable table.",
+  "outcome": "Socrata view metadata is resolved by source-native ID. Tabular datasets stay in the row-sample queue; documents, visualizations and external links stay out. Wire fieldName, labels, types, descriptions, code values and custom-field evidence are preserved. PLACES produces 154 documented fields without inferring geography completeness or a person-level grain. All baseline CDC IDs have a reconciled extraction receipt; four isolated records stay in explicit compatibility/missing-data handling. No source record disappears.",
+  "dependencies": [
+    "PR-007",
+    "PR-008",
+    "PR-011",
+    "PR-012"
+  ],
+  "owned_paths": [
+    "scripts/research/source-extractors.mjs",
+    "packages/connectors/",
+    "tests/research-program/cdc-view.test.mjs",
+    "verification/research-program/pr-014/",
+    "docs/research-program/handoffs/PR-014.json"
+  ],
+  "commits": [
+    {
+      "id": "C-014-1",
+      "subject": "Resolve exact Socrata view metadata",
+      "instructions": "Fetch the publisher view identified by its source-native ID; distinguish a tabular dataset from a document, visualization or external link.",
+      "verification": "Fixtures for each asset type keep non-tabular records out of the row-sample queue."
+    },
+    {
+      "id": "C-014-2",
+      "subject": "Extract columns and metadata roles",
+      "instructions": "Preserve wire fieldName, labels, types, descriptions, code values and custom-field evidence. Keep row label, date roles and geographic assertions separate.",
+      "verification": "PLACES produces its 154 documented fields without inferring geography completeness or a person-level grain."
+    },
+    {
+      "id": "C-014-3",
+      "subject": "Build the CDC extraction receipt",
+      "instructions": "Reconcile all baseline CDC IDs, dictionary eligibility and parser outcomes. Carry four currently isolated records into explicit compatibility/missing-data handling.",
+      "verification": "No source record disappears; dictionary counts are based on record IDs with parse receipts, not the number of fetched pages."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/cdc-view.test.mjs",
+    "node --test tests/research-extractors.test.mjs",
+    "node --test tests/research-program/http-outcomes.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-014.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-014/",
+  "binding": {
+    "base_sha": "70b2861bb802200db400fe53f1a320f70db050f8",
+    "base_tree": "1addd6c8ac61a321970b72332549912aa58beab0",
+    "dependency_merge_shas": {
+      "PR-007": "0d730aaf07b89bb16fb66fc224841a2d66c80d49",
+      "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+      "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74",
+      "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
