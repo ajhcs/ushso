@@ -1,0 +1,252 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-051",
+  "status": "producer_checked",
+  "owner": "/root/pr051_tic_provider_reference",
+  "reviewer": "Astra/root",
+  "base_sha": "793c195259468be9f31939e5810dea3282296898",
+  "head_sha": "04516ca62c0910c27f95b34a8d9467df303bb6dc",
+  "dependency_merge_shas": {
+    "PR-034": "a8437e36ecf102af6f3bc86cf539a0d6b1739796",
+    "PR-049": "4828683a6573ba9e95566d68eec367067df61102",
+    "PR-050": "50a49d7288fd306d5eae05d98300e412c91db046"
+  },
+  "branch": "codex/ushso-pr051-tic-provider-reference-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/connectors/mrf/payer-provider-reference.mjs",
+    "evaluation/research-program/mrf-fixtures/payer-provider-reference/",
+    "tests/research-program/tic-provider-reference.test.mjs",
+    "docs/research-program/tic-provider-reference.md",
+    "verification/research-program/pr-051/",
+    "docs/research-program/handoffs/PR-051.json"
+  ],
+  "problem": "Payer provider-reference IDs could be treated as NPIs or hospital CCNs. Equal numeric reference IDs in different files could be joined accidentally. Missing referenced objects could invent provider groups from hospital names. An NPI-bearing rate could automatically map to a hospital CCN or a complete facility roster. Source-local reference resolution could perform an implicit cross-source identity merge.",
+  "resulting_behavior": "Provider-reference resolution lives in packages/connectors/mrf/payer-provider-reference.mjs because identity is WP7-sealed. Provider-group IDs are scoped to the reporting file/version. Equal numeric IDs in different files cannot be joined. A missing referenced object yields an unresolved association; no provider group is invented from a hospital name. An NPI-bearing rate does not automatically map to a hospital CCN or a complete facility roster. Reference closure has explicit count and byte limits. Source-local resolution never performs an implicit cross-source identity merge. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-051-1",
+      "subject": "Model inline and external references",
+      "sha": "2509e5c5ac98e983c1ac83909feff9d1eb631f14"
+    },
+    {
+      "id": "C-051-2",
+      "subject": "Resolve bounded reference closures",
+      "sha": "00d0b9d946afe9aaf3b092cd566dbe0f72b4bae5"
+    },
+    {
+      "id": "C-051-3",
+      "subject": "Expose reference completeness",
+      "sha": "04516ca62c0910c27f95b34a8d9467df303bb6dc"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "payer-provider-reference",
+      "id": "packages/connectors/mrf/payer-provider-reference.mjs",
+      "location": "local",
+      "sha256": "551a96a23358a37243a8f0ea240a863a2c63aab1b123296686d3c49fe0406795"
+    },
+    {
+      "kind": "tic-provider-reference-tests",
+      "id": "tests/research-program/tic-provider-reference.test.mjs",
+      "location": "local",
+      "sha256": "d731bd51244355ad8527d0e597b499c7bcc6d445ad7dec56e8b9ca7f7f9cb706"
+    },
+    {
+      "kind": "tic-provider-reference-docs",
+      "id": "docs/research-program/tic-provider-reference.md",
+      "location": "local",
+      "sha256": "af7a2a43e0ac6001f0a06757849a49ebb389f0808ac6c74ac53b1ac05f07e696"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c051-focused",
+      "command": "node --test tests/research-program/tic-provider-reference.test.mjs",
+      "started_at": "2026-09-14T16:25:36.270761Z",
+      "completed_at": "2026-09-14T16:25:36.415893Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 provider-reference tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c051-focused-event",
+        "path": "verification/research-program/pr-051/producer-20260914/commands/focused-refs/event.json",
+        "sha256": "210c69bf19e6150274e80a4835e13d6fce2dbd360390343e7e9df2c3edd7474b",
+        "bytes": 1044
+      }
+    },
+    {
+      "id": "cmd-c051-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T16:25:36.416382Z",
+      "completed_at": "2026-09-14T16:25:36.475120Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c051-identity-event",
+        "path": "verification/research-program/pr-051/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "28a4e49c32c1f04bff1fb60736665f60a4b3e6e84ba23e4169a19af5e68ce7d6",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr051-artifact-0",
+      "path": "verification/research-program/pr-051/task-binding.json",
+      "bytes": 3808,
+      "sha256": "931815fadf2eb20f8db9d332c816f7a25c85b4a14cc33ecdcd928a373312ebf9"
+    },
+    {
+      "id": "pr051-artifact-1",
+      "path": "verification/research-program/pr-051/dispatch.json",
+      "bytes": 2848,
+      "sha256": "4a46cbf84805b161c0f8022dbd63829a36cacc07620859d2dbfb43e8149e7c36"
+    },
+    {
+      "id": "pr051-artifact-2",
+      "path": "verification/research-program/pr-051/producer-20260914/commands/focused-refs/receipt.json",
+      "bytes": 465,
+      "sha256": "25b2a2d0099c23fdeab5b2bb281ff8d5a438064d0b6ddeecd5c0d2b93ea22aa6"
+    },
+    {
+      "id": "pr051-artifact-3",
+      "path": "verification/research-program/pr-051/producer-20260914/commands/focused-refs/stdout.log",
+      "bytes": 451,
+      "sha256": "a6b6c084a019a8ae9580ef34daa8fefc320c197dbc57c04b99e198013c51524a"
+    },
+    {
+      "id": "pr051-artifact-4",
+      "path": "verification/research-program/pr-051/producer-20260914/commands/focused-refs/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr051-artifact-5",
+      "path": "verification/research-program/pr-051/producer-20260914/commands/focused-refs/event.json",
+      "bytes": 1044,
+      "sha256": "210c69bf19e6150274e80a4835e13d6fce2dbd360390343e7e9df2c3edd7474b"
+    },
+    {
+      "id": "pr051-artifact-6",
+      "path": "verification/research-program/pr-051/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "29dc3220319e0f5cac75e92a7a0af2a2b7bcc474af99f49f87c7723c714cd74b"
+    },
+    {
+      "id": "pr051-artifact-7",
+      "path": "verification/research-program/pr-051/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr051-artifact-8",
+      "path": "verification/research-program/pr-051/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr051-artifact-9",
+      "path": "verification/research-program/pr-051/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "28a4e49c32c1f04bff1fb60736665f60a4b3e6e84ba23e4169a19af5e68ce7d6"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-051-1",
+      "status": "producer_checked",
+      "result": "Equal numeric reference IDs in different files cannot be joined accidentally.",
+      "command_ids": [
+        "cmd-c051-focused"
+      ]
+    },
+    {
+      "id": "C-051-2",
+      "status": "producer_checked",
+      "result": "A missing referenced object yields an unresolved association; no provider group is invented from a hospital name.",
+      "command_ids": [
+        "cmd-c051-focused"
+      ]
+    },
+    {
+      "id": "C-051-3",
+      "status": "producer_checked",
+      "result": "An NPI-bearing rate does not automatically map to a hospital CCN or a complete facility roster. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c051-focused",
+        "cmd-c051-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "identity-src-untouched",
+      "status": "accepted",
+      "detail": "packages/identity was not edited. Ledger-named packages/identity/mrf/ was not created."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Provider-reference resolution is not R08/R10 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-provider-reference-review",
+      "status": "pending",
+      "detail": "Independent review of scoped references, missing objects and NPI-not-CCN mapping remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "official-example-is-fictional",
+      "status": "risk",
+      "detail": "Provider groups in the official CMS fictional in-network sample are not live provider identities."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of scoped references, missing objects and NPI-not-CCN mapping, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-051 source and replay focused provider-reference and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
