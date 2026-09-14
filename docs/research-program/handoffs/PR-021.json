@@ -1,0 +1,311 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-021",
+  "status": "producer_checked",
+  "owner": "/root/pr021_deterministic_qualification",
+  "reviewer": "Astra/root",
+  "base_sha": "866718b5b3378dba879ff404d0311a887ef1db87",
+  "head_sha": "3b1a73f27e0eca29f8ba8c78af7177d260ca21dd",
+  "dependency_merge_shas": {
+    "PR-018": "fdda1278b5796b8ca112b2d722182f23308f196c",
+    "PR-020": "f3faa2c5eeff99da14196db08543db7865b788f2"
+  },
+  "branch": "codex/ushso-pr021-deterministic-qualification-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/coverage/",
+    "scripts/research-program/qualify-deterministic.mjs",
+    "docs/research-program/deterministic-results.md",
+    "tests/research-program/qualify-deterministic.test.mjs",
+    "verification/research-program/pr-021/",
+    "docs/research-program/handoffs/PR-021.json"
+  ],
+  "problem": "Deterministic extraction lacked a measured acceptance boundary and a concrete residual queue. Successful results could be promoted without capture/parser receipts. Residual work could default to the entire corpus or ask a model to invent missing facts. Failed empirical thresholds could be silently flipped. Last-good public generation could be overwritten without publication validation.",
+  "resulting_behavior": "reconcileEvidence requires a capture/parser receipt for every successful result and refuses promotion when evidence is missing. Partial dictionaries and stale observations are retained with reasons. createResidualTasks emits a bounded queue (not 3434 records) excluding credentials, forbidden access and unknown eligibility. Every residual has a public passage or an explicit insufficient-evidence outcome; LLM-from-memory is forbidden. publishDeterministicReadout reports attempt coverage, dictionary yield, working examples, unresolved essential fields and source differences with reproducible R03/R06 denominators of 3434. Failed R03/R04/R06 thresholds stay failed. Last-good generation live-2026-09-03-85b50522b420 and manifest 85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e remain unchanged. Publication is not authorized. Live fetch is forbidden. CLI stays fixture-only. Sealed accounting artifacts, normalization src and identity schema-catalog are unchanged. scripts/research/sweep.mjs is not invoked.",
+  "commits": [
+    {
+      "id": "C-021-1",
+      "subject": "Reconcile successful and failed evidence",
+      "sha": "f90695eb691557cd5618ca6cc4c185b58e9ee1a1"
+    },
+    {
+      "id": "C-021-2",
+      "subject": "Create residual tasks from actual gaps",
+      "sha": "f90695eb691557cd5618ca6cc4c185b58e9ee1a1"
+    },
+    {
+      "id": "C-021-3",
+      "subject": "Publish a deterministic completion readout",
+      "sha": "3b1a73f27e0eca29f8ba8c78af7177d260ca21dd"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "qualify-lib",
+      "id": "packages/coverage/research-program/v1.0.0/src/qualify-deterministic.mjs",
+      "location": "local",
+      "sha256": "17b72bb4bf4b867519b9fa6bfe8dde37cf1afafefafb552f13c10a7a32a948ce"
+    },
+    {
+      "kind": "coverage-index",
+      "id": "packages/coverage/index.mjs",
+      "location": "local",
+      "sha256": "dc921609cd8acc80cc30763570c3d271bdea39383400040864cdffe49d64f301"
+    },
+    {
+      "kind": "qualify-cli",
+      "id": "scripts/research-program/qualify-deterministic.mjs",
+      "location": "local",
+      "sha256": "bd1740122171578af49549a03c6439ce92e9c7bb2cdd46fea6c99345b01b598b"
+    },
+    {
+      "kind": "qualify-tests",
+      "id": "tests/research-program/qualify-deterministic.test.mjs",
+      "location": "local",
+      "sha256": "e27623451e27285cb18a923283a23bee6b3a05c44b85589781a4bc5e68060a0c"
+    },
+    {
+      "kind": "deterministic-readout",
+      "id": "docs/research-program/deterministic-results.md",
+      "location": "local",
+      "sha256": "a53c041aef0d91e41309fe46539567aac3998426a4f9c90ec645615230792510"
+    },
+    {
+      "kind": "last-good-corpus",
+      "id": "packages/retrieval/versions/v1.2.0/corpus/corpus.json",
+      "location": "local",
+      "sha256": "56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c021-focused",
+      "command": "node --test tests/research-program/qualify-deterministic.test.mjs",
+      "started_at": "2026-09-14T06:37:30.302134Z",
+      "completed_at": "2026-09-14T06:37:34.641649Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "4/4 qualify-deterministic tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c021-focused-event",
+        "path": "verification/research-program/pr-021/producer-20260914/commands/focused-qualify/event.json",
+        "sha256": "6485df5fe2a4e8a0aa868c976c3fa1c6a35dfeacbc327d18546048bc067b0d40",
+        "bytes": 1055
+      }
+    },
+    {
+      "id": "cmd-c021-sweep",
+      "command": "node --test tests/research-program/sweep-accounting.test.mjs",
+      "started_at": "2026-09-14T06:37:34.642069Z",
+      "completed_at": "2026-09-14T06:37:35.768131Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "4/4 sweep-accounting tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c021-sweep-event",
+        "path": "verification/research-program/pr-021/producer-20260914/commands/sweep-accounting/event.json",
+        "sha256": "13b5f65aab0a37030752c5b1ba523e7eaf39f0979c4b471454e8f71bd98ac3dc",
+        "bytes": 1048
+      }
+    },
+    {
+      "id": "cmd-c021-meaning",
+      "command": "node --test tests/research-program/field-meaning.test.mjs",
+      "started_at": "2026-09-14T06:37:35.768516Z",
+      "completed_at": "2026-09-14T06:37:35.908535Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "6/6 field-meaning tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c021-meaning-event",
+        "path": "verification/research-program/pr-021/producer-20260914/commands/field-meaning/event.json",
+        "sha256": "213f5df986cbb0429d83afd754978b17a7de2d0c61a7d7540a64077d3b3aacb2",
+        "bytes": 1033
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr021-artifact-0",
+      "path": "verification/research-program/pr-021/task-binding.json",
+      "bytes": 3908,
+      "sha256": "a3d64f1edd3f14d525232873e9e92485b8000601ab2cb3636af110758886a5d0"
+    },
+    {
+      "id": "pr021-artifact-1",
+      "path": "verification/research-program/pr-021/dispatch.json",
+      "bytes": 2602,
+      "sha256": "52ffed2dc034bce6ef713bcd2f057932f8a67e354b2add2e6a3cda9d98b589f2"
+    },
+    {
+      "id": "pr021-artifact-2",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/focused-qualify/receipt.json",
+      "bytes": 467,
+      "sha256": "5aba08eeaeb17884ad1a408281922c54516d4b7c13aa9db18d06f6da1c04f61d"
+    },
+    {
+      "id": "pr021-artifact-3",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/focused-qualify/stdout.log",
+      "bytes": 535,
+      "sha256": "27b32d3fe02b54d02f5e3e897b3b87f27c5c85c886c9fcb1c46bb723a2f5186f"
+    },
+    {
+      "id": "pr021-artifact-4",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/focused-qualify/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr021-artifact-5",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/focused-qualify/event.json",
+      "bytes": 1055,
+      "sha256": "6485df5fe2a4e8a0aa868c976c3fa1c6a35dfeacbc327d18546048bc067b0d40"
+    },
+    {
+      "id": "pr021-artifact-6",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/sweep-accounting/receipt.json",
+      "bytes": 463,
+      "sha256": "dd46c30139239a5d307ff43456200727b70792f72fe20263cbeb63283c089eaa"
+    },
+    {
+      "id": "pr021-artifact-7",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/sweep-accounting/stdout.log",
+      "bytes": 531,
+      "sha256": "7bf65fad644a8bef484bf7ed83cfe3e7cb96739a90f7b3302d2747fa2ff79632"
+    },
+    {
+      "id": "pr021-artifact-8",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/sweep-accounting/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr021-artifact-9",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/sweep-accounting/event.json",
+      "bytes": 1048,
+      "sha256": "13b5f65aab0a37030752c5b1ba523e7eaf39f0979c4b471454e8f71bd98ac3dc"
+    },
+    {
+      "id": "pr021-artifact-10",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/field-meaning/receipt.json",
+      "bytes": 457,
+      "sha256": "f1f7918a3e6abca0b018273c2fed5cf05944a5bf57fd638b66f2a26523037bf5"
+    },
+    {
+      "id": "pr021-artifact-11",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/field-meaning/stdout.log",
+      "bytes": 653,
+      "sha256": "9813312208249ac07265091ea5b2b0e8fa9b594564ec3bc4152ba00254d4e146"
+    },
+    {
+      "id": "pr021-artifact-12",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/field-meaning/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr021-artifact-13",
+      "path": "verification/research-program/pr-021/producer-20260914/commands/field-meaning/event.json",
+      "bytes": 1033,
+      "sha256": "213f5df986cbb0429d83afd754978b17a7de2d0c61a7d7540a64077d3b3aacb2"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-021-1",
+      "status": "producer_checked",
+      "result": "Every successful result has a matching capture/parser receipt. Missing evidence prevents promotion. Partial dictionaries and stale observations are retained.",
+      "command_ids": [
+        "cmd-c021-focused"
+      ]
+    },
+    {
+      "id": "C-021-2",
+      "status": "producer_checked",
+      "result": "Residual queue is bounded and not the entire corpus. Credentials and forbidden access are excluded. No residual asks an LLM to recall a missing fact; each has a public passage or insufficient-evidence outcome.",
+      "command_ids": [
+        "cmd-c021-focused"
+      ]
+    },
+    {
+      "id": "C-021-3",
+      "status": "producer_checked",
+      "result": "R03/R06 denominators are 3434 and reproducible. Failed thresholds stay failed. Last-good generation is unchanged. Sweep and field-meaning tests remain green.",
+      "command_ids": [
+        "cmd-c021-focused",
+        "cmd-c021-sweep",
+        "cmd-c021-meaning"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-cms-cdc-census-http",
+      "status": "accepted",
+      "detail": "Qualification uses the PR-020 fixture sweep and retained public passages. blockedFetch forbids live HTTP."
+    },
+    {
+      "id": "requirement-acceptance",
+      "status": "skipped",
+      "detail": "R01\u2013R16 remain unaccepted. Failed empirical thresholds are recorded as failed."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-deterministic-review",
+      "status": "pending",
+      "detail": "Independent review of evidence reconciliation, residual queue and unaccepted readout remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "fixture-not-full-selected-source-execution",
+      "status": "risk",
+      "detail": "Attempt coverage uses the PR-020 reserved fixture budget. It does not execute live captures for every eligible record."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of evidence reconciliation, residual queue and unaccepted readout, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-021 source and replay focused qualify-deterministic, sweep-accounting and field-meaning tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
