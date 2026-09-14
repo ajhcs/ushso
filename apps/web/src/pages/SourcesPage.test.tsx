@@ -70,6 +70,8 @@ describe('historical readiness is not current coverage', () => {
     })
     const archived = archiveHistoricalReadiness(readiness)
     const pa = archived.states.find((state: { postal: string }) => state.postal === 'PA')
+    expect(pa).toBeDefined()
+    if (!pa) throw new Error('expected archived Pennsylvania readiness row')
     expect(pa.archived_published_state_record_count).toBe(HISTORICAL_PA_PUBLISHED_RECORD_COUNT)
     expect(pa.current_published_state_record_count).toBe(0)
     expect(pa.published_state_record_count_is_current).toBe(false)
