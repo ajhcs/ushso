@@ -1,0 +1,79 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr057-machine-variables-20260914",
+  "slice_id": "C-057-1",
+  "pr_id": "PR-057",
+  "title": "Expose qualified variables and proposal status coherently",
+  "owner": "/root/pr057_machine_variables",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr057-machine-variables-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr057-machine-variables-20260914",
+  "objective": "get_variables serves exact contextual fields; proposals remain separately inspectable.",
+  "outcome": "The positive HCRIS fixture uses accepted wire mappings. Unapproved documentation does not leak into the canonical schema. A supplied schema identifier does not establish dictionary applicability. A 154-field dictionary traverses without omissions or duplicates. A known dictionary proposal remains a proposal. get_variables stays honest about an unbound schema. worker/index.mjs does not import enrichment. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-008",
+    "PR-029",
+    "PR-055"
+  ],
+  "owned_paths": [
+    "worker/dictionary-review-router.mjs",
+    "worker/static-machine-toolkit-service.mjs",
+    "worker/machine-cursor.mjs",
+    "packages/machine-toolkit/src/service.mjs",
+    "packages/registry/qualified-variable-contexts.mjs",
+    "packages/registry/index.mjs",
+    "tests/research-program/machine-variables.test.mjs",
+    "verification/research-program/pr-057/",
+    "docs/research-program/handoffs/PR-057.json"
+  ],
+  "commits": [
+    {
+      "id": "C-057-1",
+      "subject": "Read accepted variable contexts",
+      "instructions": "Resolve schema/release/distribution IDs from get_asset and expose exact wire names, definitions, units/states, allowed values and evidence.",
+      "verification": "The positive HCRIS fixture uses accepted wire mappings; unapproved documentation does not leak into the canonical schema."
+    },
+    {
+      "id": "C-057-2",
+      "subject": "Support bounded variable search and paging",
+      "instructions": "Implement exact-name/label matching and required field filters using indexed dictionary pages. Preserve supplement and truncation metadata.",
+      "verification": "A 154-field dictionary traverses without omissions/duplicates, and oversized fields retain their documented retrieval path."
+    },
+    {
+      "id": "C-057-3",
+      "subject": "Explain unresolved dictionary states",
+      "instructions": "Return targeted guidance for no schema context, missing dictionary and pending proposals. Link proposal inspection without changing scientific status.",
+      "verification": "A known dictionary proposal is visible as a proposal, while get_variables remains honest about an unbound schema."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/machine-variables.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-057.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-057/",
+  "binding": {
+    "base_sha": "55834fb545f969e765d79ab67e3770a697b84347",
+    "base_tree": "dfaa5c3561ee9e52a799a483a2a1773ec30f1c1f",
+    "dependency_merge_shas": {
+      "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+      "PR-029": "ddb8f4cc88106ab937220a2c231ed62928ae101f",
+      "PR-055": "a6c63c1ca35f98517e7000b44602c1e8f765e2d5"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
