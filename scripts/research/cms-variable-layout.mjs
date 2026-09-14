@@ -1,3 +1,4 @@
+import { createContextScopedSchemaFieldId } from '../../packages/identity/src/schema-catalog.mjs';
 export function parseVariableLayout(document){
  if(document.status!=='captured'||document.mode!=='layout')throw Error('LAYOUT_UNAVAILABLE');
  const lines=document.text.split('\n'),header=lines.findIndex(l=>/^\s*Variable Name\s+Term Name\s+Definition\s*$/.test(l));
@@ -184,4 +185,18 @@ export function invalidateMappingOnDocumentationUpdate({ mapping, previousDocume
     }),
     reason: 'documented_name_changed',
   });
+}
+
+export function fieldIdForAcceptedWireMapping(context, mapping) {
+  if (!mapping || !['exact', 'reviewed_alias'].includes(mapping.state) || typeof mapping.wire_name !== 'string' || mapping.wire_name.length < 1) {
+    const error = new Error('ACCEPTED_WIRE_MAPPING_REQUIRED');
+    error.code = 'ACCEPTED_WIRE_MAPPING_REQUIRED';
+    throw error;
+  }
+  if (mapping.state === 'reviewed_alias' && !(Array.isArray(mapping.evidence_ids) && mapping.evidence_ids.length > 0)) {
+    const error = new Error('REVIEW_EVIDENCE_REQUIRED');
+    error.code = 'REVIEW_EVIDENCE_REQUIRED';
+    throw error;
+  }
+  return createContextScopedSchemaFieldId(context, mapping.wire_name);
 }

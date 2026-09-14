@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { createContextScopedSchemaFieldId, fieldIdForAcceptedWireMapping } from '../../packages/identity/src/schema-catalog.mjs';
+import { createContextScopedSchemaFieldId } from '../../packages/identity/src/schema-catalog.mjs';
 import { retainNameDiscrepancySummary } from '../../packages/identity/src/variable-identity.mjs';
 import {
   blockedFetch,
@@ -13,6 +13,7 @@ import {
   expandCountedHcrisNames,
   invalidateMappingOnDocumentationUpdate,
   proposeWireKeyReconciliation,
+  fieldIdForAcceptedWireMapping,
 } from '../../scripts/research/cms-variable-layout.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
