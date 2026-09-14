@@ -1,0 +1,322 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-027",
+  "status": "producer_checked",
+  "owner": "/root/pr027_enrichment_eval",
+  "reviewer": "Astra/root",
+  "base_sha": "83e8193580f3fb16038e4f689d52f2d77367ea5d",
+  "head_sha": "cb625ad6fe11af1ece14978db7807042c75e2f24",
+  "dependency_merge_shas": {
+    "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+    "PR-024": "467f4fbd91f54f1e0d7603162b510647591d2b63",
+    "PR-026": "d50de58bbb834d3924a3a223e14a3444a420611a"
+  },
+  "branch": "codex/ushso-pr027-enrichment-eval-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "evaluation/enrichment/",
+    "scripts/research-program/evaluate-enrichment.mjs",
+    "docs/research-program/model-selection.md",
+    "tests/research-program/evaluate-enrichment.test.mjs",
+    "verification/research-program/pr-027/",
+    "docs/research-program/handoffs/PR-027.json"
+  ],
+  "problem": "Model choice could treat model output as gold, leak held-out labels into prompts, call live OpenRouter, or let cheap tokens and inter-model agreement override the \u22650.98 precision / zero critical-error gate. A failed model gate could be treated as disabling deterministic collection.",
+  "resulting_behavior": "C-027-1 freezes independently adjudicated CMS/CDC/Census/unit/date/insufficient-evidence tasks with critical-error categories and reviewer disagreement. Public prompts exclude held-out labels. Model output is not gold. C-027-2 compares exact IDs deepseek/deepseek-chat and meta/muse-spark-1.3-contributor on recorded offline outputs under the editable $10 pilot configuration, saving tokens, actual price, latency, abstentions and rejected claims. The offline harness works without credentials. --live reports exact model/endpoint and total spend without HTTP. C-027-3 reports precision, coverage, critical errors and review cost. A model failing a task class is disabled for that class. Cheap tokens and agreement do not override the gate. Neither recorded model is publication-eligible on this fixture. Deterministic collection remains operational. R14 remains unaccepted.",
+  "commits": [
+    {
+      "id": "C-027-1",
+      "subject": "Create independently adjudicated tasks",
+      "sha": "e2cc85eb51e25ad812f56daaa89202a69e02e3ff"
+    },
+    {
+      "id": "C-027-2",
+      "subject": "Run paired bounded evaluation",
+      "sha": "e2cc85eb51e25ad812f56daaa89202a69e02e3ff"
+    },
+    {
+      "id": "C-027-3",
+      "subject": "Select the initial task-specific policy",
+      "sha": "cb625ad6fe11af1ece14978db7807042c75e2f24"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "eval-harness",
+      "id": "evaluation/enrichment/harness.mjs",
+      "location": "local",
+      "sha256": "a24828f2e6e695bafb4fc47cc66d656c6bb9e0f473500b39c5e69f209df23c7c"
+    },
+    {
+      "kind": "held-out-labels",
+      "id": "evaluation/enrichment/labels.held-out.json",
+      "location": "local",
+      "sha256": "61fc1ed0876acdbc80adfe9bb1d1f6b3bad2915808ae34c476de2b004165d04b"
+    },
+    {
+      "kind": "public-tasks",
+      "id": "evaluation/enrichment/tasks.public.json",
+      "location": "local",
+      "sha256": "92b8697d5d5c4f664aea067a8d7832ddf84db495ec46dcda361d7a5cf2ac956d"
+    },
+    {
+      "kind": "eval-cli",
+      "id": "scripts/research-program/evaluate-enrichment.mjs",
+      "location": "local",
+      "sha256": "514ec2a54e5c21f6cc590c314bff54f6c9c308318cb819fbb94bd9e65f8f369a"
+    },
+    {
+      "kind": "model-selection",
+      "id": "docs/research-program/model-selection.md",
+      "location": "local",
+      "sha256": "72190f1e77fd75628e9f61f47b15afa02ecdcc6dd0a6385c273e3fcccefb910c"
+    },
+    {
+      "kind": "eval-tests",
+      "id": "tests/research-program/evaluate-enrichment.test.mjs",
+      "location": "local",
+      "sha256": "3dd0cd188b731b5d8ebb31e00389b1b072c889016a6d43d4ab390171d8b0a489"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c027-focused",
+      "command": "node --test tests/research-program/evaluate-enrichment.test.mjs",
+      "started_at": "2026-09-14T08:24:19.347511Z",
+      "completed_at": "2026-09-14T08:24:19.446837Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 evaluate-enrichment tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c027-focused-event",
+        "path": "verification/research-program/pr-027/producer-20260914/commands/focused-eval/event.json",
+        "sha256": "5bb6755c6d6380ff009cf4541ac1c7228b0cdbf9d2673fb872c912720e6ffc7e",
+        "bytes": 1042
+      }
+    },
+    {
+      "id": "cmd-c027-claims",
+      "command": "node --test tests/research-program/claim-validation.test.mjs",
+      "started_at": "2026-09-14T08:24:19.447231Z",
+      "completed_at": "2026-09-14T08:24:19.535698Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 claim-validation tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c027-claims-event",
+        "path": "verification/research-program/pr-027/producer-20260914/commands/claim-validation/event.json",
+        "sha256": "86c85c2f8ed3945eb5177718e3438ca8a9f17c8a2d206f071055cb0d92de4a91",
+        "bytes": 1048
+      }
+    },
+    {
+      "id": "cmd-c027-cli",
+      "command": "node scripts/research-program/evaluate-enrichment.mjs",
+      "started_at": "2026-09-14T08:24:19.536012Z",
+      "completed_at": "2026-09-14T08:24:19.582181Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "offline CLI exits 0 without credentials.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c027-cli-event",
+        "path": "verification/research-program/pr-027/producer-20260914/commands/cli/event.json",
+        "sha256": "9c3eecd7e86f29be53d4600441969c9a9e8393808f42b9827cc242da65a0f8fd",
+        "bytes": 1004
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr027-artifact-0",
+      "path": "verification/research-program/pr-027/task-binding.json",
+      "bytes": 3855,
+      "sha256": "dea8bcb44d0dc804028e99a3be09608de3f802ba46f3d24eb50aaae106ff3be2"
+    },
+    {
+      "id": "pr027-artifact-1",
+      "path": "verification/research-program/pr-027/dispatch.json",
+      "bytes": 2436,
+      "sha256": "2d675135dbc2cbeea6a3c318d9f0655ff9c4fae337b74cbd792f26c2e6ee71bf"
+    },
+    {
+      "id": "pr027-artifact-2",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/focused-eval/receipt.json",
+      "bytes": 462,
+      "sha256": "5301f326a3d041a0b160400b055f1c4a4c021ae9204c7ea967db948d04afe8db"
+    },
+    {
+      "id": "pr027-artifact-3",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/focused-eval/stdout.log",
+      "bytes": 503,
+      "sha256": "39a51ced3363914702d370c60dc6bbae7cd98fcc274887bf9569296f7d8304ec"
+    },
+    {
+      "id": "pr027-artifact-4",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/focused-eval/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr027-artifact-5",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/focused-eval/event.json",
+      "bytes": 1042,
+      "sha256": "5bb6755c6d6380ff009cf4541ac1c7228b0cdbf9d2673fb872c912720e6ffc7e"
+    },
+    {
+      "id": "pr027-artifact-6",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/claim-validation/receipt.json",
+      "bytes": 463,
+      "sha256": "7205e4d40b74397d94e8ae9b2216815a05efd46802a1c0c56469f994b24588e4"
+    },
+    {
+      "id": "pr027-artifact-7",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/claim-validation/stdout.log",
+      "bytes": 430,
+      "sha256": "d45b6793a122dd0f93932999cd6cf05649de524012ff072e3c4e157d4933afea"
+    },
+    {
+      "id": "pr027-artifact-8",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/claim-validation/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr027-artifact-9",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/claim-validation/event.json",
+      "bytes": 1048,
+      "sha256": "86c85c2f8ed3945eb5177718e3438ca8a9f17c8a2d206f071055cb0d92de4a91"
+    },
+    {
+      "id": "pr027-artifact-10",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/cli/receipt.json",
+      "bytes": 437,
+      "sha256": "b247a3fa0eddc9da6b0e9830efc31ea8aa1bd20d818c707cdfc52f9adb5b2f19"
+    },
+    {
+      "id": "pr027-artifact-11",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/cli/stdout.log",
+      "bytes": 7417,
+      "sha256": "71bdc54776cf87b0ba8fea06a8e859ccbf425d2a8262c5234aedfcab20e0ad07"
+    },
+    {
+      "id": "pr027-artifact-12",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/cli/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr027-artifact-13",
+      "path": "verification/research-program/pr-027/producer-20260914/commands/cli/event.json",
+      "bytes": 1004,
+      "sha256": "9c3eecd7e86f29be53d4600441969c9a9e8393808f42b9827cc242da65a0f8fd"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-027-1",
+      "status": "producer_checked",
+      "result": "Labels include critical-error categories and reviewer disagreement. Model output is not gold. Held-out labels are outside public prompts.",
+      "command_ids": [
+        "cmd-c027-focused"
+      ]
+    },
+    {
+      "id": "C-027-2",
+      "status": "producer_checked",
+      "result": "Offline harness works without credentials. --live reports exact model/endpoint and total spend without HTTP.",
+      "command_ids": [
+        "cmd-c027-focused",
+        "cmd-c027-cli"
+      ]
+    },
+    {
+      "id": "C-027-3",
+      "status": "producer_checked",
+      "result": "Failing task classes are disabled. Cheap tokens and agreement do not override the gate. Deterministic collection stays operational. Claim-validation tests remain green.",
+      "command_ids": [
+        "cmd-c027-focused",
+        "cmd-c027-claims"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-openrouter-http",
+      "status": "accepted",
+      "detail": "Evaluation uses retained recorded outputs. --live is forbidden and does not send HTTP."
+    },
+    {
+      "id": "r14-acceptance",
+      "status": "accepted",
+      "detail": "This fixture does not accept R14 or materialize the full residual sample."
+    },
+    {
+      "id": "publication-eligibility",
+      "status": "accepted",
+      "detail": "Neither recorded model meets \u22650.98 precision with zero critical errors. That is a retained failing gate, not a hidden pass."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "R14",
+      "status": "unresolved",
+      "detail": "R14 quality gates promotion later; this comparison does not accept R14. Status remains unresolved, not unaccepted-as-a-handoff-enum."
+    },
+    {
+      "id": "independent-enrichment-eval-review",
+      "status": "pending",
+      "detail": "Independent review of frozen labels, offline comparison and disabled classes remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "fixture-is-not-full-r14-sample",
+      "status": "risk",
+      "detail": "Six representative tasks freeze the comparison protocol. They are not the R14 residual sample."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of frozen labels, offline comparison and disabled classes, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-027 source and replay focused evaluate-enrichment tests plus the offline CLI. Do not issue current approval, R14 acceptance, or production change.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
