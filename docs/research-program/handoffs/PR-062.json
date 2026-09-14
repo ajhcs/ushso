@@ -1,0 +1,344 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-062",
+  "status": "producer_checked",
+  "owner": "/root/pr062_planner_qualification",
+  "reviewer": "Astra/root",
+  "base_sha": "fe17b53421a3f1e0c1abcf108eb5feb2d360ed23",
+  "head_sha": "2546b99b55f8968e3848fa435a11b80da1aeeef0",
+  "dependency_merge_shas": {
+    "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+    "PR-041": "7ee6ef80c438b584d16025ad3f60c24bb8c0c83e",
+    "PR-042": "24319b6584eae072971030adc2376c37d43d8cd3",
+    "PR-054": "4b8c8e0ec6c8b7a397ecb4d0d7dc00904f3ee924",
+    "PR-061": "9768f9b469c1c9b8d8f4082c05e3df534f65e1e2"
+  },
+  "branch": "codex/ushso-pr062-planner-qualification-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/planner/planner-acceptance.mjs",
+    "packages/planner/compile-metadata-plan.mjs",
+    "packages/planner/index.mjs",
+    "apps/web/src/pages/PlanPage.tsx",
+    "contracts/machine-toolkit/planner-activation.v1.json",
+    "tests/research-program/planner-qualification.test.mjs",
+    "verification/research-program/pr-062/",
+    "docs/research-program/handoffs/PR-062.json"
+  ],
+  "problem": "The disabled planner had no concrete path to useful, evidence-bound enablement. A compiler could invent datasets, fields, joins or analysis output. Missing required sources could be silently omitted. Adding plan fields could incidentally enable plan_research. Status text could claim an enabled planner prematurely. HTTP 200 or a successful tool envelope could be treated as a completed research task.",
+  "resulting_behavior": "No invented dataset, field, join or analysis output can appear; insufficient evidence returns an incomplete plan. The same pinned selections produce the same plan; missing required sources remain a named gap. The eight existing tools continue working if planner activation is not accepted; no status text claims an enabled planner prematurely. Planner activation is not an incidental side effect of adding fields. An accepted plan compiles documented steps; it does not certify a study design. plan_research remains disabled. worker/index.mjs does not import enrichment. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-062-1",
+      "subject": "Define planner acceptance and output scope",
+      "sha": "fc3dda805e007b746a05fb791104f5be63c4140f"
+    },
+    {
+      "id": "C-062-2",
+      "subject": "Implement deterministic plan composition",
+      "sha": "1689ec279e14b42eed19aa62aefe5eddb3ca2ba2"
+    },
+    {
+      "id": "C-062-3",
+      "subject": "Prepare gated activation evidence",
+      "sha": "2546b99b55f8968e3848fa435a11b80da1aeeef0"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "planner-acceptance",
+      "id": "packages/planner/planner-acceptance.mjs",
+      "location": "local",
+      "sha256": "73238cae0167d5b3a1e6be032cffa792703abd39bd91978cfeb4fa620aa0836a"
+    },
+    {
+      "kind": "compile-metadata-plan",
+      "id": "packages/planner/compile-metadata-plan.mjs",
+      "location": "local",
+      "sha256": "2f3af172d4ee4228536d2bbb3a99f04ebea504df2396c678b5fbe669449bf68f"
+    },
+    {
+      "kind": "planner-index",
+      "id": "packages/planner/index.mjs",
+      "location": "local",
+      "sha256": "7a0c58d58fe8d395ced21036fb139da3b3cb1610153736d6a4cf567599f45090"
+    },
+    {
+      "kind": "plan-page",
+      "id": "apps/web/src/pages/PlanPage.tsx",
+      "location": "local",
+      "sha256": "04396d795b2b0183fbef55a21d5039bdb067cff6376922268fc383e07c978eb8"
+    },
+    {
+      "kind": "planner-activation-contract",
+      "id": "contracts/machine-toolkit/planner-activation.v1.json",
+      "location": "local",
+      "sha256": "ba003fcb0d9a8f70411c7bbf804155e9730eb0be8704e5c5d4e755ed7a2dd44e"
+    },
+    {
+      "kind": "planner-qualification-tests",
+      "id": "tests/research-program/planner-qualification.test.mjs",
+      "location": "local",
+      "sha256": "0c08aeb7ba2399df601e734afbbdd821b9242731adda8d5435206f1b6dcc7a4d"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "worker-index-unchanged",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "ca413cc6224ce2ef472d2116b3acf9ce3f60f4d9181e31f8bfdc1c2d2963ace1"
+    },
+    {
+      "kind": "public-capability-flags-unchanged",
+      "id": "packages/machine-toolkit/src/manifest.mjs",
+      "location": "local",
+      "sha256": "5f3fbb10e704b129951123b6e83640cf7312077d7e6dd71d413787afa17a4652"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c062-focused",
+      "command": "node --test tests/research-program/planner-qualification.test.mjs",
+      "started_at": "2026-09-14T21:37:43.478032Z",
+      "completed_at": "2026-09-14T21:37:43.653924Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 planner-qualification tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c062-focused-event",
+        "path": "verification/research-program/pr-062/producer-20260914/commands/focused-planner/event.json",
+        "sha256": "d5a5eee5710d047136afdd116d9ed35a50d47ffdcde854e0fec825c0a8893f9b",
+        "bytes": 1055
+      }
+    },
+    {
+      "id": "cmd-c062-related",
+      "command": "node --test tests/static-machine-toolkit.test.mjs",
+      "started_at": "2026-09-14T21:37:43.654315Z",
+      "completed_at": "2026-09-14T21:37:44.267895Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Eight public inspection operations remain contract-safe.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c062-related-event",
+        "path": "verification/research-program/pr-062/producer-20260914/commands/related-eight-tools/event.json",
+        "sha256": "c42ffbba963543622f26744f1faafcc47fb0c4e26c06ceae00776ce1f58056db",
+        "bytes": 1070
+      }
+    },
+    {
+      "id": "cmd-c062-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T21:37:44.268336Z",
+      "completed_at": "2026-09-14T21:37:44.331377Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c062-identity-event",
+        "path": "verification/research-program/pr-062/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "2e3977dc4870e630640f808f2bd78fdda5d191d6fbdba67f89bbb3bbaeebd06d",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr062-artifact-0",
+      "path": "verification/research-program/pr-062/task-binding.json",
+      "bytes": 4082,
+      "sha256": "5c636b5edee8552627ec2cdf2b475265adf14bb0bafe97946aeee4165f9841ff"
+    },
+    {
+      "id": "pr062-artifact-1",
+      "path": "verification/research-program/pr-062/dispatch.json",
+      "bytes": 2503,
+      "sha256": "4f7001ec232aa1529a9d40fb3a17ba3dbe75639e0467da5cf1f30b1d3d743417"
+    },
+    {
+      "id": "pr062-artifact-2",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/focused-planner/receipt.json",
+      "bytes": 467,
+      "sha256": "7d1becaf81fe2b679116f249c4708b3a3cfe143a7c73d02375abc0dc8227a840"
+    },
+    {
+      "id": "pr062-artifact-3",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/focused-planner/stdout.log",
+      "bytes": 503,
+      "sha256": "5122cc62770927c85ea3a19d0c17c5a580807fbf0a8288d9c225fcaf2b63a869"
+    },
+    {
+      "id": "pr062-artifact-4",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/focused-planner/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr062-artifact-5",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/focused-planner/event.json",
+      "bytes": 1055,
+      "sha256": "d5a5eee5710d047136afdd116d9ed35a50d47ffdcde854e0fec825c0a8893f9b"
+    },
+    {
+      "id": "pr062-artifact-6",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/related-eight-tools/receipt.json",
+      "bytes": 455,
+      "sha256": "91539a81d86e3f974d4b9fd327adc1f346cc2ab1838ac8c62fe9cddd80d0a69f"
+    },
+    {
+      "id": "pr062-artifact-7",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/related-eight-tools/stdout.log",
+      "bytes": 290,
+      "sha256": "2c65df4036aae3a410f58eda6ce57c62e5cdd9acd4efe7dda574e4107f0e0bf8"
+    },
+    {
+      "id": "pr062-artifact-8",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/related-eight-tools/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr062-artifact-9",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/related-eight-tools/event.json",
+      "bytes": 1070,
+      "sha256": "c42ffbba963543622f26744f1faafcc47fb0c4e26c06ceae00776ce1f58056db"
+    },
+    {
+      "id": "pr062-artifact-10",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "c7f037020e330ae5e963b640d7c9a5c9e256f8ffd0d6fe9aee237b97127dd200"
+    },
+    {
+      "id": "pr062-artifact-11",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr062-artifact-12",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr062-artifact-13",
+      "path": "verification/research-program/pr-062/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "2e3977dc4870e630640f808f2bd78fdda5d191d6fbdba67f89bbb3bbaeebd06d"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-062-1",
+      "status": "producer_checked",
+      "result": "No invented dataset, field, join or analysis output can appear; insufficient evidence returns an incomplete plan.",
+      "command_ids": [
+        "cmd-c062-focused"
+      ]
+    },
+    {
+      "id": "C-062-2",
+      "status": "producer_checked",
+      "result": "The same pinned selections produce the same plan; missing required sources remain a named gap.",
+      "command_ids": [
+        "cmd-c062-focused"
+      ]
+    },
+    {
+      "id": "C-062-3",
+      "status": "producer_checked",
+      "result": "The eight existing tools continue working if planner activation is not accepted; no status text claims an enabled planner prematurely. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c062-focused",
+        "cmd-c062-related",
+        "cmd-c062-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "planner-remains-disabled",
+      "status": "accepted",
+      "detail": "plan_research remains disabled. PUBLIC_CAPABILITY_FLAGS stays eight-true one-false."
+    },
+    {
+      "id": "envelope-not-task",
+      "status": "accepted",
+      "detail": "A successful tool envelope is not a completed research task. HTTP 200 is not acceptance. An accepted plan does not certify a study design."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "AUTH-12",
+      "status": "unresolved",
+      "detail": "Planner public activation remains pending explicit Astra/owner resolution of AUTH-12/WP10B."
+    },
+    {
+      "id": "independent-planner-qualification-review",
+      "status": "pending",
+      "detail": "Independent review of gated compilation, incomplete-plan gaps and disabled plan_research remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "plan-is-not-study-design",
+      "status": "risk",
+      "detail": "A compiled metadata plan is protocol evidence, not R04/R11 acceptance, scientific approval, or production change."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of gated compilation, incomplete-plan gaps and disabled plan_research, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-062 source and replay focused planner-qualification and identity validators. Do not enable plan_research. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
