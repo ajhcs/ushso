@@ -1,0 +1,269 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-063",
+  "status": "producer_checked",
+  "owner": "/root/pr063_machine_parity",
+  "reviewer": "Astra/root",
+  "base_sha": "96625a0df72a1da6e001f00ef8de22da36479d04",
+  "head_sha": "7271cbc96cabbe6b68252a5f7c60b225b34ccd05",
+  "dependency_merge_shas": {
+    "PR-058": "7ebaded20cd1ece299a9611eace8eed884544e09",
+    "PR-059": "6c412f64a0bb2c901fdf593744b5ffcc61d18f80",
+    "PR-060": "4ea2cb499e44a884a9b9831e8977a00319202a0d",
+    "PR-061": "9768f9b469c1c9b8d8f4082c05e3df534f65e1e2",
+    "PR-062": "e0ec1fc989dcb00eede11f2059cad640bf98d8b4"
+  },
+  "branch": "codex/ushso-pr063-machine-parity-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "verification/research-program/machine/",
+    "scripts/research-program/verify-machine.mjs",
+    "tests/research-program/machine-parity.test.mjs",
+    "verification/research-program/pr-063/",
+    "docs/research-program/handoffs/PR-063.json"
+  ],
+  "problem": "Enabled machine features lacked actual cross-transport evidence. Positive paths could use made-up schema IDs. Protocol success could be treated as research success. Browser unavailability could be recorded as passed. A transport discrepancy could be ignored if each transport passed its own producer tests. HTTP 200 or a successful tool envelope could be treated as a completed research task.",
+  "resulting_behavior": "Do not use made-up schema IDs for the positive path; fixtures explicitly distinguish protocol and research success. All advertised tools are discovered and callable; browser unavailability is recorded as untested rather than passed. A discrepancy blocks qualification even if each transport passed its own producer tests. plan_research remains disabled. worker/index.mjs does not import enrichment. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-063-1",
+      "subject": "Create one cross-transport scenario set",
+      "sha": "a5e8e256c11ed5a23780a89e72c58f84cab93671"
+    },
+    {
+      "id": "C-063-2",
+      "subject": "Invoke real clients on the candidate",
+      "sha": "caba9d786138a7ebffe45c4ec5206b307e905008"
+    },
+    {
+      "id": "C-063-3",
+      "subject": "Compare scientific and identity fields",
+      "sha": "7271cbc96cabbe6b68252a5f7c60b225b34ccd05"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "machine-scenarios",
+      "id": "verification/research-program/machine/scenarios.json",
+      "location": "local",
+      "sha256": "874518a5e3d610f0a2b75f92dd1d0a2213d6725eec51b1ce9258708d9329f0d0"
+    },
+    {
+      "kind": "verify-machine",
+      "id": "scripts/research-program/verify-machine.mjs",
+      "location": "local",
+      "sha256": "76d25ba1cb694d1d7a55b1dc8e703389d1089ebb6c3c5e1eee2ded1e5ce2c119"
+    },
+    {
+      "kind": "machine-parity-tests",
+      "id": "tests/research-program/machine-parity.test.mjs",
+      "location": "local",
+      "sha256": "4d0258e2beafcf6012fea7f3c2350215efb70959fe56c137f1391f7018f4b5ca"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "worker-index-unchanged",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "ca413cc6224ce2ef472d2116b3acf9ce3f60f4d9181e31f8bfdc1c2d2963ace1"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c063-focused",
+      "command": "node --test tests/research-program/machine-parity.test.mjs",
+      "started_at": "2026-09-14T22:07:23.276983Z",
+      "completed_at": "2026-09-14T22:07:25.843122Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 machine-parity tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c063-focused-event",
+        "path": "verification/research-program/pr-063/producer-20260914/commands/focused-parity/event.json",
+        "sha256": "cb42e2b1bf7bd8f160d7728ea7494d951203916cfa0027696161dd57269c618c",
+        "bytes": 1038
+      }
+    },
+    {
+      "id": "cmd-c063-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T22:07:25.843560Z",
+      "completed_at": "2026-09-14T22:07:25.903512Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c063-identity-event",
+        "path": "verification/research-program/pr-063/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "7e19e931d1134c110ae67afa97e0229bcec8c402e558048dbe7d70b797e725d7",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr063-artifact-0",
+      "path": "verification/research-program/pr-063/task-binding.json",
+      "bytes": 3733,
+      "sha256": "d7925c1adef44ca52aedceff95c7e685462f08312493e7ec369c22e14fc842e5"
+    },
+    {
+      "id": "pr063-artifact-1",
+      "path": "verification/research-program/pr-063/dispatch.json",
+      "bytes": 2335,
+      "sha256": "5f87e2d74294da30c459e1c58ebb179ba1300df5146013fae32024b94962149e"
+    },
+    {
+      "id": "pr063-artifact-2",
+      "path": "verification/research-program/pr-063/producer-20260914/commands/focused-parity/receipt.json",
+      "bytes": 459,
+      "sha256": "1a8e167f99ea4be6dda504bc1806d53304c5aadd797c96add211f524dbe370a9"
+    },
+    {
+      "id": "pr063-artifact-3",
+      "path": "verification/research-program/pr-063/producer-20260914/commands/focused-parity/stdout.log",
+      "bytes": 492,
+      "sha256": "65c7650d092bbb9d1b724a8ed923db3f5127280e7b8d65b8ad5aedd08a124f91"
+    },
+    {
+      "id": "pr063-artifact-4",
+      "path": "verification/research-program/pr-063/producer-20260914/commands/focused-parity/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr063-artifact-5",
+      "path": "verification/research-program/pr-063/producer-20260914/commands/focused-parity/event.json",
+      "bytes": 1038,
+      "sha256": "cb42e2b1bf7bd8f160d7728ea7494d951203916cfa0027696161dd57269c618c"
+    },
+    {
+      "id": "pr063-artifact-6",
+      "path": "verification/research-program/pr-063/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "463153f0b88779f3c8d0f4a58afc36bef446a9014787fed3963638e194e7c390"
+    },
+    {
+      "id": "pr063-artifact-7",
+      "path": "verification/research-program/pr-063/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr063-artifact-8",
+      "path": "verification/research-program/pr-063/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr063-artifact-9",
+      "path": "verification/research-program/pr-063/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "7e19e931d1134c110ae67afa97e0229bcec8c402e558048dbe7d70b797e725d7"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-063-1",
+      "status": "producer_checked",
+      "result": "Do not use made-up schema IDs for the positive path; fixtures explicitly distinguish protocol and research success.",
+      "command_ids": [
+        "cmd-c063-focused"
+      ]
+    },
+    {
+      "id": "C-063-2",
+      "status": "producer_checked",
+      "result": "All advertised tools are discovered and callable; browser unavailability is recorded as untested rather than passed.",
+      "command_ids": [
+        "cmd-c063-focused"
+      ]
+    },
+    {
+      "id": "C-063-3",
+      "status": "producer_checked",
+      "result": "A discrepancy blocks qualification even if each transport passed its own producer tests. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c063-focused",
+        "cmd-c063-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "native-webmcp-untested",
+      "status": "accepted",
+      "detail": "Native browser WebMCP is recorded as untested when the Chrome debugger surface is unavailable. Untested is not passed."
+    },
+    {
+      "id": "planner-remains-disabled",
+      "status": "accepted",
+      "detail": "plan_research remains disabled. HTTP /api/machine/v1/plan-research returns 404."
+    },
+    {
+      "id": "envelope-not-task",
+      "status": "accepted",
+      "detail": "A successful tool envelope is not a completed research task. HTTP 200 is not acceptance."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-machine-parity-review",
+      "status": "pending",
+      "detail": "Independent review of HTTP/MCP identity comparison and native-untested recording remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "protocol-is-not-research",
+      "status": "risk",
+      "detail": "Cross-transport protocol agreement is not R11/R16 acceptance, scientific approval, or production change."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of HTTP/MCP identity comparison and native-untested recording, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-063 source and replay focused machine-parity and identity validators. Do not enable plan_research. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
