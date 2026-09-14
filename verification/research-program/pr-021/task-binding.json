@@ -1,0 +1,75 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr021-deterministic-qualification-20260914",
+  "slice_id": "C-021-1",
+  "pr_id": "PR-021",
+  "title": "Close deterministic extraction deficits and publish the baseline",
+  "owner": "/root/pr021_deterministic_qualification",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr021-deterministic-qualification-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr021-deterministic-qualification-20260914",
+  "objective": "Deterministic results have a measured acceptance boundary and an explicit residual workload.",
+  "outcome": "Every successful result has a matching capture/parser receipt; missing evidence prevents promotion. Residual jobs exclude credentials, missing evidence and forbidden access. No LLM task asks a model to discover a missing fact from memory; every residual includes an exact public passage or an explicit insufficient-evidence outcome. R03/R06 denominators are reproducible. A failed threshold stays failed. The next phase receives a concrete residual queue, not the entire corpus. The last good public generation live-2026-09-03-85b50522b420 remains unchanged.",
+  "dependencies": [
+    "PR-018",
+    "PR-020"
+  ],
+  "owned_paths": [
+    "packages/coverage/",
+    "scripts/research-program/qualify-deterministic.mjs",
+    "docs/research-program/deterministic-results.md",
+    "tests/research-program/qualify-deterministic.test.mjs",
+    "verification/research-program/pr-021/",
+    "docs/research-program/handoffs/PR-021.json"
+  ],
+  "commits": [
+    {
+      "id": "C-021-1",
+      "subject": "Reconcile successful and failed evidence",
+      "instructions": "Validate references, source-context bindings, parser coverage and timestamps over the full sweep. Preserve partial dictionaries and stale observations with their reasons.",
+      "verification": "Every successful result has a matching capture/parser receipt; missing evidence prevents promotion."
+    },
+    {
+      "id": "C-021-2",
+      "subject": "Create residual tasks from actual gaps",
+      "instructions": "Generate bounded residual jobs by source/document/field, excluding facts that require credentials, missing evidence or forbidden access. Route parser defects back to engineering.",
+      "verification": "No LLM task asks a model to discover a missing fact from memory; every task includes an exact public passage or an explicit insufficient-evidence outcome."
+    },
+    {
+      "id": "C-021-3",
+      "subject": "Publish a deterministic completion readout",
+      "instructions": "Report attempt coverage, parsed dictionary yield, working examples, unresolved essential fields and source differences. Add bounded follow-up PRs when an empirical target fails.",
+      "verification": "R03/R06 denominators are reproducible; a failed threshold stays failed and does not become an undocumented exception."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/qualify-deterministic.test.mjs",
+    "node --test tests/research-program/sweep-accounting.test.mjs",
+    "node --test tests/research-program/field-meaning.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-021.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-021/",
+  "binding": {
+    "base_sha": "866718b5b3378dba879ff404d0311a887ef1db87",
+    "base_tree": "6e3abe8c73a4fbf86b526c84762af74149d632b6",
+    "dependency_merge_shas": {
+      "PR-018": "fdda1278b5796b8ca112b2d722182f23308f196c",
+      "PR-020": "f3faa2c5eeff99da14196db08543db7865b788f2"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
