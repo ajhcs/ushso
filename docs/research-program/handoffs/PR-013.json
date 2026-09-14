@@ -1,0 +1,366 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-013",
+  "status": "producer_checked",
+  "owner": "/root/pr013_cms_resources",
+  "reviewer": "Astra/root",
+  "base_sha": "f326446bc2d6d79c2a70fc936896c0eba62370b1",
+  "head_sha": "f6c60fc0ce81a679ca435c9f96669a0c7646a4a4",
+  "dependency_merge_shas": {
+    "PR-007": "0d730aaf07b89bb16fb66fc224841a2d66c80d49",
+    "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+    "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74",
+    "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0"
+  },
+  "branch": "codex/ushso-pr013-cms-resources-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "scripts/research/cms-documents.mjs",
+    "tests/research-program/cms-resources.test.mjs",
+    "verification/research-program/pr-013/",
+    "docs/research-program/handoffs/PR-013.json"
+  ],
+  "problem": "Baseline CMS catalog entries exposed titles without evidence-backed distribution/resource candidates, collapsed temporal/modified/format roles, and could treat missing dictionary locators as dictionary-absent or HTTP 200 documentation as payload success.",
+  "resulting_behavior": "bindCmsCatalogResources binds captured dataset identifiers, resourcesAPI links and distribution objects from a retained CMS catalog fixture. Title, temporal, modified and format stay in distinct roles. A cost-report fixture distinguishes product-level coverage 2011-2023 from the 2023 distribution and 2026-01-08 metadata modification. API/CSV/XLSX/ZIP and landing-page locators keep catalog pointers. Duplicate locators deduplicate by capture identity. buildCmsCauseLedger emits one reconciled row for all 159 CMS IDs. Missing dictionary locators remain unresolved, never dictionary-absent. HTTP 200 HTML cannot be JSON payload success. Live fetch is forbidden in tests. The historical cms-documents CLI remains gated behind isCli and is not invoked by tests.",
+  "commits": [
+    {
+      "id": "C-013-1",
+      "subject": "Bind CMS catalog resources exactly",
+      "sha": "855f46b236ac3c6fe6a7279d32de86e69f959ffb"
+    },
+    {
+      "id": "C-013-2",
+      "subject": "Extract dictionary and access candidates",
+      "sha": "855f46b236ac3c6fe6a7279d32de86e69f959ffb"
+    },
+    {
+      "id": "C-013-3",
+      "subject": "Produce the CMS cause ledger",
+      "sha": "f6c60fc0ce81a679ca435c9f96669a0c7646a4a4"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "cms-documents",
+      "id": "scripts/research/cms-documents.mjs",
+      "location": "local",
+      "sha256": "8a870d0af62603af6e36470a0b5ca18754282689ff4cd6f3d75006b64c9469f3"
+    },
+    {
+      "kind": "cms-resources-tests",
+      "id": "tests/research-program/cms-resources.test.mjs",
+      "location": "local",
+      "sha256": "641828d0ec34bdf37f730584c40eee7ce6bc63c57905b115993494a8b2bca244"
+    },
+    {
+      "kind": "cms-catalog-slim-fixture",
+      "id": "verification/research-program/pr-013/fixtures/cms-catalog-slim.json.gz",
+      "location": "local",
+      "sha256": "e36c53352e0781a16dac658ff4e227ed430fef88aba89d38fc70aa652df2c722"
+    },
+    {
+      "kind": "source-extractors",
+      "id": "scripts/research/source-extractors.mjs",
+      "location": "local",
+      "sha256": "c9d519a79074a8a8235d15c6d6e9ac5a51c80c33245c10f9ebf569dddbed04cc"
+    },
+    {
+      "kind": "cms-adapter",
+      "id": "packages/connectors/src/adapters/cms.mjs",
+      "location": "local",
+      "sha256": "de22c63f229457c54d1f1c9b5220aa2e9719cd5a71e79e12b558a7c892315fbc"
+    },
+    {
+      "kind": "content-classifier",
+      "id": "packages/connectors/src/content-classifier.mjs",
+      "location": "local",
+      "sha256": "f4a567374fba271365fc7dd3d7be991ed35bb645ed8883fe95289ba8025de784"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c013-focused",
+      "command": "node --test tests/research-program/cms-resources.test.mjs",
+      "started_at": "2026-09-14T03:00:59.523520Z",
+      "completed_at": "2026-09-14T03:01:01.287846Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "9/9 focused CMS resource tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c013-focused-event",
+        "path": "verification/research-program/pr-013/producer-20260914/commands/focused-cms-resources/event.json",
+        "sha256": "b5ea28477fe5b5fc5838ac099c60928fa952f25a0b55c0303346a5906ca01847",
+        "bytes": 1064
+      }
+    },
+    {
+      "id": "cmd-c013-extractors",
+      "command": "node --test tests/research-extractors.test.mjs",
+      "started_at": "2026-09-14T03:01:01.288283Z",
+      "completed_at": "2026-09-14T03:01:01.471396Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "19/19 research-extractors tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c013-extractors-event",
+        "path": "verification/research-program/pr-013/producer-20260914/commands/research-extractors/event.json",
+        "sha256": "9470bf7f97a6b2eec13e325bb0cf26dc54cc8cb0e0498481ff947ec5ed4712a2",
+        "bytes": 1049
+      }
+    },
+    {
+      "id": "cmd-c013-http",
+      "command": "node --test tests/research-program/http-outcomes.test.mjs",
+      "started_at": "2026-09-14T03:01:01.471850Z",
+      "completed_at": "2026-09-14T03:01:02.531316Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "10/10 HTTP outcomes tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c013-http-event",
+        "path": "verification/research-program/pr-013/producer-20260914/commands/http-outcomes/event.json",
+        "sha256": "04092124ec79a534735a0ae77bd715604d556fa022b64ae9959cab1f7cff2602",
+        "bytes": 1035
+      }
+    },
+    {
+      "id": "cmd-c013-budget",
+      "command": "node --test tests/research-program/source-budget.test.mjs",
+      "started_at": "2026-09-14T03:01:02.531767Z",
+      "completed_at": "2026-09-14T03:01:02.639953Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "13/13 source-budget tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c013-budget-event",
+        "path": "verification/research-program/pr-013/producer-20260914/commands/source-budget/event.json",
+        "sha256": "a2aa5aecbaefbe248dd373c1fc4af67d21a95cbc552a96dbb672b8fe120563dd",
+        "bytes": 1036
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr013-artifact-0",
+      "path": "verification/research-program/pr-013/task-binding.json",
+      "sha256": "4bcc2cc47299ba68354d7184aeda7592aa6d775ec29096852840eb9038ab897f",
+      "bytes": 3666
+    },
+    {
+      "id": "pr013-artifact-1",
+      "path": "verification/research-program/pr-013/dispatch.json",
+      "sha256": "c1d1d564572778f25d25d7e8a1820d588557ae3e128a34c66bd16086010f5549",
+      "bytes": 2433
+    },
+    {
+      "id": "pr013-artifact-2",
+      "path": "verification/research-program/pr-013/fixtures/cms-catalog-slim.json.gz",
+      "sha256": "e36c53352e0781a16dac658ff4e227ed430fef88aba89d38fc70aa652df2c722",
+      "bytes": 262137
+    },
+    {
+      "id": "pr013-artifact-3",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/focused-cms-resources/receipt.json",
+      "sha256": "a7a6530b95f0ed78de7488d979d869a6140e033a2ccf2e0279aa87ccf9c52ff8",
+      "bytes": 465
+    },
+    {
+      "id": "pr013-artifact-4",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/focused-cms-resources/stdout.log",
+      "sha256": "02f2e7ddfc63d70025cf936a51ff4e8965957168215c5a0072f73756bde92095",
+      "bytes": 901
+    },
+    {
+      "id": "pr013-artifact-5",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/focused-cms-resources/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr013-artifact-6",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/focused-cms-resources/event.json",
+      "sha256": "b5ea28477fe5b5fc5838ac099c60928fa952f25a0b55c0303346a5906ca01847",
+      "bytes": 1064
+    },
+    {
+      "id": "pr013-artifact-7",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/research-extractors/receipt.json",
+      "sha256": "261c14a6213853378cf184a35c8b8ba89b1c15c36fd86bf824abbb9ba615775b",
+      "bytes": 453
+    },
+    {
+      "id": "pr013-artifact-8",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/research-extractors/stdout.log",
+      "sha256": "e56d95c9d0eccb4ca23f918b6e9138df8bfcf91a47c28d9637a2e73f21dff0d0",
+      "bytes": 2037
+    },
+    {
+      "id": "pr013-artifact-9",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/research-extractors/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr013-artifact-10",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/research-extractors/event.json",
+      "sha256": "9470bf7f97a6b2eec13e325bb0cf26dc54cc8cb0e0498481ff947ec5ed4712a2",
+      "bytes": 1049
+    },
+    {
+      "id": "pr013-artifact-11",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/http-outcomes/receipt.json",
+      "sha256": "cb36015bb302399aa2085f3757fdaa8d43d22810b4cb803804a0f8e2b91f23df",
+      "bytes": 457
+    },
+    {
+      "id": "pr013-artifact-12",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/http-outcomes/stdout.log",
+      "sha256": "b2a638f53be1a3bf181d2728519bf35f33f006c6f14da13f45351edf303e327d",
+      "bytes": 989
+    },
+    {
+      "id": "pr013-artifact-13",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/http-outcomes/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr013-artifact-14",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/http-outcomes/event.json",
+      "sha256": "04092124ec79a534735a0ae77bd715604d556fa022b64ae9959cab1f7cff2602",
+      "bytes": 1035
+    },
+    {
+      "id": "pr013-artifact-15",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/source-budget/receipt.json",
+      "sha256": "3d08bc353727f25d30c160275d8c7a6c84e767cdefa3ed8ef26a236b46f9f531",
+      "bytes": 458
+    },
+    {
+      "id": "pr013-artifact-16",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/source-budget/stdout.log",
+      "sha256": "44f77df060e51d502271e6432f99d1b88ca4f4754d113db33aa1ffb848db8d4f",
+      "bytes": 1080
+    },
+    {
+      "id": "pr013-artifact-17",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/source-budget/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "id": "pr013-artifact-18",
+      "path": "verification/research-program/pr-013/producer-20260914/commands/source-budget/event.json",
+      "sha256": "a2aa5aecbaefbe248dd373c1fc4af67d21a95cbc552a96dbb672b8fe120563dd",
+      "bytes": 1036
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-013-1",
+      "status": "producer_checked",
+      "result": "Cost-report fixture distinguishes product coverage, 2023 distribution, and later metadata modification. Title/temporal/modified/format remain distinct.",
+      "command_ids": [
+        "cmd-c013-focused"
+      ]
+    },
+    {
+      "id": "C-013-2",
+      "status": "producer_checked",
+      "result": "API/CSV/XLSX/ZIP and landing-page locators keep catalog pointers. Duplicate links deduplicate by capture identity. HTTP 200 HTML cannot be JSON success.",
+      "command_ids": [
+        "cmd-c013-focused",
+        "cmd-c013-http"
+      ]
+    },
+    {
+      "id": "C-013-3",
+      "status": "producer_checked",
+      "result": "All 159 CMS IDs have a reconciled cause-ledger row. Missing dictionary locator remains unresolved, not dictionary-absent. Extractors, HTTP outcomes and source-budget remain green.",
+      "command_ids": [
+        "cmd-c013-focused",
+        "cmd-c013-extractors",
+        "cmd-c013-http",
+        "cmd-c013-budget"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-cms-http",
+      "status": "accepted",
+      "detail": "Tests consume a retained gzip catalog fixture and blockedFetch. No live HTTP to data.cms.gov."
+    },
+    {
+      "id": "cms-documents-cli-live-path",
+      "status": "skipped",
+      "detail": "Historical cms-documents CLI remains gated behind isCli and was not invoked. It still can live-fetch when executed as a CLI; PR-013 tests do not run it."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-cms-resources-review",
+      "status": "pending",
+      "detail": "Independent review of catalog-resource binding, cause ledger and no-payload-success remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "retained-catalog-not-resourcesapi-bodies",
+      "status": "risk",
+      "detail": "Cause-ledger dictionary status uses catalog distribution metadata. Per-distribution resourcesAPI JSON bodies were not retained for all 159 IDs, so missing dictionary locators stay unresolved rather than dictionary-absent."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of CMS resource binding and the 159-row cause ledger, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-013 source and replay focused CMS, extractors, HTTP outcomes and source-budget tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
