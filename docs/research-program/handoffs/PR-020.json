@@ -1,0 +1,314 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-020",
+  "status": "producer_checked",
+  "owner": "/root/pr020_baseline_sweep",
+  "reviewer": "Astra/root",
+  "base_sha": "b0e68a18c996d33c9bc911967a3e952a087b7f90",
+  "head_sha": "120487acf4d6fee83884a0daf0a32b195f044498",
+  "dependency_merge_shas": {
+    "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+    "PR-013": "861a7808fec20e5e7795bb8f8082f82717e01f11",
+    "PR-014": "8878aa2cc8bd9b36995d429774f377e3de66aca7",
+    "PR-015": "df5f7f9b8460b6b118f5a4699673b9c96c15b07b",
+    "PR-016": "0f601a908e74492a9803906ce35cbd346df28565",
+    "PR-019": "94d7d904800de12df7c9fe5e9a6fdc252e4687e9"
+  },
+  "branch": "codex/ushso-pr020-baseline-sweep-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "scripts/research-program/sweep.mjs",
+    "packages/coverage/",
+    "tests/research-program/sweep-accounting.test.mjs",
+    "verification/research-program/pr-020/",
+    "docs/research-program/handoffs/PR-020.json"
+  ],
+  "problem": "Baseline records could be left without a bounded processing disposition. Unknown eligibility could be counted as attempted. Interrupted batches could diverge from uninterrupted membership or double-charge captures. Completion could be asserted while eligible records remained unattempted. Live scripts/research/sweep.mjs could contact CMS/CDC/Census.",
+  "resulting_behavior": "compileSweepJobs joins all 3434 corpus IDs to source adapters and disjoint dispositions. Inventory count equals the sum of dispositions. Unknown eligibility is visible and never counted as attempted. Isolated PR-004 records remain isolated/non-searchable. runResumableBatch/resumeBatch reuse unchanged captures, route Census access exceptions, and produce identical final attempted membership to an uninterrupted fixture with no duplicate capture charges. writeDeficitManifest records remaining missing facts and next actions; completion stays false while unattempted eligible records remain. buildSweepReceipt includes all 3434 IDs. Live fetch is forbidden. CLI stays fixture-only and refuses --live. Sealed packages/coverage/accounting/v1.0.0 artifacts, packages/normalization/src and packages/identity/src/schema-catalog.mjs are unchanged. scripts/research/sweep.mjs is not invoked.",
+  "commits": [
+    {
+      "id": "C-020-1",
+      "subject": "Compile the full inventory into jobs",
+      "sha": "83db3d967bde6ee959cbb3816fbc80f222ecd006"
+    },
+    {
+      "id": "C-020-2",
+      "subject": "Run resumable source batches",
+      "sha": "83db3d967bde6ee959cbb3816fbc80f222ecd006"
+    },
+    {
+      "id": "C-020-3",
+      "subject": "Write source and field deficit manifests",
+      "sha": "120487acf4d6fee83884a0daf0a32b195f044498"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "sweep-lib",
+      "id": "packages/coverage/research-program/v1.0.0/src/sweep.mjs",
+      "location": "local",
+      "sha256": "7d12f09becb505081c348ff9cd8c55fe91e355804396df710fc1f58db0af142a"
+    },
+    {
+      "kind": "coverage-index",
+      "id": "packages/coverage/index.mjs",
+      "location": "local",
+      "sha256": "d5d9248fe02bf429a765849020cbeaf8fadea7962a85ef59fec894cc082a3103"
+    },
+    {
+      "kind": "sweep-cli",
+      "id": "scripts/research-program/sweep.mjs",
+      "location": "local",
+      "sha256": "e2ab6561457efdb6b79077bd025f969f4d99f443b42c53553333d32f9337a8b7"
+    },
+    {
+      "kind": "sweep-tests",
+      "id": "tests/research-program/sweep-accounting.test.mjs",
+      "location": "local",
+      "sha256": "c1e87b5c58aed1240adf498675ef3243b27a0525d667ba03f48c49cd13fd7b71"
+    },
+    {
+      "kind": "baseline-corpus",
+      "id": "packages/retrieval/versions/v1.2.0/corpus/corpus.json",
+      "location": "local",
+      "sha256": "56646ec623bac36f16f69282c59787728a316af4b96d437e264631c1dd850633"
+    },
+    {
+      "kind": "pr004-isolated-records",
+      "id": "verification/research-program/pr-004/evidence.json",
+      "location": "local",
+      "sha256": "21c8191004eca6f58b8f05fb8a404548ad8f686af0cd951b4a1df09b6a447e73"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c020-focused",
+      "command": "node --test tests/research-program/sweep-accounting.test.mjs",
+      "started_at": "2026-09-14T06:19:44.981351Z",
+      "completed_at": "2026-09-14T06:19:46.196836Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "4/4 sweep-accounting tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c020-focused-event",
+        "path": "verification/research-program/pr-020/producer-20260914/commands/focused-sweep/event.json",
+        "sha256": "de237903fb761da9456f4c47fcf905858c11f5d3ad94cb53cd35203c77253690",
+        "bytes": 1039
+      }
+    },
+    {
+      "id": "cmd-c020-example",
+      "command": "node --test tests/research-program/example-runner.test.mjs",
+      "started_at": "2026-09-14T06:19:46.197186Z",
+      "completed_at": "2026-09-14T06:19:46.324453Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "5/5 example-runner tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c020-example-event",
+        "path": "verification/research-program/pr-020/producer-20260914/commands/example-runner/event.json",
+        "sha256": "c7282de52aa6515be59d78bdf228530157727c7ff5fae07e80300d7705779cc5",
+        "bytes": 1038
+      }
+    },
+    {
+      "id": "cmd-c020-http",
+      "command": "node --test tests/research-program/http-outcomes.test.mjs",
+      "started_at": "2026-09-14T06:19:46.324766Z",
+      "completed_at": "2026-09-14T06:19:47.294868Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "10/10 HTTP-outcome tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c020-http-event",
+        "path": "verification/research-program/pr-020/producer-20260914/commands/http-outcomes/event.json",
+        "sha256": "b06b8ae6231a6619f8d40dcf73dc9cd43cd23ba61a85ef39926f9c45013c7d7a",
+        "bytes": 1034
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr020-artifact-0",
+      "path": "verification/research-program/pr-020/task-binding.json",
+      "bytes": 3890,
+      "sha256": "64953f21f1b480cc4db73c7d932cf10d8ea4121938293df2d650a369c7986fed"
+    },
+    {
+      "id": "pr020-artifact-1",
+      "path": "verification/research-program/pr-020/dispatch.json",
+      "bytes": 2739,
+      "sha256": "7a1d3d8063674657dfb10abb67a879c4724ed3127292430ffdce7e02d4372e64"
+    },
+    {
+      "id": "pr020-artifact-2",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/focused-sweep/receipt.json",
+      "bytes": 460,
+      "sha256": "f7ddf5a0b53c83ce635541a583ae085c9d1077a8090aec198830926c467e0dae"
+    },
+    {
+      "id": "pr020-artifact-3",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/focused-sweep/stdout.log",
+      "bytes": 531,
+      "sha256": "e74617cdd7c631efe8a47b9f2cd73f5b05bbbb2d742e89fe2f7e0b5eb8ef73e4"
+    },
+    {
+      "id": "pr020-artifact-4",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/focused-sweep/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr020-artifact-5",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/focused-sweep/event.json",
+      "bytes": 1039,
+      "sha256": "de237903fb761da9456f4c47fcf905858c11f5d3ad94cb53cd35203c77253690"
+    },
+    {
+      "id": "pr020-artifact-6",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/example-runner/receipt.json",
+      "bytes": 459,
+      "sha256": "42ca9aeb1952a7da2226c70239b3e8cdad4fe12ebf439a736c7459626344073a"
+    },
+    {
+      "id": "pr020-artifact-7",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/example-runner/stdout.log",
+      "bytes": 599,
+      "sha256": "0d24e60d245c2ad39c4e382a2ef52d5ef84d16e9bb57dd8a3efb8918a7b3743b"
+    },
+    {
+      "id": "pr020-artifact-8",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/example-runner/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr020-artifact-9",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/example-runner/event.json",
+      "bytes": 1038,
+      "sha256": "c7282de52aa6515be59d78bdf228530157727c7ff5fae07e80300d7705779cc5"
+    },
+    {
+      "id": "pr020-artifact-10",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/http-outcomes/receipt.json",
+      "bytes": 457,
+      "sha256": "0a4752ddeeb19c3632f210a295125f0238a61c37bc22d917ad6e7c8abbf860f2"
+    },
+    {
+      "id": "pr020-artifact-11",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/http-outcomes/stdout.log",
+      "bytes": 987,
+      "sha256": "ee4597c35633f978a851e2662ba4a4f7a7a5698b6ffb8ab80a28dc6f7b2bbc6f"
+    },
+    {
+      "id": "pr020-artifact-12",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/http-outcomes/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr020-artifact-13",
+      "path": "verification/research-program/pr-020/producer-20260914/commands/http-outcomes/event.json",
+      "bytes": 1034,
+      "sha256": "b06b8ae6231a6619f8d40dcf73dc9cd43cd23ba61a85ef39926f9c45013c7d7a"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-020-1",
+      "status": "producer_checked",
+      "result": "Inventory count equals the sum of disjoint dispositions. Unknown eligibility is visible and not counted as attempted. All 3434 IDs are present.",
+      "command_ids": [
+        "cmd-c020-focused"
+      ]
+    },
+    {
+      "id": "C-020-2",
+      "status": "producer_checked",
+      "result": "A stopped/restarted batch has identical final attempted membership to an uninterrupted fixture with no duplicate capture charges.",
+      "command_ids": [
+        "cmd-c020-focused"
+      ]
+    },
+    {
+      "id": "C-020-3",
+      "status": "producer_checked",
+      "result": "All original audit gaps have an observed disposition. Completion is not asserted while unattempted eligible records remain. Example-runner and HTTP-outcome tests remain green.",
+      "command_ids": [
+        "cmd-c020-focused",
+        "cmd-c020-example",
+        "cmd-c020-http"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-cms-cdc-census-http",
+      "status": "accepted",
+      "detail": "Sweep uses the local 3434-record corpus and in-memory dispositions. blockedFetch forbids live HTTP. scripts/research/sweep.mjs is not invoked."
+    },
+    {
+      "id": "full-live-budget-execution",
+      "status": "skipped",
+      "detail": "Reserved attempts are a fixture budget (3), not a live 3434-record capture. Remaining eligible records stay eligible_unattempted."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-sweep-review",
+      "status": "pending",
+      "detail": "Independent review of inventory compilation, resumable batches and deficit manifests remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "fixture-budget-not-full-corpus-execution",
+      "status": "risk",
+      "detail": "The receipt proves all 3434 IDs have a disposition. It does not execute live captures for every eligible record."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of inventory compilation, resumable batches and deficit manifests, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-020 source and replay focused sweep-accounting, example-runner and HTTP-outcome tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
