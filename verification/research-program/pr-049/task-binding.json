@@ -1,0 +1,81 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr049-tic-index-20260914",
+  "slice_id": "C-049-1",
+  "pr_id": "PR-049",
+  "title": "Parse payer Transparency in Coverage indexes",
+  "owner": "/root/pr049_tic_index",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr049-tic-index-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr049-tic-index-20260914",
+  "objective": "Ten payer reporting entities have scoped plan/file inventories.",
+  "outcome": "Consume the frozen 10 payer reporting-entity IDs without replacement or silent deduplication. Employer plan ID, insurer identity and hospital identity cannot be substituted. The same file linked by many plans is fetched once but retains all supported plan associations. All ten reporting entities are accounted for; an inaccessible bulk file remains a valid documented route with failed sample state. Hospital HPT and payer TiC schemas remain separate. Allowed-amount files are discoverable without pretending the in-network parser validates them. Ledger-named packages/identity/mrf/ is not used because identity is WP7-sealed. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-002",
+    "PR-009",
+    "PR-011",
+    "PR-012",
+    "PR-034"
+  ],
+  "owned_paths": [
+    "packages/connectors/mrf/payer-index.mjs",
+    "packages/connectors/mrf/payer-cohort.json",
+    "evaluation/research-program/mrf-fixtures/payer-index/",
+    "tests/research-program/tic-index.test.mjs",
+    "docs/research-program/tic-index.md",
+    "verification/research-program/pr-049/",
+    "docs/research-program/handoffs/PR-049.json"
+  ],
+  "commits": [
+    {
+      "id": "C-049-1",
+      "subject": "Define payer and file identity",
+      "instructions": "Represent reporting entity, plan identity/type, market, network, update date, index URL and file type separately. Distinguish in-network, allowed-amount and provider-reference files.",
+      "verification": "An employer plan ID, insurer identity and hospital identity cannot be substituted for one another."
+    },
+    {
+      "id": "C-049-2",
+      "subject": "Parse bounded table-of-contents indexes",
+      "instructions": "Pin the official schema revision and follow only declared file references with duplicate/reference limits. Reconcile shared files across multiple plans.",
+      "verification": "The same file linked by many plans is fetched once but retains all supported plan associations."
+    },
+    {
+      "id": "C-049-3",
+      "subject": "Build the payer cohort ledger",
+      "instructions": "Record locator, size/encoding, declared version, access disposition and parser eligibility for each selected entity.",
+      "verification": "All ten reporting entities are accounted for; an inaccessible bulk file remains a valid documented route with failed sample state."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/tic-index.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-049.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-049/",
+  "binding": {
+    "base_sha": "958504ef0336ac7c91f4e7dd20e7ec3589042274",
+    "base_tree": "febbd20e484487752e65f79ba7c6359af928de14",
+    "dependency_merge_shas": {
+      "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+      "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+      "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74",
+      "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+      "PR-034": "a8437e36ecf102af6f3bc86cf539a0d6b1739796"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
