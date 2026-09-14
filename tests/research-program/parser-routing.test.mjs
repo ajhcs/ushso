@@ -7,7 +7,7 @@ import {
   classifyDocumentSignature,
   resumeDocumentWindows,
   routeDocument,
-} from '../../scripts/research/parser-routing.mjs';
+} from '../../scripts/research/collect-pdf-windows.mjs';
 
 const span = (text, x, y) => ({ text, x, y });
 function gridPage(number = 1) {
