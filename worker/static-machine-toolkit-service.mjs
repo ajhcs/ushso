@@ -4,6 +4,7 @@ import {
   snapshotDigest,
 } from '../packages/machine-toolkit/src/index.mjs';
 import { createMachineCursorSigner } from './machine-cursor.mjs';
+import { collectAssetContext } from '../packages/registry/asset-context-collections.mjs';
 
 const POLICY_ID = 'policy.public-metadata-only.v1';
 const POLICY_EVIDENCE_ID = 'evidence.policy.public-metadata-only.v1';
@@ -350,20 +351,65 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
     async getAsset(input) {
       const generationError = generationUnavailable('get_asset', input, context);
       if (generationError) return generationError;
-      if (Object.values(input.collection_cursors).some(Boolean)) return unavailable('get_asset', input, context, 'cursor_expired', { restartRequired: true });
       const record = recordsById.get(input.record_id);
       if (!record) return unavailable('get_asset', input, context);
+      const collections = collectAssetContext(record);
       const evidenceIds = [record.evidence[0].evidence_id];
-      return successCore({
-        capability: 'get_asset', context, records: [record], resultState: 'partial',
+      const sections = ['releases', 'distributions', 'documentation', 'schemas'];
+      const paged = {};
+      const completeness = {};
+      let truncated = false;
+      const omitted = [];
+      let nextCursor = null;
+      let continuationExpires = null;
+      for (const section of sections) {
+        const collection = collections[section];
+        const cursor = input.collection_cursors?.[section] ?? null;
+        if (!collection.resolved) {
+          if (cursor) return unavailable('get_asset', input, context, 'cursor_expired', { restartRequired: true });
+          paged[section] = [];
+          completeness[section] = 'unknown';
+          continue;
+        }
+        const pagingInput = {
+          contract_version: input.contract_version,
+          record_id: input.record_id,
+          expected_generation: input.expected_generation,
+          collection_limits: input.collection_limits,
+          collection_section: section,
+          limit: input.collection_limits[section],
+          cursor,
+        };
+        const pagination = await page('get_asset', pagingInput, [...collection.items], section);
+        if (pagination.error) return pagination.error;
+        paged[section] = pagination.selected;
+        if (pagination.envelope.truncated) {
+          completeness[section] = 'partial';
+          truncated = true;
+          omitted.push(section);
+          if (!nextCursor) {
+            nextCursor = pagination.envelope.next_cursor;
+            continuationExpires = pagination.envelope.continuation_expires_at;
+          }
+        } else {
+          completeness[section] = collection.completeness;
+        }
+      }
+      const response = successCore({
+        capability: 'get_asset', context, records: [record], resultState: truncated ? 'partial' : 'complete',
         result: {
           asset: { asset_id: record.record_id, title: sourceExcerpt(record.title), asset_kind: 'dataset', evidence_ids: evidenceIds },
           source: { source_id: record.identity.source.source_id, name: sourceExcerpt(record.identity.source.name), authority_level: 'authoritative', evidence_ids: evidenceIds },
           identity_state: 'source_scoped', family_state: 'not_grouped',
-          releases: [], distributions: [], documentation: [], schemas: [],
-          collection_completeness: { releases: 'unknown', distributions: 'unknown', documentation: 'unknown', schemas: 'unknown' },
+          releases: paged.releases, distributions: paged.distributions, documentation: paged.documentation, schemas: paged.schemas,
+          collection_completeness: completeness,
         },
       });
+      response.truncated = truncated;
+      response.omitted_sections = omitted;
+      response.next_cursor = nextCursor;
+      response.continuation_expires_at = continuationExpires;
+      return response;
     },
 
     async getAccessPlan(input) {

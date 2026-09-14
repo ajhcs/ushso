@@ -1,0 +1,272 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-055",
+  "status": "producer_checked",
+  "owner": "/root/pr055_machine_assets",
+  "reviewer": "Astra/root",
+  "base_sha": "37521968ebf4e64f99bdcc71f9bd1e6c6cabf0c1",
+  "head_sha": "b0f2fc6e06f141722a07ba71ff10ec997a308347",
+  "dependency_merge_shas": {
+    "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+    "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7",
+    "PR-033": "ad0091998837a32c84f495ad67c4cbbaee3edd44",
+    "PR-053": "76ef9d9d2b3ce91fdb9827b3ae40c495ac95b6cb"
+  },
+  "branch": "codex/ushso-pr055-machine-assets-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/registry/asset-context-collections.mjs",
+    "packages/registry/index.mjs",
+    "worker/static-machine-toolkit-service.mjs",
+    "worker/machine-cursor.mjs",
+    "tests/research-program/machine-assets.test.mjs",
+    "verification/research-program/pr-055/",
+    "docs/research-program/handoffs/PR-055.json"
+  ],
+  "problem": "get_asset returned empty unknown placeholders for every collection. Clients could not obtain real follow-up IDs. Rolling HCRIS URLs could be minted as exact releases. Collection limits could silently clip required context. Tests could inject fake release IDs. Enrichment could be imported into worker/index.mjs.",
+  "resulting_behavior": "HCRIS has positive documentation collections derived from catalog locators that agree with the public detail page. An unbound product stays explicitly unknown. Rolling HCRIS URLs do not mint exact releases. Known-empty versus not-yet-resolved collections remain distinguishable. Pagination across a generation change returns a typed restart. Limits never silently clip required context. Tests obtain IDs from actual get_asset output and do not inject fake release IDs. worker/index.mjs does not import enrichment. Last-good generation live-2026-09-03-85b50522b420 is unchanged. GitHub PR12 was merged by the user to main as 5d5a30ca; this producer starts from research HEAD 37521968 after that merge.",
+  "commits": [
+    {
+      "id": "C-055-1",
+      "subject": "Read accepted asset context collections",
+      "sha": "8ab55f23398017e5b2a6df6b26b548f4a4d67294"
+    },
+    {
+      "id": "C-055-2",
+      "subject": "Page and pin each collection",
+      "sha": "dbce31f1b8a87e17e31ca547b3d4f55bba1e8cf3"
+    },
+    {
+      "id": "C-055-3",
+      "subject": "Verify client discovery of follow-up IDs",
+      "sha": "b0f2fc6e06f141722a07ba71ff10ec997a308347"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "asset-context-collections",
+      "id": "packages/registry/asset-context-collections.mjs",
+      "location": "local",
+      "sha256": "48e2ce93960e9e82dfb3240310b4dd847d69c24be1f5c942312b69c3b2c18163"
+    },
+    {
+      "kind": "registry-index",
+      "id": "packages/registry/index.mjs",
+      "location": "local",
+      "sha256": "cd1ba495bce4c704b8f2ebc26760811586c3c3abdf05b3d63e47e3af7940a051"
+    },
+    {
+      "kind": "static-machine-toolkit-service",
+      "id": "worker/static-machine-toolkit-service.mjs",
+      "location": "local",
+      "sha256": "bd8df1ffc62db839a54023eba5adf3729121019b5eac74862c8e011716534d0e"
+    },
+    {
+      "kind": "machine-cursor",
+      "id": "worker/machine-cursor.mjs",
+      "location": "local",
+      "sha256": "035f166601ea24d9152e3553986afccb95b7bbfd0cef12fd494e5bf6ac903613"
+    },
+    {
+      "kind": "machine-assets-tests",
+      "id": "tests/research-program/machine-assets.test.mjs",
+      "location": "local",
+      "sha256": "57545c5d2a7d6771ebf5ba02f16df86999695079e338d27c1c1a32e584c6802b"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "worker-index-no-enrichment-import",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "0be15165ba0deb5d3cc94e9d02f5bf63394aea84a74f474d26854bceadf760c4"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c055-focused",
+      "command": "node --test tests/research-program/machine-assets.test.mjs",
+      "started_at": "2026-09-14T18:24:40.266159Z",
+      "completed_at": "2026-09-14T18:24:40.457819Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "4/4 machine-assets tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c055-focused-event",
+        "path": "verification/research-program/pr-055/producer-20260914/commands/focused-assets/event.json",
+        "sha256": "1d1aac8ba5d6b685641bcca7119fe1b358167857c4c26ffa2f52b774f6d618e7",
+        "bytes": 1038
+      }
+    },
+    {
+      "id": "cmd-c055-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T18:24:40.458259Z",
+      "completed_at": "2026-09-14T18:24:40.518873Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c055-identity-event",
+        "path": "verification/research-program/pr-055/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "0d2050bd1bd4c143c05331af5f4a9a33f62e30e3ab2518ec98e29a7ad8cb2334",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr055-artifact-0",
+      "path": "verification/research-program/pr-055/task-binding.json",
+      "bytes": 3837,
+      "sha256": "61e9a0f143e454d1fd0d51c3e727e4a97764bf9ebdcf6a8ac1324fe2f5c2a2de"
+    },
+    {
+      "id": "pr055-artifact-1",
+      "path": "verification/research-program/pr-055/dispatch.json",
+      "bytes": 2850,
+      "sha256": "33de01944c7051437e51616cacdc8b301c0095a2b1a6c93d033bc13e9e066721"
+    },
+    {
+      "id": "pr055-artifact-2",
+      "path": "verification/research-program/pr-055/producer-20260914/commands/focused-assets/receipt.json",
+      "bytes": 459,
+      "sha256": "76d5e1fe380d9b5a262bb76d5a1698fab1ef4b3148c889c17c67506603f6b868"
+    },
+    {
+      "id": "pr055-artifact-3",
+      "path": "verification/research-program/pr-055/producer-20260914/commands/focused-assets/stdout.log",
+      "bytes": 575,
+      "sha256": "c87955789eb099f5e0ebfc3eaa4406bb5045ac273c17f2010c4fa1c11e9f3aa7"
+    },
+    {
+      "id": "pr055-artifact-4",
+      "path": "verification/research-program/pr-055/producer-20260914/commands/focused-assets/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr055-artifact-5",
+      "path": "verification/research-program/pr-055/producer-20260914/commands/focused-assets/event.json",
+      "bytes": 1038,
+      "sha256": "1d1aac8ba5d6b685641bcca7119fe1b358167857c4c26ffa2f52b774f6d618e7"
+    },
+    {
+      "id": "pr055-artifact-6",
+      "path": "verification/research-program/pr-055/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "3952320eca9ccbbacdec19274f875288c6fd8a98d091586a5c537380985fb243"
+    },
+    {
+      "id": "pr055-artifact-7",
+      "path": "verification/research-program/pr-055/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr055-artifact-8",
+      "path": "verification/research-program/pr-055/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr055-artifact-9",
+      "path": "verification/research-program/pr-055/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "0d2050bd1bd4c143c05331af5f4a9a33f62e30e3ab2518ec98e29a7ad8cb2334"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-055-1",
+      "status": "producer_checked",
+      "result": "HCRIS has positive contextual collections while an unbound product stays explicitly unknown.",
+      "command_ids": [
+        "cmd-c055-focused"
+      ]
+    },
+    {
+      "id": "C-055-2",
+      "status": "producer_checked",
+      "result": "Pagination across a generation change returns a typed restart. Limits never silently clip required context.",
+      "command_ids": [
+        "cmd-c055-focused"
+      ]
+    },
+    {
+      "id": "C-055-3",
+      "status": "producer_checked",
+      "result": "Search to get_asset yields actual HCRIS follow-up IDs. Tests do not inject fake release IDs. Sealed identity package validates. worker/index.mjs does not import enrichment.",
+      "command_ids": [
+        "cmd-c055-focused",
+        "cmd-c055-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "rolling-hcris-release",
+      "status": "accepted",
+      "detail": "HCRIS remains a rolling catalog endpoint. Releases/distributions/schemas stay unknown rather than minting an exact release from a URL."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-machine-assets-review",
+      "status": "pending",
+      "detail": "Independent review of HCRIS collections, unknown unbound products and generation-restart cursors remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "exact-release-still-unknown",
+      "status": "risk",
+      "detail": "HCRIS documentation locators are complete, but exact release/distribution/schema IDs remain unknown because rolling URLs cannot mint exact releases. Later get_access_plan/get_variables still require those IDs."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of HCRIS collections, unknown unbound products and generation-restart cursors, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-055 source and replay focused machine-assets and identity validators. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
