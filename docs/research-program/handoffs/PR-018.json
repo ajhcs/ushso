@@ -1,0 +1,299 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-018",
+  "status": "producer_checked",
+  "owner": "/root/pr018_field_meaning",
+  "reviewer": "Astra/root",
+  "base_sha": "fb8ad50047907d374af35422150c7586530cec72",
+  "head_sha": "804dc031b660f788ea8dfe929033e54eacdebcb9",
+  "dependency_merge_shas": {
+    "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+    "PR-014": "8878aa2cc8bd9b36995d429774f377e3de66aca7",
+    "PR-015": "df5f7f9b8460b6b118f5a4699673b9c96c15b07b",
+    "PR-016": "0f601a908e74492a9803906ce35cbd346df28565"
+  },
+  "branch": "codex/ushso-pr018-field-meaning-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "scripts/research/source-extractors.mjs",
+    "tests/research-program/field-meaning.test.mjs",
+    "verification/research-program/pr-018/",
+    "docs/research-program/handoffs/PR-018.json"
+  ],
+  "problem": "Codebooks, units and definitions could be invented from field names, Census concepts treated as definitions, suppressed markers converted to zero, or high-volume Census coverage hide missing CMS/CDC semantics.",
+  "resulting_behavior": "extractCodebookEvidence keeps numeric-looking codes as strings and refuses to convert suppressed/missing markers to zero. representConservativeMeaning keeps Census concepts as concepts, allows not-applicable units only for identifiers, and marks a rate without a denominator incomplete. inferUnitFromFieldName fails closed. reportFieldMeaningCoverage reconciles totals by source, role and release so Census volume cannot hide missing CMS/CDC semantics. Sealed packages/normalization/src and packages/identity/src/schema-catalog.mjs are unchanged. Live fetch is forbidden. No model is required.",
+  "commits": [
+    {
+      "id": "C-018-1",
+      "subject": "Extract codebooks as separate evidence",
+      "sha": "e432d8ecba24b841b22b0e48ce1da17ccacdb636"
+    },
+    {
+      "id": "C-018-2",
+      "subject": "Represent units and definitions conservatively",
+      "sha": "e432d8ecba24b841b22b0e48ce1da17ccacdb636"
+    },
+    {
+      "id": "C-018-3",
+      "subject": "Report meaningful field coverage",
+      "sha": "804dc031b660f788ea8dfe929033e54eacdebcb9"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "source-extractors",
+      "id": "scripts/research/source-extractors.mjs",
+      "location": "local",
+      "sha256": "f5d0f8c3f4e08aa29956e51958f8b1b20c5ab4fddeda0c106961fd26040e81be"
+    },
+    {
+      "kind": "field-meaning-tests",
+      "id": "tests/research-program/field-meaning.test.mjs",
+      "location": "local",
+      "sha256": "123f8bde45698a20d131e139d488ee0d4620296938622754011359185106172c"
+    },
+    {
+      "kind": "field-observation-consume-only",
+      "id": "packages/normalization/src/field-observation.mjs",
+      "location": "local",
+      "sha256": "d52f7cc9c631541a38f33773223486e68a010452ddaaf7528475c9d7c1ad2aab"
+    },
+    {
+      "kind": "variable-identity-consume-only",
+      "id": "packages/identity/src/variable-identity.mjs",
+      "location": "local",
+      "sha256": "e100821315e6386b979f1464b77922b4a3532881ee86f94e9492923b2cdab9c6"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c018-focused",
+      "command": "node --test tests/research-program/field-meaning.test.mjs tests/research-extractors.test.mjs",
+      "started_at": "2026-09-14T05:36:47.302756Z",
+      "completed_at": "2026-09-14T05:36:47.478864Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "25/25 field-meaning and extractors tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c018-focused-event",
+        "path": "verification/research-program/pr-018/producer-20260914/commands/focused-field-meaning/event.json",
+        "sha256": "7dd981afcc6db294998d7ce644f172cf82f15a75b9ada235bcd4db2ea7a37df2",
+        "bytes": 1117
+      }
+    },
+    {
+      "id": "cmd-c018-cdc",
+      "command": "node --test tests/research-program/cdc-view.test.mjs",
+      "started_at": "2026-09-14T05:36:47.479212Z",
+      "completed_at": "2026-09-14T05:36:48.566138Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "9/9 CDC view tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c018-cdc-event",
+        "path": "verification/research-program/pr-018/producer-20260914/commands/cdc-view/event.json",
+        "sha256": "b118d161232e60d4a80e392cc4fdd4bd584a50e1db56d72680ce1cd7632fe594",
+        "bytes": 1008
+      }
+    },
+    {
+      "id": "cmd-c018-census",
+      "command": "node --test tests/research-program/census-api.test.mjs",
+      "started_at": "2026-09-14T05:36:48.566455Z",
+      "completed_at": "2026-09-14T05:36:48.692448Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "8/8 Census API tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c018-census-event",
+        "path": "verification/research-program/pr-018/producer-20260914/commands/census-api/event.json",
+        "sha256": "a8b35cf77ff25a9cb28c39ff5177bab48027dac54286b109396561ea68553dfc",
+        "bytes": 1018
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr018-artifact-0",
+      "path": "verification/research-program/pr-018/task-binding.json",
+      "bytes": 3673,
+      "sha256": "08be4f7404afd2dcafafadaeb668c8e3a4847c39eb146e83892235abc71de611"
+    },
+    {
+      "id": "pr018-artifact-1",
+      "path": "verification/research-program/pr-018/dispatch.json",
+      "bytes": 2470,
+      "sha256": "06b7c78a311a7e665594eb1269e14e73e96507df576a0d7b13744b9a82a22575"
+    },
+    {
+      "id": "pr018-artifact-2",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/focused-field-meaning/receipt.json",
+      "bytes": 508,
+      "sha256": "2b66797f3841bce0a979c2b5d8e7ba7d50d1d36c8d33d00bf900bb8e56aef53a"
+    },
+    {
+      "id": "pr018-artifact-3",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/focused-field-meaning/stdout.log",
+      "bytes": 2571,
+      "sha256": "f0afb2515e429871e76740172776bd32780c72b6f9631e596b88def6a5711a87"
+    },
+    {
+      "id": "pr018-artifact-4",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/focused-field-meaning/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr018-artifact-5",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/focused-field-meaning/event.json",
+      "bytes": 1117,
+      "sha256": "7dd981afcc6db294998d7ce644f172cf82f15a75b9ada235bcd4db2ea7a37df2"
+    },
+    {
+      "id": "pr018-artifact-6",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/cdc-view/receipt.json",
+      "bytes": 447,
+      "sha256": "890cf20fc43bcab8795536bd1c573369d03a913dd05f2992488c5694bbdf44d0"
+    },
+    {
+      "id": "pr018-artifact-7",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/cdc-view/stdout.log",
+      "bytes": 883,
+      "sha256": "6c53bb1e799a974d9999e663e4c6e33ca67853ed9ffcf472cf84ae1a4b85a542"
+    },
+    {
+      "id": "pr018-artifact-8",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/cdc-view/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr018-artifact-9",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/cdc-view/event.json",
+      "bytes": 1008,
+      "sha256": "b118d161232e60d4a80e392cc4fdd4bd584a50e1db56d72680ce1cd7632fe594"
+    },
+    {
+      "id": "pr018-artifact-10",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/census-api/receipt.json",
+      "bytes": 451,
+      "sha256": "a0cb7c39765f7015046013521fe199fa0ebd5e500f0fdae1ec51e2dcd47920a6"
+    },
+    {
+      "id": "pr018-artifact-11",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/census-api/stdout.log",
+      "bytes": 880,
+      "sha256": "c35b02087bc92e15752180a69495b39cc6bad29c47e1ec170fa87dc7b8138038"
+    },
+    {
+      "id": "pr018-artifact-12",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/census-api/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr018-artifact-13",
+      "path": "verification/research-program/pr-018/producer-20260914/commands/census-api/event.json",
+      "bytes": 1018,
+      "sha256": "a8b35cf77ff25a9cb28c39ff5177bab48027dac54286b109396561ea68553dfc"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-018-1",
+      "status": "producer_checked",
+      "result": "Numeric-looking identifiers remain strings. Suppressed and missing values are not converted to zero.",
+      "command_ids": [
+        "cmd-c018-focused"
+      ]
+    },
+    {
+      "id": "C-018-2",
+      "status": "producer_checked",
+      "result": "Census concepts stay concepts. Identifiers accept not-applicable units. A rate without a denominator remains incomplete. A unit inferred only from a field name fails.",
+      "command_ids": [
+        "cmd-c018-focused"
+      ]
+    },
+    {
+      "id": "C-018-3",
+      "status": "producer_checked",
+      "result": "Coverage totals reconcile by source, role and release. High-volume Census fields cannot hide missing CMS/CDC semantics. Extractors, CDC view and Census API remain green.",
+      "command_ids": [
+        "cmd-c018-focused",
+        "cmd-c018-cdc",
+        "cmd-c018-census"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-cms-cdc-census-http",
+      "status": "accepted",
+      "detail": "Tests use in-memory codebook and versioned extractor fixtures. blockedFetch forbids live HTTP."
+    },
+    {
+      "id": "normalization-src-edit",
+      "status": "skipped",
+      "detail": "packages/normalization/src remains sealed. Field-meaning helpers live in owned source-extractors.mjs and consume identity/normalization types without editing sealed files."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-field-meaning-review",
+      "status": "pending",
+      "detail": "Independent review of codebook extraction, conservative units and coverage grouping remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "fixture-scale-coverage",
+      "status": "risk",
+      "detail": "Coverage grouping is exact for the constructed Census/CMS/CDC fixture set. It does not claim corpus-wide scientific completeness."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of codebook extraction, conservative units and coverage grouping, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-018 source and replay focused field-meaning, extractors, CDC view and Census API tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}

@@ -427,3 +427,212 @@ export function verifyVersionedVariables(claims, captures, options = {}) {
   for (const claim of claims) verifyVariableIdentity(claim, captures, options);
   return true;
 }
+const SUPPRESSED_MARKERS = Object.freeze(['.', '-', '*', '**', 'NA', 'N/A', 'null', 'suppressed', 'missing']);
+
+export async function blockedFetch() {
+  const error = new Error('FIELD_MEANING_LIVE_NETWORK_FORBIDDEN');
+  error.code = 'FIELD_MEANING_LIVE_NETWORK_FORBIDDEN';
+  throw error;
+}
+
+function asCodeString(value) {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    const error = new Error('CODE_MUST_REMAIN_STRING');
+    error.code = 'CODE_MUST_REMAIN_STRING';
+    throw error;
+  }
+  if (typeof value !== 'string') {
+    const error = new Error('CODE_MUST_REMAIN_STRING');
+    error.code = 'CODE_MUST_REMAIN_STRING';
+    throw error;
+  }
+  return value;
+}
+
+function isSuppressedOrMissing(code) {
+  if (typeof code !== 'string') return false;
+  return SUPPRESSED_MARKERS.includes(code) || SUPPRESSED_MARKERS.includes(code.trim());
+}
+
+export function extractCodebookEvidence({ source, release, pointer, table, labels = null } = {}) {
+  if (!Array.isArray(table)) {
+    const error = new Error('CODEBOOK_TABLE_REQUIRED');
+    error.code = 'CODEBOOK_TABLE_REQUIRED';
+    throw error;
+  }
+  const rows = table.map((entry, index) => {
+    const raw = object(entry) ? entry : { code: entry };
+    const code = asCodeString(raw.code ?? raw.value ?? raw.item);
+    if (code === null) {
+      const error = new Error('CODE_MUST_REMAIN_STRING');
+      error.code = 'CODE_MUST_REMAIN_STRING';
+      throw error;
+    }
+    const numericLook = /^[0-9]+$/.test(code);
+    const suppressed = isSuppressedOrMissing(code) || raw.suppressed === true || raw.missing === true;
+    if (suppressed && (raw.numeric_value === 0 || raw.as_number === 0)) {
+      const error = new Error('SUPPRESSED_NOT_ZERO');
+      error.code = 'SUPPRESSED_NOT_ZERO';
+      throw error;
+    }
+    return Object.freeze({
+      code,
+      label: typeof raw.label === 'string' ? raw.label : (labels && typeof labels[code] === 'string' ? labels[code] : null),
+      suppressed,
+      missing: suppressed || raw.missing === true,
+      numeric_looking: numericLook,
+      numeric_value: null,
+      pointer: typeof pointer === 'string' ? `${pointer}/${index}` : `/${index}`,
+    });
+  });
+  return Object.freeze({
+    format: 'ushso.codebook-evidence.v1',
+    source: source ?? null,
+    release: release ?? null,
+    pointer: pointer ?? null,
+    rows: Object.freeze(rows),
+    publication_authorized: false,
+    scientific_approval: false,
+  });
+}
+
+export function inferUnitFromFieldName(name) {
+  const error = new Error('UNIT_INFERRED_FROM_NAME');
+  error.code = 'UNIT_INFERRED_FROM_NAME';
+  error.field_name = name ?? null;
+  throw error;
+}
+
+export function representConservativeMeaning({
+  source,
+  release,
+  role,
+  label = null,
+  concept = null,
+  definition = null,
+  unit = null,
+  unitState = null,
+  unitRationale = null,
+  denominator = null,
+  evidenceIds = [],
+} = {}) {
+  if (unitState === 'inferred_from_name' || unit === 'inferred_from_name') inferUnitFromFieldName(label);
+  const conceptIsNotDefinition = concept !== null && (definition === null || definition === concept);
+  const descriptionEqualsLabel = typeof definition === 'string' && typeof label === 'string' && definition === label;
+  let unitRecord;
+  if (unitState === 'not_applicable') {
+    if (role !== 'identifier') {
+      const error = new Error('UNIT_NOT_APPLICABLE_REQUIRES_IDENTIFIER');
+      error.code = 'UNIT_NOT_APPLICABLE_REQUIRES_IDENTIFIER';
+      throw error;
+    }
+    unitRecord = Object.freeze({
+      state: 'not_applicable',
+      value: null,
+      rationale: unitRationale ?? 'Identifier fields have no physical unit.',
+      evidence_ids: Object.freeze([...evidenceIds]),
+    });
+  } else if (typeof unit === 'string' && unit.length > 0) {
+    unitRecord = Object.freeze({
+      state: 'documented',
+      value: unit,
+      rationale: unitRationale ?? 'Literal documented unit statement.',
+      evidence_ids: Object.freeze([...evidenceIds]),
+    });
+  } else if (role === 'rate' && (denominator === null || denominator === undefined || denominator === '')) {
+    unitRecord = Object.freeze({
+      state: 'missing',
+      value: null,
+      rationale: unitRationale ?? 'Rate without a documented denominator remains incomplete.',
+      evidence_ids: Object.freeze([...evidenceIds]),
+      incomplete: true,
+    });
+  } else {
+    unitRecord = Object.freeze({
+      state: unitState ?? 'unknown',
+      value: null,
+      rationale: unitRationale,
+      evidence_ids: Object.freeze([...evidenceIds]),
+    });
+  }
+  const completeness = role === 'rate' && unitRecord.incomplete ? 'incomplete'
+    : (unitRecord.state === 'documented' || unitRecord.state === 'not_applicable' || role === 'identifier' ? 'documented' : 'incomplete');
+  return Object.freeze({
+    source: source ?? null,
+    release: release ?? null,
+    role: role ?? 'unknown',
+    label,
+    concept,
+    definition,
+    concept_is_not_definition: conceptIsNotDefinition,
+    description_equals_label: descriptionEqualsLabel,
+    unit: unitRecord,
+    completeness,
+    publication_authorized: false,
+    scientific_approval: false,
+  });
+}
+
+export function reportFieldMeaningCoverage(fields = []) {
+  const rows = fields.map((field, index) => {
+    const meaning = field.meaning ?? field;
+    return Object.freeze({
+      id: field.id ?? meaning.id ?? `field-${index}`,
+      source: meaning.source ?? field.source ?? 'unknown',
+      release: meaning.release ?? field.release ?? 'unknown',
+      role: meaning.role ?? field.role ?? 'unknown',
+      description_equals_label: meaning.description_equals_label === true,
+      unsupported_unit: meaning.unit?.state === 'unknown' || meaning.unit?.state === 'missing' || meaning.unit?.unsupported === true,
+      conflicting_codebook: field.conflicting_codebook === true,
+      missing_definition: meaning.definition === null || meaning.definition === undefined || meaning.definition === '',
+      concept_only: meaning.concept_is_not_definition === true && (meaning.definition === null || meaning.definition === meaning.concept),
+      completeness: meaning.completeness ?? 'unknown',
+    });
+  });
+  const countBy = (key) => {
+    const map = new Map();
+    for (const row of rows) {
+      const value = row[key];
+      map.set(value, (map.get(value) ?? 0) + 1);
+    }
+    return Object.freeze(Object.fromEntries([...map.entries()].sort()));
+  };
+  const flagged = (predicate) => rows.filter(predicate).map((row) => row.id);
+  const bySource = countBy('source');
+  const censusCount = bySource.census ?? bySource['census-api'] ?? 0;
+  const cmsCount = bySource.cms ?? bySource['cms-data-catalog'] ?? 0;
+  const cdcCount = bySource.cdc ?? bySource['cdc-socrata'] ?? 0;
+  const missingCmsCdc = rows.filter((row) => (row.source === 'cms' || row.source === 'cms-data-catalog' || row.source === 'cdc' || row.source === 'cdc-socrata') && (row.missing_definition || row.unsupported_unit));
+  return Object.freeze({
+    format: 'ushso.field-meaning-coverage.v1',
+    record_count: rows.length,
+    rows: Object.freeze(rows),
+    totals: Object.freeze({
+      fields: rows.length,
+      description_equals_label: rows.filter((row) => row.description_equals_label).length,
+      unsupported_unit: rows.filter((row) => row.unsupported_unit).length,
+      conflicting_codebook: rows.filter((row) => row.conflicting_codebook).length,
+      missing_definition: rows.filter((row) => row.missing_definition).length,
+    }),
+    by_source: bySource,
+    by_role: countBy('role'),
+    by_release: countBy('release'),
+    groups: Object.freeze({
+      description_equals_label: Object.freeze(flagged((row) => row.description_equals_label)),
+      unsupported_unit: Object.freeze(flagged((row) => row.unsupported_unit)),
+      conflicting_codebook: Object.freeze(flagged((row) => row.conflicting_codebook)),
+      missing_definition: Object.freeze(flagged((row) => row.missing_definition)),
+    }),
+    census_cannot_hide_cms_cdc: Object.freeze({
+      census_count: censusCount,
+      cms_count: cmsCount,
+      cdc_count: cdcCount,
+      cms_cdc_missing_semantics: Object.freeze(missingCmsCdc.map((row) => row.id)),
+      hidden: false,
+    }),
+    reconciled: rows.length === (Object.values(bySource).reduce((sum, n) => sum + n, 0)),
+    publication_authorized: false,
+    live_source_traffic: false,
+  });
+}
