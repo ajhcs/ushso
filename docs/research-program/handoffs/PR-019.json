@@ -1,0 +1,356 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-019",
+  "status": "producer_checked",
+  "owner": "/root/pr019_example_runner",
+  "reviewer": "Astra/root",
+  "base_sha": "176875b71176d65d038609a2b2e82ad1cfeb242e",
+  "head_sha": "c9c3cdd26c4cf26dd849ff7cf8c152b8d5231086",
+  "dependency_merge_shas": {
+    "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+    "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74",
+    "PR-013": "861a7808fec20e5e7795bb8f8082f82717e01f11",
+    "PR-014": "8878aa2cc8bd9b36995d429774f377e3de66aca7",
+    "PR-015": "df5f7f9b8460b6b118f5a4699673b9c96c15b07b",
+    "PR-017": "2e43f46908b7970c933e110fcd2072b7aab9ddd4"
+  },
+  "branch": "codex/ushso-pr019-example-runner-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/connectors/src/testing/",
+    "scripts/research-program/test-example.mjs",
+    "tests/research-program/example-runner.test.mjs",
+    "verification/research-program/pr-019/",
+    "docs/research-program/handoffs/PR-019.json"
+  ],
+  "problem": "Recipes could not prove exactly what a small request checked. HTTP 200 HTML, missing Census keys, wrong MIME, unexpected fields, empty-but-valid data, ignored row limits, and public examples could be conflated with full dataset/schema validation or leak credentials.",
+  "resulting_behavior": "createExampleReceipt stores source/release/distribution, sanitized parameters, expected content/fields, size and row limits, observation time and attempted checks. CMS/CDC sample receipts and Census keyless HTML produce distinct outcomes. executeBoundedSample compares actual fields/types to the receipt independently of catalog classification, and stops on wrong MIME, missing key, unexpected field, empty-but-valid data and ignored row limit. HTTP 200 alone never produces a tested-example badge. Sample field/type checks remain separate from full dataset/schema checks. publishExamplePreview distinguishes sampled values from synthetic schema examples. generateCopyableExamples round-trips limits, context pins and credential placeholders without placing secrets in public artifacts. Live fetch is forbidden. CLI stays fixture-only. Sealed packages/normalization/src and packages/identity/src/schema-catalog.mjs are unchanged.",
+  "commits": [
+    {
+      "id": "C-019-1",
+      "subject": "Define example-request receipts",
+      "sha": "290620d9e53ce37ef84a6dc5bab31fc6e750bc81"
+    },
+    {
+      "id": "C-019-2",
+      "subject": "Execute and validate bounded samples",
+      "sha": "290620d9e53ce37ef84a6dc5bab31fc6e750bc81"
+    },
+    {
+      "id": "C-019-3",
+      "subject": "Publish example previews safely",
+      "sha": "c9c3cdd26c4cf26dd849ff7cf8c152b8d5231086"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "example-runner",
+      "id": "packages/connectors/src/testing/example-runner.mjs",
+      "location": "local",
+      "sha256": "0296168c89cb33578483ac53bac87e87b40e7fcf26cf9f84b1198a0819d902b5"
+    },
+    {
+      "kind": "testing-index",
+      "id": "packages/connectors/src/testing/index.mjs",
+      "location": "local",
+      "sha256": "e4a5091a3e0a2c4dfca402416cb84970dbb30bf932e534c3612c4ed1b78d28cf"
+    },
+    {
+      "kind": "test-example-cli",
+      "id": "scripts/research-program/test-example.mjs",
+      "location": "local",
+      "sha256": "6cd827f961c34b36e52a8660c37d6b551b2c676b74f930cefffc9f832954a812"
+    },
+    {
+      "kind": "example-runner-tests",
+      "id": "tests/research-program/example-runner.test.mjs",
+      "location": "local",
+      "sha256": "cf6ba3780b3973f011221bc73f1d391e22741e5bdc2827c99a507a9d5b30af9c"
+    },
+    {
+      "kind": "census-keyless-receipt",
+      "id": "tests/research-program/fixtures/pr009-census-negative/sample-census-acs.receipt.json",
+      "location": "local",
+      "sha256": "ec82248a6c9e4ba7f92b5d5721aed46b639036a96a0f5df0297e45ac51738896"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c019-focused",
+      "command": "node --test tests/research-program/example-runner.test.mjs",
+      "started_at": "2026-09-14T05:59:22.107043Z",
+      "completed_at": "2026-09-14T05:59:22.240932Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "5/5 example-runner tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c019-focused-event",
+        "path": "verification/research-program/pr-019/producer-20260914/commands/focused-example/event.json",
+        "sha256": "a2d43894584f8eff72374eac8393f62e1235d9ea855148dc4fa5e609ed8f0fd2",
+        "bytes": 1041
+      }
+    },
+    {
+      "id": "cmd-c019-http",
+      "command": "node --test tests/research-program/http-outcomes.test.mjs",
+      "started_at": "2026-09-14T05:59:22.241371Z",
+      "completed_at": "2026-09-14T05:59:23.210848Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "10/10 HTTP-outcome tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c019-http-event",
+        "path": "verification/research-program/pr-019/producer-20260914/commands/http-outcomes/event.json",
+        "sha256": "10e3a88fee1fb7875621f298aacb8f91f96097dd2b459ecbbd97cfe9f90e3b5f",
+        "bytes": 1034
+      }
+    },
+    {
+      "id": "cmd-c019-census",
+      "command": "node --test tests/research-program/census-api.test.mjs",
+      "started_at": "2026-09-14T05:59:23.211223Z",
+      "completed_at": "2026-09-14T05:59:23.351089Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "8/8 Census API tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c019-census-event",
+        "path": "verification/research-program/pr-019/producer-20260914/commands/census-api/event.json",
+        "sha256": "8ac7fb331a915c11adefa5a134993920d263c655ec816f8e7f45957787f99c44",
+        "bytes": 1018
+      }
+    },
+    {
+      "id": "cmd-c019-cms",
+      "command": "node --test tests/research-program/cms-resources.test.mjs",
+      "started_at": "2026-09-14T05:59:23.351425Z",
+      "completed_at": "2026-09-14T05:59:25.250268Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "10/10 CMS resources tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c019-cms-event",
+        "path": "verification/research-program/pr-019/producer-20260914/commands/cms-resources/event.json",
+        "sha256": "6e03c4799704e97f03105122fc2e1d7debadc501c46558fe3ca14944708f13dd",
+        "bytes": 1036
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr019-artifact-0",
+      "path": "verification/research-program/pr-019/task-binding.json",
+      "bytes": 4361,
+      "sha256": "a0c4da8b7d7389de45827fe352938c7cc2b617ad3b5db658b181eacc9c38ef05"
+    },
+    {
+      "id": "pr019-artifact-1",
+      "path": "verification/research-program/pr-019/dispatch.json",
+      "bytes": 2809,
+      "sha256": "912c2bc4cb4407733e69db1b34783eb0f4a37e520af47f5f6941cc7da979063b"
+    },
+    {
+      "id": "pr019-artifact-2",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/focused-example/receipt.json",
+      "bytes": 460,
+      "sha256": "611a9ac20d3412ad9f3683a90d03a204b1d08c57c9b2b2f7e505ed42724aa840"
+    },
+    {
+      "id": "pr019-artifact-3",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/focused-example/stdout.log",
+      "bytes": 600,
+      "sha256": "310f5bad7c3e4683d5d017ccd826c4e65dca7aba8c9fccb2c38c0d4044a714b5"
+    },
+    {
+      "id": "pr019-artifact-4",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/focused-example/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr019-artifact-5",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/focused-example/event.json",
+      "bytes": 1041,
+      "sha256": "a2d43894584f8eff72374eac8393f62e1235d9ea855148dc4fa5e609ed8f0fd2"
+    },
+    {
+      "id": "pr019-artifact-6",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/http-outcomes/receipt.json",
+      "bytes": 457,
+      "sha256": "6190fbee07c85a4414451768045aa9c8f470963413d6fe6dca76bc8f3cc0aa3e"
+    },
+    {
+      "id": "pr019-artifact-7",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/http-outcomes/stdout.log",
+      "bytes": 983,
+      "sha256": "7ebe16a95e67be70fedc0831af8a8a5a59f0de80cf742f985271970626f1cfff"
+    },
+    {
+      "id": "pr019-artifact-8",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/http-outcomes/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr019-artifact-9",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/http-outcomes/event.json",
+      "bytes": 1034,
+      "sha256": "10e3a88fee1fb7875621f298aacb8f91f96097dd2b459ecbbd97cfe9f90e3b5f"
+    },
+    {
+      "id": "pr019-artifact-10",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/census-api/receipt.json",
+      "bytes": 451,
+      "sha256": "839c2fc3c981d9b7c222dd187c998a257ce7eced6d51cbef8f313458cbb1cd11"
+    },
+    {
+      "id": "pr019-artifact-11",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/census-api/stdout.log",
+      "bytes": 881,
+      "sha256": "92a6581c251fc49289311cdec1797ad61a1aad6ed3be855ec4afc58da124e1b4"
+    },
+    {
+      "id": "pr019-artifact-12",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/census-api/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr019-artifact-13",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/census-api/event.json",
+      "bytes": 1018,
+      "sha256": "8ac7fb331a915c11adefa5a134993920d263c655ec816f8e7f45957787f99c44"
+    },
+    {
+      "id": "pr019-artifact-14",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/cms-resources/receipt.json",
+      "bytes": 458,
+      "sha256": "ffb15d5322423d93edef80ba3e81fda466da6f70a6f976a7748572a153f982ec"
+    },
+    {
+      "id": "pr019-artifact-15",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/cms-resources/stdout.log",
+      "bytes": 1002,
+      "sha256": "eee20f75c9e4d81525f6b8e4cd6bcffdfb9f434cb93b82f68473607a8e0dff75"
+    },
+    {
+      "id": "pr019-artifact-16",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/cms-resources/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr019-artifact-17",
+      "path": "verification/research-program/pr-019/producer-20260914/commands/cms-resources/event.json",
+      "bytes": 1036,
+      "sha256": "6e03c4799704e97f03105122fc2e1d7debadc501c46558fe3ca14944708f13dd"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-019-1",
+      "status": "producer_checked",
+      "result": "CMS/CDC audit samples and Census keyless response produce distinct expected outcomes.",
+      "command_ids": [
+        "cmd-c019-focused",
+        "cmd-c019-http"
+      ]
+    },
+    {
+      "id": "C-019-2",
+      "status": "producer_checked",
+      "result": "Wrong MIME, missing key, unexpected field, empty-but-valid data and ignored row limit have explicit results. HTTP 200 alone is not a tested-example badge. Sample checks stay separate from full schema.",
+      "command_ids": [
+        "cmd-c019-focused"
+      ]
+    },
+    {
+      "id": "C-019-3",
+      "status": "producer_checked",
+      "result": "Sampled values stay distinct from synthetic examples. Credentials are redacted. Generated examples round-trip limits, context pins and credential placeholders. CMS and Census consumer tests remain green.",
+      "command_ids": [
+        "cmd-c019-focused",
+        "cmd-c019-census",
+        "cmd-c019-cms"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-cms-cdc-census-http",
+      "status": "accepted",
+      "detail": "Tests use in-memory JSON fixtures and the retained PR-009 Census Missing Key HTML observation. blockedFetch forbids live HTTP."
+    },
+    {
+      "id": "catalog-classifier-payload-accept",
+      "status": "accepted",
+      "detail": "classifyResponse remains catalog-metadata oriented and rejects row-shaped JSON. Sample field/type checks are independent and never claim catalog or full-schema acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-example-runner-review",
+      "status": "pending",
+      "detail": "Independent review of receipts, bounded sample execution and public example generation remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "fixture-scale-examples",
+      "status": "risk",
+      "detail": "Example receipts prove the bounded sample recipe for constructed CMS/CDC JSON and retained Census HTML. They do not claim corpus-wide payload access or full-file validation."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of receipts, bounded sample execution and public example generation, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-019 source and replay focused example-runner, HTTP-outcome, Census API and CMS resources tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
