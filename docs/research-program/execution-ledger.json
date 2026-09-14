@@ -1,6 +1,6 @@
 {
   "format": "ushso.research-program-execution.v1",
-  "updated_at": "2026-09-14T15:29:01.369172Z",
+  "updated_at": "2026-09-14T15:45:49.579510Z",
   "plan": "docs/master-plan/2026-09-10/plan.json",
   "plan_sha256": "dac28833f472624d09f6ec678d49ad9e9c4884c68662806d17a11655693cb85d",
   "integration_branch": "codex/research-program-integration-20260910",
@@ -4225,7 +4225,7 @@
     },
     {
       "pr_id": "PR-048",
-      "status": "ready",
+      "status": "integrated",
       "owner": "/root/pr048_hpt_csv",
       "dependencies": [
         "PR-008",
@@ -4247,18 +4247,35 @@
         "verification/research-program/pr-048/",
         "docs/research-program/handoffs/PR-048.json"
       ],
-      "head_sha": null,
-      "merge_sha": null,
+      "head_sha": "2340fb4764a849cb37975e84fb0fd3167ecf56e2",
+      "merge_sha": "e698f55cec1de955c3ed283c18fae741d89acbf4",
       "handoff": "docs/research-program/handoffs/PR-048.json",
       "evidence_directory": "verification/research-program/pr-048/",
-      "github_pr_url": null,
-      "blockers": [],
-      "next_action": "Create isolated PR-048 worktree from this bound head. A generic CSV header parser cannot misclassify a metadata row as the variable schema. Format equivalence does not prove two real hospital files describe identical periods/services.",
+      "github_pr_url": "https://github.com/ajhcs/ushso/pull/65",
+      "blockers": [
+        {
+          "id": "C0091",
+          "kind": "qualification",
+          "detail": "Measured topology qualification remains unresolved."
+        }
+      ],
+      "next_action": "PR048 is integrated through research-integration merge e698f55c. Independent review passed. Metadata rows are not the variable schema. Wide/tall fixture equivalence does not prove two real hospital files describe identical periods/services. Last-good generation is unchanged. This is not R05/R10 acceptance, C0091 qualification, PR049 dispatch, live MRF download, or production change.",
       "base_sha": "1ec26a16790d1f5233ffeac2e706f5eb6ff25ab1",
       "base_tree": "6b643852dca31c2d772cc820c5d4e52b069bb2ae",
       "task_id": "ushso-pr048-hpt-csv-20260914",
       "branch": "codex/ushso-pr048-hpt-csv-20260914",
-      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr048-hpt-csv-20260914"
+      "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr048-hpt-csv-20260914",
+      "integration_merge_sha": "e698f55cec1de955c3ed283c18fae741d89acbf4",
+      "integration_tree": "1cfc9f66e76882569c7c4e74f732137940b3d94a",
+      "scope_history": [
+        {
+          "recorded_at": "2026-09-14T15:45:49.579510Z",
+          "kind": "research_integration_merge",
+          "merge_sha": "e698f55cec1de955c3ed283c18fae741d89acbf4",
+          "tree": "1cfc9f66e76882569c7c4e74f732137940b3d94a",
+          "github_pr": 65
+        }
+      ]
     },
     {
       "pr_id": "PR-049",
@@ -4282,7 +4299,8 @@
       "handoff": "docs/research-program/handoffs/PR-049.json",
       "evidence_directory": "verification/research-program/pr-049/",
       "github_pr_url": null,
-      "blockers": []
+      "blockers": [],
+      "next_action": "PR048 research-integration merge e698f55c is available. Bind exact PR-002/PR-009/PR-011/PR-012/PR-034 merge SHAs and dispatch a bounded PR-049 worktree. Hospital HPT and payer TiC schemas remain separate. Allowed-amount files are discoverable without pretending the in-network parser validates them."
     },
     {
       "pr_id": "PR-050",
