@@ -11,7 +11,7 @@ const acceptedResponse = await loadAcceptedDiscoveryFixture()
 assertDiscoveryResult(acceptedResponse)
 
 describe('result card six-region presentation contract', () => {
-  it('shows exactly the six required scanning regions while keeping rich evidence one click down', () => {
+  it('shows the compact scanning regions while keeping rich evidence one click down', () => {
     const result = adaptDiscoveryResponse(acceptedResponse).records[0]
     const markup = renderToStaticMarkup(createElement(
       MemoryRouter,
@@ -19,8 +19,9 @@ describe('result card six-region presentation contract', () => {
       createElement(ResultCard, { result, displayRank: 1 }),
     ))
 
-    expect(markup.match(/data-result-region=/g)).toHaveLength(6)
+    expect(markup.match(/data-result-region=/g)).toHaveLength(7)
     expect(markup).toContain(`aria-label="Result 1: ${result.title}"`)
+    expect(markup).toContain('data-result-region="source"')
     expect(markup).toContain('data-result-region="title"')
     expect(markup).toContain('data-result-region="description"')
     expect(markup).toContain('data-result-region="why-match"')
@@ -32,19 +33,20 @@ describe('result card six-region presentation contract', () => {
     expect(markup).toContain('Scoped metadata route checked')
     expect(markup).toContain('Question match')
     expect(markup).toContain('Documented match')
-    expect(markup).toContain('Access')
+    expect(markup).toContain('Tested access')
     expect(markup).toContain('Geography')
     expect(markup).toContain('Grain')
     expect(markup).toContain('Time')
-    expect(markup).toContain('View evidence and access')
+    expect(markup).toContain('Open access route')
     expect(markup).not.toContain('Evidence source')
     expect(markup).not.toContain('What the fields tell you:')
     expect(markup).not.toContain('Relationship:')
     expect(markup).not.toContain('Relevance:')
     expect(markup).not.toContain('Variables documented')
-    expect(markup).toContain('Why it matched')
+    expect(markup).toContain('Purpose')
     expect(markup).toContain(result.canonicalResult.relevance.why_relevant[0] ?? 'No evidence-backed match explanation is available.')
     expect(markup).not.toContain('Live verified')
+    expect(markup).toContain('Evidence and generation details')
     expect(markup).toContain('Last successful metadata check')
     expect(markup).toContain('Latest catalog-metadata attempt')
     expect(markup).toContain('Payload check not attempted')

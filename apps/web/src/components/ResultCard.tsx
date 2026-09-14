@@ -71,12 +71,13 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
   return (
     <article id={id} className="result-card" data-result-id={result.id} aria-label={displayRank ? `Result ${displayRank}: ${result.title}` : undefined}>
       <div className="result-card__main">
+        <p className="result-card__source" data-result-region="source">{result.sourceName}{result.familyStatus === "Family" ? ` · ${result.familySiblingCount + 1} related records` : ""}</p>
         <h2 data-result-region="title"><Link to={detailsHref} onClick={onDetailsClick}>{result.title}</Link></h2>
         <p className="result-card__description" data-result-region="description">{description}</p>
         {metadata?.named_source_role === 'secondary_mention' && <p className="result-card__source-role">Secondary mention—not the requested source</p>}
         {corrupted && <p className="result-card__quality"><AlertTriangle aria-hidden="true" />Captured description may contain encoding damage; inspect the source.</p>}
         {uncertaintyReasons.length > 0 && <div className="result-card__uncertainty"><strong>Why this is uncertain</strong><ul>{uncertaintyReasons.map((reason) => <li key={reason}>{reason}</li>)}</ul></div>}
-        <div className="result-card__why" data-result-region="why-match"><h3>Why it matched</h3><p>{whyMatched}</p></div>
+        <div className="result-card__why" data-result-region="why-match"><h3>Purpose</h3><p>{whyMatched}</p></div>
         {categoryDetails.length > 0 && (
           <ul className="result-card__categories">
             {categoryDetails.map((category) => <li key={category.id || category.label}>{category.label}{category.evidence_state === 'inferred' && <small>Inferred search aid</small>}</li>)}
@@ -101,21 +102,25 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
       <aside className="result-card__summary" aria-label="Verification and access status">
         <div className="result-card__evidence-access" data-result-region="access-evidence">
           <p className="result-status"><span><small>Question match</small><strong>{matchStatus(result)}</strong></span></p>
-          <p className={result.verification.liveVerified ? 'result-status result-status--verified' : 'result-status'}>
+                    <p className={result.verification.liveVerified ? 'result-status result-status--verified' : 'result-status'}>
             <ShieldCheck aria-hidden="true" />
             <span>
-              <small>Verification target</small>
-              <strong>{verificationTarget}</strong>
+              <small>Tested access</small>
+              <strong>{result.accessStatusLabel}</strong>
               {freshness.overdue && <em>Review overdue</em>}
               {freshness.stale && <em>Historical metadata success is stale</em>}
-              <small>Last successful metadata check {freshness.lastSuccessfulText}</small>
-              <small>Latest catalog-metadata attempt {freshness.latestAttemptText} ({freshness.latestAttemptOutcome})</small>
-              <small>Payload check {freshness.payloadCheckState}. {freshness.payloadCheck}</small>
+              <small>{verificationTarget}</small>
             </span>
           </p>
-          <p className="result-status"><span><small>Access</small><strong>{result.accessStatusLabel}</strong></span></p>
         </div>
-        <Link className="view-details" data-result-region="details-action" to={detailsHref} onClick={onDetailsClick}>View evidence and access</Link>
+        <details className="result-card__evidence">
+          <summary>Evidence and generation details</summary>
+          <p>Last successful metadata check {freshness.lastSuccessfulText}</p>
+          <p>Latest catalog-metadata attempt {freshness.latestAttemptText} ({freshness.latestAttemptOutcome})</p>
+          <p>Payload check {freshness.payloadCheckState}. {freshness.payloadCheck}</p>
+          <p>Catalog generation and ranking hashes stay on the results page receipt, not this card.</p>
+        </details>
+        <Link className="view-details" data-result-region="details-action" to={detailsHref} onClick={onDetailsClick}>Open access route</Link>
       </aside>
     </article>
   )
