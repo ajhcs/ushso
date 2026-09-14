@@ -1,0 +1,339 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-061",
+  "status": "producer_checked",
+  "owner": "/root/pr061_research_packet",
+  "reviewer": "Astra/root",
+  "base_sha": "6a3f429dbe509703aeeb5f8c3c6a1c3015553f97",
+  "head_sha": "8eb4b409e178194790d918e0e126565df1c5c1ad",
+  "dependency_merge_shas": {
+    "PR-036": "a6c2fc568062c4af3c93d7639bc0bb005ac88dd1",
+    "PR-041": "7ee6ef80c438b584d16025ad3f60c24bb8c0c83e",
+    "PR-055": "a6c63c1ca35f98517e7000b44602c1e8f765e2d5",
+    "PR-056": "413e70b342f4fc1a8fed65dbb2b0fd68ffb1813d",
+    "PR-057": "81533dfed8e814485a451cf66629babb181fbeda"
+  },
+  "branch": "codex/ushso-pr061-research-packet-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/registry/comparison-dimensions.mjs",
+    "packages/registry/qualified-join-routes.mjs",
+    "packages/registry/research-packet.mjs",
+    "packages/registry/index.mjs",
+    "packages/machine-toolkit/src/service.mjs",
+    "worker/static-machine-toolkit-service.mjs",
+    "tests/research-program/machine-research-packet.test.mjs",
+    "verification/research-program/pr-061/",
+    "docs/research-program/handoffs/PR-061.json"
+  ],
+  "problem": "Agents could not compare source suitability or export a reproducible metadata packet. compare_assets could return a generic complete result with empty facts. Individually valid joins could be promoted to a combined path without compatibility checks. Packet exports could contain credentials or hidden research-query telemetry. HTTP 200 or a successful tool envelope could be treated as a completed research task.",
+  "resulting_behavior": "Comparing HCRIS and PHC4 shows differing reporting definitions rather than a generic complete result with empty facts. An individually valid pair of joins cannot be promoted to a valid combined path without compatibility checks. The export can be validated offline and reproduces source identities without invoking LLMs or fetching source data. Comparison completeness is about populated relevant dimensions, not envelope construction. Exports contain no credentials or hidden research-query telemetry. A successful tool envelope is not a completed research task. HTTP 200 is not acceptance. worker/index.mjs does not import enrichment. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-061-1",
+      "subject": "Return supported comparison dimensions",
+      "sha": "ff7e0d2ec1bde1da3d179da7aac322dbdda6f464"
+    },
+    {
+      "id": "C-061-2",
+      "subject": "Integrate qualified join route inspection",
+      "sha": "bf90b5407ed427517fbd1436b7a3c78ec9cc8568"
+    },
+    {
+      "id": "C-061-3",
+      "subject": "Provide a versioned evidence packet export",
+      "sha": "8eb4b409e178194790d918e0e126565df1c5c1ad"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "comparison-dimensions",
+      "id": "packages/registry/comparison-dimensions.mjs",
+      "location": "local",
+      "sha256": "c249c0a6ed03d18f9eb1b9340a10b5e4a172475b4bf5040163de638db49cc4ee"
+    },
+    {
+      "kind": "qualified-join-routes",
+      "id": "packages/registry/qualified-join-routes.mjs",
+      "location": "local",
+      "sha256": "0aa4ebc1bd8a608952407180110c60ebdcaaf010083372bd5c1ec1b78e2b7cd4"
+    },
+    {
+      "kind": "research-packet",
+      "id": "packages/registry/research-packet.mjs",
+      "location": "local",
+      "sha256": "2000ea004c3d929acac587ed405e9cb657696c7f6ebb35c5efd9d1f946094b22"
+    },
+    {
+      "kind": "registry-index",
+      "id": "packages/registry/index.mjs",
+      "location": "local",
+      "sha256": "047dcec7cc1579f0ffb3d0cd7d95d5a50b72f3e9fb51a684e59bb5bffda89555"
+    },
+    {
+      "kind": "toolkit-service",
+      "id": "packages/machine-toolkit/src/service.mjs",
+      "location": "local",
+      "sha256": "7cd97351af7c5e1f20a79aa61054bfc205a4d5b085f77d6f12de9ce9a6d32962"
+    },
+    {
+      "kind": "static-toolkit",
+      "id": "worker/static-machine-toolkit-service.mjs",
+      "location": "local",
+      "sha256": "fecf6872fd86628de63abba13db83ca812ade52c5c1ee70d83839b66425d427c"
+    },
+    {
+      "kind": "packet-tests",
+      "id": "tests/research-program/machine-research-packet.test.mjs",
+      "location": "local",
+      "sha256": "b2c2a2cf896a677ad9030862389136a2ee5a27536acd3d6f63cb4c788afe41fb"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "worker-index-unchanged",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "ca413cc6224ce2ef472d2116b3acf9ce3f60f4d9181e31f8bfdc1c2d2963ace1"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c061-focused",
+      "command": "node --test tests/research-program/machine-research-packet.test.mjs",
+      "started_at": "2026-09-14T21:10:04.264255Z",
+      "completed_at": "2026-09-14T21:10:04.487329Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 machine-research-packet tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c061-focused-event",
+        "path": "verification/research-program/pr-061/producer-20260914/commands/focused-packet/event.json",
+        "sha256": "94db91e0416b629be352a7743f6baabd715631d264cfc8f7dc07981d64d4b685",
+        "bytes": 1056
+      }
+    },
+    {
+      "id": "cmd-c061-related",
+      "command": "node --test tests/static-machine-toolkit.test.mjs tests/research-program/machine-assets.test.mjs tests/research-program/machine-recipes.test.mjs tests/research-program/machine-variables.test.mjs",
+      "started_at": "2026-09-14T21:10:04.487742Z",
+      "completed_at": "2026-09-14T21:10:05.309132Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "12/12 related toolkit/asset/recipe/variable tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c061-related-event",
+        "path": "verification/research-program/pr-061/producer-20260914/commands/related-packet/event.json",
+        "sha256": "cd250df1c093c0c5b28d85cd4bdabb383b9d4e369b04d3f5635b5926688cc6fa",
+        "bytes": 1221
+      }
+    },
+    {
+      "id": "cmd-c061-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T21:10:05.309531Z",
+      "completed_at": "2026-09-14T21:10:05.367008Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c061-identity-event",
+        "path": "verification/research-program/pr-061/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "2143911aa10ce38d9e446af9b4ef626d72a57b2c93988edab60fdf12fc4bc3e5",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr061-artifact-0",
+      "path": "verification/research-program/pr-061/task-binding.json",
+      "bytes": 3951,
+      "sha256": "ca1ed499d164f6aebb62d824de6f0c7385e499488eab40953234835aeac04a94"
+    },
+    {
+      "id": "pr061-artifact-1",
+      "path": "verification/research-program/pr-061/dispatch.json",
+      "bytes": 2877,
+      "sha256": "5573d1aa2d1692fa652810114dd35ce282a4ee46005cfba8f514b76b7b24fc39"
+    },
+    {
+      "id": "pr061-artifact-2",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/focused-packet/receipt.json",
+      "bytes": 468,
+      "sha256": "f1d1ef2992360988aa6bf4f02af0568e0bcf73502972c5e1abfd6e4c1d33cd16"
+    },
+    {
+      "id": "pr061-artifact-3",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/focused-packet/stdout.log",
+      "bytes": 525,
+      "sha256": "98a958fb9c91900957920df3095b1d31a4664197086c3b54bbcc975014eddcd3"
+    },
+    {
+      "id": "pr061-artifact-4",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/focused-packet/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr061-artifact-5",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/focused-packet/event.json",
+      "bytes": 1056,
+      "sha256": "94db91e0416b629be352a7743f6baabd715631d264cfc8f7dc07981d64d4b685"
+    },
+    {
+      "id": "pr061-artifact-6",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/related-packet/receipt.json",
+      "bytes": 617,
+      "sha256": "ae06f7175237ba78505e2a880d7db859b1fc4f9976d71ac2d03935601cb7aecf"
+    },
+    {
+      "id": "pr061-artifact-7",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/related-packet/stdout.log",
+      "bytes": 1513,
+      "sha256": "8533eb203b26d90b922f955b9b9974277a12fb442da963e90b355212c0aeee8c"
+    },
+    {
+      "id": "pr061-artifact-8",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/related-packet/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr061-artifact-9",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/related-packet/event.json",
+      "bytes": 1221,
+      "sha256": "cd250df1c093c0c5b28d85cd4bdabb383b9d4e369b04d3f5635b5926688cc6fa"
+    },
+    {
+      "id": "pr061-artifact-10",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "44b56a480d1fec15109f82d24bd885fb820be3064d6cc39d3f10201ad8f914f3"
+    },
+    {
+      "id": "pr061-artifact-11",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr061-artifact-12",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr061-artifact-13",
+      "path": "verification/research-program/pr-061/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "2143911aa10ce38d9e446af9b4ef626d72a57b2c93988edab60fdf12fc4bc3e5"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-061-1",
+      "status": "producer_checked",
+      "result": "Comparing HCRIS and PHC4 shows differing reporting definitions rather than a generic complete result with empty facts.",
+      "command_ids": [
+        "cmd-c061-focused"
+      ]
+    },
+    {
+      "id": "C-061-2",
+      "status": "producer_checked",
+      "result": "An individually valid pair of joins cannot be promoted to a valid combined path without compatibility checks.",
+      "command_ids": [
+        "cmd-c061-focused"
+      ]
+    },
+    {
+      "id": "C-061-3",
+      "status": "producer_checked",
+      "result": "The export can be validated offline and reproduces source identities without invoking LLMs or fetching source data. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c061-focused",
+        "cmd-c061-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "envelope-not-task",
+      "status": "accepted",
+      "detail": "A successful tool envelope is not a completed research task. HTTP 200 is not acceptance."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment."
+    },
+    {
+      "id": "two-hop-uncomposed",
+      "status": "accepted",
+      "detail": "Two-hop composition stays explicit and unpromoted."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-research-packet-review",
+      "status": "pending",
+      "detail": "Independent review of HCRIS/PHC4 comparison, uncomposed two-hop joins and credential-free packet export remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "packet-is-not-scientific-approval",
+      "status": "risk",
+      "detail": "A populated comparison and offline packet are protocol evidence, not R08/R11 acceptance or production change."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of HCRIS/PHC4 comparison, uncomposed two-hop joins and credential-free packet export, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-061 source and replay focused packet and identity validators. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
