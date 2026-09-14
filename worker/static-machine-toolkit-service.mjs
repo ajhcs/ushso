@@ -7,6 +7,8 @@ import { createMachineCursorSigner } from './machine-cursor.mjs';
 import { collectAssetContext } from '../packages/registry/asset-context-collections.mjs';
 import { buildAccessPlan, buildRetrievalRecipe, matchQualifiedRoute } from '../packages/registry/qualified-access-routes.mjs';
 import { filterQualifiedFields, matchQualifiedVariableContext } from '../packages/registry/qualified-variable-contexts.mjs';
+import { comparisonDimensionState, comparisonExplanation, comparisonFact } from '../packages/registry/comparison-dimensions.mjs';
+import { inspectJoinRoutes } from '../packages/registry/qualified-join-routes.mjs';
 
 const POLICY_ID = 'policy.public-metadata-only.v1';
 const POLICY_EVIDENCE_ID = 'evidence.policy.public-metadata-only.v1';
@@ -124,7 +126,7 @@ function uniqueEvidence(records, canonicalAsOf) {
   return references.filter((reference, index) => references.findIndex(candidate => candidate.evidence_id === reference.evidence_id) === index);
 }
 
-function successCore({ capability, context, result, records = [], resultState = 'complete', warnings = [warning()] }) {
+function successCore({ capability, context, result, records = [], extraEvidence = [], resultState = 'complete', warnings = [warning()] }) {
   return {
     tool_contract_version: 'observatory-machine-toolkit.v1.1.0',
     capability,
@@ -137,7 +139,7 @@ function successCore({ capability, context, result, records = [], resultState = 
     result_state: resultState,
     result,
     error: null,
-    evidence_references: uniqueEvidence(records, context.canonical_as_of),
+    evidence_references: uniqueEvidence(records, context.canonical_as_of).concat(extraEvidence).filter((reference, index, list) => list.findIndex(candidate => candidate.evidence_id === reference.evidence_id) === index),
     warnings,
     truncated: false,
     omitted_sections: [],
@@ -485,10 +487,28 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
       if (!recordsById.has(input.from_id)) return unavailable('get_join_routes', { ...input, record_id: input.from_id }, context);
       if (input.to_id && !recordsById.has(input.to_id)) return unavailable('get_join_routes', { ...input, record_id: input.to_id }, context);
       const records = [recordsById.get(input.from_id), input.to_id ? recordsById.get(input.to_id) : null].filter(Boolean);
+      const inspected = inspectJoinRoutes(input);
+      if (!inspected.routes.length) {
+        return successCore({
+          capability: 'get_join_routes', context, records, resultState: 'empty',
+          warnings: [warning('No join route is returned because this generation contains no documented cross-source identity or field mapping.')],
+          result: { from_id: input.from_id, to_id: input.to_id, max_hops_used: 0, routes: [] },
+        });
+      }
       return successCore({
-        capability: 'get_join_routes', context, records, resultState: 'empty',
-        warnings: [warning('No join route is returned because this generation contains no documented cross-source identity or field mapping.')],
-        result: { from_id: input.from_id, to_id: input.to_id, max_hops_used: 0, routes: [] },
+        capability: 'get_join_routes', context, records, resultState: 'complete',
+        extraEvidence: [{
+          evidence_id: 'evidence.join-fixture.priority-routes.v1',
+          evidence_class: 'documentation',
+          public_locator: null,
+          observed_at: context.canonical_as_of,
+          evidence_state: 'documented',
+          staleness_state: 'current',
+          derivation_reference: 'policy.direct.v1',
+          policy_reference: POLICY_ID,
+        }],
+        warnings: [warning('Reviewed join fixtures are inspectable metadata. An individually documented pair of joins is not a valid combined path. CCN and NPI are never interchangeable.')],
+        result: { from_id: inspected.from_id, to_id: inspected.to_id, max_hops_used: inspected.max_hops_used, routes: inspected.routes },
       });
     },
 
@@ -500,14 +520,17 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
       const evidenceIds = records.map(record => record.evidence[0].evidence_id);
       const dimensions = input.dimensions.map(dimension => {
         const values = records.map(record => {
-          const metadataValue = compareValue(record, dimension);
-          return { asset_id: record.record_id, metadata_value: metadataValue, state: metadataValue === null ? 'unknown' : 'known' };
+          const overlay = comparisonFact(record, dimension);
+          const metadataValue = overlay.metadata_value ?? compareValue(record, dimension);
+          const state = overlay.metadata_value != null ? overlay.state : (metadataValue === null ? 'unknown' : 'known');
+          return { asset_id: record.record_id, metadata_value: metadataValue, state };
         });
+        const state = comparisonDimensionState(values);
         return {
           dimension,
-          state: values.every(value => value.state === 'known') ? 'comparable' : 'unknown',
+          state,
           values,
-          explanation: 'Only indexed metadata is compared. Unknown values are preserved and no source values or analytical rankings are produced.',
+          explanation: comparisonExplanation(dimension, values, state),
           evidence_ids: evidenceIds,
         };
       });

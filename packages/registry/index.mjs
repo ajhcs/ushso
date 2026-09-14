@@ -6,3 +6,6 @@ export * from './static-asset-catalog-repository.mjs';
 export * from './asset-context-collections.mjs';
 export * from './qualified-access-routes.mjs';
 export * from './qualified-variable-contexts.mjs';
+export * from './comparison-dimensions.mjs';
+export * from './qualified-join-routes.mjs';
+export * from './research-packet.mjs';
