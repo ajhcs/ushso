@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ushso.org/packages/enrichment/provider-schema.json",
+  "title": "USHSO OpenRouter extraction response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "residual_id",
+    "field",
+    "value",
+    "evidence_ids",
+    "insufficient_evidence"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "extracted",
+        "insufficient_evidence"
+      ]
+    },
+    "residual_id": {
+      "type": "string",
+      "minLength": 3
+    },
+    "field": {
+      "type": "string",
+      "minLength": 1
+    },
+    "value": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 3
+      },
+      "minItems": 1
+    },
+    "insufficient_evidence": {
+      "type": "boolean"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}
