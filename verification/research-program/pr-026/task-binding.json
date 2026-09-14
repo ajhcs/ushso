@@ -1,0 +1,71 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr026-claim-validation-20260914",
+  "slice_id": "C-026-1",
+  "pr_id": "PR-026",
+  "title": "Validate evidence-cited model extraction",
+  "owner": "/root/pr026_claim_validation",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr026-claim-validation-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr026-claim-validation-20260914",
+  "objective": "Model output becomes a traceable proposal with explicit uncertainty.",
+  "outcome": "A model cannot introduce an unknown field, citation or record ID even when its JSON is syntactically valid. Correct quote with wrong semantic role is flagged for review. Quote matching alone never certifies scientific correctness. Unsupported claims remain rejected across reruns. Accepted literals can be traced back without calling the model again. 100% of accepted proposals have resolvable citations. A schema-valid hallucination fails claim validation.",
+  "dependencies": [
+    "PR-025"
+  ],
+  "owned_paths": [
+    "packages/enrichment/extract.mjs",
+    "packages/enrichment/validate-claims.mjs",
+    "tests/research-program/claim-validation.test.mjs",
+    "verification/research-program/pr-026/",
+    "docs/research-program/handoffs/PR-026.json"
+  ],
+  "commits": [
+    {
+      "id": "C-026-1",
+      "subject": "Define constrained extraction outputs",
+      "instructions": "Require field path, proposed value, source passage IDs, exact quotation/span, claim type, uncertainty and abstention reason. Keep output limited to the requested task scope.",
+      "verification": "A model cannot introduce an unknown field, citation or record ID even when its JSON is syntactically valid."
+    },
+    {
+      "id": "C-026-2",
+      "subject": "Check source support deterministically",
+      "instructions": "Verify quoted spans/pointers against immutable captures, enforce field/context binding and reject invented units/definitions. Preserve raw response separately from normalized proposals.",
+      "verification": "Correct quote with wrong semantic role is flagged for review; quote matching alone never certifies scientific correctness."
+    },
+    {
+      "id": "C-026-3",
+      "subject": "Record acceptance and rejection evidence",
+      "instructions": "Persist proposal hash, model identity, validators, rejected fields and reasons. Make retry decisions specific to syntax/transport failures rather than repeatedly asking until a preferred answer appears.",
+      "verification": "Unsupported claims remain rejected across reruns; accepted literals can be traced back without calling the model again."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/claim-validation.test.mjs",
+    "node --test tests/research-program/residual-task.test.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-026.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-026/",
+  "binding": {
+    "base_sha": "fdc5b5a43d0b790354242d5a165b9d4c55cbdc73",
+    "base_tree": "ac2c60d0de6f24ed364650da0c1509463c13279f",
+    "dependency_merge_shas": {
+      "PR-025": "3aa52e83951d32c330417258b9637d6b5178c785"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
