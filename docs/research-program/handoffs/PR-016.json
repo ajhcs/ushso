@@ -5,7 +5,7 @@
   "owner": "/root/pr016_parser_routing",
   "reviewer": "Astra/root",
   "base_sha": "b9490a0b55ba98d7a466222de5f870282c33a73f",
-  "head_sha": "bae5d28facf78f6c665e1edcbd890708feb877b2",
+  "head_sha": "6557fcb064e011599c0a52d12b65e101c7df4df1",
   "dependency_merge_shas": {
     "PR-013": "861a7808fec20e5e7795bb8f8082f82717e01f11",
     "PR-014": "8878aa2cc8bd9b36995d429774f377e3de66aca7",
@@ -14,14 +14,13 @@
   "branch": "codex/ushso-pr016-parser-routing-20260914",
   "github_pr_url": null,
   "changed_files": [
-    "scripts/research/parser-routing.mjs",
     "scripts/research/collect-pdf-windows.mjs",
     "tests/research-program/parser-routing.test.mjs",
     "verification/research-program/pr-016/",
     "docs/research-program/handoffs/PR-016.json"
   ],
   "problem": "Captured CMS/CDC/Census documents mixed CSV, XLSX, text-PDF and painted-grid families. Unsupported, scanned, encrypted and ambiguous layouts could be treated as payload success, and PDF window checkpoints could be reused after source or extractor bytes changed.",
-  "resulting_behavior": "routeDocument selects CSV (parseTextCodebook), XLSX (parseWorkbookCells), text-PDF (parseCmsDictionary or captured pypdf 6.18.0 windows) and grid (parseGrid) only from validated format/layout evidence. Unsupported, scanned, encrypted, missing-source, ambiguous-layout and parser-defect documents remain residual with payload_success and publication_authorized false. resumeDocumentWindows merges mid-document PDF windows without lost or duplicate pages and invalidates checkpoints when pdf_sha256 or extractor_sha256 change. buildDocumentExtractionCoverage groups those residual reasons without live source traffic. collect-pdf-windows.mjs remains a gated CLI and exports the resume helpers. Live fetch is forbidden.",
+  "resulting_behavior": "collect-pdf-windows.mjs now exports routeDocument. CSV (parseTextCodebook), XLSX (parseWorkbookCells), text-PDF (parseCmsDictionary or captured pypdf 6.18.0 windows) and grid (parseGrid) are selected only from validated format/layout evidence. Unsupported, scanned, encrypted, missing-source, ambiguous-layout and parser-defect documents remain residual with payload_success and publication_authorized false. resumeDocumentWindows merges mid-document PDF windows without lost or duplicate pages and invalidates checkpoints when pdf_sha256 or extractor_sha256 change. buildDocumentExtractionCoverage groups those residual reasons without live source traffic. The CLI remains gated. Live fetch is forbidden. Parser routing lives in the owned collect-pdf-windows.mjs path; no extra unowned helper remains.",
   "commits": [
     {
       "id": "C-016-1",
@@ -37,20 +36,19 @@
       "id": "C-016-3",
       "subject": "Emit a document extraction coverage report",
       "sha": "bae5d28facf78f6c665e1edcbd890708feb877b2"
+    },
+    {
+      "id": "C-016-1-R1",
+      "subject": "Fold parser routing into owned PDF window collector",
+      "sha": "6557fcb064e011599c0a52d12b65e101c7df4df1"
     }
   ],
   "source_identities": [
     {
-      "kind": "parser-routing",
-      "id": "scripts/research/parser-routing.mjs",
-      "location": "local",
-      "sha256": "5d7a5150f57fbdbd4055c5f3b3aff25a8322177b4ff00cb3d8cba5f8eaf0b532"
-    },
-    {
-      "kind": "pdf-windows",
+      "kind": "pdf-windows-and-parser-routing",
       "id": "scripts/research/collect-pdf-windows.mjs",
       "location": "local",
-      "sha256": "ebcaead47fea8811c5c7300af869bcd73b5c718a53c20f53b8210c9c6c70fc72"
+      "sha256": "767bd0afe103f55f4a160f827d87b1f66f536a9b0ca454c6b4bf5be40ebcfa0a"
     },
     {
       "kind": "grid-parser",
@@ -68,15 +66,15 @@
       "kind": "parser-routing-tests",
       "id": "tests/research-program/parser-routing.test.mjs",
       "location": "local",
-      "sha256": "7fc1d53156095d2702058e3bf04bc1a06751ac9a96fb0d0d39d0ea8cfd2d5752"
+      "sha256": "bd40bf50e0556da097d5b57d1589222b77a1d9509a03b208d731175a0c50254c"
     }
   ],
   "commands": [
     {
       "id": "cmd-c016-focused",
       "command": "node --test tests/research-program/parser-routing.test.mjs scripts/research/pdf-window-resume.test.mjs tests/cms-grid-parser.test.mjs",
-      "started_at": "2026-09-14T04:36:34.959187Z",
-      "completed_at": "2026-09-14T04:36:35.328550Z",
+      "started_at": "2026-09-14T04:39:36.879396Z",
+      "completed_at": "2026-09-14T04:39:37.262121Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "25/25 focused parser, PDF resume and grid tests pass.",
@@ -91,15 +89,15 @@
       "event_source": {
         "id": "cmd-c016-focused-event",
         "path": "verification/research-program/pr-016/producer-20260914/commands/focused-parser-routing/event.json",
-        "sha256": "8600bc893a72ea9e2fe9ce60a5d2779e4d1d525b82ba50b5341fcb2426ed02c4",
+        "sha256": "6c065a3ba182cbe5aa434b8134ee2670fcb49eb5a56ae143d3cf2d2bcba1996b",
         "bytes": 1175
       }
     },
     {
       "id": "cmd-c016-cms",
       "command": "node --test tests/research-program/cms-resources.test.mjs",
-      "started_at": "2026-09-14T04:36:35.328889Z",
-      "completed_at": "2026-09-14T04:36:37.129882Z",
+      "started_at": "2026-09-14T04:39:37.262591Z",
+      "completed_at": "2026-09-14T04:39:39.035385Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "10/10 CMS resources tests pass.",
@@ -114,15 +112,15 @@
       "event_source": {
         "id": "cmd-c016-cms-event",
         "path": "verification/research-program/pr-016/producer-20260914/commands/cms-resources/event.json",
-        "sha256": "6e2cfadecea1a55b8fad3ed6dc0b5ea1c79f4f397407b67ba0f62ebd0f50b499",
+        "sha256": "bc4cac0ec4f43aab0a83ca8f63ce11d11fc66a893bfd7340f4491ca103955aa8",
         "bytes": 1036
       }
     },
     {
       "id": "cmd-c016-cdc",
       "command": "node --test tests/research-program/cdc-view.test.mjs",
-      "started_at": "2026-09-14T04:36:37.130268Z",
-      "completed_at": "2026-09-14T04:36:38.169045Z",
+      "started_at": "2026-09-14T04:39:39.035840Z",
+      "completed_at": "2026-09-14T04:39:40.125011Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "9/9 CDC view tests pass.",
@@ -137,15 +135,15 @@
       "event_source": {
         "id": "cmd-c016-cdc-event",
         "path": "verification/research-program/pr-016/producer-20260914/commands/cdc-view/event.json",
-        "sha256": "48e5594fdfa09d9ee4ec36a1d3916771511f17f312d0b14e46a05b2865f195ae",
+        "sha256": "1913e59ba8e05e719ea6d0c7443de92a567642e0a0014a7bca2d9df17b8e18e8",
         "bytes": 1008
       }
     },
     {
       "id": "cmd-c016-census",
       "command": "node --test tests/research-program/census-api.test.mjs",
-      "started_at": "2026-09-14T04:36:38.169410Z",
-      "completed_at": "2026-09-14T04:36:38.302890Z",
+      "started_at": "2026-09-14T04:39:40.125476Z",
+      "completed_at": "2026-09-14T04:39:40.266635Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "8/8 Census API tests pass.",
@@ -160,7 +158,7 @@
       "event_source": {
         "id": "cmd-c016-census-event",
         "path": "verification/research-program/pr-016/producer-20260914/commands/census-api/event.json",
-        "sha256": "60bfe6812f8beebff568e1f3c513de02c3eb35fd216664f4c4a9873553d22ebf",
+        "sha256": "72a05e8d7d4a5d61214261831aa1f5227857394c72541d99658b69fcdecb529b",
         "bytes": 1018
       }
     }
@@ -182,13 +180,13 @@
       "id": "pr016-artifact-2",
       "path": "verification/research-program/pr-016/producer-20260914/commands/focused-parser-routing/receipt.json",
       "bytes": 557,
-      "sha256": "cda8d2a5a4d6451107f55896d839204400616061d2e361afc75ca071e7e2441c"
+      "sha256": "1729e354db9e7f29dc9ebb14a5acb13ac3ef9e38dcdb4383ea1830e6837d5d25"
     },
     {
       "id": "pr016-artifact-3",
       "path": "verification/research-program/pr-016/producer-20260914/commands/focused-parser-routing/stdout.log",
-      "bytes": 1997,
-      "sha256": "d91febd16819be923d21070c06010695a89372d2df3180a4c1526cbe1d20433b"
+      "bytes": 1998,
+      "sha256": "46eebf1054bff6cae39e46e84bdef27812259f1d6be2d8360e94156b75900017"
     },
     {
       "id": "pr016-artifact-4",
@@ -200,19 +198,19 @@
       "id": "pr016-artifact-5",
       "path": "verification/research-program/pr-016/producer-20260914/commands/focused-parser-routing/event.json",
       "bytes": 1175,
-      "sha256": "8600bc893a72ea9e2fe9ce60a5d2779e4d1d525b82ba50b5341fcb2426ed02c4"
+      "sha256": "6c065a3ba182cbe5aa434b8134ee2670fcb49eb5a56ae143d3cf2d2bcba1996b"
     },
     {
       "id": "pr016-artifact-6",
       "path": "verification/research-program/pr-016/producer-20260914/commands/cms-resources/receipt.json",
       "bytes": 458,
-      "sha256": "4188c80bc1a9c5b8a3158101c9678060a2706b8b5b4e48bc1ec7b030606afb7a"
+      "sha256": "46f2e8e46c7491553a4c1983f3258ee211e036b2811c0a1cc6a57c0746c8eeaf"
     },
     {
       "id": "pr016-artifact-7",
       "path": "verification/research-program/pr-016/producer-20260914/commands/cms-resources/stdout.log",
       "bytes": 1000,
-      "sha256": "d3b8ea1a82f3fe384674adbeec3f94bcadeb23cb664ab19425ed2e66c73fc642"
+      "sha256": "370ceef8e706aff5d4aabe66e213f8d875505f32e1d1abc9fef84adea47e6f62"
     },
     {
       "id": "pr016-artifact-8",
@@ -224,19 +222,19 @@
       "id": "pr016-artifact-9",
       "path": "verification/research-program/pr-016/producer-20260914/commands/cms-resources/event.json",
       "bytes": 1036,
-      "sha256": "6e2cfadecea1a55b8fad3ed6dc0b5ea1c79f4f397407b67ba0f62ebd0f50b499"
+      "sha256": "bc4cac0ec4f43aab0a83ca8f63ce11d11fc66a893bfd7340f4491ca103955aa8"
     },
     {
       "id": "pr016-artifact-10",
       "path": "verification/research-program/pr-016/producer-20260914/commands/cdc-view/receipt.json",
       "bytes": 447,
-      "sha256": "9f29346c002dfefadfae5356bc6850096ce5f812f3fb0ea492b02ac8daa4093f"
+      "sha256": "d28e0ae059fed07c026155113a6e9fc761f3079a9daf8963f799f620903a2d13"
     },
     {
       "id": "pr016-artifact-11",
       "path": "verification/research-program/pr-016/producer-20260914/commands/cdc-view/stdout.log",
-      "bytes": 884,
-      "sha256": "4cefaa0638889e43e59f643d84bac26472b27afa6b6f9381e9f9e712ec8f07ef"
+      "bytes": 883,
+      "sha256": "342032cb8569d021eae95176053a312a58bcb41db4504a15ea89da9becb53004"
     },
     {
       "id": "pr016-artifact-12",
@@ -248,19 +246,19 @@
       "id": "pr016-artifact-13",
       "path": "verification/research-program/pr-016/producer-20260914/commands/cdc-view/event.json",
       "bytes": 1008,
-      "sha256": "48e5594fdfa09d9ee4ec36a1d3916771511f17f312d0b14e46a05b2865f195ae"
+      "sha256": "1913e59ba8e05e719ea6d0c7443de92a567642e0a0014a7bca2d9df17b8e18e8"
     },
     {
       "id": "pr016-artifact-14",
       "path": "verification/research-program/pr-016/producer-20260914/commands/census-api/receipt.json",
       "bytes": 451,
-      "sha256": "d6e6e8e80d1d3ed2f2737a5fd93e18b30f83df201dcd24e8b1822d770dcfae92"
+      "sha256": "14959970f3ed8834c713a2e2d642cabc8bb801532e45c103b85b23daf2e16bd3"
     },
     {
       "id": "pr016-artifact-15",
       "path": "verification/research-program/pr-016/producer-20260914/commands/census-api/stdout.log",
-      "bytes": 881,
-      "sha256": "2bb4e89e82c455fc63edf5e44e81f7fa9fbf0d05176ae9a4b3756175e1b268ee"
+      "bytes": 878,
+      "sha256": "31c9ed167376bf724be8a89e3dc2e1435d1d39329feb4299f0fa88e7ddcfea5b"
     },
     {
       "id": "pr016-artifact-16",
@@ -272,7 +270,7 @@
       "id": "pr016-artifact-17",
       "path": "verification/research-program/pr-016/producer-20260914/commands/census-api/event.json",
       "bytes": 1018,
-      "sha256": "60bfe6812f8beebff568e1f3c513de02c3eb35fd216664f4c4a9873553d22ebf"
+      "sha256": "72a05e8d7d4a5d61214261831aa1f5227857394c72541d99658b69fcdecb529b"
     }
   ],
   "acceptance_results": [
