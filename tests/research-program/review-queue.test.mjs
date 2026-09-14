@@ -2,12 +2,13 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createHash } from 'node:crypto';
 import {
+  buildClaimReviewPacket,
   enqueueClaimPackets,
+  groupIdenticalEvidence,
   invalidateStaleDisposition,
   recordClaimDisposition,
   reportClaimQueue,
-} from '../../packages/identity/src/review-queue.mjs';
-import { buildClaimReviewPacket, groupIdenticalEvidence } from '../../packages/enrichment/review-packet.mjs';
+} from '../../packages/enrichment/review-packet.mjs';
 import { quoteSupported } from '../../packages/enrichment/validate-claims.mjs';
 
 const sourceA = 'Crude prevalence is the percent of adults.';
