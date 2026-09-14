@@ -1,0 +1,251 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-024",
+  "status": "producer_checked",
+  "owner": "/root/pr024_inference_budget",
+  "reviewer": "Astra/root",
+  "base_sha": "2852bdd10df0ea85079c4a9ad49e5c925f5db95a",
+  "head_sha": "8c80a43afb4e8f41e661f73bf9096208f2a646dd",
+  "dependency_merge_shas": {
+    "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+    "PR-022": "00b2c0a5073b21f9d0c7f365a72d1432bbd18014",
+    "PR-023": "6d0666d7a2aec2c61a42995e160f8224ef05a05a"
+  },
+  "branch": "codex/ushso-pr024-inference-budget-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/budget-ledger.mjs",
+    "packages/enrichment/job-cache.mjs",
+    "tests/research-program/inference-budget.test.mjs",
+    "verification/research-program/pr-024/",
+    "docs/research-program/handoffs/PR-024.json"
+  ],
+  "problem": "Concurrent enrichment jobs could silently exceed the selected spend cap. Missing prices could be treated as free. Interrupted provider responses could be assumed uncharged. Unchanged reruns could repurchase the same task. Pilot $10 / monthly $50 values could be hidden defaults. Cost reports could omit failures, retries and rejected proposals.",
+  "resulting_behavior": "createBudgetLedger reserves worst-case spend from input tokens, max output/reasoning tokens, selected maximum prices and retry policy using an exclusive atomic queue. Two workers racing for the final budget unit cannot both proceed. Missing price data fails closed. settle persists usage/cost/provider IDs on success and uncertain-charge state on timeout-after-send, malformed usage and process restart; uncertain charges are not assumed free. 429 honors Retry-After and is retry-capped; 402 is payment_required. createJobCache keys proposals by source bytes, parser/prompt/schema/model/provider-policy versions and task scope. A changed source or prompt invalidates the cache; an unchanged rerun performs no duplicate inference. Suggested $10 pilot / $50 monthly values are editable configuration with hidden_default=false. The cost report includes failures, retries and rejected proposals. Paid calls remain disabled.",
+  "commits": [
+    {
+      "id": "C-024-1",
+      "subject": "Reserve worst-case request spend",
+      "sha": "e9161f51252560ac58f8e31456a86f913f0e9e09"
+    },
+    {
+      "id": "C-024-2",
+      "subject": "Reconcile actual provider usage",
+      "sha": "e9161f51252560ac58f8e31456a86f913f0e9e09"
+    },
+    {
+      "id": "C-024-3",
+      "subject": "Cache by complete task identity",
+      "sha": "8c80a43afb4e8f41e661f73bf9096208f2a646dd"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "budget-ledger",
+      "id": "packages/enrichment/budget-ledger.mjs",
+      "location": "local",
+      "sha256": "03f9754c40f0fde38134f9ce88503c4db22995eea1c2c90a7672e26034447401"
+    },
+    {
+      "kind": "job-cache",
+      "id": "packages/enrichment/job-cache.mjs",
+      "location": "local",
+      "sha256": "e3c0ba0bbbe82bcdb36ccaf5dd61be388dccfc626f3ff7afc73b11366cce4596"
+    },
+    {
+      "kind": "inference-budget-tests",
+      "id": "tests/research-program/inference-budget.test.mjs",
+      "location": "local",
+      "sha256": "339c9cbdea30e2fef8ec43a0b008e3a87758de51f5037d962db5d25f9bf82487"
+    },
+    {
+      "kind": "model-snapshot-consume",
+      "id": "packages/enrichment/model-snapshot.json",
+      "location": "local",
+      "sha256": "a36d475f8f80677d0d71c210a5cf937bdeb95ad685cc9465418ec88254182039"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c024-focused",
+      "command": "node --test tests/research-program/inference-budget.test.mjs",
+      "started_at": "2026-09-14T07:26:40.120025Z",
+      "completed_at": "2026-09-14T07:26:40.225703Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 inference-budget tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c024-focused-event",
+        "path": "verification/research-program/pr-024/producer-20260914/commands/focused-budget/event.json",
+        "sha256": "81bc96964100dc24997859efaa856c421bc055481d25228909a2813acea2dc36",
+        "bytes": 1042
+      }
+    },
+    {
+      "id": "cmd-c024-policy",
+      "command": "node --test tests/research-program/provider-policy.test.mjs",
+      "started_at": "2026-09-14T07:26:40.226147Z",
+      "completed_at": "2026-09-14T07:26:40.325617Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "4/4 provider-policy tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c024-policy-event",
+        "path": "verification/research-program/pr-024/producer-20260914/commands/provider-policy/event.json",
+        "sha256": "113a49596b55c0bc4774288f73545e4b9cd509e7d1cd3c591e24d0205e4c78d1",
+        "bytes": 1043
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr024-artifact-0",
+      "path": "verification/research-program/pr-024/task-binding.json",
+      "bytes": 3610,
+      "sha256": "5c7587096c93647e66caa90a7a0b7735b55412f03e83a99fb175e66fa6a87a0e"
+    },
+    {
+      "id": "pr024-artifact-1",
+      "path": "verification/research-program/pr-024/dispatch.json",
+      "bytes": 2146,
+      "sha256": "c817924076f51dc336f65da37f95861f0317167a841d2f87985ab333a64fd288"
+    },
+    {
+      "id": "pr024-artifact-2",
+      "path": "verification/research-program/pr-024/producer-20260914/commands/focused-budget/receipt.json",
+      "bytes": 461,
+      "sha256": "1602157f9dfe135b3c4ee02a16327997144aaed4e637be9dd65b676b06f60cdc"
+    },
+    {
+      "id": "pr024-artifact-3",
+      "path": "verification/research-program/pr-024/producer-20260914/commands/focused-budget/stdout.log",
+      "bytes": 445,
+      "sha256": "2d4e63b0f553b196255d88412bcfff56935039fc6d8a14459fe6adf26c589026"
+    },
+    {
+      "id": "pr024-artifact-4",
+      "path": "verification/research-program/pr-024/producer-20260914/commands/focused-budget/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr024-artifact-5",
+      "path": "verification/research-program/pr-024/producer-20260914/commands/focused-budget/event.json",
+      "bytes": 1042,
+      "sha256": "81bc96964100dc24997859efaa856c421bc055481d25228909a2813acea2dc36"
+    },
+    {
+      "id": "pr024-artifact-6",
+      "path": "verification/research-program/pr-024/producer-20260914/commands/provider-policy/receipt.json",
+      "bytes": 461,
+      "sha256": "9c6a7aa7ea0caee2ce8692d1a5fe06c31cf4cdd8635e2631ee8a83c600ee3b87"
+    },
+    {
+      "id": "pr024-artifact-7",
+      "path": "verification/research-program/pr-024/producer-20260914/commands/provider-policy/stdout.log",
+      "bytes": 475,
+      "sha256": "93345e0bd63c254bd0a197026e96a0064f6c635aa1c60772f4d30f60f7955df6"
+    },
+    {
+      "id": "pr024-artifact-8",
+      "path": "verification/research-program/pr-024/producer-20260914/commands/provider-policy/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr024-artifact-9",
+      "path": "verification/research-program/pr-024/producer-20260914/commands/provider-policy/event.json",
+      "bytes": 1043,
+      "sha256": "113a49596b55c0bc4774288f73545e4b9cd509e7d1cd3c591e24d0205e4c78d1"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-024-1",
+      "status": "producer_checked",
+      "result": "Two workers racing for the final budget unit cannot both proceed. Missing price data fails closed. $10/$50 are editable configuration.",
+      "command_ids": [
+        "cmd-c024-focused"
+      ]
+    },
+    {
+      "id": "C-024-2",
+      "status": "producer_checked",
+      "result": "Timeout after send, 402, 429, malformed usage and process restart leave uncertain charges that are not assumed free. Cost report includes failures, retries and rejected proposals.",
+      "command_ids": [
+        "cmd-c024-focused"
+      ]
+    },
+    {
+      "id": "C-024-3",
+      "status": "producer_checked",
+      "result": "A changed source or prompt invalidates the cache. An unchanged rerun performs no duplicate inference. Provider-policy tests remain green.",
+      "command_ids": [
+        "cmd-c024-focused",
+        "cmd-c024-policy"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-openrouter-http",
+      "status": "accepted",
+      "detail": "Budget and cache tests are in-memory. Paid calls remain disabled. No live OpenRouter HTTP."
+    },
+    {
+      "id": "distributed-durable-store",
+      "status": "skipped",
+      "detail": "Atomicity is an exclusive in-process reservation queue suitable for fixture workers. A networked durable store is not claimed."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-inference-budget-review",
+      "status": "pending",
+      "detail": "Independent review of atomic reservations, uncertain charges and cache identity remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "in-process-mutex-not-multi-host",
+      "status": "risk",
+      "detail": "The exclusive queue serializes fixture workers in one process. Multi-host durability is out of scope for this assignment."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of atomic reservations, uncertain charges and cache identity, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-024 source and replay focused inference-budget and provider-policy tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
