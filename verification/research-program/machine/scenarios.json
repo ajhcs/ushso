@@ -1,0 +1,143 @@
+{
+  "format": "ushso.machine-parity-scenarios.v1",
+  "generation": "live-2026-09-03-85b50522b420",
+  "advertised_tools": [
+    "observatory.search_assets",
+    "observatory.get_asset",
+    "observatory.get_access_plan",
+    "observatory.get_retrieval_recipe",
+    "observatory.get_variables",
+    "observatory.get_join_routes",
+    "observatory.compare_assets",
+    "observatory.get_coverage_status"
+  ],
+  "disabled_tools": [
+    "observatory.plan_research"
+  ],
+  "protocol_success_is_not_research_success": true,
+  "http_200_is_not_completed_research_task": true,
+  "made_up_schema_ids_forbidden_on_positive_path": true,
+  "ids": {
+    "hcris": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+    "census": "obs:asset:census-api:api.census.gov-data-id-abscb2023-ec8bee5f048e6e3f",
+    "hcup": "asset.hcup.restricted.fixture",
+    "phc4": "obs:asset:pa-phc4-public-financial-reports",
+    "missing": "obs:asset:does-not-exist",
+    "hcris_release": "release.cms.hcris.documentation",
+    "hcris_distribution": "distribution.cms.hcris.landing-page",
+    "hcris_access": "access.cms.hcris.public-docs",
+    "hcris_schema": "schema.cms.hcris.worksheet-g3.accepted",
+    "hcup_release": "release.hcup.nis.application",
+    "hcup_distribution": "distribution.hcup.central-distributor",
+    "hcup_access": "access.hcup.restricted-manual",
+    "invented_schema": "schema.native-test"
+  },
+  "scenarios": [
+    {
+      "id": "search-positive-hcris",
+      "capability": "search_assets",
+      "kind": "positive",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": true,
+      "expected_result_state": "partial",
+      "note": "Limit 5 on the 3434-ID generation is a paged protocol result. Finding HCRIS metadata is not a completed research task."
+    },
+    {
+      "id": "asset-positive-hcris",
+      "capability": "get_asset",
+      "kind": "positive",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": true
+    },
+    {
+      "id": "access-positive-hcris",
+      "capability": "get_access_plan",
+      "kind": "positive",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": true,
+      "expected_result_state": "complete"
+    },
+    {
+      "id": "recipe-positive-hcris",
+      "capability": "get_retrieval_recipe",
+      "kind": "positive",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": true,
+      "expected_result_state": "complete"
+    },
+    {
+      "id": "variables-positive-hcris",
+      "capability": "get_variables",
+      "kind": "positive",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": true,
+      "note": "Uses exact HCRIS schema.cms.hcris.worksheet-g3.accepted, not an invented schema ID."
+    },
+    {
+      "id": "variables-unknown-invented-schema",
+      "capability": "get_variables",
+      "kind": "unknown",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": false,
+      "expected_error": "schema_context_required",
+      "expected_result_state": "unknown"
+    },
+    {
+      "id": "access-unknown-invented-route",
+      "capability": "get_access_plan",
+      "kind": "unknown",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": false,
+      "expected_error": "route_not_documented",
+      "expected_result_state": "unknown"
+    },
+    {
+      "id": "access-restricted-hcup",
+      "capability": "get_access_plan",
+      "kind": "restricted",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": true,
+      "expected_result_state": "complete"
+    },
+    {
+      "id": "join-partial-hcris-phc4",
+      "capability": "get_join_routes",
+      "kind": "partial",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": true
+    },
+    {
+      "id": "compare-hcris-phc4",
+      "capability": "compare_assets",
+      "kind": "positive",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": true
+    },
+    {
+      "id": "coverage-positive",
+      "capability": "get_coverage_status",
+      "kind": "positive",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": true
+    },
+    {
+      "id": "missing-source-asset",
+      "capability": "get_asset",
+      "kind": "missing-source",
+      "protocol_success": true,
+      "research_success": false,
+      "expected_ok": false
+    }
+  ]
+}
