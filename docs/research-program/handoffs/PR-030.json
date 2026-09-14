@@ -5,7 +5,7 @@
   "owner": "/root/pr030_publication_parity",
   "reviewer": "Astra/root",
   "base_sha": "42735bbe42a24a2896e5e9ffa0f99023be4656b1",
-  "head_sha": "4da75c508761a425ddb2cf45c6e9003fa197d338",
+  "head_sha": "a88c5b8ff131210885c0d87b1fa734e1bd0ea061",
   "dependency_merge_shas": {
     "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
     "PR-021": "ed08e8ee861622b99d5d7c3150d68304ecc95881",
@@ -15,7 +15,6 @@
   "github_pr_url": null,
   "changed_files": [
     "packages/registry/publication-parity.mjs",
-    "packages/registry/index.mjs",
     "apps/web/src/pages/SourcesPage.tsx",
     "apps/web/src/pages/SourcesPage.test.tsx",
     "scripts/stage-research-assets.mjs",
@@ -24,7 +23,7 @@
     "docs/research-program/handoffs/PR-030.json"
   ],
   "problem": "The Sources page v1.1.0 national-readiness table could present a historical Pennsylvania published-record count as current coverage. Publication manifests could close with missing assets, source-context mismatches or undeclared partial fragments. One bad dictionary asset could blank the catalog. Failed publication could replace last-good generation. Mixed catalog/dictionary generations could be served together. Sealed search lifecycle could be edited and break the search package seal.",
-  "resulting_behavior": "assembleAcceptedPublicationManifest closes only when required assets, checksums and source context are present. archiveHistoricalReadiness treats corpus v1.1.0 as a historical view; Pennsylvania's 24 published records are archived and current_published_state_record_count is 0. SourcesPage labels that historical overlay as not current coverage. pageDictionary/measureAssetPage page large dictionaries predictably. serveBoundedAssets keeps the catalog available when one asset fails. Mixed generations fail closed. Failed publication leaves last-good generation live-2026-09-03-85b50522b420 live. Static fallback remains available. Sealed packages/search/publication-lifecycle-v2.mjs is unchanged (26572 bytes).",
+  "resulting_behavior": "assembleAcceptedPublicationManifest closes only when required assets, checksums and source context are present. archiveHistoricalReadiness treats corpus v1.1.0 as a historical view; Pennsylvania's 24 published records are archived and current_published_state_record_count is 0. SourcesPage labels that historical overlay as not current coverage. pageDictionary/measureAssetPage page large dictionaries predictably. serveBoundedAssets keeps the catalog available when one asset fails. Mixed generations fail closed. Failed publication leaves last-good generation live-2026-09-03-85b50522b420 live. Static fallback remains available. Sealed packages/search/publication-lifecycle-v2.mjs is unchanged (26572 bytes). packages/registry/index.mjs is unchanged; consumers import publication-parity.mjs directly.",
   "commits": [
     {
       "id": "C-030-1",
