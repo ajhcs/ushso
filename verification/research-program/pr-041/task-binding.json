@@ -1,0 +1,77 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr041-example-packets-20260914",
+  "slice_id": "C-041-1",
+  "pr_id": "PR-041",
+  "title": "Build reproducible research example packets",
+  "owner": "/root/pr041_example_packets",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr041-example-packets-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr041-example-packets-20260914",
+  "objective": "Users can reproduce a source selection and its technical next steps.",
+  "outcome": "A research example packet includes question, selected products/releases, why each is needed, fields, access steps, tested request, supported join routes, caveats and citations. A packet is invalid if its source/schema generation differs from an attached request or result. Representative finance/utilization, staffing/quality, insurance/geography and public-health examples are authored from accepted facts. Unavailable restricted steps are explicitly labeled. Every executed step has a receipt; a documented but unexecuted step is visibly labeled. Expected output is a field/type shape, not a fragile numeric constant. A changed source schema invalidates the example and preserves its previous dated version. No live data is fabricated for a demo. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-033",
+    "PR-036",
+    "PR-040"
+  ],
+  "owned_paths": [
+    "packages/enrichment/example-packet.mjs",
+    "evaluation/research-program/examples/",
+    "scripts/research-program/build-example-packet.mjs",
+    "tests/research-program/example-packet.test.mjs",
+    "docs/research-program/example-packets.md",
+    "verification/research-program/pr-041/",
+    "docs/research-program/handoffs/PR-041.json"
+  ],
+  "commits": [
+    {
+      "id": "C-041-1",
+      "subject": "Define the research example packet",
+      "instructions": "Include question, selected products/releases, why each is needed, fields, access steps, tested request, supported join routes, caveats and citations.",
+      "verification": "A packet is invalid if its source/schema generation differs from an attached request or result."
+    },
+    {
+      "id": "C-041-2",
+      "subject": "Author representative worked examples",
+      "instructions": "Prepare finance/utilization, staffing/quality, insurance/geography and public-health examples from accepted facts; explicitly state unavailable restricted steps.",
+      "verification": "Every executed step has a receipt, while a documented but unexecuted step is visibly labeled."
+    },
+    {
+      "id": "C-041-3",
+      "subject": "Validate examples end to end",
+      "instructions": "Replay eligible bounded requests through the common tester and reconcile their fields and source context. Record expected output shape, not fragile current numeric constants.",
+      "verification": "A changed source schema invalidates the example and preserves its previous dated version; no live data is fabricated for a demo."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/example-packet.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-041.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-041/",
+  "binding": {
+    "base_sha": "fcb9d266f2494214548e0fbc02415f01379347f6",
+    "base_tree": "b99aeccc22bf6d24b70fe2c07dedf0d8fcad61ee",
+    "dependency_merge_shas": {
+      "PR-033": "ad0091998837a32c84f495ad67c4cbbaee3edd44",
+      "PR-036": "a6c2fc568062c4af3c93d7639bc0bb005ac88dd1",
+      "PR-040": "0b3ca8442de86175a35b52c008f83e1b42b39204"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
