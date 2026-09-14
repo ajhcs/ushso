@@ -1,0 +1,93 @@
+{
+  "format": "ushso.research-example-packet.v1",
+  "question": "Hospital cost-report net patient revenue for Pennsylvania",
+  "products": [
+    {
+      "product_key": "cms-hcris-hospital-provider-cost-report",
+      "release": "hcris-worksheet-g3",
+      "why_needed": "Facility/report/year financial worksheets.",
+      "source_id": "cms-hcris"
+    }
+  ],
+  "fields": [
+    "PROVNUM",
+    "NET_PATIENT_REVENUE"
+  ],
+  "types": {
+    "PROVNUM": "string",
+    "NET_PATIENT_REVENUE": "number"
+  },
+  "access_steps": [
+    {
+      "id": "hcris-sample",
+      "label": "Replay bounded HCRIS sample",
+      "executed": true,
+      "documented_unexecuted": false,
+      "unavailable_restricted": false,
+      "receipt": {
+        "format": "ushso.example-request-receipt.v1",
+        "source": "cms",
+        "release": "live-2026-09-03-85b50522b420",
+        "distribution": "hcris",
+        "parameters": {},
+        "expected": {
+          "content_class": "json",
+          "media_type": "application/json",
+          "fields": [
+            "PROVNUM"
+          ],
+          "types": {
+            "PROVNUM": "string"
+          }
+        },
+        "limits": {
+          "max_bytes": 65536,
+          "max_rows": 5
+        },
+        "observed_at": "2026-09-14T00:00:00.000Z",
+        "attempted_checks": [
+          "http_status",
+          "media_type",
+          "fields",
+          "row_limit"
+        ],
+        "outcome_kind": "sample",
+        "credential_required": false,
+        "tested_example": false,
+        "full_dataset_validated": false,
+        "full_schema_validated": false,
+        "publication_authorized": false
+      }
+    }
+  ],
+  "tested_request": {
+    "source_generation": "live-2026-09-03-85b50522b420",
+    "schema_generation": "live-2026-09-03-85b50522b420"
+  },
+  "join_routes": [],
+  "caveats": [
+    "Sample field checks are not full schema validation."
+  ],
+  "citations": [
+    "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report"
+  ],
+  "generation": "live-2026-09-03-85b50522b420",
+  "source_generation": "live-2026-09-03-85b50522b420",
+  "schema_generation": "live-2026-09-03-85b50522b420",
+  "previous_dated_version": null,
+  "live_data_fabricated": false,
+  "last_good_generation": "live-2026-09-03-85b50522b420",
+  "expected": {
+    "kind": "field_type_shape",
+    "fields": [
+      "PROVNUM",
+      "NET_PATIENT_REVENUE"
+    ],
+    "types": {
+      "PROVNUM": "string",
+      "NET_PATIENT_REVENUE": "number"
+    },
+    "numeric_constants_forbidden": true,
+    "values": null
+  }
+}
