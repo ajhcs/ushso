@@ -1,0 +1,281 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-041",
+  "status": "producer_checked",
+  "owner": "/root/pr041_example_packets",
+  "reviewer": "Astra/root",
+  "base_sha": "fcb9d266f2494214548e0fbc02415f01379347f6",
+  "head_sha": "a1c7548e4c5940c35c87e92bdb43a8037a4ed4cf",
+  "dependency_merge_shas": {
+    "PR-033": "ad0091998837a32c84f495ad67c4cbbaee3edd44",
+    "PR-036": "a6c2fc568062c4af3c93d7639bc0bb005ac88dd1",
+    "PR-040": "0b3ca8442de86175a35b52c008f83e1b42b39204"
+  },
+  "branch": "codex/ushso-pr041-example-packets-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/enrichment/example-packet.mjs",
+    "evaluation/research-program/examples/",
+    "scripts/research-program/build-example-packet.mjs",
+    "tests/research-program/example-packet.test.mjs",
+    "docs/research-program/example-packets.md",
+    "verification/research-program/pr-041/",
+    "docs/research-program/handoffs/PR-041.json"
+  ],
+  "problem": "A research example packet could remain valid after its source/schema generation diverged from an attached request or result. Executed steps could lack receipts. Documented but unexecuted steps could look completed. Restricted routes could be silently treated as executed. Expected output could freeze fragile numeric constants. A changed source schema could keep a stale example live. Live data could be fabricated for a demo.",
+  "resulting_behavior": "Example packets live in packages/enrichment/example-packet.mjs with representative packets under evaluation/research-program/examples/. A packet is invalid if source/schema generation differs from an attached request or result. Every executed step has a receipt; documented but unexecuted steps are labeled; unavailable restricted steps stay unavailable. Expected output is a field/type shape, not a numeric constant. A changed source schema invalidates the example and preserves the previous dated version. No live data is fabricated. Last-good generation live-2026-09-03-85b50522b420 is unchanged. Sealed identity schema-catalog.mjs and example-runner.mjs are unchanged.",
+  "commits": [
+    {
+      "id": "C-041-1",
+      "subject": "Define the research example packet",
+      "sha": "f858e07e5507d6a106c417cfeb09b3a94c2f3060"
+    },
+    {
+      "id": "C-041-2",
+      "subject": "Author representative worked examples",
+      "sha": "d7202796549cefddde66c5645dc419f983e51743"
+    },
+    {
+      "id": "C-041-3",
+      "subject": "Validate examples end to end",
+      "sha": "a1c7548e4c5940c35c87e92bdb43a8037a4ed4cf"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "example-packet",
+      "id": "packages/enrichment/example-packet.mjs",
+      "location": "local",
+      "sha256": "24f578e4666d167154c466630e701f3f4375c8d076a818a285d3102ea21732e5"
+    },
+    {
+      "kind": "build-example-packet",
+      "id": "scripts/research-program/build-example-packet.mjs",
+      "location": "local",
+      "sha256": "74dc42dba319d5c99046de76f89042953e64759f546cfd90637f6010ca6445fc"
+    },
+    {
+      "kind": "example-packet-tests",
+      "id": "tests/research-program/example-packet.test.mjs",
+      "location": "local",
+      "sha256": "383888532051508f9ca7e60c64d776f83f710a005d045e0e0d0ea52aa905c566"
+    },
+    {
+      "kind": "example-packets-docs",
+      "id": "docs/research-program/example-packets.md",
+      "location": "local",
+      "sha256": "1338fa40d77ae3961a8bc4bbc08cc792deb54eec5464b912494584e8a87f9ef8"
+    },
+    {
+      "kind": "example-index",
+      "id": "evaluation/research-program/examples/index.json",
+      "location": "local",
+      "sha256": "5287f80bafa07a27fc013454e9ea46fb5e2174f8219ce1ed569a0b7245a90a1f"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "example-runner-unchanged",
+      "id": "packages/connectors/src/testing/example-runner.mjs",
+      "location": "local",
+      "sha256": "0296168c89cb33578483ac53bac87e87b40e7fcf26cf9f84b1198a0819d902b5"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c041-focused",
+      "command": "node --test tests/research-program/example-packet.test.mjs",
+      "started_at": "2026-09-14T13:36:42.375689Z",
+      "completed_at": "2026-09-14T13:36:42.516401Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 example-packet tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c041-focused-event",
+        "path": "verification/research-program/pr-041/producer-20260914/commands/focused-packets/event.json",
+        "sha256": "40bee10d2ce5ab04cef30d244d4533f4d81cfbdcb2efcbdaf5f53d850a78dfa5",
+        "bytes": 1041
+      }
+    },
+    {
+      "id": "cmd-c041-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T13:36:42.516733Z",
+      "completed_at": "2026-09-14T13:36:42.565933Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c041-identity-event",
+        "path": "verification/research-program/pr-041/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "097a0a91356e4b64b845d437f8142b276b79c91585fc4288f26cd76bdf9c9a73",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr041-artifact-0",
+      "path": "verification/research-program/pr-041/task-binding.json",
+      "bytes": 3987,
+      "sha256": "495f064586e881cc8ce4623ceb90ec7dcbe13e02317976a66b94354485c0c750"
+    },
+    {
+      "id": "pr041-artifact-1",
+      "path": "verification/research-program/pr-041/dispatch.json",
+      "bytes": 2762,
+      "sha256": "70ac57532f98f2e4981c10e8c170ccf73ead1639d72401ba270218f2158e4bad"
+    },
+    {
+      "id": "pr041-artifact-2",
+      "path": "verification/research-program/pr-041/producer-20260914/commands/focused-packets/receipt.json",
+      "bytes": 460,
+      "sha256": "0756d7104d5734544b2e15921c0e358ae5c2b705d3e08c319b3f9f9f8969dbdc"
+    },
+    {
+      "id": "pr041-artifact-3",
+      "path": "verification/research-program/pr-041/producer-20260914/commands/focused-packets/stdout.log",
+      "bytes": 517,
+      "sha256": "8be4e65af38c86245788c7877aec2816d241c143eab6ea87c42d95bb335bba52"
+    },
+    {
+      "id": "pr041-artifact-4",
+      "path": "verification/research-program/pr-041/producer-20260914/commands/focused-packets/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr041-artifact-5",
+      "path": "verification/research-program/pr-041/producer-20260914/commands/focused-packets/event.json",
+      "bytes": 1041,
+      "sha256": "40bee10d2ce5ab04cef30d244d4533f4d81cfbdcb2efcbdaf5f53d850a78dfa5"
+    },
+    {
+      "id": "pr041-artifact-6",
+      "path": "verification/research-program/pr-041/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "fb7778173de0791f8486aaef49e416229c1436eb9f32026c29dc9c848b6fcd1b"
+    },
+    {
+      "id": "pr041-artifact-7",
+      "path": "verification/research-program/pr-041/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr041-artifact-8",
+      "path": "verification/research-program/pr-041/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr041-artifact-9",
+      "path": "verification/research-program/pr-041/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "097a0a91356e4b64b845d437f8142b276b79c91585fc4288f26cd76bdf9c9a73"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-041-1",
+      "status": "producer_checked",
+      "result": "A packet is invalid if its source/schema generation differs from an attached request or result.",
+      "command_ids": [
+        "cmd-c041-focused"
+      ]
+    },
+    {
+      "id": "C-041-2",
+      "status": "producer_checked",
+      "result": "Every executed step has a receipt. Documented but unexecuted and unavailable restricted steps are labeled.",
+      "command_ids": [
+        "cmd-c041-focused"
+      ]
+    },
+    {
+      "id": "C-041-3",
+      "status": "producer_checked",
+      "result": "A changed source schema invalidates the example and preserves the previous dated version. No live data is fabricated. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c041-focused",
+        "cmd-c041-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-demo-fabrication",
+      "status": "accepted",
+      "detail": "Fabricated live demo values fail closed (LIVE_DATA_FABRICATED)."
+    },
+    {
+      "id": "fragile-numeric-constants",
+      "status": "accepted",
+      "detail": "Expected values are field/type shapes; numeric constants fail closed."
+    },
+    {
+      "id": "example-runner-untouched",
+      "status": "accepted",
+      "detail": "packages/connectors/src/testing/example-runner.mjs was not edited (11517 bytes)."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Example packets are not R04/R05/R08/R13 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-example-packet-review",
+      "status": "pending",
+      "detail": "Independent review of generation mismatch, receipts and schema-change invalidation remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "packets-are-not-live-examples",
+      "status": "risk",
+      "detail": "Packets reuse createExampleReceipt offline. They do not authorize public example publication or live source HTTP."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of generation mismatch, executed-step receipts and schema-change invalidation, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-041 source and replay focused example-packet and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
