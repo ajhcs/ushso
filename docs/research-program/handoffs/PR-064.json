@@ -1,0 +1,280 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-064",
+  "status": "producer_checked",
+  "owner": "/root/pr064_beginner_navigation",
+  "reviewer": "Astra/root",
+  "base_sha": "1ca0eb9a15432954f73eb37014a0389c50f63439",
+  "head_sha": "348c4882c7ceb86ca53e514ef46be3ddd4f40483",
+  "dependency_merge_shas": {
+    "PR-005": "4fa2e0b5c8ee210cff9750a59e69df4b4a527fdc",
+    "PR-033": "ad0091998837a32c84f495ad67c4cbbaee3edd44",
+    "PR-041": "7ee6ef80c438b584d16025ad3f60c24bb8c0c83e"
+  },
+  "branch": "codex/ushso-pr064-beginner-navigation-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "apps/web/src/App.tsx",
+    "apps/web/src/components/ObservatoryHeader.tsx",
+    "apps/web/src/components/ObservatoryHeader.test.tsx",
+    "apps/web/src/pages/LandingPage.tsx",
+    "apps/web/src/pages/LandingPage.test.tsx",
+    "apps/web/src/pages/LearnPage.tsx",
+    "apps/web/src/pages/LearnPage.test.tsx",
+    "apps/web/src/styles.css",
+    "worker/index.mjs",
+    "verification/research-program/pr-064/",
+    "docs/research-program/handoffs/PR-064.json"
+  ],
+  "problem": "People could not understand the product or choose an appropriate starting route. Disabled planner could be promoted as a primary action. Home copy could fail to distinguish finding a source from obtaining restricted data. Small-screen menus could overflow. Claims could drift from the accepted generation.",
+  "resulting_behavior": "Every navigation destination resolves to useful content; disabled features are not promoted as primary actions. Claims match the accepted generation; a beginner can distinguish finding a source from obtaining restricted data. At 320px and 390px menus remain usable without overflow and every entry has a descriptive accessible name. plan_research remains disabled. worker/index.mjs does not import enrichment. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-064-1",
+      "subject": "Define the information architecture",
+      "sha": "8622bf8fa5be6779e1bca360f32f0e28316e6fb7"
+    },
+    {
+      "id": "C-064-2",
+      "subject": "Rewrite home around the mission",
+      "sha": "9c4ad3238eec6eaeb12d4be500219c3719dcf672"
+    },
+    {
+      "id": "C-064-3",
+      "subject": "Implement responsive navigation",
+      "sha": "348c4882c7ceb86ca53e514ef46be3ddd4f40483"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "app-routes",
+      "id": "apps/web/src/App.tsx",
+      "location": "local",
+      "sha256": "61d59389dca6ed96adfc6422fb30acf085a35cce08849fe6526628f96132eec4"
+    },
+    {
+      "kind": "header-nav",
+      "id": "apps/web/src/components/ObservatoryHeader.tsx",
+      "location": "local",
+      "sha256": "1e0d82b060db900386c80dafbbba4d2e4eec126578bae89a16c17cc5ec1ec4e6"
+    },
+    {
+      "kind": "landing",
+      "id": "apps/web/src/pages/LandingPage.tsx",
+      "location": "local",
+      "sha256": "2349a7af6358e5780824acf92c8baba042d005715b4639a17f9b22075dd2e8fc"
+    },
+    {
+      "kind": "learn-page",
+      "id": "apps/web/src/pages/LearnPage.tsx",
+      "location": "local",
+      "sha256": "9c479192347bb00bd53d2f52d3f2ecb180baf20c3d197e28cac6e6eaad61776e"
+    },
+    {
+      "kind": "nav-css",
+      "id": "apps/web/src/styles.css",
+      "location": "local",
+      "sha256": "8cf96a0b504225cab91694c2254da25ff86f3af6891488a74c386c3815ab9a42"
+    },
+    {
+      "kind": "spa-learn-route",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "ace6d4d0a49a5496177ee46f1d3b4c3da64e9e6d85e6ad28cbc723194a60e69d"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c064-focused",
+      "command": "npm test --workspace @ushso/observatory-web -- src/pages/LearnPage.test.tsx src/pages/LandingPage.test.tsx src/components/ObservatoryHeader.test.tsx src/pages/PlanPage.test.tsx src/pages/modeSeparation.test.ts",
+      "started_at": "2026-09-14T22:29:50.028867Z",
+      "completed_at": "2026-09-14T22:29:51.512691Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Focused navigation, landing, learn, plan and mode-separation tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c064-focused-event",
+        "path": "verification/research-program/pr-064/producer-20260914/commands/focused-web/event.json",
+        "sha256": "08248b7f03a63950839d055d1230569c9c8ef4c4e719a43396cd002ab890b3c3",
+        "bytes": 1271
+      }
+    },
+    {
+      "id": "cmd-c064-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T22:29:51.513096Z",
+      "completed_at": "2026-09-14T22:29:51.566954Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c064-identity-event",
+        "path": "verification/research-program/pr-064/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "cbe67dfe6a4aea693043e285e1ca29730d0b8b8ddf3e4353a446f3a89246e0b8",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr064-artifact-0",
+      "path": "verification/research-program/pr-064/task-binding.json",
+      "bytes": 3959,
+      "sha256": "52fd67dd947cb7b99b89d6e0840b479866598ddebf4afb549b572193c2b55fe4"
+    },
+    {
+      "id": "pr064-artifact-1",
+      "path": "verification/research-program/pr-064/dispatch.json",
+      "bytes": 2601,
+      "sha256": "8b36f19547b63bd204f8cdbbb2736ed0132ccc3afcd6c245acaf61d015194742"
+    },
+    {
+      "id": "pr064-artifact-2",
+      "path": "verification/research-program/pr-064/producer-20260914/commands/focused-web/receipt.json",
+      "bytes": 656,
+      "sha256": "7673937f683fda995128648f7ecafd2c98442edc1213f2aeb575b4ed8e00aba8"
+    },
+    {
+      "id": "pr064-artifact-3",
+      "path": "verification/research-program/pr-064/producer-20260914/commands/focused-web/stdout.log",
+      "bytes": 779,
+      "sha256": "b53ea18e7c7a101b378b88d66abbc0044e1043219412adc374f5ef69438e9704"
+    },
+    {
+      "id": "pr064-artifact-4",
+      "path": "verification/research-program/pr-064/producer-20260914/commands/focused-web/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr064-artifact-5",
+      "path": "verification/research-program/pr-064/producer-20260914/commands/focused-web/event.json",
+      "bytes": 1271,
+      "sha256": "08248b7f03a63950839d055d1230569c9c8ef4c4e719a43396cd002ab890b3c3"
+    },
+    {
+      "id": "pr064-artifact-6",
+      "path": "verification/research-program/pr-064/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "15bd6f707984295694f30102cb1c529e611924a76c68f2ef26be4c80675a5193"
+    },
+    {
+      "id": "pr064-artifact-7",
+      "path": "verification/research-program/pr-064/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr064-artifact-8",
+      "path": "verification/research-program/pr-064/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr064-artifact-9",
+      "path": "verification/research-program/pr-064/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "cbe67dfe6a4aea693043e285e1ca29730d0b8b8ddf3e4353a446f3a89246e0b8"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-064-1",
+      "status": "producer_checked",
+      "result": "Every navigation destination resolves to useful content; disabled features are not promoted as primary actions.",
+      "command_ids": [
+        "cmd-c064-focused"
+      ]
+    },
+    {
+      "id": "C-064-2",
+      "status": "producer_checked",
+      "result": "Claims match the accepted generation; a beginner can distinguish finding a source from obtaining restricted data.",
+      "command_ids": [
+        "cmd-c064-focused"
+      ]
+    },
+    {
+      "id": "C-064-3",
+      "status": "producer_checked",
+      "result": "At 320px and 390px menus remain usable without overflow and every entry has a descriptive accessible name. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c064-focused",
+        "cmd-c064-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "planner-not-primary",
+      "status": "accepted",
+      "detail": "Primary navigation does not include /plan. plan_research remains disabled."
+    },
+    {
+      "id": "envelope-not-task",
+      "status": "accepted",
+      "detail": "A successful page load or tool envelope is not a completed research task. HTTP 200 is not acceptance."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment. SPA_ROUTES gained /learn only."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-beginner-navigation-review",
+      "status": "pending",
+      "detail": "Independent review of destinations, home claims and small-screen navigation remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "nav-is-not-r12",
+      "status": "risk",
+      "detail": "Beginner navigation is protocol/product evidence, not R12/R13 acceptance, scientific approval, or production change."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of destinations, home claims and small-screen navigation, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-064 source and replay focused web and identity validators. Do not enable plan_research. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
