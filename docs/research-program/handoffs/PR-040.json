@@ -1,0 +1,280 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-040",
+  "status": "producer_checked",
+  "owner": "/root/pr040_core_readiness",
+  "reviewer": "Astra/root",
+  "base_sha": "06eb1cca37e0ff72f40e818cb4e0b8e97f0fc576",
+  "head_sha": "578860f4ceff4171937ca94ffac2d2faddd8205a",
+  "dependency_merge_shas": {
+    "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+    "PR-021": "ed08e8ee861622b99d5d7c3150d68304ecc95881",
+    "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7",
+    "PR-033": "ad0091998837a32c84f495ad67c4cbbaee3edd44"
+  },
+  "branch": "codex/ushso-pr040-core-readiness-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/coverage/research-program/v1.0.0/src/core-readiness.mjs",
+    "scripts/research-program/core-readiness.mjs",
+    "tests/research-program/core-readiness.test.mjs",
+    "docs/research-program/core-readiness.md",
+    "verification/research-program/pr-040/",
+    "docs/research-program/handoffs/PR-040.json"
+  ],
+  "problem": "Annual releases of one product could inflate the 100-product denominator. Missing essential context could be ignored. A thousand populated optional fields could compensate for an unknown essential denominator or inaccessible recipe. Public-sample and restricted/manual completion could be mixed. Incomplete products could be waived by adding more easy records. Editing frozen evaluation/research-program/cohorts.json or sealed coverage accounting artifacts would break the cohort freeze and WP7-style accounting seal. Last-good generation could be changed.",
+  "resulting_behavior": "Core readiness lives in packages/coverage/research-program/v1.0.0/src/core-readiness.mjs with a thin CLI re-export. The frozen 100-product cohort remains the denominator; annual releases are not additional products. Missing essential context remains a named blocker. Public-sample and restricted/manual completion are counted separately. Optional fields cannot compensate for unknown essential denominators or inaccessible recipes. Every incomplete product has a concrete next task that cannot be waived by adding easy records. R04/R05 remain unaccepted. Frozen evaluation/research-program/cohorts.json (2449368 bytes) and sealed coverage accounting artifacts are unchanged. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-040-1",
+      "subject": "Join the cohort to exact contexts",
+      "sha": "76e7a1ec9dc018c56a07e66e7d7d698c9f9e009c"
+    },
+    {
+      "id": "C-040-2",
+      "subject": "Compute essential readiness",
+      "sha": "76e7a1ec9dc018c56a07e66e7d7d698c9f9e009c"
+    },
+    {
+      "id": "C-040-3",
+      "subject": "Generate bounded deficit assignments",
+      "sha": "578860f4ceff4171937ca94ffac2d2faddd8205a"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "core-readiness",
+      "id": "packages/coverage/research-program/v1.0.0/src/core-readiness.mjs",
+      "location": "local",
+      "sha256": "81f7a0df1288a7c8fe157c536a37df84e16a90dd2e032f80fc8f25dad3fcb932"
+    },
+    {
+      "kind": "core-readiness-script",
+      "id": "scripts/research-program/core-readiness.mjs",
+      "location": "local",
+      "sha256": "6783dd5f3cd3878c4e0f3cf278e79504c14415267e439a89df29a4e5fcaaffff"
+    },
+    {
+      "kind": "core-readiness-tests",
+      "id": "tests/research-program/core-readiness.test.mjs",
+      "location": "local",
+      "sha256": "a3ba0cf1e4480a6682e24b999d3c82cfc681ada34d7ff89ad159f6d6de094e38"
+    },
+    {
+      "kind": "core-readiness-docs",
+      "id": "docs/research-program/core-readiness.md",
+      "location": "local",
+      "sha256": "d38caa32041e31e00b8134608ff717566dc23f9daf065e5343cb9212fc8d47b6"
+    },
+    {
+      "kind": "frozen-cohorts-unchanged",
+      "id": "evaluation/research-program/cohorts.json",
+      "location": "local",
+      "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543"
+    },
+    {
+      "kind": "sealed-coverage-accounting-unchanged",
+      "id": "packages/coverage/accounting/v1.0.0/artifacts/federal-source-registry.json",
+      "location": "local",
+      "sha256": "fc4f0c76df53dbceac9ba2a5bfde9b938967a47a46a7af326ad2748915242ada"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c040-focused",
+      "command": "node --test tests/research-program/core-readiness.test.mjs",
+      "started_at": "2026-09-14T13:19:12.439511Z",
+      "completed_at": "2026-09-14T13:19:12.599405Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 core-readiness tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c040-focused-event",
+        "path": "verification/research-program/pr-040/producer-20260914/commands/focused-readiness/event.json",
+        "sha256": "8f850694ddbbdb5f75485ae0ee2dbba0576f3e4ee6a250b3fa534eb42bd11646",
+        "bytes": 1047
+      }
+    },
+    {
+      "id": "cmd-c040-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T13:19:12.599783Z",
+      "completed_at": "2026-09-14T13:19:12.654033Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c040-identity-event",
+        "path": "verification/research-program/pr-040/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "c17510c44a57ef4f939a85bc3e8be8d4e5257e0bbcb8d4062b61125aae25cf20",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr040-artifact-0",
+      "path": "verification/research-program/pr-040/task-binding.json",
+      "bytes": 4078,
+      "sha256": "99305eeb1249146c9db9495cacb62f47e020dd566ddcf2030b0425df07c14263"
+    },
+    {
+      "id": "pr040-artifact-1",
+      "path": "verification/research-program/pr-040/dispatch.json",
+      "bytes": 2952,
+      "sha256": "24f064503bf875f911dff350c1caac864d2166f208cf49fb032678b9ba5b1502"
+    },
+    {
+      "id": "pr040-artifact-2",
+      "path": "verification/research-program/pr-040/producer-20260914/commands/focused-readiness/receipt.json",
+      "bytes": 462,
+      "sha256": "a32ee39bb3e5fc18cc4cef5fae6560f762c5877df367e840f22cd31656fb46c5"
+    },
+    {
+      "id": "pr040-artifact-3",
+      "path": "verification/research-program/pr-040/producer-20260914/commands/focused-readiness/stdout.log",
+      "bytes": 512,
+      "sha256": "533e238d9fa4a033809a1ab5466edb83f685b22a95696814be2bd655fead369d"
+    },
+    {
+      "id": "pr040-artifact-4",
+      "path": "verification/research-program/pr-040/producer-20260914/commands/focused-readiness/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr040-artifact-5",
+      "path": "verification/research-program/pr-040/producer-20260914/commands/focused-readiness/event.json",
+      "bytes": 1047,
+      "sha256": "8f850694ddbbdb5f75485ae0ee2dbba0576f3e4ee6a250b3fa534eb42bd11646"
+    },
+    {
+      "id": "pr040-artifact-6",
+      "path": "verification/research-program/pr-040/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "2adaa0b428d4e090250cfb953ccdc4ae70d456b3a67650e0f0f2d42a24703c17"
+    },
+    {
+      "id": "pr040-artifact-7",
+      "path": "verification/research-program/pr-040/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr040-artifact-8",
+      "path": "verification/research-program/pr-040/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr040-artifact-9",
+      "path": "verification/research-program/pr-040/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "c17510c44a57ef4f939a85bc3e8be8d4e5257e0bbcb8d4062b61125aae25cf20"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-040-1",
+      "status": "producer_checked",
+      "result": "Annual releases do not inflate the 100-product denominator. Missing essential context remains a named blocker.",
+      "command_ids": [
+        "cmd-c040-focused"
+      ]
+    },
+    {
+      "id": "C-040-2",
+      "status": "producer_checked",
+      "result": "A thousand populated optional fields cannot compensate for an unknown essential denominator or inaccessible recipe.",
+      "command_ids": [
+        "cmd-c040-focused"
+      ]
+    },
+    {
+      "id": "C-040-3",
+      "status": "producer_checked",
+      "result": "Every incomplete priority product has a concrete next task. The program gate cannot waive it by adding more easy records. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c040-focused",
+        "cmd-c040-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "frozen-cohorts",
+      "status": "accepted",
+      "detail": "evaluation/research-program/cohorts.json was not edited (2449368 bytes, 100 products)."
+    },
+    {
+      "id": "sealed-coverage-accounting",
+      "status": "accepted",
+      "detail": "packages/coverage/accounting artifacts were not edited."
+    },
+    {
+      "id": "last-good-generation",
+      "status": "accepted",
+      "detail": "Last-good generation remains live-2026-09-03-85b50522b420."
+    },
+    {
+      "id": "r04-r05-complete",
+      "status": "accepted",
+      "detail": "Public-sample engineering target is met at 83/80. R04/R05 remain unaccepted because remaining restricted/manual products lack verified routes."
+    },
+    {
+      "id": "scientific-acceptance",
+      "status": "accepted",
+      "detail": "Core-readiness modeling is not R04/R05 scientific acceptance."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-core-readiness-review",
+      "status": "pending",
+      "detail": "Independent review of the 100-product denominator, unknown essential denominators and deficit tasks remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "ledger-owned-paths-named-frozen-cohorts",
+      "status": "risk",
+      "detail": "The original ledger named evaluation/research-program/cohorts.json and packages/coverage/. Implementation adds core-readiness.mjs under coverage/research-program and does not mutate the frozen cohort or accounting artifacts."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of the 100-product denominator, unknown essential denominators and deficit tasks, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-040 source and replay focused core-readiness and identity validators. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
