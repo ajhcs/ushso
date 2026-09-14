@@ -1,0 +1,378 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-015",
+  "status": "producer_checked",
+  "owner": "/root/pr015_census_api",
+  "reviewer": "Astra/root",
+  "base_sha": "ba9f592bf94dfbde200971573428dcd316fa537a",
+  "head_sha": "0dd0571e2cfb9afb61d0ab9aba1af2e249f1684e",
+  "dependency_merge_shas": {
+    "PR-007": "0d730aaf07b89bb16fb66fc224841a2d66c80d49",
+    "PR-008": "8f2914e345b30809be4e1ad97cdccc39b809cc95",
+    "PR-011": "2c5092073ef6f98e95293769971c3a71b0d93d74",
+    "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0"
+  },
+  "branch": "codex/ushso-pr015-census-api-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/connectors/src/adapters/census-api.mjs",
+    "tests/research-program/census-api.test.mjs",
+    "verification/research-program/pr-015/",
+    "docs/research-program/handoffs/PR-015.json"
+  ],
+  "problem": "Census product/vintage/geography metadata could collapse ACS 5-year, ACS 1-year and time-series identities, infer observation period from vintage, place a Census key in evidence URLs, or emit a sample recipe before required inputs and a secret-provider key were present.",
+  "resulting_behavior": "bindCensusProducts keeps ACSST5Y2023, ACSST1Y2023 and BDSTIMESERIES distinct. Vintage is not an observation period. Variables/geography/groups/examples links bind to exact catalog entries over HTTPS. A Census key is received only through secretProvider.getSecret and never appears in evidence URLs, logs or query redaction. Missing keys produce a documented access step. Offline tests run with no secret. Keyless Missing Key HTML remains authentication-required and not JSON success. Pennsylvania state:42 uses S0101_C01_001E and documented geography predicates. Labels/concepts are not definitions. Sample recipes are withheld until required inputs including the key are present. Live fetch is forbidden.",
+  "commits": [
+    {
+      "id": "C-015-1",
+      "subject": "Resolve Census metadata links",
+      "sha": "afb6257711c765d8f1a4ecd915e80e7b6794a0a0"
+    },
+    {
+      "id": "C-015-2",
+      "subject": "Add a source-scoped credential adapter",
+      "sha": "afb6257711c765d8f1a4ecd915e80e7b6794a0a0"
+    },
+    {
+      "id": "C-015-3",
+      "subject": "Extract documented query dimensions",
+      "sha": "0dd0571e2cfb9afb61d0ab9aba1af2e249f1684e"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "census-api-adapter",
+      "id": "packages/connectors/src/adapters/census-api.mjs",
+      "location": "local",
+      "sha256": "eaa9d5f6755f8874d05c2f089ab10f376fe8a274cf9512eadb2621b37da3c22f"
+    },
+    {
+      "kind": "census-api-tests",
+      "id": "tests/research-program/census-api.test.mjs",
+      "location": "local",
+      "sha256": "081b892f555d59937b0864b5f0a2c3724a30c9b901febbd046262f384ec7c8c5"
+    },
+    {
+      "kind": "census-catalog-slim",
+      "id": "verification/research-program/pr-015/fixtures/census-catalog-slim.json.gz",
+      "location": "local",
+      "sha256": "ce39725129e63e5aded3766aec240309bb246212afbba2b51b506b860e4aac07"
+    },
+    {
+      "kind": "acs5-geography",
+      "id": "verification/research-program/pr-015/fixtures/acs5-subject-geography.json.gz",
+      "location": "local",
+      "sha256": "03e6744b79151f8ddf5d0521504b6d07e89af7fe20b222d904456ee4182ac036"
+    },
+    {
+      "kind": "acs5-variables-slim",
+      "id": "verification/research-program/pr-015/fixtures/acs5-subject-variables-slim.json.gz",
+      "location": "local",
+      "sha256": "d02dfe7f52b7d0bd49edaff5045392eb442bc0e3cdffe51b8c128ca30dc45cbe"
+    },
+    {
+      "kind": "census-metadata-connector",
+      "id": "packages/connectors/src/adapters/census.mjs",
+      "location": "local",
+      "sha256": "5b3f2bd0dc99be9ea36b2afa562ab0024c9ea490587fb7b8d7335944c963047d"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c015-focused",
+      "command": "node --test tests/research-program/census-api.test.mjs",
+      "started_at": "2026-09-14T04:06:52.766515Z",
+      "completed_at": "2026-09-14T04:06:52.902786Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "8/8 focused Census API tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c015-focused-event",
+        "path": "verification/research-program/pr-015/producer-20260914/commands/focused-census-api/event.json",
+        "sha256": "1844c7f740aed442c40fdba14cf988417ca01c186211ee68cfa3b7f4c699592f",
+        "bytes": 1050
+      }
+    },
+    {
+      "id": "cmd-c015-extractors",
+      "command": "node --test tests/research-extractors.test.mjs",
+      "started_at": "2026-09-14T04:06:52.903194Z",
+      "completed_at": "2026-09-14T04:06:53.085310Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "19/19 research-extractors tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c015-extractors-event",
+        "path": "verification/research-program/pr-015/producer-20260914/commands/research-extractors/event.json",
+        "sha256": "468b8c6eaf0cf8caf4b7dd15d213ce72c6e87d47c9384f26dec10c32d9e99003",
+        "bytes": 1049
+      }
+    },
+    {
+      "id": "cmd-c015-http",
+      "command": "node --test tests/research-program/http-outcomes.test.mjs",
+      "started_at": "2026-09-14T04:06:53.085674Z",
+      "completed_at": "2026-09-14T04:06:54.048697Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "10/10 HTTP outcomes tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c015-http-event",
+        "path": "verification/research-program/pr-015/producer-20260914/commands/http-outcomes/event.json",
+        "sha256": "fab41826f74692b187fff3d84b2446c88d04954c915644d3917ddf01a4381615",
+        "bytes": 1035
+      }
+    },
+    {
+      "id": "cmd-c015-cdc",
+      "command": "node --test tests/research-program/cdc-view.test.mjs",
+      "started_at": "2026-09-14T04:06:54.049079Z",
+      "completed_at": "2026-09-14T04:06:55.159521Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "9/9 CDC view tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c015-cdc-event",
+        "path": "verification/research-program/pr-015/producer-20260914/commands/cdc-view/event.json",
+        "sha256": "da15c8242e5cc1fe3ab3e053deee920611f59d3dd0deb8713cb3800ee9453b94",
+        "bytes": 1008
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr015-artifact-0",
+      "path": "verification/research-program/pr-015/task-binding.json",
+      "bytes": 3924,
+      "sha256": "ce6941934cc2bc89d077279ea5d5277b7aad88823df495fb784c5112473500fe"
+    },
+    {
+      "id": "pr015-artifact-1",
+      "path": "verification/research-program/pr-015/dispatch.json",
+      "bytes": 2366,
+      "sha256": "6a9952f46df9a266dec87478fbb20925807a1520ec0eb8571bc3e9f21af4e99a"
+    },
+    {
+      "id": "pr015-artifact-2",
+      "path": "verification/research-program/pr-015/fixtures/census-catalog-slim.json.gz",
+      "bytes": 1580,
+      "sha256": "ce39725129e63e5aded3766aec240309bb246212afbba2b51b506b860e4aac07"
+    },
+    {
+      "id": "pr015-artifact-3",
+      "path": "verification/research-program/pr-015/fixtures/acs5-subject-geography.json.gz",
+      "bytes": 660,
+      "sha256": "03e6744b79151f8ddf5d0521504b6d07e89af7fe20b222d904456ee4182ac036"
+    },
+    {
+      "id": "pr015-artifact-4",
+      "path": "verification/research-program/pr-015/fixtures/acs5-subject-variables-slim.json.gz",
+      "bytes": 372,
+      "sha256": "d02dfe7f52b7d0bd49edaff5045392eb442bc0e3cdffe51b8c128ca30dc45cbe"
+    },
+    {
+      "id": "pr015-artifact-5",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/focused-census-api/receipt.json",
+      "bytes": 459,
+      "sha256": "74867b361851c367f2952970db6bdee246e499dbfa241bd681dd023505f1c318"
+    },
+    {
+      "id": "pr015-artifact-6",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/focused-census-api/stdout.log",
+      "bytes": 880,
+      "sha256": "538e0f55db3a40e58f5a2b46f4683b52da8d790bb7a2bd2cce35e7ea1231fba8"
+    },
+    {
+      "id": "pr015-artifact-7",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/focused-census-api/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr015-artifact-8",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/focused-census-api/event.json",
+      "bytes": 1050,
+      "sha256": "1844c7f740aed442c40fdba14cf988417ca01c186211ee68cfa3b7f4c699592f"
+    },
+    {
+      "id": "pr015-artifact-9",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/research-extractors/receipt.json",
+      "bytes": 453,
+      "sha256": "dd9a0a039df5507d95b94dd96a28acc4211a3cfbcac6263eff204ade03591ce2"
+    },
+    {
+      "id": "pr015-artifact-10",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/research-extractors/stdout.log",
+      "bytes": 2036,
+      "sha256": "267a6f5f1650074a465cab1898cc0275f090c4d2172ceab9c7357859c2d8ee2b"
+    },
+    {
+      "id": "pr015-artifact-11",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/research-extractors/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr015-artifact-12",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/research-extractors/event.json",
+      "bytes": 1049,
+      "sha256": "468b8c6eaf0cf8caf4b7dd15d213ce72c6e87d47c9384f26dec10c32d9e99003"
+    },
+    {
+      "id": "pr015-artifact-13",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/http-outcomes/receipt.json",
+      "bytes": 457,
+      "sha256": "ae4a65acc6bc618e1c0253deacd823cba05702a0d6b9d899657cacf3ffb8499d"
+    },
+    {
+      "id": "pr015-artifact-14",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/http-outcomes/stdout.log",
+      "bytes": 987,
+      "sha256": "9265ea632d1ad30b9cbd7df7aa6a2da11c47e3e63d3bcd38935f40f158ebea28"
+    },
+    {
+      "id": "pr015-artifact-15",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/http-outcomes/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr015-artifact-16",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/http-outcomes/event.json",
+      "bytes": 1035,
+      "sha256": "fab41826f74692b187fff3d84b2446c88d04954c915644d3917ddf01a4381615"
+    },
+    {
+      "id": "pr015-artifact-17",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/cdc-view/receipt.json",
+      "bytes": 447,
+      "sha256": "4f67fb041806b2af578a6fe168a190b3da4535c3ba9f52b38d6efdf032604b2c"
+    },
+    {
+      "id": "pr015-artifact-18",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/cdc-view/stdout.log",
+      "bytes": 882,
+      "sha256": "c40ba0a21f10762aeedc5f809f9697d68720f19bca23e2b5a0a033e735ac721d"
+    },
+    {
+      "id": "pr015-artifact-19",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/cdc-view/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr015-artifact-20",
+      "path": "verification/research-program/pr-015/producer-20260914/commands/cdc-view/event.json",
+      "bytes": 1008,
+      "sha256": "da15c8242e5cc1fe3ab3e053deee920611f59d3dd0deb8713cb3800ee9453b94"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-015-1",
+      "status": "producer_checked",
+      "result": "ACS 5-year, ACS 1-year and time-series remain distinct. Vintage is not an observation period. Catalog links bind exactly.",
+      "command_ids": [
+        "cmd-c015-focused"
+      ]
+    },
+    {
+      "id": "C-015-2",
+      "status": "producer_checked",
+      "result": "Offline tests need no secret. Keyless HTML is authentication-required. Keyed recipe redacts the key from evidence URLs and logs.",
+      "command_ids": [
+        "cmd-c015-focused",
+        "cmd-c015-http"
+      ]
+    },
+    {
+      "id": "C-015-3",
+      "status": "producer_checked",
+      "result": "Pennsylvania state:42 uses supported geography predicates and S0101_C01_001E. Labels are not definitions. Recipe withheld without a key. Extractors, HTTP outcomes and CDC views remain green.",
+      "command_ids": [
+        "cmd-c015-focused",
+        "cmd-c015-extractors",
+        "cmd-c015-http",
+        "cmd-c015-cdc"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-census-http",
+      "status": "accepted",
+      "detail": "Tests consume retained gzip catalog/geography/variable fixtures and the PR009 Missing Key HTML. blockedFetch forbids live HTTP."
+    },
+    {
+      "id": "full-subject-variables-body",
+      "status": "skipped",
+      "detail": "The 7.9 MiB ACS 5-year subject variables.json is retained off-tree. Tests use a slim predicate/label fixture. Full dictionary parsing remains source-extractors.mjs census_variables."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-census-api-review",
+      "status": "pending",
+      "detail": "Independent review of vintage/product distinction, secret-provider key handling and Pennsylvania recipe remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "secret-provider-is-test-double",
+      "status": "risk",
+      "detail": "The secret-provider port is a test double. No production Census key is configured. A successful keyed fixture does not authorize unpublished series payloads."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of Census product binding, keyless HTML and Pennsylvania sample recipe, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-015 source and replay focused Census, extractors, HTTP outcomes and CDC view tests. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
