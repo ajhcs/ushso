@@ -162,7 +162,8 @@ export async function loadEngineFromAssets(request, env) {
 function parsePageSize(value, fallback = 20) {
   const requested = Number(value ?? fallback);
   if (!Number.isInteger(requested) || requested < 1) return fallback;
-  return Math.min(requested, 200);
+  // Bound metadata-rich catalog pages; continuation cursors retain the full scope.
+  return Math.min(requested, 100);
 }
 
 function catalogOptions(url) {
