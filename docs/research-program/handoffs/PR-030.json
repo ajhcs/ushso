@@ -1,0 +1,260 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-030",
+  "status": "producer_checked",
+  "owner": "/root/pr030_publication_parity",
+  "reviewer": "Astra/root",
+  "base_sha": "42735bbe42a24a2896e5e9ffa0f99023be4656b1",
+  "head_sha": "4da75c508761a425ddb2cf45c6e9003fa197d338",
+  "dependency_merge_shas": {
+    "PR-007": "17f9271372ecdf29f6b818ad9caaa5332258f4fd",
+    "PR-021": "ed08e8ee861622b99d5d7c3150d68304ecc95881",
+    "PR-029": "ddb8f4cc88106ab937220a2c231ed62928ae101f"
+  },
+  "branch": "codex/ushso-pr030-publication-parity-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/registry/publication-parity.mjs",
+    "packages/registry/index.mjs",
+    "apps/web/src/pages/SourcesPage.tsx",
+    "apps/web/src/pages/SourcesPage.test.tsx",
+    "scripts/stage-research-assets.mjs",
+    "tests/research-program/publication-parity.test.mjs",
+    "verification/research-program/pr-030/",
+    "docs/research-program/handoffs/PR-030.json"
+  ],
+  "problem": "The Sources page v1.1.0 national-readiness table could present a historical Pennsylvania published-record count as current coverage. Publication manifests could close with missing assets, source-context mismatches or undeclared partial fragments. One bad dictionary asset could blank the catalog. Failed publication could replace last-good generation. Mixed catalog/dictionary generations could be served together. Sealed search lifecycle could be edited and break the search package seal.",
+  "resulting_behavior": "assembleAcceptedPublicationManifest closes only when required assets, checksums and source context are present. archiveHistoricalReadiness treats corpus v1.1.0 as a historical view; Pennsylvania's 24 published records are archived and current_published_state_record_count is 0. SourcesPage labels that historical overlay as not current coverage. pageDictionary/measureAssetPage page large dictionaries predictably. serveBoundedAssets keeps the catalog available when one asset fails. Mixed generations fail closed. Failed publication leaves last-good generation live-2026-09-03-85b50522b420 live. Static fallback remains available. Sealed packages/search/publication-lifecycle-v2.mjs is unchanged (26572 bytes).",
+  "commits": [
+    {
+      "id": "C-030-1",
+      "subject": "Assemble the accepted publication manifest",
+      "sha": "6e76f25e924589f04ac01d72aebcb7bd412c6c78"
+    },
+    {
+      "id": "C-030-2",
+      "subject": "Integrate bounded content delivery",
+      "sha": "6e76f25e924589f04ac01d72aebcb7bd412c6c78"
+    },
+    {
+      "id": "C-030-3",
+      "subject": "Verify generation promotion and rollback",
+      "sha": "4da75c508761a425ddb2cf45c6e9003fa197d338"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "publication-parity",
+      "id": "packages/registry/publication-parity.mjs",
+      "location": "local",
+      "sha256": "e7cc116efff5c7c27246a4cc61d1eadd89952fec85cddd1b9606c49670b26ff3"
+    },
+    {
+      "kind": "sources-page",
+      "id": "apps/web/src/pages/SourcesPage.tsx",
+      "location": "local",
+      "sha256": "a5bb40c165176138bb9886b2bcb0675a4e743bbed7922fc95fff5f6f6dadc465"
+    },
+    {
+      "kind": "stage-research-assets",
+      "id": "scripts/stage-research-assets.mjs",
+      "location": "local",
+      "sha256": "a6a34ae509f00c3e34cd6ecb75becfb5281929428d460aa753122e4545cf81e4"
+    },
+    {
+      "kind": "publication-parity-tests",
+      "id": "tests/research-program/publication-parity.test.mjs",
+      "location": "local",
+      "sha256": "6f5182dfa79ff6f0c517ec8b8d443b230de1fee2651302d424337cee0663e180"
+    },
+    {
+      "kind": "sealed-search-lifecycle-unchanged",
+      "id": "packages/search/publication-lifecycle-v2.mjs",
+      "location": "local",
+      "sha256": "61bc4b3be2b8c0aff697094cf821d1b3671d61f576a1a77063920d61f7e3a1f9"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c030-focused",
+      "command": "node --test tests/research-program/publication-parity.test.mjs",
+      "started_at": "2026-09-14T09:42:15.230884Z",
+      "completed_at": "2026-09-14T09:42:15.333298Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 publication-parity tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c030-focused-event",
+        "path": "verification/research-program/pr-030/producer-20260914/commands/focused-parity/event.json",
+        "sha256": "4e352e8be352381e60d67ac211b2886be63778ecb489c27ae63d526bc7fef42a",
+        "bytes": 1046
+      }
+    },
+    {
+      "id": "cmd-c030-web",
+      "command": "npm test --workspace @ushso/observatory-web -- src/pages/SourcesPage.test.tsx",
+      "started_at": "2026-09-14T09:42:15.333683Z",
+      "completed_at": "2026-09-14T09:42:16.421637Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 SourcesPage tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c030-web-event",
+        "path": "verification/research-program/pr-030/producer-20260914/commands/sources-page/event.json",
+        "sha256": "e55b7071cb9770581702e04177dc251090eb7d64474a4f9a0e49a752ce91d93d",
+        "bytes": 1069
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr030-artifact-0",
+      "path": "verification/research-program/pr-030/task-binding.json",
+      "bytes": 4057,
+      "sha256": "7e008eea20464d12717adb49e9caa323bd5ca0410da6591db467c8765491b399"
+    },
+    {
+      "id": "pr030-artifact-1",
+      "path": "verification/research-program/pr-030/dispatch.json",
+      "bytes": 2634,
+      "sha256": "c6e524c043b50a46f50cda2fb27fd10475e8032b2883d56b04e38b51d1cdbe8d"
+    },
+    {
+      "id": "pr030-artifact-2",
+      "path": "verification/research-program/pr-030/producer-20260914/commands/focused-parity/receipt.json",
+      "bytes": 463,
+      "sha256": "5b71961fa07313918811d089cd9c0964d151a4b40f46feeb4ce1266a51ad31b8"
+    },
+    {
+      "id": "pr030-artifact-3",
+      "path": "verification/research-program/pr-030/producer-20260914/commands/focused-parity/stdout.log",
+      "bytes": 456,
+      "sha256": "fc82d1460db94a9a7bfaa9ed2f5b381c7b4f3b25a45cf0e6760dd3ff40e1129d"
+    },
+    {
+      "id": "pr030-artifact-4",
+      "path": "verification/research-program/pr-030/producer-20260914/commands/focused-parity/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr030-artifact-5",
+      "path": "verification/research-program/pr-030/producer-20260914/commands/focused-parity/event.json",
+      "bytes": 1046,
+      "sha256": "4e352e8be352381e60d67ac211b2886be63778ecb489c27ae63d526bc7fef42a"
+    },
+    {
+      "id": "pr030-artifact-6",
+      "path": "verification/research-program/pr-030/producer-20260914/commands/sources-page/receipt.json",
+      "bytes": 497,
+      "sha256": "e00aa3b809998014fe88c80df8b2d01e1b9ab2996b6cf134ce1d548fea1e8f01"
+    },
+    {
+      "id": "pr030-artifact-7",
+      "path": "verification/research-program/pr-030/producer-20260914/commands/sources-page/stdout.log",
+      "bytes": 433,
+      "sha256": "f09d870a5811e5b0d66379ef45b98eb1417c7590597670194f8cc5c27d8b058e"
+    },
+    {
+      "id": "pr030-artifact-8",
+      "path": "verification/research-program/pr-030/producer-20260914/commands/sources-page/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr030-artifact-9",
+      "path": "verification/research-program/pr-030/producer-20260914/commands/sources-page/event.json",
+      "bytes": 1069,
+      "sha256": "e55b7071cb9770581702e04177dc251090eb7d64474a4f9a0e49a752ce91d93d"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-030-1",
+      "status": "producer_checked",
+      "result": "Manifest closure rejects missing assets, source-context mismatches and undeclared partial fragments. Historical Pennsylvania published-record counts are not current coverage.",
+      "command_ids": [
+        "cmd-c030-focused",
+        "cmd-c030-web"
+      ]
+    },
+    {
+      "id": "C-030-2",
+      "status": "producer_checked",
+      "result": "A large dictionary is paged predictably. One bad asset does not blank the catalog.",
+      "command_ids": [
+        "cmd-c030-focused"
+      ]
+    },
+    {
+      "id": "C-030-3",
+      "status": "producer_checked",
+      "result": "Mixed generations fail closed. Failed publication leaves last-good live. Static fallback remains available.",
+      "command_ids": [
+        "cmd-c030-focused"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "search-package-validate",
+      "status": "skipped",
+      "detail": "packages/search/tools/validate-package.mjs already mismatches stored static-search-backend.mjs digest versus the package-manifest inventory on the integration base. PR-030 does not edit packages/search. Sealed publication-lifecycle-v2.mjs remains 26572 bytes."
+    },
+    {
+      "id": "live-publication",
+      "status": "accepted",
+      "detail": "This assignment does not publish a new public generation. Last-good remains live-2026-09-03-85b50522b420."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-publication-parity-review",
+      "status": "pending",
+      "detail": "Independent review of historical-PA archival, manifest closure and last-good fallback remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "ledger-named-sealed-search-lifecycle",
+      "status": "risk",
+      "detail": "The original ledger named packages/search/publication-lifecycle-v2.mjs. Implementation reuses it without editing, following the PR-028/PR-029 seal lesson."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of historical-PA archival, manifest closure and last-good fallback, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-030 source and replay focused publication-parity and SourcesPage tests. Do not issue current approval, R acceptance, or a new public generation.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
