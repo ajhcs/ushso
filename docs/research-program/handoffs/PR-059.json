@@ -1,0 +1,327 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-059",
+  "status": "producer_checked",
+  "owner": "/root/pr059_client_recovery",
+  "reviewer": "Astra/root",
+  "base_sha": "9a53581e58f5ede5556636f600092aa2c7da39e2",
+  "head_sha": "b7f71984617ff4ae758191a9f9729bd8858df7cb",
+  "dependency_merge_shas": {
+    "PR-055": "a6c63c1ca35f98517e7000b44602c1e8f765e2d5",
+    "PR-056": "413e70b342f4fc1a8fed65dbb2b0fd68ffb1813d",
+    "PR-057": "81533dfed8e814485a451cf66629babb181fbeda",
+    "PR-058": "7ebaded20cd1ece299a9611eace8eed884544e09"
+  },
+  "branch": "codex/ushso-pr059-client-recovery-20260914",
+  "github_pr_url": null,
+  "changed_files": [
+    "packages/machine-toolkit/src/client-recovery.mjs",
+    "packages/machine-toolkit/src/index.mjs",
+    "packages/machine-toolkit/src/service.mjs",
+    "worker/machine-cursor.mjs",
+    "plugins/ushso-research/scripts/client.mjs",
+    "tests/research-program/client-recovery.test.mjs",
+    "verification/research-program/pr-059/",
+    "docs/research-program/handoffs/PR-059.json"
+  ],
+  "problem": "Clients could guess after source/generation limits. A cursor for one tool/query could page a different collection. An expired cursor could silently begin a new generation. An unknown schema could be treated as an empty list of variables. HTTP 200 could be treated as task completion. Nonretryable states could be retried. Cancellation might not stop the current request. Next-cursor and omitted-section explanations could be lost.",
+  "resulting_behavior": "A cursor for one tool/query cannot page a different collection. An expired cursor never silently begins a new generation. Restart instructions preserve the research question and disclose snapshot change. An unknown schema is not returned as an empty list of variables or a transport success claiming the task completed. Cancellation stops the current request. Clients neither retry nonretryable states nor lose the next-cursor/omitted-section explanation. Recovery behavior is documented with runnable examples. No acceptance check depends solely on status 200. A successful tool envelope is not a completed research task. worker/index.mjs does not import enrichment. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-059-1",
+      "subject": "Unify cursor and generation guidance",
+      "sha": "c69fd4796e1fc8e796423a63ccecedccb826a386"
+    },
+    {
+      "id": "C-059-2",
+      "subject": "Preserve typed domain results",
+      "sha": "125b88798da89e2a76c38f916916464612286a88"
+    },
+    {
+      "id": "C-059-3",
+      "subject": "Verify cancellation and output limits",
+      "sha": "b7f71984617ff4ae758191a9f9729bd8858df7cb"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "client-recovery",
+      "id": "packages/machine-toolkit/src/client-recovery.mjs",
+      "location": "local",
+      "sha256": "e7114d5f0005801ae477b776dda01b48220110a835d3aed7bfc14ccfce4ee2f5"
+    },
+    {
+      "kind": "toolkit-index",
+      "id": "packages/machine-toolkit/src/index.mjs",
+      "location": "local",
+      "sha256": "e513c91a899b35d9533ef998ff6b409d9397dcbdf78139c19f8794217dd6e1e0"
+    },
+    {
+      "kind": "toolkit-service-guidance",
+      "id": "packages/machine-toolkit/src/service.mjs",
+      "location": "local",
+      "sha256": "3af4ce8749751aeae07c1ae454686828b69cb6565716d5e102fe2870d201b625"
+    },
+    {
+      "kind": "machine-cursor",
+      "id": "worker/machine-cursor.mjs",
+      "location": "local",
+      "sha256": "b5108f713f165c4db561e65e3529ae4f4e2ca4ec492c718c722d169c48a0e938"
+    },
+    {
+      "kind": "plugin-client",
+      "id": "plugins/ushso-research/scripts/client.mjs",
+      "location": "local",
+      "sha256": "9f161e07e66f5d3c89828831929ad4ca57db77b9f61c7510e3c09f0fd9243b1d"
+    },
+    {
+      "kind": "client-recovery-tests",
+      "id": "tests/research-program/client-recovery.test.mjs",
+      "location": "local",
+      "sha256": "b994e6c4c5e2b130c4a9e79d6038c5d69146e852bc6dfeaf75f1cb12fe16a569"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "worker-index-unchanged",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "ca413cc6224ce2ef472d2116b3acf9ce3f60f4d9181e31f8bfdc1c2d2963ace1"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c059-focused",
+      "command": "node --test tests/research-program/client-recovery.test.mjs",
+      "started_at": "2026-09-14T20:15:04.994648Z",
+      "completed_at": "2026-09-14T20:15:05.849425Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "3/3 client-recovery tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c059-focused-event",
+        "path": "verification/research-program/pr-059/producer-20260914/commands/focused-recovery/event.json",
+        "sha256": "38a046345fefb620e8fd416c301a331359b0349a644ad13e1cc3843366e35179",
+        "bytes": 1046
+      }
+    },
+    {
+      "id": "cmd-c059-related",
+      "command": "node --test tests/machine-pagination.test.mjs tests/research-program/machine-variables.test.mjs tests/research-program/machine-recipes.test.mjs",
+      "started_at": "2026-09-14T20:15:05.849846Z",
+      "completed_at": "2026-09-14T20:15:06.405409Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "13/13 related pagination/recipe/variable tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c059-related-event",
+        "path": "verification/research-program/pr-059/producer-20260914/commands/related-recovery/event.json",
+        "sha256": "00524710815eebf591c701d4e374e4384f6a9500a7df748e7bc609155c87db75",
+        "bytes": 1166
+      }
+    },
+    {
+      "id": "cmd-c059-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-14T20:15:06.405760Z",
+      "completed_at": "2026-09-14T20:15:06.465378Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c059-identity-event",
+        "path": "verification/research-program/pr-059/producer-20260914/commands/identity-validate/event.json",
+        "sha256": "6579398a2b36f3ce250277b31efc6665caa216fba9dc20e973b24ac11604ebee",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr059-artifact-0",
+      "path": "verification/research-program/pr-059/task-binding.json",
+      "bytes": 3831,
+      "sha256": "3d45d03a93ee681f2ddb2bdc65b3966c43608c6ba4971b439bc1825e164f677b"
+    },
+    {
+      "id": "pr059-artifact-1",
+      "path": "verification/research-program/pr-059/dispatch.json",
+      "bytes": 2283,
+      "sha256": "603b42791c75350256d8d529187c446eadcde40105205a1f5cf274f1f7d4cc84"
+    },
+    {
+      "id": "pr059-artifact-2",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/focused-recovery/receipt.json",
+      "bytes": 462,
+      "sha256": "4f5875bca52b3d3970e7fc03497ea6e92d4c70f6c5c24183ad769f5df77ca123"
+    },
+    {
+      "id": "pr059-artifact-3",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/focused-recovery/stdout.log",
+      "bytes": 523,
+      "sha256": "3b8913da621719d6a58092f1d5ba6c7787905ee7b50c5414e9c0a0d58549a881"
+    },
+    {
+      "id": "pr059-artifact-4",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/focused-recovery/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr059-artifact-5",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/focused-recovery/event.json",
+      "bytes": 1046,
+      "sha256": "38a046345fefb620e8fd416c301a331359b0349a644ad13e1cc3843366e35179"
+    },
+    {
+      "id": "pr059-artifact-6",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/related-recovery/receipt.json",
+      "bytes": 561,
+      "sha256": "c4c162ba3da1b3567c4aade997dfdcdb69b23b1ded0abaea945f039b8cb234eb"
+    },
+    {
+      "id": "pr059-artifact-7",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/related-recovery/stdout.log",
+      "bytes": 1609,
+      "sha256": "5f8e6351e727c8a745f1adf43ad7d62e082929be52616d6a9549db7abfee6920"
+    },
+    {
+      "id": "pr059-artifact-8",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/related-recovery/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr059-artifact-9",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/related-recovery/event.json",
+      "bytes": 1166,
+      "sha256": "00524710815eebf591c701d4e374e4384f6a9500a7df748e7bc609155c87db75"
+    },
+    {
+      "id": "pr059-artifact-10",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "b961c41df5268574c8273464707a8fa5a6c40e9aabdbe3eb36d34a02ae4757c1"
+    },
+    {
+      "id": "pr059-artifact-11",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr059-artifact-12",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr059-artifact-13",
+      "path": "verification/research-program/pr-059/producer-20260914/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "6579398a2b36f3ce250277b31efc6665caa216fba9dc20e973b24ac11604ebee"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-059-1",
+      "status": "producer_checked",
+      "result": "A cursor for one tool/query cannot page a different collection. An expired cursor never silently begins a new generation.",
+      "command_ids": [
+        "cmd-c059-focused",
+        "cmd-c059-related"
+      ]
+    },
+    {
+      "id": "C-059-2",
+      "status": "producer_checked",
+      "result": "An unknown schema is not returned as an empty list of variables or a transport success claiming the task completed. HTTP 200 is not task completion.",
+      "command_ids": [
+        "cmd-c059-focused"
+      ]
+    },
+    {
+      "id": "C-059-3",
+      "status": "producer_checked",
+      "result": "Cancellation stops the current request. Clients neither retry nonretryable states nor lose next-cursor/omitted-section explanation. Sealed identity package validates.",
+      "command_ids": [
+        "cmd-c059-focused",
+        "cmd-c059-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "envelope-not-task",
+      "status": "accepted",
+      "detail": "A successful tool envelope is not a completed research task. Protocol success and scientific-result states remain separate. HTTP 200 is not acceptance."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-client-recovery-review",
+      "status": "pending",
+      "detail": "Independent review of cursor isolation, unknown-schema typing and abort/nonretryable recovery remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "recovery-is-not-scientific-approval",
+      "status": "risk",
+      "detail": "Runnable recovery examples are protocol evidence, not R11 acceptance or production change."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of cursor isolation, unknown-schema typing and abort/nonretryable recovery, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-059 source and replay focused client-recovery and identity validators. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
