@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { LAST_GOOD_GENERATION } from '../../packages/coverage/research-program/v1.0.0/src/qualify-deterministic.mjs';
 import { evaluateCoreReadiness, loadCohort, PRODUCT_DENOMINATOR } from '../../packages/coverage/research-program/v1.0.0/src/core-readiness.mjs';
 import { refuseSelfApproval } from './qualify-mrf.mjs';
+import { ingestEvidence } from './ingest-evidence.mjs';
 
 export const QUALIFY_CORE_FORMAT = 'ushso.core-scientific-completeness.v1';
 export const HUMAN_RESEARCH_REVIEWER = 'named-human-research-reviewer';
@@ -31,7 +32,7 @@ export function refuseUnknownCellAsSupported(cell) {
   return freeze({ supported: false, unknown: cell?.unknown === true || cell?.status === 'unknown' });
 }
 
-export function essentialOutcomes(product) {
+export function essentialOutcomes(product, { cellEvidence = {} } = {}) {
   const anchor = product.anchor ?? {};
   const catalog = anchor.status === 'resolved_catalog_record';
   const intake = anchor.status === 'named_intake';
@@ -40,10 +41,10 @@ export function essentialOutcomes(product) {
     catalog_record: freeze({ status: catalog ? 'resolved' : (intake ? 'named_intake' : 'unknown'), supported: catalog, unknown: !catalog }),
     release_distinction: freeze({ status: product.product_release_distinction ? 'documented' : 'unknown', supported: Boolean(product.product_release_distinction), unknown: !product.product_release_distinction }),
     access_expectation: freeze({ status: product.access_expectation ?? 'unknown', supported: false, unknown: product.access_expectation == null, note: 'access_expectation_is_not_proof' }),
-    publisher_access: freeze({ status: 'unknown', supported: false, unknown: true }),
-    schema_qualification: freeze({ status: 'unknown', supported: false, unknown: true }),
-    join_route: freeze({ status: 'unknown', supported: false, unknown: true }),
-    unit_grain_date_denominator: freeze({ status: 'unknown', supported: false, unknown: true }),
+    publisher_access: evidenceCell(cellEvidence.publisher_access, 'unknown'),
+    schema_qualification: evidenceCell(cellEvidence.schema_qualification, 'unknown'),
+    join_route: evidenceCell(cellEvidence.join_route, 'unknown'),
+    unit_grain_date_denominator: evidenceCell(cellEvidence.unit_grain_date_denominator, 'unknown'),
   });
   for (const cell of Object.values(cells)) {
     if (cell.unknown && cell.supported) fail('UNKNOWN_CELL_CANNOT_COUNT_AS_SUPPORTED');
@@ -73,10 +74,38 @@ export function essentialOutcomes(product) {
   });
 }
 
-export function assembleCoreMatrix(cohorts) {
+function evidenceCell(evidence, fallbackStatus) {
+  if (!evidence) return freeze({ status: fallbackStatus, supported: false, unknown: true });
+  if (evidence.unknown === true && evidence.supported === true) fail('UNKNOWN_CELL_CANNOT_COUNT_AS_SUPPORTED');
+  return freeze({
+    status: evidence.status ?? (evidence.supported ? 'evidenced' : fallbackStatus),
+    supported: evidence.supported === true,
+    unknown: evidence.unknown === true || evidence.supported !== true,
+    receipt_id: evidence.receipt_id ?? null,
+    recipe: evidence.recipe ?? null,
+  });
+}
+
+export function coreCellEvidenceFromReceipts(receipts = []) {
+  const byProduct = {};
+  for (const receipt of receipts.filter((row) => row.kind === 'core_cell')) {
+    const productKey = receipt.payload.product_key;
+    if (!byProduct[productKey]) byProduct[productKey] = {};
+    byProduct[productKey][receipt.payload.field] = freeze({
+      supported: receipt.payload.supported === true,
+      unknown: receipt.payload.unknown === true,
+      status: receipt.payload.status ?? (receipt.payload.supported ? 'evidenced' : 'unknown'),
+      receipt_id: receipt.receipt_id,
+      recipe: receipt.payload.recipe,
+    });
+  }
+  return freeze(byProduct);
+}
+
+export function assembleCoreMatrix(cohorts, { cellEvidenceByProduct = {} } = {}) {
   const products = cohorts?.products ?? [];
   if (products.length !== PRODUCT_DENOMINATOR) fail('PRODUCT_DENOMINATOR_NOT_100', String(products.length));
-  const rows = products.map(essentialOutcomes);
+  const rows = products.map((product) => essentialOutcomes(product, { cellEvidence: cellEvidenceByProduct[product.product_key] ?? {} }));
   const byDomain = {};
   for (const row of rows) {
     const domain = row.domain ?? 'unknown';
@@ -124,8 +153,10 @@ export function independentSemanticReview(matrix, { actor = 'implementer', role 
 }
 
 export function issueCoreQualificationReceipt(cohorts = loadCohort(defaultCohortPath()), options = {}) {
-  const readiness = evaluateCoreReadiness(cohorts);
-  const matrix = assembleCoreMatrix(cohorts);
+  const readiness = evaluateCoreReadiness(cohorts, options.readinessExtras ?? {});
+  const ingestion = options.ingestion ?? ingestEvidence();
+  const cellEvidenceByProduct = options.cellEvidenceByProduct ?? coreCellEvidenceFromReceipts(ingestion.receipts ?? []);
+  const matrix = assembleCoreMatrix(cohorts, { cellEvidenceByProduct });
   const review = independentSemanticReview(matrix, options);
   const r04 = false;
   const r05 = false;

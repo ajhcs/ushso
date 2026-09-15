@@ -9,7 +9,8 @@ export const BASELINE_DENOMINATOR = 3434;
 export const ATTEMPT_AXES = Object.freeze(['metadata', 'documentation', 'api_file_sample', 'schema_binding']);
 export const AXIS_COUNT = BASELINE_DENOMINATOR * ATTEMPT_AXES.length;
 export const ATTEMPT_STATES = Object.freeze(['not_attempted', 'succeeded', 'restricted', 'failed', 'blocked', 'unavailable', 'stale', 'unknown']);
-export const RECEIPT_KINDS = Object.freeze(['observation_window', 'scheduled_cycle', 'attempt_axis']);
+export const RECEIPT_KINDS = Object.freeze(['observation_window', 'scheduled_cycle', 'attempt_axis', 'core_cell']);
+export const CORE_CELL_FIELDS = Object.freeze(['publisher_access', 'schema_qualification', 'join_route', 'unit_grain_date_denominator']);
 export const REQUIRED_ELAPSED_DAYS = 14;
 export const REQUIRED_SCHEDULED_CYCLES = 2;
 
@@ -98,6 +99,7 @@ export function validateReceipt(receipt, {
   seenIds = new Set(),
   seenAttemptKeys = new Set(),
   seenCycleIds = new Set(),
+  seenCoreKeys = new Set(),
   currentCandidateHead = null,
   currentCandidateTree = null,
   authorizationRegister = null,
@@ -147,6 +149,18 @@ export function validateReceipt(receipt, {
     })) fail('AUTH_NOT_GRANTED');
   }
 
+  if (receipt.kind === 'core_cell') {
+    if (typeof payload.product_key !== 'string' || !payload.product_key.trim()) fail('CORE_PRODUCT_KEY');
+    if (!CORE_CELL_FIELDS.includes(payload.field)) fail('CORE_CELL_FIELD');
+    const key = `${payload.product_key}\u0000${payload.field}`;
+    if (seenCoreKeys.has(key)) fail('DUPLICATE_CORE_CELL', key);
+    seenCoreKeys.add(key);
+    if (payload.unknown === true && payload.supported === true) fail('UNKNOWN_CELL_CANNOT_COUNT_AS_SUPPORTED');
+    if (payload.live_http === true) fail('CORE_CELL_LIVE_HTTP_FORBIDDEN');
+    if (typeof payload.recipe !== 'string' || !payload.recipe.trim()) fail('CORE_CELL_RECIPE_REQUIRED');
+    if (payload.bounded_sample !== true && payload.verified_route !== true) fail('CORE_CELL_SAMPLE_OR_ROUTE_REQUIRED');
+  }
+
   if (receipt.kind === 'scheduled_cycle') {
     if (typeof payload.cycle_id !== 'string' || !payload.cycle_id.trim()) fail('CYCLE_ID_REQUIRED');
     if (seenCycleIds.has(payload.cycle_id)) fail('DUPLICATE_CYCLE_ID', payload.cycle_id);
@@ -173,6 +187,7 @@ export function loadAndValidateReceipts({
   const seenIds = new Set();
   const seenAttemptKeys = new Set();
   const seenCycleIds = new Set();
+  const seenCoreKeys = new Set();
   const files = listReceiptFiles(repoRoot, relativeDir);
   const receipts = [];
   for (const relative of files) {
@@ -182,6 +197,7 @@ export function loadAndValidateReceipts({
       seenIds,
       seenAttemptKeys,
       seenCycleIds,
+      seenCoreKeys,
       currentCandidateHead,
       currentCandidateTree,
       authorizationRegister,
@@ -325,6 +341,7 @@ export function ingestEvidence({
   return freeze({
     format: 'ushso.evidence-ingestion-report.v1',
     generation: LAST_GOOD_GENERATION,
+    receipts: validated,
     receipt_count: validated.length,
     observation,
     attempts,

@@ -4,12 +4,16 @@ import {
   LAST_GOOD_GENERATION,
   PRODUCT_DENOMINATOR,
   assembleCoreMatrix,
+  coreCellEvidenceFromReceipts,
   independentSemanticReview,
   issueCoreQualificationReceipt,
   loadCohort,
   refuseSelfApproval,
   refuseUnknownCellAsSupported,
 } from '../../scripts/research-program/qualify-core.mjs';
+import { LAST_GOOD_GENERATION as GEN, validateReceipt } from '../../scripts/research-program/ingest-evidence.mjs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const cohort = loadCohort();
 
@@ -57,4 +61,45 @@ test('only issue a pass when R04/R05/R07/R08 actually hold; otherwise retain the
   assert.equal(receipt.product_count, 100);
   assert.ok(receipt.remaining_limits.length >= 4);
   assert.equal(receipt.last_good_generation_changed, false);
+});
+
+test('validated core-cell receipts can fill unknown cells; unknown remains unsupported; R04 stays unaccepted', () => {
+  const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+  const productKey = cohort.products[0].product_key;
+  const receipt = validateReceipt({
+    format: 'ushso.evidence-receipt.v1',
+    receipt_id: 'core-cell-publisher-access-fixture',
+    kind: 'core_cell',
+    generation: GEN,
+    candidate_head: '31631bc18808e67b5f63472585707787a29e933b',
+    recorded_at: '2026-09-15T12:00:00Z',
+    evidence_reference: 'verification/research-program/evidence/payloads/fixture-validation.txt',
+    evidence_sha256: '915be2e8ff28a86863cbd6c5cef36b7caf4239ef0e332ae6fe4fd764900c79a2',
+    payload: {
+      product_key: productKey,
+      field: 'publisher_access',
+      supported: true,
+      unknown: false,
+      status: 'bounded_sample',
+      bounded_sample: true,
+      recipe: 'fixture-only bounded sample; not live HTTP',
+      live_http: false,
+    },
+  }, { repoRoot: ROOT });
+  assert.throws(() => validateReceipt({
+    ...receipt,
+    receipt_id: 'core-cell-unknown-supported',
+    payload: { ...receipt.payload, unknown: true, supported: true },
+  }, { repoRoot: ROOT }), { code: 'UNKNOWN_CELL_CANNOT_COUNT_AS_SUPPORTED' });
+  const evidence = coreCellEvidenceFromReceipts([receipt]);
+  const matrix = assembleCoreMatrix(cohort, { cellEvidenceByProduct: evidence });
+  const row = matrix.rows.find((item) => item.product_key === productKey);
+  assert.equal(row.cells.publisher_access.supported, true);
+  assert.equal(row.cells.publisher_access.unknown, false);
+  assert.equal(row.cells.schema_qualification.supported, false);
+  assert.equal(row.cells.schema_qualification.unknown, true);
+  const issued = issueCoreQualificationReceipt(cohort, { cellEvidenceByProduct: evidence });
+  assert.equal(issued.r04_accepted, false);
+  assert.equal(issued.scientific_completeness_pass, false);
+  assert.equal(issued.failed_matrix_retained, true);
 });
