@@ -7,6 +7,7 @@ import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { Pagination } from '../components/Pagination'
 import { ResultCard } from '../components/ResultCard'
 import { buildCanonicalFacetSections, normalizeDiscoveryFacetSections } from '../data/facets'
+import { rememberLastSeenGeneration } from '../lib/shortlist'
 import { adaptDiscoveryResponse } from '../lib/catalogAdapter'
 import { searchDocumentTitle, setDocumentTitle } from '../lib/documentTitle'
 import { createSearchReturnContext, datasetDetailsHref, parseReturnContext, serializeReturnContext, resultAnchorId } from '../lib/returnContext'
@@ -63,11 +64,12 @@ export function SearchIdentityNote({ result }: { result: DiscoveryResult }) {
   return <p className="results-footnote"><Info aria-hidden="true" /><span>Results are scoped to catalog generation {generation}. Ranking version: {result.ranking?.version ?? 'not reported by this response'}. Confirm content, coverage, and access at the publisher source.</span></p>
 }
 
-export function OrderedResultCards({ records, firstDisplayRank = 1, detailsHref, onDetailsClick }: {
+export function OrderedResultCards({ records, firstDisplayRank = 1, detailsHref, onDetailsClick, generation }: {
   records: DatasetRecord[]
   firstDisplayRank?: number
   detailsHref: (record: DatasetRecord) => string
   onDetailsClick?: (record: DatasetRecord, event: MouseEvent<HTMLAnchorElement>) => void
+  generation?: string
 }) {
   return records.map((result, index) => (
     <ResultCard
@@ -76,6 +78,7 @@ export function OrderedResultCards({ records, firstDisplayRank = 1, detailsHref,
       result={result}
       displayRank={firstDisplayRank + index}
       detailsHref={detailsHref(result)}
+      generation={generation}
       onDetailsClick={onDetailsClick ? (event) => onDetailsClick(result, event) : undefined}
       uncertaintyReasons={result.canonicalResult.uncertainty_reasons}
     />
@@ -101,6 +104,10 @@ export function SearchResultsPage() {
     ...(Object.keys(facetFilters).length > 0 ? { facet_filters: facetFilters } : {}),
   })
   const catalog = useMemo(() => discovery.status === 'ready' ? adaptDiscoveryResponse(discovery.result) : null, [discovery])
+  useEffect(() => {
+    if (discovery.status !== 'ready') return
+    rememberLastSeenGeneration(discovery.result.pagination?.generation ?? discovery.result.corpus.generation ?? '')
+  }, [discovery])
 
   useEffect(() => setEditQuery(state.q), [state.q])
   useEffect(() => setDocumentTitle(searchDocumentTitle(state.q, discovery.status === 'ready' ? 'ready' : discovery.status)), [discovery.status, state.q])
@@ -206,7 +213,7 @@ export function SearchResultsPage() {
           <div className="results-list" aria-busy={discovery.status === 'loading'}>
             {discovery.status === 'loading' ? <div className="discovery-state" role="status"><span className="discovery-state__spinner" aria-hidden="true" /><h2>{state.q ? 'Searching the Observatory index…' : 'Loading the published catalog…'}</h2><p>No result count is shown until the published response has loaded.</p></div>
               : discovery.status === 'error' ? <div className="discovery-state discovery-state--error" role="alert"><h2>Discovery results are not available.</h2><p>{discovery.error.message}</p>{state.cursor ? <button className="button-link" type="button" onClick={() => resetTraversal({})}>Restart this search</button> : <Link className="button-link" to="/">Revise search</Link>}</div>
-                : records.length > 0 ? <section className="result-section" aria-labelledby="section-results-in-selected-order"><header className="result-section__header"><h2 id="section-results-in-selected-order">Results in selected order</h2><p>Cards preserve the selected server order. Contextual sources stay visibly separated from documented matches. Unknown geography is not a confirmed match.</p></header><OrderedResultCards records={records} firstDisplayRank={((state.page - 1) * (pagination?.page_size ?? PAGE_SIZE)) + 1} detailsHref={detailsHref} onDetailsClick={openDetails} /></section>
+                : records.length > 0 ? <section className="result-section" aria-labelledby="section-results-in-selected-order"><header className="result-section__header"><h2 id="section-results-in-selected-order">Results in selected order</h2><p>Cards preserve the selected server order. Contextual sources stay visibly separated from documented matches. Unknown geography is not a confirmed match.</p></header><OrderedResultCards records={records} firstDisplayRank={((state.page - 1) * (pagination?.page_size ?? PAGE_SIZE)) + 1} detailsHref={detailsHref} onDetailsClick={openDetails} generation={discovery.result.pagination?.generation ?? discovery.result.corpus.generation} /></section>
                   : state.filters.length > 0 ? <div className="empty-results"><h2>No matching records satisfy these filters.</h2><button type="button" onClick={() => resetTraversal({ filters: [] })}>Clear filters</button></div>
                     : <div className="empty-results"><h2>No indexed source matched this question.</h2><p>This is not evidence that no source exists. Try broader terms or remove a constraint.</p><Link className="button-link" to="/">Revise search</Link></div>}
           </div>

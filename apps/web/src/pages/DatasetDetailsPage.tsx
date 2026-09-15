@@ -1,5 +1,5 @@
 import { AlertTriangle, Clock3, ExternalLink, Flag, Info, ShieldCheck } from 'lucide-react'
-import { type ReactNode, lazy, Suspense, useEffect } from 'react'
+import { type ReactNode, lazy, Suspense, useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
@@ -7,6 +7,7 @@ import { ResearcherDecisionSummary } from '../components/ResearcherDecisionSumma
 import { SourceSummary } from '../components/SourceSummary'
 import { VariableBrowser } from '../components/VariableBrowser'
 import { DictionaryReviewPanel } from '../components/DictionaryReviewPanel'
+import { SHORTLIST_CHANGED_EVENT, addShortlistItem, isOnShortlist, rememberLastSeenGeneration, removeShortlistItem } from '../lib/shortlist'
 import { findDatasetInResponse } from '../lib/catalogAdapter'
 import { datasetDocumentTitle, setDocumentTitle } from '../lib/documentTitle'
 import { safeExternalHttpsUrl } from '../lib/externalUrls'
@@ -102,6 +103,27 @@ export function sourceGuidance(record: ObservatoryRecord) {
   return null
 }
 
+function DetailsShortlist({ recordId, title, sourceName, detailsPath, generation }: { recordId: string; title: string; sourceName: string; detailsPath: string; generation: string }) {
+  const [saved, setSaved] = useState(() => isOnShortlist(recordId))
+  useEffect(() => {
+    const refresh = () => setSaved(isOnShortlist(recordId))
+    refresh()
+    if (typeof window === 'undefined') return
+    window.addEventListener(SHORTLIST_CHANGED_EVENT, refresh)
+    window.addEventListener('storage', refresh)
+    return () => {
+      window.removeEventListener(SHORTLIST_CHANGED_EVENT, refresh)
+      window.removeEventListener('storage', refresh)
+    }
+  }, [recordId])
+  const toggle = () => {
+    if (saved) removeShortlistItem(recordId)
+    else addShortlistItem({ record_id: recordId, title, source_name: sourceName, details_path: detailsPath, generation })
+    setSaved(isOnShortlist(recordId))
+  }
+  return <button type="button" className="details-shortlist" onClick={toggle}>{saved ? 'Remove from local shortlist' : 'Save to local shortlist'}</button>
+}
+
 export function DatasetDetailsPage() {
   const { datasetId = '' } = useParams()
   const location = useLocation()
@@ -115,6 +137,10 @@ export function DatasetDetailsPage() {
       setDocumentTitle(datasetDocumentTitle(dataset?.title, dataset ? 'ready' : 'unavailable'))
     }
   }, [datasetId, discovery])
+  useEffect(() => {
+    if (discovery.status !== 'ready') return
+    rememberLastSeenGeneration(discovery.result.corpus.publication?.generation ?? discovery.result.corpus.generation ?? `${discovery.result.corpus.corpus_id} ${discovery.result.corpus.corpus_version}`)
+  }, [discovery])
 
   if (discovery.status === 'loading') return <div className="standard-page"><ObservatoryHeader compact /><main id="main-content" className="standard-page__main discovery-state" aria-busy="true"><span className="discovery-state__spinner" aria-hidden="true" /><h1>Loading source details…</h1><p>Dereferencing the stable published record and its evidence boundary.</p></main><ObservatoryFooter /></div>
 
@@ -153,6 +179,7 @@ export function DatasetDetailsPage() {
   ].map((item) => ({ ...item, url: safeExternalHttpsUrl(item.url) }))
     .filter((item): item is { label: string; url: string } => item.url !== null)
     .filter((item, index, items) => items.findIndex((candidate) => candidate.url === item.url) === index)
+  const catalogGeneration = discovery.result.corpus.publication?.generation ?? discovery.result.corpus.generation ?? `${discovery.result.corpus.corpus_id} ${discovery.result.corpus.corpus_version}`
   const pageUrl = typeof window === 'undefined' ? `/datasets/${encodeURIComponent(datasetId)}` : window.location.href.split('?')[0]
   const correctionBody = [`Record ID: ${record.record_id}`, `Catalog generation: ${discovery.result.corpus.corpus_id} ${discovery.result.corpus.corpus_version}`, `Page URL: ${pageUrl}`, 'Affected field: ', '', 'Authoritative supporting link: ', '', 'Correction description: ', '', 'Do not include the originating search question or protected health information.'].join('\n')
   const correctionHref = `mailto:info@ushso.org?subject=${encodeURIComponent(`Metadata correction: ${record.record_id}`)}&body=${encodeURIComponent(correctionBody)}`
@@ -175,6 +202,7 @@ export function DatasetDetailsPage() {
          {contextualQuestion && <section className="context-relevance" aria-label="Search relevance context"><strong>{searchAssessment ? `${searchAssessment.relevance} relevance in the originating search` : 'Originating search context'}</strong><p>Question: “{contextualQuestion}”</p>{searchAssessment ? <><p>Ranking version: {searchAssessment.ranking_version}. Catalog generation: {searchAssessment.generation}.</p><ul>{searchAssessment.reasons.map((reason, index) => <li key={index}>{reason}</li>)}</ul><p>This is the assessment saved from the originating search, not a scientific-quality or fitness rating.</p></> : <p>No matching search assessment is available on this record lookup. Return to the search results to inspect relevance; no relevance rating is inferred.</p>}</section>}
 
         <SourceSummary dataset={dataset} />
+        <DetailsShortlist recordId={record.record_id} title={dataset.title} sourceName={record.identity.source.name} detailsPath={dataset.detailsUrl} generation={discovery.result.corpus.publication?.generation ?? discovery.result.corpus.generation ?? `${discovery.result.corpus.corpus_id} ${discovery.result.corpus.corpus_version}`} />
         <ResearcherDecisionSummary dataset={dataset} />
 
         <div className="details-grid details-grid--decision">
