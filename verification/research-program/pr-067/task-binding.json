@@ -1,0 +1,85 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr067-local-shortlist-20260914",
+  "slice_id": "C-067-1",
+  "pr_id": "PR-067",
+  "title": "Add a local research shortlist",
+  "owner": "/root/pr067_local_shortlist",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr067-local-shortlist-20260914",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr067-local-shortlist-20260914",
+  "objective": "Users can retain selected sources without needing an account.",
+  "outcome": "Selected product/context IDs, generation and optional user-entered notes are stored locally. No credentials or source payloads enter local storage. Private notes are never automatically sent to enrichment or telemetry. Duplicate clicks do not duplicate a source. Stale entries retain their original context and offer explicit refresh. A user can select sources, navigate away, return and deliberately clear the list. Shortlist success does not mean the source is scientifically suitable. Exactly six data-result-region values remain. plan_research remains disabled. worker/index.mjs does not import enrichment. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-041",
+    "PR-064",
+    "PR-066"
+  ],
+  "owned_paths": [
+    "apps/web/src/lib/shortlist.ts",
+    "apps/web/src/lib/shortlist.test.ts",
+    "apps/web/src/pages/WorkspacePage.tsx",
+    "apps/web/src/pages/WorkspacePage.test.tsx",
+    "apps/web/src/components/ResultCard.tsx",
+    "apps/web/src/components/ResultCard.test.ts",
+    "apps/web/src/App.tsx",
+    "apps/web/src/components/ObservatoryFooter.tsx",
+    "apps/web/src/pages/SearchResultsPage.tsx",
+    "apps/web/src/pages/DatasetDetailsPage.tsx",
+    "apps/web/src/styles.css",
+    "worker/index.mjs",
+    "verification/research-program/pr-067/",
+    "docs/research-program/handoffs/PR-067.json"
+  ],
+  "commits": [
+    {
+      "id": "C-067-1",
+      "subject": "Define a versioned shortlist record",
+      "instructions": "Store selected product/context IDs, generation and optional user-entered notes locally. Keep explicit clear/export controls and a documented storage policy.",
+      "verification": "No credentials or source payloads enter local storage; private notes are never automatically sent to enrichment or telemetry."
+    },
+    {
+      "id": "C-067-2",
+      "subject": "Implement add/remove and restore",
+      "instructions": "Add visible controls on results/detail and a workspace list using canonical IDs. Detect unavailable or changed generations on reload.",
+      "verification": "Duplicate clicks do not duplicate a source; stale entries retain their original context and offer explicit refresh."
+    },
+    {
+      "id": "C-067-3",
+      "subject": "Support accessible shortlist management",
+      "instructions": "Provide keyboard operations, status announcements, empty state and count. Link each selection back to its exact source context.",
+      "verification": "A user can select sources, navigate away, return and deliberately clear the list on desktop/mobile."
+    }
+  ],
+  "check_commands": [
+    "npm test --workspace @ushso/observatory-web -- src/lib/shortlist.test.ts src/pages/WorkspacePage.test.tsx src/components/ResultCard.test.ts",
+    "node --test tests/wp11-attestation.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-067.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-067/",
+  "binding": {
+    "base_sha": "e3083ab2d0170a4b4ca9b9380ebb6841d58f5fe6",
+    "base_tree": "9b53b3d4d4b951b054c44ac3ffa5c00bedbdcb51",
+    "dependency_merge_shas": {
+      "PR-041": "7ee6ef80c438b584d16025ad3f60c24bb8c0c83e",
+      "PR-064": "bf0f7a8806af07dce9d17e4e4eacd72224525e03",
+      "PR-066": "ee5f9f3a1ea22a162bfc7546a7630535e201c1ea"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
