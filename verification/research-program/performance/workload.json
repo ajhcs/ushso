@@ -1,0 +1,24 @@
+{
+  "format": "ushso.pr077-workload.v1",
+  "named_before_measurement": true,
+  "last_good_generation": "live-2026-09-03-85b50522b420",
+  "last_good_corpus_record_count": 3434,
+  "offline_fixture_record_count": 143,
+  "query_mix_source": "packages/retrieval/fixtures/published-queries.jsonl",
+  "cold_definition": "First request after a process start with no prior retrieve/detail in that process. This fixture does not isolate Worker isolate cold starts, CDN, or Hyperdrive.",
+  "warm_definition": "Subsequent requests in the same Node process after the engine is constructed.",
+  "concurrency": { "planned_1x": 1, "planned_2x": 2, "production_peak_rps_candidate": 20, "twice_planned_rps_candidate": 40 },
+  "regions": { "measured": "local_process", "production": "unmeasured" },
+  "source_job_contention": { "user_search_starts_source_jobs": false },
+  "cost_ceilings": {
+    "numeric_budget_usd": null,
+    "owner_deferral_is_zero_dollar_cap": false,
+    "owner_deferral_proves_cheapest_topology": false
+  },
+  "existing_deployment_requirements": {
+    "wp14_record_search_p95_ms": 600,
+    "wp14_record_search_p99_ms": 1500,
+    "historical_all_samples_300ms": "not_met",
+    "silently_weakened": false
+  }
+}
