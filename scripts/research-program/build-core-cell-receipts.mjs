@@ -153,6 +153,32 @@ function namedIntakeReceipts(product, cohortsSha) {
   }));
 }
 
+function overlayCdcNamedColumnCount(receipt, view, cdcIndex) {
+  if (receipt.payload.field !== 'schema_qualification') return receipt;
+  const count = view.named_column_count;
+  const recipe = [
+    receipt.payload.recipe,
+    `Overlay frozen CDC view-index named_column_count from ${CDC_VIEW_INDEX_REL} (gzip sha256=${cdcIndex.fileSha}).`,
+    `view_type=${view.view_type ?? 'unknown'} named_column_count=${count ?? 'unknown'}.`,
+    'Column arrays were not retrieved. named_column_count is not a qualified publisher dictionary or payload sample.',
+    'The separate PLACES 7cmc-7y5g column fixture is a different product and is not substituted here.',
+  ].join(' ');
+  return {
+    ...receipt,
+    evidence_reference: CDC_VIEW_INDEX_REL,
+    evidence_sha256: cdcIndex.fileSha,
+    payload: {
+      ...receipt.payload,
+      status: 'catalog_named_column_count_not_dictionary',
+      recipe,
+      limitation: 'CDC view-index named_column_count is catalog metadata. Column names, types, and payload rows were not retrieved. This is not schema qualification.',
+      payload_success: false,
+      named_column_count: count ?? null,
+      view_type: view.view_type ?? null,
+    },
+  };
+}
+
 function overlayCdcViewIndex(receipt, view, cdcIndex) {
   if (receipt.payload.field !== 'publisher_access') return receipt;
   const native = view.source_native_id;
@@ -351,19 +377,24 @@ export async function buildCatalogMetadataReceipts({ repoRoot = ROOT } = {}) {
           receipt = overlayCmsDescribedBy(receipt, bound, cmsCatalog);
         }
       }
-      if (rec.identity?.source?.source_id === 'cdc-socrata' && field.field === 'publisher_access') {
+      if (rec.identity?.source?.source_id === 'cdc-socrata') {
         const native = rec.identity?.match_fields?.source_id ?? product.anchor?.representative?.native_id ?? null;
         const view = cdcIndex.byRecord.get(rec.record_id) ?? cdcIndex.byNative.get(native);
         if (view) {
-          receipt = overlayCdcViewIndex(receipt, view, cdcIndex);
-          cdcBound.push({
-            product_key: product.product_key,
-            record_id: rec.record_id,
-            source_native_id: view.source_native_id,
-            view_type: view.view_type ?? null,
-            named_column_count: view.named_column_count ?? null,
-            payload_success: false,
-          });
+          if (field.field === 'publisher_access') {
+            receipt = overlayCdcViewIndex(receipt, view, cdcIndex);
+            cdcBound.push({
+              product_key: product.product_key,
+              record_id: rec.record_id,
+              source_native_id: view.source_native_id,
+              view_type: view.view_type ?? null,
+              named_column_count: view.named_column_count ?? null,
+              payload_success: false,
+            });
+          }
+          if (field.field === 'schema_qualification') {
+            receipt = overlayCdcNamedColumnCount(receipt, view, cdcIndex);
+          }
         }
       }
       receipts.push(receipt);

@@ -152,5 +152,7 @@ test('frozen catalog-metadata receipts make 86 resolved and 14 named-intake prod
   assert.equal(places.cells.publisher_access.status, 'catalog_view_index_not_payload');
   assert.equal(places.cells.publisher_access.supported, false);
   assert.ok(places.cells.publisher_access.limitation.includes('payload retrieval were not executed'));
+  assert.equal(places.cells.schema_qualification.status, 'catalog_named_column_count_not_dictionary');
   assert.equal(places.cells.schema_qualification.supported, false);
+  assert.ok(places.cells.schema_qualification.limitation.includes('not schema qualification'));
 });
