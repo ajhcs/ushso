@@ -1,0 +1,88 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr074-browser-discoverability-20260915",
+  "slice_id": "C-074-1",
+  "pr_id": "PR-074",
+  "title": "Verify mobile, browsers and discoverable source pages",
+  "owner": "/root/pr074_browser_discoverability",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr074-browser-discoverability-20260915",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr074-browser-discoverability-20260915",
+  "objective": "Source pages work across viewports and expose useful content to crawlers.",
+  "outcome": "An HTML-only crawler sees meaningful source content from catalog fields. Unknown data fields are not invented for structured markup. Sitemap includes Methods/guides and eligible source pages. Browser-matrix evidence records actual engines and devices; an emulator is not claimed as a physical-device test. Live Chromium, Firefox and WebKit sessions that were not run remain untested, not passed. Native WebMCP remains untested in unsupported browsers and is distinct from ordinary site usability. No blank detail page or silent stale-context substitution. Six result-card regions remain. plan_research remains disabled. worker/index.mjs does not import enrichment. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-058",
+    "PR-065",
+    "PR-066",
+    "PR-069",
+    "PR-073"
+  ],
+  "owned_paths": [
+    "apps/web/src/pages/DatasetDetailsPage.tsx",
+    "apps/web/src/pages/DatasetDetailsPage.test.tsx",
+    "apps/web/src/styles.css",
+    "packages/web-discoverability/src/catalog-html.mjs",
+    "packages/web-discoverability/tests/catalog-html.test.mjs",
+    "worker/index.mjs",
+    "tests/worker-contract.test.mjs",
+    "tests/research-program/browser-matrix.mjs",
+    "tests/research-program/browser-matrix.test.mjs",
+    "verification/research-program/frontend/",
+    "verification/research-program/pr-074/",
+    "docs/research-program/handoffs/PR-074.json"
+  ],
+  "commits": [
+    {
+      "id": "C-074-1",
+      "subject": "Provide bounded public source representations",
+      "instructions": "Reuse web-discoverability interfaces to serve canonical source titles, summaries, evidence/version links and structured metadata in HTML/JSON. Update sitemap with Methods/guides and eligible source pages.",
+      "verification": "An HTML-only crawler sees meaningful source content; unknown data fields are not invented for structured markup."
+    },
+    {
+      "id": "C-074-2",
+      "subject": "Test the browser and viewport matrix",
+      "instructions": "Exercise the same frozen tasks in current Chromium, Firefox and WebKit/Safari-equivalent coverage with 320/390/768/1440px layouts and zoom checks.",
+      "verification": "Record actual engines/devices; an emulator is not claimed as a physical-device test."
+    },
+    {
+      "id": "C-074-3",
+      "subject": "Verify navigation and loading failures",
+      "instructions": "Test direct deep links, Back/Forward, slow/offline assets, invalid records and changed generations. Keep a first useful result visible promptly on mobile.",
+      "verification": "No blank detail page or silent stale-context substitution; sitemap and canonical URLs resolve to their intended content."
+    }
+  ],
+  "check_commands": [
+    "node --test packages/web-discoverability/tests/catalog-html.test.mjs tests/research-program/browser-matrix.test.mjs tests/worker-contract.test.mjs",
+    "node tests/research-program/browser-matrix.mjs",
+    "npm test --workspace @ushso/observatory-web -- src/pages/DatasetDetailsPage.test.tsx src/components/ResultCard.test.ts",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-074.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-074/",
+  "binding": {
+    "base_sha": "d9b499668cffb1a78b4430444997fe63aa56811c",
+    "base_tree": "b80d8925a77763d0cea40160391b43a1d97b20dd",
+    "dependency_merge_shas": {
+      "PR-058": "7ebaded20cd1ece299a9611eace8eed884544e09",
+      "PR-065": "d7055ec29a4ceef0128b79e14fda57e48011e27f",
+      "PR-066": "ee5f9f3a1ea22a162bfc7546a7630535e201c1ea",
+      "PR-069": "74436f9947c58cb8cc2ce1e6396b43e601a02a31",
+      "PR-073": "75d25d675d1b2309286cabe765dbcec1862ef205"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
