@@ -105,7 +105,7 @@ test('validated core-cell receipts can fill unknown cells; unknown remains unsup
   assert.equal(issued.failed_matrix_retained, true);
 });
 
-test('frozen catalog-metadata receipts make 86 resolved and 14 named-intake products known-unsupported; catalog_record stays unknown for intake; R04 stays unaccepted', () => {
+test('frozen catalog-metadata receipts make 86 resolved and 14 named-intake products known-unsupported; named-intake catalog_record is known missing, not unknown; R04 stays unaccepted', () => {
   const receipt = issueCoreQualificationReceipt(cohort);
   const resolved = receipt.matrix.rows.filter((row) => row.source_context.anchor_status === 'resolved_catalog_record');
   const intake = receipt.matrix.rows.filter((row) => row.source_context.anchor_status === 'named_intake');
@@ -120,7 +120,7 @@ test('frozen catalog-metadata receipts make 86 resolved and 14 named-intake prod
   }
   for (const row of intake) {
     assert.equal(row.cells.catalog_record.supported, false, row.product_key);
-    assert.equal(row.cells.catalog_record.unknown, true, row.product_key);
+    assert.equal(row.cells.catalog_record.unknown, false, row.product_key);
     assert.equal(row.cells.catalog_record.status, 'named_intake', row.product_key);
     for (const field of ['publisher_access', 'schema_qualification', 'join_route', 'unit_grain_date_denominator']) {
       assert.equal(row.cells[field].supported, false, row.product_key);

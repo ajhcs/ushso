@@ -38,7 +38,11 @@ export function essentialOutcomes(product, { cellEvidence = {} } = {}) {
   const intake = anchor.status === 'named_intake';
   const restricted = ['restricted_or_manual_route', 'pending_source_intake', 'mixed_public_and_restricted'].includes(product.access_expectation);
   const cells = freeze({
-    catalog_record: freeze({ status: catalog ? 'resolved' : (intake ? 'named_intake' : 'unknown'), supported: catalog, unknown: !catalog }),
+    catalog_record: freeze({
+      status: catalog ? 'resolved' : (intake ? 'named_intake' : 'unknown'),
+      supported: catalog,
+      unknown: !catalog && !intake,
+    }),
     release_distinction: freeze({ status: product.product_release_distinction ? 'documented' : 'unknown', supported: Boolean(product.product_release_distinction), unknown: !product.product_release_distinction }),
     access_expectation: freeze({ status: product.access_expectation ?? 'unknown', supported: false, unknown: product.access_expectation == null, note: 'access_expectation_is_not_proof' }),
     publisher_access: evidenceCell(cellEvidence.publisher_access, 'unknown'),
