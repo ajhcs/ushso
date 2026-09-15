@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { assembleAcceptanceIndex, LAST_GOOD_GENERATION, REVIEW_AUTHORITY } from '../pr-081/assemble-index.mjs';
+import { assembleAcceptanceIndex, LAST_GOOD_GENERATION, REVIEW_AUTHORITY } from './assemble-index.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
