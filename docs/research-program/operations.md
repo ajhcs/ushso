@@ -22,6 +22,6 @@ Redirect destination and resource-role drift are monitored separately from HTTP 
 
 ## Runtime activation
 
-Public Worker has no source credentials and no source-fetch capability. Rendered public Wrangler configuration uses the fail-closed foundation placeholder. Scheduler and harvest default exports remain disabled.
+Public Worker has no source credentials and no source-fetch capability. Rendered public Wrangler configuration remains the WP3-generated fail-closed foundation placeholder. This PR does not edit generated Wrangler files. Public-worker no-credential and no-source-fetch bounds are asserted from owned harvest-worker activation evidence. Scheduler and harvest default exports remain disabled.
 
 Fixture/staging cycles may be recorded as `fixture_only`. Two complete scheduled cycles remain **unrun until authorized**. Production activation is separately receipted and is not issued by this PR.
