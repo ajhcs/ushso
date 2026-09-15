@@ -5,7 +5,7 @@
   "owner": "/root/pr074_browser_discoverability",
   "reviewer": "Astra/root",
   "base_sha": "d9b499668cffb1a78b4430444997fe63aa56811c",
-  "head_sha": "00280ea70e0f04e50144b36252cb930f66cde6ea",
+  "head_sha": "dfbfb2f5def777733ac8db0f2e59d81cd4dcabe7",
   "dependency_merge_shas": {
     "PR-058": "7ebaded20cd1ece299a9611eace8eed884544e09",
     "PR-065": "d7055ec29a4ceef0128b79e14fda57e48011e27f",
@@ -19,8 +19,8 @@
     "apps/web/src/pages/DatasetDetailsPage.tsx",
     "apps/web/src/pages/DatasetDetailsPage.test.tsx",
     "apps/web/src/styles.css",
-    "packages/web-discoverability/src/catalog-html.mjs",
-    "packages/web-discoverability/tests/catalog-html.test.mjs",
+    "tests/research-program/catalog-html.test.mjs",
+    "worker/catalog-html.mjs",
     "worker/index.mjs",
     "tests/worker-contract.test.mjs",
     "tests/research-program/browser-matrix.mjs",
@@ -46,20 +46,25 @@
       "id": "C-074-3",
       "subject": "Verify navigation and loading failures",
       "sha": "00280ea70e0f04e50144b36252cb930f66cde6ea"
+    },
+    {
+      "id": "C-074-4",
+      "subject": "Keep WP13 web-discoverability sealed",
+      "sha": "dfbfb2f5def777733ac8db0f2e59d81cd4dcabe7"
     }
   ],
   "source_identities": [
     {
       "kind": "catalog-html",
-      "id": "packages/web-discoverability/src/catalog-html.mjs",
+      "id": "worker/catalog-html.mjs",
       "location": "local",
-      "sha256": "23e9f27c87e12df82397bd8824c99bb9b17fea15f22f1a9587aa16a47e28831d"
+      "sha256": "102a5cea0793f971f1f5c73f334c2b8fff4403863904c1e710b1e1a7fc47975a"
     },
     {
       "kind": "worker",
       "id": "worker/index.mjs",
       "location": "local",
-      "sha256": "249de7fa6f15db523b737d7378724f8f31dd9665bdcc61381269b9f5046325f5"
+      "sha256": "394ba9a248f81c045de510050c9d8f37b55c579eb4b49a66259f545e44415ec5"
     },
     {
       "kind": "details-page",
@@ -77,7 +82,7 @@
       "kind": "browser-matrix",
       "id": "tests/research-program/browser-matrix.mjs",
       "location": "local",
-      "sha256": "1bb68450500198d9ec5a2c1916b67fae26ae6a83a986102de583092dac4f8feb"
+      "sha256": "e8941832554d31cfa587a6fe3cffd9de04f7eb37976a76960d2c933c2c261103"
     },
     {
       "kind": "result-card-unchanged-regions",
@@ -90,14 +95,20 @@
       "id": "packages/identity/src/schema-catalog.mjs",
       "location": "local",
       "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "sealed-wp13-index-unchanged",
+      "id": "packages/web-discoverability/src/index.mjs",
+      "location": "local",
+      "sha256": "c27594d8f0fdff3cfb67897c89c98bb220dd1981ca51275881d976dd12d878d7"
     }
   ],
   "commands": [
     {
       "id": "cmd-c074-crawler",
-      "command": "node --test packages/web-discoverability/tests/catalog-html.test.mjs tests/research-program/browser-matrix.test.mjs tests/worker-contract.test.mjs",
-      "started_at": "2026-09-15T03:31:06.655260Z",
-      "completed_at": "2026-09-15T03:31:06.918404Z",
+      "command": "node --test tests/research-program/catalog-html.test.mjs tests/research-program/browser-matrix.test.mjs tests/worker-contract.test.mjs",
+      "started_at": "2026-09-15T03:45:19.023381Z",
+      "completed_at": "2026-09-15T03:45:19.283841Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "HTML-only crawlers see catalog source facts; sitemap includes Learn and Methods; unknown structured fields stay unknown.",
@@ -112,15 +123,15 @@
       "event_source": {
         "id": "cmd-c074-crawler-event",
         "path": "verification/research-program/pr-074/producer-20260915/commands/crawler/event.json",
-        "sha256": "19dbfa240b9fea1903ab5599e61bde7acc2499b14837aeb6482d693d9e4c9469",
-        "bytes": 1210
+        "sha256": "b81bb27863dede8ab9af3c5a256679118bc375a156b6aa32c6faab611b4168d3",
+        "bytes": 1198
       }
     },
     {
       "id": "cmd-c074-matrix",
       "command": "node tests/research-program/browser-matrix.mjs",
-      "started_at": "2026-09-15T03:31:06.918882Z",
-      "completed_at": "2026-09-15T03:31:06.960309Z",
+      "started_at": "2026-09-15T03:45:19.284343Z",
+      "completed_at": "2026-09-15T03:45:19.320939Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "Browser-matrix log records untested engines and does not claim physical devices or WebMCP.",
@@ -135,15 +146,15 @@
       "event_source": {
         "id": "cmd-c074-matrix-event",
         "path": "verification/research-program/pr-074/producer-20260915/commands/matrix-cli/event.json",
-        "sha256": "b6d727334438679ae55cfb9412df3d492e5c60c9c36ff993addbcfa5d3d6e258",
+        "sha256": "97b44af4c91a4629223d4ccf8a794af820ec7e09c4e80e53efd414b303f3c8b5",
         "bytes": 1068
       }
     },
     {
       "id": "cmd-c074-focused",
       "command": "npm test --workspace @ushso/observatory-web -- src/pages/DatasetDetailsPage.test.tsx src/components/ResultCard.test.ts",
-      "started_at": "2026-09-15T03:31:06.960693Z",
-      "completed_at": "2026-09-15T03:31:08.388435Z",
+      "started_at": "2026-09-15T03:45:19.321441Z",
+      "completed_at": "2026-09-15T03:45:20.954032Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "Missing records render a not-found page; six result-card regions remain.",
@@ -158,15 +169,15 @@
       "event_source": {
         "id": "cmd-c074-focused-event",
         "path": "verification/research-program/pr-074/producer-20260915/commands/focused-web/event.json",
-        "sha256": "88efa46b6cd7a86cc481d051824c5499713ee23b5b2bdd03b1429b6d3795ac8d",
+        "sha256": "30b8b654ea4a3b5994a1884bf57e8cc9d6a0488a0da12381e29999924cbe6fbb",
         "bytes": 1159
       }
     },
     {
       "id": "cmd-c074-identity",
       "command": "node packages/identity/tools/validate.mjs",
-      "started_at": "2026-09-15T03:31:08.388830Z",
-      "completed_at": "2026-09-15T03:31:08.454241Z",
+      "started_at": "2026-09-15T03:45:20.954498Z",
+      "completed_at": "2026-09-15T03:45:21.020695Z",
       "exit_code": 0,
       "completion_status": "completed",
       "result": "Sealed identity package validates.",
@@ -181,8 +192,31 @@
       "event_source": {
         "id": "cmd-c074-identity-event",
         "path": "verification/research-program/pr-074/producer-20260915/commands/identity-validate/event.json",
-        "sha256": "df653ca048f071081718630622583f00b56999db9780e71cb057c533e90f421d",
+        "sha256": "2463b08fc8c1d8a388cd2f49ec126dbc68f41a68b961dd5e9e271b14b69e8c68",
         "bytes": 1027
+      }
+    },
+    {
+      "id": "cmd-c074-wp13",
+      "command": "node --test verification/wp13/v1.0.0/tests/wp13-candidate.test.mjs",
+      "started_at": "2026-09-15T03:45:21.021187Z",
+      "completed_at": "2026-09-15T03:45:21.239079Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "WP13 sealed web-discoverability candidate still validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c074-wp13-event",
+        "path": "verification/research-program/pr-074/producer-20260915/commands/wp13/event.json",
+        "sha256": "c5dead3977721f0feb9a19fb6f03b08573796ce2e9b27f70665b141fea5dd8a4",
+        "bytes": 1045
       }
     }
   ],
@@ -190,14 +224,14 @@
     {
       "id": "pr074-artifact-0",
       "path": "verification/research-program/pr-074/task-binding.json",
-      "bytes": 4666,
-      "sha256": "e5c19f53f990979dccd6c60a4d2e17400e6fc6bb2003128e6d8e6cd6cedd359f"
+      "bytes": 4616,
+      "sha256": "ea130cf61a3a986e5fbd7ee92bc9ef7d8dcd46930e3f4fda5c38cb552911dd70"
     },
     {
       "id": "pr074-artifact-1",
       "path": "verification/research-program/pr-074/dispatch.json",
-      "bytes": 2755,
-      "sha256": "12624a780d889e367280203c02eb568a398cc551f997c15f923e48b0e2a494db"
+      "bytes": 2717,
+      "sha256": "7c60a4c075b82c45fbe6793224ffd4f2b2c11da3b9ddfc70daa98f80532f42cc"
     },
     {
       "id": "pr074-artifact-2",
@@ -214,14 +248,14 @@
     {
       "id": "pr074-artifact-4",
       "path": "verification/research-program/pr-074/producer-20260915/commands/crawler/receipt.json",
-      "bytes": 555,
-      "sha256": "5ebca2356bd57ed659abdf715dde9d332f371921a54f669e4ebff6e00a84eb92"
+      "bytes": 543,
+      "sha256": "48b9deb90dfdd27be556ee88536bf2846cef02bb1eabb6f4bc4b3c5cc5c49bf3"
     },
     {
       "id": "pr074-artifact-5",
       "path": "verification/research-program/pr-074/producer-20260915/commands/crawler/stdout.log",
-      "bytes": 1143,
-      "sha256": "90c1b950730e00123c4632b29442b6ea023038617c565df6a9a7c543262d97ba"
+      "bytes": 1145,
+      "sha256": "b58eefc084d4f71971cc923ca0c633ee976e4673236dd40454e32d1705d58f47"
     },
     {
       "id": "pr074-artifact-6",
@@ -232,14 +266,14 @@
     {
       "id": "pr074-artifact-7",
       "path": "verification/research-program/pr-074/producer-20260915/commands/crawler/event.json",
-      "bytes": 1210,
-      "sha256": "19dbfa240b9fea1903ab5599e61bde7acc2499b14837aeb6482d693d9e4c9469"
+      "bytes": 1198,
+      "sha256": "b81bb27863dede8ab9af3c5a256679118bc375a156b6aa32c6faab611b4168d3"
     },
     {
       "id": "pr074-artifact-8",
       "path": "verification/research-program/pr-074/producer-20260915/commands/matrix-cli/receipt.json",
       "bytes": 437,
-      "sha256": "5c22ffbc602d1edfd7fa235d784f165ddee84797ea63b13f9320618f2d16b491"
+      "sha256": "15564e3a198a15cf21347bba40b762c5f99715c330f3791ad9aa6314da3cb050"
     },
     {
       "id": "pr074-artifact-9",
@@ -257,19 +291,19 @@
       "id": "pr074-artifact-11",
       "path": "verification/research-program/pr-074/producer-20260915/commands/matrix-cli/event.json",
       "bytes": 1068,
-      "sha256": "b6d727334438679ae55cfb9412df3d492e5c60c9c36ff993addbcfa5d3d6e258"
+      "sha256": "97b44af4c91a4629223d4ccf8a794af820ec7e09c4e80e53efd414b303f3c8b5"
     },
     {
       "id": "pr074-artifact-12",
       "path": "verification/research-program/pr-074/producer-20260915/commands/focused-web/receipt.json",
       "bytes": 544,
-      "sha256": "7e91563073ef24ccb62d6de95897ba68778bb94602f298479d6f7b3a17cdc16a"
+      "sha256": "3181c313e5cdbb9b1ec4fcf69b29420ae3db15df3b2c310f1b18b6034f740ca3"
     },
     {
       "id": "pr074-artifact-13",
       "path": "verification/research-program/pr-074/producer-20260915/commands/focused-web/stdout.log",
       "bytes": 543,
-      "sha256": "236a3f48b85c7f546936eb7e597f891eadf7ed22dc2763e36d228e58206487fc"
+      "sha256": "43c561b78ff57d2e6baf4fe8c7c87e086ec2ef1e3997215e538c77d6e269b27a"
     },
     {
       "id": "pr074-artifact-14",
@@ -281,13 +315,13 @@
       "id": "pr074-artifact-15",
       "path": "verification/research-program/pr-074/producer-20260915/commands/focused-web/event.json",
       "bytes": 1159,
-      "sha256": "88efa46b6cd7a86cc481d051824c5499713ee23b5b2bdd03b1429b6d3795ac8d"
+      "sha256": "30b8b654ea4a3b5994a1884bf57e8cc9d6a0488a0da12381e29999924cbe6fbb"
     },
     {
       "id": "pr074-artifact-16",
       "path": "verification/research-program/pr-074/producer-20260915/commands/identity-validate/receipt.json",
       "bytes": 438,
-      "sha256": "235f516492ab754783a007902a359379b6a4074071c7a435adfafe830c5fb071"
+      "sha256": "8cfa0f4302022b8a811ea0856d1a98ec46c2f851190da92fae88420142ac57e1"
     },
     {
       "id": "pr074-artifact-17",
@@ -305,7 +339,31 @@
       "id": "pr074-artifact-19",
       "path": "verification/research-program/pr-074/producer-20260915/commands/identity-validate/event.json",
       "bytes": 1027,
-      "sha256": "df653ca048f071081718630622583f00b56999db9780e71cb057c533e90f421d"
+      "sha256": "2463b08fc8c1d8a388cd2f49ec126dbc68f41a68b961dd5e9e271b14b69e8c68"
+    },
+    {
+      "id": "pr074-artifact-20",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/wp13/receipt.json",
+      "bytes": 458,
+      "sha256": "c22261e0349bc984880b436922974b1b9c25f84a23789ac61766ab45f01ebcb2"
+    },
+    {
+      "id": "pr074-artifact-21",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/wp13/stdout.log",
+      "bytes": 1497,
+      "sha256": "f4655fef15ab8837337eaa74a3c25c5575ce966445ef7710dbcb51b0c175d443"
+    },
+    {
+      "id": "pr074-artifact-22",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/wp13/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr074-artifact-23",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/wp13/event.json",
+      "bytes": 1045,
+      "sha256": "c5dead3977721f0feb9a19fb6f03b08573796ce2e9b27f70665b141fea5dd8a4"
     }
   ],
   "acceptance_results": [
@@ -332,7 +390,8 @@
       "command_ids": [
         "cmd-c074-crawler",
         "cmd-c074-focused",
-        "cmd-c074-identity"
+        "cmd-c074-identity",
+        "cmd-c074-wp13"
       ]
     }
   ],
