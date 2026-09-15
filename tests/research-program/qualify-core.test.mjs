@@ -155,4 +155,13 @@ test('frozen catalog-metadata receipts make 86 resolved and 14 named-intake prod
   assert.equal(places.cells.schema_qualification.status, 'catalog_named_column_count_not_dictionary');
   assert.equal(places.cells.schema_qualification.supported, false);
   assert.ok(places.cells.schema_qualification.limitation.includes('not schema qualification'));
+  const acs = receipt.matrix.rows.find((row) => row.product_key === 'census-acs-5year-data-profiles');
+  assert.equal(acs.cells.publisher_access.status, 'census_catalog_native_id_not_payload');
+  assert.equal(acs.cells.publisher_access.supported, false);
+  assert.ok(acs.cells.publisher_access.limitation.includes('Vintage-mismatched catalog-slim'));
+  assert.equal(acs.cells.join_route.status, 'documented_join_fixture_not_qualified');
+  assert.equal(acs.cells.join_route.supported, false);
+  assert.ok(acs.cells.join_route.limitation.includes('Independently qualified routes remain 0'));
+  assert.equal(hcris.cells.join_route.status, 'documented_join_fixture_not_qualified');
+  assert.equal(hcris.cells.join_route.supported, false);
 });

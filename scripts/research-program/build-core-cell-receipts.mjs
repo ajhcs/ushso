@@ -15,6 +15,21 @@ const CORPUS_REL = 'packages/retrieval/versions/v1.2.0/corpus';
 const CMS_CATALOG_REL = 'verification/research-program/pr-013/fixtures/cms-catalog-slim.json.gz';
 const CDC_VIEW_INDEX_REL = 'verification/research-program/pr-014/fixtures/cdc-view-index.json.gz';
 const COHORTS_REL = 'evaluation/research-program/cohorts.json';
+const JOIN_FIXTURE_REL = 'evaluation/research-program/joins/priority-routes.json';
+
+const DOCUMENTED_JOIN_ROUTES_BY_PRODUCT = Object.freeze({
+  'cms-hcris-hospital-provider-cost-report': Object.freeze(['hcris-nppes', 'hcris-pos', 'hcris-census-county', 'hcris-phc4', 'hcris-cost-report-year', 'hcris-worksheet-g3']),
+  'cdc-places-local-data-for-better-health': Object.freeze(['places-census-county', 'places-acs-county', 'places-measure-year']),
+  'census-acs-5year-data-profiles': Object.freeze(['acs-census-tract', 'places-acs-county', 'acs-table-year', 'census-geoid-vintage']),
+  'census-acs-1year-data-profiles': Object.freeze(['acs-census-tract', 'places-acs-county', 'acs-table-year', 'census-geoid-vintage']),
+  'census-acs-5year-subject-tables': Object.freeze(['acs-census-tract', 'acs-table-year', 'census-geoid-vintage']),
+  'census-acs-5year-detailed-tables': Object.freeze(['acs-census-tract', 'acs-table-year', 'census-geoid-vintage']),
+  'census-acs-5year-comparison-profiles': Object.freeze(['acs-census-tract', 'acs-table-year', 'census-geoid-vintage']),
+  'census-acs-5year-pums': Object.freeze(['census-geoid-vintage']),
+  'census-acs-1year-pums': Object.freeze(['census-geoid-vintage']),
+  'census-acs-1year-selected-population-profiles': Object.freeze(['acs-census-tract', 'acs-table-year', 'census-geoid-vintage']),
+  'census-acs-5year-aian-detailed-tables': Object.freeze(['acs-census-tract', 'acs-table-year', 'census-geoid-vintage']),
+});
 
 function sha256File(abs) {
   return createHash('sha256').update(readFileSync(abs)).digest('hex');
@@ -207,6 +222,58 @@ function overlayCdcViewIndex(receipt, view, cdcIndex) {
   };
 }
 
+function overlayCensusNativeId(receipt, rec, hit) {
+  if (receipt.payload.field !== 'publisher_access') return receipt;
+  if (rec.identity?.source?.source_id !== 'census-api') return receipt;
+  const native = rec.identity?.match_fields?.source_id ?? rec.authoritative_url ?? null;
+  const recipe = [
+    receipt.payload.recipe,
+    `Census native catalog identifier ${native ?? 'absent'} is taken from frozen corpus ${hit.fileRel} line ${hit.line}.`,
+    'The PR-015 census-catalog-slim vintages do not match these frozen identities and were not overlaid.',
+    'The PR-009 keyless ACS HTML receipt is an unmatched historical observation and is not bound to 2024 products.',
+    'Do not request Census API rows. HTTP 200 HTML is not a tested payload sample.',
+  ].join(' ');
+  return {
+    ...receipt,
+    payload: {
+      ...receipt.payload,
+      status: 'census_catalog_native_id_not_payload',
+      recipe,
+      limitation: 'Frozen Census catalog metadata records a native dataset identifier. Dataset contents, API keys, and payload retrieval were not executed. Vintage-mismatched catalog-slim rows and keyless HTML are not this product.',
+      payload_success: false,
+      native_catalog_id: native,
+    },
+  };
+}
+
+function overlayDocumentedJoinFixtures(receipt, product, joinFixture) {
+  if (receipt.payload.field !== 'join_route') return receipt;
+  const routeIds = DOCUMENTED_JOIN_ROUTES_BY_PRODUCT[product.product_key];
+  if (!Array.isArray(routeIds) || routeIds.length === 0) return receipt;
+  const present = new Set((joinFixture.data.routes ?? []).map((route) => route.route_id));
+  const missing = routeIds.filter((id) => !present.has(id));
+  if (missing.length) throw new Error(`JOIN_FIXTURE_ROUTE_MISSING:${missing.join(',')}`);
+  const recipe = [
+    receipt.payload.recipe,
+    `Documented join fixture routes from ${JOIN_FIXTURE_REL} (sha256=${joinFixture.fileSha}): ${routeIds.join(', ')}.`,
+    'These routes are documented fixtures, not independently qualified joins. CCN is never NPI. Tiny samples cannot report a universal match rate.',
+  ].join(' ');
+  return {
+    ...receipt,
+    evidence_reference: JOIN_FIXTURE_REL,
+    evidence_sha256: joinFixture.fileSha,
+    payload: {
+      ...receipt.payload,
+      status: 'documented_join_fixture_not_qualified',
+      recipe,
+      limitation: 'Fifteen documented priority join routes exist as fixtures. Independently qualified routes remain 0. SQL success is not join validity. CCN=NPI is forbidden.',
+      independently_qualified: false,
+      documented_route_ids: routeIds,
+      ccn_equals_npi: false,
+    },
+  };
+}
+
 function overlayCmsDescribedBy(receipt, bound, cmsCatalog) {
   if (receipt.payload.field !== 'schema_qualification') return receipt;
   const describedBy = cmsCatalog.capture.data?.dataset?.[bound.catalog_index]?.describedBy ?? null;
@@ -272,8 +339,15 @@ export async function buildCatalogMetadataReceipts({ repoRoot = ROOT } = {}) {
   const cmsBound = [];
   const cdcBound = [];
   const intakeBound = [];
+  const censusBound = [];
+  const joinBound = [];
   const cohortsRelAbs = path.join(repoRoot, COHORTS_REL);
   const cohortsSha = sha256File(cohortsRelAbs);
+  const joinFixture = {
+    data: JSON.parse(readFileSync(path.join(repoRoot, JOIN_FIXTURE_REL), 'utf8')),
+    fileSha: sha256File(path.join(repoRoot, JOIN_FIXTURE_REL)),
+  };
+  if ((joinFixture.data.routes ?? []).length !== 15) throw new Error('JOIN_FIXTURE_ROUTE_COUNT_NOT_15');
   for (const product of cohorts.products) {
     const rid = product.anchor?.representative?.record_id ?? null;
     const status = product.anchor?.status;
@@ -397,14 +471,34 @@ export async function buildCatalogMetadataReceipts({ repoRoot = ROOT } = {}) {
           }
         }
       }
+      if (rec.identity?.source?.source_id === 'census-api' && field.field === 'publisher_access') {
+        receipt = overlayCensusNativeId(receipt, rec, hit);
+        censusBound.push({
+          product_key: product.product_key,
+          record_id: rec.record_id,
+          native_catalog_id: rec.identity?.match_fields?.source_id ?? null,
+          payload_success: false,
+        });
+      }
+      if (field.field === 'join_route') {
+        const before = receipt;
+        receipt = overlayDocumentedJoinFixtures(receipt, product, joinFixture);
+        if (receipt !== before) {
+          joinBound.push({
+            product_key: product.product_key,
+            documented_route_ids: receipt.payload.documented_route_ids,
+            independently_qualified: false,
+          });
+        }
+      }
       receipts.push(receipt);
     }
   }
-  return { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex, intakeBound, cohortsSha };
+  return { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex, intakeBound, censusBound, joinBound, cohortsSha, joinFixture };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex, intakeBound, cohortsSha } = await buildCatalogMetadataReceipts();
+  const { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex, intakeBound, censusBound, joinBound, cohortsSha, joinFixture } = await buildCatalogMetadataReceipts();
   const dir = path.join(ROOT, 'verification/research-program/evidence/receipts');
   mkdirSync(dir, { recursive: true });
   const bundle = {
@@ -417,6 +511,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     cms_distribution_products: cmsBound.length,
     cdc_view_index_products: cdcBound.length,
     named_intake_products: intakeBound.length,
+    census_native_id_products: censusBound.length,
+    documented_join_products: joinBound.length,
     cohorts_sha256: cohortsSha,
     cms_catalog_gzip_sha256: cmsCatalog.fileSha,
     cms_catalog_uncompressed_sha256: cmsCatalog.uncompressedSha,
@@ -463,5 +559,28 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     products: intakeBound,
     note: 'Unverified locators in frozen cohorts.json are not publisher access, verified restricted routes, or payload samples. Locators were not fetched.',
   }, null, 2)}\n`);
-  process.stdout.write(`${JSON.stringify({ receipt_count: receipts.length, unresolved: unresolved.length, products_covered: receipts.length / 4, cms_bound: cmsBound.length, cdc_bound: cdcBound.length, intake_bound: intakeBound.length }, null, 2)}\n`);
+  writeFileSync(path.join(ROOT, 'verification/research-program/evidence/census-native-id-locator-summary.json'), `${JSON.stringify({
+    format: 'ushso.census-native-id-locator-summary.v1',
+    generation: LAST_GOOD_GENERATION,
+    products_bound: censusBound.length,
+    payload_success: false,
+    bounded_sample: false,
+    live_http: false,
+    vintage_mismatched_catalog_slim_not_overlaid: true,
+    keyless_html_not_bound_to_2024_products: true,
+    products: censusBound,
+    note: 'Frozen Census native catalog identifiers are not payload samples.',
+  }, null, 2)}\n`);
+  writeFileSync(path.join(ROOT, 'verification/research-program/evidence/documented-join-fixture-summary.json'), `${JSON.stringify({
+    format: 'ushso.documented-join-fixture-summary.v1',
+    generation: LAST_GOOD_GENERATION,
+    evidence_reference: JOIN_FIXTURE_REL,
+    evidence_sha256: joinFixture.fileSha,
+    documented_routes: 15,
+    independently_qualified_routes: 0,
+    ccn_equals_npi: false,
+    products: joinBound,
+    note: 'Documented join fixtures are not independently qualified routes.',
+  }, null, 2)}\n`);
+  process.stdout.write(`${JSON.stringify({ receipt_count: receipts.length, unresolved: unresolved.length, products_covered: receipts.length / 4, cms_bound: cmsBound.length, cdc_bound: cdcBound.length, intake_bound: intakeBound.length, census_bound: censusBound.length, join_bound: joinBound.length }, null, 2)}\n`);
 }
