@@ -122,4 +122,14 @@ describe('identity-bound research-use guidance', () => {
     expect(correction).toContain('Affected field:')
     expect(correction).not.toContain('contextualQuestion')
   })
+
+  it('does not render a blank detail page when the record is missing from a successful envelope', async () => {
+    const { readFile } = await import('node:fs/promises')
+    const { fileURLToPath } = await import('node:url')
+    const repositoryRoot = fileURLToPath(new URL('../../../../', import.meta.url))
+    const page = await readFile(`${repositoryRoot}apps/web/src/pages/DatasetDetailsPage.tsx`, 'utf8')
+    expect(page).toContain('No published record has this identifier in the current catalog generation')
+    expect(page).toContain('A missing record is not replaced with a silent stale-context page')
+    expect(page).not.toContain('if (!dataset) return null')
+  })
 })

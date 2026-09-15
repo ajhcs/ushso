@@ -150,7 +150,9 @@ export function DatasetDetailsPage() {
   }
 
   const dataset = findDatasetInResponse(discovery.result, datasetId)
-  if (!dataset) return null
+  if (!dataset) {
+    return <div className="standard-page"><ObservatoryHeader compact /><main id="main-content" className="standard-page__main discovery-state discovery-state--error" role="alert"><h1>Dataset record not found</h1><p>No published record has this identifier in the current catalog generation. A missing record is not replaced with a silent stale-context page.</p><Link className="button-link" to="/search">Browse published sources</Link></main><ObservatoryFooter /></div>
+  }
 
   const record = dataset.canonicalResult.record
   const metadata = dataset.canonicalResult.metadata
