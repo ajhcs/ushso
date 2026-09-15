@@ -1,4 +1,5 @@
 import { Code2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { PageTitle } from '../components/PageTitle'
@@ -43,6 +44,7 @@ export function AgentsPage() {
 
         <section className="api-guide" aria-labelledby="api-quick-start">
           <h2 id="api-quick-start">Quick start</h2>
+          <p><Link to="/learn#developer-quick-start">Read the beginner developer and MCP guide</Link>. Code examples keep exact wire names and never embed a credential.</p>
           <p>Send a JSON question to the discovery endpoint. Requests are limited to 20 KiB. The response excerpt below is generated from the versioned 3,434-record production corpus and checked against its reviewed leading record.</p>
           <pre><code>{curlExample}</code></pre>
           <h3>Response shape</h3>
