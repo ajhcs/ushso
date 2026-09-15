@@ -121,8 +121,8 @@ export function qualifyRelease({
     secret_changed: false,
     production_changed: false,
     rollback_target: freeze({
-      production_worker: 'ecc1603f-9eb4-4a1b-a566-bd9d7a415de4',
-      note: 'Historical 2026-09-09 production identity. This packet does not change it.',
+      version_id: 'ecc1603f-9eb4-4a1b-a566-bd9d7a415de4',
+      note: 'Rollback version retained by the September 14 production deployment; not the current deployed version. Reverify before rollout.',
     }),
     http_200_is_completed_research_task: false,
     passing_schema_is_scientific_approval: false,

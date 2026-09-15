@@ -38,11 +38,16 @@ export function observeOperations({
 } = {}) {
   if (index.generation !== LAST_GOOD_GENERATION) fail('LAST_GOOD_GENERATION_CHANGED');
   if (observation.generated_dates === true || observation.simulated_operation === true) fail('GENERATED_DATES_OR_SIMULATION_FORBIDDEN');
-  if (observation.elapsed_observation_days < REQUIRED_ELAPSED_DAYS || observation.complete_scheduled_cycles < REQUIRED_SCHEDULED_CYCLES) {
-    // keep unverified; do not invent days/cycles
+  for (const key of ['elapsed_observation_days', 'complete_scheduled_cycles']) {
+    if (!Number.isSafeInteger(observation[key]) || observation[key] < 0) fail('INVALID_OBSERVATION_COUNT', key);
   }
-  if (observation.scheduler_created === true && observation.scheduler_ran === true && observation.complete_scheduled_cycles === 0) {
-    fail('SCHEDULER_CREATED_COUNTED_AS_RAN');
+  for (const key of ['generated_dates', 'simulated_operation', 'scheduler_created', 'scheduler_ran']) {
+    if (typeof observation[key] !== 'boolean') fail('INVALID_OBSERVATION_FLAG', key);
+  }
+  // This is the PR-084 zero-observation snapshot, not an evidence ingestion API.
+  // Positive claims require a separately reviewed, deployment-bound receipt path.
+  if (observation.elapsed_observation_days !== 0 || observation.complete_scheduled_cycles !== 0 || observation.scheduler_ran) {
+    fail('OBSERVATION_RECEIPTS_REQUIRED', 'This snapshot cannot attest elapsed days or cycles from caller-supplied counters.');
   }
 
   const requirements = (index.requirements ?? []).map((row) => {

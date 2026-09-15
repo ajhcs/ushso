@@ -63,3 +63,69 @@ test('generated participants and implementer self-tests cannot satisfy R12', () 
   assert.throws(() => scoreUsability({ assignments: { ...assignments, generated_participants: true } }), { code: 'GENERATED_PARTICIPANTS_FORBIDDEN' });
   assert.throws(() => scoreUsability({ assignments: { ...assignments, implementer_self_tests: true } }), { code: 'IMPLEMENTER_SELF_TESTS_CANNOT_SATISFY_R12' });
 });
+
+// Synthetic records below exercise validation only; they are not acceptance witnesses.
+function syntheticSessions() {
+  const assignments = JSON.parse(fs.readFileSync(path.join(ROOT, 'evaluation/research-program/usability/assignments.json'), 'utf8'));
+  const sessions = { consented_sessions: [], critical_misinterpretations: [] };
+  for (const group of ['novice_slots', 'advanced_slots']) {
+    for (const row of assignments[group]) {
+      Object.assign(row, { participant_id: `synthetic-${row.slot_id}`, distinct_from_implementers: true,
+        session_id: `synthetic-session-${row.slot_id}`, session_status: 'completed', completed: true });
+      sessions.consented_sessions.push({ ...row, generation: LAST_GOOD_GENERATION, consented: true,
+        simulated: false, evidence_reference: 'fixture-only://validation', evidence_sha256: 'a'.repeat(64) });
+    }
+  }
+  return { assignments, sessions };
+}
+
+test('assignment IDs and completion flags cannot replace consented session evidence', () => {
+  const fixture = syntheticSessions();
+  fixture.sessions.consented_sessions = [];
+  const score = scoreUsability(fixture);
+  for (const group of ['novice', 'advanced']) {
+    assert.equal(score.r12[group].actual_participants, 0);
+    assert.equal(score.r12[group].completed, 0);
+    assert.equal(score.r12[group].missing_or_untested, 8);
+    assert.equal(score.r12[group].pass_completion, false);
+  }
+});
+
+test('only explicitly consented, distinct, bound sessions contribute to metrics, never acceptance', () => {
+  const fixture = syntheticSessions();
+  const scored = scoreUsability(fixture);
+  assert.equal(scored.r12.novice.actual_participants, 8);
+  assert.equal(scored.r12.novice.completed, 8);
+  assert.equal(scored.r12.accepted, false);
+  assert.equal(scored.r12.advanced.actual_participants, 8);
+  for (const patch of [
+    {consented: false}, {distinct_from_implementers: null}, {simulated: true},
+    {generation: 'retired'}, {task_id: 'T-unknown'}, {slot_id: 'other'},
+    {participant_id: 'other'}, {evidence_reference: ''}, {evidence_sha256: ''},
+  ]) {
+    const changed = syntheticSessions();
+    Object.assign(changed.sessions.consented_sessions[0], patch);
+    const result = scoreUsability(changed).r12.novice;
+    assert.equal(result.actual_participants, 7, JSON.stringify(patch));
+    assert.equal(result.completed, 7);
+    assert.equal(result.pass_participants, false);
+  }
+  const incomplete = syntheticSessions();
+  incomplete.sessions.consented_sessions[0].completed = false;
+  assert.equal(scoreUsability(incomplete).r12.novice.completed, 7);
+});
+
+test('duplicate evidence and overlapping participant groups cannot satisfy 8+8', () => {
+  const duplicate = syntheticSessions();
+  duplicate.sessions.consented_sessions.push(duplicate.sessions.consented_sessions[0]);
+  assert.throws(() => scoreUsability(duplicate), {code: 'DUPLICATE_OR_MISSING_EVIDENCE_ID'});
+  const overlap = syntheticSessions();
+  overlap.assignments.advanced_slots[0].participant_id = overlap.assignments.novice_slots[0].participant_id;
+  assert.throws(() => scoreUsability(overlap), {code: 'PARTICIPANT_IN_BOTH_GROUPS'});
+  const reused = syntheticSessions();
+  reused.assignments.novice_slots[1].session_id = reused.assignments.novice_slots[0].session_id;
+  assert.throws(() => scoreUsability(reused), {code: 'SESSION_REUSED'});
+  const stale = syntheticSessions();
+  stale.assignments.generation = 'retired';
+  assert.throws(() => scoreUsability(stale), {code: 'USABILITY_GENERATION_MISMATCH'});
+});

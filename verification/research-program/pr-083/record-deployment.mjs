@@ -4,10 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const LAST_GOOD_GENERATION = 'live-2026-09-03-85b50522b420';
-export const HISTORICAL_PRODUCTION_WORKER = 'ecc1603f-9eb4-4a1b-a566-bd9d7a415de4';
-export const HISTORICAL_PRODUCTION_ACCOUNT = 'd0e89eef-5bf4-43d0-a0ba-20fbdc128c81';
-export const HISTORICAL_PRODUCTION_DATE = '2026-09-09';
-export const QUALIFIED_ARTIFACT_HEAD = '8e7520c807668e42ec5daf9313b493bf1dd6fcf8';
+export const CAPTURED_ARTIFACT_HEAD = '8e7520c807668e42ec5daf9313b493bf1dd6fcf8';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
@@ -28,11 +25,12 @@ function fail(code, detail) {
 export function recordDeployment({
   qualification = loadJson('verification/research-program/release/qualification.json'),
   auth = loadJson('verification/external-authorization/v1.0.0/register.json'),
+  baseline = loadJson('verification/research-program/release/production-baseline.json'),
 } = {}) {
   if (qualification.release_qualified === true) fail('PR082_RELEASE_QUALIFIED_CLAIM');
   if (qualification.r16?.accepted === true) fail('R16_ACCEPTED');
   if (qualification.proceeds_to_production === true) fail('PR082_PROCEEDS_TO_PRODUCTION');
-  if (qualification.captured_candidate?.head_sha !== QUALIFIED_ARTIFACT_HEAD) fail('CAPTURED_CANDIDATE_MISMATCH');
+  if (qualification.captured_candidate?.head_sha !== CAPTURED_ARTIFACT_HEAD) fail('CAPTURED_CANDIDATE_MISMATCH');
 
   const authById = Object.fromEntries((auth.entries ?? []).map((row) => [row.id, row]));
   for (const id of ['AUTH-01', 'AUTH-02', 'AUTH-03', 'AUTH-07']) {
@@ -52,7 +50,7 @@ export function recordDeployment({
     rebuilt_bundle_introduced: false,
     independently_qualified_artifact: freeze({
       exists: false,
-      captured_head: QUALIFIED_ARTIFACT_HEAD,
+      captured_head: CAPTURED_ARTIFACT_HEAD,
       r16_accepted: false,
       release_qualified: false,
       production_truth_matches_independently_qualified_artifact: false,
@@ -76,16 +74,20 @@ export function recordDeployment({
     }),
     production: freeze({
       changed: false,
-      worker_id: HISTORICAL_PRODUCTION_WORKER,
-      account_id: HISTORICAL_PRODUCTION_ACCOUNT,
-      traffic_state: 'historical_2026-09-09_unchanged',
+      worker_name: baseline.worker_name,
+      version_id: baseline.version_id,
+      deployment_id: baseline.deployment_id,
+      account_id: baseline.account_id,
+      traffic_state: 'last_recorded_deployment_not_live_reverified',
+      recorded_traffic_percentage: baseline.traffic_percentage,
+      evidence: baseline.evidence,
       observed_health: 'not_re-measured_in_this_pr',
       monitoring_owner: 'unchanged; this packet does not assign a new owner',
-      last_known_date: HISTORICAL_PRODUCTION_DATE,
+      last_known_date: baseline.deployed_at,
     }),
     rollback_target: freeze({
-      worker_id: HISTORICAL_PRODUCTION_WORKER,
-      note: 'Immediate rollback target remains the historical 2026-09-09 Worker because this PR did not deploy a new release.',
+      version_id: baseline.rollback_version_id,
+      note: 'Rollback version retained by the September 14 deployment. Reverify production and rollback eligibility before a future authorized rollout.',
     }),
     failed_release_evidence_intact: true,
     c0091: 'unresolved',
