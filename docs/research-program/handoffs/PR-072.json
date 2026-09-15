@@ -1,0 +1,288 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-072",
+  "status": "producer_checked",
+  "owner": "/root/pr072_about_accountability",
+  "reviewer": "Astra/root",
+  "base_sha": "f67779a59cb19d8cfcd917cd3f3e3f70157a2d57",
+  "head_sha": "4e55e7cdba123129d61d3024cdedc02dcb6ee39f",
+  "dependency_merge_shas": {
+    "PR-064": "bf0f7a8806af07dce9d17e4e4eacd72224525e03",
+    "PR-069": "74436f9947c58cb8cc2ce1e6396b43e601a02a31",
+    "PR-070": "a73a96a6e684eb98c54d99bd165876dbcba7f10f",
+    "PR-071": "6fffffea9f8d3140e43d9e2da0a539bca9caa87f"
+  },
+  "branch": "codex/ushso-pr072-about-accountability-20260915",
+  "github_pr_url": null,
+  "changed_files": [
+    "apps/web/src/content/learn/",
+    "apps/web/src/pages/AboutPage.tsx",
+    "apps/web/src/pages/AboutPage.test.tsx",
+    "apps/web/src/pages/ContactPage.tsx",
+    "apps/web/src/pages/ContactPage.test.tsx",
+    "apps/web/src/pages/StandardPage.tsx",
+    "apps/web/src/pages/StandardPage.test.tsx",
+    "verification/research-program/pr-072/",
+    "docs/research-program/handoffs/PR-072.json"
+  ],
+  "problem": "About was primarily a technical boundary statement. Unsupplied funding, staff, affiliations and response-time facts could be invented. Correction routes could expose private forwarding addresses or automatically attach sensitive user content.",
+  "resulting_behavior": "About is a useful introduction, not solely a technical boundary statement. Copy does not invent affiliations, staff, funding or outcomes. Unsupplied disclosures remain unsupplied. No engineer fills them using an LLM or guesses a response-time promise. All correction routes work without exposing private forwarding addresses or automatically attaching sensitive user content. info@ushso.org remains the verified public contact. plan_research remains disabled. worker/index.mjs does not import enrichment. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-072-1",
+      "subject": "Rewrite About around user benefit",
+      "sha": "bd00e1477d18e7eaa53d9f639f836bc12392b237"
+    },
+    {
+      "id": "C-072-2",
+      "subject": "Prepare exact disclosure and service text",
+      "sha": "071da98311f5a285937b6bbc2a8f2ee88de4a4b7"
+    },
+    {
+      "id": "C-072-3",
+      "subject": "Connect corrections and policies to use",
+      "sha": "4e55e7cdba123129d61d3024cdedc02dcb6ee39f"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "accountability-copy",
+      "id": "apps/web/src/content/learn/accountability.ts",
+      "location": "local",
+      "sha256": "4fe1eced3c3a99d1d882f034412e9c4c9da88c9466647704030d7a6d1adeda91"
+    },
+    {
+      "kind": "about-page",
+      "id": "apps/web/src/pages/AboutPage.tsx",
+      "location": "local",
+      "sha256": "11a0b687c01d5994ee6b7c69b2074e2d0197fb4ae6c0e15603dffca835bf0fed"
+    },
+    {
+      "kind": "contact-page",
+      "id": "apps/web/src/pages/ContactPage.tsx",
+      "location": "local",
+      "sha256": "c46adef77cd7199c059e3dc9d3bafd346779e8e2641d76a109782c966f4ac8a5"
+    },
+    {
+      "kind": "standard-page",
+      "id": "apps/web/src/pages/StandardPage.tsx",
+      "location": "local",
+      "sha256": "fe25eded1a6d669e82a482f6aa59d57cd9d15cd9e6d10bbc5fd2bcdc5cfdf01c"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "worker-index-unchanged",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "df14237a81ada978d7898720dc8eb3237d0a24af10c987a2f60fe14894ffb42e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c072-focused",
+      "command": "npm test --workspace @ushso/observatory-web -- src/pages/AboutPage.test.tsx src/pages/ContactPage.test.tsx src/pages/StandardPage.test.tsx",
+      "started_at": "2026-09-15T02:34:32.370302Z",
+      "completed_at": "2026-09-15T02:34:33.526884Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Focused About, Contact and Standard tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c072-focused-event",
+        "path": "verification/research-program/pr-072/producer-20260915/commands/focused-web/event.json",
+        "sha256": "e9ca79c2c0896239e533949013d8b581aa3cce6dcd6d532972e20597899c42e8",
+        "bytes": 1161
+      }
+    },
+    {
+      "id": "cmd-c072-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-15T02:34:33.527294Z",
+      "completed_at": "2026-09-15T02:34:33.585611Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c072-identity-event",
+        "path": "verification/research-program/pr-072/producer-20260915/commands/identity-validate/event.json",
+        "sha256": "b22d669edf44618f080d1a70fee68105de91e9fee189e7ae9764875f582bd729",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr072-artifact-0",
+      "path": "verification/research-program/pr-072/task-binding.json",
+      "bytes": 4131,
+      "sha256": "a491f5e3e613691073845f3e1fea578e0fce144c7e935bf072418a149c4b38d7"
+    },
+    {
+      "id": "pr072-artifact-1",
+      "path": "verification/research-program/pr-072/dispatch.json",
+      "bytes": 2588,
+      "sha256": "c7762e53f2d1836cf53d1a68652db59db90f690bb3354c087a58ed2949f7c6bb"
+    },
+    {
+      "id": "pr072-artifact-2",
+      "path": "verification/research-program/pr-072/producer-20260915/commands/focused-web/receipt.json",
+      "bytes": 571,
+      "sha256": "e1648416c393dac87f50c34c5f57b257bf23810f08eaab7e711e1c198fa8b601"
+    },
+    {
+      "id": "pr072-artifact-3",
+      "path": "verification/research-program/pr-072/producer-20260915/commands/focused-web/stdout.log",
+      "bytes": 595,
+      "sha256": "e24afc0aadc5c08e82f177e72cae6a499cb5166cdc5016e377d86b1101af73c1"
+    },
+    {
+      "id": "pr072-artifact-4",
+      "path": "verification/research-program/pr-072/producer-20260915/commands/focused-web/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr072-artifact-5",
+      "path": "verification/research-program/pr-072/producer-20260915/commands/focused-web/event.json",
+      "bytes": 1161,
+      "sha256": "e9ca79c2c0896239e533949013d8b581aa3cce6dcd6d532972e20597899c42e8"
+    },
+    {
+      "id": "pr072-artifact-6",
+      "path": "verification/research-program/pr-072/producer-20260915/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "46ff22efce324a2cc7ade4760beda4c18b2c6d46499725d4a1d22aefbf5df235"
+    },
+    {
+      "id": "pr072-artifact-7",
+      "path": "verification/research-program/pr-072/producer-20260915/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr072-artifact-8",
+      "path": "verification/research-program/pr-072/producer-20260915/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr072-artifact-9",
+      "path": "verification/research-program/pr-072/producer-20260915/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "b22d669edf44618f080d1a70fee68105de91e9fee189e7ae9764875f582bd729"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-072-1",
+      "status": "producer_checked",
+      "result": "Copy does not invent affiliations, staff, funding or outcomes; known operator details remain consistent with production.",
+      "command_ids": [
+        "cmd-c072-focused"
+      ]
+    },
+    {
+      "id": "C-072-2",
+      "status": "producer_checked",
+      "result": "Unsupplied facts remain unsupplied; no engineer fills them using an LLM or guesses a response-time promise.",
+      "command_ids": [
+        "cmd-c072-focused"
+      ]
+    },
+    {
+      "id": "C-072-3",
+      "status": "producer_checked",
+      "result": "All correction routes work without exposing private forwarding addresses or automatically attaching sensitive user content.",
+      "command_ids": [
+        "cmd-c072-focused",
+        "cmd-c072-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "no-invented-affiliations",
+      "status": "accepted",
+      "detail": "Copy does not invent affiliations, staff, funding or outcomes."
+    },
+    {
+      "id": "unsupplied-remain-unsupplied",
+      "status": "accepted",
+      "detail": "Funding, named editorial roles, staff, and response-time remain unsupplied."
+    },
+    {
+      "id": "public-contact-info-ushso",
+      "status": "accepted",
+      "detail": "info@ushso.org remains the verified public contact."
+    },
+    {
+      "id": "no-private-forwarding",
+      "status": "accepted",
+      "detail": "Private forwarding addresses are not published."
+    },
+    {
+      "id": "no-auto-phi",
+      "status": "accepted",
+      "detail": "Correction routes do not automatically attach the originating research question or PHI."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-about-accountability-review",
+      "status": "pending",
+      "detail": "Independent review of unsupplied disclosures, public contact, and correction-route honesty remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "about-is-not-r12",
+      "status": "risk",
+      "detail": "About and accountability copy is product evidence, not R12/R13 acceptance, scientific approval, or production change."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of unsupplied disclosures, public contact, and correction-route honesty, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-072 source and replay focused web and identity validators. Do not enable plan_research. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
