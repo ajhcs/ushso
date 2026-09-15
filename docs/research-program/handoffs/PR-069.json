@@ -1,0 +1,283 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-069",
+  "status": "producer_checked",
+  "owner": "/root/pr069_citations_export",
+  "reviewer": "Astra/root",
+  "base_sha": "b8a17e94a9e746111afa90b4c4cadd279e81bb79",
+  "head_sha": "e4e3a4c6e06c0e39da271665dff6f558fbe80d32",
+  "dependency_merge_shas": {
+    "PR-041": "7ee6ef80c438b584d16025ad3f60c24bb8c0c83e",
+    "PR-061": "9768f9b469c1c9b8d8f4082c05e3df534f65e1e2",
+    "PR-067": "92311929a70e6d2491daa2c84649b47bb7f87b66",
+    "PR-068": "73757613f2daa3e3a29c4cf1f41ce68932a6b381"
+  },
+  "branch": "codex/ushso-pr069-citations-export-20260915",
+  "github_pr_url": null,
+  "changed_files": [
+    "apps/web/src/lib/citations.ts",
+    "apps/web/src/lib/citations.test.ts",
+    "apps/web/src/lib/researchExport.ts",
+    "apps/web/src/lib/researchExport.test.ts",
+    "apps/web/src/pages/WorkspacePage.tsx",
+    "apps/web/src/pages/WorkspacePage.test.tsx",
+    "apps/web/src/styles.css",
+    "verification/research-program/pr-069/",
+    "docs/research-program/handoffs/PR-069.json"
+  ],
+  "problem": "Selected sources could not be cited or handed to another researcher without inventing DOI, authors or year, leaking credentials, defaulting private notes into exports, or silently re-running a different search on re-import.",
+  "resulting_behavior": "Citations are generated from publisher, product, release, canonical locator and observed/accessed dates. Absent DOI, authors, license or year are marked not captured and are not invented. Exports exclude credentials and default to source evidence only. Question and private notes are included only when the user explicitly chooses. Imported packets keep source order and generation; a retired generation is typed and does not silently re-run a different search. A cited source is the publisher product; USHSO verification is identified separately. plan_research remains disabled. worker/index.mjs does not import enrichment. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-069-1",
+      "subject": "Define citation formats",
+      "sha": "d191d73bbaf11dcc6670a0fa7c7c2534fc2e9805"
+    },
+    {
+      "id": "C-069-2",
+      "subject": "Export the evidence packet",
+      "sha": "fc21b2d987d38cf2374a9e7296f505020570dad9"
+    },
+    {
+      "id": "C-069-3",
+      "subject": "Verify re-import and citation fidelity",
+      "sha": "e4e3a4c6e06c0e39da271665dff6f558fbe80d32"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "citations-lib",
+      "id": "apps/web/src/lib/citations.ts",
+      "location": "local",
+      "sha256": "887b553689d84f4614ae058e6630c122612a3156ba204e7570a61c8ff8852c1e"
+    },
+    {
+      "kind": "research-export-lib",
+      "id": "apps/web/src/lib/researchExport.ts",
+      "location": "local",
+      "sha256": "7c67efea3d7d2227884a304e9598758211ac954dd2c62bc5e7af3bffa78ab7de"
+    },
+    {
+      "kind": "workspace-page",
+      "id": "apps/web/src/pages/WorkspacePage.tsx",
+      "location": "local",
+      "sha256": "0f3e0fd9a3711f77a1fa06736b49f2d0be32a1e4077199af3df30ff8866c4aa8"
+    },
+    {
+      "kind": "workspace-css",
+      "id": "apps/web/src/styles.css",
+      "location": "local",
+      "sha256": "9d33c1e19e2537d090d7126582e39bdc41f0f2b3db58a0e2b561324cf9bf6c81"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    },
+    {
+      "kind": "worker-index-unchanged",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "df14237a81ada978d7898720dc8eb3237d0a24af10c987a2f60fe14894ffb42e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c069-focused",
+      "command": "npm test --workspace @ushso/observatory-web -- src/lib/citations.test.ts src/lib/researchExport.test.ts src/pages/WorkspacePage.test.tsx",
+      "started_at": "2026-09-15T01:10:26.988255Z",
+      "completed_at": "2026-09-15T01:10:27.981983Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Focused citation, packet-export and workspace tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c069-focused-event",
+        "path": "verification/research-program/pr-069/producer-20260915/commands/focused-web/event.json",
+        "sha256": "54e9b31ddef1bc888e6181d5827550f59b4d77396f7e84d7fe720cacf58030c6",
+        "bytes": 1169
+      }
+    },
+    {
+      "id": "cmd-c069-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-15T01:10:27.982380Z",
+      "completed_at": "2026-09-15T01:10:28.048528Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c069-identity-event",
+        "path": "verification/research-program/pr-069/producer-20260915/commands/identity-validate/event.json",
+        "sha256": "62fed3f10fca7e2eb86922802dec604183ea3c1a42cf29e7b3a6b31287d2abe7",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr069-artifact-0",
+      "path": "verification/research-program/pr-069/task-binding.json",
+      "bytes": 4150,
+      "sha256": "b6f95004e2bd4b62cb8023e0b6a004e8c326c8a61ed6ed05f1b92c565c73233a"
+    },
+    {
+      "id": "pr069-artifact-1",
+      "path": "verification/research-program/pr-069/dispatch.json",
+      "bytes": 2796,
+      "sha256": "d81ddc979a5f609e207a57b2f053fa6cf266d14fcba191f57b1bf05f5f44ed05"
+    },
+    {
+      "id": "pr069-artifact-2",
+      "path": "verification/research-program/pr-069/producer-20260915/commands/focused-web/receipt.json",
+      "bytes": 569,
+      "sha256": "ef1c439139b4ba5a712f10433f90606e7148f6bfab7359376f05344042c29fd2"
+    },
+    {
+      "id": "pr069-artifact-3",
+      "path": "verification/research-program/pr-069/producer-20260915/commands/focused-web/stdout.log",
+      "bytes": 587,
+      "sha256": "b431c26d96a9c0b03ea9380d80205fcb14163fa3ab58a8afe92be69fd4aef8db"
+    },
+    {
+      "id": "pr069-artifact-4",
+      "path": "verification/research-program/pr-069/producer-20260915/commands/focused-web/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr069-artifact-5",
+      "path": "verification/research-program/pr-069/producer-20260915/commands/focused-web/event.json",
+      "bytes": 1169,
+      "sha256": "54e9b31ddef1bc888e6181d5827550f59b4d77396f7e84d7fe720cacf58030c6"
+    },
+    {
+      "id": "pr069-artifact-6",
+      "path": "verification/research-program/pr-069/producer-20260915/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "f201fd306dc17328f687ad0b22d92687e8cfb5f00868df0f4d386bf913bda284"
+    },
+    {
+      "id": "pr069-artifact-7",
+      "path": "verification/research-program/pr-069/producer-20260915/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr069-artifact-8",
+      "path": "verification/research-program/pr-069/producer-20260915/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr069-artifact-9",
+      "path": "verification/research-program/pr-069/producer-20260915/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "62fed3f10fca7e2eb86922802dec604183ea3c1a42cf29e7b3a6b31287d2abe7"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-069-1",
+      "status": "producer_checked",
+      "result": "Do not invent authors, DOI, release year or publisher endorsement; output escaping preserves special characters.",
+      "command_ids": [
+        "cmd-c069-focused"
+      ]
+    },
+    {
+      "id": "C-069-2",
+      "status": "producer_checked",
+      "result": "Exports exclude credentials and default to source evidence only; they validate against the versioned packet schema.",
+      "command_ids": [
+        "cmd-c069-focused"
+      ]
+    },
+    {
+      "id": "C-069-3",
+      "status": "producer_checked",
+      "result": "The exported source order and generation agree with the UI; reproducing a selection does not silently re-run a different search.",
+      "command_ids": [
+        "cmd-c069-focused",
+        "cmd-c069-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "no-invented-doi",
+      "status": "accepted",
+      "detail": "Absent DOI, authors, year and license are marked not captured and are not invented."
+    },
+    {
+      "id": "credentials-excluded",
+      "status": "accepted",
+      "detail": "Exports exclude credentials and default to source evidence only."
+    },
+    {
+      "id": "retired-generation-typed",
+      "status": "accepted",
+      "detail": "A retired generation is typed and does not silently re-run a different search."
+    },
+    {
+      "id": "envelope-not-task",
+      "status": "accepted",
+      "detail": "A successful page load or tool envelope is not a completed research task. HTTP 200 is not acceptance."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "independent-citation-export-review",
+      "status": "pending",
+      "detail": "Independent review of citation honesty, credential-free packet export and retired-generation re-import remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "export-is-not-r11",
+      "status": "risk",
+      "detail": "Citation and packet export is product evidence, not R11/R12/R13 acceptance, scientific approval, or production change."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of citation honesty, credential-free packet export and retired-generation re-import, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-069 source and replay focused web and identity validators. Do not enable plan_research. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, or production change."
+    ]
+  }
+}
