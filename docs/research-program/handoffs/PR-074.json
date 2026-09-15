@@ -1,0 +1,411 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-074",
+  "status": "producer_checked",
+  "owner": "/root/pr074_browser_discoverability",
+  "reviewer": "Astra/root",
+  "base_sha": "d9b499668cffb1a78b4430444997fe63aa56811c",
+  "head_sha": "00280ea70e0f04e50144b36252cb930f66cde6ea",
+  "dependency_merge_shas": {
+    "PR-058": "7ebaded20cd1ece299a9611eace8eed884544e09",
+    "PR-065": "d7055ec29a4ceef0128b79e14fda57e48011e27f",
+    "PR-066": "ee5f9f3a1ea22a162bfc7546a7630535e201c1ea",
+    "PR-069": "74436f9947c58cb8cc2ce1e6396b43e601a02a31",
+    "PR-073": "75d25d675d1b2309286cabe765dbcec1862ef205"
+  },
+  "branch": "codex/ushso-pr074-browser-discoverability-20260915",
+  "github_pr_url": null,
+  "changed_files": [
+    "apps/web/src/pages/DatasetDetailsPage.tsx",
+    "apps/web/src/pages/DatasetDetailsPage.test.tsx",
+    "apps/web/src/styles.css",
+    "packages/web-discoverability/src/catalog-html.mjs",
+    "packages/web-discoverability/tests/catalog-html.test.mjs",
+    "packages/web-discoverability/src/index.mjs",
+    "worker/index.mjs",
+    "tests/worker-contract.test.mjs",
+    "tests/research-program/browser-matrix.mjs",
+    "tests/research-program/browser-matrix.test.mjs",
+    "verification/research-program/frontend/",
+    "verification/research-program/pr-074/",
+    "docs/research-program/handoffs/PR-074.json"
+  ],
+  "problem": "HTML-only crawlers could miss source facts. Sitemap omitted Learn and Methods. Missing records could render a blank details page. Browser-matrix evidence could invent live engine sessions or treat emulators as physical devices.",
+  "resulting_behavior": "An HTML-only crawler sees meaningful source content from catalog fields. Unknown data fields are not invented for structured markup. Sitemap includes Methods/guides and eligible source pages. Browser-matrix evidence records actual engines and devices; an emulator is not claimed as a physical-device test. Live Chromium, Firefox and WebKit sessions that were not run remain untested, not passed. Native WebMCP remains untested in unsupported browsers and is distinct from ordinary site usability. No blank detail page or silent stale-context substitution. Six result-card regions remain. plan_research remains disabled. worker/index.mjs does not import enrichment. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "commits": [
+    {
+      "id": "C-074-1",
+      "subject": "Provide bounded public source representations",
+      "sha": "1a97a3ec65e6ba1dc5b947b88475309e3df03462"
+    },
+    {
+      "id": "C-074-2",
+      "subject": "Test the browser and viewport matrix",
+      "sha": "d4a3be330f01b6a8f89c24bff6a3dcb89b2562c0"
+    },
+    {
+      "id": "C-074-3",
+      "subject": "Verify navigation and loading failures",
+      "sha": "00280ea70e0f04e50144b36252cb930f66cde6ea"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "catalog-html",
+      "id": "packages/web-discoverability/src/catalog-html.mjs",
+      "location": "local",
+      "sha256": "23e9f27c87e12df82397bd8824c99bb9b17fea15f22f1a9587aa16a47e28831d"
+    },
+    {
+      "kind": "worker",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "249de7fa6f15db523b737d7378724f8f31dd9665bdcc61381269b9f5046325f5"
+    },
+    {
+      "kind": "details-page",
+      "id": "apps/web/src/pages/DatasetDetailsPage.tsx",
+      "location": "local",
+      "sha256": "42c667b9b93a1a3fc2a48db72a0082ad6f5df4701342ac6cb1950bc4a4aaf143"
+    },
+    {
+      "kind": "css",
+      "id": "apps/web/src/styles.css",
+      "location": "local",
+      "sha256": "1358756b1054d31e0059f08ed91eacac17296dfa214ca256f094789d1232ab93"
+    },
+    {
+      "kind": "browser-matrix",
+      "id": "tests/research-program/browser-matrix.mjs",
+      "location": "local",
+      "sha256": "1bb68450500198d9ec5a2c1916b67fae26ae6a83a986102de583092dac4f8feb"
+    },
+    {
+      "kind": "result-card-unchanged-regions",
+      "id": "apps/web/src/components/ResultCard.tsx",
+      "location": "local",
+      "sha256": "804b283319382aa0f89166feb1212bb79308788e0a8d7f902274569a0a99d152"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c074-crawler",
+      "command": "node --test packages/web-discoverability/tests/catalog-html.test.mjs tests/research-program/browser-matrix.test.mjs tests/worker-contract.test.mjs",
+      "started_at": "2026-09-15T03:31:06.655260Z",
+      "completed_at": "2026-09-15T03:31:06.918404Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "HTML-only crawlers see catalog source facts; sitemap includes Learn and Methods; unknown structured fields stay unknown.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c074-crawler-event",
+        "path": "verification/research-program/pr-074/producer-20260915/commands/crawler/event.json",
+        "sha256": "19dbfa240b9fea1903ab5599e61bde7acc2499b14837aeb6482d693d9e4c9469",
+        "bytes": 1210
+      }
+    },
+    {
+      "id": "cmd-c074-matrix",
+      "command": "node tests/research-program/browser-matrix.mjs",
+      "started_at": "2026-09-15T03:31:06.918882Z",
+      "completed_at": "2026-09-15T03:31:06.960309Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Browser-matrix log records untested engines and does not claim physical devices or WebMCP.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c074-matrix-event",
+        "path": "verification/research-program/pr-074/producer-20260915/commands/matrix-cli/event.json",
+        "sha256": "b6d727334438679ae55cfb9412df3d492e5c60c9c36ff993addbcfa5d3d6e258",
+        "bytes": 1068
+      }
+    },
+    {
+      "id": "cmd-c074-focused",
+      "command": "npm test --workspace @ushso/observatory-web -- src/pages/DatasetDetailsPage.test.tsx src/components/ResultCard.test.ts",
+      "started_at": "2026-09-15T03:31:06.960693Z",
+      "completed_at": "2026-09-15T03:31:08.388435Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Missing records render a not-found page; six result-card regions remain.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c074-focused-event",
+        "path": "verification/research-program/pr-074/producer-20260915/commands/focused-web/event.json",
+        "sha256": "88efa46b6cd7a86cc481d051824c5499713ee23b5b2bdd03b1429b6d3795ac8d",
+        "bytes": 1159
+      }
+    },
+    {
+      "id": "cmd-c074-identity",
+      "command": "node packages/identity/tools/validate.mjs",
+      "started_at": "2026-09-15T03:31:08.388830Z",
+      "completed_at": "2026-09-15T03:31:08.454241Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Sealed identity package validates.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c074-identity-event",
+        "path": "verification/research-program/pr-074/producer-20260915/commands/identity-validate/event.json",
+        "sha256": "df653ca048f071081718630622583f00b56999db9780e71cb057c533e90f421d",
+        "bytes": 1027
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr074-artifact-0",
+      "path": "verification/research-program/pr-074/task-binding.json",
+      "bytes": 4666,
+      "sha256": "e5c19f53f990979dccd6c60a4d2e17400e6fc6bb2003128e6d8e6cd6cedd359f"
+    },
+    {
+      "id": "pr074-artifact-1",
+      "path": "verification/research-program/pr-074/dispatch.json",
+      "bytes": 2755,
+      "sha256": "12624a780d889e367280203c02eb568a398cc551f997c15f923e48b0e2a494db"
+    },
+    {
+      "id": "pr074-artifact-2",
+      "path": "verification/research-program/frontend/pr074-browser-matrix.json",
+      "bytes": 1410,
+      "sha256": "83ed0f1633df85845f35aa69905221c5015bda13c6d45834a1a157bd9e8268b8"
+    },
+    {
+      "id": "pr074-artifact-3",
+      "path": "verification/research-program/frontend/pr074-browser-matrix-log.json",
+      "bytes": 1035,
+      "sha256": "523f560cfa05899133326aa16e65675b0bc19f484b2b7345116746efbc5b1d43"
+    },
+    {
+      "id": "pr074-artifact-4",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/crawler/receipt.json",
+      "bytes": 555,
+      "sha256": "5ebca2356bd57ed659abdf715dde9d332f371921a54f669e4ebff6e00a84eb92"
+    },
+    {
+      "id": "pr074-artifact-5",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/crawler/stdout.log",
+      "bytes": 1143,
+      "sha256": "90c1b950730e00123c4632b29442b6ea023038617c565df6a9a7c543262d97ba"
+    },
+    {
+      "id": "pr074-artifact-6",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/crawler/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr074-artifact-7",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/crawler/event.json",
+      "bytes": 1210,
+      "sha256": "19dbfa240b9fea1903ab5599e61bde7acc2499b14837aeb6482d693d9e4c9469"
+    },
+    {
+      "id": "pr074-artifact-8",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/matrix-cli/receipt.json",
+      "bytes": 437,
+      "sha256": "5c22ffbc602d1edfd7fa235d784f165ddee84797ea63b13f9320618f2d16b491"
+    },
+    {
+      "id": "pr074-artifact-9",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/matrix-cli/stdout.log",
+      "bytes": 1410,
+      "sha256": "83ed0f1633df85845f35aa69905221c5015bda13c6d45834a1a157bd9e8268b8"
+    },
+    {
+      "id": "pr074-artifact-10",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/matrix-cli/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr074-artifact-11",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/matrix-cli/event.json",
+      "bytes": 1068,
+      "sha256": "b6d727334438679ae55cfb9412df3d492e5c60c9c36ff993addbcfa5d3d6e258"
+    },
+    {
+      "id": "pr074-artifact-12",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/focused-web/receipt.json",
+      "bytes": 544,
+      "sha256": "7e91563073ef24ccb62d6de95897ba68778bb94602f298479d6f7b3a17cdc16a"
+    },
+    {
+      "id": "pr074-artifact-13",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/focused-web/stdout.log",
+      "bytes": 543,
+      "sha256": "236a3f48b85c7f546936eb7e597f891eadf7ed22dc2763e36d228e58206487fc"
+    },
+    {
+      "id": "pr074-artifact-14",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/focused-web/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr074-artifact-15",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/focused-web/event.json",
+      "bytes": 1159,
+      "sha256": "88efa46b6cd7a86cc481d051824c5499713ee23b5b2bdd03b1429b6d3795ac8d"
+    },
+    {
+      "id": "pr074-artifact-16",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/identity-validate/receipt.json",
+      "bytes": 438,
+      "sha256": "235f516492ab754783a007902a359379b6a4074071c7a435adfafe830c5fb071"
+    },
+    {
+      "id": "pr074-artifact-17",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/identity-validate/stdout.log",
+      "bytes": 507,
+      "sha256": "edf51e8549ce0dc16440c3e7a158aee6936ca0cfa222519b165dfbbbbefbff79"
+    },
+    {
+      "id": "pr074-artifact-18",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/identity-validate/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr074-artifact-19",
+      "path": "verification/research-program/pr-074/producer-20260915/commands/identity-validate/event.json",
+      "bytes": 1027,
+      "sha256": "df653ca048f071081718630622583f00b56999db9780e71cb057c533e90f421d"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-074-1",
+      "status": "producer_checked",
+      "result": "An HTML-only crawler sees meaningful source content; unknown data fields are not invented for structured markup.",
+      "command_ids": [
+        "cmd-c074-crawler"
+      ]
+    },
+    {
+      "id": "C-074-2",
+      "status": "producer_checked",
+      "result": "Record actual engines/devices; an emulator is not claimed as a physical-device test.",
+      "command_ids": [
+        "cmd-c074-matrix"
+      ]
+    },
+    {
+      "id": "C-074-3",
+      "status": "producer_checked",
+      "result": "No blank detail page or silent stale-context substitution; sitemap and canonical URLs resolve to their intended content.",
+      "command_ids": [
+        "cmd-c074-crawler",
+        "cmd-c074-focused",
+        "cmd-c074-identity"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "live-engines-untested",
+      "status": "accepted",
+      "detail": "Chromium, Firefox and WebKit live sessions remain untested, not passed."
+    },
+    {
+      "id": "no-physical-device-claim",
+      "status": "accepted",
+      "detail": "An emulator is not claimed as a physical-device test."
+    },
+    {
+      "id": "native-webmcp-untested",
+      "status": "accepted",
+      "detail": "Native WebMCP remains untested in unsupported browsers."
+    },
+    {
+      "id": "zoom-untested",
+      "status": "accepted",
+      "detail": "Zoom checks were not operated."
+    },
+    {
+      "id": "six-result-regions",
+      "status": "accepted",
+      "detail": "Exactly six sealed result-card regions remain."
+    },
+    {
+      "id": "worker-index-enrichment",
+      "status": "accepted",
+      "detail": "worker/index.mjs does not import enrichment."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "live-browser-engine-sessions",
+      "status": "unresolved",
+      "detail": "Live Chromium, Firefox and WebKit sessions were not operated. Combinations remain untested, not passed."
+    },
+    {
+      "id": "independent-browser-discoverability-review",
+      "status": "pending",
+      "detail": "Independent review of crawler HTML, sitemap guides, blank-page rejection, and honest browser-matrix logging remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "matrix-is-not-r16",
+      "status": "risk",
+      "detail": "Crawler HTML and CSS viewport bounds are product evidence, not R12/R13/R16 acceptance, WCAG certification, scientific approval, or production change."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of crawler HTML, sitemap guides, blank-page rejection, and honest browser-matrix logging, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-074 source and replay crawler, worker, matrix, focused web, and identity validators. Do not invent browser or WebMCP evidence. Do not enable plan_research. Do not import enrichment into worker/index.mjs. Do not issue current approval or R acceptance.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, live-browser certification, or production change."
+    ]
+  }
+}
