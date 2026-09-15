@@ -113,6 +113,25 @@ test('serves machine files with their real types and gives unknown pages HTTP 40
   assert.match(llms.headers.get('content-type'), /^text\/plain/);
   assert.match(await llms.text(), /POST https:\/\/ushso.org\/api\/discover/);
   assert.match(await robots.text(), /User-agent: \*/);
+  const sitemapBody = await sitemap.text();
   assert.match(sitemap.headers.get('content-type'), /^application\/xml/);
+  assert.match(sitemapBody, /<loc>https:\/\/ushso.org\/learn<\/loc>/);
+  assert.match(sitemapBody, /<loc>https:\/\/ushso.org\/methods<\/loc>/);
+  assert.match(sitemapBody, new RegExp(`<loc>https://ushso.org/datasets/${encodeURIComponent(firstRecord.record_id)}</loc>`));
   assert.equal(unknown.status, 404);
+});
+
+test('HTML-only crawlers see catalog source facts on dataset URLs without a blank page', async () => {
+  const found = await worker.fetch(new Request(`https://ushso.org/datasets/${encodeURIComponent(firstRecord.record_id)}`, { headers: { accept: 'text/html' } }), env);
+  const html = await found.text();
+  assert.equal(found.status, 200);
+  assert.match(found.headers.get('content-type'), /text\/html/);
+  assert.match(html, /data-crawler-content="dataset"/);
+  assert.match(html, new RegExp(firstRecord.title.slice(0, 24).replace(/[.*+?^$()|[\]\\]/g, '\\$&')));
+  assert.doesNotMatch(html, /doi.org\/10\./);
+  const missing = await worker.fetch(new Request('https://ushso.org/datasets/not-a-real-record'), env);
+  const missingHtml = await missing.text();
+  assert.equal(missing.status, 404);
+  assert.match(missingHtml, /Dataset record not found/);
+  assert.doesNotMatch(missingHtml, /<div id="root"><\/div>/);
 });

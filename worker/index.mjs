@@ -14,6 +14,11 @@ import {
   readBoundedText,
   RequestBodyTooLargeError,
 } from './bounded-request-body.mjs';
+import {
+  CATALOG_HTML_GENERATION,
+  renderCatalogSourceHtml,
+  renderPublicSitemap,
+} from '../packages/web-discoverability/src/catalog-html.mjs';
 
 const MAX_REQUEST_BYTES = 20 * 1024;
 const CORPUS_RESOURCE_BASE = '/corpus-v1.2.0';
@@ -206,12 +211,24 @@ function machineText(request, pathname) {
     return `# United States Health Systems Observatory (USHSO)\n\nUSHSO routes people and machines to authoritative health-systems data sources. It does not host the underlying datasets.\n\nAPI contract: ${origin}/api/contract\nHuman discovery: POST ${origin}/api/discover with application/json (maximum request size: 20 KiB)\nCatalog browse: GET ${origin}/api/catalog\nStable human-facing record: GET ${origin}/api/datasets/{record_id}\nMachine toolkit: eight read-only inspection routes under ${origin}/api/machine/v1/\nHuman and agent guide: ${origin}/agents\n\nVerification means the first-party catalog metadata entry was observed live for the published snapshot. It does not assert dataset-payload availability, schema completeness, authorization, geographic coverage, or analytic fitness. A zero-result response is not evidence that no source exists. A successful tool envelope is not a completed research task.\n`;
   }
   if (pathname === '/robots.txt') return `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`;
-  if (pathname === '/sitemap.xml') {
-    const pages = ['/', '/search', '/agents', '/sources', '/about', '/privacy', '/terms', '/contact'];
-    const urls = pages.map(page => `  <url><loc>${origin}${page}</loc></url>`).join('\n');
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
-  }
   return null;
+}
+
+function matchCatalogRecord(records, requestedId) {
+  const needle = requestedId.replace(/^obs:asset:/, '');
+  return records.find((record) => record.record_id === requestedId || record.record_id.replace(/^obs:asset:/, '') === needle) ?? null;
+}
+
+function mergeCrawlerIntoSpa(spaText, crawlerHtml) {
+  const body = crawlerHtml.match(/<body>([\s\S]*)<\/body>/i)?.[1] ?? '';
+  const title = crawlerHtml.match(/<title>[\s\S]*?<\/title>/i)?.[0] ?? '';
+  const canonical = crawlerHtml.match(/<link rel="canonical"[^>]*>/i)?.[0] ?? '';
+  const jsonLd = crawlerHtml.match(/<script type="application\/ld\+json"[\s\S]*?<\/script>/i)?.[0] ?? '';
+  if (!spaText.includes('<div id="root"></div>')) return crawlerHtml;
+  let page = spaText.replace('<div id="root"></div>', `<div id="root">${body}</div>`);
+  if (title) page = page.replace(/<title>[\s\S]*?<\/title>/i, title);
+  if (canonical || jsonLd) page = page.replace('</head>', `${canonical}${jsonLd}</head>`);
+  return page;
 }
 
 export function createWorker({
@@ -373,6 +390,46 @@ export function createWorker({
       }
 
       if (url.pathname === '/favicon.ico') return Response.redirect(new URL('/observatory-lighthouse.png', request.url), 308);
+
+      if (url.pathname === '/sitemap.xml') {
+        if (request.method !== 'GET' && !head) return textResponse('Method not allowed.\n', 'text/plain; charset=utf-8', { status: 405 });
+        let ids = [];
+        try {
+          const catalog = await loadCatalog(request, env);
+          ids = (catalog.records ?? []).slice(0, 50).map((record) => record.record_id);
+        } catch {
+          ids = [];
+        }
+        return textResponse(renderPublicSitemap(url.origin, { recordIds: ids }), 'application/xml; charset=utf-8', { cacheControl: 'public, max-age=300', head });
+      }
+
+      if (url.pathname.startsWith('/datasets/')) {
+        if (request.method !== 'GET' && !head) return textResponse('Method not allowed.\n', 'text/plain; charset=utf-8', { status: 405 });
+        let requestedId;
+        try {
+          requestedId = decodeURIComponent(url.pathname.slice('/datasets/'.length));
+        } catch {
+          return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Invalid record identifier | USHSO</title></head><body><main><h1>Invalid record identifier</h1><p>The record identifier encoding is invalid.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 400, head });
+        }
+        if (requestedId && !requestedId.includes('/')) {
+          try {
+            const catalog = await loadCatalog(request, env);
+            const record = matchCatalogRecord(catalog.records ?? [], requestedId);
+            if (!record) {
+              return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Dataset record not found | USHSO</title></head><body><main><h1>Dataset record not found</h1><p>No published record has this identifier in the current catalog generation. A missing record is not replaced with a silent stale-context page.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 404, head });
+            }
+            const generation = catalog.corpus?.publication?.generation ?? catalog.corpus?.generation ?? CATALOG_HTML_GENERATION;
+            const crawlerHtml = renderCatalogSourceHtml(record, { origin: url.origin, generation });
+            const spa = await env.ASSETS.fetch(new Request(new URL('/', request.url), { method: 'GET' }));
+            const spaText = spa.ok ? await spa.text() : '';
+            const page = mergeCrawlerIntoSpa(spaText, crawlerHtml);
+            return textResponse(page, 'text/html; charset=utf-8', { cacheControl: 'public, max-age=300', head });
+          } catch {
+            return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Source details are unavailable | USHSO</title></head><body><main><h1>Source details are unavailable</h1><p>The published record could not be loaded.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 503, head });
+          }
+        }
+      }
+
       if (isSpaPath(url.pathname) || isStaticPath(url.pathname)) return env.ASSETS.fetch(request);
 
       return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Not found | USHSO</title></head><body><main><h1>Page not found</h1><p>No page exists at this address.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 404 });
