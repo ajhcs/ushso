@@ -192,7 +192,7 @@ export function SearchResultsPage() {
     <div className="results-page">
       <ObservatoryHeader compact />
       <main id="main-content" className="results-shell">
-        <Link className="back-link" to="/">← <span>Back to search</span></Link>
+        <Link className="back-link" to="/">← <span>Back to home</span></Link>
         <div className="results-content">
           <form className="results-query" role="search" onSubmit={submitEditedSearch}><label className="sr-only" htmlFor="results-query-input">Search question</label><div className="results-query__input"><Search aria-hidden="true" /><input id="results-query-input" value={editQuery} placeholder="Ask a health-systems data question, or leave blank to browse" onChange={(event) => setEditQuery(event.target.value)} /></div><button type="submit"><Search aria-hidden="true" /> Search</button></form>
 

@@ -11,14 +11,14 @@ export function ObservatoryFooter({ results = false }: ObservatoryFooterProps) {
     <footer className={`site-footer${results ? ' site-footer--results' : ''}`}>
       {results && (
         <div className="site-footer__callout">
-          <h2>Find the right health data—and understand how to access it.</h2>
+          <h2>Find published sources and the documented access route.</h2>
           <span aria-hidden="true" />
         </div>
       )}
       <div className="site-footer__bottom">
         <div className="site-footer__mission">
           <ObservatoryLogo footer />
-          <p>A public gateway to discover, understand, and access<br />{' '}the nation’s health systems data.</p>
+          <p>A public routing layer for published United States health-systems metadata.<br />{' '}It does not host the underlying datasets.</p>
         </div>
         <div className="site-footer__copyright">
           <span>© {year} United States Health Systems Observatory</span>

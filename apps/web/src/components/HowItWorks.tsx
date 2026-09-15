@@ -1,9 +1,9 @@
 import { ArrowRight, ExternalLink, FileSearch, MessageSquareMore } from 'lucide-react'
 
 const steps = [
-  { number: 1, title: 'Ask a question', copy: 'Tell us what you need to know.', Icon: MessageSquareMore },
-  { number: 2, title: 'Review matching sources', copy: 'See what each authoritative source contains and where it applies.', Icon: FileSearch },
-  { number: 3, title: 'Follow the access route', copy: 'Use the documented public, application, license, or DUA pathway.', Icon: ExternalLink },
+  { number: 1, title: 'Ask a question', copy: 'Describe the health-systems question you need a source for.', Icon: MessageSquareMore },
+  { number: 2, title: 'Review matching sources', copy: 'Inspect title, publisher, coverage, evidence, and limitations before requesting files.', Icon: FileSearch },
+  { number: 3, title: 'Follow the access route', copy: 'Use the documented public, application, license, or DUA pathway at the publisher.', Icon: ExternalLink },
 ]
 
 export function HowItWorks() {
