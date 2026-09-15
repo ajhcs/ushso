@@ -7,7 +7,7 @@ const HCRIS_DISTRIBUTION_ID = 'distribution.cms.hcris.landing-page'
 const HCRIS_SCHEMA_ID = 'schema.cms.hcris.worksheet-g3.accepted'
 
 const HCRIS_FIELDS = [
-  { native_name: 'PROVNUM', label: 'Provider number', definition: 'CMS Certification Number / provider number on the hospital cost report.', unit: 'identifier', example_kind: 'synthetic' as const, example: 'synthetic CCN pattern only; not a live row' },
+  { native_name: 'Provider CCN', label: 'Provider CCN', definition: 'CMS Certification Number (CCN) from the hospital cost-report dictionary and live CMS JSON.', unit: 'identifier', example_kind: 'synthetic' as const, example: 'synthetic CCN pattern only; not a live row' },
   { native_name: 'NET_PATIENT_REVENUE', label: 'Net patient revenue', definition: 'Net patient revenue from HCRIS Worksheet G-3 as used in the accepted example packet.', unit: 'unknown', example_kind: 'synthetic' as const, example: 'numeric measure; not a live value' },
 ]
 

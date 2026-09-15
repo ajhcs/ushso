@@ -28,6 +28,7 @@ test('unresolved C-009-1 and missing witnesses reject R16; merged engineering is
   assert.equal(q.c0091.rejected_as_full_acceptance, true);
   assert.equal(q.r16.accepted, false);
   assert.equal(q.r16.result, 'fail');
+  assert.equal(q.requirements.find((row) => row.id === 'R16').result, 'fail');
   assert.equal(q.release_qualified, false);
   assert.equal(q.proceeds_to_production, false);
   assert.equal(q.public_traffic_changed, false);

@@ -141,8 +141,10 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
           <p>Last successful metadata check {freshness.lastSuccessfulText}</p>
           <p>Latest catalog-metadata attempt {freshness.latestAttemptText} ({freshness.latestAttemptOutcome})</p>
           <p>Payload check {freshness.payloadCheckState}. {freshness.payloadCheck}</p>
+          <p>Known vs unverified: publisher, geography, grain, and this catalog generation are shown above. Payload access, complete schema, and independently qualified joins remain unverified unless a later evidence packet says otherwise.</p>
           <p>Catalog generation and ranking hashes stay on the results page receipt, not this card.</p>
         </details>
+        <p className="result-card__next">Next: open the access route for schema, join limits, and what remains unverified. Catalog membership is not payload access.</p>
         <div className="result-card__actions" data-result-region="details-action"><Link className="view-details" to={detailsHref} onClick={onDetailsClick}>Open access route</Link><ResultCardShortlist result={result} detailsHref={detailsHref} generation={generation} /></div>
       </aside>
     </article>

@@ -1,0 +1,66 @@
+{
+  "format": "ushso.payload-retrieval-pilot-run.v1",
+  "candidate_head": "2efafed96104012da2d17ec14d8a93c5b33a3d25",
+  "authorized": true,
+  "live_http": true,
+  "accepted": false,
+  "r04_accepted": false,
+  "requests_used": 2,
+  "requests_remaining": 2,
+  "frozen_identity_not_changed": true,
+  "frozen_cohorts_sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+  "captures": [
+    {
+      "product_key": "cms-hcris-hospital-provider-cost-report",
+      "result": "identity_failed",
+      "evidence_reference": "verification/research-program/evidence/payloads/pilot-r04/cms-hcris-hospital-provider-cost-report.json",
+      "evidence_sha256": "efb538d31b8d51bf8443b12b617271617afd2f73bf379ed53c0e8bdad2eba08f",
+      "rows": 5,
+      "bytes": 20751,
+      "http_status": 200,
+      "live_http": true,
+      "derived_sample": false,
+      "observed_provider_ccn_present": true,
+      "required_field_missing": "PROVNUM"
+    },
+    {
+      "product_key": "cdc-places-local-data-for-better-health",
+      "result": "identity_passed_release_unresolved",
+      "evidence_reference": "verification/research-program/evidence/payloads/pilot-r04/cdc-places-local-data-for-better-health.json",
+      "evidence_sha256": "d67b34efce9a129cd4d79dc56b05961c2741f41807d6dd54b154c905179ca6f4",
+      "rows": 5,
+      "bytes": 3194,
+      "http_status": 200,
+      "live_http": true,
+      "derived_sample": true,
+      "release_check": {
+        "status": "unresolved",
+        "field": "year",
+        "reason": "Frozen local documentation does not establish whether PLACES year is measurement year, publication year, or another concept. It cannot prove the 2025 county-table release by itself."
+      },
+      "first_row_fields": [
+        "year",
+        "stateabbr",
+        "statedesc",
+        "locationname",
+        "datasource",
+        "category",
+        "measure",
+        "data_value_unit",
+        "data_value_type",
+        "data_value",
+        "low_confidence_limit",
+        "high_confidence_limit",
+        "totalpopulation",
+        "totalpop18plus",
+        "locationid",
+        "categoryid",
+        "measureid",
+        "datavaluetypeid",
+        "short_question_text",
+        "geolocation"
+      ]
+    }
+  ],
+  "note": "HCRIS failed identity because live rows expose Provider CCN rather than PROVNUM. Frozen requirement was not relaxed. PLACES used the remaining request budget. Publisher bytes are gitignored."
+}

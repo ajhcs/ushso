@@ -18,7 +18,7 @@ test('requirement and finding outcomes stay open when witnesses are missing or r
   assert.equal(index.requirements.find((row) => row.id === 'R08').result, 'fail');
   assert.equal(index.requirements.find((row) => row.id === 'R12').result, 'unverified');
   assert.equal(index.requirements.find((row) => row.id === 'R15').result, 'fail');
-  assert.equal(index.requirements.find((row) => row.id === 'R16').result, 'unverified');
+  assert.equal(index.requirements.find((row) => row.id === 'R16').result, 'fail');
   assert.equal(index.findings.find((row) => row.id === 'F25').status, 'open');
   assert.equal(index.findings.find((row) => row.id === 'F31').status, 'open');
   assert.ok(index.findings.find((row) => row.id === 'F31').remaining_limitation.includes('historical'));

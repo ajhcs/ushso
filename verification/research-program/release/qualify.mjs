@@ -52,7 +52,8 @@ export function qualifyRelease({
   if (requirements.length !== 16) fail('REQUIREMENT_COUNT_NOT_16');
   if (requirements.some((row) => row.accepted === true)) fail('REQUIREMENT_ACCEPTED');
   const r16 = requirements.find((row) => row.id === 'R16');
-  if (!r16 || r16.result !== 'unverified') fail('R16_NOT_UNVERIFIED');
+  if (!r16 || r16.accepted === true) fail('R16_ACCEPTED');
+  if (!['fail', 'unverified'].includes(r16.result)) fail('R16_NOT_OPEN', String(r16.result));
 
   const skipped = freeze([
     { id: 'staging-deploy', skipped: true, pass: false, reason: 'AUTH-01/02/03 remain not_requested and unauthorized. Skipped checks are not passes.' },
