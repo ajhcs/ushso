@@ -37,6 +37,8 @@ describe('result card six-region presentation contract', () => {
     expect(markup).toContain('Grain')
     expect(markup).toContain('Time')
     expect(markup).toContain('Open access route')
+    expect(markup).toContain('Save to local shortlist')
+    expect(markup).not.toContain('data-result-region="shortlist"')
     expect(markup).not.toContain('Evidence source')
     expect(markup).not.toContain('What the fields tell you:')
     expect(markup).not.toContain('Relationship:')

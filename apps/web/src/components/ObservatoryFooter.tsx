@@ -27,6 +27,7 @@ export function ObservatoryFooter({ results = false }: ObservatoryFooterProps) {
             <Link to="/methods">Methods</Link>
             <Link to="/sources">Sources</Link>
             <Link to="/agents">Agents & API</Link>
+            <Link to="/workspace">Shortlist</Link>
             <Link to="/privacy">Privacy</Link>
             <Link to="/terms">Terms</Link>
             <Link to="/contact">Contact</Link>

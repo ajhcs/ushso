@@ -1,6 +1,7 @@
 import { AlertTriangle, ShieldCheck } from 'lucide-react'
+import { useEffect, useState, type MouseEventHandler } from 'react'
 import { Link } from 'react-router-dom'
-import type { MouseEventHandler } from 'react'
+import { SHORTLIST_CHANGED_EVENT, addShortlistItem, isOnShortlist, removeShortlistItem } from '../lib/shortlist'
 import type { DatasetFamily } from '../types/catalog'
 
 interface ResultCardProps {
@@ -8,8 +9,31 @@ interface ResultCardProps {
   id?: string
   displayRank?: number
   detailsHref?: string
+  generation?: string
   onDetailsClick?: MouseEventHandler<HTMLAnchorElement>
   uncertaintyReasons?: string[]
+}
+
+function ResultCardShortlist({ result, detailsHref, generation }: { result: DatasetFamily; detailsHref: string; generation: string }) {
+  const recordId = result.canonicalResult.record_id
+  const [saved, setSaved] = useState(() => isOnShortlist(recordId))
+  useEffect(() => {
+    const refresh = () => setSaved(isOnShortlist(recordId))
+    refresh()
+    if (typeof window === 'undefined') return
+    window.addEventListener(SHORTLIST_CHANGED_EVENT, refresh)
+    window.addEventListener('storage', refresh)
+    return () => {
+      window.removeEventListener(SHORTLIST_CHANGED_EVENT, refresh)
+      window.removeEventListener('storage', refresh)
+    }
+  }, [recordId])
+  const toggle = () => {
+    if (saved) removeShortlistItem(recordId)
+    else addShortlistItem({ record_id: recordId, title: result.title, source_name: result.sourceName, details_path: detailsHref, generation })
+    setSaved(isOnShortlist(recordId))
+  }
+  return <button type="button" className="result-card__shortlist" onClick={toggle}>{saved ? 'Remove from local shortlist' : 'Save to local shortlist'}</button>
 }
 
 function formatChecked(value: string | null | undefined) {
@@ -50,7 +74,7 @@ function matchStatus(result: DatasetFamily) {
   }
 }
 
-export function ResultCard({ result, id, displayRank, detailsHref = result.detailsUrl, onDetailsClick, uncertaintyReasons = [] }: ResultCardProps) {
+export function ResultCard({ result, id, displayRank, detailsHref = result.detailsUrl, generation = 'unknown', onDetailsClick, uncertaintyReasons = [] }: ResultCardProps) {
   const categoryDetails = result.canonicalResult.record.capabilities.topics.filter((topic) => topic.label).slice(0, 3)
   const freshness = freshnessPresentation(result)
   const metadata = result.canonicalResult.metadata
@@ -119,7 +143,7 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
           <p>Payload check {freshness.payloadCheckState}. {freshness.payloadCheck}</p>
           <p>Catalog generation and ranking hashes stay on the results page receipt, not this card.</p>
         </details>
-        <Link className="view-details" data-result-region="details-action" to={detailsHref} onClick={onDetailsClick}>Open access route</Link>
+        <div className="result-card__actions" data-result-region="details-action"><Link className="view-details" to={detailsHref} onClick={onDetailsClick}>Open access route</Link><ResultCardShortlist result={result} detailsHref={detailsHref} generation={generation} /></div>
       </aside>
     </article>
   )
