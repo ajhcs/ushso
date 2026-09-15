@@ -127,8 +127,17 @@ test('frozen catalog-metadata receipts make 86 resolved and 14 named-intake prod
       assert.equal(row.cells[field].unknown, false, row.product_key);
       assert.ok(row.cells[field].receipt_id, field);
     }
-    assert.equal(row.cells.publisher_access.status, 'named_intake_unverified_locator');
-    assert.ok(row.cells.publisher_access.limitation.includes('not a verified restricted/manual route'));
+    assert.ok([
+      'named_intake_unverified_locator',
+      'documented_family_workflow_not_verified_route',
+      'synthetic_mrf_walkthrough_not_live_sample',
+    ].includes(row.cells.publisher_access.status), row.product_key);
+    assert.ok(
+      row.cells.publisher_access.limitation.includes('not a verified restricted/manual route')
+        || row.cells.publisher_access.limitation.includes('verified_route remains false')
+        || row.cells.publisher_access.limitation.includes('not bounded samples of frozen hospital/payer locators'),
+      row.product_key,
+    );
   }
   const unknownSupported = receipt.matrix.rows.flatMap((row) => Object.values(row.cells)).filter((cell) => cell.unknown && cell.supported);
   assert.equal(unknownSupported.length, 0);
@@ -164,4 +173,14 @@ test('frozen catalog-metadata receipts make 86 resolved and 14 named-intake prod
   assert.ok(acs.cells.join_route.limitation.includes('Independently qualified routes remain 0'));
   assert.equal(hcris.cells.join_route.status, 'documented_join_fixture_not_qualified');
   assert.equal(hcris.cells.join_route.supported, false);
+  assert.equal(hcris.cells.schema_qualification.status, 'catalog_describedBy_locator_not_dictionary');
+  assert.equal(hcris.cells.unit_grain_date_denominator.status, 'example_grain_docs_not_payload_denominator');
+  const hcup = intake.find((row) => row.product_key === 'ahrq-hcup');
+  assert.equal(hcup.cells.publisher_access.status, 'documented_family_workflow_not_verified_route');
+  assert.equal(hcup.cells.publisher_access.supported, false);
+  assert.equal(receipt.engineering_readiness.r05_restricted_routes_verified, false);
+  const hospitalMrf = intake.find((row) => row.product_key === 'hospital-price-transparency-mrfs');
+  assert.equal(hospitalMrf.cells.publisher_access.status, 'synthetic_mrf_walkthrough_not_live_sample');
+  assert.equal(hospitalMrf.cells.schema_qualification.status, 'synthetic_mrf_schema_walkthrough_not_live');
+  assert.equal(hospitalMrf.cells.publisher_access.supported, false);
 });
