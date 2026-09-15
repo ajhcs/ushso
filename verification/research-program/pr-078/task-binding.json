@@ -1,0 +1,80 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr078-recovery-retention-20260915",
+  "slice_id": "C-078-1",
+  "pr_id": "PR-078",
+  "title": "Verify recovery, retention and production configuration",
+  "owner": "/root/pr078_recovery_retention",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr078-recovery-retention-20260915",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr078-recovery-retention-20260915",
+  "objective": "The system can recover without losing evidence or silently changing public truth.",
+  "outcome": "A fixture restore/rollback of staged evidence and N-1 publication is timed through existing recovery ports. A configuration file, backup listing, planned drill, or earlier static Worker rollback target is not a managed restore/failover result. AUTH-05 managed drills remain unrun. Retention, replay, rotation, and cursor invalidation stay fixture-scoped and do not erase historical approved evidence. Secrets stay out of logs. Unwanted Cloudflare Insights remains disabled and CSP is not broadened. Fresh browser captures remain untested; the 2026-09-10 F31 console record is historical, not a current capture. Health/readiness names actual static-corpus dependencies. Failure recovery cannot publish pending scientific claims. C-009-1 remains unresolved. Last-good generation live-2026-09-03-85b50522b420 is unchanged. HTTP 200 is not a completed research task.",
+  "dependencies": [
+    "PR-009",
+    "PR-030",
+    "PR-059",
+    "PR-076",
+    "PR-077"
+  ],
+  "owned_paths": [
+    "infra/recovery/",
+    "docs/research-program/operations.md",
+    "verification/research-program/recovery/",
+    "worker/index.mjs",
+    "verification/research-program/pr-078/",
+    "docs/research-program/handoffs/PR-078.json"
+  ],
+  "commits": [
+    {
+      "id": "C-078-1",
+      "subject": "Exercise evidence and publication recovery",
+      "instructions": "Restore a staged evidence/accepted-metadata snapshot and return to N-1 publication using existing recovery ports. Preserve attempts and review histories.",
+      "verification": "Measure actual restore/rollback time; a configuration file or backup listing alone is not a recovery drill."
+    },
+    {
+      "id": "C-078-2",
+      "subject": "Verify retention and key operation",
+      "instructions": "Check sample/metadata retention classes, quota behavior, job stop/replay, credential rotation and cursor invalidation through scoped tests. Keep secrets out of logs.",
+      "verification": "Deletion/rotation tests use fixtures or staging; historical approved evidence is not erased to make integrity checks pass."
+    },
+    {
+      "id": "C-078-3",
+      "subject": "Resolve configuration and console inconsistencies",
+      "instructions": "Decide whether the unwanted Insights injection should be removed or intentionally configured under the site's privacy/CSP policy. Align health/readiness signals with actual dependencies.",
+      "verification": "Fresh browser captures show the selected behavior without unexpected script errors; CSP is not broadly weakened as a shortcut."
+    }
+  ],
+  "check_commands": [
+    "node --test verification/research-program/recovery/*.test.mjs tests/worker-contract.test.mjs",
+    "npm run test:worker",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-078.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-078/",
+  "binding": {
+    "base_sha": "06bc07f2522fcd52a85bf04214ad1a2bb4842a1f",
+    "base_tree": "e84c7000aabe426074b3b8152fb22b219b3f093e",
+    "dependency_merge_shas": {
+      "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+      "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7",
+      "PR-059": "6c412f64a0bb2c901fdf593744b5ffcc61d18f80",
+      "PR-076": "e1b8de1960407849a1f00c680c448b137b72f2f6",
+      "PR-077": "425c928a227060f4cc02c70aca183ef38f9a245f"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
