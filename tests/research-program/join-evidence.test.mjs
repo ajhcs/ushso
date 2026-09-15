@@ -11,6 +11,7 @@ import {
   publishRoutes,
   scopedMetrics,
 } from '../../packages/enrichment/join-evidence.mjs';
+import { documentJoinRoutes } from '../../scripts/research-program/document-join-routes.mjs';
 
 const fixturePath = path.join(path.dirname(fileURLToPath(import.meta.url)), '../../evaluation/research-program/joins/priority-routes.json');
 
@@ -51,4 +52,10 @@ test('machine/UI consumers receive identical compatibility and limits; HCRIS-to-
   assert.equal(claim.identity_established, false);
   const all = publishRoutes(fixtures, { qualifiedIds: fixtures.routes.map((route) => route.route_id), machine: limits, ui: limits });
   assert.equal(all.qualified_count, 15);
+  const documented = documentJoinRoutes();
+  assert.equal(documented.documented_routes, 15);
+  assert.equal(documented.independently_qualified_routes, 0);
+  assert.equal(documented.r08_complete, false);
+  assert.equal(documented.ccn_equals_npi, false);
+  assert.equal(documented.accepted, false);
 });

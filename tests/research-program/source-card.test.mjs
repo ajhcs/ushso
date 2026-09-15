@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { CARDS, buildSourceCard, readerPath } from '../../packages/enrichment/source-card.mjs';
+import { buildCatalogSourceCards } from '../../scripts/research-program/build-source-cards.mjs';
 
 test('a card cannot declare Best for from topic tags alone; missing essential facts are explicitly incomplete', () => {
   assert.throws(() => buildSourceCard({
@@ -40,4 +41,24 @@ test('a reader can move from purpose to variables to a tested access step withou
   assert.ok(CARDS.hcris.release_id && CARDS.hcris.schema_id && CARDS.hcris.example_ids.length);
   assert.ok(CARDS.hcris.beginner_guide_id && CARDS.hcris.expert_guide_id);
   assert.equal(CARDS.hcris.provenance_expandable, true);
+});
+
+test('catalog-metadata cards for the frozen 100-product cohort remain incomplete and do not invent grain or payload samples', async () => {
+  const cards = await buildCatalogSourceCards();
+  assert.equal(cards.length, 100);
+  assert.equal(cards.filter((row) => row.card.incomplete).length, 100);
+  assert.equal(cards.filter((row) => row.card.status === 'research_ready').length, 0);
+  for (const row of cards) {
+    assert.ok(row.card.missing_essential.includes('grain'), row.product_key);
+    assert.ok(row.card.missing_essential.includes('example_variables'), row.product_key);
+    assert.equal(row.card.example_variables.length, 0);
+    assert.ok(row.card.limits.some((item) => item.includes('Catalog membership is not payload access.')));
+    if (row.anchor_status === 'resolved_catalog_record') {
+      assert.ok(row.evidence_reference);
+      assert.match(row.evidence_sha256, /^[a-f0-9]{64}$/);
+    } else {
+      assert.equal(row.anchor_status, 'named_intake');
+      assert.equal(row.evidence_reference, null);
+    }
+  }
 });
