@@ -29,6 +29,8 @@ const LEXICAL_BUILD_PIN = typeof USHSO_LEXICAL_BUILD_PIN === "undefined" ? null 
 const SPA_ROUTES = new Set(['/', '/search', '/learn', '/agents', '/sources', '/about', '/methods', '/plan', '/privacy', '/terms', '/contact', '/workspace', '/compare']);
 const STATIC_PATHS = new Set(['/favicon.svg', '/observatory-lighthouse.png', '/state-readiness-v0.1.0.json', '/_headers']);
 
+const HTML_CONTENT_SECURITY_POLICY = "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests";
+
 function responseHeaders(init = {}) {
   const headers = new Headers(init.headers);
   headers.set('x-content-type-options', 'nosniff');
@@ -51,6 +53,9 @@ function errorResponse(status, code, message, init = {}) {
 function textResponse(value, contentType, init = {}) {
   const headers = responseHeaders(init);
   headers.set('content-type', contentType);
+  if (typeof contentType === 'string' && contentType.toLowerCase().startsWith('text/html')) {
+    headers.set('content-security-policy', HTML_CONTENT_SECURITY_POLICY);
+  }
   return new Response(init.head ? null : value, { ...init, headers });
 }
 
@@ -278,7 +283,26 @@ export function createWorker({
         if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
         try {
           const session = await publicQueryService.openRequest({ request, env });
-          return jsonResponse(await publicQueryService.health(session), { cacheControl: 'public, max-age=60', head });
+          const health = await publicQueryService.health(session);
+          return jsonResponse({
+            ...health,
+            storage_mode: session.publication.storage_mode,
+            generation: session.publication.index_generation,
+            dependencies: {
+              static_corpus_assets: session.publication.storage_mode === 'legacy_static_assets',
+              postgresql: false,
+              hyperdrive: false,
+              source_fetch: false,
+              scheduler: false,
+              harvest: false,
+            },
+            insights: {
+              enabled: false,
+              injection: 'disabled',
+              csp_allows_cloudflareinsights: false,
+              fresh_browser_capture: 'untested',
+            },
+          }, { cacheControl: 'public, max-age=60', head });
         } catch {
           return errorResponse(503, 'corpus_unavailable', 'The published discovery corpus could not be loaded.', { head });
         }
@@ -430,7 +454,14 @@ export function createWorker({
         }
       }
 
-      if (isSpaPath(url.pathname) || isStaticPath(url.pathname)) return env.ASSETS.fetch(request);
+      if (isSpaPath(url.pathname) || isStaticPath(url.pathname)) {
+        const asset = await env.ASSETS.fetch(request);
+        const contentType = asset.headers.get('content-type') ?? '';
+        if (!contentType.toLowerCase().startsWith('text/html')) return asset;
+        const headers = new Headers(asset.headers);
+        headers.set('content-security-policy', HTML_CONTENT_SECURITY_POLICY);
+        return new Response(asset.body, { status: asset.status, statusText: asset.statusText, headers });
+      }
 
       return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Not found | USHSO</title></head><body><main><h1>Page not found</h1><p>No page exists at this address.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 404 });
     }

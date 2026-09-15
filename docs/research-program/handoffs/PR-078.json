@@ -1,0 +1,310 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-078",
+  "status": "producer_checked",
+  "owner": "/root/pr078_recovery_retention",
+  "reviewer": "Astra/root",
+  "base_sha": "06bc07f2522fcd52a85bf04214ad1a2bb4842a1f",
+  "head_sha": "537a4d77a3f8e22981cd43f669c597257fbf40a5",
+  "dependency_merge_shas": {
+    "PR-009": "80996a8d3c00792d8abb8946a67a69e0400f621a",
+    "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7",
+    "PR-059": "6c412f64a0bb2c901fdf593744b5ffcc61d18f80",
+    "PR-076": "e1b8de1960407849a1f00c680c448b137b72f2f6",
+    "PR-077": "425c928a227060f4cc02c70aca183ef38f9a245f"
+  },
+  "branch": "codex/ushso-pr078-recovery-retention-20260915",
+  "github_pr_url": null,
+  "changed_files": [
+    "verification/research-program/recovery/fixture-restore.mjs",
+    "verification/research-program/recovery/retention.mjs",
+    "verification/research-program/recovery/recovery.test.mjs",
+    "worker/index.mjs",
+    "docs/research-program/operations.md",
+    "verification/research-program/pr-078/",
+    "docs/research-program/handoffs/PR-078.json"
+  ],
+  "problem": "Recovery, retention, Insights/CSP, and health signals were not evidenced as fixture-scoped operations that cannot silently change public truth or publish pending scientific claims.",
+  "resulting_behavior": "A fixture restore/rollback of staged evidence and N-1 publication is timed through existing recovery ports. A configuration file, backup listing, planned drill, or earlier static Worker rollback target is not a managed restore/failover result. AUTH-05 managed drills remain unrun. Retention, replay, rotation, and cursor invalidation stay fixture-scoped and do not erase historical approved evidence. Secrets stay out of logs. Unwanted Cloudflare Insights remains disabled and CSP is not broadened. Fresh browser captures remain untested; the 2026-09-10 F31 console record is historical, not a current capture. Health/readiness names actual static-corpus dependencies. Failure recovery cannot publish pending scientific claims. C-009-1 remains unresolved. Last-good generation live-2026-09-03-85b50522b420 is unchanged. HTTP 200 is not a completed research task.",
+  "commits": [
+    {
+      "id": "C-078-1",
+      "subject": "Exercise evidence and publication recovery",
+      "sha": "605296ff679251a2bc155f3ceece72426c7f4180"
+    },
+    {
+      "id": "C-078-2",
+      "subject": "Verify retention and key operation",
+      "sha": "11b06ad8fed5621ee17c46e14e927c68fd2aaac9"
+    },
+    {
+      "id": "C-078-3",
+      "subject": "Resolve configuration and console inconsistencies",
+      "sha": "747119b865eb6666ea65e0f8af17dfba013bebb6"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "fixture-restore",
+      "id": "verification/research-program/recovery/fixture-restore.mjs",
+      "location": "local",
+      "sha256": "8bf180c75db068c6f471d7eee1d4e96447c59c49d2c4d53bbb1b74558506a969"
+    },
+    {
+      "kind": "retention",
+      "id": "verification/research-program/recovery/retention.mjs",
+      "location": "local",
+      "sha256": "f5d8d27c17f694940df1b95476930d927c497236d5677ca246307394ad26fe35"
+    },
+    {
+      "kind": "recovery-tests",
+      "id": "verification/research-program/recovery/recovery.test.mjs",
+      "location": "local",
+      "sha256": "a7df5c7a7d238cfdfa5ad8492f68e0cc7d82e23b754a8f60e9c60d64c9871868"
+    },
+    {
+      "kind": "worker",
+      "id": "worker/index.mjs",
+      "location": "local",
+      "sha256": "8775e9867ab474736451c9907ba0409f8900411a6e5f1097075054f61951215e"
+    },
+    {
+      "kind": "operations",
+      "id": "docs/research-program/operations.md",
+      "location": "local",
+      "sha256": "6a9e013ac1b8a7d76a8bee0593360c159fc981329a82e0a53090c3602d970de6"
+    },
+    {
+      "kind": "csp-headers-unmodified",
+      "id": "apps/web/public/_headers",
+      "location": "local",
+      "sha256": "3af216e1d387a56019d02373bdd556d222f3592294aae4f03d21bfb53a7aa788"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c078-recovery-tests",
+      "command": "node --test verification/research-program/recovery/recovery.test.mjs tests/worker-contract.test.mjs",
+      "started_at": "2026-09-15T05:49:32.483829Z",
+      "completed_at": "2026-09-15T05:49:32.691300Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Fixture N-1 restore is timed and is not a managed failover. Retention/replay/rotation do not erase historical evidence or leak secrets. Health names static-corpus dependencies. HTML CSP does not allow Insights. Fresh browser captures remain untested.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c078-recovery-tests-event",
+        "path": "verification/research-program/pr-078/producer-20260915/commands/recovery-tests/event.json",
+        "sha256": "1bfb24ca4fdc83558c97e8701f19a62b1c0ad4333c98b528e075b56df8d8377d",
+        "bytes": 1307
+      }
+    },
+    {
+      "id": "cmd-c078-test-worker",
+      "command": "npm run test:worker",
+      "started_at": "2026-09-15T05:49:32.691692Z",
+      "completed_at": "2026-09-15T05:50:24.589659Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Owned Worker contract suite plus existing top-level worker tests pass.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c078-test-worker-event",
+        "path": "verification/research-program/pr-078/producer-20260915/commands/test-worker/event.json",
+        "sha256": "e5c27ebf4faa2b8f4fcf47668bc5b193c14236a045581fb8022221c022131bb3",
+        "bytes": 1032
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr078-artifact-0",
+      "path": "verification/research-program/pr-078/task-binding.json",
+      "bytes": 4206,
+      "sha256": "73be4ad0f85859a2a436f053b0f588ebf4a64cb163c63f2fd85d82b33f25e02c"
+    },
+    {
+      "id": "pr078-artifact-1",
+      "path": "verification/research-program/pr-078/dispatch.json",
+      "bytes": 2811,
+      "sha256": "4dd01805ef6d597a873601b11385bb2acb0951e1e6bcdd5f5bb64df22eefcdd0"
+    },
+    {
+      "id": "pr078-artifact-2",
+      "path": "docs/research-program/operations.md",
+      "bytes": 3774,
+      "sha256": "6a9e013ac1b8a7d76a8bee0593360c159fc981329a82e0a53090c3602d970de6"
+    },
+    {
+      "id": "pr078-artifact-3",
+      "path": "infra/recovery/drill-matrix.v1.0.0.json",
+      "bytes": 2221,
+      "sha256": "35859f3c7541289eb3db9cfb1a286b752dd722fb0c2f1509c2c1624f2f8c8716"
+    },
+    {
+      "id": "pr078-artifact-4",
+      "path": "verification/research-program/pr-078/producer-20260915/commands/recovery-tests/receipt.json",
+      "bytes": 508,
+      "sha256": "de5d55b2d7f21f22cf6f4a5bc76435677c37e441b364da33d109e9b0477173f4"
+    },
+    {
+      "id": "pr078-artifact-5",
+      "path": "verification/research-program/pr-078/producer-20260915/commands/recovery-tests/stdout.log",
+      "bytes": 1302,
+      "sha256": "a47aa8d1d0b2bc18bf15a07ef5f680fad52e70e7a2c094eac7f7e55f65f467a7"
+    },
+    {
+      "id": "pr078-artifact-6",
+      "path": "verification/research-program/pr-078/producer-20260915/commands/recovery-tests/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr078-artifact-7",
+      "path": "verification/research-program/pr-078/producer-20260915/commands/recovery-tests/event.json",
+      "bytes": 1307,
+      "sha256": "1bfb24ca4fdc83558c97e8701f19a62b1c0ad4333c98b528e075b56df8d8377d"
+    },
+    {
+      "id": "pr078-artifact-8",
+      "path": "verification/research-program/pr-078/producer-20260915/commands/test-worker/receipt.json",
+      "bytes": 419,
+      "sha256": "65d4f24f9ac68708ebd738d4119bae02e51e3bc3cbb5c07c20eeed7c2bb1d7eb"
+    },
+    {
+      "id": "pr078-artifact-9",
+      "path": "verification/research-program/pr-078/producer-20260915/commands/test-worker/stdout.log",
+      "bytes": 80398,
+      "sha256": "e22b152eb37108c7f38101b6b6bf6444231852134f7dccdf92b9fd45235e4c83"
+    },
+    {
+      "id": "pr078-artifact-10",
+      "path": "verification/research-program/pr-078/producer-20260915/commands/test-worker/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr078-artifact-11",
+      "path": "verification/research-program/pr-078/producer-20260915/commands/test-worker/event.json",
+      "bytes": 1032,
+      "sha256": "e5c27ebf4faa2b8f4fcf47668bc5b193c14236a045581fb8022221c022131bb3"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-078-1",
+      "status": "producer_checked",
+      "result": "Measure actual restore/rollback time; a configuration file or backup listing alone is not a recovery drill.",
+      "command_ids": [
+        "cmd-c078-recovery-tests"
+      ]
+    },
+    {
+      "id": "C-078-2",
+      "status": "producer_checked",
+      "result": "Deletion/rotation tests use fixtures or staging; historical approved evidence is not erased to make integrity checks pass.",
+      "command_ids": [
+        "cmd-c078-recovery-tests"
+      ]
+    },
+    {
+      "id": "C-078-3",
+      "status": "producer_checked",
+      "result": "Insights remains disabled under existing CSP. Fresh browser captures remain untested. Health names static-corpus dependencies.",
+      "command_ids": [
+        "cmd-c078-recovery-tests",
+        "cmd-c078-test-worker"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "auth-05-managed-drills-unrun",
+      "status": "accepted",
+      "detail": "AUTH-05 provider failover, PITR, Hyperdrive reconnect, and production RPO/RTO remain pending_external_authorization."
+    },
+    {
+      "id": "fresh-browser-captures-untested",
+      "status": "accepted",
+      "detail": "Fresh browser captures of Insights/CSP console behavior remain untested. The 2026-09-10 F31 console record is historical and was not reused as a current capture."
+    },
+    {
+      "id": "c0091-unresolved",
+      "status": "accepted",
+      "detail": "C-009-1 remains unresolved. Fixture restore time is not a managed restore/failover result and is not cheapest-topology qualification."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review. Do not copy 21 MiB local-gate receipts into git."
+    },
+    {
+      "id": "wp3-sealed-recovery-json-restored",
+      "status": "accepted",
+      "detail": "First candidate edited WP3-sealed infra/recovery/controls.v1.0.0.json and drill-matrix.v1.0.0.json. Those files are restored to the bind tree. Fixture N-1 restore evidence remains in verification/research-program/recovery/."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "AUTH-05",
+      "status": "unresolved",
+      "detail": "Managed recovery drills remain unrun."
+    },
+    {
+      "id": "AUTH-12",
+      "status": "unresolved",
+      "detail": "Planner public activation remains unresolved."
+    },
+    {
+      "id": "fresh-browser-captures",
+      "status": "unresolved",
+      "detail": "Fresh browser captures of Insights/CSP remain untested."
+    },
+    {
+      "id": "independent-recovery-review",
+      "status": "pending",
+      "detail": "Independent review of fixture restore, retention, Insights decision, and health dependencies remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "fixture-restore-is-not-managed-failover",
+      "status": "risk",
+      "detail": "In-memory publication rollback elapsed_ms is not PITR, provider failover, or production RPO/RTO."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of fixture restore, retention/rotation, Insights/CSP decision, and health dependencies, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-078 source and replay recovery and worker-contract tests. Do not invent browser captures, managed failover, or C-009-1 qualification. Do not copy 21 MiB receipts into git.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, managed recovery, or C-009-1 qualification."
+    ]
+  }
+}
