@@ -14,8 +14,8 @@ Two public JSON products:
 
 | Product | Frozen record ID | Frozen native ID | Endpoint | Release verification | Limits |
 | --- | --- | --- | --- | --- | --- |
-| `cms-hcris-hospital-provider-cost-report` | `obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17` | dataset UUID `44060663-47d8-4ced-a115-b53b4c270acb` | `https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5` | native UUID plus `FY_END_DT` year 2023 (`CostReport_2023_Final`). `PROVNUM` string is shape only. | 2 requests, 128 KiB, 5 rows, 15 s, concurrency 1 |
-| `cdc-places-local-data-for-better-health` | `obs:asset:cdc-socrata:swc5-untb-f762f3e61a350434` | `swc5-untb` | `https://data.cdc.gov/resource/swc5-untb.json?$limit=5` | native id `swc5-untb` plus year 2025 county table. `stateabbr` string is shape only. `7cmc-7y5g` is forbidden. | 2 requests, 128 KiB, 5 rows, 15 s, concurrency 1 |
+| `cms-hcris-hospital-provider-cost-report` | `obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17` | dataset UUID `44060663-47d8-4ced-a115-b53b4c270acb` | `https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5` | native UUID. `PROVNUM` string is shape only. `FY_END_DT` is unresolved as catalog-release proof. | 2 requests, 128 KiB, 5 rows, 15 s, concurrency 1 |
+| `cdc-places-local-data-for-better-health` | `obs:asset:cdc-socrata:swc5-untb-f762f3e61a350434` | `swc5-untb` | `https://data.cdc.gov/resource/swc5-untb.json?$limit=5` | native id `swc5-untb`. `stateabbr` string is shape only. PLACES `year` is unresolved as measurement vs publication year. `7cmc-7y5g` is forbidden. | 2 requests, 128 KiB, 5 rows, 15 s, concurrency 1 |
 
 ## Request accounting
 

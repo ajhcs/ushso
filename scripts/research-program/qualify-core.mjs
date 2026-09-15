@@ -104,6 +104,8 @@ export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
     }
     if (payload.family_workflow_as_verified_route === true) fail('FAMILY_WORKFLOW_IS_NOT_VERIFIED_ROUTE');
     const realSample = payload._derived_payload_sample === true
+      && payload._derived_from_frozen_requirements === true
+      && payload.live_http === true
       && payload.supported === true
       && payload.bounded_sample === true
       && payload.payload_success === true
@@ -115,6 +117,7 @@ export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
       && payload._derived_row_count > 0;
     const realRoute = payload.supported === true
       && payload.verified_route === true
+      && typeof payload.route_evidence === 'string'
       && payload.family_workflow_as_verified_route !== true
       && payload.fictional !== true
       && payload._evidence_kind !== 'family_registry';

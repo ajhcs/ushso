@@ -34,14 +34,22 @@ function sha256Bytes(buffer) {
   return createHash('sha256').update(buffer).digest('hex');
 }
 
-const FILE_SHA_CACHE = new Map();
+let LAST_EVIDENCE_READ = null;
 
 function sha256File(abs) {
-  const cached = FILE_SHA_CACHE.get(abs);
-  if (cached) return cached;
-  const digest = sha256Bytes(readFileSync(abs));
-  FILE_SHA_CACHE.set(abs, digest);
+  const bytes = readFileSync(abs);
+  const digest = sha256Bytes(bytes);
+  LAST_EVIDENCE_READ = { abs, digest, bytes };
   return digest;
+}
+
+export function resetEvidenceHashCache() {
+  LAST_EVIDENCE_READ = null;
+}
+
+function cachedEvidenceBytes(abs) {
+  if (LAST_EVIDENCE_READ && LAST_EVIDENCE_READ.abs === abs) return LAST_EVIDENCE_READ.bytes;
+  fail('EVIDENCE_BYTES_UNAVAILABLE', abs);
 }
 
 function isRfc3339(value) {
@@ -92,7 +100,7 @@ function frozenProduct(repoRoot, productKey) {
 }
 
 function readEvidenceBytes(abs, relative) {
-  const bytes = readFileSync(abs);
+  const bytes = cachedEvidenceBytes(abs);
   if (relative.endsWith('.gz')) return gunzipSync(bytes);
   return bytes;
 }
@@ -106,10 +114,7 @@ function parseEvidence(relative, bytes) {
     const lines = text.split('\n').filter((line) => line.trim());
     return { kind: 'jsonl', value: lines.map((line) => JSON.parse(line)), text };
   }
-  if (relative.endsWith('.csv')) {
-    const lines = text.split('\n').filter((line) => line.trim());
-    return { kind: 'csv', value: lines, text };
-  }
+  if (relative.endsWith('.csv')) fail('BOUNDED_SAMPLE_CSV_UNSUPPORTED');
   return { kind: 'bytes', value: null, text };
 }
 
@@ -151,34 +156,54 @@ function payloadRowsFromParsed(parsed, format) {
     if (!Array.isArray(rows)) fail('BOUNDED_SAMPLE_OBJECT_HAS_NO_ROWS');
     return rows;
   }
-  if (format === 'csv_rows') {
-    if (parsed.kind !== 'csv' || parsed.value.length < 2) fail('BOUNDED_SAMPLE_NOT_CSV_ROWS');
-    const header = parsed.value[0].split(',').map((cell) => cell.trim());
-    return parsed.value.slice(1).map((line) => {
-      const cells = line.split(',');
-      return Object.fromEntries(header.map((name, index) => [name, cells[index]]));
-    });
-  }
+  if (format === 'csv_rows') fail('BOUNDED_SAMPLE_CSV_UNSUPPORTED');
   fail('BOUNDED_SAMPLE_RESULT_FORMAT');
 }
 
-function requireIdentityMatch(product, payload) {
+function loadProductSampleRequirements(repoRoot) {
+  return loadJsonRelative(repoRoot, 'verification/research-program/evidence/product-sample-requirements.json');
+}
+
+function productSampleRequirement(repoRoot, productKey) {
+  const catalog = loadProductSampleRequirements(repoRoot);
+  const requirement = catalog.products?.[productKey];
+  if (!requirement) fail('PRODUCT_SAMPLE_REQUIREMENT_MISSING', productKey);
+  return requirement;
+}
+
+function requireIdentityMatch(product, payload, requirement) {
   const representative = product.anchor?.representative ?? {};
-  const frozenRecordId = representative.record_id ?? null;
-  const frozenNativeId = representative.native_id ?? null;
-  if (payload.record_id && frozenRecordId && payload.record_id !== frozenRecordId) fail('SAMPLE_RECORD_ID_MISMATCH');
-  if (payload.native_product_id !== frozenNativeId) fail('SAMPLE_NATIVE_ID_MISMATCH');
+  const frozenRecordId = representative.record_id ?? requirement.required_record_id ?? null;
+  const frozenNativeId = representative.native_id ?? requirement.required_native_id ?? null;
+  if (typeof payload.record_id !== 'string' || !payload.record_id.trim()) fail('BOUNDED_SAMPLE_RECORD_ID_REQUIRED');
+  if (typeof payload.native_product_id !== 'string' || !payload.native_product_id.trim()) fail('BOUNDED_SAMPLE_NATIVE_ID_REQUIRED');
+  if (!frozenRecordId || payload.record_id !== frozenRecordId) fail('SAMPLE_RECORD_ID_MISMATCH');
+  if (!frozenNativeId || payload.native_product_id !== frozenNativeId) fail('SAMPLE_NATIVE_ID_MISMATCH');
+  if (payload.record_id !== requirement.required_record_id) fail('SAMPLE_RECORD_ID_MISMATCH');
+  if (payload.native_product_id !== requirement.required_native_id) fail('SAMPLE_NATIVE_ID_MISMATCH');
   if (typeof payload.release_id !== 'string' || !payload.release_id.trim()) fail('BOUNDED_SAMPLE_RELEASE_ID_REQUIRED');
   if (payload.release_id === frozenNativeId) fail('SAMPLE_RELEASE_EQUALS_NATIVE_ID');
   if (payload.vintage_substitution === true) fail('VINTAGE_SUBSTITUTION_FORBIDDEN');
-  if (typeof frozenNativeId === 'string' && /20\d{2}/.test(frozenNativeId)) {
-    const frozenYear = frozenNativeId.match(/20\d{2}/g)?.at(-1);
-    const claimedYear = String(payload.release_id).match(/20\d{2}/g)?.at(-1);
-    if (frozenYear && claimedYear && frozenYear !== claimedYear) fail('VINTAGE_SUBSTITUTION_FORBIDDEN');
+  if ((requirement.forbidden_native_ids ?? []).some((id) => payload.native_product_id.includes(id))) fail('VINTAGE_SUBSTITUTION_FORBIDDEN');
+}
+
+function requireAuthorizedUrl(url, requirement) {
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    fail('BOUNDED_SAMPLE_URL_INVALID', url);
   }
+  if (parsedUrl.protocol !== 'https:') fail('BOUNDED_SAMPLE_URL_NOT_HTTPS', url);
+  if (!(requirement.authorized_hosts ?? []).includes(parsedUrl.host)) fail('BOUNDED_SAMPLE_URL_HOST', url);
+  if (requirement.authorized_url_contains && !url.includes(requirement.authorized_url_contains)) fail('BOUNDED_SAMPLE_URL_SCOPE', url);
 }
 
 function requirePayloadExecution(payload, parsed, kind) {
+  delete payload._derived_payload_sample;
+  delete payload._derived_row_count;
+  const requirement = payload._product_sample_requirement;
+  if (!requirement) fail('PRODUCT_SAMPLE_REQUIREMENT_MISSING');
   const execution = payload.execution;
   if (!execution || typeof execution !== 'object') fail('BOUNDED_SAMPLE_EXECUTION_REQUIRED');
   if (execution.kind !== 'bounded_http_sample' && execution.kind !== 'bounded_file_sample') fail('BOUNDED_SAMPLE_EXECUTION_KIND');
@@ -187,33 +212,41 @@ function requirePayloadExecution(payload, parsed, kind) {
   if (execution.kind === 'bounded_http_sample') {
     if (typeof execution.request_url !== 'string' || !execution.request_url.trim()) fail('BOUNDED_SAMPLE_REQUEST_URL');
     if (typeof execution.final_url !== 'string' || !execution.final_url.trim()) fail('BOUNDED_SAMPLE_FINAL_URL');
+    requireAuthorizedUrl(execution.request_url, requirement);
+    requireAuthorizedUrl(execution.final_url, requirement);
     if (!Number.isSafeInteger(execution.http_status) || execution.http_status < 200 || execution.http_status > 299) fail('BOUNDED_SAMPLE_HTTP_STATUS');
     if (typeof execution.content_type !== 'string' || (!execution.content_type.includes('json') && execution.content_type !== 'text/csv')) fail('BOUNDED_SAMPLE_CONTENT_TYPE');
     if (!Number.isSafeInteger(execution.redirects) || execution.redirects < 0) fail('BOUNDED_SAMPLE_REDIRECTS');
     if (!Array.isArray(execution.redirect_chain)) fail('BOUNDED_SAMPLE_REDIRECT_CHAIN');
     if (execution.redirect_chain.length !== execution.redirects) fail('BOUNDED_SAMPLE_REDIRECT_CHAIN_LENGTH');
+    for (const hop of execution.redirect_chain) requireAuthorizedUrl(hop, requirement);
   }
   if (!PAYLOAD_RESULT_FORMATS.includes(payload.result_format)) fail('BOUNDED_SAMPLE_RESULT_FORMAT');
   if (evidenceLooksLikeCatalogMetadata(kind, parsed)) fail('CATALOG_METADATA_IS_NOT_PAYLOAD_SAMPLE');
   const rows = payloadRowsFromParsed(parsed, payload.result_format);
   if (!Array.isArray(rows) || rows.length === 0) fail('BOUNDED_SAMPLE_EMPTY_ROWS');
   if (!Number.isSafeInteger(payload.row_count) || payload.row_count !== rows.length) fail('BOUNDED_SAMPLE_ROW_COUNT');
-  const checks = payload.identity_checks;
-  if (!checks || typeof checks !== 'object' || !checks.required_fields || typeof checks.required_fields !== 'object') fail('BOUNDED_SAMPLE_IDENTITY_CHECKS');
-  for (const [field, typeName] of Object.entries(checks.required_fields)) {
-    const value = rows[0]?.[field];
-    if (value == null || value === '') fail('BOUNDED_SAMPLE_IDENTITY_FIELD_MISSING', field);
-    if (typeName === 'string' && typeof value !== 'string') fail('BOUNDED_SAMPLE_IDENTITY_TYPE', field);
-  }
-  if (checks.constraints && typeof checks.constraints === 'object') {
-    for (const [field, constraint] of Object.entries(checks.constraints)) {
-      const value = String(rows[0]?.[field] ?? '');
-      if (constraint?.pattern && !new RegExp(constraint.pattern).test(value)) fail('BOUNDED_SAMPLE_RELEASE_CONSTRAINT', field);
-      if (Array.isArray(constraint?.allowed) && !constraint.allowed.includes(value)) fail('BOUNDED_SAMPLE_RELEASE_CONSTRAINT', field);
+  const requiredFields = payload._product_sample_requirement?.row_fields ?? {};
+  if (Object.keys(requiredFields).length === 0) fail('PRODUCT_SAMPLE_REQUIREMENT_EMPTY');
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    if (!row || typeof row !== 'object' || Array.isArray(row)) fail('BOUNDED_SAMPLE_ROW_NOT_OBJECT', String(index));
+    for (const field of Object.keys(requiredFields)) {
+      const typeName = requiredFields[field];
+      const value = row[field];
+      if (value == null || value === '') fail('BOUNDED_SAMPLE_IDENTITY_FIELD_MISSING', String(index) + ':' + field);
+      if (typeName === 'string' && typeof value !== 'string') fail('BOUNDED_SAMPLE_IDENTITY_TYPE', String(index) + ':' + field);
     }
   }
+  const releaseCheck = payload._product_sample_requirement?.release_check ?? { status: 'unresolved' };
+  payload._release_check = freeze({
+    status: releaseCheck.status ?? 'unresolved',
+    field: releaseCheck.field ?? null,
+    reason: releaseCheck.reason ?? 'Release semantics are unresolved.',
+  });
   payload._derived_payload_sample = true;
   payload._derived_row_count = rows.length;
+  payload._derived_from_frozen_requirements = true;
 }
 
 export function listReceiptFiles(repoRoot = ROOT, relativeDir = DEFAULT_RECEIPT_DIR) {
@@ -225,14 +258,48 @@ export function listReceiptFiles(repoRoot = ROOT, relativeDir = DEFAULT_RECEIPT_
     .map((name) => path.join(relativeDir, name));
 }
 
-function authGranted(register, authorization, { candidateHead, environment, action = null }) {
+function loadPayloadAuthorizationRegister(repoRoot) {
+  return loadJsonRelative(repoRoot, 'verification/research-program/authorization/payload-authorizations.json');
+}
+
+function payloadAuthorizationGranted(register, authorization, context) {
+  if (!authorization || typeof authorization !== 'object') return false;
+  if (authorization.id === 'AUTH-04') return false;
+  if (authorization.authorized !== true) return false;
+  const entries = register?.entries ?? [];
+  const row = entries.find((item) => item.id === authorization.id);
+  if (!row) return false;
+  if (row.authorized !== true || row.status !== 'authorized') return false;
+  if (row.revoked === true) return false;
+  if (row.action !== 'payload_retrieval') return false;
+  if (!row.candidate_head || row.candidate_head !== context.candidateHead) return false;
+  if (row.valid_from && Date.parse(row.valid_from) > Date.now()) return false;
+  if (row.valid_until && Date.parse(row.valid_until) < Date.now()) return false;
+  if (context.productKey && !(row.product_keys ?? []).includes(context.productKey)) return false;
+  if (context.requestUrl) {
+    const allowed = row.endpoints ?? [];
+    if (!allowed.some((endpoint) => context.requestUrl === endpoint || context.requestUrl.startsWith(endpoint))) return false;
+  }
+  const limits = row.limits ?? {};
+  if (context.rowCount != null && Number.isSafeInteger(limits.max_rows) && context.rowCount > limits.max_rows) return false;
+  if (context.bytes != null && Number.isSafeInteger(limits.max_bytes) && context.bytes > limits.max_bytes) return false;
+  if ((row.credentials?.kind ?? 'none') !== 'none' || row.credentials?.required === true) return false;
+  return true;
+}
+
+function authGranted(register, authorization, { candidateHead, environment, action = null, payloadAuthRegister = null, productKey = null, requestUrl = null, rowCount = null, bytes = null } = {}) {
   if (!authorization || typeof authorization !== 'object') return false;
   if (authorization.authorized !== true) return false;
-  if (authorization.candidate_head && authorization.candidate_head !== candidateHead) return false;
   if (action === 'payload_retrieval') {
-    if (authorization.id === 'AUTH-04') return false;
-    return ['AUTH-PAYLOAD-PILOT', 'AUTH-PAYLOAD-RETRIEVAL'].includes(authorization.id);
+    return payloadAuthorizationGranted(payloadAuthRegister, authorization, {
+      candidateHead,
+      productKey,
+      requestUrl,
+      rowCount,
+      bytes,
+    });
   }
+  if (authorization.candidate_head && authorization.candidate_head !== candidateHead) return false;
   if (environment === 'fixture') return authorization.environment === 'fixture' && authorization.id === 'AUTH-FIXTURE';
   const entries = register?.entries ?? [];
   const row = entries.find((item) => item.id === authorization.id);
@@ -253,7 +320,9 @@ export function validateReceipt(receipt, {
   currentCandidateHead = null,
   currentCandidateTree = null,
   authorizationRegister = null,
+  payloadAuthRegister = null,
 } = {}) {
+  const payloadRegister = payloadAuthRegister ?? loadPayloadAuthorizationRegister(repoRoot);
   if (!receipt || typeof receipt !== 'object' || Array.isArray(receipt)) fail('RECEIPT_NOT_OBJECT');
   if (receipt.format !== 'ushso.evidence-receipt.v1') fail('RECEIPT_FORMAT');
   if (typeof receipt.receipt_id !== 'string' || !receipt.receipt_id.trim()) fail('RECEIPT_ID_REQUIRED');
@@ -291,10 +360,15 @@ export function validateReceipt(receipt, {
     if (!['fixture', 'staging', 'production'].includes(payload.environment)) fail('OBSERVATION_ENVIRONMENT');
     if (!isRfc3339(payload.observation_started_at) || !isRfc3339(payload.observation_ended_at)) fail('OBSERVATION_TIMESTAMPS');
     if (Date.parse(payload.observation_ended_at) <= Date.parse(payload.observation_started_at)) fail('OBSERVATION_WINDOW_INVERTED');
-    if (Date.parse(payload.observation_ended_at) > Date.now() + 86400000) fail('OBSERVATION_WINDOW_IN_FUTURE');
+    if (Date.parse(payload.observation_ended_at) > Date.now()) fail('OBSERVATION_WINDOW_IN_FUTURE');
+    if (Date.parse(payload.observation_started_at) > Date.now()) fail('OBSERVATION_WINDOW_IN_FUTURE');
     if (payload.generated_dates === true || payload.simulated_operation === true) fail('GENERATED_DATES_OR_SIMULATION_FORBIDDEN');
     if (!payload.deployment?.deployment_id || !payload.deployment?.version_id) fail('OBSERVATION_DEPLOYMENT_REQUIRED');
-    if (currentCandidateHead && payload.deployment.candidate_head && payload.deployment.candidate_head !== currentCandidateHead) fail('OBSERVATION_DEPLOYMENT_CANDIDATE_MISMATCH');
+    if (typeof payload.deployment.candidate_head !== 'string' || !payload.deployment.candidate_head.trim()) fail('OBSERVATION_DEPLOYMENT_CANDIDATE_REQUIRED');
+    if (payload.deployment.candidate_head !== receipt.candidate_head) fail('OBSERVATION_DEPLOYMENT_CANDIDATE_MISMATCH');
+    if (currentCandidateHead && payload.deployment.candidate_head !== currentCandidateHead) fail('OBSERVATION_DEPLOYMENT_CANDIDATE_MISMATCH');
+    if (typeof payload.deployment.deployed_at !== 'string' || !isRfc3339(payload.deployment.deployed_at)) fail('OBSERVATION_DEPLOYMENT_TIME_REQUIRED');
+    if (Date.parse(payload.observation_started_at) < Date.parse(payload.deployment.deployed_at)) fail('OBSERVATION_STARTED_BEFORE_DEPLOYMENT');
     if (!authGranted(authorizationRegister, payload.authorization, {
       candidateHead: receipt.candidate_head,
       environment: payload.environment,
@@ -323,6 +397,11 @@ export function validateReceipt(receipt, {
         candidateHead: receipt.candidate_head,
         environment: payload.authorization?.environment ?? 'staging_egress',
         action: 'payload_retrieval',
+        payloadAuthRegister: payloadRegister,
+        productKey: payload.product_key,
+        requestUrl: payload.execution?.request_url ?? payload.execution?.final_url ?? null,
+        rowCount: payload.row_count ?? null,
+        bytes: payload.bytes ?? payload.execution?.bytes ?? null,
       })) fail('UNAUTHORIZED_LIVE_HTTP');
     } else if (payload.bounded_sample === true && payload.execution?.kind === 'bounded_http_sample') {
       fail('HTTP_SAMPLE_ORIGIN_MUST_BE_TRUTHFUL');
@@ -341,7 +420,9 @@ export function validateReceipt(receipt, {
     if (payload.bounded_sample === true) {
       if (payload.supported === false) fail('BOUNDED_SAMPLE_CANNOT_BE_UNSUPPORTED');
       const product = frozenProduct(repoRoot, payload.product_key);
-      requireIdentityMatch(product, payload);
+      const requirement = productSampleRequirement(repoRoot, payload.product_key);
+      payload._product_sample_requirement = requirement;
+      requireIdentityMatch(product, payload, requirement);
       requirePayloadExecution(payload, parsedEvidence, evidenceKind);
       if (payload.payload_success !== true) fail('BOUNDED_SAMPLE_REQUIRES_PAYLOAD_SUCCESS');
       payload.supported = true;
@@ -355,6 +436,8 @@ export function validateReceipt(receipt, {
     if (payload.verified_route === true) {
       if (payload.payload_success === true && payload.bounded_sample !== true) fail('VERIFIED_ROUTE_IS_NOT_AUTOMATIC_SAMPLE');
       if (typeof payload.route_id !== 'string' || !payload.route_id.trim()) fail('VERIFIED_ROUTE_ID_REQUIRED');
+      if (typeof payload.route_evidence !== 'string' || !payload.route_evidence.trim()) fail('VERIFIED_ROUTE_EVIDENCE_REQUIRED');
+      if (payload.supported === true && evidenceKind === 'family_registry') fail('FAMILY_WORKFLOW_IS_NOT_VERIFIED_ROUTE');
     }
   }
 
@@ -371,6 +454,7 @@ export function validateReceipt(receipt, {
     if (payload.generated_dates === true || payload.simulated_operation === true) fail('GENERATED_DATES_OR_SIMULATION_FORBIDDEN');
     if (typeof payload.complete !== 'boolean') fail('CYCLE_COMPLETE_FLAG');
     const after = payload.after_refresh ?? {};
+    if (typeof after.evidence_sha256 !== 'string' || after.evidence_sha256 !== receipt.evidence_sha256) fail('AFTER_REFRESH_EVIDENCE_REQUIRED');
     payload._after_refresh_complete = ['examples_checked', 'schemas_checked', 'joins_checked', 'cross_surface_checked']
       .every((key) => after[key] === true);
   }
@@ -428,20 +512,26 @@ export function calculateObservation(receipts = []) {
   const days = window ? elapsedDays(window.payload.observation_started_at, window.payload.observation_ended_at) : 0;
   const runIds = new Set();
   const completeCycles = [];
-  if (window && Date.parse(window.payload.observation_ended_at) > Date.now() + 86400000) fail('OBSERVATION_WINDOW_IN_FUTURE');
+  if (window && Date.parse(window.payload.observation_ended_at) > Date.now()) fail('OBSERVATION_WINDOW_IN_FUTURE');
   for (const cycle of cycles) {
     if (runIds.has(cycle.payload.scheduler_run_id)) fail('DUPLICATE_SCHEDULER_RUN_ID', cycle.payload.scheduler_run_id);
     runIds.add(cycle.payload.scheduler_run_id);
     const start = Date.parse(cycle.payload.started_at);
     const end = Date.parse(cycle.payload.completed_at);
     if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) fail('CYCLE_TIMESTAMPS_INVERTED');
+    if (end > Date.now()) fail('CYCLE_IN_FUTURE');
     if (window) {
       const windowStart = Date.parse(window.payload.observation_started_at);
       const windowEnd = Date.parse(window.payload.observation_ended_at);
       if (start < windowStart || end > windowEnd) fail('CYCLE_OUTSIDE_OBSERVATION_WINDOW', cycle.payload.cycle_id);
-      if (cycle.payload.environment && cycle.payload.environment !== window.payload.environment) fail('CYCLE_ENVIRONMENT_MISMATCH');
-      if (cycle.payload.deployment?.deployment_id && cycle.payload.deployment.deployment_id !== window.payload.deployment.deployment_id) fail('CYCLE_DEPLOYMENT_MISMATCH');
-      if (cycle.candidate_head && window.candidate_head && cycle.candidate_head !== window.candidate_head) fail('CYCLE_CANDIDATE_MISMATCH');
+      if (typeof cycle.payload.environment !== 'string' || !cycle.payload.environment.trim()) fail('CYCLE_ENVIRONMENT_REQUIRED');
+      if (cycle.payload.environment !== window.payload.environment) fail('CYCLE_ENVIRONMENT_MISMATCH');
+      if (typeof cycle.payload.deployment?.deployment_id !== 'string' || !cycle.payload.deployment.deployment_id.trim()) fail('CYCLE_DEPLOYMENT_REQUIRED');
+      if (cycle.payload.deployment.deployment_id !== window.payload.deployment.deployment_id) fail('CYCLE_DEPLOYMENT_MISMATCH');
+      if (typeof cycle.candidate_head !== 'string' || !cycle.candidate_head.trim()) fail('CYCLE_CANDIDATE_REQUIRED');
+      if (cycle.candidate_head !== window.candidate_head) fail('CYCLE_CANDIDATE_MISMATCH');
+      const deployedAt = Date.parse(window.payload.deployment.deployed_at);
+      if (Number.isFinite(deployedAt) && start < deployedAt) fail('CYCLE_BEFORE_DEPLOYMENT');
     } else if (cycle.payload.complete === true) {
       fail('CYCLE_WITHOUT_OBSERVATION_WINDOW');
     }

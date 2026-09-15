@@ -102,7 +102,7 @@ test('validated core-cell receipts can fill unknown cells; unknown remains unsup
   }, { repoRoot: ROOT });
   assert.equal(receipt.payload._derived_payload_sample, true);
   const derivedCounts = payloadSampleCountsFromReceipts([receipt], cohort.products);
-  assert.equal(derivedCounts.public_sample_complete, 1);
+  assert.equal(derivedCounts.public_sample_complete, 0);
   assert.throws(() => validateReceipt({
     ...receipt,
     receipt_id: 'core-cell-unknown-supported',
@@ -309,7 +309,7 @@ test('catalog-locator bytes cannot count as a payload sample when misleading fla
       recipe: 'reuse catalog-slim bytes as if they were payload rows',
       live_http: false,
     },
-  }, { repoRoot: ROOT }), { code: 'SAMPLE_NATIVE_ID_MISMATCH' });
+  }, { repoRoot: ROOT }), { code: 'BOUNDED_SAMPLE_RECORD_ID_REQUIRED' });
   assert.throws(() => validateReceipt({
     format: 'ushso.evidence-receipt.v1',
     receipt_id: 'catalog-locator-as-sample-matching-ids',

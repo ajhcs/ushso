@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdirSync, mkdtempSync, unlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,6 +11,7 @@ import {
   calculateAttemptLedger,
   calculateObservation,
   ingestEvidence,
+  resetEvidenceHashCache,
   validateReceipt,
 } from '../../scripts/research-program/ingest-evidence.mjs';
 import { materializeAttemptLedger } from '../../scripts/research-program/materialize-attempt-ledger.mjs';
@@ -34,6 +36,21 @@ function receipt(kind, payload, extra = {}) {
     payload,
   };
 }
+
+const AFTER_REFRESH = {
+  examples_checked: true,
+  schemas_checked: true,
+  joins_checked: true,
+  cross_surface_checked: true,
+  evidence_sha256: SHA,
+};
+
+const DEPLOYMENT = {
+  deployment_id: 'dep-fixture',
+  version_id: 'ver-fixture',
+  candidate_head: HEAD,
+  deployed_at: '2026-08-31T00:00:00Z',
+};
 
 const fixtureAuth = {
   id: 'AUTH-FIXTURE',
@@ -77,10 +94,10 @@ test('validated receipts change calculated observation and attempt results witho
   const window = receipt('observation_window', {
     environment: 'staging',
     observation_started_at: '2026-09-01T00:00:00Z',
-    observation_ended_at: '2026-09-16T00:00:00Z',
+    observation_ended_at: '2026-09-15T00:00:00Z',
     generated_dates: false,
     simulated_operation: false,
-    deployment: { deployment_id: 'dep-fixture', version_id: 'ver-fixture' },
+    deployment: DEPLOYMENT,
     authorization: { id: 'AUTH-03', authorized: true, environment: 'staging', candidate_head: HEAD },
   }, { receipt_id: 'window-1' });
   const cycle = (id) => receipt('scheduled_cycle', {
@@ -91,7 +108,9 @@ test('validated receipts change calculated observation and attempt results witho
     generated_dates: false,
     simulated_operation: false,
     complete: true,
-    after_refresh: { examples_checked: true, schemas_checked: true, joins_checked: true, cross_surface_checked: true },
+    environment: 'staging',
+    deployment: { deployment_id: 'dep-fixture' },
+    after_refresh: AFTER_REFRESH,
   }, { receipt_id: `cycle-${id}` });
   const register = { entries: [{ id: 'AUTH-03', authorized: true }] };
   const days = calculateObservation([
@@ -99,7 +118,7 @@ test('validated receipts change calculated observation and attempt results witho
     validateReceipt(cycle('c1'), { repoRoot: ROOT }),
     validateReceipt(cycle('c2'), { repoRoot: ROOT }),
   ]);
-  assert.equal(days.elapsed_observation_days, 15);
+  assert.equal(days.elapsed_observation_days, 14);
   assert.equal(days.complete_scheduled_cycles, 2);
   assert.equal(days.technical_success, true);
   assert.equal(days.scientific_approval, false);
@@ -107,14 +126,14 @@ test('validated receipts change calculated observation and attempt results witho
   const fixtureWindow = receipt('observation_window', {
     environment: 'fixture',
     observation_started_at: '2026-09-01T00:00:00Z',
-    observation_ended_at: '2026-09-16T00:00:00Z',
+    observation_ended_at: '2026-09-15T00:00:00Z',
     generated_dates: false,
     simulated_operation: false,
-    deployment: { deployment_id: 'dep-fixture', version_id: 'ver-fixture' },
+    deployment: DEPLOYMENT,
     authorization: fixtureAuth,
   }, { receipt_id: 'window-fixture' });
   const fixtureDays = calculateObservation([validateReceipt(fixtureWindow, { repoRoot: ROOT })]);
-  assert.equal(fixtureDays.elapsed_observation_days, 15);
+  assert.equal(fixtureDays.elapsed_observation_days, 14);
   assert.equal(fixtureDays.technical_success, false);
   assert.equal(fixtureDays.fixture_observation_cannot_satisfy_r15, true);
 
@@ -297,7 +316,7 @@ test('known-unsupported core cells require a limitation and still cannot count a
     release_id: 'release',
     live_http: false,
     recipe: 'claim bounded sample without payload success',
-  }, { receipt_id: 'core-cell-sample-without-payload' }), { repoRoot: ROOT }), { code: 'SAMPLE_NATIVE_ID_MISMATCH' });
+  }, { receipt_id: 'core-cell-sample-without-payload' }), { repoRoot: ROOT }), { code: 'BOUNDED_SAMPLE_RECORD_ID_REQUIRED' });
   assert.throws(() => validateReceipt(receipt('core_cell', {
     product_key: productKey,
     field: 'publisher_access',
@@ -314,7 +333,7 @@ test('known-unsupported core cells require a limitation and still cannot count a
     receipt_id: 'core-cell-catalog-locator-as-sample',
     evidence_reference: 'verification/research-program/pr-013/fixtures/cms-catalog-slim.json.gz',
     evidence_sha256: 'e36c53352e0781a16dac658ff4e227ed430fef88aba89d38fc70aa652df2c722',
-  }), { repoRoot: ROOT }), { code: 'SAMPLE_NATIVE_ID_MISMATCH' });
+  }), { repoRoot: ROOT }), { code: 'BOUNDED_SAMPLE_RECORD_ID_REQUIRED' });
 });
 
 test('invalid observation windows and cycles cannot report technical success', () => {
@@ -333,10 +352,10 @@ test('invalid observation windows and cycles cannot report technical success', (
   const window = validateReceipt(receipt('observation_window', {
     environment: 'staging',
     observation_started_at: '2026-09-01T00:00:00Z',
-    observation_ended_at: '2026-09-16T00:00:00Z',
+    observation_ended_at: '2026-09-15T00:00:00Z',
     generated_dates: false,
     simulated_operation: false,
-    deployment: { deployment_id: 'dep-fixture', version_id: 'ver-fixture', candidate_head: HEAD },
+    deployment: DEPLOYMENT,
     authorization: { id: 'AUTH-03', authorized: true, environment: 'staging', candidate_head: HEAD },
   }, { receipt_id: 'window-valid' }), { repoRoot: ROOT, authorizationRegister: register });
 
@@ -348,7 +367,7 @@ test('invalid observation windows and cycles cannot report technical success', (
     generated_dates: false,
     simulated_operation: false,
     complete: true,
-    after_refresh: { examples_checked: true, schemas_checked: true, joins_checked: true, cross_surface_checked: true },
+    after_refresh: AFTER_REFRESH,
   }, { receipt_id: 'cycle-inverted' }), { repoRoot: ROOT }), { code: 'CYCLE_TIMESTAMPS_INVERTED' });
 
   const outside = validateReceipt(receipt('scheduled_cycle', {
@@ -359,7 +378,7 @@ test('invalid observation windows and cycles cannot report technical success', (
     generated_dates: false,
     simulated_operation: false,
     complete: true,
-    after_refresh: { examples_checked: true, schemas_checked: true, joins_checked: true, cross_surface_checked: true },
+    after_refresh: AFTER_REFRESH,
   }, { receipt_id: 'cycle-outside' }), { repoRoot: ROOT });
   assert.throws(() => calculateObservation([window, outside]), { code: 'CYCLE_OUTSIDE_OBSERVATION_WINDOW' });
 
@@ -371,7 +390,7 @@ test('invalid observation windows and cycles cannot report technical success', (
     generated_dates: false,
     simulated_operation: false,
     complete: true,
-    after_refresh: { examples_checked: true, schemas_checked: true, joins_checked: true, cross_surface_checked: true },
+    after_refresh: AFTER_REFRESH,
   }, { receipt_id: 'cycle-dup-a' }), { repoRoot: ROOT });
   assert.throws(() => validateReceipt(receipt('scheduled_cycle', {
     cycle_id: 'dup-b',
@@ -381,7 +400,7 @@ test('invalid observation windows and cycles cannot report technical success', (
     generated_dates: false,
     simulated_operation: false,
     complete: true,
-    after_refresh: { examples_checked: true, schemas_checked: true, joins_checked: true, cross_surface_checked: true },
+    after_refresh: AFTER_REFRESH,
   }, { receipt_id: 'cycle-dup-b' }), { repoRoot: ROOT, seenSchedulerRunIds: new Set([duplicateA.payload.scheduler_run_id]) }), { code: 'DUPLICATE_SCHEDULER_RUN_ID' });
 });
 
@@ -424,6 +443,28 @@ test('authorized live HTTP captures remain live_http=true; AUTH-04 cannot grant 
     evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
     evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
   }), { repoRoot: ROOT }), { code: 'UNAUTHORIZED_LIVE_HTTP' });
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    ...payload,
+    authorization: { id: 'AUTH-PAYLOAD-PILOT', authorized: true, environment: 'staging_egress', candidate_head: HEAD },
+  }, {
+    receipt_id: 'core-cell-auth-payload-pilot-unregistered',
+    evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
+    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
+  }), { repoRoot: ROOT }), { code: 'UNAUTHORIZED_LIVE_HTTP' });
+  const granted = {
+    format: 'ushso.payload-authorization-register.v1',
+    entries: [{
+      id: 'AUTH-PAYLOAD-PILOT',
+      authorized: true,
+      status: 'authorized',
+      action: 'payload_retrieval',
+      candidate_head: HEAD,
+      product_keys: [productKey],
+      endpoints: ['https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data'],
+      limits: { max_rows: 5, max_bytes: 131072 },
+      credentials: { required: false, kind: 'none' },
+    }],
+  };
   const accepted = validateReceipt(receipt('core_cell', {
     ...payload,
     authorization: { id: 'AUTH-PAYLOAD-PILOT', authorized: true, environment: 'staging_egress', candidate_head: HEAD },
@@ -431,10 +472,19 @@ test('authorized live HTTP captures remain live_http=true; AUTH-04 cannot grant 
     receipt_id: 'core-cell-auth-payload-pilot',
     evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
     evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
-  }), { repoRoot: ROOT });
+  }), { repoRoot: ROOT, payloadAuthRegister: granted });
   assert.equal(accepted.payload.live_http, true);
   assert.equal(accepted.payload._derived_payload_sample, true);
   assert.equal(accepted.payload.authorization.id, 'AUTH-PAYLOAD-PILOT');
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    ...payload,
+    execution: { ...payload.execution, request_url: 'https://data.cdc.gov/resource/swc5-untb.json?$limit=5', final_url: 'https://data.cdc.gov/resource/swc5-untb.json?$limit=5' },
+    authorization: { id: 'AUTH-PAYLOAD-PILOT', authorized: true, environment: 'staging_egress', candidate_head: HEAD },
+  }, {
+    receipt_id: 'core-cell-auth-payload-wrong-endpoint',
+    evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
+    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
+  }), { repoRoot: ROOT, payloadAuthRegister: granted }), { code: 'UNAUTHORIZED_LIVE_HTTP' });
 });
 
 test('frozen 3434 IDs seed 13736 not_attempted axes without promoting not_attempted to success', () => {
@@ -453,4 +503,151 @@ test('frozen 3434 IDs seed 13736 not_attempted axes without promoting not_attemp
   assert.equal(ledger.r01.result, 'unverified');
   assert.equal(ledger.r03.accepted, false);
   assert.equal(ledger.r03.result, 'fail');
+});
+
+test('a valid first payload row cannot hide an invalid later row', () => {
+  const productKey = 'cms-hcris-hospital-provider-cost-report';
+  const native = 'https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data-viewer';
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    product_key: productKey,
+    field: 'publisher_access',
+    supported: true,
+    unknown: false,
+    status: 'bounded_sample',
+    bounded_sample: true,
+    payload_success: true,
+    native_product_id: native,
+    record_id: 'obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17',
+    release_id: 'CostReport_2023_Final',
+    result_format: 'json_array',
+    row_count: 2,
+    execution: {
+      kind: 'bounded_file_sample',
+      started_at: '2026-09-15T12:00:00Z',
+      ended_at: '2026-09-15T12:00:01Z',
+    },
+    recipe: 'mixed rows: first valid, second missing PROVNUM',
+    live_http: false,
+  }, {
+    receipt_id: 'core-cell-mixed-rows',
+    evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-mixed-rows.json',
+    evidence_sha256: '789c23b0ce8a0f76fda8706dd0c35b3c0c5502169b78ab33d131fdf1ca558404',
+  }), { repoRoot: ROOT }), { code: 'BOUNDED_SAMPLE_IDENTITY_FIELD_MISSING' });
+});
+
+test('caller-supplied derived flags cannot bypass frozen identity checks', () => {
+  const productKey = 'cms-hcris-hospital-provider-cost-report';
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    product_key: productKey,
+    field: 'publisher_access',
+    supported: true,
+    unknown: false,
+    status: 'bounded_sample',
+    bounded_sample: true,
+    payload_success: true,
+    native_product_id: 'arbitrary-native-id',
+    record_id: 'arbitrary-record',
+    release_id: 'arbitrary-release',
+    result_format: 'json_array',
+    row_count: 2,
+    _derived_payload_sample: true,
+    _derived_row_count: 2,
+    _derived_from_frozen_requirements: true,
+    execution: {
+      kind: 'bounded_file_sample',
+      started_at: '2026-09-15T12:00:00Z',
+      ended_at: '2026-09-15T12:00:01Z',
+    },
+    recipe: 'forged derived flags',
+    live_http: false,
+  }, {
+    receipt_id: 'core-cell-forged-derived',
+    evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
+    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
+  }), { repoRoot: ROOT }), { code: 'SAMPLE_RECORD_ID_MISMATCH' });
+});
+
+test('changed evidence bytes at the same path invalidate a cached digest', () => {
+  const relative = 'verification/research-program/evidence/payloads/hash-cache-mutation.json';
+  const abs = path.join(ROOT, relative);
+  const first = Buffer.from('[{"PROVNUM":"010001"}]');
+  writeFileSync(abs, first);
+  const sha = createHash('sha256').update(first).digest('hex');
+  const native = 'https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data-viewer';
+  const payload = {
+    product_key: 'cms-hcris-hospital-provider-cost-report',
+    field: 'publisher_access',
+    supported: true,
+    unknown: false,
+    status: 'bounded_sample',
+    bounded_sample: true,
+    payload_success: true,
+    native_product_id: native,
+    record_id: 'obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17',
+    release_id: 'CostReport_2023_Final',
+    result_format: 'json_array',
+    row_count: 1,
+    execution: { kind: 'bounded_file_sample', started_at: '2026-09-15T12:00:00Z', ended_at: '2026-09-15T12:00:01Z' },
+    recipe: 'hash cache mutation',
+    live_http: false,
+  };
+  try {
+    resetEvidenceHashCache();
+    validateReceipt(receipt('core_cell', payload, {
+      receipt_id: 'hash-cache-first',
+      evidence_reference: relative,
+      evidence_sha256: sha,
+    }), { repoRoot: ROOT });
+    writeFileSync(abs, Buffer.from('[{"PROVNUM":"CHANGED"}]'));
+    assert.throws(() => validateReceipt(receipt('core_cell', payload, {
+      receipt_id: 'hash-cache-second',
+      evidence_reference: relative,
+      evidence_sha256: sha,
+    }), { repoRoot: ROOT }), { code: 'EVIDENCE_SHA256_MISMATCH' });
+  } finally {
+    try { unlinkSync(abs); } catch {}
+  }
+});
+
+test('near-future observation end and missing deployment bindings fail closed', () => {
+  const register = { entries: [{ id: 'AUTH-03', authorized: true }] };
+  const nearFuture = new Date(Date.now() + 60 * 60 * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
+  assert.throws(() => validateReceipt(receipt('observation_window', {
+    environment: 'staging',
+    observation_started_at: '2026-09-01T00:00:00Z',
+    observation_ended_at: nearFuture,
+    generated_dates: false,
+    simulated_operation: false,
+    deployment: DEPLOYMENT,
+    authorization: { id: 'AUTH-03', authorized: true, environment: 'staging', candidate_head: HEAD },
+  }, { receipt_id: 'window-near-future' }), { repoRoot: ROOT, authorizationRegister: register }), { code: 'OBSERVATION_WINDOW_IN_FUTURE' });
+  assert.throws(() => validateReceipt(receipt('observation_window', {
+    environment: 'staging',
+    observation_started_at: '2026-09-01T00:00:00Z',
+    observation_ended_at: '2026-09-15T00:00:00Z',
+    generated_dates: false,
+    simulated_operation: false,
+    deployment: { deployment_id: 'dep-fixture', version_id: 'ver-fixture' },
+    authorization: { id: 'AUTH-03', authorized: true, environment: 'staging', candidate_head: HEAD },
+  }, { receipt_id: 'window-missing-candidate' }), { repoRoot: ROOT, authorizationRegister: register }), { code: 'OBSERVATION_DEPLOYMENT_CANDIDATE_REQUIRED' });
+  const window = validateReceipt(receipt('observation_window', {
+    environment: 'staging',
+    observation_started_at: '2026-09-01T00:00:00Z',
+    observation_ended_at: '2026-09-15T00:00:00Z',
+    generated_dates: false,
+    simulated_operation: false,
+    deployment: DEPLOYMENT,
+    authorization: { id: 'AUTH-03', authorized: true, environment: 'staging', candidate_head: HEAD },
+  }, { receipt_id: 'window-for-missing-cycle-env' }), { repoRoot: ROOT, authorizationRegister: register });
+  const cycle = validateReceipt(receipt('scheduled_cycle', {
+    cycle_id: 'missing-env',
+    started_at: '2026-09-02T00:00:00Z',
+    completed_at: '2026-09-02T06:00:00Z',
+    scheduler_run_id: 'run-missing-env',
+    generated_dates: false,
+    simulated_operation: false,
+    complete: true,
+    after_refresh: AFTER_REFRESH,
+  }, { receipt_id: 'cycle-missing-env' }), { repoRoot: ROOT });
+  assert.throws(() => calculateObservation([window, cycle]), { code: 'CYCLE_ENVIRONMENT_REQUIRED' });
 });

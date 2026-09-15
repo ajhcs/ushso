@@ -138,24 +138,19 @@
       "expected_format": "application/json",
       "identity_checks": {
         "required_fields": {
-          "PROVNUM": "string",
-          "FY_END_DT": "string"
-        },
-        "constraints": {
-          "FY_END_DT": {
-            "pattern": "^2023-"
-          }
+          "PROVNUM": "string"
         },
         "max_rows": 5,
-        "note": "PROVNUM string type is shape only. Release is the frozen native dataset UUID 44060663-47d8-4ced-a115-b53b4c270acb plus FY_END_DT year 2023 matching CostReport_2023_Final."
+        "note": "PROVNUM string type is shape only. FY_END_DT is a reporting-period field and does not prove CostReport_2023_Final."
       },
       "release_verification": {
         "native_product_id_must_equal_frozen_native_id": true,
         "endpoint_must_contain": "44060663-47d8-4ced-a115-b53b4c270acb",
         "payload_fields": [
-          "PROVNUM",
-          "FY_END_DT"
-        ]
+          "PROVNUM"
+        ],
+        "status": "unresolved",
+        "reason": "FY_END_DT is the cost-report fiscal year ending date. Frozen local documentation does not prove it is the CMS catalog distribution release named CostReport_2023_Final."
       },
       "limits": {
         "max_requests": 2,
@@ -193,18 +188,10 @@
       "expected_format": "application/json",
       "identity_checks": {
         "required_fields": {
-          "stateabbr": "string",
-          "year": "string"
-        },
-        "constraints": {
-          "year": {
-            "allowed": [
-              "2025"
-            ]
-          }
+          "stateabbr": "string"
         },
         "max_rows": 5,
-        "note": "stateabbr string type is shape only. Release is frozen native id swc5-untb plus year 2025, the representative county table. Do not use 7cmc-7y5g."
+        "note": "stateabbr string type is shape only. PLACES year is unresolved as measurement vs publication year and cannot prove the 2025 county-table release by itself. Do not use 7cmc-7y5g."
       },
       "release_verification": {
         "native_product_id_must_equal_frozen_native_id": true,
@@ -213,9 +200,10 @@
           "7cmc-7y5g"
         ],
         "payload_fields": [
-          "stateabbr",
-          "year"
-        ]
+          "stateabbr"
+        ],
+        "status": "unresolved",
+        "reason": "Frozen local documentation does not establish whether PLACES year is measurement year, publication year, or another concept."
       },
       "limits": {
         "max_requests": 2,
@@ -231,7 +219,6 @@
       "abort": [
         "non-JSON body",
         "missing stateabbr",
-        "year not 2025",
         "host not data.cdc.gov",
         "native id 7cmc-7y5g"
       ]

@@ -1,0 +1,31 @@
+{
+  "format": "ushso.product-sample-requirements.v1",
+  "note": "Identity and release requirements come from reviewed frozen product definitions. Receipt-supplied identity_checks cannot weaken or replace them. FY_END_DT and PLACES year are observation/reporting fields until frozen publisher documentation proves they are the catalog release.",
+  "products": {
+    "cms-hcris-hospital-provider-cost-report": {
+      "required_record_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+      "required_native_id": "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data-viewer",
+      "row_fields": { "PROVNUM": "string" },
+      "authorized_hosts": ["data.cms.gov"],
+      "authorized_url_contains": "44060663-47d8-4ced-a115-b53b4c270acb",
+      "release_check": {
+        "status": "unresolved",
+        "field": "FY_END_DT",
+        "reason": "FY_END_DT is the cost-report fiscal year ending date (reporting period). Frozen local documentation does not prove it is the CMS catalog distribution release named CostReport_2023_Final."
+      }
+    },
+    "cdc-places-local-data-for-better-health": {
+      "required_record_id": "obs:asset:cdc-socrata:swc5-untb-f762f3e61a350434",
+      "required_native_id": "swc5-untb",
+      "row_fields": { "stateabbr": "string" },
+      "authorized_hosts": ["data.cdc.gov"],
+      "authorized_url_contains": "swc5-untb",
+      "forbidden_native_ids": ["7cmc-7y5g"],
+      "release_check": {
+        "status": "unresolved",
+        "field": "year",
+        "reason": "Frozen local documentation does not establish whether PLACES year is measurement year, publication year, or another concept. It cannot prove the 2025 county-table release by itself."
+      }
+    }
+  }
+}

@@ -75,8 +75,9 @@ export function validatePayloadRetrievalPilot({ repoRoot = ROOT } = {}) {
     if ((item.release_verification.forbidden_native_ids ?? []).includes(FORBIDDEN_PLACES) !== true && item.product_key === 'cdc-places-local-data-for-better-health') {
       fail('PLACES_FORBIDDEN_ID_MISSING');
     }
-    if (!item.identity_checks?.required_fields || Object.keys(item.identity_checks.required_fields).length < 2) fail('PILOT_IDENTITY_CHECKS');
-    if (!item.identity_checks.constraints || Object.keys(item.identity_checks.constraints).length === 0) fail('PILOT_RELEASE_CONSTRAINTS');
+    if (!item.identity_checks?.required_fields || Object.keys(item.identity_checks.required_fields).length < 1) fail('PILOT_IDENTITY_CHECKS');
+    if (item.release_verification?.status !== 'unresolved') fail('PILOT_RELEASE_MUST_STAY_UNRESOLVED', item.product_key);
+    if (item.identity_checks.constraints && Object.keys(item.identity_checks.constraints).length > 0) fail('PILOT_GUESSED_YEAR_CONSTRAINT', item.product_key);
     if (item.permitted_redirects !== accounting.max_redirects_per_request) fail('PILOT_PERMITTED_REDIRECTS', item.product_key);
     requests += item.limits.max_requests;
     bytes += item.limits.max_bytes;

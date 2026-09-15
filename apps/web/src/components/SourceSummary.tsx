@@ -1,13 +1,33 @@
 import { ExternalLink, Info } from 'lucide-react'
 import type { DatasetFamily } from '../types/catalog'
+import { safeExternalHttpsUrl } from '../lib/externalUrls'
 
-const HCRIS_HOSPITAL_COST_REPORT_ID = 'obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17'
-const CMS_LANDING = 'https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report'
+export function nextSourceAction(dataset: DatasetFamily) {
+  const record = dataset.canonicalResult.record
+  const metadata = dataset.canonicalResult.metadata
+  const payloadState = !dataset.verification.payloadCheckState || dataset.verification.payloadCheckState === 'not_attempted'
+    ? 'not attempted'
+    : dataset.verification.payloadCheckState.replaceAll('_', ' ')
+  const route = metadata?.retrieval_plan?.access_routes?.find((step) => safeExternalHttpsUrl(step.url))
+    ?? record.retrieval.instructions.find((step) => step.action !== 'stop_and_report' && safeExternalHttpsUrl(step.url))
+  const url = safeExternalHttpsUrl(route?.url) ?? safeExternalHttpsUrl(record.authoritative_url)
+  if (url) {
+    return {
+      label: 'Open the publisher page for this exact product. That page is a reachable documentation page, not proven payload or browser access.',
+      href: url,
+      linkText: 'Open publisher documentation',
+    }
+  }
+  return {
+    label: `No verified publisher URL is bound for this record. Payload check: ${payloadState}. Catalog membership is not payload access.`,
+    href: null,
+    linkText: null,
+  }
+}
 
 export function SourceSummary({ dataset }: { dataset: DatasetFamily }) {
   const record = dataset.canonicalResult.record
   const metadata = dataset.canonicalResult.metadata
-  const hcris = record.record_id === HCRIS_HOSPITAL_COST_REPORT_ID
   const cost = metadata?.access?.cost_state ?? 'unknown'
   const quota = 'unknown'
   const lastSuccessful = dataset.verification.lastSuccessfulMetadataCheck
@@ -15,6 +35,7 @@ export function SourceSummary({ dataset }: { dataset: DatasetFamily }) {
     ? 'Not attempted'
     : dataset.verification.payloadCheckState
   const payloadNote = dataset.verification.payloadCheckNote ?? 'Catalog metadata observation is not a payload-access check.'
+  const action = nextSourceAction(dataset)
   return (
     <section className="source-summary" aria-labelledby="source-summary-heading">
       <p className="section-eyebrow">Source decision</p>
@@ -26,13 +47,10 @@ export function SourceSummary({ dataset }: { dataset: DatasetFamily }) {
         <div><dt>Access requirements</dt><dd>{dataset.accessStatusLabel}. Cost: {cost}. Usage limits: {quota}.</dd></div>
         <div><dt>Last successful metadata check</dt><dd>{lastSuccessful ?? 'Unknown'}. Payload check: {payloadState}. {payloadNote}</dd></div>
       </dl>
-      {hcris && (
-        <div className="source-summary__action">
-          <p><strong>Clear source action:</strong> Open the CMS Hospital Provider Cost Report landing page. This is a reachable documentation page, not proven payload or browser access.</p>
-          <p>Accepted Worksheet G-3 wire mappings are not a complete HCRIS schema. Inferred unit tags are search aids only and are not source-asserted observation grain.</p>
-          <a href={CMS_LANDING} target="_blank" rel="noreferrer">Open CMS documentation <ExternalLink aria-hidden="true" /></a>
-        </div>
-      )}
+      <div className="source-summary__action">
+        <p><strong>Clear source action:</strong> {action.label}</p>
+        {action.href ? <a href={action.href} target="_blank" rel="noreferrer">{action.linkText} <ExternalLink aria-hidden="true" /></a> : <p>Stay on this page and inspect the documented access route, schema, and join limitations.</p>}
+      </div>
       <p className="source-summary__boundary"><Info aria-hidden="true" />Unknown cost and usage limits remain visible. A catalog membership check is not payload access.</p>
     </section>
   )
