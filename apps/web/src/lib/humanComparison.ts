@@ -1,11 +1,3 @@
-import {
-  comparisonDimensionState,
-  comparisonExplanation,
-  comparisonFact,
-  documentedComparisonProfile,
-  HCRIS_PHC4_DEFINITION_CAVEAT,
-} from '../../../../packages/registry/comparison-dimensions.mjs'
-
 export const HUMAN_COMPARISON_DIMENSIONS = ['role', 'geography', 'grain', 'time', 'variables_schema', 'access', 'freshness', 'join_compatibility'] as const
 export type HumanComparisonDimension = typeof HUMAN_COMPARISON_DIMENSIONS[number]
 
@@ -20,6 +12,38 @@ export const HCRIS_HOSPITAL_COST_REPORT_ID = 'obs:asset:cms-data-catalog:data.cm
 export const PHC4_PUBLIC_FINANCIAL_REPORTS_ID = 'obs:asset:pa-phc4-public-financial-reports'
 export const HOSPITAL_MRF_EXAMPLE_ID = 'obs:asset:hospital-mrf-example'
 export const PAYER_MRF_EXAMPLE_ID = 'obs:asset:payer-mrf-example'
+export const HCRIS_PHC4_DEFINITION_CAVEAT = 'HCRIS Worksheet G-3 cost-report definitions are not PHC4 public financial-statement definitions.'
+
+const HCRIS = {
+  record_id: HCRIS_HOSPITAL_COST_REPORT_ID,
+  reporting_definition: 'Medicare hospital cost-report worksheets filed by CCN for a provider cost-reporting period. Not Pennsylvania PHC4 financial-statement reporting.',
+  geography: 'United States Medicare-certified hospitals; not limited to Pennsylvania.',
+  grain: 'facility/report/year (CMS cost report / CCN / fiscal year). Inferred catalog unit tags are not this claim.',
+  access: 'Public CMS catalog documentation. Catalog membership is not payload access.',
+  time: 'Provider cost-reporting fiscal period, not PHC4 annual public financial-report vintage.',
+  variables_schema: 'Accepted HCRIS Worksheet G-3 example-packet wire mappings only. Not a complete HCRIS schema and not PHC4 statement lines.',
+  freshness: 'current first-party catalog metadata as of the selected generation',
+  authority: 'CMS hospital cost-report catalog metadata',
+  join_compatibility: 'No automatic CCN=NPI or HCRIS-to-PHC4 identity merge.',
+} as const
+
+const PHC4 = {
+  record_id: PHC4_PUBLIC_FINANCIAL_REPORTS_ID,
+  reporting_definition: 'Pennsylvania Health Care Cost Containment Council public hospital and health-system financial reports. Not CMS HCRIS Worksheet G-3 cost-report definitions.',
+  geography: 'Pennsylvania public financial reporting; not the national Medicare cost-report universe.',
+  grain: 'hospital/health-system public financial report. Public report visibility is not PHC4 custom record-level access.',
+  access: 'Public PHC4 report pages. Custom record-level PHC4 files remain a separate restricted request path.',
+  time: 'PHC4 public financial-report vintage, not a CMS cost-reporting fiscal period.',
+  variables_schema: 'PHC4 public financial-statement categories. Not HCRIS Worksheet G-3 NET_PATIENT_REVENUE wire mappings.',
+  freshness: 'documented public-report locator only; payload completeness unknown',
+  authority: 'PHC4 public financial-report catalog metadata',
+  join_compatibility: 'No automatic CCN=NPI or HCRIS-to-PHC4 identity merge.',
+} as const
+
+const DOCUMENTED: Record<string, typeof HCRIS | typeof PHC4> = {
+  [HCRIS.record_id]: HCRIS,
+  [PHC4.record_id]: PHC4,
+}
 
 export interface ComparisonSource {
   record_id: string
@@ -49,8 +73,42 @@ export interface HumanComparisonResult {
   caveats: string[]
 }
 
-function asRecord(source: ComparisonSource) {
-  return { record_id: source.record_id, evidence: source.evidence ?? [] }
+export function documentedComparisonProfile(recordId: string) {
+  return DOCUMENTED[recordId] ?? null
+}
+
+export function comparisonFact(record: { record_id: string }, dimension: string): { metadata_value: string | null; state: 'known' | 'unknown' } {
+  const documented = documentedComparisonProfile(record.record_id)
+  if (!documented) return { metadata_value: null, state: 'unknown' }
+  switch (dimension) {
+    case 'access': return { metadata_value: documented.access, state: 'known' }
+    case 'time': return { metadata_value: documented.time, state: 'known' }
+    case 'grain': return { metadata_value: documented.grain, state: 'known' }
+    case 'variables_schema': return { metadata_value: documented.variables_schema, state: 'known' }
+    case 'geography': return { metadata_value: documented.geography, state: 'known' }
+    case 'authority': return { metadata_value: documented.authority, state: 'known' }
+    case 'freshness': return { metadata_value: documented.freshness, state: 'known' }
+    case 'join_compatibility': return { metadata_value: documented.join_compatibility, state: 'known' }
+    case 'role': return { metadata_value: documented.reporting_definition, state: 'known' }
+    default: return { metadata_value: null, state: 'unknown' }
+  }
+}
+
+export function comparisonDimensionState(values: Array<{ state: string; metadata_value: string | null }>) {
+  if (values.some((value) => value.state !== 'known' || value.metadata_value == null)) return 'unknown' as const
+  const texts = [...new Set(values.map((value) => value.metadata_value))]
+  if (texts.length === 1) return 'comparable' as const
+  return 'incomparable' as const
+}
+
+export function comparisonExplanation(dimension: string, values: Array<{ state: string; metadata_value: string | null }>, state: 'comparable' | 'incomparable' | 'unknown') {
+  if (state === 'incomparable') {
+    return 'These assets use different reporting definitions. Populated dimension values are documented metadata, not a generic complete comparison and not a ranking of source values.'
+  }
+  if (state === 'unknown') {
+    return 'At least one requested comparison dimension remains unknown. Envelope construction is not comparison completeness.'
+  }
+  return 'Indexed and documented metadata for this dimension is comparable. Unknown values stay unknown and no source values or analytical rankings are produced.'
 }
 
 export function compareHumanSources(sources: ComparisonSource[], dimensions: readonly HumanComparisonDimension[] = HUMAN_COMPARISON_DIMENSIONS): HumanComparisonResult {
@@ -59,11 +117,11 @@ export function compareHumanSources(sources: ComparisonSource[], dimensions: rea
   }
   const rows = dimensions.map((dimension) => {
     const values = sources.map((source) => {
-      const overlay = comparisonFact(asRecord(source), dimension)
+      const overlay = comparisonFact(source, dimension)
       return {
         asset_id: source.record_id,
         metadata_value: overlay.metadata_value,
-        state: overlay.metadata_value == null ? 'unknown' as const : overlay.state === 'known' ? 'known' as const : 'unknown' as const,
+        state: overlay.metadata_value == null ? 'unknown' as const : overlay.state,
       }
     })
     const state = comparisonDimensionState(values)

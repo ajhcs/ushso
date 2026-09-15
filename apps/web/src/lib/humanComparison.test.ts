@@ -46,6 +46,25 @@ describe('human comparison evidence', () => {
     expect(whyPairMayNotJoin(HCRIS_HOSPITAL_COST_REPORT_ID, PHC4_PUBLIC_FINANCIAL_REPORTS_ID)).toMatch(/not a confirmed merge/i)
   })
 
+  it('keeps HCRIS and PHC4 overlay wording identical to the compare_assets registry overlay', async () => {
+    const { readFile } = await import('node:fs/promises')
+    const { fileURLToPath } = await import('node:url')
+    const repositoryRoot = fileURLToPath(new URL('../../../../', import.meta.url))
+    const overlay = await readFile(`${repositoryRoot}packages/registry/comparison-dimensions.mjs`, 'utf8')
+    const human = await readFile(`${repositoryRoot}apps/web/src/lib/humanComparison.ts`, 'utf8')
+    expect(human).not.toContain("from '../../../../packages/registry/comparison-dimensions.mjs'")
+    for (const phrase of [
+      'Not Pennsylvania PHC4 financial-statement reporting.',
+      'Not CMS HCRIS Worksheet G-3 cost-report definitions.',
+      'No automatic CCN=NPI or HCRIS-to-PHC4 identity merge.',
+      'HCRIS Worksheet G-3 cost-report definitions are not PHC4 public financial-statement definitions.',
+      'Envelope construction is not comparison completeness.',
+    ]) {
+      expect(overlay).toContain(phrase)
+      expect(human).toContain(phrase)
+    }
+  })
+
   it('does not imply plan compilation from comparison or export', async () => {
     const { readFile } = await import('node:fs/promises')
     const { fileURLToPath } = await import('node:url')
