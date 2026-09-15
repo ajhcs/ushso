@@ -12,6 +12,7 @@ import {
   ingestEvidence,
   validateReceipt,
 } from '../../scripts/research-program/ingest-evidence.mjs';
+import { materializeAttemptLedger } from '../../scripts/research-program/materialize-attempt-ledger.mjs';
 import { observeOperations } from '../../verification/research-program/operations/observe.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -178,4 +179,22 @@ test('observeOperations uses ingested observation and still never accepts R15', 
   assert.equal(obs.requirements.find((row) => row.id === 'R15').result, 'observed');
   assert.equal(obs.requirements.find((row) => row.id === 'R15').accepted, false);
   assert.equal(obs.program_complete, false);
+});
+
+test('frozen 3434 IDs seed 13736 not_attempted axes without promoting not_attempted to success', () => {
+  const { ids, ledger, rows } = materializeAttemptLedger({ repoRoot: ROOT });
+  assert.equal(ids.length, 3434);
+  assert.equal(rows.length, 13736);
+  assert.equal(ledger.combinations, 13736);
+  assert.equal(ledger.combinations_accounted, 13736);
+  assert.equal(ledger.source_run_dispositions.not_attempted, 13736);
+  assert.equal(ledger.source_run_dispositions.succeeded, 0);
+  assert.equal(ledger.not_attempted_is_not_success, true);
+  assert.equal(ledger.success_total_counts_unattempted_work, false);
+  assert.equal(ledger.silent_loss, false);
+  assert.equal(ledger.identity_accounted, true);
+  assert.equal(ledger.r01.accepted, false);
+  assert.equal(ledger.r01.result, 'unverified');
+  assert.equal(ledger.r03.accepted, false);
+  assert.equal(ledger.r03.result, 'fail');
 });

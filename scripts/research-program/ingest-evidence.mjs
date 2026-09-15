@@ -284,7 +284,7 @@ export function calculateAttemptLedger(receipts = [], baselineIds = loadBaseline
     silent_loss: silentLoss,
     not_attempted_is_not_success: true,
     success_total_counts_unattempted_work: false,
-    identity_accounted: !silentLoss && idsAccounted === BASELINE_DENOMINATOR,
+    identity_accounted: !silentLoss && idsAccounted === baselineIds.length,
     r01: freeze({
       id: 'R01',
       accepted: false,
