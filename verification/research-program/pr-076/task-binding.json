@@ -1,0 +1,78 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr076-refresh-schedules-20260915",
+  "slice_id": "C-076-1",
+  "pr_id": "PR-076",
+  "title": "Operate refresh schedules and actionable monitoring",
+  "owner": "/root/pr076_refresh_schedules",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr076-refresh-schedules-20260915",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr076-refresh-schedules-20260915",
+  "objective": "Freshness and data-quality changes are maintained by an observable bounded process.",
+  "outcome": "Refresh schedules fit selected source/spend budgets. A stale source is visible even when no collector ran successfully. Repeated unchanged failures do not generate routine notification spam. Critical new loss is not hidden by aggregate success. A successful HTTP response with the wrong resource role produces a specific changed-destination signal and cannot refresh an actionable API success badge. Public Worker has no source credentials or fetch capability. Production activation is separately receipted. Merging configuration files does not enable a timer or service. Two complete scheduled cycles remain unrun until authorized. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-012",
+    "PR-024",
+    "PR-030",
+    "PR-053"
+  ],
+  "owned_paths": [
+    "services/scheduler-worker/",
+    "services/harvest-worker/",
+    "infra/",
+    "docs/research-program/operations.md",
+    "verification/research-program/pr-076/",
+    "docs/research-program/handoffs/PR-076.json"
+  ],
+  "commits": [
+    {
+      "id": "C-076-1",
+      "subject": "Configure measured source refresh schedules",
+      "instructions": "Use per-axis/source priorities, publisher cadence, changed-content hashes and last success/attempt. Reuse job leases/outbox and document environment-specific activation.",
+      "verification": "Refresh schedules fit the selected source/spend budgets; a stale source is visible even when no collector ran successfully."
+    },
+    {
+      "id": "C-076-2",
+      "subject": "Add actionable operational signals",
+      "instructions": "Track queue age, failed checks, schema drift, coverage loss, budget exhaustion and review backlog. Notify on meaningful changes with affected sources and next action. Monitor redirect destination and resource-role drift separately from HTTP reachability, using the PR011 EPA API-link-to-Widgets case as a dated regression fixture.",
+      "verification": "Repeated unchanged failures do not generate routine notification spam; critical new loss is not hidden by aggregate success. A successful HTTP response with the wrong resource role produces a specific changed-destination signal and cannot refresh an actionable API success badge."
+    },
+    {
+      "id": "C-076-3",
+      "subject": "Prepare and verify runtime activation",
+      "instructions": "Render scoped scheduler/collector deployment configuration and run fixture/staging cycles. Obtain concrete operational authorization only after the tested artifact and rollback are reviewable.",
+      "verification": "Public Worker has no source credentials or fetch capability; production activation is separately receipted."
+    }
+  ],
+  "check_commands": [
+    "node --test services/scheduler-worker/tests/*.test.mjs services/harvest-worker/tests/*.test.mjs tests/research-program/http-outcomes.test.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-076.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-076/",
+  "binding": {
+    "base_sha": "49b953d5c5a58ff3466ec9fc210b6e99b80735b3",
+    "base_tree": "39e4fc45444e66287bb1ed7edcc5eb7e7d5e96ad",
+    "dependency_merge_shas": {
+      "PR-012": "a572be58dc6f941d8045663b0078e7fd752c8be0",
+      "PR-024": "467f4fbd91f54f1e0d7603162b510647591d2b63",
+      "PR-030": "2338426f91893bbf1b9320490d75beb076c845c7",
+      "PR-053": "76ef9d9d2b3ce91fdb9827b3ae40c495ac95b6cb"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
