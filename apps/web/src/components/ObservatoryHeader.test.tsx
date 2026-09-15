@@ -23,6 +23,8 @@ describe('primary navigation information architecture', () => {
     const css = await readFile(`${repositoryRoot}apps/web/src/styles.css`, 'utf8')
     expect(css).toMatch(/@media \(max-width: 320px\)[\s\S]*\.primary-nav a \{ min-height: 44px/)
     expect(css).toMatch(/@media \(max-width: 390px\)[\s\S]*\.primary-nav a \{ min-height: 44px/)
+    expect(css).toMatch(/@media \(max-width: 360px\)[\s\S]*\.mobile-menu-button \{ width: 44px; height: 44px/)
+    expect(css).not.toMatch(/@media \(max-width: 360px\)[\s\S]*\.mobile-menu-button \{ width: 40px/)
     const markup = renderToStaticMarkup(createElement(MemoryRouter, {}, createElement(ObservatoryHeader)))
     for (const item of PRIMARY_NAVIGATION) {
       expect(markup).toContain(`aria-label="${item.name}"`)
