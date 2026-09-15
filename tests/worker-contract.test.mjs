@@ -135,3 +135,18 @@ test('HTML-only crawlers see catalog source facts on dataset URLs without a blan
   assert.match(missingHtml, /Dataset record not found/);
   assert.doesNotMatch(missingHtml, /<div id="root"><\/div>/);
 });
+
+test('HTTP catalog page limits remain bounded while preserving traversal options', async () => {
+  const observed = [];
+  const bounded = createWorker({publicQueryService:{
+    async openRequest(){return {};},
+    async browse(_session, options){observed.push(options);return {ok:true};},
+  }});
+  for (const query of ['limit=200','page_size=200&cursor=resume&generation=current','page_size=50','']) {
+    const response = await bounded.fetch(new Request('https://ushso.org/api/catalog?'+query),env);
+    assert.equal(response.status,200);
+  }
+  assert.deepEqual(observed.map(row=>row.page_size),[100,100,50,20]);
+  assert.equal(observed[1].cursor,'resume');
+  assert.equal(observed[1].generation,'current');
+});

@@ -48,6 +48,13 @@ failure_class = "product_test_failed"
 quiet_seconds = 30
 
 [[stages]]
+name = "catalog-runtime"
+kind = "artifact_verification"
+command = ["node", "--expose-gc", "scripts/check-live-catalog-runtime.mjs"]
+failure_class = "product_test_failed"
+quiet_seconds = 30
+
+[[stages]]
 name = "cloudflare-dry-run"
 kind = "artifact_verification"
 command = ["npm", "run", "cf:dry-run:artifact"]

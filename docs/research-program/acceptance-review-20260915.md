@@ -6,6 +6,10 @@ this does not establish completed capabilities or program acceptance.
 
 ## Corrected defects
 
+- Research omitted the already deployed PR-073 catalog response-size fix and
+  mandatory runtime gate. Main `92649b29` is merged into this correction; the
+  100-record HTTP cap and gate now coexist with research crawler behavior.
+
 - Assignment IDs and completion flags alone previously yielded eight participants
   and 100% completion even with an empty consented-session list. Metrics now
   require a matching session, explicit consent and implementer separation,
@@ -54,7 +58,7 @@ current deployment/qualification projections supersede their stale identity text
    allowances and measured workloads for C-009-1. Named human decisions may approve
    supported interpretations or explicitly amend requirements with reasons and
    impact; a signature cannot turn missing witnesses into observed passes.
-5. **Qualify before rollout.** Reconcile the research candidate with current main,
+5. **Qualify before rollout.** Main `92649b29` is reconciled by this correction. Recheck for later main changes,
    freeze and independently qualify an exact artifact, then obtain any required
    concrete rollout authorization. The technical gate for this correction does
    not qualify the whole research product.
