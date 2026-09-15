@@ -1,0 +1,295 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-079",
+  "status": "producer_checked",
+  "owner": "/root/pr079_data_acceptance",
+  "reviewer": "Astra/root",
+  "base_sha": "e94fd5a0aaf125774cd6ec2509205a3fac31eed0",
+  "head_sha": "706b220fbbf469d7465f5bd03b64a275c27bfe97",
+  "dependency_merge_shas": {
+    "PR-021": "ed08e8ee861622b99d5d7c3150d68304ecc95881",
+    "PR-027": "62fc8514c508c1876f2435c03aee8bee3659d825",
+    "PR-039": "1c83b4e331caa6d62adb42be6e1ca35f243a97d5",
+    "PR-042": "24319b6584eae072971030adc2376c37d43d8cd3",
+    "PR-054": "4b8c8e0ec6c8b7a397ecb4d0d7dc00904f3ee924",
+    "PR-063": "584b2830e4320eae881ddd41ffe4200e39ff14ce",
+    "PR-077": "425c928a227060f4cc02c70aca183ef38f9a245f",
+    "PR-078": "5235ae26fd2bfc0da927557ed80e1d0601acc662"
+  },
+  "branch": "codex/ushso-pr079-data-acceptance-20260915",
+  "github_pr_url": null,
+  "changed_files": [
+    "scripts/research-program/verify-data-program.mjs",
+    "verification/research-program/acceptance/verify-data-program.test.mjs",
+    "verification/research-program/acceptance/requirement-results.json",
+    "verification/research-program/pr-079/",
+    "docs/research-program/handoffs/PR-079.json"
+  ],
+  "problem": "Whole-program data/API acceptance lacked an independent recomputation of catalog denominators and a requirement-by-requirement result that could block release qualification.",
+  "resulting_behavior": "Catalog and field denominators are recomputed from accepted frozen identities. Every baseline ID and selected cohort member reconciles. No success total counts missing or unattempted work. Decisive qualify-core, deterministic, MRF, join, coverage, and machine-transport checks are independently replayed. R01-R11 and R14-R15 are marked pass/fail/unverified with evidence. Merged planned PRs do not declare the program complete. Full-catalog review and sampled upstream validation are distinguished. C-009-1 remains unresolved. R01-R16 remain unaccepted. Last-good generation live-2026-09-03-85b50522b420 is unchanged. HTTP 200 is not a completed research task. A passing schema is not scientific approval.",
+  "commits": [
+    {
+      "id": "C-079-1",
+      "subject": "Recompute all catalog and field denominators",
+      "sha": "c37f643d58915746e630f28c81460a296ce775c2"
+    },
+    {
+      "id": "C-079-2",
+      "subject": "Replay decisive research/data checks",
+      "sha": "2fbe9e32c3965e44e3fe3cbc5d35f5dc15404ced"
+    },
+    {
+      "id": "C-079-3",
+      "subject": "Issue a requirement-by-requirement result",
+      "sha": "858921320acd61b4edcd9669b34f03193c264e4d"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "verifier",
+      "id": "scripts/research-program/verify-data-program.mjs",
+      "location": "local",
+      "sha256": "053209da39d459a3e0c9201946217ff7f2a20589326048559a53d242d4dc59e7"
+    },
+    {
+      "kind": "acceptance-tests",
+      "id": "verification/research-program/acceptance/verify-data-program.test.mjs",
+      "location": "local",
+      "sha256": "4ae43eeed2c732fcc96af7b524be99528e15f3dbc8defc0195d5cbbd4c8a49b8"
+    },
+    {
+      "kind": "requirement-results",
+      "id": "verification/research-program/acceptance/requirement-results.json",
+      "location": "local",
+      "sha256": "c57c33490a0011cd6244c4edd4894005f0a4667ee1f6f8dc01d4d320bafbfbb8"
+    },
+    {
+      "kind": "frozen-cohorts-unmodified",
+      "id": "evaluation/research-program/cohorts.json",
+      "location": "local",
+      "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c079-acceptance-tests",
+      "command": "node --test verification/research-program/acceptance/verify-data-program.test.mjs",
+      "started_at": "2026-09-15T06:21:39.073501Z",
+      "completed_at": "2026-09-15T06:21:40.610064Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Denominators reconcile. Fifteen documented joins are not independently qualified. R01-R16 remain unaccepted. Merged planned PRs do not complete the program.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c079-acceptance-tests-event",
+        "path": "verification/research-program/pr-079/producer-20260915/commands/acceptance-tests/event.json",
+        "sha256": "49cb9673a2c4e63de60e00df2d7c1ff0e829d040f8d3572ceab34f69e63a8efa",
+        "bytes": 1193
+      }
+    },
+    {
+      "id": "cmd-c079-verify-cli",
+      "command": "node scripts/research-program/verify-data-program.mjs",
+      "started_at": "2026-09-15T06:21:40.610461Z",
+      "completed_at": "2026-09-15T06:21:41.892428Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Independent CLI receipt names exact denominators, failed/unverified requirements, unresolved C-009-1, and blocked release qualification.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c079-verify-cli-event",
+        "path": "verification/research-program/pr-079/producer-20260915/commands/verify-cli/event.json",
+        "sha256": "2b088d0c463159e3e8107672f748e377b3093c7435749d41a0e0eb805f4de7f3",
+        "bytes": 1121
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr079-artifact-0",
+      "path": "verification/research-program/pr-079/task-binding.json",
+      "bytes": 4223,
+      "sha256": "e592b1d40e7b9f0b343922652f914091a3e45a3f1e0c857a5238f2eaa085ecd3"
+    },
+    {
+      "id": "pr079-artifact-1",
+      "path": "verification/research-program/pr-079/dispatch.json",
+      "bytes": 2806,
+      "sha256": "6e7dc92fc073d80f92bfeb385eb7b69d98077e9b0ac10de1e8c6487789eab712"
+    },
+    {
+      "id": "pr079-artifact-2",
+      "path": "verification/research-program/acceptance/requirement-results.json",
+      "bytes": 7116,
+      "sha256": "c57c33490a0011cd6244c4edd4894005f0a4667ee1f6f8dc01d4d320bafbfbb8"
+    },
+    {
+      "id": "pr079-artifact-3",
+      "path": "verification/research-program/pr-079/producer-20260915/commands/acceptance-tests/receipt.json",
+      "bytes": 484,
+      "sha256": "cad2b5c0a711757aab2e86e1bff90adb69d0c1c61f58883e75327ea76f58d9be"
+    },
+    {
+      "id": "pr079-artifact-4",
+      "path": "verification/research-program/pr-079/producer-20260915/commands/acceptance-tests/stdout.log",
+      "bytes": 421,
+      "sha256": "2d027ec7e98bb10013d122d5586bf1bae413c6f9662e8486fd5ba3ff1ca9fa65"
+    },
+    {
+      "id": "pr079-artifact-5",
+      "path": "verification/research-program/pr-079/producer-20260915/commands/acceptance-tests/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr079-artifact-6",
+      "path": "verification/research-program/pr-079/producer-20260915/commands/acceptance-tests/event.json",
+      "bytes": 1193,
+      "sha256": "49cb9673a2c4e63de60e00df2d7c1ff0e829d040f8d3572ceab34f69e63a8efa"
+    },
+    {
+      "id": "pr079-artifact-7",
+      "path": "verification/research-program/pr-079/producer-20260915/commands/verify-cli/receipt.json",
+      "bytes": 444,
+      "sha256": "d314409a58b48b90940875503fa4c83a548de8e056dfdc576cfb9a3966023854"
+    },
+    {
+      "id": "pr079-artifact-8",
+      "path": "verification/research-program/pr-079/producer-20260915/commands/verify-cli/stdout.log",
+      "bytes": 7116,
+      "sha256": "c57c33490a0011cd6244c4edd4894005f0a4667ee1f6f8dc01d4d320bafbfbb8"
+    },
+    {
+      "id": "pr079-artifact-9",
+      "path": "verification/research-program/pr-079/producer-20260915/commands/verify-cli/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr079-artifact-10",
+      "path": "verification/research-program/pr-079/producer-20260915/commands/verify-cli/event.json",
+      "bytes": 1121,
+      "sha256": "2b088d0c463159e3e8107672f748e377b3093c7435749d41a0e0eb805f4de7f3"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-079-1",
+      "status": "producer_checked",
+      "result": "Every baseline ID and every selected cohort member reconciles; no success total counts missing or unattempted work.",
+      "command_ids": [
+        "cmd-c079-acceptance-tests",
+        "cmd-c079-verify-cli"
+      ]
+    },
+    {
+      "id": "C-079-2",
+      "status": "producer_checked",
+      "result": "Astra's receipt identifies exact commands/artifacts; producer logs are supporting material rather than the independent result.",
+      "command_ids": [
+        "cmd-c079-acceptance-tests",
+        "cmd-c079-verify-cli"
+      ]
+    },
+    {
+      "id": "C-079-3",
+      "status": "producer_checked",
+      "result": "Do not declare the program complete because all originally planned PRs merged; actual requirement failures block release qualification.",
+      "command_ids": [
+        "cmd-c079-acceptance-tests",
+        "cmd-c079-verify-cli"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "r01-r16-unaccepted",
+      "status": "accepted",
+      "detail": "R01-R16 remain unaccepted. R03/R04/R05/R06/R07/R08/R15 fail on current evidence. R01/R02/R09/R10/R11/R14 are unverified identity or protocol frames, not passes."
+    },
+    {
+      "id": "fifteen-independently-qualified-joins-absent",
+      "status": "accepted",
+      "detail": "Fifteen documented priority join routes exist. Independently qualified routes remain 0. CCN=NPI remains forbidden."
+    },
+    {
+      "id": "two-scheduled-cycles-and-14-days-absent",
+      "status": "accepted",
+      "detail": "R15 remains fail because two authorized scheduled cycles and 14 elapsed observation days are absent."
+    },
+    {
+      "id": "named-human-scientific-review-absent",
+      "status": "accepted",
+      "detail": "Exact accepted scientific values remain empty pending a named human research reviewer."
+    },
+    {
+      "id": "c0091-unresolved",
+      "status": "accepted",
+      "detail": "C-009-1 remains unresolved without actual account terms and measured production cost."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review. Do not copy 21 MiB local-gate receipts into git."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "R01-R16",
+      "status": "unresolved",
+      "detail": "R01-R16 remain unaccepted. This claim uses the handoff unresolved status enum; it is not a requirement pass."
+    },
+    {
+      "id": "AUTH-12",
+      "status": "unresolved",
+      "detail": "Planner public activation remains unresolved."
+    },
+    {
+      "id": "independent-data-acceptance-review",
+      "status": "pending",
+      "detail": "Independent review of denominator recomputation and the requirement-by-requirement fail/unverified result remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "merged-prs-are-not-acceptance",
+      "status": "risk",
+      "detail": "Engineering integration of planned PRs is not R01-R16 acceptance, scientific approval, or release qualification."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of denominator recomputation and the requirement-by-requirement result, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-079 source and replay acceptance tests and verify-data-program CLI. Do not accept R01-R16. Do not invent 14 elapsed days, two scheduled cycles, or named-human scientific approval. Do not copy 21 MiB receipts into git.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, R01-R16 acceptance, or C-009-1 qualification."
+    ]
+  }
+}
