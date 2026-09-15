@@ -181,6 +181,31 @@ function overlayCdcViewIndex(receipt, view, cdcIndex) {
   };
 }
 
+function overlayCmsDescribedBy(receipt, bound, cmsCatalog) {
+  if (receipt.payload.field !== 'schema_qualification') return receipt;
+  const describedBy = cmsCatalog.capture.data?.dataset?.[bound.catalog_index]?.describedBy ?? null;
+  if (typeof describedBy !== 'string' || !describedBy.trim()) return receipt;
+  const recipe = [
+    receipt.payload.recipe,
+    `Overlay frozen CMS catalog-slim describedBy from ${CMS_CATALOG_REL} (gzip sha256=${cmsCatalog.fileSha}).`,
+    `describedBy=${describedBy}`,
+    'Do not fetch describedBy. A catalog dictionary locator is not a qualified publisher schema or payload sample.',
+  ].join(' ');
+  return {
+    ...receipt,
+    evidence_reference: CMS_CATALOG_REL,
+    evidence_sha256: cmsCatalog.fileSha,
+    payload: {
+      ...receipt.payload,
+      status: 'catalog_describedBy_locator_not_dictionary',
+      recipe,
+      limitation: 'CMS catalog-slim describedBy is a locator in frozen catalog metadata. The dictionary file was not retrieved or parsed. This is not schema qualification.',
+      payload_success: false,
+      described_by: describedBy,
+    },
+  };
+}
+
 function overlayCmsDistribution(receipt, bound, cmsCatalog) {
   if (receipt.payload.field !== 'publisher_access') return receipt;
   const roles = {};
@@ -310,15 +335,21 @@ export async function buildCatalogMetadataReceipts({ repoRoot = ROOT } = {}) {
         evidence_sha256: hit.fileSha,
         payload: { ...payloadBase, ...field },
       };
-      if (rec.identity?.source?.source_id === 'cms-data-catalog' && field.field === 'publisher_access') {
+      if (rec.identity?.source?.source_id === 'cms-data-catalog') {
         const bound = bindCmsCatalogResources(rec, cmsCatalog.capture);
-        receipt = overlayCmsDistribution(receipt, bound, cmsCatalog);
-        cmsBound.push({
-          product_key: product.product_key,
-          record_id: rec.record_id,
-          distribution_count: bound.distributions.length,
-          payload_success: false,
-        });
+        if (field.field === 'publisher_access') {
+          receipt = overlayCmsDistribution(receipt, bound, cmsCatalog);
+          cmsBound.push({
+            product_key: product.product_key,
+            record_id: rec.record_id,
+            distribution_count: bound.distributions.length,
+            described_by: cmsCatalog.capture.data?.dataset?.[bound.catalog_index]?.describedBy ?? null,
+            payload_success: false,
+          });
+        }
+        if (field.field === 'schema_qualification') {
+          receipt = overlayCmsDescribedBy(receipt, bound, cmsCatalog);
+        }
       }
       if (rec.identity?.source?.source_id === 'cdc-socrata' && field.field === 'publisher_access') {
         const native = rec.identity?.match_fields?.source_id ?? product.anchor?.representative?.native_id ?? null;
