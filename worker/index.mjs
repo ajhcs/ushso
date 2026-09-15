@@ -18,7 +18,7 @@ import {
   CATALOG_HTML_GENERATION,
   renderCatalogSourceHtml,
   renderPublicSitemap,
-} from '../packages/web-discoverability/src/catalog-html.mjs';
+} from './catalog-html.mjs';
 
 const MAX_REQUEST_BYTES = 20 * 1024;
 const CORPUS_RESOURCE_BASE = '/corpus-v1.2.0';

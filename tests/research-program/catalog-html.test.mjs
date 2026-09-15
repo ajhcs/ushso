@@ -7,7 +7,7 @@ import {
   publicGuideSitemapPages,
   renderCatalogSourceHtml,
   renderPublicSitemap,
-} from '../src/catalog-html.mjs';
+} from '../../worker/catalog-html.mjs';
 
 const record = {
   record_id: 'obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17',

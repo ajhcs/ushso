@@ -1,4 +1,4 @@
-import { htmlAttribute, htmlText, safeJsonForHtml, safePublicHttpsUrl } from './safety.mjs';
+import { htmlAttribute, htmlText, safeJsonForHtml, safePublicHttpsUrl } from '../packages/web-discoverability/src/safety.mjs';
 
 export const CATALOG_HTML_GENERATION = 'live-2026-09-03-85b50522b420';
 export const SITE_NAME = 'United States Health Systems Observatory';

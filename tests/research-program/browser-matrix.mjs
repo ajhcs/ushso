@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { publicGuideSitemapPages } from '../../packages/web-discoverability/src/catalog-html.mjs';
+import { publicGuideSitemapPages } from '../../worker/catalog-html.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
