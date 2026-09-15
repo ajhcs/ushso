@@ -62,6 +62,7 @@ describe('/plan canonical presentation', () => {
     expect(markup).toContain('Plan compilation is not available yet.')
     expect(markup).toContain('data-plan-api-enabled="false"')
     expect(markup).toContain('No question is collected, transmitted, or persisted')
+    expect(markup).toContain('do not compile a research plan')
     expect(markup).not.toContain('<form')
     expect(markup).not.toContain('data-contract-version="observatory-research-plan.v1.0.0"')
   })
