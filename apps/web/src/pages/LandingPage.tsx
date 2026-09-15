@@ -56,6 +56,7 @@ export function LandingPage() {
             <DiscoveryDimensions />
             <p className="landing-scope">Current catalog generation <code>{CURRENT_GENERATION}</code> contains {CURRENT_CORPUS_RECORD_COUNT} indexed source identities. Catalog membership is not payload access.</p>
             <p><Link to="/learn">Learn how finding a source differs from obtaining restricted data</Link></p>
+            <p><Link to="/learn#first-search">Start the beginner sequence with a verified HCRIS search</Link></p>
           </div>
         </section>
         <section className="learning-journeys" aria-labelledby="journeys-title">

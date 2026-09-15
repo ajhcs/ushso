@@ -201,6 +201,7 @@ export function DatasetDetailsPage() {
 
          {contextualQuestion && <section className="context-relevance" aria-label="Search relevance context"><strong>{searchAssessment ? `${searchAssessment.relevance} relevance in the originating search` : 'Originating search context'}</strong><p>Question: “{contextualQuestion}”</p>{searchAssessment ? <><p>Ranking version: {searchAssessment.ranking_version}. Catalog generation: {searchAssessment.generation}.</p><ul>{searchAssessment.reasons.map((reason, index) => <li key={index}>{reason}</li>)}</ul><p>This is the assessment saved from the originating search, not a scientific-quality or fitness rating.</p></> : <p>No matching search assessment is available on this record lookup. Return to the search results to inspect relevance; no relevance rating is inferred.</p>}</section>}
 
+        <p className="details-learn-link"><Link to="/learn#read-source">How to read a source page</Link>. Finding a source is not obtaining the data.</p>
         <SourceSummary dataset={dataset} />
         <DetailsShortlist recordId={record.record_id} title={dataset.title} sourceName={record.identity.source.name} detailsPath={dataset.detailsUrl} generation={discovery.result.corpus.publication?.generation ?? discovery.result.corpus.generation ?? `${discovery.result.corpus.corpus_id} ${discovery.result.corpus.corpus_version}`} />
         <ResearcherDecisionSummary dataset={dataset} />

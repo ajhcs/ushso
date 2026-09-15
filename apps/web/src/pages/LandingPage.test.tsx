@@ -15,6 +15,7 @@ describe('home mission and tested journeys', () => {
     expect(markup).toContain('Finding the source is not obtaining the research file')
     expect(markup).toContain('Catalog membership is not payload access')
     expect(markup).toContain('href="/learn"')
+    expect(markup).toContain('href="/learn#first-search"')
     expect(markup).not.toContain('href="/plan"')
   })
 })
