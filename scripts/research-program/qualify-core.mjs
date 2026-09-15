@@ -80,9 +80,10 @@ function evidenceCell(evidence, fallbackStatus) {
   return freeze({
     status: evidence.status ?? (evidence.supported ? 'evidenced' : fallbackStatus),
     supported: evidence.supported === true,
-    unknown: evidence.unknown === true || evidence.supported !== true,
+    unknown: evidence.unknown === true,
     receipt_id: evidence.receipt_id ?? null,
     recipe: evidence.recipe ?? null,
+    limitation: evidence.limitation ?? null,
   });
 }
 
@@ -97,6 +98,7 @@ export function coreCellEvidenceFromReceipts(receipts = []) {
       status: receipt.payload.status ?? (receipt.payload.supported ? 'evidenced' : 'unknown'),
       receipt_id: receipt.receipt_id,
       recipe: receipt.payload.recipe,
+      limitation: receipt.payload.limitation ?? null,
     });
   }
   return freeze(byProduct);
@@ -189,6 +191,7 @@ export function issueCoreQualificationReceipt(cohorts = loadCohort(defaultCohort
     }),
     remaining_limits: freeze([
       'Unknown essential fields and unnamed intake records cannot count as supported.',
+      'Catalog-metadata receipts are not bounded payload samples. Dataset contents were not executed.',
       'R07 remains incomplete until failing retrieval domains have bounded remediation.',
       'R08 remains incomplete below 15 independently qualified routes.',
       'Restricted/manual products remain incomplete until verified routes exist.',

@@ -31,8 +31,14 @@ function sha256Bytes(buffer) {
   return createHash('sha256').update(buffer).digest('hex');
 }
 
+const FILE_SHA_CACHE = new Map();
+
 function sha256File(abs) {
-  return sha256Bytes(readFileSync(abs));
+  const cached = FILE_SHA_CACHE.get(abs);
+  if (cached) return cached;
+  const digest = sha256Bytes(readFileSync(abs));
+  FILE_SHA_CACHE.set(abs, digest);
+  return digest;
 }
 
 function isRfc3339(value) {
@@ -158,7 +164,11 @@ export function validateReceipt(receipt, {
     if (payload.unknown === true && payload.supported === true) fail('UNKNOWN_CELL_CANNOT_COUNT_AS_SUPPORTED');
     if (payload.live_http === true) fail('CORE_CELL_LIVE_HTTP_FORBIDDEN');
     if (typeof payload.recipe !== 'string' || !payload.recipe.trim()) fail('CORE_CELL_RECIPE_REQUIRED');
-    if (payload.bounded_sample !== true && payload.verified_route !== true) fail('CORE_CELL_SAMPLE_OR_ROUTE_REQUIRED');
+    const knownUnsupported = payload.supported === false && payload.unknown === false;
+    if (payload.bounded_sample !== true && payload.verified_route !== true && !knownUnsupported) {
+      fail('CORE_CELL_SAMPLE_OR_ROUTE_REQUIRED');
+    }
+    if (knownUnsupported && typeof payload.limitation !== 'string') fail('CORE_CELL_LIMITATION_REQUIRED');
   }
 
   if (receipt.kind === 'scheduled_cycle') {
@@ -192,16 +202,21 @@ export function loadAndValidateReceipts({
   const receipts = [];
   for (const relative of files) {
     const parsed = JSON.parse(readFileSync(path.join(repoRoot, relative), 'utf8'));
-    receipts.push(validateReceipt(parsed, {
-      repoRoot,
-      seenIds,
-      seenAttemptKeys,
-      seenCycleIds,
-      seenCoreKeys,
-      currentCandidateHead,
-      currentCandidateTree,
-      authorizationRegister,
-    }));
+    const items = parsed.format === 'ushso.core-cell-receipt-bundle.v1' && Array.isArray(parsed.receipts)
+      ? parsed.receipts
+      : [parsed];
+    for (const item of items) {
+      receipts.push(validateReceipt(item, {
+        repoRoot,
+        seenIds,
+        seenAttemptKeys,
+        seenCycleIds,
+        seenCoreKeys,
+        currentCandidateHead,
+        currentCandidateTree,
+        authorizationRegister,
+      }));
+    }
   }
   return freeze(receipts);
 }

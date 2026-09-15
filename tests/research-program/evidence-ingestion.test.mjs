@@ -181,6 +181,56 @@ test('observeOperations uses ingested observation and still never accepts R15', 
   assert.equal(obs.program_complete, false);
 });
 
+test('known-unsupported core cells require a limitation and still cannot count as supported', () => {
+  const productKey = 'cms-hcris-hospital-provider-cost-report';
+  const known = validateReceipt(receipt('core_cell', {
+    product_key: productKey,
+    field: 'publisher_access',
+    supported: false,
+    unknown: false,
+    status: 'catalog_metadata_only',
+    bounded_sample: false,
+    verified_route: false,
+    live_http: false,
+    recipe: 'read frozen catalog metadata only',
+    limitation: 'Dataset contents were not executed.',
+  }, { receipt_id: 'core-cell-known-unsupported' }), { repoRoot: ROOT });
+  assert.equal(known.payload.supported, false);
+  assert.equal(known.payload.unknown, false);
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    product_key: productKey,
+    field: 'publisher_access',
+    supported: false,
+    unknown: false,
+    status: 'catalog_metadata_only',
+    bounded_sample: false,
+    verified_route: false,
+    live_http: false,
+    recipe: 'read frozen catalog metadata only',
+  }, { receipt_id: 'core-cell-missing-limitation' }), { repoRoot: ROOT }), { code: 'CORE_CELL_LIMITATION_REQUIRED' });
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    product_key: productKey,
+    field: 'publisher_access',
+    supported: false,
+    unknown: true,
+    status: 'unknown',
+    bounded_sample: false,
+    verified_route: false,
+    live_http: false,
+    recipe: 'missing sample',
+  }, { receipt_id: 'core-cell-unknown-without-sample' }), { repoRoot: ROOT }), { code: 'CORE_CELL_SAMPLE_OR_ROUTE_REQUIRED' });
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    product_key: productKey,
+    field: 'publisher_access',
+    supported: true,
+    unknown: false,
+    status: 'live',
+    bounded_sample: true,
+    live_http: true,
+    recipe: 'forbidden live fetch',
+  }, { receipt_id: 'core-cell-live-http' }), { repoRoot: ROOT }), { code: 'CORE_CELL_LIVE_HTTP_FORBIDDEN' });
+});
+
 test('frozen 3434 IDs seed 13736 not_attempted axes without promoting not_attempted to success', () => {
   const { ids, ledger, rows } = materializeAttemptLedger({ repoRoot: ROOT });
   assert.equal(ids.length, 3434);

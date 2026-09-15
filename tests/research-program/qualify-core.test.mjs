@@ -103,3 +103,29 @@ test('validated core-cell receipts can fill unknown cells; unknown remains unsup
   assert.equal(issued.scientific_completeness_pass, false);
   assert.equal(issued.failed_matrix_retained, true);
 });
+
+test('frozen catalog-metadata receipts make 86 products known-unsupported; 14 intake rows stay unknown; R04 stays unaccepted', () => {
+  const receipt = issueCoreQualificationReceipt(cohort);
+  const resolved = receipt.matrix.rows.filter((row) => row.source_context.anchor_status === 'resolved_catalog_record');
+  const intake = receipt.matrix.rows.filter((row) => row.source_context.anchor_status === 'named_intake');
+  assert.equal(resolved.length, 86);
+  assert.equal(intake.length, 14);
+  for (const row of resolved) {
+    for (const field of ['publisher_access', 'schema_qualification', 'join_route', 'unit_grain_date_denominator']) {
+      assert.equal(row.cells[field].supported, false, row.product_key);
+      assert.equal(row.cells[field].unknown, false, row.product_key);
+      assert.ok(row.cells[field].receipt_id, field);
+    }
+  }
+  for (const row of intake) {
+    for (const field of ['publisher_access', 'schema_qualification', 'join_route', 'unit_grain_date_denominator']) {
+      assert.equal(row.cells[field].supported, false, row.product_key);
+      assert.equal(row.cells[field].unknown, true, row.product_key);
+    }
+  }
+  const unknownSupported = receipt.matrix.rows.flatMap((row) => Object.values(row.cells)).filter((cell) => cell.unknown && cell.supported);
+  assert.equal(unknownSupported.length, 0);
+  assert.equal(receipt.r04_accepted, false);
+  assert.equal(receipt.scientific_completeness_pass, false);
+  assert.ok(receipt.remaining_limits.some((item) => item.includes('Catalog-metadata receipts are not bounded payload samples')));
+});
