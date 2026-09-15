@@ -135,4 +135,8 @@ test('frozen catalog-metadata receipts make 86 products known-unsupported; 14 in
   const counts = payloadSampleCountsFromReceipts([], cohort.products);
   assert.equal(counts.public_sample_complete, 0);
   assert.equal(counts.catalog_membership_is_not_payload_sample, true);
+  const hcris = receipt.matrix.rows.find((row) => row.product_key === 'cms-hcris-hospital-provider-cost-report');
+  assert.equal(hcris.cells.publisher_access.status, 'catalog_distribution_locators_not_payload');
+  assert.equal(hcris.cells.publisher_access.supported, false);
+  assert.ok(hcris.cells.publisher_access.limitation.includes('payload_success=false'));
 });
