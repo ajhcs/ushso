@@ -35,6 +35,13 @@ describe('local shortlist workspace', () => {
     expect(filled).toContain('Never sent to enrichment or telemetry')
     expect(filled).toContain('does not compile a research plan')
     expect(filled).toContain('Compare documented examples')
+    expect(filled).toContain('DOI not captured')
+    expect(filled).toContain('Authors not captured')
+    expect(filled).toContain('not a publisher endorsement')
+    expect(filled).toContain('Question omitted by default')
+    expect(filled).toContain('Private notes omitted by default')
+    expect(filled).toContain('USHSO verification is separate from the publisher product')
+    expect(filled).not.toContain('include question and notes by default')
     setShortlistStorage(null)
   })
 
