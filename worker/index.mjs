@@ -19,6 +19,7 @@ import {
   renderCatalogSourceHtml,
   renderPublicSitemap,
   renderSearchFallbackHtml,
+  titleTokensMatch,
 } from './catalog-html.mjs';
 
 const MAX_REQUEST_BYTES = 20 * 1024;
@@ -444,9 +445,8 @@ export function createWorker({
           records = [];
         }
         const question = url.searchParams.get('q') ?? '';
-        const needle = question.trim().toLowerCase();
-        const matched = needle
-          ? records.filter((record) => String(record.title ?? record.identity?.asset?.name ?? '').toLowerCase().includes(needle)).slice(0, 10)
+        const matched = question.trim()
+          ? records.filter((record) => titleTokensMatch(question, record.title ?? record.identity?.asset?.name)).slice(0, 10)
           : records.slice(0, 10);
         const fallback = renderSearchFallbackHtml({ origin: url.origin, question, records: matched, total, generation });
         const page = mergeCrawlerIntoSpa(spaText, fallback);

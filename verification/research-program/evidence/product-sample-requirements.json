@@ -1,17 +1,33 @@
 {
   "format": "ushso.product-sample-requirements.v1",
   "note": "Identity and release requirements come from reviewed frozen product definitions. Receipt-supplied identity_checks cannot weaken or replace them. FY_END_DT and PLACES year are observation/reporting fields until frozen publisher documentation proves they are the catalog release.",
+  "amendments": [
+    {
+      "id": "HCRIS-IDENTITY-PROVIDER-CCN-20260915",
+      "product_key": "cms-hcris-hospital-provider-cost-report",
+      "from_field": "PROVNUM",
+      "to_field": "Provider CCN",
+      "status": "applied",
+      "does_not_rewrite_prior_failed_attempt": true,
+      "evidence": [
+        "scripts/research/fixtures/cms-cost-grid/hospital.json variable name Provider CCN, definition CMS Certification Number (CCN).",
+        "Retained live capture verification/research-program/evidence/payloads/pilot-r04/cms-hcris-hospital-provider-cost-report.json sha256 efb538d31b8d51bf8443b12b617271617afd2f73bf379ed53c0e8bdad2eba08f: rows expose Provider CCN, not PROVNUM.",
+        "PROVNUM is the PBJ staffing dictionary term (Medicare provider number), not a hospital cost-report JSON field in the frozen hospital dictionary."
+      ],
+      "not_a_new_retrieval": true
+    }
+  ],
   "products": {
     "cms-hcris-hospital-provider-cost-report": {
       "required_record_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
       "required_native_id": "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data-viewer",
-      "row_fields": { "PROVNUM": "string" },
+      "row_fields": { "Provider CCN": "string" },
       "authorized_hosts": ["data.cms.gov"],
       "authorized_url_contains": "44060663-47d8-4ced-a115-b53b4c270acb",
       "release_check": {
         "status": "unresolved",
         "field": "FY_END_DT",
-        "reason": "FY_END_DT is the cost-report fiscal year ending date (reporting period). Frozen local documentation does not prove it is the CMS catalog distribution release named CostReport_2023_Final."
+        "reason": "FY_END_DT / Fiscal Year End Date is the cost-report reporting period. Frozen local documentation does not prove it is the CMS catalog distribution release named CostReport_2023_Final."
       }
     },
     "cdc-places-local-data-for-better-health": {

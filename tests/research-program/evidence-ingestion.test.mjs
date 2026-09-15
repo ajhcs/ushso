@@ -441,7 +441,7 @@ test('authorized live HTTP captures remain live_http=true; AUTH-04 cannot grant 
   }, {
     receipt_id: 'core-cell-auth04-live',
     evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
-    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
+    evidence_sha256: '9c0755ab1d44e9902eac9c8103d9bb3017b7d00cad50eadeea5f13012887143c',
   }), { repoRoot: ROOT }), { code: 'UNAUTHORIZED_LIVE_HTTP' });
   assert.throws(() => validateReceipt(receipt('core_cell', {
     ...payload,
@@ -449,7 +449,7 @@ test('authorized live HTTP captures remain live_http=true; AUTH-04 cannot grant 
   }, {
     receipt_id: 'core-cell-auth-payload-pilot-unregistered',
     evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
-    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
+    evidence_sha256: '9c0755ab1d44e9902eac9c8103d9bb3017b7d00cad50eadeea5f13012887143c',
   }), { repoRoot: ROOT }), { code: 'UNAUTHORIZED_LIVE_HTTP' });
   const granted = {
     format: 'ushso.payload-authorization-register.v1',
@@ -471,7 +471,7 @@ test('authorized live HTTP captures remain live_http=true; AUTH-04 cannot grant 
   }, {
     receipt_id: 'core-cell-auth-payload-pilot',
     evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
-    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
+    evidence_sha256: '9c0755ab1d44e9902eac9c8103d9bb3017b7d00cad50eadeea5f13012887143c',
   }), { repoRoot: ROOT, payloadAuthRegister: granted });
   assert.equal(accepted.payload.live_http, true);
   assert.equal(accepted.payload._derived_payload_sample, true);
@@ -483,7 +483,7 @@ test('authorized live HTTP captures remain live_http=true; AUTH-04 cannot grant 
   }, {
     receipt_id: 'core-cell-auth-payload-wrong-endpoint',
     evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
-    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
+    evidence_sha256: '9c0755ab1d44e9902eac9c8103d9bb3017b7d00cad50eadeea5f13012887143c',
   }), { repoRoot: ROOT, payloadAuthRegister: granted }), { code: 'UNAUTHORIZED_LIVE_HTTP' });
 });
 
@@ -526,12 +526,12 @@ test('a valid first payload row cannot hide an invalid later row', () => {
       started_at: '2026-09-15T12:00:00Z',
       ended_at: '2026-09-15T12:00:01Z',
     },
-    recipe: 'mixed rows: first valid, second missing PROVNUM',
+    recipe: 'mixed rows: first valid, second missing Provider CCN',
     live_http: false,
   }, {
     receipt_id: 'core-cell-mixed-rows',
     evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-mixed-rows.json',
-    evidence_sha256: '789c23b0ce8a0f76fda8706dd0c35b3c0c5502169b78ab33d131fdf1ca558404',
+    evidence_sha256: 'a25c5e883bba1ca475a6de5c725bb7808ed5a4f195cac32afb48c2dba23420f2',
   }), { repoRoot: ROOT }), { code: 'BOUNDED_SAMPLE_IDENTITY_FIELD_MISSING' });
 });
 
@@ -563,14 +563,14 @@ test('caller-supplied derived flags cannot bypass frozen identity checks', () =>
   }, {
     receipt_id: 'core-cell-forged-derived',
     evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
-    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
+    evidence_sha256: '9c0755ab1d44e9902eac9c8103d9bb3017b7d00cad50eadeea5f13012887143c',
   }), { repoRoot: ROOT }), { code: 'SAMPLE_RECORD_ID_MISMATCH' });
 });
 
 test('changed evidence bytes at the same path invalidate a cached digest', () => {
   const relative = 'verification/research-program/evidence/payloads/hash-cache-mutation.json';
   const abs = path.join(ROOT, relative);
-  const first = Buffer.from('[{"PROVNUM":"010001"}]');
+  const first = Buffer.from('[{"Provider CCN":"010001"}]');
   writeFileSync(abs, first);
   const sha = createHash('sha256').update(first).digest('hex');
   const native = 'https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data-viewer';
@@ -598,7 +598,7 @@ test('changed evidence bytes at the same path invalidate a cached digest', () =>
       evidence_reference: relative,
       evidence_sha256: sha,
     }), { repoRoot: ROOT });
-    writeFileSync(abs, Buffer.from('[{"PROVNUM":"CHANGED"}]'));
+    writeFileSync(abs, Buffer.from('[{"Provider CCN":"CHANGED"}]'));
     assert.throws(() => validateReceipt(receipt('core_cell', payload, {
       receipt_id: 'hash-cache-second',
       evidence_reference: relative,

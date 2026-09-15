@@ -1,23 +1,27 @@
-# Independent engineering review — collector repair and qualification boundaries
+# Independent engineering review — collector repair (exact budget/timeout) and HCRIS identity
 
 Reviewer: Astra/root (engineering). This note cannot grant owner authority, accept R01–R16, spend remaining publisher requests, or change production.
 
-Candidate branch: `codex/ushso-evidence-ingestion-20260915`. Frozen `cohorts.json` unmodified. Original HCRIS failed attempt preserved.
+Candidate branch: `codex/ushso-evidence-ingestion-20260915`. Frozen `cohorts.json` unmodified. Original failed HCRIS live attempt on SHA `2efafed` preserved. Remaining publisher budget: 2 unused.
 
-## Collector
+## Collector (actionable findings addressed)
 
-- Budget is persisted to `payload-retrieval-pilot-ledger.json` before each hop (initial, redirect, retry). Empty remaining budget fails closed at run start.
-- Redirects must match the product’s approved endpoint, not merely an allowed hostname.
-- Body reads keep the timeout; oversized bodies cancel.
-- Each attempt writes a unique attempt record and capture name. Failed identity still retains capture bytes.
-- Capture success, identity verification, release verification, and acceptance eligibility are separate fields.
-- R04 sample totals require `_release_check.status === 'verified'`. Unresolved PLACES year contributes zero qualified samples.
-- Mock-transport tests cover restart, duplicate invocation, cross-source redirect, stall, oversized body, and HCRIS identity failure. They are not operational evidence.
+- Timeout cancellation is an explicit failure: `PILOT_TIMEOUT` / `PILOT_SOURCE_TIMEOUT` / `PILOT_GLOBAL_TIMEOUT`. Stalled body after valid JSON fails closed.
+- One absolute deadline per source and one global deadline; remaining wait is the min of both.
+- Each issued GET (initial, redirect hop, retry fetch) charges exactly one budget unit before the request is sent. A 503 then success uses two units.
+- Concurrent invocations take an exclusive lock file; the second fails `PILOT_CONCURRENT_INVOCATION` and cannot spend the same remaining units.
+- Missing ledger is `PILOT_LEDGER_REQUIRED` (no empty-ledger recovery that would reset spent budget). Inconsistent remaining/used totals fail closed.
+- Redirect destinations must match the product’s approved endpoint **including query parameters**. `size=50` is rejected before follow.
+- Unused redirect/error bodies are cancelled.
+- Complete receipts are persisted under `verification/research-program/evidence/pilot-receipts/`, not only IDs.
+- R04 sample totals still require verified release. Unresolved PLACES year / HCRIS FY_END_DT contribute zero qualified samples.
 
-## Remaining uncertainty
+Mock-transport tests are not operational evidence.
 
-The two live GETs on `2efafed` still stand: HCRIS identity failed (`Provider CCN` vs `PROVNUM`); PLACES identity passed with unresolved year. No additional publisher requests were made during this repair. Remaining budget: 2.
+## HCRIS identity
+
+Local hospital cost-report dictionary names **Provider CCN** (CMS Certification Number). Live retained JSON uses that field. `PROVNUM` is a PBJ staffing dictionary term, not this product’s JSON identity. Amendment `HCRIS-IDENTITY-PROVIDER-CCN-20260915` is applied to sample requirements and VariableBrowser. It does not rewrite the original failed live attempt.
 
 ## Site
 
-Chromium 149 via Playwright walked search → details → empty → missing → 360px mobile. Details pages now offer a source evidence packet download. No-JS `/search` lists catalog titles and states ranked discovery needs JavaScript. PNGs gitignored; `notes.json` committed.
+Chromium 149 walked the rebuilt candidate: search receipt download, source evidence packet download, keyboard search→details→return (query and hash restored; gold 3px `:focus-visible`), 360px no overflow, empty/missing recovery, and JavaScript-disabled title fallback with token matching. Ranked discovery still requires JS.

@@ -130,6 +130,17 @@ test('no-JS search fallback lists catalog titles without claiming ranked discove
   assert.match(html, /Catalog membership is not payload access/);
 });
 
+test('no-JS title fallback matches hospital cost report tokens, not only a contiguous phrase', async () => {
+  const hcris = { ...firstRecord, record_id: 'obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17', title: 'Hospital Provider Cost Report' };
+  const local = createWorker({ loadEngine: async () => engine, loadCatalog: async () => ({ ...catalog, records: [hcris] }) });
+  const spaEnv = { ASSETS: { fetch: async () => new Response('<!doctype html><html><head><title>SPA</title></head><body><div id="root"></div></body></html>', { status: 200, headers: { 'content-type': 'text/html' } }) } };
+  const page = await local.fetch(new Request('https://ushso.org/search?q=hospital+cost+report', { headers: { accept: 'text/html' } }), spaEnv);
+  const html = await page.text();
+  assert.match(html, /Hospital Provider Cost Report/);
+  assert.match(html, /data-crawler-content="search-fallback"/);
+  assert.match(html, /datasets\/obs%3Aasset%3Acms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17/);
+});
+
 test('HTML-only crawlers see catalog source facts on dataset URLs without a blank page', async () => {
   const found = await worker.fetch(new Request(`https://ushso.org/datasets/${encodeURIComponent(firstRecord.record_id)}`, { headers: { accept: 'text/html' } }), env);
   const html = await found.text();

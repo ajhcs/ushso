@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createHash, randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { closeSync, existsSync, mkdirSync, openSync, readFileSync, renameSync, unlinkSync, writeFileSync, writeSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -13,9 +13,12 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const PACKET_REL = 'verification/research-program/evidence/payload-retrieval-pilot.json';
 const AUTH_REL = 'verification/research-program/authorization/payload-authorizations.json';
 const LEDGER_REL = 'verification/research-program/evidence/payload-retrieval-pilot-ledger.json';
+const LOCK_REL = 'verification/research-program/evidence/payload-retrieval-pilot.lock';
 const CAPTURE_DIR = 'verification/research-program/evidence/payloads/pilot-r04';
 const ATTEMPT_DIR = 'verification/research-program/evidence/pilot-attempts';
+const RECEIPT_DIR = 'verification/research-program/evidence/pilot-receipts';
 const EXPECTED_COHORTS = '89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543';
+const LEDGER_FORMAT = 'ushso.payload-retrieval-pilot-ledger.v1';
 
 function fail(code, detail) {
   const error = new Error(detail ?? code);
@@ -31,10 +34,6 @@ function gitHead(repoRoot = ROOT) {
   return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
 }
 
-function nowIso() {
-  return new Date().toISOString();
-}
-
 function writeJsonAtomic(abs, value) {
   mkdirSync(path.dirname(abs), { recursive: true });
   const tmp = abs + '.tmp-' + randomUUID();
@@ -42,10 +41,32 @@ function writeJsonAtomic(abs, value) {
   renameSync(tmp, abs);
 }
 
+function acquirePilotLock(repoRoot) {
+  const lockPath = path.join(repoRoot, LOCK_REL);
+  mkdirSync(path.dirname(lockPath), { recursive: true });
+  let fd;
+  try {
+    fd = openSync(lockPath, 'wx');
+  } catch (error) {
+    if (error.code === 'EEXIST') fail('PILOT_CONCURRENT_INVOCATION', lockPath);
+    throw error;
+  }
+  writeSync(fd, JSON.stringify({ pid: process.pid, at: new Date().toISOString() }) + '\n');
+  return {
+    path: lockPath,
+    fd,
+    release() {
+      try { closeSync(fd); } catch {}
+      try { unlinkSync(lockPath); } catch {}
+    },
+  };
+}
+
 function emptyLedger(auth) {
   const limits = auth.entries[0].limits;
+  const keys = auth.entries[0].product_keys ?? [];
   return {
-    format: 'ushso.payload-retrieval-pilot-ledger.v1',
+    format: LEDGER_FORMAT,
     authorization_id: 'AUTH-PAYLOAD-PILOT',
     candidate_head: auth.entries[0].candidate_head,
     totals: {
@@ -53,7 +74,7 @@ function emptyLedger(auth) {
       used_requests: 0,
       remaining_requests: limits.max_requests,
     },
-    per_source: Object.fromEntries((auth.entries[0].product_keys ?? []).map((key) => [key, {
+    per_source: Object.fromEntries(keys.map((key) => [key, {
       used_requests: 0,
       remaining_requests: limits.max_requests_per_source,
       max_requests: limits.max_requests_per_source,
@@ -63,10 +84,35 @@ function emptyLedger(auth) {
   };
 }
 
+function assertLedgerConsistent(ledger, auth) {
+  if (ledger.format !== LEDGER_FORMAT) fail('PILOT_LEDGER_FORMAT');
+  if (ledger.authorization_id !== 'AUTH-PAYLOAD-PILOT') fail('PILOT_LEDGER_AUTH');
+  if (ledger.closed) fail('PILOT_LEDGER_CLOSED');
+  const limits = auth.entries[0].limits;
+  const keys = auth.entries[0].product_keys ?? [];
+  if (ledger.totals.max_requests !== limits.max_requests) fail('PILOT_LEDGER_LIMIT_MISMATCH');
+  if (!Number.isSafeInteger(ledger.totals.used_requests) || ledger.totals.used_requests < 0) fail('PILOT_LEDGER_USED_INVALID');
+  if (ledger.totals.remaining_requests !== ledger.totals.max_requests - ledger.totals.used_requests) fail('PILOT_LEDGER_REMAINING_MISMATCH');
+  if (ledger.totals.used_requests > ledger.totals.max_requests) fail('PILOT_LEDGER_OVERSPENT');
+  let sourceUsed = 0;
+  for (const key of keys) {
+    const source = ledger.per_source?.[key];
+    if (!source) fail('PILOT_LEDGER_SOURCE_MISSING', key);
+    if (source.max_requests !== limits.max_requests_per_source) fail('PILOT_LEDGER_SOURCE_LIMIT_MISMATCH', key);
+    if (!Number.isSafeInteger(source.used_requests) || source.used_requests < 0) fail('PILOT_LEDGER_SOURCE_USED_INVALID', key);
+    if (source.remaining_requests !== source.max_requests - source.used_requests) fail('PILOT_LEDGER_SOURCE_REMAINING_MISMATCH', key);
+    if (source.used_requests > source.max_requests) fail('PILOT_LEDGER_SOURCE_OVERSPENT', key);
+    sourceUsed += source.used_requests;
+  }
+  if (sourceUsed !== ledger.totals.used_requests) fail('PILOT_LEDGER_SOURCE_TOTAL_MISMATCH');
+}
+
 export function loadLedger(repoRoot = ROOT, auth = JSON.parse(readFileSync(path.join(repoRoot, AUTH_REL), 'utf8'))) {
   const abs = path.join(repoRoot, LEDGER_REL);
-  if (!existsSync(abs)) return emptyLedger(auth);
-  return JSON.parse(readFileSync(abs, 'utf8'));
+  if (!existsSync(abs)) fail('PILOT_LEDGER_REQUIRED');
+  const ledger = JSON.parse(readFileSync(abs, 'utf8'));
+  assertLedgerConsistent(ledger, auth);
+  return ledger;
 }
 
 function persistLedger(repoRoot, ledger) {
@@ -86,15 +132,39 @@ function consumeBudget(ledger, productKey, kind, url, repoRoot) {
   return ledger.totals.used_requests;
 }
 
+function queryMap(url) {
+  const parsed = new URL(url);
+  return Object.fromEntries([...parsed.searchParams.entries()].sort());
+}
+
+function sameApprovedEndpoint(approved, candidate) {
+  let approvedUrl;
+  let candidateUrl;
+  try {
+    approvedUrl = new URL(approved);
+    candidateUrl = new URL(candidate);
+  } catch {
+    return false;
+  }
+  if (approvedUrl.origin !== candidateUrl.origin) return false;
+  if (approvedUrl.pathname !== candidateUrl.pathname) return false;
+  const allowed = queryMap(approved);
+  const actual = queryMap(candidate);
+  for (const [key, value] of Object.entries(allowed)) {
+    if (actual[key] !== value) return false;
+  }
+  for (const key of Object.keys(actual)) {
+    if (!(key in allowed)) return false;
+  }
+  return true;
+}
+
 function approvedEndpoint(auth, productKey, url) {
   const entry = (auth.entries ?? []).find((row) => row.id === 'AUTH-PAYLOAD-PILOT');
   const keys = entry?.product_keys ?? [];
   const endpoints = entry?.endpoints ?? [];
   const scoped = endpoints.filter((endpoint, index) => keys[index] === productKey);
-  return scoped.some((endpoint) => {
-    const base = endpoint.split('?')[0];
-    return url === endpoint || url.split('?')[0] === base;
-  });
+  return scoped.some((endpoint) => sameApprovedEndpoint(endpoint, url));
 }
 
 function requireApprovedUrl(auth, productKey, url) {
@@ -105,21 +175,50 @@ function requireApprovedUrl(auth, productKey, url) {
   return parsed;
 }
 
-async function readBodyWithTimeout(response, { maxBytes, deadline, timeoutMs }) {
+function remainingMs(deadline, nowFn) {
+  return deadline - nowFn();
+}
+
+function failTimeout(sourceDeadline, globalDeadline, nowFn) {
+  if (nowFn() > globalDeadline) fail('PILOT_GLOBAL_TIMEOUT');
+  if (nowFn() > sourceDeadline) fail('PILOT_SOURCE_TIMEOUT');
+  fail('PILOT_TIMEOUT');
+}
+
+async function cancelBody(response) {
+  try {
+    await response.body?.cancel?.();
+  } catch {}
+}
+
+async function readBodyWithTimeout(response, { maxBytes, sourceDeadline, globalDeadline, nowFn }) {
   const reader = response.body?.getReader();
   if (!reader) fail('PILOT_EMPTY_BODY');
   const chunks = [];
   let size = 0;
   while (true) {
-    const remaining = Math.max(1, Math.min(timeoutMs, deadline - Date.now()));
-    if (Date.now() > deadline) fail('PILOT_TIMEOUT');
-    const timer = setTimeout(() => reader.cancel('timeout').catch(() => {}), remaining);
+    const wait = Math.max(1, Math.min(remainingMs(sourceDeadline, nowFn), remainingMs(globalDeadline, nowFn)));
+    if (remainingMs(sourceDeadline, nowFn) <= 0 || remainingMs(globalDeadline, nowFn) <= 0) {
+      await reader.cancel('timeout').catch(() => {});
+      failTimeout(sourceDeadline, globalDeadline, nowFn);
+    }
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      reader.cancel('timeout').catch(() => {});
+    }, wait);
     let result;
     try {
       result = await reader.read();
+    } catch (error) {
+      if (timedOut || remainingMs(sourceDeadline, nowFn) <= 0 || remainingMs(globalDeadline, nowFn) <= 0) {
+        failTimeout(sourceDeadline, globalDeadline, nowFn);
+      }
+      throw error;
     } finally {
       clearTimeout(timer);
     }
+    if (timedOut) failTimeout(sourceDeadline, globalDeadline, nowFn);
     if (result.done) break;
     size += result.value.byteLength;
     if (size > maxBytes) {
@@ -150,6 +249,7 @@ export async function runPayloadRetrievalPilot({
   execute = false,
   repoRoot = ROOT,
   now = Date.now,
+  allowMissingLedger = false,
 } = {}) {
   if (!execute) fail('PILOT_EXECUTE_FLAG_REQUIRED');
   validatePayloadRetrievalPilot({ repoRoot });
@@ -161,233 +261,287 @@ export async function runPayloadRetrievalPilot({
   if (sha256(readFileSync(path.join(repoRoot, 'evaluation/research-program/cohorts.json'))) !== EXPECTED_COHORTS) fail('FROZEN_COHORTS_CHANGED');
   mkdirSync(path.join(repoRoot, CAPTURE_DIR), { recursive: true });
   mkdirSync(path.join(repoRoot, ATTEMPT_DIR), { recursive: true });
-  const ledger = loadLedger(repoRoot, auth);
-  if (ledger.closed) fail('PILOT_LEDGER_CLOSED');
-  if (ledger.candidate_head !== entry.candidate_head) fail('PILOT_LEDGER_CANDIDATE_MISMATCH');
-  if (ledger.totals.remaining_requests <= 0) fail('PILOT_REQUEST_BUDGET_EXHAUSTED');
-  const deadline = now() + packet.totals.max_seconds * 1000;
-  const captures = [];
-  for (const product of packet.products) {
-    const attemptId = 'attempt-' + product.product_key + '-' + String(now()).replace(/\D/g, '') + '-' + randomUUID().slice(0, 8);
-    const started = new Date(now()).toISOString();
-    const attempt = {
-      format: 'ushso.payload-retrieval-attempt.v1',
-      attempt_id: attemptId,
-      product_key: product.product_key,
-      candidate_head: head,
-      started_at: started,
-      ended_at: null,
-      live_http: true,
-      capture_success: false,
-      identity_verified: false,
-      release_verified: false,
-      acceptance_eligible: false,
-      requests: [],
-      error: null,
-    };
-    writeAttempt(repoRoot, attempt);
-    ledger.attempts.push(attemptId);
-    persistLedger(repoRoot, ledger);
-    try {
-      let current = product.endpoint;
-      const chain = [];
-      let response;
-      for (let hop = 0; hop <= packet.request_accounting.max_redirects_per_request; hop += 1) {
-        requireApprovedUrl(auth, product.product_key, current);
-        consumeBudget(ledger, product.product_key, hop === 0 ? 'initial' : 'redirect', current, repoRoot);
-        attempt.requests.push({ kind: hop === 0 ? 'initial' : 'redirect', url: current, at: new Date(now()).toISOString() });
-        writeAttempt(repoRoot, attempt);
-        const remainingMs = Math.max(1, Math.min(product.limits.max_seconds * 1000, deadline - now()));
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), remainingMs);
-        try {
-          response = await fetchImpl(current, {
-            method: 'GET',
-            redirect: 'manual',
-            signal: controller.signal,
-            headers: { accept: 'application/json', 'user-agent': 'ushso-payload-pilot/1' },
-          });
-        } finally {
-          clearTimeout(timer);
-        }
-        if ([301, 302, 303, 307, 308].includes(response.status)) {
-          const location = response.headers.get('location');
-          if (!location) fail('PILOT_REDIRECT_MISSING_LOCATION', current);
-          const next = new URL(location, current).toString();
-          requireApprovedUrl(auth, product.product_key, next);
-          chain.push(next);
-          current = next;
-          continue;
-        }
-        if (response.status === 429 || response.status === 503) {
-          consumeBudget(ledger, product.product_key, 'retry', product.endpoint, repoRoot);
-          attempt.requests.push({ kind: 'retry', url: product.endpoint, at: new Date(now()).toISOString() });
-          writeAttempt(repoRoot, attempt);
-          current = product.endpoint;
-          hop = -1;
-          continue;
-        }
-        if (response.status < 200 || response.status > 299) fail('PILOT_HTTP_STATUS', String(response.status));
-        const bytes = await readBodyWithTimeout(response, {
-          maxBytes: product.limits.max_bytes,
-          deadline,
-          timeoutMs: product.limits.max_seconds * 1000,
-        });
-        const contentType = response.headers.get('content-type') ?? '';
-        if (!contentType.includes('json')) fail('PILOT_CONTENT_TYPE', contentType);
-        const parsed = parseRows(bytes);
-        if (parsed.rows.length > product.limits.max_rows) fail('PILOT_ROW_LIMIT', product.product_key);
-        const digest = sha256(bytes);
-        const captureRel = path.join(CAPTURE_DIR, attemptId + '-' + product.product_key + '.json');
-        writeFileSync(path.join(repoRoot, captureRel), bytes);
-        attempt.capture_success = true;
-        attempt.capture_reference = captureRel;
-        attempt.evidence_sha256 = digest;
-        attempt.http_status = response.status;
-        attempt.bytes = bytes.length;
-        attempt.rows = parsed.rows.length;
-        attempt.redirect_chain = chain;
-        attempt.ended_at = new Date(now()).toISOString();
-        writeAttempt(repoRoot, attempt);
-        const receipt = {
-          format: 'ushso.evidence-receipt.v1',
-          receipt_id: 'pilot-' + attemptId,
-          kind: 'core_cell',
-          generation: packet.generation,
-          candidate_head: head,
-          recorded_at: attempt.ended_at,
-          evidence_reference: captureRel,
-          evidence_sha256: digest,
-          payload: {
-            product_key: product.product_key,
-            field: 'publisher_access',
-            supported: true,
-            unknown: false,
-            status: 'bounded_sample',
-            bounded_sample: true,
-            payload_success: true,
-            live_http: true,
-            native_product_id: product.native_product_id,
-            record_id: product.frozen_record_id,
-            release_id: product.release_id,
-            result_format: parsed.format,
-            row_count: parsed.rows.length,
-            recipe: 'authorized two-source public JSON pilot; keep live_http=true',
-            limitation: product.release_verification?.reason ?? 'Release semantics remain unresolved.',
-            authorization: { id: 'AUTH-PAYLOAD-PILOT', authorized: true, environment: 'staging_egress', candidate_head: head },
-            execution: {
-              kind: 'bounded_http_sample',
-              started_at: started,
-              ended_at: attempt.ended_at,
-              request_url: product.endpoint,
-              final_url: current,
-              http_status: response.status,
-              content_type: contentType,
-              redirects: chain.length,
-              redirect_chain: chain,
-              bytes: bytes.length,
-            },
-          },
-        };
-        try {
-          const validated = validateReceipt(receipt, {
-            repoRoot,
-            currentCandidateHead: head,
-            payloadAuthRegister: auth,
-          });
-          attempt.identity_verified = validated.payload._derived_payload_sample === true;
-          attempt.release_verified = validated.payload._release_check?.status === 'verified';
-          attempt.acceptance_eligible = attempt.identity_verified && attempt.release_verified;
-          attempt.receipt_id = validated.receipt_id;
-          writeAttempt(repoRoot, attempt);
-          captures.push({
-            attempt_id: attemptId,
-            product_key: product.product_key,
-            capture_success: true,
-            identity_verified: attempt.identity_verified,
-            release_verified: attempt.release_verified,
-            acceptance_eligible: attempt.acceptance_eligible,
-            evidence_reference: captureRel,
-            evidence_sha256: digest,
-            rows: parsed.rows.length,
-            bytes: bytes.length,
-            live_http: true,
-            release_check: validated.payload._release_check,
-          });
-        } catch (error) {
-          attempt.identity_verified = false;
-          attempt.release_verified = false;
-          attempt.acceptance_eligible = false;
-          attempt.error = { code: error.code, message: error.message };
-          attempt.ended_at = new Date(now()).toISOString();
-          writeAttempt(repoRoot, attempt);
-          captures.push({
-            attempt_id: attemptId,
-            product_key: product.product_key,
-            capture_success: true,
-            identity_verified: false,
-            release_verified: false,
-            acceptance_eligible: false,
-            evidence_reference: captureRel,
-            evidence_sha256: digest,
-            rows: parsed.rows.length,
-            bytes: bytes.length,
-            live_http: true,
-            error: attempt.error,
-          });
-        }
-        break;
-      }
-    } catch (error) {
-      attempt.error = { code: error.code, message: error.message };
-      attempt.ended_at = new Date(now()).toISOString();
-      writeAttempt(repoRoot, attempt);
-      captures.push({
+  mkdirSync(path.join(repoRoot, RECEIPT_DIR), { recursive: true });
+  const lock = acquirePilotLock(repoRoot);
+  try {
+    if (!existsSync(path.join(repoRoot, LEDGER_REL))) {
+      if (!allowMissingLedger) fail('PILOT_LEDGER_REQUIRED');
+      persistLedger(repoRoot, emptyLedger(auth));
+    }
+    const ledger = loadLedger(repoRoot, auth);
+    if (ledger.candidate_head !== entry.candidate_head) fail('PILOT_LEDGER_CANDIDATE_MISMATCH');
+    if (ledger.totals.remaining_requests <= 0) fail('PILOT_REQUEST_BUDGET_EXHAUSTED');
+    const globalDeadline = now() + packet.totals.max_seconds * 1000;
+    const captures = [];
+    for (const product of packet.products) {
+      const attemptId = 'attempt-' + product.product_key + '-' + String(now()).replace(/\D/g, '') + '-' + randomUUID().slice(0, 8);
+      const started = new Date(now()).toISOString();
+      const sourceDeadline = now() + product.limits.max_seconds * 1000;
+      const attempt = {
+        format: 'ushso.payload-retrieval-attempt.v1',
         attempt_id: attemptId,
         product_key: product.product_key,
-        capture_success: attempt.capture_success,
+        candidate_head: head,
+        started_at: started,
+        ended_at: null,
+        live_http: true,
+        capture_success: false,
         identity_verified: false,
         release_verified: false,
         acceptance_eligible: false,
-        error: attempt.error,
-      });
+        requests: [],
+        error: null,
+        receipt: null,
+      };
+      writeAttempt(repoRoot, attempt);
+      ledger.attempts.push(attemptId);
+      persistLedger(repoRoot, ledger);
+      try {
+        let current = product.endpoint;
+        const chain = [];
+        let response;
+        let retries = 0;
+        for (let hop = 0; hop <= packet.request_accounting.max_redirects_per_request; hop += 1) {
+          if (remainingMs(sourceDeadline, now) <= 0 || remainingMs(globalDeadline, now) <= 0) {
+            failTimeout(sourceDeadline, globalDeadline, now);
+          }
+          requireApprovedUrl(auth, product.product_key, current);
+          consumeBudget(ledger, product.product_key, hop === 0 ? 'initial' : 'redirect', current, repoRoot);
+          attempt.requests.push({ kind: hop === 0 ? 'initial' : 'redirect', url: current, at: new Date(now()).toISOString() });
+          writeAttempt(repoRoot, attempt);
+          const wait = Math.max(1, Math.min(remainingMs(sourceDeadline, now), remainingMs(globalDeadline, now)));
+          const controller = new AbortController();
+          let aborted = false;
+          const timer = setTimeout(() => {
+            aborted = true;
+            controller.abort();
+          }, wait);
+          try {
+            response = await fetchImpl(current, {
+              method: 'GET',
+              redirect: 'manual',
+              signal: controller.signal,
+              headers: { accept: 'application/json', 'user-agent': 'ushso-payload-pilot/1' },
+            });
+          } catch (error) {
+            if (aborted || remainingMs(sourceDeadline, now) <= 0 || remainingMs(globalDeadline, now) <= 0) {
+              failTimeout(sourceDeadline, globalDeadline, now);
+            }
+            throw error;
+          } finally {
+            clearTimeout(timer);
+          }
+          if (aborted) failTimeout(sourceDeadline, globalDeadline, now);
+          if ([301, 302, 303, 307, 308].includes(response.status)) {
+            const location = response.headers.get('location');
+            await cancelBody(response);
+            if (!location) fail('PILOT_REDIRECT_MISSING_LOCATION', current);
+            const next = new URL(location, current).toString();
+            requireApprovedUrl(auth, product.product_key, next);
+            chain.push(next);
+            current = next;
+            continue;
+          }
+          if (response.status === 429 || response.status === 503) {
+            retries += 1;
+            if (retries > packet.request_accounting.max_retries_per_source) fail('PILOT_RETRY_LIMIT', product.product_key);
+            await cancelBody(response);
+            current = product.endpoint;
+            consumeBudget(ledger, product.product_key, 'retry', current, repoRoot);
+            attempt.requests.push({ kind: 'retry', url: current, at: new Date(now()).toISOString() });
+            writeAttempt(repoRoot, attempt);
+            const retryWait = Math.max(1, Math.min(remainingMs(sourceDeadline, now), remainingMs(globalDeadline, now)));
+            const retryController = new AbortController();
+            let retryAborted = false;
+            const retryTimer = setTimeout(() => {
+              retryAborted = true;
+              retryController.abort();
+            }, retryWait);
+            try {
+              response = await fetchImpl(current, {
+                method: 'GET',
+                redirect: 'manual',
+                signal: retryController.signal,
+                headers: { accept: 'application/json', 'user-agent': 'ushso-payload-pilot/1' },
+              });
+            } catch (error) {
+              if (retryAborted || remainingMs(sourceDeadline, now) <= 0 || remainingMs(globalDeadline, now) <= 0) {
+                failTimeout(sourceDeadline, globalDeadline, now);
+              }
+              throw error;
+            } finally {
+              clearTimeout(retryTimer);
+            }
+            if (retryAborted) failTimeout(sourceDeadline, globalDeadline, now);
+            if ([301, 302, 303, 307, 308].includes(response.status) || response.status === 429 || response.status === 503) {
+              await cancelBody(response);
+              fail('PILOT_RETRY_NOT_SUCCESS', String(response.status));
+            }
+          }
+          if (response.status < 200 || response.status > 299) {
+            await cancelBody(response);
+            fail('PILOT_HTTP_STATUS', String(response.status));
+          }
+          const bytes = await readBodyWithTimeout(response, {
+            maxBytes: product.limits.max_bytes,
+            sourceDeadline,
+            globalDeadline,
+            nowFn: now,
+          });
+          const contentType = response.headers.get('content-type') ?? '';
+          if (!contentType.includes('json')) fail('PILOT_CONTENT_TYPE', contentType);
+          const parsed = parseRows(bytes);
+          if (parsed.rows.length > product.limits.max_rows) fail('PILOT_ROW_LIMIT', product.product_key);
+          const digest = sha256(bytes);
+          const captureRel = path.join(CAPTURE_DIR, attemptId + '-' + product.product_key + '.json');
+          writeFileSync(path.join(repoRoot, captureRel), bytes);
+          attempt.capture_success = true;
+          attempt.capture_reference = captureRel;
+          attempt.evidence_sha256 = digest;
+          attempt.http_status = response.status;
+          attempt.bytes = bytes.length;
+          attempt.rows = parsed.rows.length;
+          attempt.redirect_chain = chain;
+          attempt.ended_at = new Date(now()).toISOString();
+          writeAttempt(repoRoot, attempt);
+          const receipt = {
+            format: 'ushso.evidence-receipt.v1',
+            receipt_id: 'pilot-' + attemptId,
+            kind: 'core_cell',
+            generation: packet.generation,
+            candidate_head: head,
+            recorded_at: attempt.ended_at,
+            evidence_reference: captureRel,
+            evidence_sha256: digest,
+            payload: {
+              product_key: product.product_key,
+              field: 'publisher_access',
+              supported: true,
+              unknown: false,
+              status: 'bounded_sample',
+              bounded_sample: true,
+              payload_success: true,
+              live_http: true,
+              native_product_id: product.native_product_id,
+              record_id: product.frozen_record_id,
+              release_id: product.release_id,
+              result_format: parsed.format,
+              row_count: parsed.rows.length,
+              recipe: 'authorized two-source public JSON pilot; keep live_http=true',
+              limitation: product.release_verification?.reason ?? 'Release semantics remain unresolved.',
+              authorization: { id: 'AUTH-PAYLOAD-PILOT', authorized: true, environment: 'staging_egress', candidate_head: head },
+              execution: {
+                kind: 'bounded_http_sample',
+                started_at: started,
+                ended_at: attempt.ended_at,
+                request_url: product.endpoint,
+                final_url: current,
+                http_status: response.status,
+                content_type: contentType,
+                redirects: chain.length,
+                redirect_chain: chain,
+                bytes: bytes.length,
+              },
+            },
+          };
+          try {
+            const validated = validateReceipt(receipt, {
+              repoRoot,
+              currentCandidateHead: head,
+              payloadAuthRegister: auth,
+            });
+            attempt.identity_verified = validated.payload._derived_payload_sample === true;
+            attempt.release_verified = validated.payload._release_check?.status === 'verified';
+            attempt.acceptance_eligible = attempt.identity_verified && attempt.release_verified;
+            attempt.receipt_id = validated.receipt_id;
+            attempt.receipt = validated;
+            const receiptRel = path.join(RECEIPT_DIR, attemptId + '.json');
+            writeJsonAtomic(path.join(repoRoot, receiptRel), validated);
+            attempt.receipt_reference = receiptRel;
+            writeAttempt(repoRoot, attempt);
+            captures.push({
+              attempt_id: attemptId,
+              product_key: product.product_key,
+              capture_success: true,
+              identity_verified: attempt.identity_verified,
+              release_verified: attempt.release_verified,
+              acceptance_eligible: attempt.acceptance_eligible,
+              evidence_reference: captureRel,
+              receipt_reference: receiptRel,
+              evidence_sha256: digest,
+              rows: parsed.rows.length,
+              bytes: bytes.length,
+              live_http: true,
+              release_check: validated.payload._release_check,
+            });
+          } catch (error) {
+            attempt.identity_verified = false;
+            attempt.release_verified = false;
+            attempt.acceptance_eligible = false;
+            attempt.error = { code: error.code, message: error.message };
+            attempt.receipt = receipt;
+            attempt.ended_at = new Date(now()).toISOString();
+            const receiptRel = path.join(RECEIPT_DIR, attemptId + '-failed.json');
+            writeJsonAtomic(path.join(repoRoot, receiptRel), receipt);
+            attempt.receipt_reference = receiptRel;
+            writeAttempt(repoRoot, attempt);
+            captures.push({
+              attempt_id: attemptId,
+              product_key: product.product_key,
+              capture_success: true,
+              identity_verified: false,
+              release_verified: false,
+              acceptance_eligible: false,
+              evidence_reference: captureRel,
+              receipt_reference: receiptRel,
+              evidence_sha256: digest,
+              rows: parsed.rows.length,
+              bytes: bytes.length,
+              live_http: true,
+              error: attempt.error,
+            });
+          }
+          break;
+        }
+      } catch (error) {
+        attempt.error = { code: error.code, message: error.message };
+        attempt.ended_at = new Date(now()).toISOString();
+        writeAttempt(repoRoot, attempt);
+        captures.push({
+          attempt_id: attemptId,
+          product_key: product.product_key,
+          capture_success: attempt.capture_success,
+          identity_verified: false,
+          release_verified: false,
+          acceptance_eligible: false,
+          error: attempt.error,
+        });
+      }
     }
+    const attemptReceipts = captures
+      .filter((row) => row.acceptance_eligible)
+      .map((row) => JSON.parse(readFileSync(path.join(repoRoot, row.receipt_reference), 'utf8')));
+    const products = loadCohort(path.join(repoRoot, 'evaluation/research-program/cohorts.json')).products;
+    const counts = payloadSampleCountsFromReceipts(attemptReceipts, products);
+    const report = {
+      format: 'ushso.payload-retrieval-pilot-run.v1',
+      candidate_head: head,
+      authorized: true,
+      live_http: true,
+      accepted: false,
+      r04_accepted: false,
+      requests_used: ledger.totals.used_requests,
+      requests_remaining: ledger.totals.remaining_requests,
+      captures,
+      qualified_sample_count: counts.public_sample_complete,
+      frozen_cohorts_sha256: EXPECTED_COHORTS,
+      ledger: LEDGER_REL,
+    };
+    writeJsonAtomic(path.join(repoRoot, 'verification/research-program/evidence/payload-retrieval-pilot-run.json'), report);
+    return report;
+  } finally {
+    lock.release();
   }
-  const attemptReceipts = captures
-    .filter((row) => row.acceptance_eligible)
-    .map((row) => ({
-      kind: 'core_cell',
-      payload: {
-        field: 'publisher_access',
-        product_key: row.product_key,
-        supported: true,
-        bounded_sample: true,
-        payload_success: true,
-        live_http: true,
-        _derived_payload_sample: true,
-        _derived_from_frozen_requirements: true,
-        _derived_row_count: row.rows,
-        _release_check: { status: 'verified' },
-      },
-    }));
-  const products = loadCohort(path.join(repoRoot, 'evaluation/research-program/cohorts.json')).products;
-  const counts = payloadSampleCountsFromReceipts(attemptReceipts, products);
-  const report = {
-    format: 'ushso.payload-retrieval-pilot-run.v1',
-    candidate_head: head,
-    authorized: true,
-    live_http: true,
-    accepted: false,
-    r04_accepted: false,
-    requests_used: ledger.totals.used_requests,
-    requests_remaining: ledger.totals.remaining_requests,
-    captures,
-    qualified_sample_count: counts.public_sample_complete,
-    frozen_cohorts_sha256: EXPECTED_COHORTS,
-    ledger: LEDGER_REL,
-  };
-  writeJsonAtomic(path.join(repoRoot, 'verification/research-program/evidence/payload-retrieval-pilot-run.json'), report);
-  return report;
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

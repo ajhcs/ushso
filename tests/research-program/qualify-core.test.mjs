@@ -76,7 +76,7 @@ test('validated core-cell receipts can fill unknown cells; unknown remains unsup
     candidate_head: '31631bc18808e67b5f63472585707787a29e933b',
     recorded_at: '2026-09-15T12:00:00Z',
     evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
-    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
+    evidence_sha256: '9c0755ab1d44e9902eac9c8103d9bb3017b7d00cad50eadeea5f13012887143c',
     payload: {
       product_key: productKey,
       field: 'publisher_access',

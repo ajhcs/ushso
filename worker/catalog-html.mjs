@@ -102,6 +102,13 @@ ${sourceLink}
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${htmlText(`${facts.title} | ${SITE_NAME}`)}</title><meta name="description" content="${htmlAttribute(facts.description)}"><link rel="canonical" href="${htmlAttribute(facts.canonical_url)}"><meta name="ushso:search-generation" content="${htmlAttribute(facts.generation)}"><script type="application/ld+json" data-profile="schema-org-dataset">${safeJsonForHtml(schema)}</script></head><body>${body}</body></html>`;
 }
 
+export function titleTokensMatch(question, title) {
+  const tokens = String(question ?? '').toLowerCase().match(/[a-z0-9]{3,}/g) ?? [];
+  if (tokens.length === 0) return true;
+  const haystack = String(title ?? '').toLowerCase();
+  return tokens.every((token) => haystack.includes(token));
+}
+
 export function renderSearchFallbackHtml({ origin, question = '', records = [], total = 0, generation = CATALOG_HTML_GENERATION } = {}) {
   const q = captured(question === '' ? '' : question);
   const items = records.slice(0, 10).map((record) => {
