@@ -66,7 +66,8 @@ test('only issue a pass when R04/R05/R07/R08 actually hold; otherwise retain the
 
 test('validated core-cell receipts can fill unknown cells; unknown remains unsupported; R04 stays unaccepted', () => {
   const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-  const productKey = cohort.products[0].product_key;
+  const product = cohort.products.find((row) => row.product_key === 'cms-hcris-hospital-provider-cost-report');
+  const productKey = product.product_key;
   const receipt = validateReceipt({
     format: 'ushso.evidence-receipt.v1',
     receipt_id: 'core-cell-publisher-access-fixture',
@@ -74,8 +75,8 @@ test('validated core-cell receipts can fill unknown cells; unknown remains unsup
     generation: GEN,
     candidate_head: '31631bc18808e67b5f63472585707787a29e933b',
     recorded_at: '2026-09-15T12:00:00Z',
-    evidence_reference: 'verification/research-program/evidence/payloads/fixture-validation.txt',
-    evidence_sha256: '915be2e8ff28a86863cbd6c5cef36b7caf4239ef0e332ae6fe4fd764900c79a2',
+    evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
+    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
     payload: {
       product_key: productKey,
       field: 'publisher_access',
@@ -84,12 +85,24 @@ test('validated core-cell receipts can fill unknown cells; unknown remains unsup
       status: 'bounded_sample',
       bounded_sample: true,
       payload_success: true,
-      native_product_id: 'fixture-native',
-      release_id: 'fixture-release',
+      native_product_id: product.anchor.representative.native_id,
+      record_id: product.anchor.representative.record_id,
+      release_id: 'CostReport_2023_Final',
+      result_format: 'json_array',
+      row_count: 2,
+      identity_checks: { required_fields: { PROVNUM: 'string' } },
+      execution: {
+        kind: 'bounded_file_sample',
+        started_at: '2026-09-15T12:00:00Z',
+        ended_at: '2026-09-15T12:00:01Z',
+      },
       recipe: 'fixture-only bounded sample; not live HTTP',
       live_http: false,
     },
   }, { repoRoot: ROOT });
+  assert.equal(receipt.payload._derived_payload_sample, true);
+  const derivedCounts = payloadSampleCountsFromReceipts([receipt], cohort.products);
+  assert.equal(derivedCounts.public_sample_complete, 1);
   assert.throws(() => validateReceipt({
     ...receipt,
     receipt_id: 'core-cell-unknown-supported',
@@ -247,10 +260,12 @@ test('catalog membership, vintage substitution, fiction, and family workflows ca
       product_key: 'cms-hcris-hospital-provider-cost-report',
       supported: true,
       bounded_sample: true,
+      payload_success: true,
       live_http: true,
     },
   }];
-  assert.throws(() => payloadSampleCountsFromReceipts(live, products), { code: 'CORE_CELL_LIVE_HTTP_FORBIDDEN' });
+  const liveCounts = payloadSampleCountsFromReceipts(live, products);
+  assert.equal(liveCounts.public_sample_complete, 0);
   const ignored = [{
     kind: 'core_cell',
     payload: {
@@ -258,11 +273,73 @@ test('catalog membership, vintage substitution, fiction, and family workflows ca
       product_key: 'cms-hcris-hospital-provider-cost-report',
       supported: true,
       bounded_sample: true,
-      payload_success: false,
+      payload_success: true,
+      native_product_id: 'arbitrary-native-id',
+      release_id: 'arbitrary-release-id',
     },
   }];
   const counts = payloadSampleCountsFromReceipts(ignored, products);
   assert.equal(counts.public_sample_complete, 0);
   assert.equal(counts.r04_engineering_target_met, false);
   assert.equal(counts.r05_restricted_routes_verified, false);
+});
+
+test('catalog-locator bytes cannot count as a payload sample when misleading flags are absent', () => {
+  const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+  const product = cohort.products.find((row) => row.product_key === 'cms-hcris-hospital-provider-cost-report');
+  assert.throws(() => validateReceipt({
+    format: 'ushso.evidence-receipt.v1',
+    receipt_id: 'catalog-locator-as-sample-arbitrary-ids',
+    kind: 'core_cell',
+    generation: GEN,
+    candidate_head: '31631bc18808e67b5f63472585707787a29e933b',
+    recorded_at: '2026-09-15T12:00:00Z',
+    evidence_reference: 'verification/research-program/pr-013/fixtures/cms-catalog-slim.json.gz',
+    evidence_sha256: 'e36c53352e0781a16dac658ff4e227ed430fef88aba89d38fc70aa652df2c722',
+    payload: {
+      product_key: product.product_key,
+      field: 'publisher_access',
+      supported: true,
+      unknown: false,
+      status: 'catalog_locator_as_sample',
+      bounded_sample: true,
+      payload_success: true,
+      native_product_id: 'arbitrary-native-id',
+      release_id: 'arbitrary-release-id',
+      recipe: 'reuse catalog-slim bytes as if they were payload rows',
+      live_http: false,
+    },
+  }, { repoRoot: ROOT }), { code: 'SAMPLE_NATIVE_ID_MISMATCH' });
+  assert.throws(() => validateReceipt({
+    format: 'ushso.evidence-receipt.v1',
+    receipt_id: 'catalog-locator-as-sample-matching-ids',
+    kind: 'core_cell',
+    generation: GEN,
+    candidate_head: '31631bc18808e67b5f63472585707787a29e933b',
+    recorded_at: '2026-09-15T12:00:00Z',
+    evidence_reference: 'verification/research-program/pr-013/fixtures/cms-catalog-slim.json.gz',
+    evidence_sha256: 'e36c53352e0781a16dac658ff4e227ed430fef88aba89d38fc70aa652df2c722',
+    payload: {
+      product_key: product.product_key,
+      field: 'publisher_access',
+      supported: true,
+      unknown: false,
+      status: 'catalog_locator_as_sample',
+      bounded_sample: true,
+      payload_success: true,
+      native_product_id: product.anchor.representative.native_id,
+      record_id: product.anchor.representative.record_id,
+      release_id: 'CostReport_2023_Final',
+      result_format: 'json_array',
+      row_count: 1,
+      identity_checks: { required_fields: { PROVNUM: 'string' } },
+      execution: {
+        kind: 'bounded_file_sample',
+        started_at: '2026-09-15T12:00:00Z',
+        ended_at: '2026-09-15T12:00:01Z',
+      },
+      recipe: 'reuse catalog-slim bytes as if they were payload rows',
+      live_http: false,
+    },
+  }, { repoRoot: ROOT }), { code: 'CATALOG_METADATA_IS_NOT_PAYLOAD_SAMPLE' });
 });

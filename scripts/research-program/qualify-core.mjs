@@ -97,24 +97,27 @@ export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
   for (const receipt of receipts.filter((row) => row.kind === 'core_cell')) {
     const payload = receipt.payload ?? {};
     if (payload.field !== 'publisher_access') continue;
-    if (payload.live_http === true) fail('CORE_CELL_LIVE_HTTP_FORBIDDEN');
     if (payload.catalog_membership_as_sample === true) fail('CATALOG_MEMBERSHIP_IS_NOT_PAYLOAD_SAMPLE');
     if (payload.vintage_substitution === true) fail('VINTAGE_SUBSTITUTION_FORBIDDEN');
     if ((payload.fictional === true || payload.synthetic === true) && payload.bounded_sample === true) {
       fail('FICTIONAL_WALKTHROUGH_IS_NOT_LIVE_SAMPLE');
     }
     if (payload.family_workflow_as_verified_route === true) fail('FAMILY_WORKFLOW_IS_NOT_VERIFIED_ROUTE');
-    const realSample = payload.supported === true
+    const realSample = payload._derived_payload_sample === true
+      && payload.supported === true
       && payload.bounded_sample === true
       && payload.payload_success === true
       && payload.fictional !== true
       && payload.synthetic !== true
       && payload.catalog_membership_as_sample !== true
-      && payload.vintage_substitution !== true;
+      && payload.vintage_substitution !== true
+      && Number.isSafeInteger(payload._derived_row_count)
+      && payload._derived_row_count > 0;
     const realRoute = payload.supported === true
       && payload.verified_route === true
       && payload.family_workflow_as_verified_route !== true
-      && payload.fictional !== true;
+      && payload.fictional !== true
+      && payload._evidence_kind !== 'family_registry';
     if (realSample) samples.add(payload.product_key);
     if (realRoute) verifiedRoutes.add(payload.product_key);
   }

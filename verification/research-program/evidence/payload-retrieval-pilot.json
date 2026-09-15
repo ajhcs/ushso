@@ -1,12 +1,18 @@
 {
   "format": "ushso.payload-retrieval-pilot-packet.v1",
   "status": "prepared_not_authorized",
-  "recorded_at": "2026-09-15T18:30:00Z",
+  "recorded_at": "2026-09-15T17:00:00Z",
   "generation": "live-2026-09-03-85b50522b420",
-  "candidate_head": "f6f5e25b9464662d98c0b86539ce6fd899aaff2c",
+  "candidate_binding": {
+    "branch": "codex/ushso-evidence-ingestion-20260915",
+    "must_match_git_head": true,
+    "stale_sha_named_at_first_draft": "f6f5e25b9464662d98c0b86539ce6fd899aaff2c",
+    "note": "Authorization and execution must name the exact git HEAD of this branch at that time. Do not reuse f6f5e25. A baked SHA in this packet would go stale on the next commit."
+  },
   "authorization": {
     "requested": false,
     "auth_id": null,
+    "required_auth_id_if_later_granted": "AUTH-PAYLOAD-PILOT",
     "note": "AUTH-04 is metadata-only live connector canaries. This packet is payload retrieval and is not covered by AUTH-04. Do not execute until a distinct payload-retrieval authorization is recorded for these exact product IDs, endpoints, and limits.",
     "auth_04_does_not_cover_payload_retrieval": true
   },
@@ -35,14 +41,33 @@
     "max_concurrency": 1,
     "credential_required": false
   },
+  "request_accounting": {
+    "budget_includes": [
+      "initial_request",
+      "redirects",
+      "retries"
+    ],
+    "redirects_consume_budget": true,
+    "retries_consume_budget": true,
+    "validate_redirect_host_before_follow": true,
+    "max_redirects_per_request": 1,
+    "max_retries_per_source": 1,
+    "retry_on": [
+      429,
+      503
+    ],
+    "note": "Each initial request, redirect hop, and retry decrements the remaining request budget before the hop is followed. If remaining budget is 0, abort without following. Host allowlist is checked on every Location before a redirect is followed. Total budget is 4 across both products."
+  },
   "abort_conditions": [
     "HTTP status outside 2xx after one retry on 429/503",
     "Final host outside the allowlist",
-    "Redirect count > 3",
+    "Redirect Location host outside the allowlist, checked before follow",
+    "A redirect or retry that would exceed the remaining request budget",
     "Content-Type not application/json",
     "Response bytes exceed the per-source max_bytes",
     "Row count exceeds the per-source max_rows",
     "Required identity field missing or type-mismatched",
+    "Release-verification constraint failed",
     "Elapsed time exceeds the per-source max_seconds",
     "Any live request issued before authorization is recorded"
   ],
@@ -57,24 +82,42 @@
     "payload.product_key",
     "payload.field=publisher_access",
     "payload.native_product_id",
+    "payload.record_id",
     "payload.release_id",
     "payload.bounded_sample",
     "payload.payload_success",
-    "payload.live_http",
-    "payload.request_url",
-    "payload.final_url",
-    "payload.http_status",
-    "payload.content_type",
-    "payload.bytes",
-    "payload.rows",
+    "payload.live_http=true",
+    "payload.authorization.id=AUTH-PAYLOAD-PILOT",
+    "payload.execution.kind=bounded_http_sample",
+    "payload.execution.request_url",
+    "payload.execution.final_url",
+    "payload.execution.http_status",
+    "payload.execution.content_type",
+    "payload.execution.redirects",
+    "payload.execution.redirect_chain",
+    "payload.result_format",
+    "payload.row_count",
     "payload.identity_checks",
-    "payload.authorization_id",
     "payload.limitation"
   ],
+  "authorized_receipt_path": {
+    "live_http_must_remain_true": true,
+    "unauthorized_live_http_rejected": true,
+    "authorization_id_required": "AUTH-PAYLOAD-PILOT",
+    "auth_04_rejected": true,
+    "execution_kind": "bounded_http_sample",
+    "note": "After authorization, captures must keep live_http=true so origin stays truthful. AUTH-04 cannot grant this path."
+  },
   "retention": {
-    "location": "verification/research-program/evidence/payloads/pilot-r04/ (repository-contained, SHA-256 bound)",
+    "captures_path": "verification/research-program/evidence/payloads/pilot-r04/",
+    "captures_gitignored": true,
+    "gitignore_entry": "verification/research-program/evidence/payloads/pilot-r04/",
+    "receipts_in_git": true,
+    "receipts_bind_sha256_of_gitignored_bytes": true,
+    "do_not_commit_publisher_rows": true,
+    "do_not_republish_publisher_rows": true,
     "max_object_bytes": 131072,
-    "redistribution": "Do not republish publisher rows. Store only the bounded captured bytes plus receipts. Do not copy 21 MiB objects into git."
+    "note": "Captured publisher bytes stay on disk and are gitignored. In-tree receipts bind their SHA-256. That is repository-contained evidence without republishing publisher rows in git."
   },
   "products": [
     {
@@ -84,21 +127,35 @@
       "access_expectation": "public_sample_eligible",
       "frozen_record_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
       "native_product_id": "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data-viewer",
-      "release_id": "CostReport_2023_Final catalog distribution listed in frozen catalog-slim; do not treat annual CSV files as extra products",
+      "release_id": "CostReport_2023_Final",
       "landing_page": "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report",
       "endpoint": "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5",
       "method": "GET",
       "permitted_hosts": [
         "data.cms.gov"
       ],
-      "permitted_redirects": 3,
+      "permitted_redirects": 1,
       "expected_format": "application/json",
       "identity_checks": {
         "required_fields": {
-          "PROVNUM": "string"
+          "PROVNUM": "string",
+          "FY_END_DT": "string"
+        },
+        "constraints": {
+          "FY_END_DT": {
+            "pattern": "^2023-"
+          }
         },
         "max_rows": 5,
-        "note": "Field-type shape only. Numeric constants are forbidden. Full schema is not claimed."
+        "note": "PROVNUM string type is shape only. Release is the frozen native dataset UUID 44060663-47d8-4ced-a115-b53b4c270acb plus FY_END_DT year 2023 matching CostReport_2023_Final."
+      },
+      "release_verification": {
+        "native_product_id_must_equal_frozen_native_id": true,
+        "endpoint_must_contain": "44060663-47d8-4ced-a115-b53b4c270acb",
+        "payload_fields": [
+          "PROVNUM",
+          "FY_END_DT"
+        ]
       },
       "limits": {
         "max_requests": 2,
@@ -114,6 +171,7 @@
       "abort": [
         "non-JSON body",
         "missing PROVNUM",
+        "FY_END_DT not 2023-",
         "host not data.cms.gov"
       ]
     },
@@ -124,21 +182,40 @@
       "access_expectation": "public_sample_eligible",
       "frozen_record_id": "obs:asset:cdc-socrata:swc5-untb-f762f3e61a350434",
       "native_product_id": "swc5-untb",
-      "release_id": "swc5-untb as frozen in cohorts.json; do not substitute 7cmc-7y5g",
+      "release_id": "PLACES_2025_county_table",
       "landing_page": "https://data.cdc.gov/d/swc5-untb",
       "endpoint": "https://data.cdc.gov/resource/swc5-untb.json?$limit=5",
       "method": "GET",
       "permitted_hosts": [
         "data.cdc.gov"
       ],
-      "permitted_redirects": 3,
+      "permitted_redirects": 1,
       "expected_format": "application/json",
       "identity_checks": {
         "required_fields": {
-          "stateabbr": "string"
+          "stateabbr": "string",
+          "year": "string"
+        },
+        "constraints": {
+          "year": {
+            "allowed": [
+              "2025"
+            ]
+          }
         },
         "max_rows": 5,
-        "note": "Do not use the 7cmc-7y5g 2023 GIS-friendly fixture as this product."
+        "note": "stateabbr string type is shape only. Release is frozen native id swc5-untb plus year 2025, the representative county table. Do not use 7cmc-7y5g."
+      },
+      "release_verification": {
+        "native_product_id_must_equal_frozen_native_id": true,
+        "endpoint_must_contain": "swc5-untb",
+        "forbidden_native_ids": [
+          "7cmc-7y5g"
+        ],
+        "payload_fields": [
+          "stateabbr",
+          "year"
+        ]
       },
       "limits": {
         "max_requests": 2,
@@ -154,6 +231,7 @@
       "abort": [
         "non-JSON body",
         "missing stateabbr",
+        "year not 2025",
         "host not data.cdc.gov",
         "native id 7cmc-7y5g"
       ]
@@ -164,6 +242,7 @@
       "product_key": "cms-hha-cost-report",
       "reason": "Second CMS cost-report JSON API. Expand only after HCRIS collection and validation succeed.",
       "frozen_record_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-4999d-ca69ba414983d352",
+      "native_product_id": "https://data.cms.gov/data-api/v1/dataset/4999da74-1d8d-4a6f-934e-2d7ea470cc63/data-viewer",
       "candidate_endpoint": "https://data.cms.gov/data-api/v1/dataset/4999da74-1d8d-4a6f-934e-2d7ea470cc63/data?size=5"
     },
     {

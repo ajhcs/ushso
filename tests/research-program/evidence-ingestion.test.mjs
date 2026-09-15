@@ -29,8 +29,8 @@ function receipt(kind, payload, extra = {}) {
     candidate_head: extra.candidate_head ?? HEAD,
     candidate_tree: extra.candidate_tree ?? '19a87a712a544465bea709e7c7addc18dcd72c39',
     recorded_at: extra.recorded_at ?? '2026-09-15T12:00:00Z',
-    evidence_reference: REF,
-    evidence_sha256: SHA,
+    evidence_reference: extra.evidence_reference ?? REF,
+    evidence_sha256: extra.evidence_sha256 ?? SHA,
     payload,
   };
 }
@@ -228,7 +228,7 @@ test('known-unsupported core cells require a limitation and still cannot count a
     bounded_sample: true,
     live_http: true,
     recipe: 'forbidden live fetch',
-  }, { receipt_id: 'core-cell-live-http' }), { repoRoot: ROOT }), { code: 'CORE_CELL_LIVE_HTTP_FORBIDDEN' });
+  }, { receipt_id: 'core-cell-live-http' }), { repoRoot: ROOT }), { code: 'UNAUTHORIZED_LIVE_HTTP' });
   assert.throws(() => validateReceipt(receipt('core_cell', {
     product_key: productKey,
     field: 'publisher_access',
@@ -297,7 +297,144 @@ test('known-unsupported core cells require a limitation and still cannot count a
     release_id: 'release',
     live_http: false,
     recipe: 'claim bounded sample without payload success',
-  }, { receipt_id: 'core-cell-sample-without-payload' }), { repoRoot: ROOT }), { code: 'BOUNDED_SAMPLE_REQUIRES_PAYLOAD_SUCCESS' });
+  }, { receipt_id: 'core-cell-sample-without-payload' }), { repoRoot: ROOT }), { code: 'SAMPLE_NATIVE_ID_MISMATCH' });
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    product_key: productKey,
+    field: 'publisher_access',
+    supported: true,
+    unknown: false,
+    status: 'catalog_locator_as_sample',
+    bounded_sample: true,
+    payload_success: true,
+    native_product_id: 'arbitrary-native-id',
+    release_id: 'arbitrary-release-id',
+    live_http: false,
+    recipe: 'reuse catalog-slim bytes as if they were payload rows',
+  }, {
+    receipt_id: 'core-cell-catalog-locator-as-sample',
+    evidence_reference: 'verification/research-program/pr-013/fixtures/cms-catalog-slim.json.gz',
+    evidence_sha256: 'e36c53352e0781a16dac658ff4e227ed430fef88aba89d38fc70aa652df2c722',
+  }), { repoRoot: ROOT }), { code: 'SAMPLE_NATIVE_ID_MISMATCH' });
+});
+
+test('invalid observation windows and cycles cannot report technical success', () => {
+  const register = { entries: [{ id: 'AUTH-03', authorized: true }] };
+  const future = receipt('observation_window', {
+    environment: 'staging',
+    observation_started_at: '2099-01-01T00:00:00Z',
+    observation_ended_at: '2099-01-15T00:00:00Z',
+    generated_dates: false,
+    simulated_operation: false,
+    deployment: { deployment_id: 'dep-fixture', version_id: 'ver-fixture' },
+    authorization: { id: 'AUTH-03', authorized: true, environment: 'staging', candidate_head: HEAD },
+  }, { receipt_id: 'window-future' });
+  assert.throws(() => validateReceipt(future, { repoRoot: ROOT, authorizationRegister: register }), { code: 'OBSERVATION_WINDOW_IN_FUTURE' });
+
+  const window = validateReceipt(receipt('observation_window', {
+    environment: 'staging',
+    observation_started_at: '2026-09-01T00:00:00Z',
+    observation_ended_at: '2026-09-16T00:00:00Z',
+    generated_dates: false,
+    simulated_operation: false,
+    deployment: { deployment_id: 'dep-fixture', version_id: 'ver-fixture', candidate_head: HEAD },
+    authorization: { id: 'AUTH-03', authorized: true, environment: 'staging', candidate_head: HEAD },
+  }, { receipt_id: 'window-valid' }), { repoRoot: ROOT, authorizationRegister: register });
+
+  assert.throws(() => validateReceipt(receipt('scheduled_cycle', {
+    cycle_id: 'inverted',
+    started_at: '2026-09-03T00:00:00Z',
+    completed_at: '2026-09-02T00:00:00Z',
+    scheduler_run_id: 'run-inverted',
+    generated_dates: false,
+    simulated_operation: false,
+    complete: true,
+    after_refresh: { examples_checked: true, schemas_checked: true, joins_checked: true, cross_surface_checked: true },
+  }, { receipt_id: 'cycle-inverted' }), { repoRoot: ROOT }), { code: 'CYCLE_TIMESTAMPS_INVERTED' });
+
+  const outside = validateReceipt(receipt('scheduled_cycle', {
+    cycle_id: 'outside',
+    started_at: '2026-08-01T00:00:00Z',
+    completed_at: '2026-08-01T06:00:00Z',
+    scheduler_run_id: 'run-outside',
+    generated_dates: false,
+    simulated_operation: false,
+    complete: true,
+    after_refresh: { examples_checked: true, schemas_checked: true, joins_checked: true, cross_surface_checked: true },
+  }, { receipt_id: 'cycle-outside' }), { repoRoot: ROOT });
+  assert.throws(() => calculateObservation([window, outside]), { code: 'CYCLE_OUTSIDE_OBSERVATION_WINDOW' });
+
+  const duplicateA = validateReceipt(receipt('scheduled_cycle', {
+    cycle_id: 'dup-a',
+    started_at: '2026-09-02T00:00:00Z',
+    completed_at: '2026-09-02T06:00:00Z',
+    scheduler_run_id: 'same-run',
+    generated_dates: false,
+    simulated_operation: false,
+    complete: true,
+    after_refresh: { examples_checked: true, schemas_checked: true, joins_checked: true, cross_surface_checked: true },
+  }, { receipt_id: 'cycle-dup-a' }), { repoRoot: ROOT });
+  assert.throws(() => validateReceipt(receipt('scheduled_cycle', {
+    cycle_id: 'dup-b',
+    started_at: '2026-09-03T00:00:00Z',
+    completed_at: '2026-09-03T06:00:00Z',
+    scheduler_run_id: 'same-run',
+    generated_dates: false,
+    simulated_operation: false,
+    complete: true,
+    after_refresh: { examples_checked: true, schemas_checked: true, joins_checked: true, cross_surface_checked: true },
+  }, { receipt_id: 'cycle-dup-b' }), { repoRoot: ROOT, seenSchedulerRunIds: new Set([duplicateA.payload.scheduler_run_id]) }), { code: 'DUPLICATE_SCHEDULER_RUN_ID' });
+});
+
+test('authorized live HTTP captures remain live_http=true; AUTH-04 cannot grant that path', () => {
+  const productKey = 'cms-hcris-hospital-provider-cost-report';
+  const native = 'https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data-viewer';
+  const payload = {
+    product_key: productKey,
+    field: 'publisher_access',
+    supported: true,
+    unknown: false,
+    status: 'bounded_sample',
+    bounded_sample: true,
+    payload_success: true,
+    native_product_id: native,
+    record_id: 'obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17',
+    release_id: 'CostReport_2023_Final',
+    result_format: 'json_array',
+    row_count: 2,
+    identity_checks: { required_fields: { PROVNUM: 'string' }, constraints: { FY_END_DT: { pattern: '^2023-' } } },
+    execution: {
+      kind: 'bounded_http_sample',
+      started_at: '2026-09-15T12:00:00Z',
+      ended_at: '2026-09-15T12:00:01Z',
+      request_url: 'https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5',
+      final_url: 'https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5',
+      http_status: 200,
+      content_type: 'application/json',
+      redirects: 0,
+      redirect_chain: [],
+    },
+    recipe: 'authorized bounded HTTP sample; origin remains live_http=true',
+    live_http: true,
+  };
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    ...payload,
+    authorization: { id: 'AUTH-04', authorized: true, environment: 'staging_egress', candidate_head: HEAD },
+  }, {
+    receipt_id: 'core-cell-auth04-live',
+    evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
+    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
+  }), { repoRoot: ROOT }), { code: 'UNAUTHORIZED_LIVE_HTTP' });
+  const accepted = validateReceipt(receipt('core_cell', {
+    ...payload,
+    authorization: { id: 'AUTH-PAYLOAD-PILOT', authorized: true, environment: 'staging_egress', candidate_head: HEAD },
+  }, {
+    receipt_id: 'core-cell-auth-payload-pilot',
+    evidence_reference: 'verification/research-program/evidence/payloads/derived-sample-hcris-fixture.json',
+    evidence_sha256: 'dfcad649b21231c75873d1d22d7490566fb3a208a7a9b66524f0bac926533e11',
+  }), { repoRoot: ROOT });
+  assert.equal(accepted.payload.live_http, true);
+  assert.equal(accepted.payload._derived_payload_sample, true);
+  assert.equal(accepted.payload.authorization.id, 'AUTH-PAYLOAD-PILOT');
 });
 
 test('frozen 3434 IDs seed 13736 not_attempted axes without promoting not_attempted to success', () => {
