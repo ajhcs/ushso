@@ -14,6 +14,7 @@ const TREE = '5e02bd2ff2ebdcbed19d1d9e050b5b7745955dfc';
 const CORPUS_REL = 'packages/retrieval/versions/v1.2.0/corpus';
 const CMS_CATALOG_REL = 'verification/research-program/pr-013/fixtures/cms-catalog-slim.json.gz';
 const CDC_VIEW_INDEX_REL = 'verification/research-program/pr-014/fixtures/cdc-view-index.json.gz';
+const COHORTS_REL = 'evaluation/research-program/cohorts.json';
 
 function sha256File(abs) {
   return createHash('sha256').update(readFileSync(abs)).digest('hex');
@@ -79,6 +80,77 @@ function loadCdcViewIndex(repoRoot) {
     byNative,
     byRecord,
   };
+}
+
+function namedIntakeReceipts(product, cohortsSha) {
+  const intake = product.anchor?.intake ?? {};
+  const limits = Array.isArray(product.anchor?.unresolved_identity_limits)
+    ? product.anchor.unresolved_identity_limits.join(' ')
+    : 'Named intake only.';
+  const locator = typeof intake.locator === 'string' ? intake.locator : null;
+  const recipe = [
+    `Read frozen named-intake locator for ${product.product_key} from ${COHORTS_REL} (sha256=${cohortsSha}).`,
+    locator
+      ? `Recorded locator_kind=${intake.locator_kind ?? 'unknown'} locator_status=${intake.locator_status ?? 'unknown'} locator=${locator}.`
+      : 'No locator string is present.',
+    'Do not fetch the locator. An unverified locator is not publisher access, a verified restricted route, or a bounded payload sample.',
+    limits,
+  ].join(' ');
+  const limitation = [
+    'Named-intake locators in frozen cohorts.json are unverified. They were not fetched, captured, or proven current.',
+    'This is not a verified restricted/manual route and not a bounded payload sample.',
+    limits,
+  ].join(' ');
+  const fields = [
+    {
+      field: 'publisher_access',
+      status: 'named_intake_unverified_locator',
+      limitation,
+    },
+    {
+      field: 'schema_qualification',
+      status: 'named_intake_no_publisher_schema',
+      limitation: 'No publisher schema or dictionary is bound. Named intake is not schema qualification.',
+    },
+    {
+      field: 'join_route',
+      status: 'named_intake_no_join_route',
+      limitation: 'No independently qualified join route is inferred from an unverified locator.',
+    },
+    {
+      field: 'unit_grain_date_denominator',
+      status: 'named_intake_no_payload_denominator',
+      limitation: 'No payload grain, date, or denominator is evidenced. Family-level freeze is not a research denominator.',
+    },
+  ];
+  return fields.map((field) => ({
+    format: 'ushso.evidence-receipt.v1',
+    receipt_id: `core-cell-${product.product_key}-${field.field}`,
+    kind: 'core_cell',
+    generation: LAST_GOOD_GENERATION,
+    candidate_head: HEAD,
+    candidate_tree: TREE,
+    recorded_at: '2026-09-15T16:10:00Z',
+    evidence_reference: COHORTS_REL,
+    evidence_sha256: cohortsSha,
+    payload: {
+      product_key: product.product_key,
+      record_id: null,
+      live_http: false,
+      bounded_sample: false,
+      verified_route: false,
+      recipe,
+      supported: false,
+      unknown: false,
+      status: field.status,
+      field: field.field,
+      limitation: field.limitation,
+      locator,
+      locator_kind: intake.locator_kind ?? null,
+      locator_status: intake.locator_status ?? 'unverified_locator',
+      access_expectation: product.access_expectation,
+    },
+  }));
 }
 
 function overlayCdcViewIndex(receipt, view, cdcIndex) {
@@ -148,16 +220,40 @@ export async function buildCatalogMetadataReceipts({ repoRoot = ROOT } = {}) {
   const unresolved = [];
   const cmsBound = [];
   const cdcBound = [];
+  const intakeBound = [];
+  const cohortsRelAbs = path.join(repoRoot, COHORTS_REL);
+  const cohortsSha = sha256File(cohortsRelAbs);
   for (const product of cohorts.products) {
     const rid = product.anchor?.representative?.record_id ?? null;
     const status = product.anchor?.status;
+    if (status === 'named_intake') {
+      const intakeReceipts = namedIntakeReceipts(product, cohortsSha);
+      receipts.push(...intakeReceipts);
+      intakeBound.push({
+        product_key: product.product_key,
+        access_expectation: product.access_expectation,
+        locator: product.anchor?.intake?.locator ?? null,
+        locator_kind: product.anchor?.intake?.locator_kind ?? null,
+        locator_status: product.anchor?.intake?.locator_status ?? null,
+        verified_route: false,
+        payload_success: false,
+      });
+      unresolved.push({
+        product_key: product.product_key,
+        access_expectation: product.access_expectation,
+        anchor_status: status,
+        record_id: rid,
+        reason: 'named_intake_unverified_locator',
+      });
+      continue;
+    }
     if (status !== 'resolved_catalog_record' || !rid || !index.has(rid)) {
       unresolved.push({
         product_key: product.product_key,
         access_expectation: product.access_expectation,
         anchor_status: status ?? null,
         record_id: rid,
-        reason: status === 'named_intake' ? 'named_intake_unverified_locator' : 'catalog_record_not_in_frozen_corpus',
+        reason: 'catalog_record_not_in_frozen_corpus',
       });
       continue;
     }
@@ -242,22 +338,24 @@ export async function buildCatalogMetadataReceipts({ repoRoot = ROOT } = {}) {
       receipts.push(receipt);
     }
   }
-  return { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex };
+  return { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex, intakeBound, cohortsSha };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex } = await buildCatalogMetadataReceipts();
+  const { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex, intakeBound, cohortsSha } = await buildCatalogMetadataReceipts();
   const dir = path.join(ROOT, 'verification/research-program/evidence/receipts');
   mkdirSync(dir, { recursive: true });
   const bundle = {
     format: 'ushso.core-cell-receipt-bundle.v1',
     generation: LAST_GOOD_GENERATION,
     candidate_head: HEAD,
-    note: 'Catalog-metadata receipts only. CMS catalog-slim locators overlay 63 products. CDC view-index locators overlay 10 products. Dataset payloads were not executed. R04 remains unaccepted.',
+    note: 'Catalog-metadata receipts only. CMS catalog-slim locators overlay 63 products. CDC view-index locators overlay 10 products. Fourteen named-intake unverified locators are known-unsupported, not verified routes. Dataset payloads were not executed. R04 remains unaccepted.',
     receipt_count: receipts.length,
     unresolved_products: unresolved,
     cms_distribution_products: cmsBound.length,
     cdc_view_index_products: cdcBound.length,
+    named_intake_products: intakeBound.length,
+    cohorts_sha256: cohortsSha,
     cms_catalog_gzip_sha256: cmsCatalog.fileSha,
     cms_catalog_uncompressed_sha256: cmsCatalog.uncompressedSha,
     live_http: false,
@@ -290,5 +388,18 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     products: cdcBound,
     note: 'View-index locators and named_column_count are not payload samples or qualified dictionaries.',
   }, null, 2)}\n`);
-  process.stdout.write(`${JSON.stringify({ receipt_count: receipts.length, unresolved: unresolved.length, products_covered: receipts.length / 4, cms_bound: cmsBound.length, cdc_bound: cdcBound.length }, null, 2)}\n`);
+  writeFileSync(path.join(ROOT, 'verification/research-program/evidence/named-intake-locator-summary.json'), `${JSON.stringify({
+    format: 'ushso.named-intake-locator-summary.v1',
+    generation: LAST_GOOD_GENERATION,
+    evidence_reference: COHORTS_REL,
+    evidence_sha256: cohortsSha,
+    products_bound: intakeBound.length,
+    payload_success: false,
+    bounded_sample: false,
+    verified_route: false,
+    live_http: false,
+    products: intakeBound,
+    note: 'Unverified locators in frozen cohorts.json are not publisher access, verified restricted routes, or payload samples. Locators were not fetched.',
+  }, null, 2)}\n`);
+  process.stdout.write(`${JSON.stringify({ receipt_count: receipts.length, unresolved: unresolved.length, products_covered: receipts.length / 4, cms_bound: cmsBound.length, cdc_bound: cdcBound.length, intake_bound: intakeBound.length }, null, 2)}\n`);
 }
