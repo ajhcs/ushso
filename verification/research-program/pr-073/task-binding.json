@@ -1,0 +1,89 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr073-keyboard-at-20260915",
+  "slice_id": "C-073-1",
+  "pr_id": "PR-073",
+  "title": "Verify keyboard and assistive-technology workflows",
+  "owner": "/root/pr073_keyboard_at",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr073-keyboard-at-20260915",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr073-keyboard-at-20260915",
+  "objective": "Core research tasks are accessible with documented tested limits.",
+  "outcome": "Automated checks identify issues but do not alone certify accessibility; their actual findings are preserved. Keyboard source checks cover search, menus, filters, dictionary, shortlist, comparison and export without claiming a mouse-free browser session that was not run. Target sizes and contrast are measured. Assistive-technology combinations that were not run remain untested, not passed. No WCAG 2.2 AA conformance claim is inferred from a scanner or screenshot. Six result-card regions remain. plan_research remains disabled. worker/index.mjs does not import enrichment. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-065",
+    "PR-066",
+    "PR-067",
+    "PR-068",
+    "PR-069",
+    "PR-070",
+    "PR-071",
+    "PR-072"
+  ],
+  "owned_paths": [
+    "apps/web/src/components/",
+    "apps/web/src/styles.css",
+    "tests/research-program/browser-accessibility.mjs",
+    "tests/research-program/browser-accessibility.test.mjs",
+    "verification/research-program/frontend/",
+    "verification/research-program/pr-073/",
+    "docs/research-program/handoffs/PR-073.json"
+  ],
+  "commits": [
+    {
+      "id": "C-073-1",
+      "subject": "Audit semantic structure and controls",
+      "instructions": "Review labels, headings, table relationships, expandable evidence, errors, skip links and live status against the agreed WCAG 2.2 AA target.",
+      "verification": "Automated checks identify issues but do not alone certify accessibility; preserve their actual findings."
+    },
+    {
+      "id": "C-073-2",
+      "subject": "Fix keyboard and focus behavior",
+      "instructions": "Exercise search, menus, filters, dictionary paging, shortlist, comparison and export without a mouse. Restore focus after dialogs and back navigation.",
+      "verification": "No keyboard trap, hidden focused control or lost context on route changes; target sizes/contrast are measured."
+    },
+    {
+      "id": "C-073-3",
+      "subject": "Run assistive-technology task checks",
+      "instructions": "Use a real supported screen reader/browser combination for selected novice/expert tasks and retain an outcome log. Record untested combinations honestly.",
+      "verification": "An implementation passes only the named combinations; unresolved critical accessibility failures block frontend acceptance."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/browser-accessibility.test.mjs",
+    "node tests/research-program/browser-accessibility.mjs",
+    "npm test --workspace @ushso/observatory-web -- src/components/ObservatoryHeader.test.tsx src/components/ResultCard.test.ts",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-073.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-073/",
+  "binding": {
+    "base_sha": "7333dbccbf0c9cbc14f41969b6e4835a52d19085",
+    "base_tree": "0e1d102e21fe78b4937322f6b768ccf15cbc4dd5",
+    "dependency_merge_shas": {
+      "PR-065": "d7055ec29a4ceef0128b79e14fda57e48011e27f",
+      "PR-066": "ee5f9f3a1ea22a162bfc7546a7630535e201c1ea",
+      "PR-067": "92311929a70e6d2491daa2c84649b47bb7f87b66",
+      "PR-068": "73757613f2daa3e3a29c4cf1f41ce68932a6b381",
+      "PR-069": "74436f9947c58cb8cc2ce1e6396b43e601a02a31",
+      "PR-070": "a73a96a6e684eb98c54d99bd165876dbcba7f10f",
+      "PR-071": "6fffffea9f8d3140e43d9e2da0a539bca9caa87f",
+      "PR-072": "2ff33fdb792386170d025b18a8b0c9ef2f5d7ace"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
