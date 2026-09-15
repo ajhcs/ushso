@@ -1,0 +1,88 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-pr070-beginner-guides-20260915",
+  "slice_id": "C-070-1",
+  "pr_id": "PR-070",
+  "title": "Write beginner learning and API quick-start guides",
+  "owner": "/root/pr070_beginner_guides",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-pr070-beginner-guides-20260915",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-pr070-beginner-guides-20260915",
+  "objective": "Beginner users and new developers have complete, tested starting instructions.",
+  "outcome": "Each beginner guide leads to a real next action and a verified example, not a generic glossary dump. A new user can follow documented prerequisites. Code examples use exact wire keys and never embed a credential. Guide examples retain the same request and response bounds as their source recipe. Credential-blocked or untested paths state their actual status. Failed or currently gated examples display the actual outcome and next step rather than a fabricated success screenshot. Finding a source is not obtaining restricted data. plan_research remains disabled. worker/index.mjs does not import enrichment. HTTP 200 is not a completed research task. Last-good generation live-2026-09-03-85b50522b420 is unchanged.",
+  "dependencies": [
+    "PR-041",
+    "PR-054",
+    "PR-060",
+    "PR-064",
+    "PR-066"
+  ],
+  "owned_paths": [
+    "apps/web/src/content/learn/",
+    "apps/web/src/pages/LearnPage.tsx",
+    "apps/web/src/pages/LearnPage.test.tsx",
+    "apps/web/src/pages/LandingPage.tsx",
+    "apps/web/src/pages/LandingPage.test.tsx",
+    "apps/web/src/pages/DatasetDetailsPage.tsx",
+    "apps/web/src/pages/AgentsPage.tsx",
+    "apps/web/src/styles.css",
+    "scripts/research-program/check-guide-examples.mjs",
+    "tests/research-program/check-guide-examples.test.mjs",
+    "verification/research-program/pr-070/",
+    "docs/research-program/handoffs/PR-070.json"
+  ],
+  "commits": [
+    {
+      "id": "C-070-1",
+      "subject": "Write the beginner learning sequence",
+      "instructions": "Create What USHSO does, Your first source search, and How to read a source page. Define dataset, API, file, release, variable, grain and access in context.",
+      "verification": "Each guide leads to a real next action and a verified example, not a generic glossary dump."
+    },
+    {
+      "id": "C-070-2",
+      "subject": "Write access and developer quick starts",
+      "instructions": "Cover public downloads, API keys, applications/DUAs, Python/R/curl examples and MCP setup. Explain which actions happen at the publisher. Prefer cURL/Python examples generated from tested canonical recipes, preserving credential placeholders, exact wire names, bounded parameters and source/release identities.",
+      "verification": "A new user can follow the documented prerequisites; code examples use exact wire keys and never embed a credential. Guide examples retain the same request and response bounds as their source recipe; credential-blocked or untested paths state their actual status."
+    },
+    {
+      "id": "C-070-3",
+      "subject": "Validate and cross-link examples",
+      "instructions": "Run eligible example commands through the shared bounded test harness and check links/anchors against the candidate site. Version examples with source generation.",
+      "verification": "Failed/currently gated examples display the actual outcome and next step rather than a fabricated success screenshot."
+    }
+  ],
+  "check_commands": [
+    "npm test --workspace @ushso/observatory-web -- src/pages/LearnPage.test.tsx src/pages/LandingPage.test.tsx",
+    "node --test tests/research-program/check-guide-examples.test.mjs",
+    "node scripts/research-program/check-guide-examples.mjs",
+    "node packages/identity/tools/validate.mjs",
+    "node scripts/research-program/check-handoff.mjs docs/research-program/handoffs/PR-070.json"
+  ],
+  "evidence_directory": "verification/research-program/pr-070/",
+  "binding": {
+    "base_sha": "25ff6816585683bf78138e6073a6ad15a23ba6e1",
+    "base_tree": "0fd1d09bf3cf527a8ed050e2af84e0c6f8309a4a",
+    "dependency_merge_shas": {
+      "PR-041": "7ee6ef80c438b584d16025ad3f60c24bb8c0c83e",
+      "PR-054": "4b8c8e0ec6c8b7a397ecb4d0d7dc00904f3ee924",
+      "PR-060": "4ea2cb499e44a884a9b9831e8977a00319202a0d",
+      "PR-064": "bf0f7a8806af07dce9d17e4e4eacd72224525e03",
+      "PR-066": "ee5f9f3a1ea22a162bfc7546a7630535e201c1ea"
+    }
+  },
+  "review_states": [
+    "planned",
+    "ready",
+    "in_progress",
+    "producer_checked",
+    "draft_pr",
+    "independent_review",
+    "changes_requested",
+    "independently_verified",
+    "merged",
+    "integrated",
+    "qualified",
+    "blocked"
+  ],
+  "status": "ready"
+}
