@@ -22,6 +22,12 @@ const RESTRICTED_FAMILIES_REL = 'packages/connectors/source-registry/restricted-
 const MRF_HOSPITAL_WALKTHROUGH_REL = 'evaluation/research-program/mrf-examples/hospital-walkthrough.json';
 const MRF_PAYER_WALKTHROUGH_REL = 'evaluation/research-program/mrf-examples/payer-walkthrough.json';
 const HCRIS_EXAMPLE_REL = 'evaluation/research-program/examples/finance-utilization.json';
+const CMS_COST_GRID_PROVENANCE_REL = 'scripts/research/fixtures/cms-cost-grid/provenance.json';
+const CMS_COST_GRID_DIR = 'scripts/research/fixtures/cms-cost-grid';
+const CMS_COST_GRID_BY_PRODUCT = Object.freeze({
+  'cms-hcris-hospital-provider-cost-report': 'hospital.json',
+  'cms-hha-cost-report': 'hha.json',
+});
 
 const FAMILY_REGISTRY_BY_PRODUCT = Object.freeze({
   'nppes-npi-registry': FEDERAL_FAMILIES_REL,
@@ -339,6 +345,35 @@ function overlaySyntheticMrfWalkthrough(receipt, product, walkthroughs) {
   };
 }
 
+function overlayCmsCostGridDictionary(receipt, product, grids) {
+  if (receipt.payload.field !== 'schema_qualification') return receipt;
+  const packed = grids[product.product_key];
+  if (!packed) return receipt;
+  const recipe = [
+    receipt.payload.recipe,
+    `Overlay frozen CMS cost-grid geometry ${packed.relative} (sha256=${packed.fileSha}) bound by ${CMS_COST_GRID_PROVENANCE_REL}.`,
+    `publisher_url=${packed.publisherUrl ?? 'absent'} scope=${packed.scope ?? 'unspecified'}.`,
+    'This is painted PDF dictionary geometry from the first two pages, not dataset rows. eligible_for_schema_promotion remains false. Do not fetch the PDF.',
+  ].join(' ');
+  return {
+    ...receipt,
+    evidence_reference: packed.relative,
+    evidence_sha256: packed.fileSha,
+    payload: {
+      ...receipt.payload,
+      status: 'cost_grid_dictionary_geometry_not_payload',
+      recipe,
+      limitation: 'CMS cost-grid fixtures recover literal dictionary field names from public PDF page geometry. They are not bounded payload samples, not full schema qualification, and not eligible for schema promotion.',
+      bounded_sample: false,
+      payload_success: false,
+      eligible_for_schema_promotion: false,
+      publisher_url: packed.publisherUrl ?? null,
+      scope: packed.scope ?? null,
+      pdf_sha256: packed.pdfSha256 ?? null,
+    },
+  };
+}
+
 function overlayHcrisExamplePacket(receipt, product, example) {
   if (product.product_key !== 'cms-hcris-hospital-provider-cost-report') return receipt;
   if (receipt.payload.field !== 'unit_grain_date_denominator') return receipt;
@@ -502,8 +537,24 @@ export async function buildCatalogMetadataReceipts({ repoRoot = ROOT } = {}) {
   const mrfWalkthroughs = Object.fromEntries(Object.entries(SYNTHETIC_MRF_BY_PRODUCT).map(([productKey, relative]) => [productKey, loadJsonSha(repoRoot, relative)]));
   const hcrisExample = loadJsonSha(repoRoot, HCRIS_EXAMPLE_REL);
   if (hcrisExample.data.access_steps?.[0]?.receipt?.tested_example === true) throw new Error('HCRIS_EXAMPLE_CANNOT_CLAIM_TESTED_EXAMPLE');
+  const costGridProvenance = loadJsonSha(repoRoot, CMS_COST_GRID_PROVENANCE_REL);
+  const costGrids = {};
+  for (const [productKey, fixtureName] of Object.entries(CMS_COST_GRID_BY_PRODUCT)) {
+    const relative = `${CMS_COST_GRID_DIR}/${fixtureName}`;
+    const packed = loadJsonSha(repoRoot, relative);
+    const ref = (costGridProvenance.data ?? []).find((row) => row.fixture === fixtureName);
+    if (!ref) throw new Error(`COST_GRID_PROVENANCE_MISSING:${fixtureName}`);
+    if (ref.fixture_sha256 !== packed.fileSha) throw new Error(`COST_GRID_SHA_MISMATCH:${fixtureName}`);
+    costGrids[productKey] = {
+      ...packed,
+      publisherUrl: ref.publisher_url,
+      scope: ref.scope,
+      pdfSha256: ref.pdf_sha256,
+    };
+  }
   const familyBound = [];
   const mrfBound = [];
+  const costGridBound = [];
   for (const product of cohorts.products) {
     const rid = product.anchor?.representative?.record_id ?? null;
     const status = product.anchor?.status;
@@ -626,6 +677,16 @@ export async function buildCatalogMetadataReceipts({ repoRoot = ROOT } = {}) {
         }
         if (field.field === 'schema_qualification') {
           receipt = overlayCmsDescribedBy(receipt, bound, cmsCatalog);
+          const beforeGrid = receipt;
+          receipt = overlayCmsCostGridDictionary(receipt, product, costGrids);
+          if (receipt !== beforeGrid) {
+            costGridBound.push({
+              product_key: product.product_key,
+              evidence_reference: receipt.evidence_reference,
+              eligible_for_schema_promotion: false,
+              bounded_sample: false,
+            });
+          }
         }
       }
       if (rec.identity?.source?.source_id === 'cdc-socrata') {
@@ -672,11 +733,11 @@ export async function buildCatalogMetadataReceipts({ repoRoot = ROOT } = {}) {
       receipts.push(receipt);
     }
   }
-  return { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex, intakeBound, censusBound, joinBound, familyBound, mrfBound, cohortsSha, joinFixture };
+  return { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex, intakeBound, censusBound, joinBound, familyBound, mrfBound, costGridBound, cohortsSha, joinFixture };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex, intakeBound, censusBound, joinBound, familyBound, mrfBound, cohortsSha, joinFixture } = await buildCatalogMetadataReceipts();
+  const { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex, intakeBound, censusBound, joinBound, familyBound, mrfBound, costGridBound, cohortsSha, joinFixture } = await buildCatalogMetadataReceipts();
   const dir = path.join(ROOT, 'verification/research-program/evidence/receipts');
   mkdirSync(dir, { recursive: true });
   const bundle = {
@@ -693,6 +754,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     documented_join_products: joinBound.length,
     family_workflow_products: familyBound.length,
     synthetic_mrf_products: mrfBound.length,
+    cost_grid_dictionary_products: costGridBound.length,
     cohorts_sha256: cohortsSha,
     cms_catalog_gzip_sha256: cmsCatalog.fileSha,
     cms_catalog_uncompressed_sha256: cmsCatalog.uncompressedSha,
@@ -782,5 +844,15 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     products: mrfBound,
     note: 'Official fictional CMS MRF walkthroughs are not live 25/10 locator samples.',
   }, null, 2)}\n`);
-  process.stdout.write(`${JSON.stringify({ receipt_count: receipts.length, unresolved: unresolved.length, products_covered: receipts.length / 4, cms_bound: cmsBound.length, cdc_bound: cdcBound.length, intake_bound: intakeBound.length, census_bound: censusBound.length, join_bound: joinBound.length, family_bound: familyBound.length, mrf_bound: mrfBound.length }, null, 2)}\n`);
+  writeFileSync(path.join(ROOT, 'verification/research-program/evidence/cms-cost-grid-dictionary-summary.json'), `${JSON.stringify({
+    format: 'ushso.cms-cost-grid-dictionary-summary.v1',
+    generation: LAST_GOOD_GENERATION,
+    products_bound: costGridBound.length,
+    bounded_sample: false,
+    eligible_for_schema_promotion: false,
+    live_http: false,
+    products: costGridBound,
+    note: 'Painted PDF dictionary geometry is not a bounded payload sample or schema promotion.',
+  }, null, 2)}\n`);
+  process.stdout.write(`${JSON.stringify({ receipt_count: receipts.length, unresolved: unresolved.length, products_covered: receipts.length / 4, cms_bound: cmsBound.length, cdc_bound: cdcBound.length, intake_bound: intakeBound.length, census_bound: censusBound.length, join_bound: joinBound.length, family_bound: familyBound.length, mrf_bound: mrfBound.length, cost_grid_bound: costGridBound.length }, null, 2)}\n`);
 }

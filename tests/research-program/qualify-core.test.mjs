@@ -154,9 +154,6 @@ test('frozen catalog-metadata receipts make 86 resolved and 14 named-intake prod
   assert.equal(hcris.cells.publisher_access.status, 'catalog_distribution_locators_not_payload');
   assert.equal(hcris.cells.publisher_access.supported, false);
   assert.ok(hcris.cells.publisher_access.limitation.includes('payload_success=false'));
-  assert.equal(hcris.cells.schema_qualification.status, 'catalog_describedBy_locator_not_dictionary');
-  assert.equal(hcris.cells.schema_qualification.supported, false);
-  assert.ok(hcris.cells.schema_qualification.limitation.includes('not schema qualification'));
   const places = receipt.matrix.rows.find((row) => row.product_key === 'cdc-places-local-data-for-better-health');
   assert.equal(places.cells.publisher_access.status, 'catalog_view_index_not_payload');
   assert.equal(places.cells.publisher_access.supported, false);
@@ -173,8 +170,13 @@ test('frozen catalog-metadata receipts make 86 resolved and 14 named-intake prod
   assert.ok(acs.cells.join_route.limitation.includes('Independently qualified routes remain 0'));
   assert.equal(hcris.cells.join_route.status, 'documented_join_fixture_not_qualified');
   assert.equal(hcris.cells.join_route.supported, false);
-  assert.equal(hcris.cells.schema_qualification.status, 'catalog_describedBy_locator_not_dictionary');
+  assert.equal(hcris.cells.schema_qualification.status, 'cost_grid_dictionary_geometry_not_payload');
+  assert.equal(hcris.cells.schema_qualification.supported, false);
+  assert.ok(hcris.cells.schema_qualification.limitation.includes('not bounded payload samples'));
   assert.equal(hcris.cells.unit_grain_date_denominator.status, 'example_grain_docs_not_payload_denominator');
+  const hha = receipt.matrix.rows.find((row) => row.product_key === 'cms-hha-cost-report');
+  assert.equal(hha.cells.schema_qualification.status, 'cost_grid_dictionary_geometry_not_payload');
+  assert.equal(hha.cells.schema_qualification.supported, false);
   const hcup = intake.find((row) => row.product_key === 'ahrq-hcup');
   assert.equal(hcup.cells.publisher_access.status, 'documented_family_workflow_not_verified_route');
   assert.equal(hcup.cells.publisher_access.supported, false);
