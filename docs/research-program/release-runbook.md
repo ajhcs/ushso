@@ -40,7 +40,7 @@ All sixteen requirements remain unaccepted. The release evidence includes those 
 - Release qualified: **no**
 - Proceeds to production: **no**
 - Public traffic / paid resource / secret change: **no**
-- Rollback target if a later authorized change occurs: historical production Worker `ecc1603f-9eb4-4a1b-a566-bd9d7a415de4` (2026-09-09). This packet does not change it.
+- Retained rollback version (reverify before a later authorized change): `ecc1603f-9eb4-4a1b-a566-bd9d7a415de4` (2026-09-09). This packet does not change it.
 
 HTTP 200 is not a completed research task. A passing schema is not scientific approval.
 
@@ -51,9 +51,10 @@ No deployment takes place merely because this planning package exists.
 - Approved staged rollout executed: **no**
 - `wrangler deploy` / `cf:deploy` / `cf:deploy:staging` invoked: **no**
 - AUTH-07 remains `not_requested` and `authorized: false`
-- Production Worker remains historical `ecc1603f-9eb4-4a1b-a566-bd9d7a415de4` (2026-09-09)
-- Account remains historical `d0e89eef-5bf4-43d0-a0ba-20fbdc128c81`
-- Immediate rollback target: the same historical Worker, because no new release was deployed
+- Last recorded production version: `bfed4c53-b186-42d1-bb47-5cf40b7e4657`, deployed September 14 at 100% traffic by the separate PR-012/073 release.
+- Deployment ID: `7be18fc5-9c3a-4384-85e2-a8c492c07e8e`. Worker name: `ushso`. Account ID comes from `wrangler.jsonc`; a deployment UUID is not an account ID.
+- Retained rollback version: `ecc1603f-9eb4-4a1b-a566-bd9d7a415de4`.
+- Source receipt and hash: [production baseline](../../verification/research-program/release/production-baseline.json). This is a retained observation, not a fresh live readback. Reverify before rollout. Historical native Chrome checks apply to that deployed artifact, not this research candidate.
 - Production research journeys (public domains, MCP/WebMCP, website examples, screenshots): **unverified**. Staging evidence is not relabeled as production verification. Screenshots were not invented.
 - Production truth does **not** match an independently qualified artifact. R16 remains fail.
 

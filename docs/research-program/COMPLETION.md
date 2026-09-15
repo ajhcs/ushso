@@ -50,7 +50,7 @@ Actual budget and retention behavior after real publication updates remain uncon
 
 Humans: Learn/Methods/About routes exist as engineering artifacts. Real novice and advanced participants remain 0/8. Clicking through a page is not completion. Production screenshots were not invented.
 
-Machines: protocol success is not research success. Native WebMCP remains untested. HTTP 200 is not a completed research task. `plan_research` remains disabled.
+Machines: protocol success is not research success. Native WebMCP remains untested on this research candidate. The separately deployed September 14 artifact has historical native Chrome evidence, which does not transfer to changed bytes. HTTP 200 is not a completed research task. `plan_research` remains disabled.
 
 ## Continuing ownership
 
@@ -64,6 +64,6 @@ Named continuing responsibilities:
 4. Keep AUTH-05/07 unauthorized until explicitly requested and granted.
 5. Do not copy 21 MiB local-gate receipts into git.
 
-Production Worker remains historical `ecc1603f-9eb4-4a1b-a566-bd9d7a415de4` (2026-09-09). This report does not change it.
+Last recorded production is version `bfed4c53-b186-42d1-bb47-5cf40b7e4657` (September 14), with retained rollback version `ecc1603f-9eb4-4a1b-a566-bd9d7a415de4`. See the [production baseline and receipt hash](../../verification/research-program/release/production-baseline.json). This report does not change production or reverify its live state.
 
 **Declare completion?** No.

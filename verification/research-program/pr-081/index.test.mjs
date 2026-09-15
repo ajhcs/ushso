@@ -31,7 +31,7 @@ test('review cannot grant owner authority or send an incomplete candidate to rel
   assert.equal(index.fully_evidenced_candidate, false);
   assert.equal(index.proceeds_to_release_preparation, false);
   assert.equal(index.readiness_is_not_commit_count, true);
-  assert.deepEqual(index.planned_remaining, ['PR-082', 'PR-083', 'PR-084']);
+  assert.deepEqual(index.planned_remaining, []);
   assert.equal(index.c0091, 'unresolved');
   assert.equal(index.production_spend_decisions.separate_from_this_review, true);
   assert.equal(index.production_spend_decisions.production_changed, false);
@@ -39,4 +39,16 @@ test('review cannot grant owner authority or send an incomplete candidate to rel
   assert.equal(onDisk.proceeds_to_release_preparation, false);
   assert.equal(onDisk.requirements.length, 16);
   assert.equal(onDisk.findings.length, 33);
+});
+
+
+test('planning status follows the supplied ledger without converting integration into acceptance', () => {
+  const tasks = ['PR-082', 'PR-083', 'PR-084'].map((pr_id) => ({pr_id, status: 'planned'}));
+  const planned = assembleAcceptanceIndex({ledger: {tasks}});
+  assert.deepEqual(planned.planned_remaining, ['PR-082', 'PR-083', 'PR-084']);
+  const integrated = assembleAcceptanceIndex({ledger: {tasks: tasks.map((row) => ({...row, status: 'integrated'}))}});
+  assert.deepEqual(integrated.planned_remaining, []);
+  assert.equal(integrated.integrated_pr_count, 3);
+  assert.equal(integrated.fully_evidenced_candidate, false);
+  assert.ok(integrated.requirements.every((row) => row.accepted === false));
 });

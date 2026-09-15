@@ -35,12 +35,27 @@ export function loadFrozenHumanTasks(tasks = loadJson('evaluation/research-progr
   return freeze({ novice, advanced, machine });
 }
 
-function scoreGroup(slots, allowedTaskIds, { minimum, audience }) {
+function scoreGroup(slots, allowedTaskIds, { minimum, audience, sessions }) {
+  // An assignment is an opportunity, not proof a person attended or completed it.
+  const witnessed = slots.filter((slot) => {
+    const session = sessions.find((row) => row.session_id === slot.session_id);
+    return typeof slot.session_id === 'string' && slot.session_id.trim().length > 0
+      && typeof slot.participant_id === 'string' && slot.participant_id.trim().length > 0
+      && slot.distinct_from_implementers === true
+      && session?.participant_id === slot.participant_id
+      && session?.slot_id === slot.slot_id && session?.task_id === slot.task_id
+      && session?.audience === audience && session?.generation === LAST_GOOD_GENERATION
+      && session?.consented === true && session?.distinct_from_implementers === true
+      && session?.simulated === false && session?.session_status === 'completed'
+      && typeof session?.evidence_reference === 'string' && session.evidence_reference.trim().length > 0
+      && /^[a-f0-9]{64}$/.test(session?.evidence_sha256 ?? '');
+  });
   const assigned = slots.length;
-  const actualParticipants = new Set(slots.map((row) => row.participant_id).filter((id) => typeof id === 'string' && id.length > 0));
+  const actualParticipants = new Set(witnessed.map((row) => row.participant_id));
   const implementerSlots = slots.filter((row) => row.distinct_from_implementers === false);
-  const completed = slots.filter((row) => row.session_status === 'completed' && row.completed === true).length;
-  const missingOrUntested = slots.filter((row) => row.session_status !== 'completed' || row.completed !== true).length;
+  const completed = witnessed.filter((row) => row.session_status === 'completed' && row.completed === true
+    && sessions.find((session) => session.session_id === row.session_id)?.completed === true).length;
+  const missingOrUntested = assigned - completed;
   if (slots.some((row) => !allowedTaskIds.includes(row.task_id))) fail('ASSIGNMENT_NOT_IN_FROZEN_HUMAN_TASKS', audience);
   if (slots.some((row) => row.session_status === 'completed' && !row.participant_id)) fail('COMPLETED_WITHOUT_PARTICIPANT');
   const ratio = assigned === 0 ? 0 : completed / assigned;
@@ -73,8 +88,21 @@ export function scoreUsability({
   if (assignments.implementer_self_tests === true) fail('IMPLEMENTER_SELF_TESTS_CANNOT_SATISFY_R12');
   if (protocol.non_phi_notes.protected_research_data_required === true) fail('PHI_REQUIRED');
   const frozen = loadFrozenHumanTasks(tasks);
-  const novice = scoreGroup(assignments.novice_slots, frozen.novice, { minimum: NOVICE_MINIMUM, audience: 'novice' });
-  const advanced = scoreGroup(assignments.advanced_slots, frozen.advanced, { minimum: ADVANCED_MINIMUM, audience: 'advanced' });
+  if (assignments.generation !== LAST_GOOD_GENERATION || protocol.generation !== LAST_GOOD_GENERATION) fail('USABILITY_GENERATION_MISMATCH');
+  if (assignments.frozen_before_sessions !== true) fail('ASSIGNMENTS_NOT_FROZEN');
+  const consented = sessions.consented_sessions;
+  if (!Array.isArray(consented)) fail('CONSENTED_SESSIONS_REQUIRED');
+  const slots = [...assignments.novice_slots, ...assignments.advanced_slots];
+  for (const [rows, key] of [[slots, 'slot_id'], [consented, 'session_id']]) {
+    const ids = rows.map((row) => row[key]);
+    if (ids.some((id) => typeof id !== 'string' || !id.trim()) || new Set(ids).size !== ids.length) fail('DUPLICATE_OR_MISSING_EVIDENCE_ID', key);
+  }
+  const assignedSessions = slots.map((row) => row.session_id).filter((id) => id != null);
+  if (new Set(assignedSessions).size !== assignedSessions.length) fail('SESSION_REUSED');
+  const noviceIds = new Set(assignments.novice_slots.map((row) => row.participant_id).filter(Boolean));
+  if (assignments.advanced_slots.some((row) => row.participant_id && noviceIds.has(row.participant_id))) fail('PARTICIPANT_IN_BOTH_GROUPS');
+  const novice = scoreGroup(assignments.novice_slots, frozen.novice, { minimum: NOVICE_MINIMUM, audience: 'novice', sessions: consented });
+  const advanced = scoreGroup(assignments.advanced_slots, frozen.advanced, { minimum: ADVANCED_MINIMUM, audience: 'advanced', sessions: consented });
   const critical = sessions.critical_misinterpretations ?? [];
   const participantsUnavailable = novice.actual_participants < NOVICE_MINIMUM || advanced.actual_participants < ADVANCED_MINIMUM;
   const r12 = freeze({
