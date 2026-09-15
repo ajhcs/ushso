@@ -16,6 +16,8 @@ describe('home mission and tested journeys', () => {
     expect(markup).toContain('Catalog membership is not payload access')
     expect(markup).toContain('href="/learn"')
     expect(markup).toContain('href="/learn#first-search"')
+    expect(markup).toContain('Learn the difference')
+    expect(markup).toContain('start with a verified HCRIS search')
     expect(markup).not.toContain('href="/plan"')
   })
 })

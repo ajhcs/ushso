@@ -54,9 +54,7 @@ export function LandingPage() {
             <p>USHSO is a discovery and routing layer. It shows what sources exist, the evidence behind each preview, and the documented access route. It does not host the underlying datasets or fetch restricted files for you.</p>
             <SearchBox initialQuery={params.get('q') ?? ''} onSubmit={search} />
             <DiscoveryDimensions />
-            <p className="landing-scope">Current catalog generation <code>{CURRENT_GENERATION}</code> contains {CURRENT_CORPUS_RECORD_COUNT} indexed source identities. Catalog membership is not payload access.</p>
-            <p><Link to="/learn">Learn how finding a source differs from obtaining restricted data</Link></p>
-            <p><Link to="/learn#first-search">Start the beginner sequence with a verified HCRIS search</Link></p>
+            <p className="landing-scope">Current catalog generation <code>{CURRENT_GENERATION}</code> contains {CURRENT_CORPUS_RECORD_COUNT} indexed source identities. Catalog membership is not payload access. <Link to="/learn">Learn the difference</Link> or <Link to="/learn#first-search">start with a verified HCRIS search</Link>.</p>
           </div>
         </section>
         <section className="learning-journeys" aria-labelledby="journeys-title">
