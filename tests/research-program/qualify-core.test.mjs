@@ -83,6 +83,9 @@ test('validated core-cell receipts can fill unknown cells; unknown remains unsup
       unknown: false,
       status: 'bounded_sample',
       bounded_sample: true,
+      payload_success: true,
+      native_product_id: 'fixture-native',
+      release_id: 'fixture-release',
       recipe: 'fixture-only bounded sample; not live HTTP',
       live_http: false,
     },
@@ -185,4 +188,81 @@ test('frozen catalog-metadata receipts make 86 resolved and 14 named-intake prod
   assert.equal(hospitalMrf.cells.publisher_access.status, 'synthetic_mrf_walkthrough_not_live_sample');
   assert.equal(hospitalMrf.cells.schema_qualification.status, 'synthetic_mrf_schema_walkthrough_not_live');
   assert.equal(hospitalMrf.cells.publisher_access.supported, false);
+});
+
+test('catalog membership, vintage substitution, fiction, and family workflows cannot count toward R04/R05 engineering totals', () => {
+  const products = cohort.products;
+  const catalogAsSample = [{
+    kind: 'core_cell',
+    payload: {
+      field: 'publisher_access',
+      product_key: 'cms-hcris-hospital-provider-cost-report',
+      supported: true,
+      bounded_sample: true,
+      payload_success: true,
+      catalog_membership_as_sample: true,
+    },
+  }];
+  assert.throws(() => payloadSampleCountsFromReceipts(catalogAsSample, products), { code: 'CATALOG_MEMBERSHIP_IS_NOT_PAYLOAD_SAMPLE' });
+  const vintage = [{
+    kind: 'core_cell',
+    payload: {
+      field: 'publisher_access',
+      product_key: 'census-acs-5year-data-profiles',
+      supported: true,
+      bounded_sample: true,
+      payload_success: true,
+      vintage_substitution: true,
+    },
+  }];
+  assert.throws(() => payloadSampleCountsFromReceipts(vintage, products), { code: 'VINTAGE_SUBSTITUTION_FORBIDDEN' });
+  const fiction = [{
+    kind: 'core_cell',
+    payload: {
+      field: 'publisher_access',
+      product_key: 'hospital-price-transparency-mrfs',
+      supported: true,
+      bounded_sample: true,
+      payload_success: true,
+      fictional: true,
+      synthetic: true,
+    },
+  }];
+  assert.throws(() => payloadSampleCountsFromReceipts(fiction, products), { code: 'FICTIONAL_WALKTHROUGH_IS_NOT_LIVE_SAMPLE' });
+  const workflow = [{
+    kind: 'core_cell',
+    payload: {
+      field: 'publisher_access',
+      product_key: 'ahrq-hcup',
+      supported: true,
+      verified_route: true,
+      family_workflow_as_verified_route: true,
+    },
+  }];
+  assert.throws(() => payloadSampleCountsFromReceipts(workflow, products), { code: 'FAMILY_WORKFLOW_IS_NOT_VERIFIED_ROUTE' });
+  const live = [{
+    kind: 'core_cell',
+    payload: {
+      field: 'publisher_access',
+      product_key: 'cms-hcris-hospital-provider-cost-report',
+      supported: true,
+      bounded_sample: true,
+      live_http: true,
+    },
+  }];
+  assert.throws(() => payloadSampleCountsFromReceipts(live, products), { code: 'CORE_CELL_LIVE_HTTP_FORBIDDEN' });
+  const ignored = [{
+    kind: 'core_cell',
+    payload: {
+      field: 'publisher_access',
+      product_key: 'cms-hcris-hospital-provider-cost-report',
+      supported: true,
+      bounded_sample: true,
+      payload_success: false,
+    },
+  }];
+  const counts = payloadSampleCountsFromReceipts(ignored, products);
+  assert.equal(counts.public_sample_complete, 0);
+  assert.equal(counts.r04_engineering_target_met, false);
+  assert.equal(counts.r05_restricted_routes_verified, false);
 });

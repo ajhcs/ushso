@@ -229,6 +229,75 @@ test('known-unsupported core cells require a limitation and still cannot count a
     live_http: true,
     recipe: 'forbidden live fetch',
   }, { receipt_id: 'core-cell-live-http' }), { repoRoot: ROOT }), { code: 'CORE_CELL_LIVE_HTTP_FORBIDDEN' });
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    product_key: productKey,
+    field: 'publisher_access',
+    supported: true,
+    unknown: false,
+    status: 'catalog_as_sample',
+    bounded_sample: true,
+    payload_success: true,
+    native_product_id: 'native',
+    release_id: 'release',
+    catalog_membership_as_sample: true,
+    live_http: false,
+    recipe: 'catalog membership counted as sample',
+  }, { receipt_id: 'core-cell-catalog-as-sample' }), { repoRoot: ROOT }), { code: 'CATALOG_MEMBERSHIP_IS_NOT_PAYLOAD_SAMPLE' });
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    product_key: 'census-acs-5year-data-profiles',
+    field: 'publisher_access',
+    supported: true,
+    unknown: false,
+    status: 'vintage_swap',
+    bounded_sample: true,
+    payload_success: true,
+    native_product_id: 'https://api.census.gov/data/id/ACSDP5Y2023',
+    release_id: 'ACSDP5Y2023',
+    vintage_substitution: true,
+    live_http: false,
+    recipe: 'bind 2023 fixture to 2024 product',
+  }, { receipt_id: 'core-cell-vintage-swap' }), { repoRoot: ROOT }), { code: 'VINTAGE_SUBSTITUTION_FORBIDDEN' });
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    product_key: 'hospital-price-transparency-mrfs',
+    field: 'publisher_access',
+    supported: true,
+    unknown: false,
+    status: 'fictional_as_live',
+    bounded_sample: true,
+    payload_success: true,
+    native_product_id: 'west-mercy',
+    release_id: 'v3-fictional',
+    fictional: true,
+    synthetic: true,
+    live_http: false,
+    recipe: 'count official fictional CMS walkthrough as live sample',
+  }, { receipt_id: 'core-cell-fictional-sample' }), { repoRoot: ROOT }), { code: 'FICTIONAL_WALKTHROUGH_IS_NOT_LIVE_SAMPLE' });
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    product_key: 'ahrq-hcup',
+    field: 'publisher_access',
+    supported: true,
+    unknown: false,
+    status: 'workflow_as_route',
+    bounded_sample: false,
+    verified_route: true,
+    route_id: 'hcup-read-docs',
+    family_workflow_as_verified_route: true,
+    live_http: false,
+    recipe: 'count family workflow as verified route',
+  }, { receipt_id: 'core-cell-workflow-as-route' }), { repoRoot: ROOT }), { code: 'FAMILY_WORKFLOW_IS_NOT_VERIFIED_ROUTE' });
+  assert.throws(() => validateReceipt(receipt('core_cell', {
+    product_key: productKey,
+    field: 'publisher_access',
+    supported: true,
+    unknown: false,
+    status: 'sample-without-payload',
+    bounded_sample: true,
+    payload_success: false,
+    native_product_id: 'native',
+    release_id: 'release',
+    live_http: false,
+    recipe: 'claim bounded sample without payload success',
+  }, { receipt_id: 'core-cell-sample-without-payload' }), { repoRoot: ROOT }), { code: 'BOUNDED_SAMPLE_REQUIRES_PAYLOAD_SUCCESS' });
 });
 
 test('frozen 3434 IDs seed 13736 not_attempted axes without promoting not_attempted to success', () => {

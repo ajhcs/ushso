@@ -1,0 +1,176 @@
+{
+  "format": "ushso.payload-retrieval-pilot-packet.v1",
+  "status": "prepared_not_authorized",
+  "recorded_at": "2026-09-15T18:30:00Z",
+  "generation": "live-2026-09-03-85b50522b420",
+  "candidate_head": "f6f5e25b9464662d98c0b86539ce6fd899aaff2c",
+  "authorization": {
+    "requested": false,
+    "auth_id": null,
+    "note": "AUTH-04 is metadata-only live connector canaries. This packet is payload retrieval and is not covered by AUTH-04. Do not execute until a distinct payload-retrieval authorization is recorded for these exact product IDs, endpoints, and limits.",
+    "auth_04_does_not_cover_payload_retrieval": true
+  },
+  "scientific_approval": false,
+  "accepted": false,
+  "live_http": false,
+  "purpose": "Prove collection and validation paths on two public JSON endpoints before any expansion toward the R04 80-sample target.",
+  "expansion_rule": "Expand only after this pilot's collection and validation paths work on these exact identities. Do not substitute vintages, fictional MRF walkthroughs, family workflows, or catalog membership.",
+  "frozen_cohort": {
+    "path": "evaluation/research-program/cohorts.json",
+    "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+    "unmodified": true
+  },
+  "historical_receipts_preserved": [
+    "verification/research-program/evidence/history/core-matrix-pr040.json",
+    "verification/research-program/evidence/history/core-qualification-receipt-pr040.json",
+    "verification/research-program/evidence/history/observation-pr084.json",
+    "verification/research-program/evidence/history/requirement-results-pr079.json"
+  ],
+  "totals": {
+    "products": 2,
+    "max_requests": 4,
+    "max_bytes": 262144,
+    "max_rows": 10,
+    "max_seconds": 30,
+    "max_concurrency": 1,
+    "credential_required": false
+  },
+  "abort_conditions": [
+    "HTTP status outside 2xx after one retry on 429/503",
+    "Final host outside the allowlist",
+    "Redirect count > 3",
+    "Content-Type not application/json",
+    "Response bytes exceed the per-source max_bytes",
+    "Row count exceeds the per-source max_rows",
+    "Required identity field missing or type-mismatched",
+    "Elapsed time exceeds the per-source max_seconds",
+    "Any live request issued before authorization is recorded"
+  ],
+  "required_receipt_fields": [
+    "format=ushso.evidence-receipt.v1",
+    "kind=core_cell",
+    "generation",
+    "candidate_head",
+    "recorded_at",
+    "evidence_reference",
+    "evidence_sha256",
+    "payload.product_key",
+    "payload.field=publisher_access",
+    "payload.native_product_id",
+    "payload.release_id",
+    "payload.bounded_sample",
+    "payload.payload_success",
+    "payload.live_http",
+    "payload.request_url",
+    "payload.final_url",
+    "payload.http_status",
+    "payload.content_type",
+    "payload.bytes",
+    "payload.rows",
+    "payload.identity_checks",
+    "payload.authorization_id",
+    "payload.limitation"
+  ],
+  "retention": {
+    "location": "verification/research-program/evidence/payloads/pilot-r04/ (repository-contained, SHA-256 bound)",
+    "max_object_bytes": 131072,
+    "redistribution": "Do not republish publisher rows. Store only the bounded captured bytes plus receipts. Do not copy 21 MiB objects into git."
+  },
+  "products": [
+    {
+      "product_key": "cms-hcris-hospital-provider-cost-report",
+      "title": "Hospital Provider Cost Report",
+      "publisher": "Centers for Medicare & Medicaid Services",
+      "access_expectation": "public_sample_eligible",
+      "frozen_record_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+      "native_product_id": "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data-viewer",
+      "release_id": "CostReport_2023_Final catalog distribution listed in frozen catalog-slim; do not treat annual CSV files as extra products",
+      "landing_page": "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report",
+      "endpoint": "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5",
+      "method": "GET",
+      "permitted_hosts": [
+        "data.cms.gov"
+      ],
+      "permitted_redirects": 3,
+      "expected_format": "application/json",
+      "identity_checks": {
+        "required_fields": {
+          "PROVNUM": "string"
+        },
+        "max_rows": 5,
+        "note": "Field-type shape only. Numeric constants are forbidden. Full schema is not claimed."
+      },
+      "limits": {
+        "max_requests": 2,
+        "max_bytes": 131072,
+        "max_rows": 5,
+        "max_seconds": 15,
+        "max_concurrency": 1
+      },
+      "credentials": {
+        "required": false,
+        "kind": "none"
+      },
+      "abort": [
+        "non-JSON body",
+        "missing PROVNUM",
+        "host not data.cms.gov"
+      ]
+    },
+    {
+      "product_key": "cdc-places-local-data-for-better-health",
+      "title": "PLACES: Local Data for Better Health",
+      "publisher": "Centers for Disease Control and Prevention",
+      "access_expectation": "public_sample_eligible",
+      "frozen_record_id": "obs:asset:cdc-socrata:swc5-untb-f762f3e61a350434",
+      "native_product_id": "swc5-untb",
+      "release_id": "swc5-untb as frozen in cohorts.json; do not substitute 7cmc-7y5g",
+      "landing_page": "https://data.cdc.gov/d/swc5-untb",
+      "endpoint": "https://data.cdc.gov/resource/swc5-untb.json?$limit=5",
+      "method": "GET",
+      "permitted_hosts": [
+        "data.cdc.gov"
+      ],
+      "permitted_redirects": 3,
+      "expected_format": "application/json",
+      "identity_checks": {
+        "required_fields": {
+          "stateabbr": "string"
+        },
+        "max_rows": 5,
+        "note": "Do not use the 7cmc-7y5g 2023 GIS-friendly fixture as this product."
+      },
+      "limits": {
+        "max_requests": 2,
+        "max_bytes": 131072,
+        "max_rows": 5,
+        "max_seconds": 15,
+        "max_concurrency": 1
+      },
+      "credentials": {
+        "required": false,
+        "kind": "none"
+      },
+      "abort": [
+        "non-JSON body",
+        "missing stateabbr",
+        "host not data.cdc.gov",
+        "native id 7cmc-7y5g"
+      ]
+    }
+  ],
+  "later_expansion_not_in_this_pilot": [
+    {
+      "product_key": "cms-hha-cost-report",
+      "reason": "Second CMS cost-report JSON API. Expand only after HCRIS collection and validation succeed.",
+      "frozen_record_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-4999d-ca69ba414983d352",
+      "candidate_endpoint": "https://data.cms.gov/data-api/v1/dataset/4999da74-1d8d-4a6f-934e-2d7ea470cc63/data?size=5"
+    },
+    {
+      "product_key": "census-acs-5year-data-profiles",
+      "reason": "Census ACS 5-year 2024 identity. Keyless HTML and 2023 fixtures must not be substituted. Likely requires a Census API key; that is a later AUTH packet, not this public-JSON pilot.",
+      "frozen_record_id": "obs:asset:census-api:api.census.gov-data-id-acsdp5y2024-c4f6db86ec517aba",
+      "native_product_id": "https://api.census.gov/data/id/ACSDP5Y2024"
+    }
+  ]
+}

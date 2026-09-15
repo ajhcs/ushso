@@ -98,8 +98,25 @@ export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
     const payload = receipt.payload ?? {};
     if (payload.field !== 'publisher_access') continue;
     if (payload.live_http === true) fail('CORE_CELL_LIVE_HTTP_FORBIDDEN');
-    if (payload.supported === true && payload.bounded_sample === true) samples.add(payload.product_key);
-    if (payload.supported === true && payload.verified_route === true) verifiedRoutes.add(payload.product_key);
+    if (payload.catalog_membership_as_sample === true) fail('CATALOG_MEMBERSHIP_IS_NOT_PAYLOAD_SAMPLE');
+    if (payload.vintage_substitution === true) fail('VINTAGE_SUBSTITUTION_FORBIDDEN');
+    if ((payload.fictional === true || payload.synthetic === true) && payload.bounded_sample === true) {
+      fail('FICTIONAL_WALKTHROUGH_IS_NOT_LIVE_SAMPLE');
+    }
+    if (payload.family_workflow_as_verified_route === true) fail('FAMILY_WORKFLOW_IS_NOT_VERIFIED_ROUTE');
+    const realSample = payload.supported === true
+      && payload.bounded_sample === true
+      && payload.payload_success === true
+      && payload.fictional !== true
+      && payload.synthetic !== true
+      && payload.catalog_membership_as_sample !== true
+      && payload.vintage_substitution !== true;
+    const realRoute = payload.supported === true
+      && payload.verified_route === true
+      && payload.family_workflow_as_verified_route !== true
+      && payload.fictional !== true;
+    if (realSample) samples.add(payload.product_key);
+    if (realRoute) verifiedRoutes.add(payload.product_key);
   }
   const publicEligible = products.filter((product) => product.access_expectation === 'public_sample_eligible');
   const publicComplete = publicEligible.filter((product) => samples.has(product.product_key)).length;

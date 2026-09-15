@@ -169,6 +169,28 @@ export function validateReceipt(receipt, {
       fail('CORE_CELL_SAMPLE_OR_ROUTE_REQUIRED');
     }
     if (knownUnsupported && typeof payload.limitation !== 'string') fail('CORE_CELL_LIMITATION_REQUIRED');
+    if (payload.catalog_membership_as_sample === true) fail('CATALOG_MEMBERSHIP_IS_NOT_PAYLOAD_SAMPLE');
+    if (payload.vintage_substitution === true) fail('VINTAGE_SUBSTITUTION_FORBIDDEN');
+    if ((payload.fictional === true || payload.synthetic === true) && payload.bounded_sample === true) {
+      fail('FICTIONAL_WALKTHROUGH_IS_NOT_LIVE_SAMPLE');
+    }
+    if (payload.family_workflow_as_verified_route === true) fail('FAMILY_WORKFLOW_IS_NOT_VERIFIED_ROUTE');
+    if (payload.eligible_for_schema_promotion === true && payload.bounded_sample === true) {
+      fail('DICTIONARY_GEOMETRY_IS_NOT_PAYLOAD_SAMPLE');
+    }
+    if (payload.tested_example === true && payload.bounded_sample === true && payload.payload_success !== true) {
+      fail('UNTESTED_EXAMPLE_IS_NOT_BOUNDED_SAMPLE');
+    }
+    if (payload.bounded_sample === true) {
+      if (payload.payload_success !== true) fail('BOUNDED_SAMPLE_REQUIRES_PAYLOAD_SUCCESS');
+      if (payload.live_http === true) fail('CORE_CELL_LIVE_HTTP_FORBIDDEN');
+      if (typeof payload.native_product_id !== 'string' || !payload.native_product_id.trim()) fail('BOUNDED_SAMPLE_NATIVE_ID_REQUIRED');
+      if (typeof payload.release_id !== 'string' || !payload.release_id.trim()) fail('BOUNDED_SAMPLE_RELEASE_ID_REQUIRED');
+    }
+    if (payload.verified_route === true) {
+      if (payload.payload_success === true && payload.bounded_sample !== true) fail('VERIFIED_ROUTE_IS_NOT_AUTOMATIC_SAMPLE');
+      if (typeof payload.route_id !== 'string' || !payload.route_id.trim()) fail('VERIFIED_ROUTE_ID_REQUIRED');
+    }
   }
 
   if (receipt.kind === 'scheduled_cycle') {
