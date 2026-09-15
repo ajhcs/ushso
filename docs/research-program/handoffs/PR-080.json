@@ -1,0 +1,324 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-080",
+  "status": "producer_checked",
+  "owner": "/root/pr080_usability",
+  "reviewer": "Astra/root",
+  "base_sha": "f02f5f5895a5cdf8d6dbf188cc0a4e1290f79b49",
+  "head_sha": "08ff61fc831b4f286ea7d561a69c46335fce627b",
+  "dependency_merge_shas": {
+    "PR-002": "5647e81457b606bb36456e75c48f990ce21e9c6c",
+    "PR-041": "7ee6ef80c438b584d16025ad3f60c24bb8c0c83e",
+    "PR-054": "4b8c8e0ec6c8b7a397ecb4d0d7dc00904f3ee924",
+    "PR-063": "584b2830e4320eae881ddd41ffe4200e39ff14ce",
+    "PR-075": "86bff31d5c65c93d0a077d154a4f9f010f7063fd"
+  },
+  "branch": "codex/ushso-pr080-usability-20260915",
+  "github_pr_url": null,
+  "changed_files": [
+    "evaluation/research-program/usability/protocol.json",
+    "evaluation/research-program/usability/assignments.json",
+    "evaluation/research-program/usability/sessions.json",
+    "evaluation/research-program/usability/score.mjs",
+    "evaluation/research-program/usability/usability.test.mjs",
+    "evaluation/research-program/usability/score-result.json",
+    "docs/research-program/usability-results.md",
+    "verification/research-program/pr-080/",
+    "docs/research-program/handoffs/PR-080.json"
+  ],
+  "problem": "Beginner and expert task completion lacked a frozen 8+8 protocol that retains unverified status when actual participants are unavailable.",
+  "resulting_behavior": "A reproducible moderated protocol names eight novice and eight advanced actual participants distinct from implementers, frozen opaque tasks, success criteria, help rules and non-PHI notes. Human participants are separate from agent simulations. If participants are unavailable, R12 remains unverified and implementer self-tests cannot satisfy it. Missing or untested assigned opportunities count as non-completions. Tiny-group results are not a population-wide usability claim. Testing materials never require protected research data. R12 and R13 remain unaccepted. C-009-1 remains unresolved. Last-good generation live-2026-09-03-85b50522b420 is unchanged. HTTP 200 is not a completed research task.",
+  "commits": [
+    {
+      "id": "C-080-1",
+      "subject": "Prepare a reproducible moderated protocol",
+      "sha": "fcd2807a6ba5f2e8c0fa304577aaf0ef84983fce"
+    },
+    {
+      "id": "C-080-2",
+      "subject": "Collect consented task evidence",
+      "sha": "ac61103170ecd690b64222f5f02401ee915fd34f"
+    },
+    {
+      "id": "C-080-3",
+      "subject": "Report and route concrete failures",
+      "sha": "08ff61fc831b4f286ea7d561a69c46335fce627b"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "protocol",
+      "id": "evaluation/research-program/usability/protocol.json",
+      "location": "local",
+      "sha256": "d5f7964877bca00bba3edf0012d7c036681a92239db38930d108e7932f89126f"
+    },
+    {
+      "kind": "assignments",
+      "id": "evaluation/research-program/usability/assignments.json",
+      "location": "local",
+      "sha256": "41f79be777f68115bdd5c996da092507d992b39025198fd5aa01b0eba91f5b44"
+    },
+    {
+      "kind": "sessions",
+      "id": "evaluation/research-program/usability/sessions.json",
+      "location": "local",
+      "sha256": "713413f3daed30381bfdd1a103ff36fafa7161470645b8a96369e69916735559"
+    },
+    {
+      "kind": "scorer",
+      "id": "evaluation/research-program/usability/score.mjs",
+      "location": "local",
+      "sha256": "6eb195c2adc0cb6d2a1a73f6aa2eedc3300fa4b1493c222a4e610dbd6745933f"
+    },
+    {
+      "kind": "tests",
+      "id": "evaluation/research-program/usability/usability.test.mjs",
+      "location": "local",
+      "sha256": "00797d392cc787c0eaa1b09c73ff9058035bec1a77e60938a0c4e7d31dbaff0d"
+    },
+    {
+      "kind": "score-result",
+      "id": "evaluation/research-program/usability/score-result.json",
+      "location": "local",
+      "sha256": "2d49919194b74d454c3ba54391b0332f55573aec40b8e949cee396122c74fdd8"
+    },
+    {
+      "kind": "results",
+      "id": "docs/research-program/usability-results.md",
+      "location": "local",
+      "sha256": "4042915733d69fcab08aa4b17caf4331cb26e2aa3ff0fa28569f7e9c668be6f8"
+    },
+    {
+      "kind": "frozen-tasks-unmodified",
+      "id": "evaluation/research-program/tasks.json",
+      "location": "local",
+      "sha256": "4fc5c7fe2a5b51da4bf5ae8e348949a33f26c1758d7a18065e7c5611d1efcedc"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c080-usability-tests",
+      "command": "node --test evaluation/research-program/usability/usability.test.mjs",
+      "started_at": "2026-09-15T06:43:34.917363Z",
+      "completed_at": "2026-09-15T06:43:35.011169Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Protocol freezes eight novice and eight advanced slots against opaque human tasks. Clicking through is not completion. Generated participants and implementer self-tests cannot satisfy R12.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c080-usability-tests-event",
+        "path": "verification/research-program/pr-080/producer-20260915/commands/usability-tests/event.json",
+        "sha256": "5d35b78ee631411e6913ab0fb233378764c5dc687886ba68afc9d5bd2964c758",
+        "bytes": 1209
+      }
+    },
+    {
+      "id": "cmd-c080-score-cli",
+      "command": "node evaluation/research-program/usability/score.mjs",
+      "started_at": "2026-09-15T06:43:35.011540Z",
+      "completed_at": "2026-09-15T06:43:35.042655Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "R12 remains unverified. Actual participants=0/8 in each group. Missing assigned opportunities are non-completions. R13 remains unaccepted. C-009-1 remains unresolved.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c080-score-cli-event",
+        "path": "verification/research-program/pr-080/producer-20260915/commands/score-cli/event.json",
+        "sha256": "080026a99b10eb0d03631b0e52cbb8348c37f236532aafd8ddfc73d1932f4a62",
+        "bytes": 1147
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr080-artifact-0",
+      "path": "verification/research-program/pr-080/task-binding.json",
+      "bytes": 3944,
+      "sha256": "cb069105ca2af15588323af9da559a7e86f1d754555c6c0c72d4d88b98f7b6bc"
+    },
+    {
+      "id": "pr080-artifact-1",
+      "path": "verification/research-program/pr-080/dispatch.json",
+      "bytes": 2482,
+      "sha256": "47e0d6640a11f67e9441c6777ce47c4be546225e0c3e628f59d3387732a981f5"
+    },
+    {
+      "id": "pr080-artifact-2",
+      "path": "evaluation/research-program/usability/score-result.json",
+      "bytes": 1729,
+      "sha256": "2d49919194b74d454c3ba54391b0332f55573aec40b8e949cee396122c74fdd8"
+    },
+    {
+      "id": "pr080-artifact-3",
+      "path": "docs/research-program/usability-results.md",
+      "bytes": 2532,
+      "sha256": "4042915733d69fcab08aa4b17caf4331cb26e2aa3ff0fa28569f7e9c668be6f8"
+    },
+    {
+      "id": "pr080-artifact-4",
+      "path": "verification/research-program/pr-080/producer-20260915/commands/usability-tests/receipt.json",
+      "bytes": 470,
+      "sha256": "3d7ad72441c0be27e45a3392934dfe4f68b4f27b57e945c00352f0939d3695bc"
+    },
+    {
+      "id": "pr080-artifact-5",
+      "path": "verification/research-program/pr-080/producer-20260915/commands/usability-tests/stdout.log",
+      "bytes": 448,
+      "sha256": "a799535512a0a11e9e0fa38a655fb026c43543ecc7a49ea8e2209d72cd6adc15"
+    },
+    {
+      "id": "pr080-artifact-6",
+      "path": "verification/research-program/pr-080/producer-20260915/commands/usability-tests/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr080-artifact-7",
+      "path": "verification/research-program/pr-080/producer-20260915/commands/usability-tests/event.json",
+      "bytes": 1209,
+      "sha256": "5d35b78ee631411e6913ab0fb233378764c5dc687886ba68afc9d5bd2964c758"
+    },
+    {
+      "id": "pr080-artifact-8",
+      "path": "verification/research-program/pr-080/producer-20260915/commands/score-cli/receipt.json",
+      "bytes": 442,
+      "sha256": "bab82d52ca77e24d2d4e9b6df51d9ceae772e25aa09639dd7e710d88f3049a9f"
+    },
+    {
+      "id": "pr080-artifact-9",
+      "path": "verification/research-program/pr-080/producer-20260915/commands/score-cli/stdout.log",
+      "bytes": 1729,
+      "sha256": "2d49919194b74d454c3ba54391b0332f55573aec40b8e949cee396122c74fdd8"
+    },
+    {
+      "id": "pr080-artifact-10",
+      "path": "verification/research-program/pr-080/producer-20260915/commands/score-cli/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr080-artifact-11",
+      "path": "verification/research-program/pr-080/producer-20260915/commands/score-cli/event.json",
+      "bytes": 1147,
+      "sha256": "080026a99b10eb0d03631b0e52cbb8348c37f236532aafd8ddfc73d1932f4a62"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-080-1",
+      "status": "producer_checked",
+      "result": "Tasks test finding, interpreting, accessing and citing sources; merely clicking through a page is not completion.",
+      "command_ids": [
+        "cmd-c080-usability-tests"
+      ]
+    },
+    {
+      "id": "C-080-2",
+      "status": "producer_checked",
+      "result": "If participants are unavailable, retain unverified status; implementer self-tests cannot satisfy R12.",
+      "command_ids": [
+        "cmd-c080-usability-tests",
+        "cmd-c080-score-cli"
+      ]
+    },
+    {
+      "id": "C-080-3",
+      "status": "producer_checked",
+      "result": "Require >=85% completion in each group and no critical misunderstanding; tiny-group results are product acceptance evidence, not a population-wide usability claim. Current actual participants are 0/8 in each group, so R12 remains unverified.",
+      "command_ids": [
+        "cmd-c080-score-cli"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "eight-plus-eight-actual-participants-unavailable",
+      "status": "accepted",
+      "detail": "Actual novice participants=0 and actual advanced participants=0. The 8+8 minimum is unmet. R12 remains unverified."
+    },
+    {
+      "id": "missing-assigned-opportunities-are-non-completions",
+      "status": "accepted",
+      "detail": "All 16 assigned frozen task/session opportunities remain untested and count as non-completions. They were not dropped."
+    },
+    {
+      "id": "r12-r13-unaccepted",
+      "status": "accepted",
+      "detail": "R12 and R13 remain unaccepted. This PR does not invent consented sessions or accept documentation usability from protocol publication."
+    },
+    {
+      "id": "c0091-unresolved",
+      "status": "accepted",
+      "detail": "C-009-1 remains unresolved without actual account terms and measured production cost."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review. Do not copy 21 MiB local-gate receipts into git."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "R12",
+      "status": "unresolved",
+      "detail": "Eight actual novice and eight actual advanced participants distinct from implementers are unavailable. R12 remains unaccepted/unverified."
+    },
+    {
+      "id": "R13",
+      "status": "unresolved",
+      "detail": "R13 remains unaccepted. Guide artifacts are owned by PR-070/071/072."
+    },
+    {
+      "id": "AUTH-12",
+      "status": "unresolved",
+      "detail": "Planner public activation remains unresolved."
+    },
+    {
+      "id": "independent-usability-review",
+      "status": "pending",
+      "detail": "Independent review of the frozen protocol and unverified 8+8 result remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "empty-slots-are-not-pass",
+      "status": "risk",
+      "detail": "A frozen protocol with empty participant identities is not R12 acceptance, not a usability pass, and not a substitute for 8+8 real humans."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of the frozen 8+8 protocol and unverified R12 result, then joint local gate and hosted CI.",
+  "next_action": "Independently review C-080 source and replay usability tests and score CLI. Do not invent 8+8 participants, names, emails, or completions. Do not accept R12. Do not copy 21 MiB receipts into git.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, R12 acceptance, or 8+8 real participants."
+    ]
+  }
+}
