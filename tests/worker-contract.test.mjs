@@ -121,6 +121,15 @@ test('serves machine files with their real types and gives unknown pages HTTP 40
   assert.equal(unknown.status, 404);
 });
 
+test('no-JS search fallback lists catalog titles without claiming ranked discovery', async () => {
+  const page = await worker.fetch(new Request('https://ushso.org/search?q=hospital', { headers: { accept: 'text/html' } }), env);
+  const html = await page.text();
+  assert.equal(page.status, 200);
+  assert.match(html, /data-crawler-content="search-fallback"/);
+  assert.match(html, /JavaScript is required for ranked search|ranked discovery/i);
+  assert.match(html, /Catalog membership is not payload access/);
+});
+
 test('HTML-only crawlers see catalog source facts on dataset URLs without a blank page', async () => {
   const found = await worker.fetch(new Request(`https://ushso.org/datasets/${encodeURIComponent(firstRecord.record_id)}`, { headers: { accept: 'text/html' } }), env);
   const html = await found.text();

@@ -18,6 +18,7 @@ import {
   CATALOG_HTML_GENERATION,
   renderCatalogSourceHtml,
   renderPublicSitemap,
+  renderSearchFallbackHtml,
 } from './catalog-html.mjs';
 
 const MAX_REQUEST_BYTES = 20 * 1024;
@@ -426,6 +427,30 @@ export function createWorker({
           ids = [];
         }
         return textResponse(renderPublicSitemap(url.origin, { recordIds: ids }), 'application/xml; charset=utf-8', { cacheControl: 'public, max-age=300', head });
+      }
+
+      if (url.pathname === '/search') {
+        const spa = await env.ASSETS.fetch(new Request(new URL('/', request.url), { method: 'GET' }));
+        const spaText = spa.ok ? await spa.text() : '';
+        let records = [];
+        let total = 0;
+        let generation = CATALOG_HTML_GENERATION;
+        try {
+          const catalog = await loadCatalog(request, env);
+          records = catalog.records ?? [];
+          total = records.length;
+          generation = catalog.corpus?.publication?.generation ?? catalog.corpus?.generation ?? CATALOG_HTML_GENERATION;
+        } catch {
+          records = [];
+        }
+        const question = url.searchParams.get('q') ?? '';
+        const needle = question.trim().toLowerCase();
+        const matched = needle
+          ? records.filter((record) => String(record.title ?? record.identity?.asset?.name ?? '').toLowerCase().includes(needle)).slice(0, 10)
+          : records.slice(0, 10);
+        const fallback = renderSearchFallbackHtml({ origin: url.origin, question, records: matched, total, generation });
+        const page = mergeCrawlerIntoSpa(spaText, fallback);
+        return textResponse(page, 'text/html; charset=utf-8', { cacheControl: 'public, max-age=60', head });
       }
 
       if (url.pathname.startsWith('/datasets/')) {

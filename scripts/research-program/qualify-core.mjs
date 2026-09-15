@@ -113,6 +113,7 @@ export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
       && payload.synthetic !== true
       && payload.catalog_membership_as_sample !== true
       && payload.vintage_substitution !== true
+      && payload._release_check?.status === 'verified'
       && Number.isSafeInteger(payload._derived_row_count)
       && payload._derived_row_count > 0;
     const realRoute = payload.supported === true

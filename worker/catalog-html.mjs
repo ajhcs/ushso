@@ -102,6 +102,21 @@ ${sourceLink}
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${htmlText(`${facts.title} | ${SITE_NAME}`)}</title><meta name="description" content="${htmlAttribute(facts.description)}"><link rel="canonical" href="${htmlAttribute(facts.canonical_url)}"><meta name="ushso:search-generation" content="${htmlAttribute(facts.generation)}"><script type="application/ld+json" data-profile="schema-org-dataset">${safeJsonForHtml(schema)}</script></head><body>${body}</body></html>`;
 }
 
+export function renderSearchFallbackHtml({ origin, question = '', records = [], total = 0, generation = CATALOG_HTML_GENERATION } = {}) {
+  const q = captured(question === '' ? '' : question);
+  const items = records.slice(0, 10).map((record) => {
+    const title = captured(record.title ?? record.identity?.asset?.name);
+    const href = '/datasets/' + encodeURIComponent(record.record_id);
+    return '<li><a href="' + htmlAttribute(href) + '">' + htmlText(title) + '</a></li>';
+  }).join('');
+  const empty = records.length === 0
+    ? '<p>No indexed titles matched this exact page. Empty results do not establish that no source exists. JavaScript is required for ranked search, facets, and page receipts.</p>'
+    : '';
+  const list = items ? '<ol>' + items + '</ol>' : '';
+  const body = '<main data-crawler-content="search-fallback"><h1>Search the published catalog</h1><p>This no-JavaScript page lists indexed titles only. Ranked discovery, why-match explanations, and receipt download require JavaScript.</p><form method="get" action="/search" role="search"><label for="q">Question or title words</label><input id="q" name="q" value="' + htmlAttribute(question) + '"><button type="submit">Search titles</button></form><p>' + htmlText(String(total)) + ' catalog records are in this generation (' + htmlText(generation) + '). Showing up to 10 title matches for “' + htmlText(q === 'not captured' ? '' : question) + '”.</p>' + empty + list + '<p><a href="/sources">Review indexed sources</a>. Catalog membership is not payload access.</p></main>';
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Search | ' + htmlText(SITE_NAME) + '</title></head><body>' + body + '</body></html>';
+}
+
 export function publicGuideSitemapPages() {
   return ['/', '/search', '/learn', '/methods', '/agents', '/sources', '/about', '/privacy', '/terms', '/contact'];
 }
