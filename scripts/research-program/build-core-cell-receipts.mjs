@@ -13,6 +13,7 @@ const HEAD = '9f96b491cdf0c9654ff1366e5ff81cd173b27a26';
 const TREE = '5e02bd2ff2ebdcbed19d1d9e050b5b7745955dfc';
 const CORPUS_REL = 'packages/retrieval/versions/v1.2.0/corpus';
 const CMS_CATALOG_REL = 'verification/research-program/pr-013/fixtures/cms-catalog-slim.json.gz';
+const CDC_VIEW_INDEX_REL = 'verification/research-program/pr-014/fixtures/cdc-view-index.json.gz';
 
 function sha256File(abs) {
   return createHash('sha256').update(readFileSync(abs)).digest('hex');
@@ -64,6 +65,50 @@ function loadCmsCatalog(repoRoot) {
   };
 }
 
+function loadCdcViewIndex(repoRoot) {
+  const abs = path.join(repoRoot, CDC_VIEW_INDEX_REL);
+  const gzipBytes = readFileSync(abs);
+  const text = gunzipSync(gzipBytes).toString('utf8');
+  const data = JSON.parse(text);
+  const byNative = new Map((data.views ?? []).map((view) => [view.source_native_id, view]));
+  const byRecord = new Map((data.views ?? []).map((view) => [view.record_id, view]));
+  return {
+    data,
+    fileSha: sha256File(abs),
+    uncompressedSha: createHash('sha256').update(text).digest('hex'),
+    byNative,
+    byRecord,
+  };
+}
+
+function overlayCdcViewIndex(receipt, view, cdcIndex) {
+  if (receipt.payload.field !== 'publisher_access') return receipt;
+  const native = view.source_native_id;
+  const locator = native ? `https://data.cdc.gov/d/${native}` : null;
+  const recipe = [
+    receipt.payload.recipe,
+    `Overlay frozen CDC view-index ${CDC_VIEW_INDEX_REL} (gzip sha256=${cdcIndex.fileSha}; uncompressed sha256=${cdcIndex.uncompressedSha}).`,
+    `view_type=${view.view_type ?? 'unknown'} named_column_count=${view.named_column_count ?? 'unknown'} isolated=${view.isolated === true}.`,
+    locator ? `Catalog locator ${locator} was not fetched. Column arrays were not retrieved.` : 'No catalog locator was derived.',
+    'The separate PLACES 7cmc-7y5g column fixture is a different product and is not substituted here.',
+  ].join(' ');
+  return {
+    ...receipt,
+    evidence_reference: CDC_VIEW_INDEX_REL,
+    evidence_sha256: cdcIndex.fileSha,
+    payload: {
+      ...receipt.payload,
+      status: 'catalog_view_index_not_payload',
+      recipe,
+      limitation: 'CDC view-index entries are catalog metadata. Dataset rows, column arrays, authorization, and payload retrieval were not executed.',
+      payload_success: false,
+      view_type: view.view_type ?? null,
+      named_column_count: view.named_column_count ?? null,
+      catalog_locator: locator,
+    },
+  };
+}
+
 function overlayCmsDistribution(receipt, bound, cmsCatalog) {
   if (receipt.payload.field !== 'publisher_access') return receipt;
   const roles = {};
@@ -98,9 +143,11 @@ export async function buildCatalogMetadataReceipts({ repoRoot = ROOT } = {}) {
   const cohorts = JSON.parse(readFileSync(path.join(repoRoot, 'evaluation/research-program/cohorts.json'), 'utf8'));
   const cmsCatalog = loadCmsCatalog(repoRoot);
   if (cmsCatalog.payloadSuccess) throw new Error('CMS_CATALOG_SLIM_CANNOT_COUNT_AS_PAYLOAD');
+  const cdcIndex = loadCdcViewIndex(repoRoot);
   const receipts = [];
   const unresolved = [];
   const cmsBound = [];
+  const cdcBound = [];
   for (const product of cohorts.products) {
     const rid = product.anchor?.representative?.record_id ?? null;
     const status = product.anchor?.status;
@@ -177,24 +224,40 @@ export async function buildCatalogMetadataReceipts({ repoRoot = ROOT } = {}) {
           payload_success: false,
         });
       }
+      if (rec.identity?.source?.source_id === 'cdc-socrata' && field.field === 'publisher_access') {
+        const native = rec.identity?.match_fields?.source_id ?? product.anchor?.representative?.native_id ?? null;
+        const view = cdcIndex.byRecord.get(rec.record_id) ?? cdcIndex.byNative.get(native);
+        if (view) {
+          receipt = overlayCdcViewIndex(receipt, view, cdcIndex);
+          cdcBound.push({
+            product_key: product.product_key,
+            record_id: rec.record_id,
+            source_native_id: view.source_native_id,
+            view_type: view.view_type ?? null,
+            named_column_count: view.named_column_count ?? null,
+            payload_success: false,
+          });
+        }
+      }
       receipts.push(receipt);
     }
   }
-  return { receipts, unresolved, cmsBound, cmsCatalog };
+  return { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const { receipts, unresolved, cmsBound, cmsCatalog } = await buildCatalogMetadataReceipts();
+  const { receipts, unresolved, cmsBound, cmsCatalog, cdcBound, cdcIndex } = await buildCatalogMetadataReceipts();
   const dir = path.join(ROOT, 'verification/research-program/evidence/receipts');
   mkdirSync(dir, { recursive: true });
   const bundle = {
     format: 'ushso.core-cell-receipt-bundle.v1',
     generation: LAST_GOOD_GENERATION,
     candidate_head: HEAD,
-    note: 'Catalog-metadata receipts only. CMS catalog-slim locators overlay publisher_access for 63 products. Dataset payloads were not executed. R04 remains unaccepted.',
+    note: 'Catalog-metadata receipts only. CMS catalog-slim locators overlay 63 products. CDC view-index locators overlay 10 products. Dataset payloads were not executed. R04 remains unaccepted.',
     receipt_count: receipts.length,
     unresolved_products: unresolved,
     cms_distribution_products: cmsBound.length,
+    cdc_view_index_products: cdcBound.length,
     cms_catalog_gzip_sha256: cmsCatalog.fileSha,
     cms_catalog_uncompressed_sha256: cmsCatalog.uncompressedSha,
     live_http: false,
@@ -213,5 +276,19 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     products: cmsBound,
     note: 'Distribution locators are not payload samples.',
   }, null, 2)}\n`);
-  process.stdout.write(`${JSON.stringify({ receipt_count: receipts.length, unresolved: unresolved.length, products_covered: receipts.length / 4, cms_bound: cmsBound.length }, null, 2)}\n`);
+  writeFileSync(path.join(ROOT, 'verification/research-program/evidence/cdc-view-index-locator-summary.json'), `${JSON.stringify({
+    format: 'ushso.cdc-view-index-locator-summary.v1',
+    generation: LAST_GOOD_GENERATION,
+    evidence_reference: CDC_VIEW_INDEX_REL,
+    evidence_sha256: cdcIndex.fileSha,
+    uncompressed_sha256: cdcIndex.uncompressedSha,
+    products_bound: cdcBound.length,
+    payload_success: false,
+    bounded_sample: false,
+    live_http: false,
+    places_7cmc_7y5g_not_substituted_for_swc5_untb: true,
+    products: cdcBound,
+    note: 'View-index locators and named_column_count are not payload samples or qualified dictionaries.',
+  }, null, 2)}\n`);
+  process.stdout.write(`${JSON.stringify({ receipt_count: receipts.length, unresolved: unresolved.length, products_covered: receipts.length / 4, cms_bound: cmsBound.length, cdc_bound: cdcBound.length }, null, 2)}\n`);
 }

@@ -139,4 +139,9 @@ test('frozen catalog-metadata receipts make 86 products known-unsupported; 14 in
   assert.equal(hcris.cells.publisher_access.status, 'catalog_distribution_locators_not_payload');
   assert.equal(hcris.cells.publisher_access.supported, false);
   assert.ok(hcris.cells.publisher_access.limitation.includes('payload_success=false'));
+  const places = receipt.matrix.rows.find((row) => row.product_key === 'cdc-places-local-data-for-better-health');
+  assert.equal(places.cells.publisher_access.status, 'catalog_view_index_not_payload');
+  assert.equal(places.cells.publisher_access.supported, false);
+  assert.ok(places.cells.publisher_access.limitation.includes('payload retrieval were not executed'));
+  assert.equal(places.cells.schema_qualification.supported, false);
 });
