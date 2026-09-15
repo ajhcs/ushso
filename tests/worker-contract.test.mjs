@@ -127,6 +127,7 @@ test('HTML-only crawlers see catalog source facts on dataset URLs without a blan
   assert.equal(found.status, 200);
   assert.match(found.headers.get('content-type'), /text\/html/);
   assert.match(html, /data-crawler-content="dataset"/);
+  assert.match(html, /Clear source action/);
   assert.match(html, new RegExp(firstRecord.title.slice(0, 24).replace(/[.*+?^$()|[\]\\]/g, '\\$&')));
   assert.doesNotMatch(html, /doi.org\/10\./);
   const missing = await worker.fetch(new Request('https://ushso.org/datasets/not-a-real-record'), env);

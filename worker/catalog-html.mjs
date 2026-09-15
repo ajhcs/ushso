@@ -81,8 +81,8 @@ export function renderCatalogSourceHtml(record, options = {}) {
   const facts = catalogSourceFacts(record, options);
   const schema = catalogSourceJsonLd(facts);
   const sourceLink = facts.canonical_source_url
-    ? `<p><a class="canonical-source" rel="external noopener" href="${htmlAttribute(facts.canonical_source_url)}">View the publisher source</a></p>`
-    : '<p>Publisher locator not captured.</p>';
+    ? `<p><strong>Clear source action:</strong> Open the publisher page for this exact product. That page is a reachable documentation page, not proven payload or browser access.</p><p><a class="canonical-source" rel="external noopener" href="${htmlAttribute(facts.canonical_source_url)}">View the publisher source</a></p>`
+    : '<p><strong>Clear source action:</strong> No verified publisher URL is bound for this record. Catalog membership is not payload access.</p><p>Publisher locator not captured.</p>';
   const body = `<main data-crawler-content="dataset" data-publication-generation="${htmlAttribute(facts.generation)}">
 <nav aria-label="Breadcrumb"><a href="/">USHSO</a> / <a href="/learn">Learn</a> / <a href="/methods">Methods</a></nav>
 <article>
