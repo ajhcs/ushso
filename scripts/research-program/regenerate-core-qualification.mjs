@@ -1,20 +1,10 @@
 #!/usr/bin/env node
-import { mkdirSync, copyFileSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { issueCoreQualificationReceipt, loadCohort } from './qualify-core.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const historyDir = path.join(ROOT, 'verification/research-program/evidence/history');
-mkdirSync(historyDir, { recursive: true });
-copyFileSync(
-  path.join(ROOT, 'evaluation/research-program/review/core-matrix.json'),
-  path.join(historyDir, 'core-matrix-pr040.json'),
-);
-copyFileSync(
-  path.join(ROOT, 'evaluation/research-program/review/core-qualification-receipt.json'),
-  path.join(historyDir, 'core-qualification-receipt-pr040.json'),
-);
 const receipt = issueCoreQualificationReceipt(loadCohort(), { recordedAt: '2026-09-15T14:45:00Z' });
 writeFileSync(
   path.join(ROOT, 'evaluation/research-program/review/core-qualification-receipt.json'),
