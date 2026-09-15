@@ -2,13 +2,13 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LAST_GOOD_GENERATION } from '../../packages/coverage/research-program/v1.0.0/src/qualify-deterministic.mjs';
-import { evaluateCoreReadiness, loadCohort, PRODUCT_DENOMINATOR } from '../../packages/coverage/research-program/v1.0.0/src/core-readiness.mjs';
+import { evaluateCoreReadiness, loadCohort, PRODUCT_DENOMINATOR, PUBLIC_SAMPLE_TARGET } from '../../packages/coverage/research-program/v1.0.0/src/core-readiness.mjs';
 import { refuseSelfApproval } from './qualify-mrf.mjs';
 import { ingestEvidence } from './ingest-evidence.mjs';
 
 export const QUALIFY_CORE_FORMAT = 'ushso.core-scientific-completeness.v1';
 export const HUMAN_RESEARCH_REVIEWER = 'named-human-research-reviewer';
-export { LAST_GOOD_GENERATION, PRODUCT_DENOMINATOR };
+export { LAST_GOOD_GENERATION, PRODUCT_DENOMINATOR, PUBLIC_SAMPLE_TARGET };
 
 function freeze(value) {
   return Object.freeze(value);
@@ -87,6 +87,31 @@ function evidenceCell(evidence, fallbackStatus) {
   });
 }
 
+export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
+  const samples = new Set();
+  const verifiedRoutes = new Set();
+  for (const receipt of receipts.filter((row) => row.kind === 'core_cell')) {
+    const payload = receipt.payload ?? {};
+    if (payload.field !== 'publisher_access') continue;
+    if (payload.live_http === true) fail('CORE_CELL_LIVE_HTTP_FORBIDDEN');
+    if (payload.supported === true && payload.bounded_sample === true) samples.add(payload.product_key);
+    if (payload.supported === true && payload.verified_route === true) verifiedRoutes.add(payload.product_key);
+  }
+  const publicEligible = products.filter((product) => product.access_expectation === 'public_sample_eligible');
+  const publicComplete = publicEligible.filter((product) => samples.has(product.product_key)).length;
+  const restricted = products.filter((product) => ['restricted_or_manual_route', 'pending_source_intake', 'mixed_public_and_restricted'].includes(product.access_expectation));
+  const restrictedComplete = restricted.filter((product) => verifiedRoutes.has(product.product_key)).length;
+  return freeze({
+    catalog_membership_is_not_payload_sample: true,
+    public_sample_complete: publicComplete,
+    public_sample_target: PUBLIC_SAMPLE_TARGET,
+    public_sample_eligible: publicEligible.length,
+    restricted_route_complete: restrictedComplete,
+    r04_engineering_target_met: publicComplete >= PUBLIC_SAMPLE_TARGET,
+    r05_restricted_routes_verified: restricted.length > 0 && restrictedComplete === restricted.length,
+  });
+}
+
 export function coreCellEvidenceFromReceipts(receipts = []) {
   const byProduct = {};
   for (const receipt of receipts.filter((row) => row.kind === 'core_cell')) {
@@ -155,11 +180,13 @@ export function independentSemanticReview(matrix, { actor = 'implementer', role 
 }
 
 export function issueCoreQualificationReceipt(cohorts = loadCohort(defaultCohortPath()), options = {}) {
-  const readiness = evaluateCoreReadiness(cohorts, options.readinessExtras ?? {});
+  const sealedReadiness = evaluateCoreReadiness(cohorts, options.readinessExtras ?? {});
   const ingestion = options.ingestion ?? ingestEvidence();
-  const cellEvidenceByProduct = options.cellEvidenceByProduct ?? coreCellEvidenceFromReceipts(ingestion.receipts ?? []);
+  const receipts = ingestion.receipts ?? [];
+  const cellEvidenceByProduct = options.cellEvidenceByProduct ?? coreCellEvidenceFromReceipts(receipts);
   const matrix = assembleCoreMatrix(cohorts, { cellEvidenceByProduct });
   const review = independentSemanticReview(matrix, options);
+  const payloadCounts = payloadSampleCountsFromReceipts(receipts, cohorts.products ?? []);
   const r04 = false;
   const r05 = false;
   const r07 = false;
@@ -184,10 +211,13 @@ export function issueCoreQualificationReceipt(cohorts = loadCohort(defaultCohort
     scientific_completeness_pass: false,
     failed_matrix_retained: true,
     engineering_readiness: freeze({
-      r04_engineering_target_met: readiness.r04_engineering_target_met === true,
-      r05_restricted_routes_verified: readiness.r05_restricted_routes_verified === true,
-      public_sample_complete: readiness.public_sample_complete,
-      incomplete: readiness.incomplete,
+      r04_engineering_target_met: payloadCounts.r04_engineering_target_met,
+      r05_restricted_routes_verified: payloadCounts.r05_restricted_routes_verified,
+      public_sample_complete: payloadCounts.public_sample_complete,
+      public_sample_target: payloadCounts.public_sample_target,
+      catalog_membership_is_not_payload_sample: true,
+      sealed_catalog_membership_count: sealedReadiness.public_sample_complete,
+      incomplete: sealedReadiness.incomplete,
     }),
     remaining_limits: freeze([
       'Unknown essential fields and unnamed intake records cannot count as supported.',

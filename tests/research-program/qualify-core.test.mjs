@@ -8,6 +8,7 @@ import {
   independentSemanticReview,
   issueCoreQualificationReceipt,
   loadCohort,
+  payloadSampleCountsFromReceipts,
   refuseSelfApproval,
   refuseUnknownCellAsSupported,
 } from '../../scripts/research-program/qualify-core.mjs';
@@ -128,4 +129,10 @@ test('frozen catalog-metadata receipts make 86 products known-unsupported; 14 in
   assert.equal(receipt.r04_accepted, false);
   assert.equal(receipt.scientific_completeness_pass, false);
   assert.ok(receipt.remaining_limits.some((item) => item.includes('Catalog-metadata receipts are not bounded payload samples')));
+  assert.equal(receipt.engineering_readiness.catalog_membership_is_not_payload_sample, true);
+  assert.equal(receipt.engineering_readiness.public_sample_complete, 0);
+  assert.equal(receipt.engineering_readiness.r04_engineering_target_met, false);
+  const counts = payloadSampleCountsFromReceipts([], cohort.products);
+  assert.equal(counts.public_sample_complete, 0);
+  assert.equal(counts.catalog_membership_is_not_payload_sample, true);
 });

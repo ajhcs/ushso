@@ -182,8 +182,8 @@ export async function verifyDataProgram({ fetchImpl } = {}) {
     requirement({
       id: 'R04',
       result: 'fail',
-      evidence: `Core qualification retains a failed matrix. Engineering public-sample complete=${readiness.public_sample_complete}/80 is not R04 acceptance. Unknown cells are not counted as supported.`,
-      remaining: 'Publisher access, schema qualification, join routes, and unit/grain/date/denominator remain unknown for the 100-product cohort.',
+      evidence: `Core qualification retains a failed matrix. Bounded payload samples=${core.engineering_readiness.public_sample_complete}/80. Catalog membership is not a payload sample (sealed catalog-membership count=${core.engineering_readiness.sealed_catalog_membership_count}). Unknown cells are not counted as supported.`,
+      remaining: 'Need bounded payload samples and recipes for at least 80 public products, plus verified routes for remaining members. Catalog metadata is not payload access.',
     }),
     requirement({
       id: 'R05',
