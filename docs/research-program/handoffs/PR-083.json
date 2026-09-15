@@ -1,0 +1,309 @@
+{
+  "format": "ushso.pr-handoff.v1",
+  "pr_id": "PR-083",
+  "status": "producer_checked",
+  "owner": "/root/pr083_production_rollout",
+  "reviewer": "Astra/root",
+  "base_sha": "51286952f62bcef382ab037bf9955999681a3131",
+  "head_sha": "d4ff79e5bf8e0ea0dfc2ba4773e9f0693243378a",
+  "dependency_merge_shas": {
+    "PR-082": "24947781b957dffd6c6c9fb9d146c4ea6108a13a"
+  },
+  "branch": "codex/ushso-pr083-production-rollout-20260915",
+  "github_pr_url": null,
+  "changed_files": [
+    "verification/research-program/pr-083/record-deployment.mjs",
+    "verification/research-program/pr-083/record-deployment.test.mjs",
+    "verification/research-program/release/deployment.json",
+    "docs/research-program/release-runbook.md",
+    "verification/research-program/pr-083/",
+    "docs/research-program/handoffs/PR-083.json"
+  ],
+  "problem": "A production rollout planning package could be mistaken for authorization to deploy, and staging evidence could be relabeled as production verification.",
+  "resulting_behavior": "No deployment takes place merely because this planning package exists. Production truth is not claimed to match an independently qualified artifact because R16 remains fail and AUTH-01/02/03/07 remain unauthorized. Staging evidence is not relabeled as production verification. Deployment identity remains the historical 2026-09-09 Worker. Immediate rollback target is unchanged. R16 remains unaccepted. C-009-1 remains unresolved. Last-good generation live-2026-09-03-85b50522b420 is unchanged. HTTP 200 is not a completed research task. No public traffic, paid resource or secret change occurs.",
+  "commits": [
+    {
+      "id": "C-083-1",
+      "subject": "Execute the approved staged rollout",
+      "sha": "b173486f9b5f67c6b20ba66e47779021257341b7"
+    },
+    {
+      "id": "C-083-2",
+      "subject": "Verify production research journeys",
+      "sha": "aa37c964a5c51153bef1c638f939b3296c40fdab"
+    },
+    {
+      "id": "C-083-3",
+      "subject": "Record deployment and rollback state",
+      "sha": "d4ff79e5bf8e0ea0dfc2ba4773e9f0693243378a"
+    }
+  ],
+  "source_identities": [
+    {
+      "kind": "recorder",
+      "id": "verification/research-program/pr-083/record-deployment.mjs",
+      "location": "local",
+      "sha256": "18fa598715dc18c87fd213eb1a02048872513706aaef30181334bb365b34cfc1"
+    },
+    {
+      "kind": "tests",
+      "id": "verification/research-program/pr-083/record-deployment.test.mjs",
+      "location": "local",
+      "sha256": "e0cb8607e9494bd823ee44fb3a91501229bff6c49bc31e5bc19fca7c08fa82c9"
+    },
+    {
+      "kind": "deployment",
+      "id": "verification/research-program/release/deployment.json",
+      "location": "local",
+      "sha256": "2009c9153ee8a96127386b82072fca77c25e68c76c23d8d1dd82ea4b507eeba7"
+    },
+    {
+      "kind": "runbook",
+      "id": "docs/research-program/release-runbook.md",
+      "location": "local",
+      "sha256": "22ec86115dcb1e614f174c11a058cbf85207ecce4c29b3068ed21a59e56aef0c"
+    },
+    {
+      "kind": "pr082-qualification-unmodified-claim",
+      "id": "verification/research-program/release/qualification.json",
+      "location": "local",
+      "sha256": "2e77401ddcbaff8beb9e2dc42ccd90d54b693c362d9fa0b0eb2060ac40d5e5c8"
+    },
+    {
+      "kind": "sealed-schema-catalog-unchanged",
+      "id": "packages/identity/src/schema-catalog.mjs",
+      "location": "local",
+      "sha256": "70ff90fd97db38ca23045d66a0c3452ab2b5b480261e5a1a8c56bb2eb353b95e"
+    }
+  ],
+  "commands": [
+    {
+      "id": "cmd-c083-deployment-tests",
+      "command": "node --test verification/research-program/pr-083/record-deployment.test.mjs",
+      "started_at": "2026-09-15T07:50:12.697246Z",
+      "completed_at": "2026-09-15T07:50:12.790252Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "No deployment takes place merely because this planning package exists. Staging evidence is not relabeled as production verification.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c083-deployment-tests-event",
+        "path": "verification/research-program/pr-083/producer-20260915/commands/deployment-tests/event.json",
+        "sha256": "a0350cbb303b513442f3e5e2b0e1aa4a3d3fe9d317c769bfa535d3b206bc7961",
+        "bytes": 1163
+      }
+    },
+    {
+      "id": "cmd-c083-deployment-cli",
+      "command": "node verification/research-program/pr-083/record-deployment.mjs",
+      "started_at": "2026-09-15T07:50:12.790669Z",
+      "completed_at": "2026-09-15T07:50:12.822102Z",
+      "exit_code": 0,
+      "completion_status": "completed",
+      "result": "Historical production Worker ecc1603f remains unchanged. AUTH-07 remains unauthorized. R16 remains fail. Screenshots were not invented.",
+      "expected_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "observed_outcome": {
+        "kind": "observed_exit",
+        "exit_code": 0
+      },
+      "event_source": {
+        "id": "cmd-c083-deployment-cli-event",
+        "path": "verification/research-program/pr-083/producer-20260915/commands/deployment-cli/event.json",
+        "sha256": "8068d1ce5845208231a740b5ccac49c75656318b114f4a655143e050ef5f9587",
+        "bytes": 1142
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "pr083-artifact-0",
+      "path": "verification/research-program/pr-083/task-binding.json",
+      "bytes": 3697,
+      "sha256": "27365a7ce191b71492cbb13ab3d36918edce92b3a1f8c5ed27686b22aff45c08"
+    },
+    {
+      "id": "pr083-artifact-1",
+      "path": "verification/research-program/pr-083/dispatch.json",
+      "bytes": 2126,
+      "sha256": "9aad3165bf39af17ac4303fd2de87014163a5b8160953fd028390d621f1640cb"
+    },
+    {
+      "id": "pr083-artifact-2",
+      "path": "verification/research-program/release/deployment.json",
+      "bytes": 2133,
+      "sha256": "2009c9153ee8a96127386b82072fca77c25e68c76c23d8d1dd82ea4b507eeba7"
+    },
+    {
+      "id": "pr083-artifact-3",
+      "path": "docs/research-program/release-runbook.md",
+      "bytes": 3426,
+      "sha256": "22ec86115dcb1e614f174c11a058cbf85207ecce4c29b3068ed21a59e56aef0c"
+    },
+    {
+      "id": "pr083-artifact-4",
+      "path": "verification/research-program/pr-083/producer-20260915/commands/deployment-tests/receipt.json",
+      "bytes": 478,
+      "sha256": "300efee14ad23e97a5ddfce67f4c9bb814fbd0ea46a1d99d93eb2807924704fc"
+    },
+    {
+      "id": "pr083-artifact-5",
+      "path": "verification/research-program/pr-083/producer-20260915/commands/deployment-tests/stdout.log",
+      "bytes": 321,
+      "sha256": "236139d61d55b0f1105961fb13e196653d40cdbf89a0f0be50f1cfb5eac4e120"
+    },
+    {
+      "id": "pr083-artifact-6",
+      "path": "verification/research-program/pr-083/producer-20260915/commands/deployment-tests/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr083-artifact-7",
+      "path": "verification/research-program/pr-083/producer-20260915/commands/deployment-tests/event.json",
+      "bytes": 1163,
+      "sha256": "a0350cbb303b513442f3e5e2b0e1aa4a3d3fe9d317c769bfa535d3b206bc7961"
+    },
+    {
+      "id": "pr083-artifact-8",
+      "path": "verification/research-program/pr-083/producer-20260915/commands/deployment-cli/receipt.json",
+      "bytes": 458,
+      "sha256": "2f79fc5dd81c3a800c7240d11c8ebd59dc1a3329cbbd2a2f9790def676c7c286"
+    },
+    {
+      "id": "pr083-artifact-9",
+      "path": "verification/research-program/pr-083/producer-20260915/commands/deployment-cli/stdout.log",
+      "bytes": 2133,
+      "sha256": "2009c9153ee8a96127386b82072fca77c25e68c76c23d8d1dd82ea4b507eeba7"
+    },
+    {
+      "id": "pr083-artifact-10",
+      "path": "verification/research-program/pr-083/producer-20260915/commands/deployment-cli/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "pr083-artifact-11",
+      "path": "verification/research-program/pr-083/producer-20260915/commands/deployment-cli/event.json",
+      "bytes": 1142,
+      "sha256": "8068d1ce5845208231a740b5ccac49c75656318b114f4a655143e050ef5f9587"
+    }
+  ],
+  "acceptance_results": [
+    {
+      "id": "C-083-1",
+      "status": "producer_checked",
+      "result": "Approved staged rollout was not executed. AUTH-07 remains unauthorized. No implicit upgrade, new binding, or rebuilt bundle was introduced.",
+      "command_ids": [
+        "cmd-c083-deployment-tests",
+        "cmd-c083-deployment-cli"
+      ]
+    },
+    {
+      "id": "C-083-2",
+      "status": "producer_checked",
+      "result": "Production journeys remain unverified. Screenshots were not invented. Staging evidence is not relabeled as production verification.",
+      "command_ids": [
+        "cmd-c083-deployment-tests"
+      ]
+    },
+    {
+      "id": "C-083-3",
+      "status": "producer_checked",
+      "result": "Historical production Worker ecc1603f remains unchanged. Immediate rollback target is that same Worker. Failed-release evidence remains intact.",
+      "command_ids": [
+        "cmd-c083-deployment-cli"
+      ]
+    }
+  ],
+  "failures_and_skipped_checks": [
+    {
+      "id": "no-deployment-from-planning-package",
+      "status": "accepted",
+      "detail": "No deployment takes place merely because this planning package exists."
+    },
+    {
+      "id": "auth-07-unauthorized",
+      "status": "accepted",
+      "detail": "AUTH-07 remains not_requested. Public production traffic was not promoted."
+    },
+    {
+      "id": "production-journeys-unverified",
+      "status": "accepted",
+      "detail": "Real production responses and screenshots were not recorded. They were not invented."
+    },
+    {
+      "id": "r16-fail",
+      "status": "accepted",
+      "detail": "Production truth does not match an independently qualified artifact. R16 remains fail."
+    },
+    {
+      "id": "c0091-unresolved",
+      "status": "accepted",
+      "detail": "C-009-1 remains unresolved."
+    },
+    {
+      "id": "joint-gate",
+      "status": "skipped",
+      "detail": "Full local release-gate and hosted CI remain root-owned after independent review. Do not copy 21 MiB local-gate receipts into git."
+    }
+  ],
+  "unresolved_claims": [
+    {
+      "id": "C0091",
+      "status": "unresolved",
+      "detail": "Measured topology qualification remains unresolved."
+    },
+    {
+      "id": "R16",
+      "status": "unresolved",
+      "detail": "R16 remains unaccepted. This claim uses the handoff unresolved status enum; it is not a requirement pass."
+    },
+    {
+      "id": "AUTH-07",
+      "status": "unresolved",
+      "detail": "Public production traffic promotion remains not_requested."
+    },
+    {
+      "id": "AUTH-01",
+      "status": "unresolved",
+      "detail": "Paid Neon/Cloudflare staging and production capabilities remain not_requested."
+    },
+    {
+      "id": "AUTH-03",
+      "status": "unresolved",
+      "detail": "Managed staging apply remains not_requested."
+    },
+    {
+      "id": "independent-production-rollout-review",
+      "status": "pending",
+      "detail": "Independent review of the blocked no-rollout packet remains required before integration."
+    }
+  ],
+  "risks": [
+    {
+      "id": "planning-package-is-not-deploy-authorization",
+      "status": "risk",
+      "detail": "This packet is not a production rollout, not R16, and not a substitute for owner authorization."
+    }
+  ],
+  "next_consumer": "Astra/root independent review of the blocked no-rollout packet, then joint local gate and hosted CI. Do not deploy.",
+  "next_action": "Independently review C-083 source and replay deployment tests/CLI. Do not deploy. Do not invent screenshots. Do not accept R16. Do not copy 21 MiB receipts into git.",
+  "independent_review": {
+    "status": "not_started",
+    "reviewed_head_sha": null,
+    "decisive_checks": [],
+    "limitations": [
+      "Producer-side packet only. Passing focused tests are not independent verification, research integration, R16 acceptance, or production change."
+    ]
+  }
+}

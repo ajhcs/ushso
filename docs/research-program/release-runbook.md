@@ -43,3 +43,18 @@ All sixteen requirements remain unaccepted. The release evidence includes those 
 - Rollback target if a later authorized change occurs: historical production Worker `ecc1603f-9eb4-4a1b-a566-bd9d7a415de4` (2026-09-09). This packet does not change it.
 
 HTTP 200 is not a completed research task. A passing schema is not scientific approval.
+
+## PR-083 production rollout
+
+No deployment takes place merely because this planning package exists.
+
+- Approved staged rollout executed: **no**
+- `wrangler deploy` / `cf:deploy` / `cf:deploy:staging` invoked: **no**
+- AUTH-07 remains `not_requested` and `authorized: false`
+- Production Worker remains historical `ecc1603f-9eb4-4a1b-a566-bd9d7a415de4` (2026-09-09)
+- Account remains historical `d0e89eef-5bf4-43d0-a0ba-20fbdc128c81`
+- Immediate rollback target: the same historical Worker, because no new release was deployed
+- Production research journeys (public domains, MCP/WebMCP, website examples, screenshots): **unverified**. Staging evidence is not relabeled as production verification. Screenshots were not invented.
+- Production truth does **not** match an independently qualified artifact. R16 remains fail.
+
+HTTP 200 is not a completed research task. A passing schema is not scientific approval.
