@@ -1,0 +1,29 @@
+{
+  "format": "ushso.remediation-task.v1",
+  "recorded_at": "2026-09-15T13:55:00Z",
+  "base_sha": "31631bc18808e67b5f63472585707787a29e933b",
+  "base_tree": "19a87a712a544465bea709e7c7addc18dcd72c39",
+  "integrated_prs_do_not_close_this_task": true,
+  "id": "REM-R03",
+  "requirement": "R03",
+  "result": "fail",
+  "failure": "13,736 record/axis combinations remain not_attempted. not_attempted is not success.",
+  "owner": "/root/r01_r03_attempt_ledger",
+  "reviewer": "Astra/root",
+  "permitted_files": [
+    "scripts/research-program/ingest-evidence.mjs",
+    "scripts/research-program/verify-data-program.mjs",
+    "verification/research-program/evidence/",
+    "packages/coverage/research-program/"
+  ],
+  "frozen": {
+    "generation": "live-2026-09-03-85b50522b420",
+    "denominator": "3434 records x metadata, documentation, api_file_sample, schema_binding"
+  },
+  "reproduction": "node --test tests/research-program/evidence-ingestion.test.mjs && node scripts/research-program/verify-data-program.mjs",
+  "expected": "Every axis has eligibility plus latest attempt or stop reason. Totals reconcile. accepted stays false until the full conjunctive pass.",
+  "evidence_needed": "Validated attempt-axis receipts. Live samples require source authorization distinct from metadata-only collection.",
+  "external_action": "Dataset samples, restricted access, and paid enrichment need separate AUTH packets. Metadata-only AUTH-04 does not cover them.",
+  "accepted": false,
+  "scientific_approval": false
+}
