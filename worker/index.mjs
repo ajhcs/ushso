@@ -21,7 +21,7 @@ const CORPUS_BASE = `${CORPUS_RESOURCE_BASE}/corpus`;
 const catalogByAssets = new WeakMap();
 const lexicalPinByAssets = new WeakMap();
 const LEXICAL_BUILD_PIN = typeof USHSO_LEXICAL_BUILD_PIN === "undefined" ? null : USHSO_LEXICAL_BUILD_PIN;
-const SPA_ROUTES = new Set(['/', '/search', '/learn', '/agents', '/sources', '/about', '/methods', '/plan', '/privacy', '/terms', '/contact', '/workspace']);
+const SPA_ROUTES = new Set(['/', '/search', '/learn', '/agents', '/sources', '/about', '/methods', '/plan', '/privacy', '/terms', '/contact', '/workspace', '/compare']);
 const STATIC_PATHS = new Set(['/favicon.svg', '/observatory-lighthouse.png', '/state-readiness-v0.1.0.json', '/_headers']);
 
 function responseHeaders(init = {}) {
