@@ -14,4 +14,5 @@ test('payload-retrieval pilot is prepared, unauthorized, bound to frozen identit
   assert.equal(report.redirects_consume_budget, true);
   assert.equal(report.branch, 'codex/ushso-evidence-ingestion-20260915');
   assert.match(report.git_head, /^[a-f0-9]{40}$/);
+  assert.equal(typeof report.detached_head_allowed, 'boolean');
 });

@@ -34,9 +34,15 @@ export function validatePayloadRetrievalPilot({ repoRoot = ROOT } = {}) {
   if (packet.live_http === true) fail('PILOT_LIVE_HTTP_FORBIDDEN');
   if (packet.candidate_binding?.must_match_git_head !== true) fail('PILOT_MUST_BIND_GIT_HEAD');
   if (packet.candidate_binding?.branch !== EXPECTED_BRANCH) fail('PILOT_BRANCH');
-  if (git(repoRoot, ['branch', '--show-current']) !== EXPECTED_BRANCH) fail('PILOT_WORKTREE_BRANCH');
-  if (packet.candidate_head && packet.candidate_head !== git(repoRoot, ['rev-parse', 'HEAD'])) fail('PILOT_CANDIDATE_HEAD_STALE');
-  if (packet.candidate_binding?.stale_sha_named_at_first_draft === git(repoRoot, ['rev-parse', 'HEAD'])) fail('PILOT_STALE_DRAFT_SHA');
+  const head = git(repoRoot, ['rev-parse', 'HEAD']);
+  const currentBranch = git(repoRoot, ['branch', '--show-current']);
+  if (currentBranch && currentBranch !== EXPECTED_BRANCH) fail('PILOT_WORKTREE_BRANCH');
+  if (!currentBranch) {
+    const names = git(repoRoot, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/' + EXPECTED_BRANCH, 'refs/remotes/origin/' + EXPECTED_BRANCH]);
+    if (!names.split('\n').filter(Boolean).length) fail('PILOT_BRANCH_REF_MISSING');
+  }
+  if (packet.candidate_head && packet.candidate_head !== head) fail('PILOT_CANDIDATE_HEAD_STALE');
+  if (packet.candidate_binding?.stale_sha_named_at_first_draft === head) fail('PILOT_STALE_DRAFT_SHA');
   const cohortsBytes = readFileSync(path.join(repoRoot, COHORTS_REL));
   const cohortsSha = createHash('sha256').update(cohortsBytes).digest('hex');
   if (cohortsSha !== EXPECTED_COHORTS_SHA256) fail('FROZEN_COHORTS_CHANGED');
@@ -99,6 +105,7 @@ export function validatePayloadRetrievalPilot({ repoRoot = ROOT } = {}) {
     redirects_consume_budget: true,
     branch: EXPECTED_BRANCH,
     git_head: git(repoRoot, ['rev-parse', 'HEAD']),
+    detached_head_allowed: !git(repoRoot, ['branch', '--show-current']),
   });
 }
 
