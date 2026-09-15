@@ -54,7 +54,7 @@ test('after-refresh recheck keeps R01-R16 unaccepted and does not declare comple
 test('the zero-observation snapshot rejects unsupported positive counts and malformed values', () => {
   const empty = {elapsed_observation_days: 0, complete_scheduled_cycles: 0,
     generated_dates: false, simulated_operation: false, scheduler_created: true, scheduler_ran: false};
-  for (const patch of [{elapsed_observation_days: 14}, {complete_scheduled_cycles: 2}, {scheduler_ran: true}]) {
+  for (const patch of [{elapsed_observation_days: 14}, {complete_scheduled_cycles: 2}, {scheduler_ran: true}, {}]) {
     assert.throws(() => observeOperations({observation: {...empty, ...patch}}), {code: 'OBSERVATION_RECEIPTS_REQUIRED'});
   }
   for (const value of [undefined, null, -1, NaN, Infinity, '14', 0.5]) {

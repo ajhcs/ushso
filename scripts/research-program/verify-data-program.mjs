@@ -9,6 +9,7 @@ import { reconcilePilot, expansionFamilyRoutes } from './qualify-mrf.mjs';
 import { REVIEWED_JOIN_ROUTES, inspectJoinRoutes } from '../../packages/registry/qualified-join-routes.mjs';
 import { loadScenarios } from './verify-machine.mjs';
 import { evaluateCoreReadiness } from './core-readiness.mjs';
+import { ingestEvidence } from './ingest-evidence.mjs';
 
 export const LAST_GOOD_GENERATION = 'live-2026-09-03-85b50522b420';
 export const BASELINE_DENOMINATOR = 3434;
@@ -158,12 +159,13 @@ export async function verifyDataProgram({ fetchImpl } = {}) {
   if (scenarios.scenarios.some((row) => row.research_success === true)) fail('MACHINE_SCENARIO_CLAIMS_RESEARCH_SUCCESS');
 
   const plannedPrsMergedIsNotCompletion = true;
+  const ingestion = ingestEvidence({ repoRoot: ROOT });
   const requirements = freeze([
     requirement({
       id: 'R01',
-      result: 'unverified',
-      evidence: '3434 unique baseline IDs exist and each has typed source_run_disposition=not_attempted. Identity accounting is not a completed source-run ledger.',
-      remaining: 'PR-020 source-run dispositions remain unmaterialized. not_attempted is not success.',
+      result: ingestion.attempts.r01.result,
+      evidence: ingestion.attempts.r01.evidence,
+      remaining: 'Attempt-axis accounting is calculated from validated receipts. Identity presence is not a completed successful source-run ledger. not_attempted is not success. accepted remains false.',
     }),
     requirement({
       id: 'R02',
@@ -173,9 +175,9 @@ export async function verifyDataProgram({ fetchImpl } = {}) {
     }),
     requirement({
       id: 'R03',
-      result: 'fail',
-      evidence: `All ${BASELINE_DENOMINATOR} records remain source_run_disposition=not_attempted on four axes. not_attempted is not success.`,
-      remaining: 'Attempt ledger must be frozen before R03 measurement.',
+      result: ingestion.attempts.r03.result,
+      evidence: ingestion.attempts.r03.evidence,
+      remaining: 'Every record/axis combination must have eligibility plus latest attempt or stop reason. not_attempted is not success. Technical ledger updates do not accept R03.',
     }),
     requirement({
       id: 'R04',
@@ -250,7 +252,12 @@ export async function verifyDataProgram({ fetchImpl } = {}) {
     generation: LAST_GOOD_GENERATION,
     catalog_manifest_sha256: sha256File('evaluation/research-program/cohorts.json') && cohorts.corpus.manifest_sha256,
     cohorts_sha256: sha256File('evaluation/research-program/cohorts.json'),
-    denominators,
+    denominators: freeze({
+      ...denominators,
+      attempt_axis_combinations: ingestion.attempts.combinations,
+      attempt_axis_accounted: ingestion.attempts.combinations_accounted,
+      attempt_axis_states: ingestion.attempts.source_run_dispositions,
+    }),
     core: freeze({
       product_count: core.product_count,
       r04_accepted: core.r04_accepted,
