@@ -121,12 +121,33 @@ test('serves machine files with their real types and gives unknown pages HTTP 40
   assert.equal(unknown.status, 404);
 });
 
+test('no-JS search fallback lists catalog titles without claiming ranked discovery', async () => {
+  const page = await worker.fetch(new Request('https://ushso.org/search?q=hospital', { headers: { accept: 'text/html' } }), env);
+  const html = await page.text();
+  assert.equal(page.status, 200);
+  assert.match(html, /data-crawler-content="search-fallback"/);
+  assert.match(html, /JavaScript is required for ranked search|ranked discovery/i);
+  assert.match(html, /Catalog membership is not payload access/);
+});
+
+test('no-JS title fallback matches hospital cost report tokens, not only a contiguous phrase', async () => {
+  const hcris = { ...firstRecord, record_id: 'obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17', title: 'Hospital Provider Cost Report' };
+  const local = createWorker({ loadEngine: async () => engine, loadCatalog: async () => ({ ...catalog, records: [hcris] }) });
+  const spaEnv = { ASSETS: { fetch: async () => new Response('<!doctype html><html><head><title>SPA</title></head><body><div id="root"></div></body></html>', { status: 200, headers: { 'content-type': 'text/html' } }) } };
+  const page = await local.fetch(new Request('https://ushso.org/search?q=hospital+cost+report', { headers: { accept: 'text/html' } }), spaEnv);
+  const html = await page.text();
+  assert.match(html, /Hospital Provider Cost Report/);
+  assert.match(html, /data-crawler-content="search-fallback"/);
+  assert.match(html, /datasets\/obs%3Aasset%3Acms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17/);
+});
+
 test('HTML-only crawlers see catalog source facts on dataset URLs without a blank page', async () => {
   const found = await worker.fetch(new Request(`https://ushso.org/datasets/${encodeURIComponent(firstRecord.record_id)}`, { headers: { accept: 'text/html' } }), env);
   const html = await found.text();
   assert.equal(found.status, 200);
   assert.match(found.headers.get('content-type'), /text\/html/);
   assert.match(html, /data-crawler-content="dataset"/);
+  assert.match(html, /Clear source action/);
   assert.match(html, new RegExp(firstRecord.title.slice(0, 24).replace(/[.*+?^$()|[\]\\]/g, '\\$&')));
   assert.doesNotMatch(html, /doi.org\/10\./);
   const missing = await worker.fetch(new Request('https://ushso.org/datasets/not-a-real-record'), env);

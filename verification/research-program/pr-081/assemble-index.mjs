@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ingestEvidence } from '../../../scripts/research-program/ingest-evidence.mjs';
 
 export const LAST_GOOD_GENERATION = 'live-2026-09-03-85b50522b420';
 export const REVIEW_AUTHORITY = Object.freeze({
@@ -54,15 +55,16 @@ export function assembleAcceptanceIndex({
   data = loadJson('verification/research-program/acceptance/requirement-results.json'),
   usability = loadJson('evaluation/research-program/usability/score-result.json'),
   ledger = loadJson('docs/research-program/execution-ledger.json'),
+  ingestion = ingestEvidence(),
 } = {}) {
   if (data.generation !== LAST_GOOD_GENERATION) fail('LAST_GOOD_GENERATION_CHANGED');
   if (usability.r12.accepted === true) fail('R12_ACCEPTED_WITHOUT_PARTICIPANTS');
   const planned = ledger.tasks.filter((t) => t.status === 'planned').map((t) => t.pr_id);
   const integrated = ledger.tasks.filter((t) => t.status === 'integrated');
   const requirements = freeze([
-    req('R01', { result: 'unverified', witnesses: ['verification/research-program/acceptance/requirement-results.json'], remaining: '3434 source_run_disposition=not_attempted. Identity accounting is not a completed source-run ledger.' }),
+    req('R01', { result: ingestion.attempts.r01.result, witnesses: ['scripts/research-program/ingest-evidence.mjs', 'verification/research-program/evidence/history/requirement-results-pr079.json'], remaining: ingestion.attempts.r01.evidence }),
     req('R02', { result: 'unverified', witnesses: ['docs/research-program/acceptance.md'], remaining: 'Full-catalog factual-field evidence was not re-measured as a pass.' }),
-    req('R03', { result: 'fail', witnesses: ['verification/research-program/acceptance/requirement-results.json'], remaining: 'not_attempted is not success. Attempt ledger is unfrozen.' }),
+    req('R03', { result: ingestion.attempts.r03.result, witnesses: ['scripts/research-program/ingest-evidence.mjs', 'verification/research-program/evidence/history/requirement-results-pr079.json'], remaining: ingestion.attempts.r03.evidence }),
     req('R04', { result: 'fail', witnesses: ['evaluation/research-program/review/core-qualification-receipt.json'], remaining: 'Failed 100-product matrix retained. Unknown cells are not supported.' }),
     req('R05', { result: 'fail', witnesses: ['docs/research-program/restricted-routes.md'], remaining: 'Restricted/manual routes remain unverified.' }),
     req('R06', { result: 'fail', witnesses: ['docs/research-program/deterministic-results.md'], remaining: 'Dictionary/unit/key residuals remain.' }),
@@ -74,8 +76,8 @@ export function assembleAcceptanceIndex({
     req('R12', { result: usability.r12.result, witnesses: ['evaluation/research-program/usability/score-result.json', 'docs/research-program/usability-results.md'], remaining: `Actual participants novice=${usability.r12.novice.actual_participants}/8 advanced=${usability.r12.advanced.actual_participants}/8. Implementer self-tests cannot satisfy R12.` }),
     req('R13', { result: 'unverified', witnesses: ['docs/research-program/mcp-setup.md', 'apps/web/src/pages/LearnPage.tsx', 'apps/web/src/pages/AboutPage.tsx'], remaining: 'Guides exist as engineering artifacts; R13 remains unaccepted pending documented usability of the named set.' }),
     req('R14', { result: 'unverified', witnesses: ['docs/research-program/acceptance.md'], remaining: 'Held-out claim precision, spend ledger, and residual scientific-claim sample are not materialized.' }),
-    req('R15', { result: 'fail', witnesses: ['docs/research-program/operations.md'], remaining: 'Two authorized scheduled cycles and 14 elapsed observation days are absent.' }),
-    req('R16', { result: 'unverified', witnesses: ['docs/research-program/acceptance.md'], remaining: 'Independent exact release qualification is PR-082–084. This review cannot qualify the release.' }),
+    req('R15', { result: ingestion.observation.result === 'observed' ? 'observed' : 'fail', witnesses: ['scripts/research-program/ingest-evidence.mjs', 'verification/research-program/operations/observe.mjs'], remaining: ingestion.observation.technical_success ? 'Technical observation thresholds were calculated from validated receipts. Scientific approval remains separate.' : 'Two authorized scheduled cycles and 14 elapsed observation days remain absent, or observation was not on a reviewed deployed product.' }),
+    req('R16', { result: 'fail', witnesses: ['verification/research-program/release/qualification.json'], remaining: 'PR-082 rejected independent exact release qualification. PR-083 did not deploy. Production truth does not match an independently qualified artifact.' }),
   ]);
   if (requirements.length !== 16) fail('REQUIREMENT_COUNT_NOT_16');
   if (requirements.some((row) => row.accepted === true || row.closed === true)) fail('REQUIREMENT_CLOSED_OR_ACCEPTED');

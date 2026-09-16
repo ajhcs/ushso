@@ -1,0 +1,175 @@
+{
+  "format": "ushso.pr079-data-program-acceptance.v1",
+  "generation": "live-2026-09-03-85b50522b420",
+  "catalog_manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e",
+  "cohorts_sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+  "denominators": {
+    "generation": "live-2026-09-03-85b50522b420",
+    "catalog_manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e",
+    "baseline_ids": 3434,
+    "unique_baseline_ids": 3434,
+    "isolated_record_ids": 4,
+    "source_run_dispositions": {
+      "not_attempted": 3434
+    },
+    "not_attempted_is_not_success": true,
+    "success_total_counts_unattempted_work": false,
+    "products": 100,
+    "hospital_candidates": 25,
+    "payer_candidates": 10,
+    "expansion_families": 12,
+    "full_catalog_review": {
+      "kind": "identity_accounting",
+      "denominator": 3434,
+      "note": "Every frozen baseline ID is present and unique. This is not sampled upstream payload validation."
+    },
+    "sampled_upstream_validation": {
+      "kind": "distinct_from_full_catalog",
+      "note": "Bounded samples and fixture receipts remain sampled. They cannot stand in for 3,434 payload validations."
+    }
+  },
+  "core": {
+    "product_count": 100,
+    "r04_accepted": false,
+    "r05_accepted": false,
+    "r07_accepted": false,
+    "r08_accepted": false,
+    "scientific_completeness_pass": false,
+    "failed_matrix_retained": true,
+    "unknown_cells_counted_as_supported": false,
+    "public_sample_complete": 83,
+    "r04_engineering_target_met": true
+  },
+  "deterministic": {
+    "last_good_generation": "live-2026-09-03-85b50522b420",
+    "r01_r16_accepted": false
+  },
+  "mrf": {
+    "hospital_denominator": 25,
+    "payer_denominator": 10,
+    "hospital_parsed_live": 0,
+    "payer_parsed_live": 0,
+    "live_parsed_sample_targets_met": false,
+    "scientific_acceptance": false,
+    "unknown_cells_counted_as_supported": false
+  },
+  "expansion_families": {
+    "family_count": 12,
+    "all_have_documented_routes": true
+  },
+  "joins": {
+    "reviewed_documented_routes": 15,
+    "independently_qualified_routes": 0,
+    "r08_complete": false,
+    "ccn_equals_npi": false,
+    "name_only_equality": false,
+    "note": "Fifteen documented priority routes exist. R08 remains incomplete until fifteen independently qualified routes actually hold."
+  },
+  "machine": {
+    "advertised_tools": 8,
+    "disabled_plan_research": true,
+    "protocol_success_is_not_research_success": true,
+    "http_200_is_not_completed_research_task": true,
+    "native_webmcp": "untested"
+  },
+  "requirements": [
+    {
+      "id": "R01",
+      "result": "unverified",
+      "accepted": false,
+      "evidence": "3434 unique baseline IDs exist and each has typed source_run_disposition=not_attempted. Identity accounting is not a completed source-run ledger.",
+      "remaining_scope": "PR-020 source-run dispositions remain unmaterialized. not_attempted is not success."
+    },
+    {
+      "id": "R02",
+      "result": "unverified",
+      "accepted": false,
+      "evidence": "Field-evidence contract exists. Freshness clock and 100% public factual-field evidence were not re-measured as a full-catalog pass.",
+      "remaining_scope": "Conditional field-evidence frame remains unaccepted."
+    },
+    {
+      "id": "R03",
+      "result": "fail",
+      "accepted": false,
+      "evidence": "All 3434 records remain source_run_disposition=not_attempted on four axes. not_attempted is not success.",
+      "remaining_scope": "Attempt ledger must be frozen before R03 measurement."
+    },
+    {
+      "id": "R04",
+      "result": "fail",
+      "accepted": false,
+      "evidence": "Core qualification retains a failed matrix. Engineering public-sample complete=83/80 is not R04 acceptance. Unknown cells are not counted as supported.",
+      "remaining_scope": "Publisher access, schema qualification, join routes, and unit/grain/date/denominator remain unknown for the 100-product cohort."
+    },
+    {
+      "id": "R05",
+      "result": "fail",
+      "accepted": false,
+      "evidence": "Restricted/manual routes are not verified. r05_restricted_routes_verified=false.",
+      "remaining_scope": "Verified restricted/manual access routes remain required."
+    },
+    {
+      "id": "R06",
+      "result": "fail",
+      "accepted": false,
+      "evidence": "Deterministic qualification keeps unresolved dictionary, unit and key gaps failed. Unknown essential fields cannot count as supported.",
+      "remaining_scope": "Dictionary/unit/key residuals remain."
+    },
+    {
+      "id": "R07",
+      "result": "fail",
+      "accepted": false,
+      "evidence": "Failing retrieval domains still need bounded remediation. Scientific completeness pass=false.",
+      "remaining_scope": "R07 remains incomplete until failing retrieval domains have bounded remediation."
+    },
+    {
+      "id": "R08",
+      "result": "fail",
+      "accepted": false,
+      "evidence": "15 documented priority join routes exist. Independently qualified routes=0. CCN=NPI remains forbidden.",
+      "remaining_scope": "R08 remains incomplete below 15 independently qualified routes."
+    },
+    {
+      "id": "R09",
+      "result": "unverified",
+      "accepted": false,
+      "evidence": "Family pointers are frozen. Family usability is not accepted.",
+      "remaining_scope": "Twelve named families remain identity-frozen, not scientifically accepted."
+    },
+    {
+      "id": "R10",
+      "result": "unverified",
+      "accepted": false,
+      "evidence": "25 hospital and 10 payer directory candidate IDs are frozen. Locators are not materialized.",
+      "remaining_scope": "Directory identity is not payload, parse, or TiC reporting-entity proof."
+    },
+    {
+      "id": "R11",
+      "result": "unverified",
+      "accepted": false,
+      "evidence": "Comparison/join caveats exist. Tiny samples cannot report universal match rates.",
+      "remaining_scope": "Independent comparison quality remains unaccepted."
+    },
+    {
+      "id": "R14",
+      "result": "unverified",
+      "accepted": false,
+      "evidence": "R14 protocol is published. Residual scientific-claim sample, labels, spend ledger, and 0.98 precision measurement are not materialized. No model is in public request handling in this candidate, but that is not the full conjunctive pass.",
+      "remaining_scope": "Held-out claim precision, zero critical scientific errors, and actual sample-size/CI design remain unrun."
+    },
+    {
+      "id": "R15",
+      "result": "fail",
+      "accepted": false,
+      "evidence": "Two complete scheduled cycles remain unrun until authorized. A 14-day observation window has not elapsed. Generated dates do not count.",
+      "remaining_scope": "PR-076/PR-084 actual cycles and elapsed days."
+    }
+  ],
+  "planned_prs_merged_is_not_program_completion": true,
+  "release_qualification_blocked": true,
+  "c0091": "unresolved",
+  "http_200_is_completed_research_task": false,
+  "passing_schema_is_scientific_approval": false,
+  "last_good_generation_changed": false,
+  "production_changed": false
+}

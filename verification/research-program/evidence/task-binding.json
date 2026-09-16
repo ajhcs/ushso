@@ -1,0 +1,78 @@
+{
+  "format": "ushso.research-program.task.v1",
+  "task_id": "ushso-evidence-ingestion-20260915",
+  "slice_id": "C-INGEST-1",
+  "pr_id": "INGEST-001",
+  "title": "Replace snapshot-only reporting with validated evidence ingestion",
+  "owner": "/root/evidence_ingestion",
+  "reviewer": "Astra/root",
+  "branch": "codex/ushso-evidence-ingestion-20260915",
+  "worktree": "/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-evidence-ingestion-20260915",
+  "objective": "Acceptance reports consume real evidence. Validated receipts can change calculated results without manually editing an accepted flag.",
+  "outcome": "Receipts are validated by identity and referenced bytes. Stale, duplicate, mismatched, and incomplete evidence is rejected. Observation days/cycles and attempt-ledger counts are calculated from validated evidence. Technical success is distinct from scientific approval. Previous failed reports are retained as history. accepted flags remain unedited. Frozen cohorts.json is unmodified. R01-R16 remain unaccepted. C-009-1 remains unresolved. No 8+8 participants, 14 elapsed days, two scheduled cycles, AT/browser evidence, AUTH-12, or production rollout are invented.",
+  "dependencies": [
+    "PR-020",
+    "PR-079",
+    "PR-080",
+    "PR-081",
+    "PR-082",
+    "PR-083",
+    "PR-084"
+  ],
+  "owned_paths": [
+    "scripts/research-program/ingest-evidence.mjs",
+    "tests/research-program/evidence-ingestion.test.mjs",
+    "verification/research-program/evidence/",
+    "verification/research-program/remediation/",
+    "verification/research-program/operations/observe.mjs",
+    "verification/research-program/operations/observe.test.mjs",
+    "evaluation/research-program/usability/score.mjs",
+    "evaluation/research-program/usability/usability.test.mjs",
+    "scripts/research-program/verify-data-program.mjs",
+    "verification/research-program/acceptance/verify-data-program.test.mjs",
+    "verification/research-program/pr-081/assemble-index.mjs",
+    "docs/research-program/facilitator-packet.md",
+    "docs/research-program/c0091-account-information-request.md"
+  ],
+  "commits": [
+    {
+      "id": "C-INGEST-1",
+      "subject": "Validate evidence identities and referenced bytes",
+      "instructions": "Add a receipt ingest path that hashes referenced bytes, rejects stale/duplicate/mismatched/incomplete evidence, and never sets accepted.",
+      "verification": "Tests reject bad receipts and accept structurally valid fixtures without treating them as scientific approval."
+    },
+    {
+      "id": "C-INGEST-2",
+      "subject": "Calculate observation and attempt outcomes from receipts",
+      "instructions": "Extend observe.mjs and the R01/R03 attempt ledger so validated receipts change calculated days, cycles, and accounted axis counts. Caller-supplied counters remain rejected.",
+      "verification": "A valid receipt fixture changes calculated results; empty/missing receipts retain the previous failed/unverified snapshot. accepted remains false."
+    },
+    {
+      "id": "C-INGEST-3",
+      "subject": "Record remediation tasks and parallel collection packets",
+      "instructions": "Create one remediation task per failed/unverified requirement. Publish facilitator packet and C-009-1 account-information request without inventing participants or bills.",
+      "verification": "Each failed requirement has a task file. Facilitator packet requires 8+8 real participants. C-009-1 request lists required account facts and leaves topology unresolved."
+    }
+  ],
+  "check_commands": [
+    "node --test tests/research-program/evidence-ingestion.test.mjs",
+    "node --test verification/research-program/operations/observe.test.mjs",
+    "node --test evaluation/research-program/usability/usability.test.mjs",
+    "node --test verification/research-program/acceptance/verify-data-program.test.mjs"
+  ],
+  "evidence_directory": "verification/research-program/evidence/",
+  "binding": {
+    "base_sha": "31631bc18808e67b5f63472585707787a29e933b",
+    "base_tree": "19a87a712a544465bea709e7c7addc18dcd72c39",
+    "dependency_merge_shas": {
+      "PR-020": "f3faa2c5eeff99da14196db08543db7865b788f2",
+      "PR-079": "5e239eed61813fc6e954aa7424479e88ddf885ad",
+      "PR-080": "2096c943fa297ba74d576bd91183cd3a1c89ccbc",
+      "PR-081": "7fe3a84a2d16b5c2dc173b20392c5b9583eb9aec",
+      "PR-082": "24947781b957dffd6c6c9fb9d146c4ea6108a13a",
+      "PR-083": "c3b68524c17a210558d8ff1070fcac142120b58d",
+      "PR-084": "a52d0440bea79988c3ce5f536f734abf8c419bdc"
+    }
+  },
+  "status": "in_progress"
+}

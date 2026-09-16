@@ -81,8 +81,8 @@ export function renderCatalogSourceHtml(record, options = {}) {
   const facts = catalogSourceFacts(record, options);
   const schema = catalogSourceJsonLd(facts);
   const sourceLink = facts.canonical_source_url
-    ? `<p><a class="canonical-source" rel="external noopener" href="${htmlAttribute(facts.canonical_source_url)}">View the publisher source</a></p>`
-    : '<p>Publisher locator not captured.</p>';
+    ? `<p><strong>Clear source action:</strong> Open the publisher page for this exact product. That page is a reachable documentation page, not proven payload or browser access.</p><p><a class="canonical-source" rel="external noopener" href="${htmlAttribute(facts.canonical_source_url)}">View the publisher source</a></p>`
+    : '<p><strong>Clear source action:</strong> No verified publisher URL is bound for this record. Catalog membership is not payload access.</p><p>Publisher locator not captured.</p>';
   const body = `<main data-crawler-content="dataset" data-publication-generation="${htmlAttribute(facts.generation)}">
 <nav aria-label="Breadcrumb"><a href="/">USHSO</a> / <a href="/learn">Learn</a> / <a href="/methods">Methods</a></nav>
 <article>
@@ -100,6 +100,28 @@ ${sourceLink}
 <aside aria-label="Research boundary"><strong>Research boundary:</strong> Catalog membership is not payload access. Finding a source is not obtaining the data. HTTP 200 is not a completed research task. Unknown fields stay not captured and are not invented.</aside>
 </article></main>`;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${htmlText(`${facts.title} | ${SITE_NAME}`)}</title><meta name="description" content="${htmlAttribute(facts.description)}"><link rel="canonical" href="${htmlAttribute(facts.canonical_url)}"><meta name="ushso:search-generation" content="${htmlAttribute(facts.generation)}"><script type="application/ld+json" data-profile="schema-org-dataset">${safeJsonForHtml(schema)}</script></head><body>${body}</body></html>`;
+}
+
+export function titleTokensMatch(question, title) {
+  const tokens = String(question ?? '').toLowerCase().match(/[a-z0-9]{3,}/g) ?? [];
+  if (tokens.length === 0) return true;
+  const haystack = String(title ?? '').toLowerCase();
+  return tokens.every((token) => haystack.includes(token));
+}
+
+export function renderSearchFallbackHtml({ origin, question = '', records = [], total = 0, generation = CATALOG_HTML_GENERATION } = {}) {
+  const q = captured(question === '' ? '' : question);
+  const items = records.slice(0, 10).map((record) => {
+    const title = captured(record.title ?? record.identity?.asset?.name);
+    const href = '/datasets/' + encodeURIComponent(record.record_id);
+    return '<li><a href="' + htmlAttribute(href) + '">' + htmlText(title) + '</a></li>';
+  }).join('');
+  const empty = records.length === 0
+    ? '<p>No indexed titles matched this exact page. Empty results do not establish that no source exists. JavaScript is required for ranked search, facets, and page receipts.</p>'
+    : '';
+  const list = items ? '<ol>' + items + '</ol>' : '';
+  const body = '<main data-crawler-content="search-fallback"><h1>Search the published catalog</h1><p>This no-JavaScript page lists indexed titles only. Ranked discovery, why-match explanations, and receipt download require JavaScript.</p><form method="get" action="/search" role="search"><label for="q">Question or title words</label><input id="q" name="q" value="' + htmlAttribute(question) + '"><button type="submit">Search titles</button></form><p>' + htmlText(String(total)) + ' catalog records are in this generation (' + htmlText(generation) + '). Showing up to 10 title matches for “' + htmlText(q === 'not captured' ? '' : question) + '”.</p>' + empty + list + '<p><a href="/sources">Review indexed sources</a>. Catalog membership is not payload access.</p></main>';
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Search | ' + htmlText(SITE_NAME) + '</title></head><body>' + body + '</body></html>';
 }
 
 export function publicGuideSitemapPages() {
