@@ -106,6 +106,97 @@ test('missing ledger is not recovered by resetting the spent budget', async () =
   assert.equal(existsSync(path.join(dir, 'verification/research-program/evidence/payload-retrieval-pilot-ledger.json')), false);
 });
 
+test('allowMissingLedger cannot recreate a zeroed ledger after spent requests', async () => {
+  const { dir } = isolateRepo({ ledger: false });
+  let fetches = 0;
+  await assert.rejects(
+    () => runPayloadRetrievalPilot({
+      execute: true,
+      repoRoot: dir,
+      allowMissingLedger: true,
+      fetchImpl: async () => { fetches += 1; return jsonResponse([{ stateabbr: 'AL' }]); },
+    }),
+    { code: 'PILOT_LEDGER_REQUIRED' },
+  );
+  assert.equal(fetches, 0);
+  assert.equal(existsSync(path.join(dir, 'verification/research-program/evidence/payload-retrieval-pilot-ledger.json')), false);
+  assert.equal(Object.hasOwn(runPayloadRetrievalPilot, 'length') || true, true);
+  const source = readFileSync(new URL('../../scripts/research-program/run-payload-retrieval-pilot.mjs', import.meta.url), 'utf8');
+  assert.equal(source.includes('allowMissingLedger'), false);
+  assert.equal(source.includes('emptyLedger'), false);
+});
+
+test('a redirect that duplicates a query parameter is rejected before follow', async () => {
+  const { dir, auth } = isolateRepo();
+  const fetched = [];
+  const cancelled = [];
+  const fetchImpl = async (url) => {
+    fetched.push(url);
+    if (url === HCRIS_URL) {
+      return {
+        status: 302,
+        headers: { get: (name) => name === 'location' ? HCRIS_URL + '&size=5' : null },
+        body: { async cancel(reason) { cancelled.push(reason ?? 'cancel'); }, getReader() { return { async read() { return { done: true }; }, async cancel() {} }; } },
+      };
+    }
+    return jsonResponse([{ stateabbr: 'AL', year: '2024' }]);
+  };
+  const report = await runPayloadRetrievalPilot({ execute: true, repoRoot: dir, fetchImpl });
+  const hcris = report.captures.find((row) => row.product_key === HCRIS);
+  assert.equal(hcris.error.code, 'PILOT_URL_DUPLICATE_QUERY');
+  assert.deepEqual(fetched.filter((url) => url.includes('44060663')), [HCRIS_URL]);
+  assert.equal(fetched.some((url) => url.includes('size=5&size=5') || url.split('size=').length > 2), false);
+  assert.equal(cancelled.length >= 1, true);
+  assert.equal(loadLedger(dir, auth).per_source[HCRIS].used_requests, 1);
+});
+
+test('a spent ledger remains bound to AUTH-PAYLOAD-PILOT after AUTH is rebound to a later SHA', async () => {
+  const { dir, auth } = isolateRepo({ ledger: false });
+  seedLedger(dir, auth, {
+    candidate_head: '2efafed96104012da2d17ec14d8a93c5b33a3d25',
+    totals: { max_requests: 4, used_requests: 2, remaining_requests: 2 },
+    per_source: {
+      [HCRIS]: { used_requests: 1, remaining_requests: 1, max_requests: 2 },
+      [PLACES]: { used_requests: 1, remaining_requests: 1, max_requests: 2 },
+    },
+    attempts: ['retained-hcris', 'retained-places'],
+  });
+  const fetchImpl = async (url) => {
+    if (url.includes('44060663')) return jsonResponse([{ 'Provider CCN': '110130' }]);
+    return jsonResponse([{ stateabbr: 'AL', year: '2024' }]);
+  };
+  const report = await runPayloadRetrievalPilot({ execute: true, repoRoot: dir, fetchImpl });
+  const ledger = loadLedger(dir, auth);
+  assert.equal(ledger.authorization_id, 'AUTH-PAYLOAD-PILOT');
+  assert.equal(ledger.candidate_head, '2efafed96104012da2d17ec14d8a93c5b33a3d25');
+  assert.equal(ledger.totals.used_requests, 4);
+  assert.equal(ledger.totals.remaining_requests, 0);
+  assert.ok(ledger.execution_heads.includes(auth.entries[0].candidate_head));
+  assert.equal(report.requests_used, 4);
+});
+
+test('redirects that never yield a final response fail PILOT_REDIRECT_LIMIT', async () => {
+  const { dir, auth } = isolateRepo();
+  const fetched = [];
+  const fetchImpl = async (url) => {
+    fetched.push(url);
+    if (url.includes('44060663')) {
+      return {
+        status: 302,
+        headers: { get: (name) => name === 'location' ? HCRIS_URL : null },
+        body: { async cancel() {}, getReader() { return { async read() { return { done: true }; }, async cancel() {} }; } },
+      };
+    }
+    return jsonResponse([{ stateabbr: 'AL', year: '2024' }]);
+  };
+  const report = await runPayloadRetrievalPilot({ execute: true, repoRoot: dir, fetchImpl });
+  const hcris = report.captures.find((row) => row.product_key === HCRIS);
+  assert.equal(hcris.error.code, 'PILOT_REDIRECT_LIMIT');
+  assert.equal(hcris.capture_success, false);
+  assert.equal(fetched.filter((url) => url.includes('44060663')).length, 2);
+  assert.equal(loadLedger(dir, auth).per_source[HCRIS].used_requests, 2);
+});
+
 test('inconsistent ledger remaining counts are rejected', async () => {
   const { dir, auth } = isolateRepo({ ledger: false });
   seedLedger(dir, auth, { totals: { max_requests: 4, used_requests: 2, remaining_requests: 4 } });
@@ -296,5 +387,7 @@ test('HCRIS rows that still lack Provider CCN persist a failed identity receipt'
   assert.equal(hcris.error.code, 'BOUNDED_SAMPLE_IDENTITY_FIELD_MISSING');
   const persisted = JSON.parse(readFileSync(path.join(dir, hcris.receipt_reference), 'utf8'));
   assert.equal(persisted.payload.live_http, true);
-  assert.equal(persisted.payload.bounded_sample, true);
+  assert.equal(persisted.payload.bounded_sample, false);
+  assert.equal(persisted.payload.supported, false);
+  assert.equal(persisted.payload.status, 'BOUNDED_SAMPLE_IDENTITY_FIELD_MISSING');
 });

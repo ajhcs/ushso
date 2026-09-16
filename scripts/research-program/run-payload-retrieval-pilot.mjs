@@ -62,28 +62,6 @@ function acquirePilotLock(repoRoot) {
   };
 }
 
-function emptyLedger(auth) {
-  const limits = auth.entries[0].limits;
-  const keys = auth.entries[0].product_keys ?? [];
-  return {
-    format: LEDGER_FORMAT,
-    authorization_id: 'AUTH-PAYLOAD-PILOT',
-    candidate_head: auth.entries[0].candidate_head,
-    totals: {
-      max_requests: limits.max_requests,
-      used_requests: 0,
-      remaining_requests: limits.max_requests,
-    },
-    per_source: Object.fromEntries(keys.map((key) => [key, {
-      used_requests: 0,
-      remaining_requests: limits.max_requests_per_source,
-      max_requests: limits.max_requests_per_source,
-    }])),
-    attempts: [],
-    closed: false,
-  };
-}
-
 function assertLedgerConsistent(ledger, auth) {
   if (ledger.format !== LEDGER_FORMAT) fail('PILOT_LEDGER_FORMAT');
   if (ledger.authorization_id !== 'AUTH-PAYLOAD-PILOT') fail('PILOT_LEDGER_AUTH');
@@ -134,7 +112,13 @@ function consumeBudget(ledger, productKey, kind, url, repoRoot) {
 
 function queryMap(url) {
   const parsed = new URL(url);
-  return Object.fromEntries([...parsed.searchParams.entries()].sort());
+  const pairs = [...parsed.searchParams.entries()];
+  const seen = new Set();
+  for (const [key] of pairs) {
+    if (seen.has(key)) fail('PILOT_URL_DUPLICATE_QUERY', url);
+    seen.add(key);
+  }
+  return Object.fromEntries(pairs.sort((a, b) => a[0].localeCompare(b[0])));
 }
 
 function sameApprovedEndpoint(approved, candidate) {
@@ -249,7 +233,6 @@ export async function runPayloadRetrievalPilot({
   execute = false,
   repoRoot = ROOT,
   now = Date.now,
-  allowMissingLedger = false,
 } = {}) {
   if (!execute) fail('PILOT_EXECUTE_FLAG_REQUIRED');
   validatePayloadRetrievalPilot({ repoRoot });
@@ -264,12 +247,15 @@ export async function runPayloadRetrievalPilot({
   mkdirSync(path.join(repoRoot, RECEIPT_DIR), { recursive: true });
   const lock = acquirePilotLock(repoRoot);
   try {
-    if (!existsSync(path.join(repoRoot, LEDGER_REL))) {
-      if (!allowMissingLedger) fail('PILOT_LEDGER_REQUIRED');
-      persistLedger(repoRoot, emptyLedger(auth));
-    }
     const ledger = loadLedger(repoRoot, auth);
-    if (ledger.candidate_head !== entry.candidate_head) fail('PILOT_LEDGER_CANDIDATE_MISMATCH');
+    if (ledger.authorization_id !== entry.id) fail('PILOT_LEDGER_AUTH');
+    const beforeUsed = ledger.totals.used_requests;
+    const beforeRemaining = ledger.totals.remaining_requests;
+    ledger.last_seen_candidate_head = head;
+    if (!Array.isArray(ledger.execution_heads)) ledger.execution_heads = ledger.candidate_head ? [ledger.candidate_head] : [];
+    if (!ledger.execution_heads.includes(head)) ledger.execution_heads.push(head);
+    persistLedger(repoRoot, ledger);
+    if (ledger.totals.used_requests !== beforeUsed || ledger.totals.remaining_requests !== beforeRemaining) fail('PILOT_LEDGER_BUDGET_MUTATED');
     if (ledger.totals.remaining_requests <= 0) fail('PILOT_REQUEST_BUDGET_EXHAUSTED');
     const globalDeadline = now() + packet.totals.max_seconds * 1000;
     const captures = [];
@@ -479,6 +465,11 @@ export async function runPayloadRetrievalPilot({
             attempt.release_verified = false;
             attempt.acceptance_eligible = false;
             attempt.error = { code: error.code, message: error.message };
+            receipt.payload.supported = false;
+            receipt.payload.unknown = false;
+            receipt.payload.status = error.code ?? 'receipt_validation_failed';
+            receipt.payload.bounded_sample = false;
+            receipt.payload.payload_success = false;
             attempt.receipt = receipt;
             attempt.ended_at = new Date(now()).toISOString();
             const receiptRel = path.join(RECEIPT_DIR, attemptId + '-failed.json');
@@ -503,6 +494,7 @@ export async function runPayloadRetrievalPilot({
           }
           break;
         }
+        if (!attempt.capture_success && !attempt.error) fail('PILOT_REDIRECT_LIMIT', product.product_key);
       } catch (error) {
         attempt.error = { code: error.code, message: error.message };
         attempt.ended_at = new Date(now()).toISOString();
