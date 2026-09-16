@@ -25,8 +25,16 @@ import {
 const MAX_REQUEST_BYTES = 20 * 1024;
 const CORPUS_RESOURCE_BASE = '/corpus-v1.2.0';
 const CORPUS_BASE = `${CORPUS_RESOURCE_BASE}/corpus`;
+// Correction-3 candidate: additive v1.3.0-candidate (baseline 3,434 rows plus
+// 2 documentation-first rows). Served lazily on /api/candidate/* and
+// candidate- dataset pages only; baseline /api/* behavior is unchanged.
+const CANDIDATE_RESOURCE_BASE = '/corpus-candidate-v1.3.0';
+const CANDIDATE_BASE = `${CANDIDATE_RESOURCE_BASE}/corpus`;
+const CANDIDATE_RECORD_PREFIX = 'candidate-';
 const catalogByAssets = new WeakMap();
 const lexicalPinByAssets = new WeakMap();
+const candidateCatalogByAssets = new WeakMap();
+const candidateLexicalPinByAssets = new WeakMap();
 const LEXICAL_BUILD_PIN = typeof USHSO_LEXICAL_BUILD_PIN === "undefined" ? null : USHSO_LEXICAL_BUILD_PIN;
 const SPA_ROUTES = new Set(['/', '/search', '/learn', '/agents', '/sources', '/about', '/methods', '/plan', '/privacy', '/terms', '/contact', '/workspace', '/compare']);
 const STATIC_PATHS = new Set(['/favicon.svg', '/observatory-lighthouse.png', '/state-readiness-v0.1.0.json', '/_headers']);
@@ -105,25 +113,25 @@ function parseJsonl(value, label) {
   });
 }
 
-export async function loadCatalogFromAssets(request, env, { diagnostic = null, lexicalExpected = LEXICAL_BUILD_PIN } = {}) {
-  if (catalogByAssets.has(env?.ASSETS) && lexicalPinByAssets.get(env.ASSETS) !== JSON.stringify(lexicalExpected)) throw new Error('LEXICAL_OPTIONS_REQUIRE_FRESH_BINDING');
+async function loadCatalogWithBases(request, env, resourceBase, corpusBase, cache, pinCache, { diagnostic = null, lexicalExpected = LEXICAL_BUILD_PIN } = {}) {
+  if (cache.has(env?.ASSETS) && pinCache.get(env.ASSETS) !== JSON.stringify(lexicalExpected)) throw new Error('LEXICAL_OPTIONS_REQUIRE_FRESH_BINDING');
   const mark = (stage, asset_path = null) => { if (typeof diagnostic === 'function') diagnostic({ stage, asset_path, wall_ms: performance.now() }); };
   const measuredAssetText = async (...args) => { mark('asset_read_start', args[2]); const value = await assetText(...args); mark('asset_read_complete', args[2]); return value; };
   if (!env?.ASSETS || typeof env.ASSETS.fetch !== 'function') throw new Error('STATIC_ASSET_BINDING_REQUIRED');
-  if (!catalogByAssets.has(env.ASSETS)) {
-    lexicalPinByAssets.set(env.ASSETS, JSON.stringify(lexicalExpected));
-    catalogByAssets.set(env.ASSETS, (async () => {
+  if (!cache.has(env.ASSETS)) {
+    pinCache.set(env.ASSETS, JSON.stringify(lexicalExpected));
+    cache.set(env.ASSETS, (async () => {
       const [routesText, vocabularyText, corpusText, namedSourceRegistryText] = await Promise.all([
-        measuredAssetText(request, env, `${CORPUS_BASE}/join-routes.jsonl`),
-        measuredAssetText(request, env, `${CORPUS_RESOURCE_BASE}/fixtures/controlled-vocabulary.json`),
-        measuredAssetText(request, env, `${CORPUS_BASE}/corpus.json`),
-        measuredAssetText(request, env, `${CORPUS_RESOURCE_BASE}/fixtures/named-source-registry.json`).catch(() => null),
+        measuredAssetText(request, env, `${corpusBase}/join-routes.jsonl`),
+        measuredAssetText(request, env, `${resourceBase}/fixtures/controlled-vocabulary.json`),
+        measuredAssetText(request, env, `${corpusBase}/corpus.json`),
+        measuredAssetText(request, env, `${resourceBase}/fixtures/named-source-registry.json`).catch(() => null),
       ]);
       const corpus = JSON.parse(corpusText);
       if (!Array.isArray(corpus.record_files) || !Array.isArray(corpus.search_document_files)) throw new Error('CORPUS_SHARD_MANIFEST_REQUIRED');
       const [recordShards, searchDocumentShards] = await Promise.all([
-        Promise.all(corpus.record_files.map(file => measuredAssetText(request, env, `${CORPUS_BASE}/${file}`))),
-        Promise.all(corpus.search_document_files.map(file => measuredAssetText(request, env, `${CORPUS_BASE}/${file}`))),
+        Promise.all(corpus.record_files.map(file => measuredAssetText(request, env, `${corpusBase}/${file}`))),
+        Promise.all(corpus.search_document_files.map(file => measuredAssetText(request, env, `${corpusBase}/${file}`))),
       ]);
       mark('jsonl_parse_start');
       const rawRecords = recordShards.flatMap((text, index) => parseJsonl(text, `records:${corpus.record_files[index]}`));
@@ -153,7 +161,7 @@ export async function loadCatalogFromAssets(request, env, { diagnostic = null, l
           || await digest(recordShards.join('')) !== lexicalExpected.source_sha256
           || await digest(vocabularyText) !== lexicalExpected.vocabulary_sha256) throw new Error('LEXICAL_LOADER_SOURCE_MISMATCH');
         mark('lexical_asset_read_start');
-        const response = await env.ASSETS.fetch(new Request(new URL(`${CORPUS_BASE}/lexical-index.json`, request.url)));
+        const response = await env.ASSETS.fetch(new Request(new URL(`${corpusBase}/lexical-index.json`, request.url)));
         if (!response.ok || !response.body) throw new Error('LEXICAL_ASSET_UNAVAILABLE');
         const reader = response.body.getReader(), chunks = []; let size = 0;
         try { for (;;) { const {done, value} = await reader.read(); if(done) break; size += value.byteLength; if(size > 8*1024*1024) throw new Error('LEXICAL_SIZE_INVALID'); chunks.push(value); } }
@@ -177,11 +185,28 @@ export async function loadCatalogFromAssets(request, env, { diagnostic = null, l
       };
     })());
   }
-  return catalogByAssets.get(env.ASSETS);
+  return cache.get(env.ASSETS);
+}
+
+export async function loadCatalogFromAssets(request, env, opts = {}) {
+  return loadCatalogWithBases(request, env, CORPUS_RESOURCE_BASE, CORPUS_BASE, catalogByAssets, lexicalPinByAssets, opts);
 }
 
 export async function loadEngineFromAssets(request, env) {
   return (await loadCatalogFromAssets(request, env)).engine;
+}
+
+export async function loadCandidateCatalogFromAssets(request, env, opts = {}) {
+  return loadCatalogWithBases(request, env, CANDIDATE_RESOURCE_BASE, CANDIDATE_BASE, candidateCatalogByAssets, candidateLexicalPinByAssets, opts);
+}
+
+export async function loadCandidateEngineFromAssets(request, env) {
+  return (await loadCandidateCatalogFromAssets(request, env)).engine;
+}
+
+export function isCandidateRecordId(requestedId) {
+  const needle = String(requestedId ?? '').replace(/^obs:asset:/, '');
+  return needle.startsWith(CANDIDATE_RECORD_PREFIX);
 }
 
 function parsePageSize(value, fallback = 20) {
@@ -223,7 +248,7 @@ function isSpaPath(pathname) {
 }
 
 function isStaticPath(pathname) {
-  return STATIC_PATHS.has(pathname) || pathname.startsWith('/assets/') || pathname.startsWith('/corpus/') || pathname.startsWith('/corpus-v1.1.0/') || pathname.startsWith('/corpus-v1.2.0/') || pathname.startsWith('/contracts/') || pathname.startsWith('/verification-v0.1.0/');
+  return STATIC_PATHS.has(pathname) || pathname.startsWith('/assets/') || pathname.startsWith('/corpus/') || pathname.startsWith('/corpus-v1.1.0/') || pathname.startsWith('/corpus-v1.2.0/') || pathname.startsWith('/corpus-candidate-v1.3.0/') || pathname.startsWith('/contracts/') || pathname.startsWith('/verification-v0.1.0/');
 }
 
 function machineText(request, pathname) {
@@ -255,7 +280,10 @@ function mergeCrawlerIntoSpa(spaText, crawlerHtml) {
 export function createWorker({
   loadEngine = loadEngineFromAssets,
   loadCatalog = loadCatalogFromAssets,
-  publicQueryService = createStaticPublicQueryService({ loadEngine, loadCatalog })
+  publicQueryService = createStaticPublicQueryService({ loadEngine, loadCatalog }),
+  candidateLoadEngine = loadCandidateEngineFromAssets,
+  candidateLoadCatalog = loadCandidateCatalogFromAssets,
+  candidateQueryService = createStaticPublicQueryService({ loadEngine: candidateLoadEngine, loadCatalog: candidateLoadCatalog })
 } = {}) {
   const localCursorSigner = createMachineCursorSigner();
   return {
@@ -403,6 +431,74 @@ export function createWorker({
         }
       }
 
+            if (url.pathname === '/api/candidate/catalog') {
+        if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
+        try {
+          const session = await candidateQueryService.openRequest({ request, env });
+          return jsonResponse(await candidateQueryService.browse(session, catalogOptions(url)), { cacheControl: 'public, max-age=300', head });
+        } catch (error) {
+          if (error?.code === 'generation_unavailable') return errorResponse(410, 'generation_unavailable', error.message, { head });
+          if (error instanceof TypeError) return errorResponse(400, error.code ?? 'invalid_catalog_query', error.message, { head });
+          return errorResponse(503, 'catalog_unavailable', 'The candidate discovery catalog could not be loaded.', { head });
+        }
+      }
+
+      if (url.pathname.startsWith('/api/candidate/datasets/')) {
+        if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
+        let requestedId;
+        try {
+          requestedId = decodeURIComponent(url.pathname.slice('/api/candidate/datasets/'.length));
+        } catch {
+          return errorResponse(400, 'invalid_record_id', 'The record identifier encoding is invalid.', { head });
+        }
+        try {
+          const session = await candidateQueryService.openRequest({ request, env });
+          const result = await candidateQueryService.dataset(session, requestedId);
+          if (!result) return errorResponse(404, 'dataset_not_found', 'No candidate record has this identifier.', { head });
+          return jsonResponse(result, { cacheControl: 'public, max-age=300', head });
+        } catch {
+          return errorResponse(503, 'dataset_unavailable', 'The candidate record could not be loaded.', { head });
+        }
+      }
+
+      if (url.pathname === '/api/candidate/discover') {
+        if (request.method !== 'POST') {
+          await discardRequestBody(request, MAX_REQUEST_BYTES);
+          return errorResponse(405, 'method_not_allowed', 'Use POST for discovery queries.');
+        }
+        const contentType = request.headers.get('content-type') ?? '';
+        if (!contentType.toLowerCase().startsWith('application/json')) {
+          await discardRequestBody(request, MAX_REQUEST_BYTES);
+          return errorResponse(415, 'unsupported_media_type', 'Use application/json.');
+        }
+        const declaredLength = Number(request.headers.get('content-length') ?? 0);
+        if (Number.isFinite(declaredLength) && declaredLength > MAX_REQUEST_BYTES) {
+          await discardRequestBody(request, MAX_REQUEST_BYTES);
+          return errorResponse(413, 'request_too_large', 'The discovery request exceeds 20 KiB.');
+        }
+        let bodyText;
+        try {
+          bodyText = await readBoundedText(request, MAX_REQUEST_BYTES);
+        } catch (error) {
+          if (error instanceof RequestBodyTooLargeError) return errorResponse(413, 'request_too_large', 'The discovery request exceeds 20 KiB.');
+          return errorResponse(400, 'invalid_json', 'The request body could not be decoded safely.');
+        }
+        let input;
+        try {
+          input = JSON.parse(bodyText);
+        } catch {
+          return errorResponse(400, 'invalid_json', 'The request body is not valid JSON.');
+        }
+        try {
+          const session = await candidateQueryService.openRequest({ request, env });
+          return jsonResponse(await candidateQueryService.discover(session, input));
+        } catch (error) {
+          if (error?.code === 'generation_unavailable') return errorResponse(410, 'generation_unavailable', error.message);
+          if (error instanceof TypeError) return errorResponse(400, 'invalid_query', error.message);
+          return errorResponse(503, 'retrieval_unavailable', 'The candidate discovery catalog could not be queried.');
+        }
+      }
+
       if (url.pathname.startsWith('/api/')) return errorResponse(404, 'api_not_found', 'No API route exists at this path.', { head });
 
       const machineBody = machineText(request, url.pathname);
@@ -476,7 +572,7 @@ export function createWorker({
         }
         if (requestedId && !requestedId.includes('/')) {
           try {
-            const catalog = await loadCatalog(request, env);
+            const catalog = await (isCandidateRecordId(requestedId) ? candidateLoadCatalog(request, env) : loadCatalog(request, env));
             const record = matchCatalogRecord(catalog.records ?? [], requestedId);
             if (!record) {
               return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Dataset record not found | USHSO</title></head><body><main><h1>Dataset record not found</h1><p>No published record has this identifier in the current catalog generation. A missing record is not replaced with a silent stale-context page.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 404, head, csp: htmlContentSecurityPolicy(request) });

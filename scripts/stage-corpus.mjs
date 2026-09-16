@@ -42,6 +42,16 @@ for (const sourcePath of await filesBelow(liveVersionRoot)) {
   const relative = path.relative(liveVersionRoot, sourcePath).replaceAll('\\', '/');
   files.push([`versions/v1.2.0/${relative}`, `corpus-v1.2.0/${relative}`]);
 }
+// Correction-3 candidate: stage only the served corpus inputs (records,
+// registry, vocabulary, packets, manifests, validation). Build tooling and
+// notes in the version directory are intentionally not published.
+const candidateVersionRoot = path.join(sourceRoot, 'versions/v1.3.0');
+const candidateStagedPrefixes = ['corpus/', 'fixtures/', 'manifests/', 'validation/', 'evidence-packets/'];
+for (const sourcePath of await filesBelow(candidateVersionRoot)) {
+  const relative = path.relative(candidateVersionRoot, sourcePath).replaceAll('\\', '/');
+  if (!candidateStagedPrefixes.some((prefix) => relative.startsWith(prefix))) continue;
+  files.push([`versions/v1.3.0/${relative}`, `corpus-candidate-v1.3.0/${relative}`]);
+}
 files.push(['fixtures/named-source-registry.v1.0.0.json', 'corpus-v1.2.0/fixtures/named-source-registry.json']);
 files.push([
   null,
@@ -54,6 +64,7 @@ for (const asset of schemaAssets) files.push([null, asset.relative, asset.absolu
 
 await fs.mkdir(targetRoot, { recursive: true });
 await fs.rm(path.join(targetRoot, 'corpus-v1.2.0'), { recursive: true, force: true });
+await fs.rm(path.join(targetRoot, 'corpus-candidate-v1.3.0'), { recursive: true, force: true });
 for (const version of SUPPORTED_TOOLKIT_CONTRACTS) await fs.rm(path.join(targetRoot, `contracts/machine-toolkit/${version}/schemas`), { recursive: true, force: true });
 for (const [source, target, absoluteSource = null] of files) {
   const sourcePath = absoluteSource ?? path.join(sourceRoot, source);

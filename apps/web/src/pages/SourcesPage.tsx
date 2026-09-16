@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { CandidateCatalogNotice } from '../components/CandidateCatalogNotice'
+import { CANDIDATE_CORPUS_VERSION, CANDIDATE_GENERATION } from '../data/candidateCatalog'
 import { LiveCatalogPositioning } from '../components/LiveCatalogPositioning'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
@@ -43,7 +45,7 @@ interface NationalReadiness {
   current_generation?: string
 }
 
-export function archiveHistoricalReadiness(readiness: NationalReadiness, currentCorpusVersion = CURRENT_CORPUS_VERSION): NationalReadiness {
+export function archiveHistoricalReadiness(readiness: NationalReadiness, currentCorpusVersion = CURRENT_CORPUS_VERSION, currentGeneration = CURRENT_GENERATION): NationalReadiness {
   const historical = readiness.corpus_version !== currentCorpusVersion
   return {
     ...readiness,
@@ -51,7 +53,7 @@ export function archiveHistoricalReadiness(readiness: NationalReadiness, current
     current_coverage: !historical,
     archived_reason: historical ? 'v1.1.0 national-readiness table is a historical view, not current generation coverage' : null,
     current_corpus_version: currentCorpusVersion,
-    current_generation: CURRENT_GENERATION,
+    current_generation: currentGeneration,
     summary: {
       ...readiness.summary,
       published_records_are_current: !historical,
@@ -110,7 +112,7 @@ export function SourcesPage() {
     fetch('/state-readiness-v0.1.0.json', { signal: controller.signal }).then(async response => {
       if (!response.ok) throw new Error('readiness unavailable')
       const raw = await response.json() as NationalReadiness
-      setReadiness(archiveHistoricalReadiness(raw))
+      setReadiness(archiveHistoricalReadiness(raw, CANDIDATE_CORPUS_VERSION, CANDIDATE_GENERATION))
     }).catch(error => {
       if (error instanceof DOMException && error.name === 'AbortError') return
       setReadinessError(true)
@@ -132,6 +134,7 @@ export function SourcesPage() {
         </header>
 
         <LiveCatalogPositioning />
+        <CandidateCatalogNotice />
 
         {readiness && (
           <section className="readiness" aria-labelledby="readiness-heading">

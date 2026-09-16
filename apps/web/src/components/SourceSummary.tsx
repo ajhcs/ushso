@@ -11,6 +11,14 @@ export function nextSourceAction(dataset: DatasetFamily) {
   const route = metadata?.retrieval_plan?.access_routes?.find((step) => safeExternalHttpsUrl(step.url))
     ?? record.retrieval.instructions.find((step) => step.action !== 'stop_and_report' && safeExternalHttpsUrl(step.url))
   const url = safeExternalHttpsUrl(route?.url) ?? safeExternalHttpsUrl(record.authoritative_url)
+  const liveVerified = record.freshness_verification.verification_status === 'current_verified'
+  if (url && !liveVerified) {
+    return {
+      label: 'Open the publisher documentation page. This route is documented-not-executed: reachability, payload, and browser access were not tested — not proven payload or browser access. Catalog membership is not payload access.',
+      href: url,
+      linkText: 'Open publisher documentation',
+    }
+  }
   if (url) {
     return {
       label: 'Open the publisher page for this exact product. That page is a reachable documentation page, not proven payload or browser access.',

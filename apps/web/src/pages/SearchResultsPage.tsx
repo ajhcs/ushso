@@ -1,6 +1,7 @@
 import { Download, ExternalLink, Info, PanelLeftOpen, Search } from 'lucide-react'
 import { type FormEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { CandidateCatalogNotice } from '../components/CandidateCatalogNotice'
 import { FacetSidebar } from '../components/FacetSidebar'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
@@ -197,6 +198,7 @@ export function SearchResultsPage() {
           <form className="results-query" role="search" onSubmit={submitEditedSearch}><label className="sr-only" htmlFor="results-query-input">Search question</label><div className="results-query__input"><Search aria-hidden="true" /><input id="results-query-input" value={editQuery} placeholder="Ask a health-systems data question, or leave blank to browse" onChange={(event) => setEditQuery(event.target.value)} /></div><button type="submit"><Search aria-hidden="true" /> Search</button></form>
 
           <aside className="catalog-scope-summary" aria-label="Catalog coverage"><strong>Searching a bounded published catalog</strong><span>Empty results do not establish that no source exists. Unknown geography is not a confirmed match. <Link to="/sources">Review indexed sources and major gaps</Link>.</span></aside>
+          <CandidateCatalogNotice compact />
 
           {discovery.status === 'ready' && catalog && <>
             <div className="results-overview">
