@@ -1,0 +1,330 @@
+{
+  "format": "ushso.metadata-check-packet.v1",
+  "status": "prepared_not_authorized",
+  "recorded_at": "2026-09-16T00:00:00Z",
+  "generation": "live-2026-09-03-85b50522b420",
+  "candidate_binding": {
+    "branch": "codex/ushso-track4-metadata-20260916",
+    "must_match_git_head": true,
+    "stale_sha_named_at_first_draft": "0000000000000000000000000000000000000000",
+    "note": "Authorization and execution must name the exact git HEAD of codex/ushso-track4-metadata-20260916 at that time. Do not reuse 78da769 or any baked SHA. This packet is prepared, not authorized; no live HTTP is permitted until AUTH-METADATA-CHECK is granted for these exact endpoints and limits."
+  },
+  "authorization": {
+    "requested": false,
+    "auth_id": null,
+    "required_auth_id_if_later_granted": "AUTH-METADATA-CHECK",
+    "note": "AUTH-04 (metadata-only canaries) and AUTH-PAYLOAD-PILOT (4-request payload pilot on codex/ushso-evidence-ingestion-20260915) do not cover this metadata check. Do not execute until a distinct AUTH-METADATA-CHECK authorization is recorded for these exact product IDs, endpoints, and limits on this branch without resetting the payload ledger.",
+    "auth_04_does_not_cover_metadata_check": true,
+    "auth_payload_pilot_does_not_cover_metadata_check": true
+  },
+  "scientific_approval": false,
+  "accepted": false,
+  "live_http": false,
+  "purpose": "Determine from first-party JSON metadata whether the frozen release identities (CostReport_2023_Final; PLACES_2025_county_table) are established. Two public JSON endpoints only, reused exactly from prior proposals. No dictionary downloads, no redirects, no retries. Observation year must not be equated with release year.",
+  "endpoint_provenance": {
+    "note": "Exact 2 URLs reused verbatim from prior proposals; no new URLs invented here.",
+    "sources": [
+      "verification/research-program/authorization/payload-authorizations.json endpoints[0..1] on codex/ushso-evidence-ingestion-20260916",
+      "docs/research-program/payload-retrieval-pilot.md representative-first table (2026-09-15)"
+    ],
+    "urls": [
+      "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5",
+      "https://data.cdc.gov/resource/swc5-untb.json?$limit=5"
+    ]
+  },
+  "frozen_cohort": {
+    "path": "evaluation/research-program/cohorts.json",
+    "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+    "unmodified": true
+  },
+  "historical_receipts_preserved": [
+    "verification/research-program/evidence/history/core-matrix-pr040.json",
+    "verification/research-program/evidence/history/core-qualification-receipt-pr040.json",
+    "verification/research-program/evidence/history/observation-pr084.json",
+    "verification/research-program/evidence/history/requirement-results-pr079.json"
+  ],
+  "totals": {
+    "products": 2,
+    "max_requests": 2,
+    "max_bytes": 131072,
+    "max_rows": 10,
+    "max_seconds": 15,
+    "max_concurrency": 1,
+    "credential_required": false
+  },
+  "allocation": {
+    "note": "1 request per product; byte budget split 65536+65536=131072 to match aggregate; row budget split 5+5=10; time is a shared 15s wall-clock (global deadline binds) with per-source 15s upper bound; concurrency 1 sequential.",
+    "per_source": {
+      "cms-hcris-hospital-provider-cost-report": {
+        "max_requests": 1,
+        "max_bytes": 65536,
+        "max_rows": 5,
+        "max_seconds": 15,
+        "max_concurrency": 1
+      },
+      "cdc-places-local-data-for-better-health": {
+        "max_requests": 1,
+        "max_bytes": 65536,
+        "max_rows": 5,
+        "max_seconds": 15,
+        "max_concurrency": 1
+      }
+    },
+    "sums": {
+      "max_requests": 2,
+      "max_bytes": 131072,
+      "max_rows": 10
+    }
+  },
+  "request_accounting": {
+    "budget_includes": [
+      "initial_request",
+      "redirects",
+      "retries"
+    ],
+    "redirects_consume_budget": true,
+    "retries_consume_budget": true,
+    "validate_redirect_host_before_follow": true,
+    "max_redirects_per_request": 0,
+    "max_retries_per_source": 0,
+    "retry_on": [
+      429,
+      503
+    ],
+    "note": "Only the initial request per product is permitted (1+1=2 total). Any redirect hop or 429/503 retry would consume budget first and then abort with METADATA_REDIRECT_NOT_PERMITTED / METADATA_RETRY_NOT_PERMITTED. Remaining budget is decremented before a hop is followed. Host allowlist is checked on every Location before a redirect is followed (all redirects abort here). Total budget is 2 across both products, separate from the payload pilot ledger."
+  },
+  "abort_conditions": [
+    "HTTP status outside 2xx (no retry: 0 permitted on 429/503)",
+    "Any redirect response (0 permitted per request)",
+    "Final host outside the allowlist",
+    "Redirect Location host outside the allowlist, checked before follow (all redirects abort)",
+    "A redirect or retry that would exceed the remaining request budget",
+    "Content-Type not application/json",
+    "Response bytes exceed the per-source max_bytes (65536) or aggregate 131072",
+    "Row count exceeds the per-source max_rows (5)",
+    "Required identity field missing or type-mismatched (CMS Provider CCN; CDC stateabbr)",
+    "Release-verification constraint failed (both releases must stay unresolved until first-party docs prove them)",
+    "Elapsed time exceeds the per-source max_seconds (15) or aggregate 15s global deadline",
+    "Duplicate query key on request or redirect Location",
+    "Out-of-scope URL, non-HTTPS, or host not in permitted_hosts",
+    "Credentials required or presented (none permitted)",
+    "Forbidden native id 7cmc-7y5g appears",
+    "Any live request issued before AUTH-METADATA-CHECK is recorded",
+    "Frozen cohorts.json SHA mismatch"
+  ],
+  "required_receipt_fields": [
+    "format=ushso.evidence-receipt.v1",
+    "kind=core_cell",
+    "generation",
+    "candidate_head",
+    "recorded_at",
+    "evidence_reference",
+    "evidence_sha256",
+    "payload.product_key",
+    "payload.field=publisher_access",
+    "payload.native_product_id",
+    "payload.record_id",
+    "payload.release_id",
+    "payload.bounded_sample",
+    "payload.payload_success",
+    "payload.live_http=true",
+    "payload.authorization.id=AUTH-METADATA-CHECK",
+    "payload.execution.kind=bounded_http_sample",
+    "payload.execution.request_url",
+    "payload.execution.final_url",
+    "payload.execution.http_status",
+    "payload.execution.content_type",
+    "payload.execution.redirects",
+    "payload.execution.redirect_chain",
+    "payload.result_format",
+    "payload.row_count",
+    "payload.identity_checks",
+    "payload.limitation"
+  ],
+  "authorized_receipt_path": {
+    "live_http_must_remain_true": true,
+    "unauthorized_live_http_rejected": true,
+    "authorization_id_required": "AUTH-METADATA-CHECK",
+    "auth_04_rejected": true,
+    "auth_payload_pilot_rejected": true,
+    "execution_kind": "bounded_http_sample",
+    "note": "After authorization, captures must keep live_http=true so origin stays truthful. AUTH-04 and AUTH-PAYLOAD-PILOT cannot grant this path."
+  },
+  "retention": {
+    "captures_path": "verification/research-program/evidence/payloads/metadata-check/",
+    "captures_gitignored": true,
+    "gitignore_entry": "verification/research-program/evidence/payloads/metadata-check/",
+    "receipts_path": "verification/research-program/evidence/metadata-receipts/",
+    "receipts_in_git": true,
+    "receipts_bind_sha256_of_gitignored_bytes": true,
+    "do_not_commit_publisher_rows": true,
+    "do_not_republish_publisher_rows": true,
+    "max_object_bytes": 65536,
+    "note": "Captured publisher bytes stay on disk and are gitignored. In-tree receipts bind their SHA-256. That is repository-contained evidence without republishing publisher rows in git. Separate from payloads/pilot-r04/."
+  },
+  "release_question": {
+    "note": "Do not equate observation year with release year.",
+    "cms-hcris-hospital-provider-cost-report": {
+      "claimed_release": "CostReport_2023_Final",
+      "candidate_field": "Fiscal Year End Date / FY_END_DT",
+      "status": "unresolved",
+      "reason": "Fiscal Year End Date is a reporting-period date. Frozen local documentation does not prove it identifies catalog distribution CostReport_2023_Final. Needs a first-party CMS statement linking Fiscal Year End Date (or another captured field) to CostReport_2023_Final."
+    },
+    "cdc-places-local-data-for-better-health": {
+      "claimed_release": "PLACES_2025_county_table",
+      "candidate_field": "year",
+      "status": "unresolved",
+      "reason": "PLACES year is an observation attribute on the row. Frozen local documentation does not state whether year is measurement year, publication year, or another concept, or that year=2025 proves the representative 2025 county table. Needs a first-party PLACES data dictionary for swc5-untb defining year relative to the 2025 county-table release. Do not treat year=2025 as release proof."
+    }
+  },
+  "products": [
+    {
+      "product_key": "cms-hcris-hospital-provider-cost-report",
+      "title": "Hospital Provider Cost Report",
+      "publisher": "Centers for Medicare & Medicaid Services",
+      "access_expectation": "public_sample_eligible",
+      "frozen_record_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+      "native_product_id": "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data-viewer",
+      "release_id": "CostReport_2023_Final",
+      "landing_page": "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report",
+      "endpoint": "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5",
+      "method": "GET",
+      "permitted_hosts": [
+        "data.cms.gov"
+      ],
+      "permitted_redirects": 0,
+      "expected_format": "application/json",
+      "identity_checks": {
+        "required_fields": {
+          "Provider CCN": "string"
+        },
+        "max_rows": 5,
+        "note": "Provider CCN per amendment HCRIS-IDENTITY-PROVIDER-CCN-20260915 (PBJ PROVNUM is a different product). Shape only. Fiscal Year End Date is a reporting-period field and does not prove CostReport_2023_Final. No year equality constraint."
+      },
+      "release_verification": {
+        "native_product_id_must_equal_frozen_native_id": true,
+        "endpoint_must_contain": "44060663-47d8-4ced-a115-b53b4c270acb",
+        "payload_fields": [
+          "Provider CCN"
+        ],
+        "status": "unresolved",
+        "reason": "FY_END_DT / Fiscal Year End Date is the cost-report fiscal year ending date. Frozen local documentation does not prove it is the CMS catalog distribution release named CostReport_2023_Final."
+      },
+      "limits": {
+        "max_requests": 1,
+        "max_bytes": 65536,
+        "max_rows": 5,
+        "max_seconds": 15,
+        "max_concurrency": 1
+      },
+      "credentials": {
+        "required": false,
+        "kind": "none"
+      },
+      "abort": [
+        "non-JSON body",
+        "missing Provider CCN",
+        "any redirect",
+        "any retry",
+        "host not data.cms.gov",
+        "bytes>65536",
+        "rows>5",
+        "over 15s"
+      ]
+    },
+    {
+      "product_key": "cdc-places-local-data-for-better-health",
+      "title": "PLACES: Local Data for Better Health",
+      "publisher": "Centers for Disease Control and Prevention",
+      "access_expectation": "public_sample_eligible",
+      "frozen_record_id": "obs:asset:cdc-socrata:swc5-untb-f762f3e61a350434",
+      "native_product_id": "swc5-untb",
+      "release_id": "PLACES_2025_county_table",
+      "landing_page": "https://data.cdc.gov/d/swc5-untb",
+      "endpoint": "https://data.cdc.gov/resource/swc5-untb.json?$limit=5",
+      "method": "GET",
+      "permitted_hosts": [
+        "data.cdc.gov"
+      ],
+      "permitted_redirects": 0,
+      "expected_format": "application/json",
+      "identity_checks": {
+        "required_fields": {
+          "stateabbr": "string"
+        },
+        "max_rows": 5,
+        "note": "stateabbr string type is shape only. PLACES year is unresolved as measurement vs publication year and cannot prove the 2025 county-table release by itself. Do not use 7cmc-7y5g. No year equality constraint."
+      },
+      "release_verification": {
+        "native_product_id_must_equal_frozen_native_id": true,
+        "endpoint_must_contain": "swc5-untb",
+        "forbidden_native_ids": [
+          "7cmc-7y5g"
+        ],
+        "payload_fields": [
+          "stateabbr"
+        ],
+        "status": "unresolved",
+        "reason": "Frozen local documentation does not establish whether PLACES year is measurement year, publication year, or another concept."
+      },
+      "limits": {
+        "max_requests": 1,
+        "max_bytes": 65536,
+        "max_rows": 5,
+        "max_seconds": 15,
+        "max_concurrency": 1
+      },
+      "credentials": {
+        "required": false,
+        "kind": "none"
+      },
+      "abort": [
+        "non-JSON body",
+        "missing stateabbr",
+        "any redirect",
+        "any retry",
+        "host not data.cdc.gov",
+        "native id 7cmc-7y5g",
+        "bytes>65536",
+        "rows>5",
+        "over 15s"
+      ]
+    }
+  ],
+  "later_expansion_not_in_this_check": [
+    {
+      "product_key": "cms-hha-cost-report",
+      "reason": "Second CMS cost-report JSON API. Expand only after this metadata release question is resolved and collection paths are proven.",
+      "frozen_record_id": "obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-4999d-ca69ba414983d352",
+      "native_product_id": "https://data.cms.gov/data-api/v1/dataset/4999da74-1d8d-4a6f-934e-2d7ea470cc63/data-viewer",
+      "candidate_endpoint": "https://data.cms.gov/data-api/v1/dataset/4999da74-1d8d-4a6f-934e-2d7ea470cc63/data?size=5"
+    },
+    {
+      "product_key": "census-acs-5year-data-profiles",
+      "reason": "Census ACS 5-year 2024 identity. Keyless HTML and 2023 fixtures must not be substituted. Likely requires a Census API key; that is a later AUTH packet, not this public-JSON metadata check.",
+      "frozen_record_id": "obs:asset:census-api:api.census.gov-data-id-acsdp5y2024-c4f6db86ec517aba",
+      "native_product_id": "https://api.census.gov/data/id/ACSDP5Y2024"
+    }
+  ],
+  "dictionary_boundary": {
+    "note": "No dictionary downloads in this check. Proposed exact docs for a later bounded assignment if this metadata is inconclusive (retain unresolved):",
+    "proposals": [
+      {
+        "need": "CMS statement linking Fiscal Year End Date to CostReport_2023_Final",
+        "candidates": [
+          "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb (dataset metadata showing distributions, if it names CostReport_2023_Final)",
+          "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb (resources listing CostReport_2023_Final.csv distribution)",
+          "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report (landing page / distribution notes, if it states the FY End Date to distribution mapping)"
+        ],
+        "constraint": "One bounded JSON metadata fetch at most under a later AUTH; no CSV/XLSX dictionary payload in this check."
+      },
+      {
+        "need": "PLACES dictionary for swc5-untb defining year vs 2025 county table",
+        "candidates": [
+          "https://data.cdc.gov/api/views/swc5-untb.json (Socrata view metadata: columns, descriptions, and release notes for swc5-untb, if it defines year)"
+        ],
+        "constraint": "One bounded JSON metadata fetch at most under a later AUTH; no extra dictionary downloads beyond that one in this check (0 here)."
+      }
+    ]
+  }
+}

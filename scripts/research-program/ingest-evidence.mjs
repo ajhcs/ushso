@@ -285,7 +285,7 @@ function payloadAuthorizationGranted(register, authorization, context) {
   if (!row) return false;
   if (row.authorized !== true || row.status !== 'authorized') return false;
   if (row.revoked === true) return false;
-  if (row.action !== 'payload_retrieval') return false;
+  if (row.action !== 'payload_retrieval' && row.action !== 'metadata_check') return false;
   if (!row.candidate_head || row.candidate_head !== context.candidateHead) return false;
   if (row.valid_from && Date.parse(row.valid_from) > Date.now()) return false;
   if (row.valid_until && Date.parse(row.valid_until) < Date.now()) return false;

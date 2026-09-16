@@ -1,0 +1,136 @@
+{
+  "format": "ushso.metadata-check-readiness.v1",
+  "track": "track4-bounded-cms-cdc-metadata",
+  "base": "78da769956e124898b39fb287cd5b018de9fa962",
+  "branch": "codex/ushso-track4-metadata-20260916",
+  "worktree": "/mnt/d/worktrees/plumbob/ushso-track4-metadata",
+  "status": "prepared_not_authorized_no_live_execution",
+  "live_executed": false,
+  "authorized": false,
+  "required_auth_id_if_later_granted": "AUTH-METADATA-CHECK",
+  "frozen_cohort": {
+    "path": "evaluation/research-program/cohorts.json",
+    "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+    "unmodified": true
+  },
+  "packet": {
+    "path": "verification/research-program/evidence/metadata-check-packet.json",
+    "sha256": "857f3ae82053c96839da9272e09331c9ba2c84ceccfa5431226fa1d74a096e97",
+    "totals": {
+      "max_requests": 2,
+      "max_bytes": 131072,
+      "max_rows": 10,
+      "max_seconds": 15,
+      "max_concurrency": 1
+    },
+    "per_source": {
+      "cms-hcris-hospital-provider-cost-report": {
+        "max_requests": 1,
+        "max_bytes": 65536,
+        "max_rows": 5
+      },
+      "cdc-places-local-data-for-better-health": {
+        "max_requests": 1,
+        "max_bytes": 65536,
+        "max_rows": 5
+      }
+    },
+    "redirects": 0,
+    "retries": 0
+  },
+  "endpoints_exact_from_prior_proposals": [
+    "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5",
+    "https://data.cdc.gov/resource/swc5-untb.json?$limit=5"
+  ],
+  "endpoint_sources": [
+    "verification/research-program/authorization/payload-authorizations.json endpoints[0..1]",
+    "docs/research-program/payload-retrieval-pilot.md representative-first table"
+  ],
+  "ledger_separate_from_payload": {
+    "path": "verification/research-program/evidence/metadata-check-ledger.json",
+    "sha256": "22bbaca3565fb1b7374449c870482feb8ba1b3215903cc9b73a2e4bc0441553f",
+    "totals": {
+      "max_requests": 2,
+      "used_requests": 0,
+      "remaining_requests": 2
+    },
+    "payload_ledger_untouched": true
+  },
+  "auth_prepared": {
+    "path": "verification/research-program/authorization/metadata-authorizations.json",
+    "sha256": "2b211d00c81c1f1dd0b34696cfdd2f454c5041ef19a3811e055c1a1799c8f83a",
+    "id": "AUTH-METADATA-CHECK",
+    "authorized": false,
+    "status": "prepared"
+  },
+  "collector": {
+    "path": "scripts/research-program/run-metadata-check.mjs",
+    "sha256": "e2e52c05e312e2fb250f0809a2057ce64f3deb506ab90ed53edd3878f8b1cc51",
+    "enforces": [
+      "exact URLs",
+      "2 total / 1 per-source",
+      "65536 per-source / 131072 aggregate bytes",
+      "5 per-source / 10 aggregate rows",
+      "15s global + per-source deadlines",
+      "concurrency 1 + lock",
+      "0 redirects",
+      "0 retries",
+      "JSON content-type",
+      "duplicate query",
+      "host allowlist",
+      "HTTPS",
+      "no credentials",
+      "frozen SHA",
+      "AUTH materialization",
+      "accounting+SHA persistence"
+    ],
+    "fix": "scripts/research-program/ingest-evidence.mjs payloadAuthorizationGranted now accepts metadata_check alongside payload_retrieval (mock-verified; payload regression 15/15)"
+  },
+  "validator": {
+    "path": "scripts/research-program/validate-metadata-check.mjs",
+    "sha256": "0398b9cd7d6f48762bce4d77e8c6dc408c0c0168d129b6ae98c171b11fecbeb3",
+    "result": "pass",
+    "git_head": "78da769956e124898b39fb287cd5b018de9fa962"
+  },
+  "mock_tests": {
+    "path": "tests/research-program/run-metadata-check.test.mjs",
+    "sha256": "ae9b6c0dd9947b3bca5b2768fd9cf20aaed768d52eb870ebae8239d2b25980b7",
+    "passed": 11,
+    "failed": 0,
+    "command": "/home/plumbob/bin/with-dev-storage node --test tests/research-program/run-metadata-check.test.mjs",
+    "live_http_used": false
+  },
+  "payload_regression": {
+    "suite": "tests/research-program/run-payload-retrieval-pilot.test.mjs",
+    "passed": 15,
+    "failed": 0
+  },
+  "retention": {
+    "captures_path": "verification/research-program/evidence/payloads/metadata-check/",
+    "captures_gitignored": true,
+    "gitignore_entry": "verification/research-program/evidence/payloads/metadata-check/",
+    "captures_committed": 0,
+    "receipts_path": "verification/research-program/evidence/metadata-receipts/",
+    "receipts_committed": 0
+  },
+  "release_determination": {
+    "method": "frozen docs only (no live)",
+    "cms": "unresolved (Fiscal Year End Date is reporting period, not CostReport_2023_Final proof)",
+    "cdc": "unresolved (year is observation attribute, not 2025 county-table proof; do not equate year with release)",
+    "r04_from_this_packet": 0,
+    "retained": true,
+    "proposed_exact_docs": [
+      "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb",
+      "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb",
+      "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report",
+      "https://data.cdc.gov/api/views/swc5-untb.json"
+    ]
+  },
+  "next_owner_decision": "Authorize AUTH-METADATA-CHECK with rebind to exact execution HEAD plus validity window (without resetting either ledger), or defer. No live run until then. Keep live_http=true, persist accounting+SHA, retain unresolved unless first-party docs prove release.",
+  "rules": {
+    "deploy": false,
+    "with_dev_storage": true,
+    "credentials": "none",
+    "live_execution_in_this_packet": false
+  }
+}
