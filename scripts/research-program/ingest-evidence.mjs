@@ -258,6 +258,17 @@ function requirePayloadExecution(payload, parsed, kind) {
     if (payload.status === 'bounded_sample') {
       payload._status_hazard = 'legacy_bounded_sample_for_file_sample_prefer_file_sample_derived';
     }
+    // Correction 4 (2026-09-17, additive only; no throw behavior changed):
+    // machine-readable reanalysis linkage for the Case-B qualification path
+    // (qualify-core.mjs assessReanalysisEligibility). A live_http=false sample
+    // is not a blanket refetch order: when these link flags plus SHA-bound
+    // bytes, current-identity derivation, verified release, and a recipe all
+    // hold, the reanalysis can satisfy the R04 text without new retrieval.
+    if (payload.not_a_new_retrieval === true
+      && typeof payload.reanalysis_of === 'string'
+      && payload.reanalysis_of.trim() !== '') {
+      payload._reanalysis_of = payload.reanalysis_of;
+    }
   } else {
     payload._file_sample = false;
   }

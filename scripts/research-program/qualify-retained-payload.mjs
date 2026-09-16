@@ -14,16 +14,33 @@
 // future run or file reanalysis. The prepared packet (PROVNUM) is preserved as
 // pre-amendment history and must not be executed as-is.
 //
-// Acceptance contract (scripts/research-program/qualify-core.mjs):
-// only live_http=true + frozen-derivation + verified-release counts toward R04.
-// Receipt status strings never count. Both products remain unresolved, so the
-// retained set yields exactly 0 R04 samples.
+// Acceptance ground (docs/research-program/acceptance.md R04, unaccepted):
+// "Frozen 100-product cohort has complete mandatory source cards. At least 80
+// publicly accessible products have a recent successful bounded sample and
+// exact technical recipe; remaining cohort members have verified
+// restricted/manual access routes." Denominator: 100 frozen product
+// identities; numerator: 100 source cards + >=80 public bounded samples with
+// exact recipes + verified restricted routes. Correction 4 (2026-09-17): this
+// rule compares the retained receipts against THAT text across four cases —
+// (a) originally authorized live capture, (b) later local reanalysis of the
+// same bytes, (c) suitably evidenced frozen corpus, (d) capture with missing
+// evidence — instead of defining the contract as isR04EligiblePayload() and
+// concluding the implementation matches itself. isR04EligiblePayload() remains
+// the Case-A live-sample engineering predicate; assessReanalysisEligibility()
+// and assessFrozenCorpusEligibility() state when Cases B/C can qualify without
+// a refetch. Receipt status strings never count. Present receipts fail on
+// identity/release dimensions, so the retained set yields exactly 0 R04.
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { packetIdentityCurrency } from './validate-payload-retrieval-pilot.mjs';
-import { isR04EligiblePayload, payloadSampleCountsFromReceipts } from './qualify-core.mjs';
+import {
+  assessFrozenCorpusEligibility,
+  assessReanalysisEligibility,
+  isR04EligiblePayload,
+  payloadSampleCountsFromReceipts,
+} from './qualify-core.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -35,6 +52,26 @@ export const HCRIS_SHA256 = 'efb538d31b8d51bf8443b12b617271617afd2f73bf379ed53c0
 export const PLACES_SHA256 = 'd67b34efce9a129cd4d79dc56b05961c2741f41807d6dd54b154c905179ca6f4';
 export const HCRIS_PRODUCT = 'cms-hcris-hospital-provider-cost-report';
 export const PLACES_PRODUCT = 'cdc-places-local-data-for-better-health';
+
+// Correction 4 (2026-09-17): verbatim R04 acceptance text from
+// docs/research-program/acceptance.md. The rule compares retained receipts
+// against THIS text — it must never define the contract as
+// isR04EligiblePayload() and then conclude the implementation matches itself.
+export const R04_ACCEPTANCE_TEXT = Object.freeze({
+  source: 'docs/research-program/acceptance.md R04 — Core research sources are usable',
+  status: 'unaccepted',
+  frame_state: 'identities_frozen_usability_not_materialized',
+  threshold: 'Frozen 100-product cohort has complete mandatory source cards. At least 80 '
+    + 'publicly accessible products have a recent successful bounded sample and exact '
+    + 'technical recipe; remaining cohort members have verified restricted/manual access '
+    + 'routes. Record versions are not extra products.',
+  denominator: '100 frozen product identities from C-002-1. Public-sample target uses '
+    + 'the public-access subset of that same 100; it does not redefine the cohort.',
+  numerator: 'Pass iff all 100 have complete mandatory source cards, at least 80 '
+    + 'public-access members have recent successful bounded samples plus exact recipes, '
+    + 'and every remaining member has a verified restricted/manual route. Shortfall is '
+    + 'reported; the cohort is not quietly redefined.',
+});
 
 const PACKET_REL = 'verification/research-program/evidence/payload-retrieval-pilot.json';
 const AUTH_REL = 'verification/research-program/authorization/payload-authorizations.json';
@@ -285,6 +322,82 @@ export function qualifyRetainedPayload({ repoRoot = ROOT, fetchImpl = null } = {
   })));
   if (r04Checks.some((row) => row.r04_eligible === true)) fail('RETAINED_NO_RECEIPT_IS_R04_ELIGIBLE');
 
+  // Correction 4 (2026-09-17): compare the retained receipts against the R04
+  // acceptance TEXT across four cases instead of against isR04EligiblePayload()
+  // alone. Case A uses the live-sample predicate; Cases B/C use the
+  // reanalysis/corpus predicates (a fully-evidenced local reanalysis CAN
+  // qualify — live_http=false alone never forces a refetch); Case D is the
+  // missing-evidence remainder. Present receipts fail on named dimensions.
+  const hcrisIntegrity = integrity.find((row) => row.product_key === HCRIS_PRODUCT);
+  const caseA = freeze([
+    freeze({
+      case: 'a_originally_authorized_live_capture',
+      receipt_id: hcrisReceipt.receipt_id,
+      eligible: isR04EligiblePayload(hcrisReceipt.payload ?? {}),
+      disqualifying_dimensions: freeze(['identity: failed under then-required PROVNUM; not a derived sample']),
+    }),
+    freeze({
+      case: 'a_originally_authorized_live_capture',
+      receipt_id: placesReceipt.receipt_id,
+      eligible: isR04EligiblePayload(placesReceipt.payload ?? {}),
+      disqualifying_dimensions: freeze(['release: year is unresolved as 2025 county-table proof']),
+    }),
+  ]);
+  const caseB = assessReanalysisEligibility(
+    { ...(reanalysis.payload ?? {}), evidence_sha256: reanalysis.evidence_sha256 },
+    {
+      expectedSha256: HCRIS_SHA256,
+      shaVerified: hcrisIntegrity.sha_verified,
+      bytesPresent: hcrisIntegrity.bytes_present,
+    },
+  );
+  const caseC = assessFrozenCorpusEligibility(
+    { ...(reanalysis.payload ?? {}), evidence_sha256: reanalysis.evidence_sha256 },
+    {
+      expectedSha256: HCRIS_SHA256,
+      shaVerified: hcrisIntegrity.sha_verified,
+      bytesPresent: hcrisIntegrity.bytes_present,
+      acquisitionEvidenced: false,
+    },
+  );
+  const caseAnalysis = freeze({
+    acceptance_source: R04_ACCEPTANCE_TEXT.source,
+    acceptance_status: R04_ACCEPTANCE_TEXT.status,
+    circular_contract_rejected: true,
+    note: 'isR04EligiblePayload() is the Case-A live-sample predicate, not the acceptance '
+      + 'contract. Cases B/C show when a local reanalysis or frozen corpus sample can '
+      + 'qualify without a refetch (SHA-bound bytes + intact auth chain + current-identity '
+      + 'derivation + verified release + exact recipe). Present samples fail on the named '
+      + 'dimensions below, so no refetch is ordered by this rule — the failing dimension '
+      + '(not live_http=false) is what must be repaired.',
+    case_a_live_captures: caseA,
+    case_b_reanalysis_present: freeze({
+      receipt_id: reanalysis.receipt_id,
+      eligible: caseB.eligible,
+      reasons: caseB.reasons,
+      can_qualify_without_refetch: true,
+      why_not_yet: 'release unresolved (FY_END_DT) and bytes absent off-host; '
+        + 'live_http=false is not the disqualifier',
+    }),
+    case_c_frozen_corpus_present: freeze({
+      eligible: caseC.eligible,
+      reasons: caseC.reasons,
+      suitably_evidenced: false,
+    }),
+    case_d_missing_evidence: freeze({
+      captures_with_missing_dimensions: 3,
+      dimensions: freeze([
+        'acquisition provenance: PLACES mixed-transport gap; no independent HTTP access log',
+        'freshness: 2026-09-15 captures are not recent for future R04',
+        'integrity: bytes gitignored and absent off-host; SHA claimed, not re-verified',
+        'identity: HCRIS live failed under superseded PROVNUM (preserved)',
+        'release: both products unresolved (FY_END_DT; year)',
+      ]),
+    }),
+  });
+  if (caseB.eligible !== false) fail('RETAINED_REANALYSIS_MUST_NOT_YET_QUALIFY');
+  if (caseC.eligible !== false) fail('RETAINED_CORPUS_MUST_NOT_YET_QUALIFY');
+
   const ledgerBytesAfter = readFileSync(path.join(repoRoot, LEDGER_REL), 'utf8');
   if (ledgerBytesAfter !== ledgerBytesBefore) fail('RETAINED_LEDGER_MUTATED');
   assertNoFetch(fetchCalls);
@@ -358,8 +471,18 @@ export function qualifyRetainedPayload({ repoRoot = ROOT, fetchImpl = null } = {
       legacy_status_hazard_noted: legacyStatusHazard,
       future_receipts_should_prefer_file_sample_derived: true,
     }),
+    acceptance_grounding: freeze({
+      acceptance_text: R04_ACCEPTANCE_TEXT,
+      circular_contract_rejected:
+        'The contract is the quoted R04 text above, not isR04EligiblePayload(). '
+        + 'That predicate is the Case-A live-sample check inside the comparison below.',
+      case_analysis: caseAnalysis,
+    }),
     acceptance_comparison: freeze({
-      contract: 'Only scripts/research-program/qualify-core.mjs live_http + frozen-derivation + verified-release counts toward R04; receipt status strings never count.',
+      contract: 'Case-A live-sample engineering predicate '
+        + '(scripts/research-program/qualify-core.mjs isR04EligiblePayload: live_http + '
+        + 'frozen-derivation + verified-release); receipt status strings never count. '
+        + 'Cases B/C are assessed in acceptance_grounding, not here.',
       r04_target: 80,
       r04_eligible_retained_samples: 0,
       public_sample_complete: counts.public_sample_complete,

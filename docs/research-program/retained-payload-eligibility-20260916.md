@@ -2,7 +2,7 @@
 
 Status: engineering rule for existing captured payloads. Not scientific acceptance, not payload authorization, not production change. No live HTTP is issued by this rule. Frozen `evaluation/research-program/cohorts.json` (`89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543`) is unmodified.
 
-Machine-readable rule: `scripts/research-program/qualify-retained-payload.mjs` (format `ushso.retained-payload-eligibility.v1`). Regression tests: `tests/research-program/retained-payload-eligibility.test.mjs` (mock transport only, zero fetches).
+Machine-readable rule: `scripts/research-program/qualify-retained-payload.mjs` (format `ushso.retained-payload-eligibility.v1`). Regression tests: `tests/research-program/retained-payload-eligibility.test.mjs` plus Correction-4 `tests/research-program/retained-payload-contract-cases.test.mjs` (mock transport only, zero fetches).
 
 ## Retained set (no new retrieval)
 
@@ -53,18 +53,112 @@ File reanalysis `verification/research-program/evidence/reanalysis/hcris-provide
 - Reanalysis: 1 receipt, `bounded_file_sample`, `live_http` false, candidate `be7d32b`, same evidence SHA as live HCRIS, does not overwrite live, spends no budget.
 - Legacy status hazard: the history reanalysis uses status `bounded_sample` with `bounded_sample` true to mean file-sample identity derived. The rule notes `legacy_status_hazard` and requires future receipts prefer `file_sample_derived`. Both validate; both yield 0 R04.
 
-## 7. Acceptance-contract comparison (R04)
+## 7. Acceptance comparison, grounded in the R04 text (Correction 4 — 2026-09-17)
 
-Contract: only `scripts/research-program/qualify-core.mjs` `isR04EligiblePayload()` counts — `_derived_payload_sample` + `_derived_from_frozen_requirements` + `live_http` true + supported + `bounded_sample` + `payload_success` + not fictional/synthetic/catalog/vintage + `_release_check.status` verified + row count > 0. R04 needs 80 such public samples (frozen 100 cohort); restricted routes need verified routes.
+Prior wording of this section defined the contract as the existing
+`isR04EligiblePayload()` implementation and then concluded the implementation
+matched — a circular comparison. That wording is retracted. The contract is the
+acceptance text quoted below; the implementation is compared against it across
+four cases. Machine-readable ground: `R04_ACCEPTANCE_TEXT` +
+`acceptance_grounding.case_analysis` in `qualify-retained-payload.mjs`.
 
-Retained comparison: HCRIS live is not a derived sample (failed); PLACES live is derived-identity but release unresolved; reanalysis is derived-identity but `live_http` false and release unresolved. Per-receipt `r04_eligible` false × 3. `payloadSampleCountsFromReceipts` gives `public_sample_complete` 0, target 80, `r04_engineering_target_met` false, `r04_accepted` false. Accurate counts, no refetch:
+R04 (`docs/research-program/acceptance.md`, status `unaccepted`, frame
+`identities_frozen_usability_not_materialized`) — R03/R05 context: R03 needs a
+complete attempt ledger (not_attempted is not success); R05 needs every example
+field bound to wire names with provenance. R04 builds on both (attempted +
+meaningful samples):
+
+- **Master-plan threshold (quote):** "Frozen 100-product cohort has complete
+  mandatory source cards. At least 80 publicly accessible products have a recent
+  successful bounded sample and exact technical recipe; remaining cohort members
+  have verified restricted/manual access routes. Record versions are not extra
+  products."
+- **Denominator (quote):** "100 frozen product identities from C-002-1.
+  Public-sample target uses the public-access subset of that same 100; it does
+  not redefine the cohort."
+- **Numerator / pass predicate (quote):** "Pass iff all 100 have complete
+  mandatory source cards, at least 80 public-access members have recent
+  successful bounded samples plus exact recipes, and every remaining member has
+  a verified restricted/manual route. Shortfall is reported; the cohort is not
+  quietly redefined."
+
+Five evidence dimensions decide whether a candidate sample satisfies "recent
+successful bounded sample plus exact recipe" for one numerator slot:
+
+1. **Acquisition provenance** — the capture is bound to an authorization
+   (AUTH id, execution head, endpoints, limits, credentials none) with no
+   unexplained transport gap. A gap (e.g. the PLACES manual continuation) does
+   not auto-fail if disclosed and bridged by receipt + ledger agreement; an
+   unregistered capture fails.
+2. **Freshness** — the sample is recent relative to evaluation time.
+   Validation-assigned execution windows are disclosed as such; retained
+   2026-09-15 captures are not recent for future R04. Freshness follows the
+   capture, not a later reanalysis timestamp.
+3. **Integrity** — bytes are SHA-bound (digest equality on the exact bytes,
+   not a claimed string) with row count and JSON-row shape re-verified where
+   bytes are present. Gitignored-and-absent bytes are `unverified_missing_bytes`.
+4. **Identity** — every row exposes the CURRENT frozen requirement field
+   (`Provider CCN` for HCRIS per amendment
+   `HCRIS-IDENTITY-PROVIDER-CCN-20260915`; `stateabbr` for PLACES), with frozen
+   record/native IDs matching. A superseded field (PROVNUM) fails.
+5. **Release verification** — `_release_check.status` is `verified` by frozen
+   publisher documentation. A claimed `release_id` string is not proof: HCRIS
+   `FY_END_DT` / Fiscal Year End Date is a reporting-period date, and PLACES
+   `year` is an observation attribute of undetermined meaning (see
+   `hcris-places-schema-notes-20260915.md`). Unresolved release fails the slot.
+
+Four cases, evaluated against that text:
+
+- **(a) Originally authorized live capture.** Qualifies for one slot iff all
+  five dimensions hold. `isR04EligiblePayload()` (`_derived_payload_sample` +
+  `_derived_from_frozen_requirements` + `live_http` true + supported +
+  `bounded_sample` + `payload_success` + not fictional/synthetic/catalog/vintage
+  + `_release_check.status` verified + row count > 0) is the Case-A
+  live-sample check — one case, not the contract. Present: HCRIS live fails
+  identity (failed under then-required PROVNUM, preserved); PLACES live fails
+  release (year unresolved). 0 slots.
+- **(b) Later local reanalysis of the same bytes.** CAN qualify without a
+  refetch iff: SHA-bound to the original capture (digest equality) + auth chain
+  intact (`reanalysis_of` link, `not_a_new_retrieval`, no budget spent) +
+  identity re-derived under current frozen requirements + release verified +
+  exact recipe recorded (`assessReanalysisEligibility()` in `qualify-core.mjs`).
+  There is NO blanket refetch rule for `live_http` false: `live_http=false`
+  alone never disqualifies; the failing dimension does. Present HCRIS
+  reanalysis: auth chain intact, identity derived under `Provider CCN`, recipe
+  recorded — but release unresolved (FY_END_DT) and bytes absent off-host, so
+  reasons `release_unverified:unresolved`, `integrity_sha_unverified`,
+  `integrity_bytes_absent`. 0 slots. A future reanalysis that closes release
+  (first-party CMS statement) and re-verifies bytes on the original disk would
+  qualify with no new publisher request.
+- **(c) Suitably evidenced frozen local payload corpus.** Same five dimensions
+  as (b), minus the `reanalysis_of` link: the sample stands on its own
+  evidence reference + digest, and acquisition provenance must be evidenced by
+  the corpus manifest (`assessFrozenCorpusEligibility()`). "Suitably evidenced"
+  means every dimension holds. The present `pilot-r04` corpus is NOT suitably
+  evidenced (gitignored/absent bytes, unresolved releases, mixed-transport
+  gap) — reasons `acquisition_provenance_unevidenced`,
+  `integrity_bytes_absent`, `integrity_sha_unverified`,
+  `release_unverified:unresolved`. 0 slots.
+- **(d) Capture with missing acquisition/release evidence.** Cannot qualify:
+  unregistered IDs fail `UNAUTHORIZED_LIVE_HTTP`; missing SHA, identity, or
+  release each fail their dimension. All three present receipts sit in (d) for
+  at least one dimension (see `case_d_missing_evidence`).
+
+Retained verdict against the R04 text: HCRIS live 0 (identity), PLACES live 0
+(release), reanalysis 0 (release + integrity). Per-receipt `r04_eligible` false
+× 3. `payloadSampleCountsFromReceipts` gives `public_sample_complete` 0,
+target 80, `r04_engineering_target_met` false, `r04_accepted` false. R04 stays
+`unaccepted`. Accurate counts, no refetch ordered by this rule — the failing
+dimension (not `live_http=false`) is what a future correction must repair:
 
 `{ live_captures: 2, live_identity_failed: 1, live_identity_passed_release_unresolved: 1, reanalysis_file_samples: 1, qualified_r04_samples: 0, live_requests_used: 2, live_requests_remaining: 2 }`
 
 ## 8. Validator repairs (failures preserved)
 
 - `ingest-evidence.mjs`: additive file-sample flags (`_file_sample`, `_r04_eligible=false`, `_status_hazard` for legacy status). No throw behavior changed; all prior failures (identity missing, catalog-as-sample, vintage, fictional, AUTH-04, hash mismatch) still fail with the same codes.
-- `qualify-core.mjs`: extracted `isR04EligiblePayload()` as the single source of truth; `payloadSampleCountsFromReceipts` delegates with identical predicate. Status strings still never count.
+- `qualify-core.mjs`: `isR04EligiblePayload()` is the Case-A live-sample predicate (behavior unchanged; `payloadSampleCountsFromReceipts` delegates identically). Correction 4 adds `assessReanalysisEligibility()` (Case B) and `assessFrozenCorpusEligibility()` (Case C) — pure predicates stating when a local reanalysis or frozen corpus sample can satisfy the R04 text without a refetch. Status strings still never count.
+- `qualify-retained-payload.mjs`: Correction 4 adds `R04_ACCEPTANCE_TEXT` (verbatim threshold/denominator/numerator) and `acceptance_grounding.case_analysis`, which compares the three retained receipts against that text across cases (a)–(d). `acceptance_comparison` now labels the live-sample predicate as Case A only. Counts, failures, ledger, and zero-fetch behavior unchanged.
+- `ingest-evidence.mjs`: Correction 4 adds the `_reanalysis_of` link flag for `bounded_file_sample` receipts carrying `reanalysis_of` + `not_a_new_retrieval` (Case-B chain). No throw behavior changed.
 - `validate-payload-retrieval-pilot.mjs`: additive `packetIdentityCurrency()` (+ amended/superseded constants). `validatePayloadRetrievalPilot()` throw behavior unchanged; the prepared packet still validates as prepared/not-authorized history while currency reports stale.
 
 ## 9. What this rule does not do

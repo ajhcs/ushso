@@ -91,10 +91,18 @@ function evidenceCell(evidence, fallbackStatus) {
   });
 }
 
-// Track 3 retained-payload repair: single source of truth for the R04 live-sample
-// acceptance contract. Receipt status strings never count; only this
-// live_http + frozen-derivation + verified-release predicate counts.
-// File-sample reanalysis (live_http false, unresolved release) is never eligible.
+// Track 3 retained-payload repair: single source of truth for the R04 LIVE-sample
+// engineering predicate. Receipt status strings never count; only this
+// live_http + frozen-derivation + verified-release predicate counts for Case A
+// (originally authorized live capture). This predicate is NOT the whole R04
+// acceptance contract: docs/research-program/acceptance.md R04 requires
+// "recent successful bounded sample[s] plus exact recipes" over the frozen
+// 100-product cohort, and Correction 4 (2026-09-17) defines when a later local
+// reanalysis (Case B, assessReanalysisEligibility) or a suitably evidenced
+// frozen corpus sample (Case C, assessFrozenCorpusEligibility) can satisfy that
+// text without a refetch. live_http=false alone never forces a refetch; a
+// missing dimension (unbound SHA, broken auth chain, failed identity,
+// unverified release, missing recipe) is what disqualifies.
 export function isR04EligiblePayload(payload = {}) {
   return payload._derived_payload_sample === true
     && payload._derived_from_frozen_requirements === true
@@ -109,6 +117,109 @@ export function isR04EligiblePayload(payload = {}) {
     && payload._release_check?.status === 'verified'
     && Number.isSafeInteger(payload._derived_row_count)
     && payload._derived_row_count > 0;
+}
+
+export const REANALYSIS_QUALIFICATION_VERSION = 'ushso.reanalysis-qualification.v1';
+
+function hasRecipe(payload) {
+  return typeof payload.recipe === 'string' && payload.recipe.trim().length > 0;
+}
+
+function hasDerivedIdentity(payload) {
+  return payload._derived_payload_sample === true
+    && payload._derived_from_frozen_requirements === true
+    && Number.isSafeInteger(payload._derived_row_count)
+    && payload._derived_row_count > 0;
+}
+
+function releaseStatusOf(payload) {
+  return payload._release_check?.status ?? 'missing';
+}
+
+// Correction 4 (2026-09-17) Case B: later local reanalysis of the SAME bytes
+// captured by an originally authorized live retrieval. A reanalysis CAN satisfy
+// the R04 acceptance text ("recent successful bounded sample plus exact
+// recipe") without a refetch when all five dimensions hold: (1) integrity —
+// bytes are SHA-bound to the original capture (digest equality, not a claimed
+// string); (2) acquisition provenance — the auth chain is intact
+// (reanalysis_of links the original receipt, not_a_new_retrieval is true, no
+// budget is spent); (3) identity — re-derived under CURRENT frozen
+// requirements (not a superseded field); (4) release — verified (a reporting
+// attribute such as FY_END_DT or year is not release proof); (5)
+// reproducibility — an exact recipe is recorded. live_http=false alone never
+// forces a refetch; a failed dimension does. Pure predicate: no I/O, no fetch.
+export function assessReanalysisEligibility(payload = {}, {
+  expectedSha256 = null,
+  shaVerified = null,
+  bytesPresent = null,
+} = {}) {
+  const reasons = [];
+  if (payload.live_http !== false) reasons.push('not_a_reanalysis_use_live_path');
+  if (payload.not_a_new_retrieval !== true) reasons.push('auth_chain_new_retrieval_claim');
+  if (typeof payload.reanalysis_of !== 'string' || payload.reanalysis_of.trim() === '') {
+    reasons.push('auth_chain_no_reanalysis_link');
+  }
+  if (expectedSha256 != null
+    && typeof payload.evidence_sha256 === 'string'
+    && payload.evidence_sha256 !== expectedSha256) {
+    reasons.push('integrity_sha_mismatch');
+  }
+  if (shaVerified === false) reasons.push('integrity_sha_unverified');
+  if (bytesPresent === false) reasons.push('integrity_bytes_absent');
+  if (expectedSha256 == null && shaVerified !== true) reasons.push('integrity_sha_unbound');
+  if (!hasDerivedIdentity(payload)) reasons.push('identity_not_derived');
+  const release = releaseStatusOf(payload);
+  if (release !== 'verified') reasons.push('release_unverified:' + release);
+  if (!hasRecipe(payload)) reasons.push('recipe_missing');
+  if (payload.fictional === true || payload.synthetic === true) reasons.push('fictional_or_synthetic');
+  if (payload.vintage_substitution === true) reasons.push('vintage_substitution');
+  if (payload.catalog_membership_as_sample === true) reasons.push('catalog_membership_is_not_sample');
+  return freeze({
+    format: REANALYSIS_QUALIFICATION_VERSION,
+    case: 'reanalysis_of_retained_bytes',
+    eligible: reasons.length === 0,
+    reasons: freeze(reasons),
+    release_status: release,
+  });
+}
+
+// Correction 4 (2026-09-17) Case C: suitably evidenced frozen local payload
+// corpus. Same five dimensions as Case B, minus the reanalysis_of link (a
+// corpus sample stands on its own evidence_reference + digest); acquisition
+// provenance must instead be evidenced by the corpus manifest (caller passes
+// acquisitionEvidenced=true only when that manifest binds the bytes to an
+// authorized capture). "Suitably evidenced" means every dimension below
+// holds; gitignored-and-absent bytes, an unresolved release, or a missing
+// recipe each disqualify on their own. Pure predicate: no I/O, no fetch.
+export function assessFrozenCorpusEligibility(payload = {}, {
+  expectedSha256 = null,
+  shaVerified = false,
+  bytesPresent = false,
+  acquisitionEvidenced = false,
+} = {}) {
+  const reasons = [];
+  if (acquisitionEvidenced !== true) reasons.push('acquisition_provenance_unevidenced');
+  if (bytesPresent !== true) reasons.push('integrity_bytes_absent');
+  if (shaVerified !== true) reasons.push('integrity_sha_unverified');
+  if (expectedSha256 != null
+    && typeof payload.evidence_sha256 === 'string'
+    && payload.evidence_sha256 !== expectedSha256) {
+    reasons.push('integrity_sha_mismatch');
+  }
+  if (!hasDerivedIdentity(payload)) reasons.push('identity_not_derived');
+  const release = releaseStatusOf(payload);
+  if (release !== 'verified') reasons.push('release_unverified:' + release);
+  if (!hasRecipe(payload)) reasons.push('recipe_missing');
+  if (payload.fictional === true || payload.synthetic === true) reasons.push('fictional_or_synthetic');
+  if (payload.vintage_substitution === true) reasons.push('vintage_substitution');
+  if (payload.catalog_membership_as_sample === true) reasons.push('catalog_membership_is_not_sample');
+  return freeze({
+    format: REANALYSIS_QUALIFICATION_VERSION,
+    case: 'frozen_local_payload_corpus',
+    eligible: reasons.length === 0,
+    reasons: freeze(reasons),
+    release_status: release,
+  });
 }
 
 export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
