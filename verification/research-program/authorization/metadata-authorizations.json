@@ -38,6 +38,43 @@
       "valid_from": null,
       "valid_until": null,
       "note": "Corrected 20260917 (see docs/research-program/metadata-endpoint-deviation-20260917.md): prior owner-approved integration rebind to 348e464 executed the wrong payload endpoints (2 used/0 remaining, receipts a25f0526/935ea833, byte-identical repeats efb538d3/d67b34ef). This entry is now prepared-corrected for the intended JSON metadata endpoints (dataset-resources + api/views swc5-untb.json) on codex/ushso-corr1-metadata-20260917 with the same caps; owner must rebind candidate_head to the exact execution HEAD with a validity window without resetting either ledger. Prior authorization history preserved in git (f86dc15). AUTH-04 and AUTH-PAYLOAD-PILOT do not grant this. No live execution until re-authorized."
+    },
+    {
+      "id": "AUTH-METADATA-CHECK-CORRECTED-20260917",
+      "authorized": false,
+      "status": "prepared-20260917-int2",
+      "revoked": false,
+      "action": "metadata_check",
+      "candidate_head": null,
+      "candidate_branch": "codex/ushso-int2-metadata-20260917",
+      "operation_id": "OP-METADATA-CHECK-CORRECTED-20260917",
+      "ledger": "verification/research-program/evidence/metadata-check-ledger-corrected-20260917.json",
+      "product_keys": [
+        "cms-hcris-hospital-provider-cost-report",
+        "cdc-places-local-data-for-better-health"
+      ],
+      "endpoints": [
+        "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb",
+        "https://data.cdc.gov/api/views/swc5-untb.json"
+      ],
+      "limits": {
+        "max_requests": 2,
+        "max_bytes": 131072,
+        "max_seconds": 15,
+        "max_concurrency": 1,
+        "max_requests_per_source": 1,
+        "max_bytes_per_source": 65536,
+        "max_seconds_per_source": 15,
+        "max_redirects_per_request": 0,
+        "max_retries_per_source": 0
+      },
+      "credentials": {
+        "required": false,
+        "kind": "none"
+      },
+      "valid_from": null,
+      "valid_until": null,
+      "note": "Additive corrected entry 20260917 (integration): same caps as the prior entry but bound to operation OP-METADATA-CHECK-CORRECTED-20260917 and the corrected ledger, with NO row limits (metadata docs are parsed as documents, not rows). The prior AUTH-METADATA-CHECK entry is preserved untouched (spent on wrong payload endpoints). Owner must rebind candidate_head to the exact execution HEAD with a validity window without resetting any ledger. AUTH-04 and AUTH-PAYLOAD-PILOT do not grant this. No live execution until re-authorized."
     }
   ]
 }
