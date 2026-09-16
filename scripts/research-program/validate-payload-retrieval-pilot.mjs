@@ -12,6 +12,34 @@ const EXPECTED_COHORTS_SHA256 = '89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f33
 const PILOT_KEYS = Object.freeze(['cms-hcris-hospital-provider-cost-report', 'cdc-places-local-data-for-better-health']);
 const FORBIDDEN_PLACES = '7cmc-7y5g';
 const EXPECTED_BRANCH = 'codex/ushso-evidence-ingestion-20260915';
+// Track 3 retained-payload repair (additive only; validatePayloadRetrievalPilot
+// throw behavior unchanged). Amendment HCRIS-IDENTITY-PROVIDER-CCN-20260915
+// supersedes the prepared packet's PROVNUM field with Provider CCN. The
+// prepared packet is preserved as pre-amendment history and must not be
+// executed as-is; future live runs need a new packet or explicit revision plus
+// an owner AUTH rebind without ledger reset.
+export const AMENDED_HCRIS_IDENTITY_FIELD = 'Provider CCN';
+export const SUPERSEDED_HCRIS_IDENTITY_FIELD = 'PROVNUM';
+export function packetIdentityCurrency(packet = {}, requirements = {}) {
+  const hcrisPacket = (packet.products ?? []).find((row) => row.product_key === 'cms-hcris-hospital-provider-cost-report');
+  const packetFields = Object.keys(hcrisPacket?.identity_checks?.required_fields ?? {});
+  const requiredFields = Object.keys(requirements.products?.['cms-hcris-hospital-provider-cost-report']?.row_fields ?? {});
+  const amended = requiredFields.includes(AMENDED_HCRIS_IDENTITY_FIELD);
+  const packetHasAmended = packetFields.includes(AMENDED_HCRIS_IDENTITY_FIELD);
+  const packetHasSuperseded = packetFields.includes(SUPERSEDED_HCRIS_IDENTITY_FIELD);
+  const stale = amended && !packetHasAmended;
+  return Object.freeze({
+    amended_field: AMENDED_HCRIS_IDENTITY_FIELD,
+    superseded_field: SUPERSEDED_HCRIS_IDENTITY_FIELD,
+    amendment_applied: amended,
+    packet_required_fields: Object.freeze(packetFields),
+    requirement_row_fields: Object.freeze(requiredFields),
+    packet_has_amended_field: packetHasAmended,
+    packet_has_superseded_field: packetHasSuperseded,
+    stale_pre_amendment_packet: stale,
+    must_not_execute_as_is: stale,
+  });
+}
 
 function fail(code, detail) {
   const error = new Error(detail ?? code);
