@@ -12,6 +12,12 @@ const EXPECTED_COHORTS_SHA256 = '89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f33
 const METADATA_KEYS = Object.freeze(['cms-hcris-hospital-provider-cost-report', 'cdc-places-local-data-for-better-health']);
 const FORBIDDEN_PLACES = '7cmc-7y5g';
 const EXPECTED_BRANCH = 'codex/ushso-corr1-metadata-20260917';
+// Historical provenance only: the prepared packet was drafted on EXPECTED_BRANCH,
+// but offline validation is branch-agnostic and must pass on integration branches,
+// detached HEAD, and CI. Do NOT gate offline validation on checkout branch name.
+// Execution-time authorization (run-metadata-check.mjs --execute) still enforces
+// exact candidate HEAD + AUTH binding + endpoints + frozen SHA + budget before any fetch.
+export const METADATA_HISTORICAL_BRANCH = EXPECTED_BRANCH;
 const EXPECTED_ENDPOINTS = Object.freeze([
   'https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb',
   'https://data.cdc.gov/api/views/swc5-untb.json',
@@ -39,14 +45,16 @@ export function validateMetadataCheck({ repoRoot = ROOT } = {}) {
   if (packet.accepted === true || packet.scientific_approval === true) fail('METADATA_CANNOT_ACCEPT');
   if (packet.live_http === true) fail('METADATA_LIVE_HTTP_FORBIDDEN');
   if (packet.candidate_binding?.must_match_git_head !== true) fail('METADATA_MUST_BIND_GIT_HEAD');
-  if (packet.candidate_binding?.branch !== EXPECTED_BRANCH) fail('METADATA_BRANCH');
+  // Branch provenance (informational, not a gate): record packet-declared branch
+  // and checkout branch/HEAD. Offline validation must not fail on branch name.
+  // Historical note: packetBranch equals EXPECTED_BRANCH for the original prepared
+  // packet, but future integrated candidates may carry different provenance.
+  // Execution authorization binds exact HEAD, not branch name.
+  const packetBranch = packet.candidate_binding?.branch ?? null;
   const head = git(repoRoot, ['rev-parse', 'HEAD']);
   const currentBranch = git(repoRoot, ['branch', '--show-current']);
-  if (currentBranch && currentBranch !== EXPECTED_BRANCH) fail('METADATA_WORKTREE_BRANCH');
-  if (!currentBranch) {
-    const names = git(repoRoot, ['for-each-ref', '--format=%(refname:short)', 'refs/heads/' + EXPECTED_BRANCH, 'refs/remotes/origin/' + EXPECTED_BRANCH]);
-    if (!names.split('\n').filter(Boolean).length) fail('METADATA_BRANCH_REF_MISSING');
-  }
+  const checkoutBranch = currentBranch || null;
+  const checkoutDetached = !currentBranch;
   if (packet.candidate_head && packet.candidate_head !== head) fail('METADATA_CANDIDATE_HEAD_STALE');
   if (packet.candidate_binding?.stale_sha_named_at_first_draft === head) fail('METADATA_STALE_DRAFT_SHA');
   const cohortsBytes = readFileSync(path.join(repoRoot, COHORTS_REL));
@@ -144,9 +152,14 @@ export function validateMetadataCheck({ repoRoot = ROOT } = {}) {
     frozen_cohorts_unmodified: true,
     captures_gitignored: true,
     redirects_consume_budget: true,
-    branch: EXPECTED_BRANCH,
-    git_head: git(repoRoot, ['rev-parse', 'HEAD']),
-    detached_head_allowed: !git(repoRoot, ['branch', '--show-current']),
+    branch: packetBranch ?? EXPECTED_BRANCH,
+    packet_branch: packetBranch,
+    historical_branch: EXPECTED_BRANCH,
+    checkout_branch: checkoutBranch,
+    checkout_head: head,
+    branch_enforcement: 'execution-only',
+    git_head: head,
+    detached_head_allowed: checkoutDetached,
   });
 }
 
