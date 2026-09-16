@@ -1,0 +1,43 @@
+{
+  "format": "ushso.metadata-authorization-register.v1",
+  "policy": "Receipts cannot self-authorize. Only an owner-authorized entry that binds action, exact candidate SHA, product identities, endpoints, limits, credential policy, and validity can grant metadata retrieval. AUTH-04 and AUTH-PAYLOAD-PILOT do not grant this check.",
+  "entries": [
+    {
+      "id": "AUTH-METADATA-CHECK",
+      "authorized": false,
+      "status": "prepared",
+      "revoked": false,
+      "action": "metadata_check",
+      "candidate_head": "78da769956e124898b39fb287cd5b018de9fa962",
+      "candidate_branch": "codex/ushso-track4-metadata-20260916",
+      "product_keys": [
+        "cms-hcris-hospital-provider-cost-report",
+        "cdc-places-local-data-for-better-health"
+      ],
+      "endpoints": [
+        "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5",
+        "https://data.cdc.gov/resource/swc5-untb.json?$limit=5"
+      ],
+      "limits": {
+        "max_requests": 2,
+        "max_bytes": 131072,
+        "max_rows": 10,
+        "max_seconds": 15,
+        "max_concurrency": 1,
+        "max_requests_per_source": 1,
+        "max_bytes_per_source": 65536,
+        "max_rows_per_source": 5,
+        "max_seconds_per_source": 15,
+        "max_redirects_per_request": 0,
+        "max_retries_per_source": 0
+      },
+      "credentials": {
+        "required": false,
+        "kind": "none"
+      },
+      "valid_from": null,
+      "valid_until": null,
+      "note": "Prepared, not authorized. An owner must later rebind candidate_head to the exact execution HEAD on codex/ushso-track4-metadata-20260916 and set authorized true with a validity window. Do not reuse 78da769 after further commits. AUTH-04 and AUTH-PAYLOAD-PILOT do not grant this. No live execution until then."
+    }
+  ]
+}
