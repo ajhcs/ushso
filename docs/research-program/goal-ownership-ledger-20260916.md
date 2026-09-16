@@ -13,8 +13,9 @@
   `/mnt/d/worktrees/plumbob/.ushso-research-program-20260910-worktrees/ushso-goal-20260916`.
 - Base: `origin/codex/research-program-integration-20260910` at
   `9035a81bff0b9aa4a6ccba59d7b8d2dad56fbc30`.
-- Candidate head SHA: recorded by the final Git handoff after review and the
-  exact release gate; no production branch is edited by this task.
+- Implementation head SHA: `b20f66f8117c6e6e1dac05eea7c9fa122a042d8d`.
+  The final handoff commit adds only this ledger update; no production branch
+  is edited by this task.
 
 ## Ownership boundaries
 
@@ -36,8 +37,13 @@
 - Candidate review build is opt-in through the explicit research-candidate
   Vite mode and `/api/candidate/discover`; candidate facts remain documentation
   and evidence-state claims, not payload-access claims.
-- Independent review, exact-candidate release-gate output, and final SHA are
-  handoff requirements and remain pending until recorded.
+- Initial independent Cursor review of `aa9d1f7` requested four bounded fixes:
+  matcher specificity, candidate record/evidence binding, active-generation
+  landing copy, and a clickable brief CTA. Those fixes are in `b20f66f`.
+- Final independent Cursor review of `b20f66f` returned **PASS** with no
+  findings. The reviewer did not modify the implementation branch.
+- The exact-candidate release gate is the remaining handoff check; its receipt
+  and final Git SHA are recorded after execution.
 
 ## Evidence receipts
 
