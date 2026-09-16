@@ -31,7 +31,19 @@ const LEXICAL_BUILD_PIN = typeof USHSO_LEXICAL_BUILD_PIN === "undefined" ? null 
 const SPA_ROUTES = new Set(['/', '/search', '/learn', '/agents', '/sources', '/about', '/methods', '/plan', '/privacy', '/terms', '/contact', '/workspace', '/compare']);
 const STATIC_PATHS = new Set(['/favicon.svg', '/observatory-lighthouse.png', '/state-readiness-v0.1.0.json', '/_headers']);
 
-const HTML_CONTENT_SECURITY_POLICY = "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests";
+const HTML_CSP_BASE = "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; manifest-src 'self'";
+
+// WebKit honors upgrade-insecure-requests even for http://127.0.0.1 origins and
+// rewrites subresource URLs to https://, where no local TLS listener exists.
+// The document then loads no JS/CSS and renders blank (Chromium/Firefox keep
+// localhost subresources on http). Only advertise the upgrade when the document
+// itself was requested over https (production); local http stays http.
+function htmlContentSecurityPolicy(request) {
+  try {
+    if (new URL(request.url).protocol === 'https:') return `${HTML_CSP_BASE}; upgrade-insecure-requests`;
+  } catch {}
+  return HTML_CSP_BASE;
+}
 
 function responseHeaders(init = {}) {
   const headers = new Headers(init.headers);
@@ -56,7 +68,7 @@ function textResponse(value, contentType, init = {}) {
   const headers = responseHeaders(init);
   headers.set('content-type', contentType);
   if (typeof contentType === 'string' && contentType.toLowerCase().startsWith('text/html')) {
-    headers.set('content-security-policy', HTML_CONTENT_SECURITY_POLICY);
+    headers.set('content-security-policy', init.csp ?? HTML_CSP_BASE);
   }
   return new Response(init.head ? null : value, { ...init, headers });
 }
@@ -450,7 +462,7 @@ export function createWorker({
           : records.slice(0, 10);
         const fallback = renderSearchFallbackHtml({ origin: url.origin, question, records: matched, total, generation });
         const page = mergeCrawlerIntoSpa(spaText, fallback);
-        return textResponse(page, 'text/html; charset=utf-8', { cacheControl: 'public, max-age=60', head });
+        return textResponse(page, 'text/html; charset=utf-8', { cacheControl: 'public, max-age=60', head, csp: htmlContentSecurityPolicy(request) });
       }
 
       if (url.pathname.startsWith('/datasets/')) {
@@ -459,23 +471,23 @@ export function createWorker({
         try {
           requestedId = decodeURIComponent(url.pathname.slice('/datasets/'.length));
         } catch {
-          return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Invalid record identifier | USHSO</title></head><body><main><h1>Invalid record identifier</h1><p>The record identifier encoding is invalid.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 400, head });
+          return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Invalid record identifier | USHSO</title></head><body><main><h1>Invalid record identifier</h1><p>The record identifier encoding is invalid.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 400, head, csp: htmlContentSecurityPolicy(request) });
         }
         if (requestedId && !requestedId.includes('/')) {
           try {
             const catalog = await loadCatalog(request, env);
             const record = matchCatalogRecord(catalog.records ?? [], requestedId);
             if (!record) {
-              return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Dataset record not found | USHSO</title></head><body><main><h1>Dataset record not found</h1><p>No published record has this identifier in the current catalog generation. A missing record is not replaced with a silent stale-context page.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 404, head });
+              return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Dataset record not found | USHSO</title></head><body><main><h1>Dataset record not found</h1><p>No published record has this identifier in the current catalog generation. A missing record is not replaced with a silent stale-context page.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 404, head, csp: htmlContentSecurityPolicy(request) });
             }
             const generation = catalog.corpus?.publication?.generation ?? catalog.corpus?.generation ?? CATALOG_HTML_GENERATION;
             const crawlerHtml = renderCatalogSourceHtml(record, { origin: url.origin, generation });
             const spa = await env.ASSETS.fetch(new Request(new URL('/', request.url), { method: 'GET' }));
             const spaText = spa.ok ? await spa.text() : '';
             const page = mergeCrawlerIntoSpa(spaText, crawlerHtml);
-            return textResponse(page, 'text/html; charset=utf-8', { cacheControl: 'public, max-age=300', head });
+            return textResponse(page, 'text/html; charset=utf-8', { cacheControl: 'public, max-age=300', head, csp: htmlContentSecurityPolicy(request) });
           } catch {
-            return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Source details are unavailable | USHSO</title></head><body><main><h1>Source details are unavailable</h1><p>The published record could not be loaded.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 503, head });
+            return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Source details are unavailable | USHSO</title></head><body><main><h1>Source details are unavailable</h1><p>The published record could not be loaded.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 503, head, csp: htmlContentSecurityPolicy(request) });
           }
         }
       }
@@ -485,11 +497,11 @@ export function createWorker({
         const contentType = asset.headers.get('content-type') ?? '';
         if (!contentType.toLowerCase().startsWith('text/html')) return asset;
         const headers = new Headers(asset.headers);
-        headers.set('content-security-policy', HTML_CONTENT_SECURITY_POLICY);
+        headers.set('content-security-policy', htmlContentSecurityPolicy(request));
         return new Response(asset.body, { status: asset.status, statusText: asset.statusText, headers });
       }
 
-      return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Not found | USHSO</title></head><body><main><h1>Page not found</h1><p>No page exists at this address.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 404 });
+      return textResponse('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Not found | USHSO</title></head><body><main><h1>Page not found</h1><p>No page exists at this address.</p></main></body></html>\n', 'text/html; charset=utf-8', { status: 404, csp: htmlContentSecurityPolicy(request) });
     }
   };
 }
