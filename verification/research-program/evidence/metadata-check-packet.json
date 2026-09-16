@@ -1,26 +1,48 @@
 {
-  "format": "ushso.metadata-check-packet.v1",
+  "format": "ushso.metadata-check-packet.v2",
   "status": "prepared_not_authorized",
-  "recorded_at": "2026-09-16T00:00:00Z",
+  "recorded_at": "2026-09-17T00:00:00Z",
   "generation": "live-2026-09-03-85b50522b420",
   "candidate_binding": {
-    "branch": "codex/ushso-corr1-metadata-20260917",
+    "branch": "codex/ushso-int2-metadata-20260917",
     "must_match_git_head": true,
     "stale_sha_named_at_first_draft": "0000000000000000000000000000000000000000",
-    "note": "Corrected 20260917 (see docs/research-program/metadata-endpoint-deviation-20260917.md): authorization and execution must name the exact git HEAD of codex/ushso-corr1-metadata-20260917 at that time. Do not reuse 78da769, 348e464, or f86dc15 (prior spends used payload endpoints, not the intended metadata URLs). This packet is prepared, not authorized; no live HTTP is permitted until AUTH-METADATA-CHECK is rebound for these exact metadata endpoints and limits."
+    "note": "Packet v2 (integration 20260917): single coherent operation OP-METADATA-CHECK-CORRECTED-20260917. Authorization and execution must name the exact git HEAD of codex/ushso-int2-metadata-20260917 at execution time. Do not reuse 78da769, 348e464, f86dc15, or 9035a81 (prior spends/merge base used payload endpoints or no execution, not the corrected metadata operation). This packet is prepared, not authorized; no live HTTP is permitted until AUTH-METADATA-CHECK-CORRECTED-20260917 is rebound for these exact metadata endpoints and limits. V1 history (codex/ushso-corr1-metadata-20260917) is preserved in git."
   },
   "authorization": {
     "requested": false,
     "auth_id": null,
-    "required_auth_id_if_later_granted": "AUTH-METADATA-CHECK",
-    "note": "AUTH-04 (metadata-only canaries) and AUTH-PAYLOAD-PILOT (4-request payload pilot on codex/ushso-evidence-ingestion-20260915) do not cover this metadata check. Do not execute until a distinct AUTH-METADATA-CHECK authorization is recorded for these exact product IDs, endpoints, and limits on this branch without resetting the payload ledger.",
+    "required_auth_id_if_later_granted": "AUTH-METADATA-CHECK-CORRECTED-20260917",
+    "note": "AUTH-04 (metadata-only canaries) and AUTH-PAYLOAD-PILOT (4-request payload pilot on codex/ushso-evidence-ingestion-20260915) do not cover this metadata check. The prior AUTH-METADATA-CHECK entry (spent: 2 used/0 remaining on wrong payload endpoints) does not cover the corrected operation either. Do not execute until the distinct AUTH-METADATA-CHECK-CORRECTED-20260917 authorization is recorded for these exact product IDs, endpoints, and limits on this branch without resetting any ledger.",
     "auth_04_does_not_cover_metadata_check": true,
     "auth_payload_pilot_does_not_cover_metadata_check": true
   },
   "scientific_approval": false,
   "accepted": false,
   "live_http": false,
-  "purpose": "Determine from first-party JSON metadata whether the frozen release identities (CostReport_2023_Final; PLACES_2025_county_table) are established. Two public JSON endpoints only, reused exactly from prior proposals. No dictionary downloads, no redirects, no retries. Observation year must not be equated with release year.",
+  "purpose": "Determine from first-party JSON metadata docs (parsed as documents, not dataset rows) whether the frozen release identities (CostReport_2023_Final; PLACES_2025_county_table) are established. Two public JSON metadata endpoints only, resolved from the operation binding. No dictionary downloads, no redirects, no retries, no row limits. Observation year must not be equated with release year.",
+  "operation": {
+    "id": "OP-METADATA-CHECK-CORRECTED-20260917",
+    "packet_version": "ushso.metadata-check-packet.v2",
+    "auth_id": "AUTH-METADATA-CHECK-CORRECTED-20260917",
+    "ledger": "verification/research-program/evidence/metadata-check-ledger-corrected-20260917.json",
+    "endpoints": [
+      {
+        "product_key": "cms-hcris-hospital-provider-cost-report",
+        "url": "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb"
+      },
+      {
+        "product_key": "cdc-places-local-data-for-better-health",
+        "url": "https://data.cdc.gov/api/views/swc5-untb.json"
+      }
+    ],
+    "capture_dir": "verification/research-program/evidence/payloads/metadata-check/corrected-20260917/",
+    "receipt_dir": "verification/research-program/evidence/metadata-receipts-corrected-20260917/",
+    "attempt_dir": "verification/research-program/evidence/metadata-attempts/corrected-20260917/",
+    "lock": "verification/research-program/evidence/metadata-attempts/corrected-20260917.lock",
+    "run_report": "verification/research-program/evidence/metadata-check-run-corrected-20260917.json",
+    "note": "Single coherent binding: the collector (run-metadata-check.mjs resolveMetadataOperation) reads ledger/capture/receipt/attempt/lock/report paths and endpoints from this block joined against the AUTH entry. The spent wrong-endpoint ledger (metadata-check-ledger.json) is preserved as history and is never referenced. Capture/attempt/lock paths sit under already-gitignored parent trees so no .gitignore change is required."
+  },
   "endpoint_provenance": {
     "note": "Corrected 20260917: exact 2 JSON metadata URLs from track4 proposals (dataset-resources + Socrata api/views); prior provenance citing payload-authorizations endpoints was wrong — see docs/research-program/metadata-endpoint-deviation-20260917.md. No new URLs invented here.",
     "sources": [
@@ -47,33 +69,23 @@
     "products": 2,
     "max_requests": 2,
     "max_bytes": 131072,
-    "max_rows": 10,
     "max_seconds": 15,
     "max_concurrency": 1,
     "credential_required": false
   },
   "allocation": {
-    "note": "1 request per product; byte budget split 65536+65536=131072 to match aggregate; row budget split 5+5=10; time is a shared 15s wall-clock (global deadline binds) with per-source 15s upper bound; concurrency 1 sequential.",
+    "note": "1 request per product; byte budget split 65536+65536=131072 to match aggregate; time is a shared 15s wall-clock (global deadline binds) with per-source 15s upper bound; concurrency 1 sequential. No row budgets: metadata docs are parsed as documents, not rows.",
     "per_source": {
       "cms-hcris-hospital-provider-cost-report": {
-        "max_requests": 1,
-        "max_bytes": 65536,
-        "max_rows": 5,
-        "max_seconds": 15,
-        "max_concurrency": 1
+        "max_requests": 1
       },
       "cdc-places-local-data-for-better-health": {
-        "max_requests": 1,
-        "max_bytes": 65536,
-        "max_rows": 5,
-        "max_seconds": 15,
-        "max_concurrency": 1
+        "max_requests": 1
       }
     },
     "sums": {
       "max_requests": 2,
-      "max_bytes": 131072,
-      "max_rows": 10
+      "max_bytes": 131072
     }
   },
   "request_accounting": {
@@ -91,7 +103,7 @@
       429,
       503
     ],
-    "note": "Only the initial request per product is permitted (1+1=2 total). Any redirect hop or 429/503 retry would consume budget first and then abort with METADATA_REDIRECT_NOT_PERMITTED / METADATA_RETRY_NOT_PERMITTED. Remaining budget is decremented before a hop is followed. Host allowlist is checked on every Location before a redirect is followed (all redirects abort here). Total budget is 2 across both products, separate from the payload pilot ledger."
+    "note": "Only the initial request per product is permitted (1+1=2 total). Any redirect hop or 429/503 retry would consume budget first and then abort with METADATA_REDIRECT_NOT_PERMITTED / METADATA_RETRY_NOT_PERMITTED. Remaining budget is decremented before a hop is followed. Host allowlist is checked on every Location before a redirect is followed (all redirects abort here). Total budget is 2 across both products, separate from the payload pilot ledger and the spent wrong-endpoint ledger."
   },
   "abort_conditions": [
     "HTTP status outside 2xx (no retry: 0 permitted on 429/503)",
@@ -101,80 +113,86 @@
     "A redirect or retry that would exceed the remaining request budget",
     "Content-Type not application/json",
     "Response bytes exceed the per-source max_bytes (65536) or aggregate 131072",
-    "Row count exceeds the per-source max_rows (5)",
-    "Required identity field missing or type-mismatched (CMS Provider CCN; CDC stateabbr)",
-    "Release-verification constraint failed (both releases must stay unresolved until first-party docs prove them)",
+    "Metadata doc structure unrecognized (not a dataset-resources / Socrata view doc)",
+    "Metadata doc identity mismatch (wrong dataset UUID / wrong view id)",
     "Elapsed time exceeds the per-source max_seconds (15) or aggregate 15s global deadline",
     "Duplicate query key on request or redirect Location",
     "Out-of-scope URL, non-HTTPS, or host not in permitted_hosts",
     "Credentials required or presented (none permitted)",
     "Forbidden native id 7cmc-7y5g appears",
-    "Any live request issued before AUTH-METADATA-CHECK is recorded",
+    "Any live request issued before AUTH-METADATA-CHECK-CORRECTED-20260917 is recorded",
     "Frozen cohorts.json SHA mismatch"
   ],
   "required_receipt_fields": [
-    "format=ushso.evidence-receipt.v1",
-    "kind=core_cell",
+    "format=ushso.metadata-receipt.v1",
+    "kind=metadata_check",
+    "operation_id=OP-METADATA-CHECK-CORRECTED-20260917",
     "generation",
     "candidate_head",
+    "execution_sha256",
     "recorded_at",
-    "evidence_reference",
-    "evidence_sha256",
-    "payload.product_key",
-    "payload.field=publisher_access",
+    "product_key",
+    "payload.field=source_metadata",
     "payload.native_product_id",
     "payload.record_id",
     "payload.release_id",
-    "payload.bounded_sample",
-    "payload.payload_success",
-    "payload.live_http=true",
-    "payload.authorization.id=AUTH-METADATA-CHECK",
-    "payload.execution.kind=bounded_http_sample",
-    "payload.execution.request_url",
-    "payload.execution.final_url",
-    "payload.execution.http_status",
-    "payload.execution.content_type",
-    "payload.execution.redirects",
-    "payload.execution.redirect_chain",
-    "payload.result_format",
-    "payload.row_count",
-    "payload.identity_checks",
-    "payload.limitation"
+    "authorization.id=AUTH-METADATA-CHECK-CORRECTED-20260917",
+    "request.attempted",
+    "request.url",
+    "request.final_url",
+    "response.captured",
+    "response.http_status",
+    "response.content_type",
+    "response.bytes",
+    "response.capture_reference",
+    "response.capture_sha256",
+    "structure.recognized",
+    "structure.parser_version",
+    "identity.verified",
+    "identity.facts[].path",
+    "release.status=verified|unresolved",
+    "year_notes[] (kept separate from release evidence)",
+    "limitations[]",
+    "failure=null|{code,message}"
   ],
   "authorized_receipt_path": {
     "live_http_must_remain_true": true,
     "unauthorized_live_http_rejected": true,
-    "authorization_id_required": "AUTH-METADATA-CHECK",
+    "authorization_id_required": "AUTH-METADATA-CHECK-CORRECTED-20260917",
     "auth_04_rejected": true,
     "auth_payload_pilot_rejected": true,
-    "execution_kind": "bounded_http_sample",
-    "note": "After authorization, captures must keep live_http=true so origin stays truthful. AUTH-04 and AUTH-PAYLOAD-PILOT cannot grant this path."
+    "receipt_format": "ushso.metadata-receipt.v1",
+    "receipt_kind": "metadata_check",
+    "receipt_field": "source_metadata",
+    "execution_kind": "metadata_fetch",
+    "note": "After authorization, captures must keep live_http=true so origin stays truthful. AUTH-04, AUTH-PAYLOAD-PILOT, and the spent AUTH-METADATA-CHECK entry cannot grant this path. Metadata receipts are never bounded payload samples and never increment R04."
   },
   "retention": {
-    "captures_path": "verification/research-program/evidence/payloads/metadata-check/",
+    "captures_path": "verification/research-program/evidence/payloads/metadata-check/corrected-20260917/",
     "captures_gitignored": true,
-    "gitignore_entry": "verification/research-program/evidence/payloads/metadata-check/",
-    "receipts_path": "verification/research-program/evidence/metadata-receipts/",
+    "gitignore_covering_entry": "verification/research-program/evidence/payloads/metadata-check/",
+    "attempts_path": "verification/research-program/evidence/metadata-attempts/corrected-20260917/",
+    "receipts_path": "verification/research-program/evidence/metadata-receipts-corrected-20260917/",
     "receipts_in_git": true,
     "receipts_bind_sha256_of_gitignored_bytes": true,
     "do_not_commit_publisher_rows": true,
     "do_not_republish_publisher_rows": true,
     "max_object_bytes": 65536,
-    "note": "Captured publisher bytes stay on disk and are gitignored. In-tree receipts bind their SHA-256. That is repository-contained evidence without republishing publisher rows in git. Separate from payloads/pilot-r04/."
+    "note": "Captured publisher bytes stay on disk under the gitignored corrected-20260917/ subtree (separate from prior wrong-endpoint captures; no .gitignore change needed). In-tree receipts bind their SHA-256. That is repository-contained evidence without republishing publisher rows in git. Separate from payloads/pilot-r04/."
   },
   "release_question": {
     "note": "Do not equate observation year with release year.",
     "cms-hcris-hospital-provider-cost-report": {
       "claimed_release": "CostReport_2023_Final",
-      "candidate_field": "Fiscal Year End Date / FY_END_DT",
+      "candidate_field": "distribution name + distribution date in $.resources[]",
       "status": "unresolved",
-      "reason": "Fiscal Year End Date is a reporting-period date. Frozen local documentation does not prove it identifies catalog distribution CostReport_2023_Final. Needs a first-party CMS statement linking Fiscal Year End Date (or another captured field) to CostReport_2023_Final."
+      "reason": "Fiscal Year End Date is a reporting-period date. Frozen local documentation does not prove it identifies catalog distribution CostReport_2023_Final. Needs a first-party CMS resources doc with a dated distribution naming CostReport_2023_Final."
     },
     "cdc-places-local-data-for-better-health": {
       "claimed_release": "PLACES_2025_county_table",
-      "candidate_field": "year",
+      "candidate_field": "explicit release statement ($.metadata.release / $.release)",
       "status": "unresolved",
-      "reason": "PLACES year is an observation attribute on the row. Frozen local documentation does not state whether year is measurement year, publication year, or another concept, or that year=2025 proves the representative 2025 county table. Needs a first-party PLACES data dictionary for swc5-untb defining year relative to the 2025 county-table release. Do not treat year=2025 as release proof."
+      "reason": "PLACES year is an observation attribute on the row. Frozen local documentation does not state whether year is measurement year, publication year, or another concept, or that year=2025 proves the representative 2025 county table. Needs an explicit first-party release statement for swc5-untb. Do not treat year=2025 as release proof."
     }
   },
   "products": [
@@ -194,26 +212,43 @@
       ],
       "permitted_redirects": 0,
       "expected_format": "application/json",
-      "identity_checks": {
-        "required_fields": {
-          "Provider CCN": "string"
-        },
-        "max_rows": 5,
-        "note": "Provider CCN per amendment HCRIS-IDENTITY-PROVIDER-CCN-20260915 (PBJ PROVNUM is a different product). Shape only. Fiscal Year End Date is a reporting-period field and does not prove CostReport_2023_Final. No year equality constraint."
+      "metadata_parser": "cms-dataset-resources.v1",
+      "metadata_identity": {
+        "expected_uuid": "44060663-47d8-4ced-a115-b53b4c270acb",
+        "uuid_paths": [
+          "$.dataset.uuid",
+          "$.dataset.id",
+          "$.uuid",
+          "$.id"
+        ],
+        "title_paths": [
+          "$.dataset.title",
+          "$.title",
+          "$.dataset.name",
+          "$.name"
+        ],
+        "resources_path": "$.resources[]",
+        "resource_fields": [
+          "name",
+          "title",
+          "format",
+          "accessURL",
+          "url",
+          "created",
+          "modified",
+          "issued"
+        ],
+        "note": "Doc-level identity is the dataset UUID. Row-level HCRIS identity remains Provider CCN per amendment HCRIS-IDENTITY-PROVIDER-CCN-20260915 (PBJ PROVNUM is a different product); that gate applies to payload rows, not to this metadata doc."
       },
       "release_verification": {
         "native_product_id_must_equal_frozen_native_id": true,
         "endpoint_must_contain": "44060663-47d8-4ced-a115-b53b4c270acb",
-        "payload_fields": [
-          "Provider CCN"
-        ],
         "status": "unresolved",
-        "reason": "FY_END_DT / Fiscal Year End Date is the cost-report fiscal year ending date. Frozen local documentation does not prove it is the CMS catalog distribution release named CostReport_2023_Final."
+        "reason": "FY_END_DT / Fiscal Year End Date is the cost-report fiscal year ending date. Frozen local documentation does not prove it is the CMS catalog distribution release named CostReport_2023_Final. A dated $.resources[] distribution naming CostReport_2023_Final exactly is required; anything weaker stays unresolved."
       },
       "limits": {
         "max_requests": 1,
         "max_bytes": 65536,
-        "max_rows": 5,
         "max_seconds": 15,
         "max_concurrency": 1
       },
@@ -223,12 +258,12 @@
       },
       "abort": [
         "non-JSON body",
-        "missing Provider CCN",
+        "unrecognized resources structure",
+        "wrong dataset UUID",
         "any redirect",
         "any retry",
         "host not data.cms.gov",
         "bytes>65536",
-        "rows>5",
         "over 15s"
       ]
     },
@@ -248,12 +283,19 @@
       ],
       "permitted_redirects": 0,
       "expected_format": "application/json",
-      "identity_checks": {
-        "required_fields": {
-          "stateabbr": "string"
-        },
-        "max_rows": 5,
-        "note": "stateabbr string type is shape only. PLACES year is unresolved as measurement vs publication year and cannot prove the 2025 county-table release by itself. Do not use 7cmc-7y5g. No year equality constraint."
+      "metadata_parser": "cdc-socrata-view.v1",
+      "metadata_identity": {
+        "expected_id": "swc5-untb",
+        "id_path": "$.id",
+        "name_path": "$.name",
+        "description_path": "$.description",
+        "columns_path": "$.columns[]",
+        "column_fields": [
+          "fieldName",
+          "name",
+          "description"
+        ],
+        "note": "Doc-level identity is the Socrata view id swc5-untb. Row-level PLACES identity remains stateabbr; that gate applies to payload rows, not to this metadata doc. Do not use 7cmc-7y5g."
       },
       "release_verification": {
         "native_product_id_must_equal_frozen_native_id": true,
@@ -261,16 +303,12 @@
         "forbidden_native_ids": [
           "7cmc-7y5g"
         ],
-        "payload_fields": [
-          "stateabbr"
-        ],
         "status": "unresolved",
-        "reason": "Frozen local documentation does not establish whether PLACES year is measurement year, publication year, or another concept."
+        "reason": "Frozen local documentation does not establish whether PLACES year is measurement year, publication year, or another concept. An explicit release statement ($.metadata.release / $.release) naming PLACES_2025_county_table is required; anything weaker stays unresolved."
       },
       "limits": {
         "max_requests": 1,
         "max_bytes": 65536,
-        "max_rows": 5,
         "max_seconds": 15,
         "max_concurrency": 1
       },
@@ -280,13 +318,13 @@
       },
       "abort": [
         "non-JSON body",
-        "missing stateabbr",
+        "unrecognized view structure",
+        "wrong view id",
         "any redirect",
         "any retry",
         "host not data.cdc.gov",
         "native id 7cmc-7y5g",
         "bytes>65536",
-        "rows>5",
         "over 15s"
       ]
     }
@@ -307,24 +345,7 @@
     }
   ],
   "dictionary_boundary": {
-    "note": "Corrected 20260917: the two bounded JSON metadata docs below (CMS dataset-resources + CDC api/views swc5-untb.json) are now this check’s endpoints (see endpoint_provenance); they were previously listed as later proposals. No dictionary downloads beyond those two in this check (0 here). Remaining candidates are fallbacks only if the two metadata docs are inconclusive (retain unresolved). See docs/research-program/metadata-endpoint-deviation-20260917.md.",
-    "proposals": [
-      {
-        "need": "CMS statement linking Fiscal Year End Date to CostReport_2023_Final (now fetched as this check’s CMS endpoint)",
-        "candidates": [
-          "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb (resources listing CostReport_2023_Final.csv distribution — now the CMS endpoint)",
-          "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb (dataset metadata fallback, only if resources doc is inconclusive)",
-          "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report (landing page fallback, only if resources doc is inconclusive)"
-        ],
-        "constraint": "The two endpoints of this check only; no CSV/XLSX dictionary payload in this check."
-      },
-      {
-        "need": "PLACES dictionary for swc5-untb defining year vs 2025 county table (now fetched as this check’s CDC endpoint)",
-        "candidates": [
-          "https://data.cdc.gov/api/views/swc5-untb.json (Socrata view metadata — now the CDC endpoint)"
-        ],
-        "constraint": "The two endpoints of this check only; no extra dictionary downloads beyond those two in this check (0 here)."
-      }
-    ]
+    "note": "The two bounded JSON metadata docs above (CMS dataset-resources + CDC api/views swc5-untb.json) are this check’s endpoints. No dictionary downloads beyond those two in this check (0 here). See docs/research-program/metadata-endpoint-deviation-20260917.md.",
+    "extra_downloads": 0
   }
 }
