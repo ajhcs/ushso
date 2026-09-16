@@ -20,11 +20,13 @@ Baseline is the approved production default. Candidate is an explicit research p
 - Two preview entries are HRSA AHRF documentation and Sheps rural closure tracking
 - Both entries are documented-not-verified: access unknown, not live-verified, variables unknown, steps documented but not executed
 - Env file apps/web/.env.candidate selects candidate with vite mode candidate
-- Build with npm run build:candidate, which requires candidate assets and fails loudly if they are missing
+- Build with the explicit candidate command sequence below (no root shortcut script exists by design), which requires candidate assets and fails loudly if they are missing
 - Run locally with npm run dev:candidate in apps/web, or vite with mode candidate
 
-    npm run build:candidate
+    USHSO_CATALOG_MODE=candidate node scripts/stage-corpus.mjs && node scripts/prepare-research-assets.mjs && npm run build:candidate --workspace @ushso/observatory-web
     npm run dev:candidate --workspace @ushso/observatory-web
+
+Root package.json intentionally carries no candidate scripts: the sealed attestation pins the root manifest, so candidate orchestration stays explicit (commands above) plus the apps/web workspace scripts.
 
 ## Single source of truth
 
