@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { PageTitle } from '../components/PageTitle'
+import { CATALOG_RECORD_COUNT, DISCOVERY_API_PATH } from '../data/catalogMode'
 import responseExample from '../data/generatedAgentsResponseExample.json'
 import webMcpContractJson from '../../../../packages/machine-toolkit/public-webmcp-tool.json'
 
@@ -45,7 +46,7 @@ export function AgentsPage() {
         <section className="api-guide" aria-labelledby="api-quick-start">
           <h2 id="api-quick-start">Quick start</h2>
           <p><Link to="/learn#developer-quick-start">Read the beginner developer and MCP guide</Link>. Code examples keep exact wire names and never embed a credential.</p>
-          <p>Send a JSON question to the discovery endpoint. Requests are limited to 20 KiB. The response excerpt below is generated from the versioned 3,434-record production corpus and checked against its reviewed leading record.</p>
+          <p>Send a JSON question to the discovery endpoint at {DISCOVERY_API_PATH}. Requests are limited to 20 KiB. The response excerpt below is generated from the versioned production corpus and checked against its reviewed leading record. This build searches {CATALOG_RECORD_COUNT} records.</p>
           <pre><code>{curlExample}</code></pre>
           <h3>Response shape</h3>
           <pre><code>{jsonExample}</code></pre>
@@ -55,7 +56,7 @@ export function AgentsPage() {
           <h2 id="api-routes">Routes and behavior</h2>
           <dl>
             <div><dt><a href="/api/contract">GET /api/contract</a></dt><dd>Published WebMCP and versioned machine-route activation contract.</dd></div>
-            <div><dt>POST /api/discover</dt><dd>Question-to-source discovery. A zero-result response is not evidence that no source exists. <code>returned_count</code>, <code>total_matches</code>, and <code>has_more</code> describe the bounded response; they do not claim a complete catalog.</dd></div>
+            <div><dt>POST {DISCOVERY_API_PATH}</dt><dd>Question-to-source discovery. A zero-result response is not evidence that no source exists. <code>returned_count</code>, <code>total_matches</code>, and <code>has_more</code> describe the bounded response; they do not claim a complete catalog.</dd></div>
             <div><dt><a href="/api/catalog">GET /api/catalog</a></dt><dd>Browse the published catalog without inventing a question.</dd></div>
             <div><dt>GET /api/datasets/{'{record_id}'}</dt><dd>Dereference one published record independently of search results.</dd></div>
             <div><dt><a href="/api/health">GET or HEAD /api/health</a></dt><dd>Bounded service and corpus readiness check.</dd></div>

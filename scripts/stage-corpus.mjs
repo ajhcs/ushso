@@ -62,6 +62,41 @@ files.push([
 const schemaAssets = await collectSchemaAssets(root);
 for (const asset of schemaAssets) files.push([null, asset.relative, asset.absolute]);
 
+const requestedCatalogMode = process.env.USHSO_CATALOG_MODE || 'all';
+if (requestedCatalogMode !== 'all' && requestedCatalogMode !== 'baseline' && requestedCatalogMode !== 'candidate') {
+  throw new Error('STAGE_CATALOG_MODE_UNKNOWN: USHSO_CATALOG_MODE is ' + requestedCatalogMode);
+}
+if (requestedCatalogMode === 'baseline') {
+  for (let index = files.length - 1; index >= 0; index--) {
+    if (files[index][1].indexOf('corpus-candidate-v1.3.0') === 0) {
+      files.splice(index, 1);
+    }
+  }
+}
+if (requestedCatalogMode === 'candidate' || requestedCatalogMode === 'all') {
+  const candidateManifestPath = path.join(sourceRoot, 'versions/v1.3.0/manifests/candidate-manifest.json');
+  const candidateCorpusPath = path.join(sourceRoot, 'versions/v1.3.0/corpus/corpus.json');
+  const baselineCorpusPath = path.join(sourceRoot, 'versions/v1.2.0/corpus/corpus.json');
+  let candidateManifest = null;
+  let candidateCorpus = null;
+  let baselineCorpus = null;
+  try {
+    candidateManifest = JSON.parse(await fs.readFile(candidateManifestPath, 'utf8'));
+    candidateCorpus = JSON.parse(await fs.readFile(candidateCorpusPath, 'utf8'));
+    baselineCorpus = JSON.parse(await fs.readFile(baselineCorpusPath, 'utf8'));
+  } catch (error) {
+    throw new Error('CANDIDATE_ASSETS_MISSING: candidate corpus or manifest is unavailable and candidate staging cannot silently fall back to baseline');
+  }
+  if (candidateCorpus.record_count !== 3436 || baselineCorpus.record_count !== 3434) {
+    throw new Error('CANDIDATE_MANIFEST_MISMATCH: staged corpus counts do not match the frozen manifests');
+  }
+  if (candidateCorpus.record_count !== baselineCorpus.record_count + 2) {
+    throw new Error('CANDIDATE_ARITHMETIC_MISMATCH: candidate count is not baseline plus two additive records');
+  }
+  if (!candidateManifest || candidateManifest.corpus_version !== '1.3.0-candidate') {
+    throw new Error('CANDIDATE_MANIFEST_VERSION_MISMATCH: candidate manifest version is not 1.3.0-candidate');
+  }
+}
 await fs.mkdir(targetRoot, { recursive: true });
 await fs.rm(path.join(targetRoot, 'corpus-v1.2.0'), { recursive: true, force: true });
 await fs.rm(path.join(targetRoot, 'corpus-candidate-v1.3.0'), { recursive: true, force: true });

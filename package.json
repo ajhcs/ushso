@@ -57,7 +57,11 @@
     "cf:dev": "node scripts/run-wrangler.mjs dev --local --port 8787",
     "cf:deploy:staging": "npm run build && node scripts/run-wrangler.mjs deploy --config wrangler.staging.jsonc",
     "cf:deploy": "npm run build && node scripts/run-wrangler.mjs deploy",
-    "stage:research": "node scripts/prepare-research-assets.mjs"
+    "stage:research": "node scripts/prepare-research-assets.mjs",
+    "stage:corpus:candidate": "USHSO_CATALOG_MODE=candidate node scripts/stage-corpus.mjs",
+    "stage:corpus:baseline": "USHSO_CATALOG_MODE=baseline node scripts/stage-corpus.mjs",
+    "build:candidate": "USHSO_CATALOG_MODE=candidate npm run stage:corpus && npm run stage:research && npm run build:candidate --workspace @ushso/observatory-web",
+    "dev:candidate": "npm run dev:candidate --workspace @ushso/observatory-web"
   },
   "overrides": {
     "ajv": "8.20.0",

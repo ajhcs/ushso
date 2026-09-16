@@ -1,4 +1,5 @@
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
+import { DISCOVERY_API_PATH } from '../data/catalogMode'
 import { canonicalFacetValues, matchesFacetFilter, matchesFacetFilterToken, normalizeFacetValue } from '../data/facets'
 import { browserRecordErrors } from '../../../../packages/retrieval/tools/catalog-contract.mjs'
 import { safeExternalHttpsUrl } from '../../../../packages/retrieval/tools/external-url-policy.mjs'
@@ -551,7 +552,7 @@ export class ApiDiscoveryProvider implements DiscoveryProvider {
   readonly promotionState = 'remote' as const
 
   constructor(
-    private readonly endpoint = '/api/discover',
+    private readonly endpoint = DISCOVERY_API_PATH,
     private readonly fetchImpl: FetchLike = globalThis.fetch.bind(globalThis),
   ) {}
 
@@ -615,7 +616,7 @@ export class ApiDiscoveryProvider implements DiscoveryProvider {
 
 export function createDefaultDiscoveryProvider(): DiscoveryProvider {
   if (import.meta.env.VITE_DISCOVERY_PROVIDER === 'api') {
-    return new ApiDiscoveryProvider(import.meta.env.VITE_DISCOVERY_API_PATH || '/api/discover')
+    return new ApiDiscoveryProvider(DISCOVERY_API_PATH)
   }
   return new FixtureDiscoveryProvider(loadAcceptedDiscoveryFixture, 'accepted')
 }
