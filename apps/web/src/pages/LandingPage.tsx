@@ -6,6 +6,8 @@ import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { SearchBox } from '../components/SearchBox'
 import { PageTitle } from '../components/PageTitle'
+import { PriorityResearchCatalog } from '../components/PriorityResearchNavigator'
+import { ACTIVE_CATALOG } from '../data/catalogDescriptor'
 
 export const CURRENT_GENERATION = 'live-2026-09-03-85b50522b420'
 export const CURRENT_CORPUS_RECORD_COUNT = 3434
@@ -55,7 +57,7 @@ export function LandingPage() {
             <p>USHSO is a discovery and routing layer. It shows what sources exist, the evidence behind each preview, and the documented access route. It does not host the underlying datasets or fetch restricted files for you.</p>
             <SearchBox initialQuery={params.get('q') ?? ''} onSubmit={search} />
             <DiscoveryDimensions />
-            <p className="landing-scope">Current catalog generation <code>{CURRENT_GENERATION}</code> contains {CURRENT_CORPUS_RECORD_COUNT} indexed source identities. Catalog membership is not payload access. <Link to="/learn">Learn the difference</Link> or <Link to="/learn#first-search">start with a verified HCRIS search</Link>.</p>
+            <p className="landing-scope">Active catalog generation <code>{ACTIVE_CATALOG.generation}</code> contains {ACTIVE_CATALOG.recordCount} indexed source identities. Catalog membership is not payload access. <Link to="/learn">Learn the difference</Link> or <Link to="/learn#first-search">start with a verified HCRIS search</Link>.</p>
             <CandidateCatalogNotice compact />
           </div>
         </section>
@@ -77,6 +79,7 @@ export function LandingPage() {
             </ul>
           </div>
         </section>
+        <PriorityResearchCatalog />
         <HowItWorks />
       </main>
       <ObservatoryFooter />

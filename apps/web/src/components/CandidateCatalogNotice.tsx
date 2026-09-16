@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
+import { ACTIVE_CATALOG } from '../data/catalogDescriptor'
 import { CANDIDATE_ADDITIVE_RECORD_COUNT, CANDIDATE_BASELINE_RECORD_COUNT, CANDIDATE_CORPUS_VERSION, CANDIDATE_ENTRIES, CANDIDATE_GENERATION, CANDIDATE_PARENT_GENERATION, CANDIDATE_RECORD_COUNT } from '../data/candidateCatalog'
 
 export function CandidateCatalogNotice({ compact = false }: { compact?: boolean }) {
+  if (!ACTIVE_CATALOG.isCandidate) return null
+
   return (
     <section className="candidate-notice" aria-label="Candidate catalog version" role="note">
       <p><strong>Candidate catalog {CANDIDATE_CORPUS_VERSION}</strong> (explicitly versioned, additive).</p>

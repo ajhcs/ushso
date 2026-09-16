@@ -25,4 +25,14 @@ describe('browse, discover, and plan mode separation', () => {
     expect(planPage).not.toContain('useDiscoveryResult')
     expect(planPage).not.toContain('useDiscoveryProvider')
   })
+
+  it('keeps the published build on the baseline route and requires a named mode for candidates', async () => {
+    const production = await readFile(`${repositoryRoot}apps/web/.env.production`, 'utf8')
+    const candidate = await readFile(`${repositoryRoot}apps/web/.env.research-candidate`, 'utf8')
+    expect(production).toContain('VITE_DISCOVERY_API_PATH=/api/discover')
+    expect(production).toContain('VITE_CATALOG_MODE=baseline')
+    expect(production).not.toContain('/api/candidate/discover')
+    expect(candidate).toContain('VITE_DISCOVERY_API_PATH=/api/candidate/discover')
+    expect(candidate).toContain('VITE_CATALOG_MODE=research-candidate')
+  })
 })
