@@ -11,10 +11,10 @@ const COHORTS_REL = 'evaluation/research-program/cohorts.json';
 const EXPECTED_COHORTS_SHA256 = '89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543';
 const METADATA_KEYS = Object.freeze(['cms-hcris-hospital-provider-cost-report', 'cdc-places-local-data-for-better-health']);
 const FORBIDDEN_PLACES = '7cmc-7y5g';
-const EXPECTED_BRANCH = 'codex/ushso-track4-metadata-20260916';
+const EXPECTED_BRANCH = 'codex/ushso-corr1-metadata-20260917';
 const EXPECTED_ENDPOINTS = Object.freeze([
-  'https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5',
-  'https://data.cdc.gov/resource/swc5-untb.json?$limit=5',
+  'https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb',
+  'https://data.cdc.gov/api/views/swc5-untb.json',
 ]);
 const EXPECTED_AUTH = 'AUTH-METADATA-CHECK';
 
