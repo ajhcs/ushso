@@ -247,6 +247,20 @@ function requirePayloadExecution(payload, parsed, kind) {
   payload._derived_payload_sample = true;
   payload._derived_row_count = rows.length;
   payload._derived_from_frozen_requirements = true;
+  // Track 3 retained-payload repair (additive only; no throw behavior changed):
+  // mark file-sample derivation machine-readably so receipt status strings can
+  // never be counted toward live R04. Only qualify-core live_http+verified
+  // derivation counts. Legacy history uses status bounded_sample for file
+  // samples; future receipts should prefer file_sample_derived.
+  if (execution.kind === 'bounded_file_sample') {
+    payload._file_sample = true;
+    payload._r04_eligible = false;
+    if (payload.status === 'bounded_sample') {
+      payload._status_hazard = 'legacy_bounded_sample_for_file_sample_prefer_file_sample_derived';
+    }
+  } else {
+    payload._file_sample = false;
+  }
 }
 
 export function listReceiptFiles(repoRoot = ROOT, relativeDir = DEFAULT_RECEIPT_DIR) {

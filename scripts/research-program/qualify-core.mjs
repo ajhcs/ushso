@@ -91,6 +91,26 @@ function evidenceCell(evidence, fallbackStatus) {
   });
 }
 
+// Track 3 retained-payload repair: single source of truth for the R04 live-sample
+// acceptance contract. Receipt status strings never count; only this
+// live_http + frozen-derivation + verified-release predicate counts.
+// File-sample reanalysis (live_http false, unresolved release) is never eligible.
+export function isR04EligiblePayload(payload = {}) {
+  return payload._derived_payload_sample === true
+    && payload._derived_from_frozen_requirements === true
+    && payload.live_http === true
+    && payload.supported === true
+    && payload.bounded_sample === true
+    && payload.payload_success === true
+    && payload.fictional !== true
+    && payload.synthetic !== true
+    && payload.catalog_membership_as_sample !== true
+    && payload.vintage_substitution !== true
+    && payload._release_check?.status === 'verified'
+    && Number.isSafeInteger(payload._derived_row_count)
+    && payload._derived_row_count > 0;
+}
+
 export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
   const samples = new Set();
   const verifiedRoutes = new Set();
@@ -103,19 +123,7 @@ export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
       fail('FICTIONAL_WALKTHROUGH_IS_NOT_LIVE_SAMPLE');
     }
     if (payload.family_workflow_as_verified_route === true) fail('FAMILY_WORKFLOW_IS_NOT_VERIFIED_ROUTE');
-    const realSample = payload._derived_payload_sample === true
-      && payload._derived_from_frozen_requirements === true
-      && payload.live_http === true
-      && payload.supported === true
-      && payload.bounded_sample === true
-      && payload.payload_success === true
-      && payload.fictional !== true
-      && payload.synthetic !== true
-      && payload.catalog_membership_as_sample !== true
-      && payload.vintage_substitution !== true
-      && payload._release_check?.status === 'verified'
-      && Number.isSafeInteger(payload._derived_row_count)
-      && payload._derived_row_count > 0;
+    const realSample = isR04EligiblePayload(payload);
     const realRoute = payload.supported === true
       && payload.verified_route === true
       && typeof payload.route_evidence === 'string'
