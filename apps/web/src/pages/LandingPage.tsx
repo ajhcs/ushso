@@ -1,4 +1,5 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { CATALOG_GENERATION, CATALOG_RECORD_COUNT } from '../data/catalogMode'
 import { CandidateCatalogNotice } from '../components/CandidateCatalogNotice'
 import { DiscoveryDimensions } from '../components/DiscoveryDimensions'
 import { HowItWorks } from '../components/HowItWorks'
@@ -7,8 +8,8 @@ import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { SearchBox } from '../components/SearchBox'
 import { PageTitle } from '../components/PageTitle'
 
-export const CURRENT_GENERATION = 'live-2026-09-03-85b50522b420'
-export const CURRENT_CORPUS_RECORD_COUNT = 3434
+export const CURRENT_GENERATION = CATALOG_GENERATION
+export const CURRENT_CORPUS_RECORD_COUNT = CATALOG_RECORD_COUNT
 
 const journeys = [
   {

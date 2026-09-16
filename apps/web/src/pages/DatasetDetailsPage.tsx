@@ -1,7 +1,7 @@
 import { AlertTriangle, Clock3, ExternalLink, Flag, Info, ShieldCheck } from 'lucide-react'
 import { type ReactNode, lazy, Suspense, useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { candidateEntryForRecordId } from '../data/candidateCatalog'
+import { candidateEntryForRecordId } from '../data/catalogMode'
 import { downloadJsonPacket } from '../lib/searchReceipt'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
@@ -223,7 +223,7 @@ export function DatasetDetailsPage() {
           evidence_ids: record.evidence.map((item) => item.evidence_id),
           limitation: 'Catalog membership is not payload access. This packet is the displayed source facts, not scientific acceptance.',
         }, `ushso-source-packet-${record.record_id.replace(/[^a-z0-9.-]+/gi, '-').slice(0, 48)}.json`)}>Download source evidence packet</button></p>
-        {candidateEntry && <section className="candidate-record" aria-labelledby="candidate-record-heading"><h2 id="candidate-record-heading">Documentation-first candidate entry</h2><p>This record is a documentation-first candidate (status incomplete): access unknown, verification not live-verified, variable list unknown, and access steps documented-not-executed (tested false, executed false). Catalog membership is not payload access.</p><p><a href={candidateEntry.packetUrl} download={candidateEntry.packetFilename}>Download research evidence packet</a></p></section>}
+        {candidateEntry && <section className="candidate-record" aria-labelledby="candidate-record-heading"><h2 id="candidate-record-heading">About this research preview entry</h2><p>What this source is: {candidateEntry.whatItIs}</p><p>Why it may help: {candidateEntry.whyItHelps}</p><p>What is documented: {candidateEntry.whatIsDocumented}</p><p>What USHSO actually checked: {candidateEntry.whatWasChecked}</p><p>Next steps: {candidateEntry.nextSteps}</p><p>Unknowns stay unknown. Catalog membership is not payload access.</p><p><a href={candidateEntry.packetUrl} download={candidateEntry.packetFilename}>Download research evidence packet</a></p><details className="technical-details"><summary>Technical details: identifiers and promotion status</summary><p>Record {candidateEntry.recordId} is documentation-first and not live-verified. Access is unknown and variables are unknown.</p><p>Promotion stays deliberate. This preview never replaces the baseline catalog in ordinary builds.</p></details></section>}
         <DetailsShortlist recordId={record.record_id} title={dataset.title} sourceName={record.identity.source.name} detailsPath={dataset.detailsUrl} generation={discovery.result.corpus.publication?.generation ?? discovery.result.corpus.generation ?? `${discovery.result.corpus.corpus_id} ${discovery.result.corpus.corpus_version}`} />
         <ResearcherDecisionSummary dataset={dataset} />
 

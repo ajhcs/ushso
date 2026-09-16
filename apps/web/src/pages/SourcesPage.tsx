@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CandidateCatalogNotice } from '../components/CandidateCatalogNotice'
-import { CANDIDATE_CORPUS_VERSION, CANDIDATE_GENERATION } from '../data/candidateCatalog'
+import { CATALOG_GENERATION, CATALOG_VERSION } from '../data/catalogMode'
 import { LiveCatalogPositioning } from '../components/LiveCatalogPositioning'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
@@ -12,8 +12,8 @@ import { useDiscoveryResult } from '../providers/DiscoveryProviderContext'
 import type { DatasetRecord } from '../types/catalog'
 import type { DiscoveryResult } from '../types/discovery'
 
-export const CURRENT_CORPUS_VERSION = '1.2.0'
-export const CURRENT_GENERATION = 'live-2026-09-03-85b50522b420'
+export const CURRENT_CORPUS_VERSION = CATALOG_VERSION
+export const CURRENT_GENERATION = CATALOG_GENERATION
 export const HISTORICAL_PA_PUBLISHED_RECORD_COUNT = 24
 
 interface ReadinessState {
@@ -112,7 +112,7 @@ export function SourcesPage() {
     fetch('/state-readiness-v0.1.0.json', { signal: controller.signal }).then(async response => {
       if (!response.ok) throw new Error('readiness unavailable')
       const raw = await response.json() as NationalReadiness
-      setReadiness(archiveHistoricalReadiness(raw, CANDIDATE_CORPUS_VERSION, CANDIDATE_GENERATION))
+      setReadiness(archiveHistoricalReadiness(raw, CATALOG_VERSION, CATALOG_GENERATION))
     }).catch(error => {
       if (error instanceof DOMException && error.name === 'AbortError') return
       setReadinessError(true)
