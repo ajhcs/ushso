@@ -20,6 +20,13 @@ const RECEIPT_DIR = 'verification/research-program/evidence/metadata-receipts';
 const EXPECTED_COHORTS = '89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543';
 const LEDGER_FORMAT = 'ushso.metadata-check-ledger.v1';
 const AUTH_ID = 'AUTH-METADATA-CHECK';
+// Correction 20260917 (see docs/research-program/metadata-endpoint-deviation-20260917.md):
+// the bounded payload endpoints below must never satisfy the metadata authorization, even if a
+// stale AUTH entry still lists them. Metadata endpoints are dataset-resources + api/views only.
+const FORBIDDEN_PAYLOAD_ENDPOINTS = Object.freeze([
+  'https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5',
+  'https://data.cdc.gov/resource/swc5-untb.json?$limit=5',
+]);
 
 function fail(code, detail) {
   const error = new Error(detail ?? code);
@@ -156,8 +163,19 @@ function requireApprovedUrl(auth, productKey, url) {
   let parsed;
   try { parsed = new URL(url); } catch { fail('METADATA_URL_INVALID', url); }
   if (parsed.protocol !== 'https:') fail('METADATA_URL_NOT_HTTPS', url);
+  for (const forbidden of FORBIDDEN_PAYLOAD_ENDPOINTS) {
+    if (sameApprovedEndpoint(forbidden, url)) fail('METADATA_PAYLOAD_URL_FORBIDDEN', url);
+  }
   if (!approvedEndpoint(auth, productKey, url)) fail('METADATA_URL_OUT_OF_SCOPE', url);
   return parsed;
+}
+
+export function isForbiddenPayloadUrl(url) {
+  try {
+    return FORBIDDEN_PAYLOAD_ENDPOINTS.some((forbidden) => sameApprovedEndpoint(forbidden, url));
+  } catch {
+    return false;
+  }
 }
 
 function remainingMs(deadline, nowFn) {

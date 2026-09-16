@@ -1,6 +1,18 @@
 # Track 4 — Bounded CMS/CDC JSON metadata check (prepared, not authorized)
 
-Status: **prepared, not authorized. No live HTTP executed.**
+> Correction 20260917: this 20260916 packet described the check with payload row endpoints
+> (`/data?size=5`, `/resource/…`) and a live run on `348e464` re-fetched those bytes under an
+> `AUTH-METADATA-CHECK` label. The intended bounded JSON **metadata** endpoints are
+> `https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb` and
+> `https://data.cdc.gov/api/views/swc5-untb.json` (see :82,85 below). The planned metadata
+> investigation is **not** completed. See
+> `docs/research-program/metadata-endpoint-deviation-20260917.md` for the full deviation record
+> (4 publisher requests, same bytes repeated, ledgers preserved) and the corrected packet/ledger
+> amendment (fresh 0/2, same caps, no live execution here). This file is preserved as history;
+> canonical endpoints are restored in `verification/research-program/evidence/metadata-check-packet.json`,
+> collector allowlist, validator, and tests on branch `codex/ushso-corr1-metadata-20260917`.
+
+Status: **prepared, not authorized. No live HTTP executed (at the time of writing; later live run deviated — see correction note above).**
 
 Base: `78da769956e124898b39fb287cd5b018de9fa962`.
 Branch: `codex/ushso-track4-metadata-20260916` (own worktree `/mnt/d/worktrees/plumbob/ushso-track4-metadata`; no changes in `/mnt/d/Coding Projects/ushso`).

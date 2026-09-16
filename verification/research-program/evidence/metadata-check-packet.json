@@ -4,10 +4,10 @@
   "recorded_at": "2026-09-16T00:00:00Z",
   "generation": "live-2026-09-03-85b50522b420",
   "candidate_binding": {
-    "branch": "codex/ushso-track4-metadata-20260916",
+    "branch": "codex/ushso-corr1-metadata-20260917",
     "must_match_git_head": true,
     "stale_sha_named_at_first_draft": "0000000000000000000000000000000000000000",
-    "note": "Authorization and execution must name the exact git HEAD of codex/ushso-track4-metadata-20260916 at that time. Do not reuse 78da769 or any baked SHA. This packet is prepared, not authorized; no live HTTP is permitted until AUTH-METADATA-CHECK is granted for these exact endpoints and limits."
+    "note": "Corrected 20260917 (see docs/research-program/metadata-endpoint-deviation-20260917.md): authorization and execution must name the exact git HEAD of codex/ushso-corr1-metadata-20260917 at that time. Do not reuse 78da769, 348e464, or f86dc15 (prior spends used payload endpoints, not the intended metadata URLs). This packet is prepared, not authorized; no live HTTP is permitted until AUTH-METADATA-CHECK is rebound for these exact metadata endpoints and limits."
   },
   "authorization": {
     "requested": false,
@@ -22,14 +22,14 @@
   "live_http": false,
   "purpose": "Determine from first-party JSON metadata whether the frozen release identities (CostReport_2023_Final; PLACES_2025_county_table) are established. Two public JSON endpoints only, reused exactly from prior proposals. No dictionary downloads, no redirects, no retries. Observation year must not be equated with release year.",
   "endpoint_provenance": {
-    "note": "Exact 2 URLs reused verbatim from prior proposals; no new URLs invented here.",
+    "note": "Corrected 20260917: exact 2 JSON metadata URLs from track4 proposals (dataset-resources + Socrata api/views); prior provenance citing payload-authorizations endpoints was wrong — see docs/research-program/metadata-endpoint-deviation-20260917.md. No new URLs invented here.",
     "sources": [
-      "verification/research-program/authorization/payload-authorizations.json endpoints[0..1] on codex/ushso-evidence-ingestion-20260916",
-      "docs/research-program/payload-retrieval-pilot.md representative-first table (2026-09-15)"
+      "docs/research-program/track4-cms-cdc-metadata-packet-20260916.md:82 (CMS dataset-resources 44060663-47d8-4ced-a115-b53b4c270acb)",
+      "docs/research-program/track4-cms-cdc-metadata-packet-20260916.md:85 (CDC api/views swc5-untb.json)"
     ],
     "urls": [
-      "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5",
-      "https://data.cdc.gov/resource/swc5-untb.json?$limit=5"
+      "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb",
+      "https://data.cdc.gov/api/views/swc5-untb.json"
     ]
   },
   "frozen_cohort": {
@@ -187,7 +187,7 @@
       "native_product_id": "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data-viewer",
       "release_id": "CostReport_2023_Final",
       "landing_page": "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report",
-      "endpoint": "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5",
+      "endpoint": "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb",
       "method": "GET",
       "permitted_hosts": [
         "data.cms.gov"
@@ -241,7 +241,7 @@
       "native_product_id": "swc5-untb",
       "release_id": "PLACES_2025_county_table",
       "landing_page": "https://data.cdc.gov/d/swc5-untb",
-      "endpoint": "https://data.cdc.gov/resource/swc5-untb.json?$limit=5",
+      "endpoint": "https://data.cdc.gov/api/views/swc5-untb.json",
       "method": "GET",
       "permitted_hosts": [
         "data.cdc.gov"
@@ -307,23 +307,23 @@
     }
   ],
   "dictionary_boundary": {
-    "note": "No dictionary downloads in this check. Proposed exact docs for a later bounded assignment if this metadata is inconclusive (retain unresolved):",
+    "note": "Corrected 20260917: the two bounded JSON metadata docs below (CMS dataset-resources + CDC api/views swc5-untb.json) are now this check’s endpoints (see endpoint_provenance); they were previously listed as later proposals. No dictionary downloads beyond those two in this check (0 here). Remaining candidates are fallbacks only if the two metadata docs are inconclusive (retain unresolved). See docs/research-program/metadata-endpoint-deviation-20260917.md.",
     "proposals": [
       {
-        "need": "CMS statement linking Fiscal Year End Date to CostReport_2023_Final",
+        "need": "CMS statement linking Fiscal Year End Date to CostReport_2023_Final (now fetched as this check’s CMS endpoint)",
         "candidates": [
-          "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb (dataset metadata showing distributions, if it names CostReport_2023_Final)",
-          "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb (resources listing CostReport_2023_Final.csv distribution)",
-          "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report (landing page / distribution notes, if it states the FY End Date to distribution mapping)"
+          "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb (resources listing CostReport_2023_Final.csv distribution — now the CMS endpoint)",
+          "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb (dataset metadata fallback, only if resources doc is inconclusive)",
+          "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report (landing page fallback, only if resources doc is inconclusive)"
         ],
-        "constraint": "One bounded JSON metadata fetch at most under a later AUTH; no CSV/XLSX dictionary payload in this check."
+        "constraint": "The two endpoints of this check only; no CSV/XLSX dictionary payload in this check."
       },
       {
-        "need": "PLACES dictionary for swc5-untb defining year vs 2025 county table",
+        "need": "PLACES dictionary for swc5-untb defining year vs 2025 county table (now fetched as this check’s CDC endpoint)",
         "candidates": [
-          "https://data.cdc.gov/api/views/swc5-untb.json (Socrata view metadata: columns, descriptions, and release notes for swc5-untb, if it defines year)"
+          "https://data.cdc.gov/api/views/swc5-untb.json (Socrata view metadata — now the CDC endpoint)"
         ],
-        "constraint": "One bounded JSON metadata fetch at most under a later AUTH; no extra dictionary downloads beyond that one in this check (0 here)."
+        "constraint": "The two endpoints of this check only; no extra dictionary downloads beyond those two in this check (0 here)."
       }
     ]
   }

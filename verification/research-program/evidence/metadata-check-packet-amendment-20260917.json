@@ -1,0 +1,144 @@
+{
+  "format": "ushso.metadata-check-packet-amendment.v1",
+  "amends": "verification/research-program/evidence/metadata-check-packet.json",
+  "deviation": "docs/research-program/metadata-endpoint-deviation-20260917.md",
+  "status": "prepared_not_authorized",
+  "recorded_at": "2026-09-17T00:00:00Z",
+  "branch": "codex/ushso-corr1-metadata-20260917",
+  "base": "f86dc150a3ad60986e0809e0ca59616f3b605914",
+  "frozen_cohort": {
+    "path": "evaluation/research-program/cohorts.json",
+    "sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+    "unmodified": true
+  },
+  "authorization": {
+    "requested": false,
+    "auth_id": null,
+    "required_auth_id_if_later_granted": "AUTH-METADATA-CHECK",
+    "note": "Requires future owner rebind of AUTH-METADATA-CHECK to the exact execution HEAD on codex/ushso-corr1-metadata-20260917 with a validity window, without resetting either ledger. AUTH-04 and AUTH-PAYLOAD-PILOT do not cover this. No live execution until then."
+  },
+  "live_http": false,
+  "accepted": false,
+  "scientific_approval": false,
+  "purpose": "Fetch the two intended first-party JSON metadata docs to seek release statements for the frozen identities (CostReport_2023_Final; PLACES_2025_county_table). Retain unresolved unless first-party docs prove otherwise. Observation year must not be equated with release year.",
+  "endpoints": [
+    "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb",
+    "https://data.cdc.gov/api/views/swc5-untb.json"
+  ],
+  "endpoint_sources": [
+    "docs/research-program/track4-cms-cdc-metadata-packet-20260916.md:82 (CMS dataset-resources)",
+    "docs/research-program/track4-cms-cdc-metadata-packet-20260916.md:85 (CDC api/views swc5-untb.json)"
+  ],
+  "products": [
+    {
+      "product_key": "cms-hcris-hospital-provider-cost-report",
+      "endpoint": "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb",
+      "permitted_hosts": [
+        "data.cms.gov"
+      ],
+      "limits": {
+        "max_requests": 1,
+        "max_bytes": 65536,
+        "max_rows": 5,
+        "max_seconds": 15,
+        "max_concurrency": 1
+      }
+    },
+    {
+      "product_key": "cdc-places-local-data-for-better-health",
+      "endpoint": "https://data.cdc.gov/api/views/swc5-untb.json",
+      "permitted_hosts": [
+        "data.cdc.gov"
+      ],
+      "limits": {
+        "max_requests": 1,
+        "max_bytes": 65536,
+        "max_rows": 5,
+        "max_seconds": 15,
+        "max_concurrency": 1
+      }
+    }
+  ],
+  "totals": {
+    "products": 2,
+    "max_requests": 2,
+    "max_bytes": 131072,
+    "max_rows": 10,
+    "max_seconds": 15,
+    "max_concurrency": 1,
+    "credential_required": false
+  },
+  "allocation": {
+    "note": "1 request per product; 65536+65536=131072 bytes; 5+5=10 rows; 15s shared global wall-clock with 15s per-source upper bound; concurrency 1 sequential.",
+    "per_source": {
+      "cms-hcris-hospital-provider-cost-report": {
+        "max_requests": 1,
+        "max_bytes": 65536,
+        "max_rows": 5
+      },
+      "cdc-places-local-data-for-better-health": {
+        "max_requests": 1,
+        "max_bytes": 65536,
+        "max_rows": 5
+      }
+    },
+    "sums": {
+      "max_requests": 2,
+      "max_bytes": 131072,
+      "max_rows": 10
+    }
+  },
+  "request_accounting": {
+    "budget_includes": [
+      "initial_request",
+      "redirects",
+      "retries"
+    ],
+    "redirects_consume_budget": true,
+    "retries_consume_budget": true,
+    "validate_redirect_host_before_follow": true,
+    "max_redirects_per_request": 0,
+    "max_retries_per_source": 0,
+    "retry_on": [
+      429,
+      503
+    ],
+    "note": "Only the initial request per product is permitted (1+1=2). Any redirect or 429/503 retry consumes budget first then aborts with METADATA_REDIRECT_NOT_PERMITTED / METADATA_RETRY_NOT_PERMITTED."
+  },
+  "credentials": {
+    "required": false,
+    "kind": "none"
+  },
+  "dictionary_boundary": {
+    "note": "No dictionary downloads beyond the two bounded JSON metadata docs above (0 here). No CSV/XLSX payloads in this check.",
+    "extra_downloads": 0
+  },
+  "ledger": "verification/research-program/evidence/metadata-check-ledger-corrected-20260917.json",
+  "ledger_state": {
+    "max_requests": 2,
+    "used_requests": 0,
+    "remaining_requests": 2
+  },
+  "retention": {
+    "captures_path": "verification/research-program/evidence/payloads/metadata-check-corrected-20260917/",
+    "captures_gitignored": true,
+    "receipts_path": "verification/research-program/evidence/metadata-receipts-corrected-20260917/",
+    "receipts_in_git": true,
+    "receipts_bind_sha256_of_gitignored_bytes": true,
+    "do_not_commit_publisher_rows": true,
+    "max_object_bytes": 65536,
+    "note": "Separate gitignored captures path for the corrected run (do not mix with prior wrong-endpoint captures). No captures committed here (0 live executions)."
+  },
+  "release_question": {
+    "cms-hcris-hospital-provider-cost-report": {
+      "claimed_release": "CostReport_2023_Final",
+      "status": "unresolved",
+      "reason": "Needs first-party CMS resources listing naming CostReport_2023_Final.csv; FY End Date alone does not prove distribution."
+    },
+    "cdc-places-local-data-for-better-health": {
+      "claimed_release": "PLACES_2025_county_table",
+      "status": "unresolved",
+      "reason": "Needs first-party Socrata view metadata defining year relative to the 2025 county table; year=2025 alone does not prove release."
+    }
+  }
+}

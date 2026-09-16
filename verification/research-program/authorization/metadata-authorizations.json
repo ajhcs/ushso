@@ -4,19 +4,19 @@
   "entries": [
     {
       "id": "AUTH-METADATA-CHECK",
-      "authorized": true,
-      "status": "authorized",
+      "authorized": false,
+      "status": "prepared-corrected-20260917",
       "revoked": false,
       "action": "metadata_check",
-      "candidate_head": "348e4646a529faa85ca1a95168b56592f7d65c72",
-      "candidate_branch": "codex/ushso-assignment-20260916",
+      "candidate_head": null,
+      "candidate_branch": "codex/ushso-corr1-metadata-20260917",
       "product_keys": [
         "cms-hcris-hospital-provider-cost-report",
         "cdc-places-local-data-for-better-health"
       ],
       "endpoints": [
-        "https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5",
-        "https://data.cdc.gov/resource/swc5-untb.json?$limit=5"
+        "https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb",
+        "https://data.cdc.gov/api/views/swc5-untb.json"
       ],
       "limits": {
         "max_requests": 2,
@@ -35,9 +35,9 @@
         "required": false,
         "kind": "none"
       },
-      "valid_from": "2026-09-16T18:24:09Z",
-      "valid_until": "2026-09-17T18:24:09Z",
-      "note": "Owner-approved integration rebind (USHSO assignment 20260916): candidate_head is the exact integration execution HEAD 348e464 on codex/ushso-assignment-20260916 (4-track merge + worker CSP comment). Bounded to the 2 exact endpoints/limits below, no credentials, 24h window. Neither ledger reset: metadata 0 used/2 remaining, payload 2 used/2 remaining. AUTH-04 and AUTH-PAYLOAD-PILOT do not grant this."
+      "valid_from": null,
+      "valid_until": null,
+      "note": "Corrected 20260917 (see docs/research-program/metadata-endpoint-deviation-20260917.md): prior owner-approved integration rebind to 348e464 executed the wrong payload endpoints (2 used/0 remaining, receipts a25f0526/935ea833, byte-identical repeats efb538d3/d67b34ef). This entry is now prepared-corrected for the intended JSON metadata endpoints (dataset-resources + api/views swc5-untb.json) on codex/ushso-corr1-metadata-20260917 with the same caps; owner must rebind candidate_head to the exact execution HEAD with a validity window without resetting either ledger. Prior authorization history preserved in git (f86dc15). AUTH-04 and AUTH-PAYLOAD-PILOT do not grant this. No live execution until re-authorized."
     }
   ]
 }

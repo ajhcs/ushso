@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { runMetadataCheck, loadLedger } from '../../scripts/research-program/run-metadata-check.mjs';
+import { runMetadataCheck, loadLedger, isForbiddenPayloadUrl } from '../../scripts/research-program/run-metadata-check.mjs';
 import { validateMetadataCheck } from '../../scripts/research-program/validate-metadata-check.mjs';
 import { payloadSampleCountsFromReceipts } from '../../scripts/research-program/qualify-core.mjs';
 import { loadCohort } from '../../packages/coverage/research-program/v1.0.0/src/core-readiness.mjs';
@@ -13,9 +13,12 @@ import { loadCohort } from '../../packages/coverage/research-program/v1.0.0/src/
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HCRIS = 'cms-hcris-hospital-provider-cost-report';
 const PLACES = 'cdc-places-local-data-for-better-health';
-const HCRIS_URL = 'https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5';
-const PLACES_URL = 'https://data.cdc.gov/resource/swc5-untb.json?$limit=5';
-const BRANCH = 'codex/ushso-track4-metadata-20260916';
+const HCRIS_URL = 'https://data.cms.gov/data-api/v1/dataset-resources/44060663-47d8-4ced-a115-b53b4c270acb';
+const PLACES_URL = 'https://data.cdc.gov/api/views/swc5-untb.json';
+// Payload endpoints must never satisfy the metadata authorization (deviation 20260917).
+const FORBIDDEN_HCRIS_PAYLOAD_URL = 'https://data.cms.gov/data-api/v1/dataset/44060663-47d8-4ced-a115-b53b4c270acb/data?size=5';
+const FORBIDDEN_PLACES_PAYLOAD_URL = 'https://data.cdc.gov/resource/swc5-untb.json?$limit=5';
+const BRANCH = 'codex/ushso-corr1-metadata-20260917';
 
 function copyNeeded(srcRoot, dstRoot, rel) {
   mkdirSync(path.dirname(path.join(dstRoot, rel)), { recursive: true });
@@ -93,7 +96,7 @@ function jsonResponse(body, { status = 200, headers = { 'content-type': 'applica
   };
 }
 
-test('metadata packet is internally consistent on the track4 branch', () => {
+test('metadata packet is internally consistent on the correction branch', () => {
   const out = validateMetadataCheck({ repoRoot: ROOT });
   assert.equal(out.branch, BRANCH);
   assert.deepEqual([...out.products], [HCRIS, PLACES]);
@@ -256,4 +259,42 @@ test('concurrent invocations respect the lock and do not double-spend', async ()
   await first;
   assert.equal(secondErr?.code, 'METADATA_CONCURRENT_INVOCATION');
   assert.ok(loadLedger(dir, auth).totals.used_requests <= 2);
+});
+
+test('payload endpoints cannot satisfy the corrected metadata authorization (deviation 20260917)', async () => {
+  const { dir, auth } = isolateRepo();
+  // Tamper the isolated packet to the prior wrong payload endpoints; packet validation must
+  // reject them before any fetch (validator-level enforcement).
+  const packetPath = path.join(dir, 'verification/research-program/evidence/metadata-check-packet.json');
+  const packet = JSON.parse(readFileSync(packetPath, 'utf8'));
+  packet.products[0].endpoint = FORBIDDEN_HCRIS_PAYLOAD_URL;
+  packet.products[1].endpoint = FORBIDDEN_PLACES_PAYLOAD_URL;
+  packet.endpoint_provenance.urls = [FORBIDDEN_HCRIS_PAYLOAD_URL, FORBIDDEN_PLACES_PAYLOAD_URL];
+  writeFileSync(packetPath, JSON.stringify(packet, null, 2) + '\n');
+  let fetches = 0;
+  const fetchImpl = async () => { fetches += 1; return jsonResponse([{ stateabbr: 'AL' }]); };
+  // Validator rejects tampered provenance first (METADATA_ENDPOINT_PROVENANCE) before reaching
+  // the exact-URL check (METADATA_EXACT_URLS); either specific code proves payload URLs fail.
+  try {
+    await runMetadataCheck({ execute: true, repoRoot: dir, fetchImpl });
+    assert.fail('tampered payload packet should have been rejected');
+  } catch (error) {
+    assert.ok(
+      ['METADATA_ENDPOINT_PROVENANCE', 'METADATA_EXACT_URLS'].includes(error.code),
+      'expected provenance/exact-URL rejection, got ' + error.code,
+    );
+  }
+  assert.equal(fetches, 0);
+  // Budget untouched: rejected before any hop is spent.
+  assert.equal(loadLedger(dir, auth).totals.used_requests, 0);
+  assert.equal(loadLedger(dir, auth).totals.remaining_requests, 2);
+});
+
+test('collector allowlist explicitly forbids payload URLs even if AUTH is stale (defense in depth)', () => {
+  // Mock-only unit check (no fetch): the corrected allowlist must flag both prior payload
+  // endpoints as forbidden while accepting the intended metadata endpoints.
+  assert.equal(isForbiddenPayloadUrl(FORBIDDEN_HCRIS_PAYLOAD_URL), true);
+  assert.equal(isForbiddenPayloadUrl(FORBIDDEN_PLACES_PAYLOAD_URL), true);
+  assert.equal(isForbiddenPayloadUrl(HCRIS_URL), false);
+  assert.equal(isForbiddenPayloadUrl(PLACES_URL), false);
 });
