@@ -42,8 +42,10 @@
   landing copy, and a clickable brief CTA. Those fixes are in `b20f66f`.
 - Final independent Cursor review of `b20f66f` returned **PASS** with no
   findings. The reviewer did not modify the implementation branch.
-- The exact-candidate release gate is the remaining handoff check; its receipt
-  and final Git SHA are recorded after execution.
+- The exact-candidate release gate is the final handoff check for this tree. Its
+  receipt is planned at
+  `/mnt/d/tmp/plumbob/ushso-goal-20260916-release-gate.json`; the result is
+  reported in the task handoff, and no deployment is implied.
 
 ## Evidence receipts
 
