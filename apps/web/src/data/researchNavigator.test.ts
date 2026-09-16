@@ -31,6 +31,7 @@ describe('frozen priority research navigator', () => {
     expect(findPriorityResearchQuestion('CMS HCRIS hospital cost reports')?.id).toBe('hospital-finance-hcris')
     expect(findPriorityResearchQuestion('Where can I find quarterly provisional infant mortality?')?.id).toBe('infant-mortality')
     expect(findPriorityResearchQuestion('NPPES provider identity')?.id).toBe('nppes-provider-identity')
+    expect(findPriorityResearchQuestion('behavioral-health treatment')?.id).toBe('samhsa-facilities')
     for (const question of PRIORITY_RESEARCH_QUESTIONS) {
       expect(findPriorityResearchQuestion(question.question)?.id).toBe(question.id)
     }

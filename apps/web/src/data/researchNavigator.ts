@@ -161,10 +161,15 @@ interface NamedGapInput {
   nextAction: string
   coverageNote?: string
   additionalFacts?: ResearchFact[]
+  candidateRecordId?: string
+  candidateEvidenceId?: string
 }
 
 function namedGapProfile(input: NamedGapInput): ResearchSourceProfile {
   const evidenceRefs = [registryRef(input.sourceId)]
+  if (ACTIVE_CATALOG.isCandidate && input.candidateRecordId && input.candidateEvidenceId) {
+    evidenceRefs.push(recordRef(input.candidateRecordId, input.candidateEvidenceId))
+  }
   const observedState: EvidenceState = input.documented ? 'publisher_documented' : 'ushso_observed'
   return {
     id: input.id,
@@ -176,6 +181,7 @@ function namedGapProfile(input: NamedGapInput): ResearchSourceProfile {
     coverageLabel: 'Named source gap',
     coverageNote: input.coverageNote ?? 'The named family is retained in the source registry but has no current indexed payload record in this build. This is a routing lead, not a source match or payload-access claim.',
     officialDiscoveryUrl: input.officialDiscoveryUrl,
+    ...(ACTIVE_CATALOG.isCandidate && input.candidateRecordId ? { catalogRecordId: input.candidateRecordId } : {}),
     evidenceRefs,
     facts: [
       fact('Publisher / operator', `Registry-listed publisher or operator: ${input.publisher}`, observedState, evidenceRefs),
@@ -387,6 +393,7 @@ const gapProfiles: ResearchSourceProfile[] = [
     id: 'hrsa-ahrf', sourceId: 'hrsa-ahrf', familyId: 'hrsa-ahrf',
     name: 'HRSA Area Health Resources Files', publisher: 'Health Resources and Services Administration', product: 'Area Health Resources Files (AHRF)',
     officialDiscoveryUrl: 'https://data.hrsa.gov/topics/health-workforce/ahrf', documented: false,
+    candidateRecordId: 'obs:asset:candidate-ahrf-documentation-v1', candidateEvidenceId: 'evidence:candidate-ahrf-documentation-v1',
     population: 'County-level health-resource and workforce entities are a stated research lead; exact population and release are unresolved.',
     access: 'Registry retains an official locator, but current access, cost, account, and download terms were not verified or executed.',
     nextAction: 'Inspect the HRSA AHRF page and documentation, then verify the release, county fields, workforce definitions, and file access path.',
@@ -437,6 +444,7 @@ const gapProfiles: ResearchSourceProfile[] = [
     id: 'rural-hospital-closure-tracking', sourceId: 'rural-hospital-closure-tracking', familyId: 'rural-hospital-closure-tracking',
     name: 'Rural hospital closure tracking', publisher: 'Cecil G. Sheps Center for Health Services Research, University of North Carolina', product: 'Rural hospital closure tracking and methodology',
     officialDiscoveryUrl: 'https://www.shepscenter.unc.edu/programs-projects/rural-health/rural-hospital-closures/', documented: false,
+    candidateRecordId: 'obs:asset:candidate-sheps-closures-documentation-v1', candidateEvidenceId: 'evidence:candidate-sheps-closures-documentation-v1',
     population: 'Rural hospitals and closure events represented by the selected Sheps Center list or vintage.',
     access: 'Registry retains an official locator, but current access, file format, vintage, account, and payload terms were not verified or executed.',
     nextAction: 'Inspect the Sheps methodology and current closure list, then record the event definition, reporting period, facility identifier, and limitations.',
@@ -525,11 +533,15 @@ export function sourceProfileForId(id: string) {
 }
 
 export function findPriorityResearchQuestion(value: string) {
-  const normalized = value.trim().toLowerCase().replace(/\s+/g, ' ')
+  const normalizeQuestionText = (text: string) => text.trim().toLowerCase().replace(/[-_/]+/g, ' ').replace(/\s+/g, ' ')
+  const normalized = normalizeQuestionText(value)
   if (normalized.length < 4) return null
-  const exactQuestion = PRIORITY_RESEARCH_QUESTIONS.find((question) => question.question.trim().toLowerCase().replace(/\s+/g, ' ') === normalized)
+  const exactQuestion = PRIORITY_RESEARCH_QUESTIONS.find((question) => normalizeQuestionText(question.question) === normalized)
   if (exactQuestion) return exactQuestion
-  return PRIORITY_RESEARCH_QUESTIONS.find((question) => question.searchTerms.some((term) => normalized.includes(term) || (normalized.length > 10 && term.includes(normalized)))) ?? null
+  const matches = PRIORITY_RESEARCH_QUESTIONS.flatMap((question, questionIndex) => question.searchTerms.map((term) => ({ question, questionIndex, term: normalizeQuestionText(term) })))
+    .filter(({ term }) => term.length > 0 && (normalized.includes(term) || (normalized.length > 10 && term.includes(normalized))))
+    .sort((left, right) => right.term.length - left.term.length || left.questionIndex - right.questionIndex)
+  return matches[0]?.question ?? null
 }
 
 export function buildPriorityResearchPacket(question: PriorityResearchQuestion): PriorityResearchEvidencePacket {

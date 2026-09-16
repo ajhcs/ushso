@@ -9,8 +9,8 @@ import { PageTitle } from '../components/PageTitle'
 import { PriorityResearchCatalog } from '../components/PriorityResearchNavigator'
 import { ACTIVE_CATALOG } from '../data/catalogDescriptor'
 
-export const CURRENT_GENERATION = 'live-2026-09-03-85b50522b420'
-export const CURRENT_CORPUS_RECORD_COUNT = 3434
+export const CURRENT_GENERATION = ACTIVE_CATALOG.generation
+export const CURRENT_CORPUS_RECORD_COUNT = ACTIVE_CATALOG.recordCount
 
 const journeys = [
   {
@@ -64,7 +64,7 @@ export function LandingPage() {
         <section className="learning-journeys" aria-labelledby="journeys-title">
           <div className="learning-journeys__inner">
             <h2 id="journeys-title">Three tested example journeys</h2>
-            <p>These questions come from accepted example packets on generation {CURRENT_GENERATION}. They are metadata routes, not completed research tasks.</p>
+            <p>These questions are metadata routes on the active catalog generation {ACTIVE_CATALOG.generation}. They are not completed research tasks.</p>
             <ul>
               {journeys.map((journey) => (
                 <li key={journey.id}>

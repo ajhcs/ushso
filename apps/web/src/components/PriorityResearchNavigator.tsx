@@ -118,7 +118,7 @@ export function PriorityResearchCatalog() {
                 <p className="priority-question-card__family">{source?.familyId ?? question.familyIds.join(' · ')}</p>
                 <h3><Link to={`/search?q=${encodeURIComponent(question.question)}`}>{question.question}</Link></h3>
                 <p>{source?.coverageLabel ?? 'Evidence-bound source route'}</p>
-                <span className="priority-question-card__action">View brief →</span>
+                <Link className="priority-question-card__action" to={`/search?q=${encodeURIComponent(question.question)}`}>View brief →</Link>
               </article>
             </li>
           )
