@@ -1,4 +1,5 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { CandidateCatalogNotice } from '../components/CandidateCatalogNotice'
 import { DiscoveryDimensions } from '../components/DiscoveryDimensions'
 import { HowItWorks } from '../components/HowItWorks'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
@@ -55,6 +56,7 @@ export function LandingPage() {
             <SearchBox initialQuery={params.get('q') ?? ''} onSubmit={search} />
             <DiscoveryDimensions />
             <p className="landing-scope">Current catalog generation <code>{CURRENT_GENERATION}</code> contains {CURRENT_CORPUS_RECORD_COUNT} indexed source identities. Catalog membership is not payload access. <Link to="/learn">Learn the difference</Link> or <Link to="/learn#first-search">start with a verified HCRIS search</Link>.</p>
+            <CandidateCatalogNotice compact />
           </div>
         </section>
         <section className="learning-journeys" aria-labelledby="journeys-title">

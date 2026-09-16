@@ -1,6 +1,7 @@
 import { AlertTriangle, Clock3, ExternalLink, Flag, Info, ShieldCheck } from 'lucide-react'
 import { type ReactNode, lazy, Suspense, useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
+import { candidateEntryForRecordId } from '../data/candidateCatalog'
 import { downloadJsonPacket } from '../lib/searchReceipt'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
@@ -159,6 +160,7 @@ export function DatasetDetailsPage() {
   const metadata = dataset.canonicalResult.metadata
   const freshness = freshnessPresentation(dataset)
   const guidance = sourceGuidance(record)
+  const candidateEntry = candidateEntryForRecordId(record.record_id)
   const rawAccessRoutes = metadata?.retrieval_plan?.access_routes ?? record.retrieval.instructions.filter((step) => step.action !== 'stop_and_report' && step.url)
   const accessRoutes = rawAccessRoutes.flatMap((step) => {
     const url = safeExternalHttpsUrl(step.url)
@@ -221,6 +223,7 @@ export function DatasetDetailsPage() {
           evidence_ids: record.evidence.map((item) => item.evidence_id),
           limitation: 'Catalog membership is not payload access. This packet is the displayed source facts, not scientific acceptance.',
         }, `ushso-source-packet-${record.record_id.replace(/[^a-z0-9.-]+/gi, '-').slice(0, 48)}.json`)}>Download source evidence packet</button></p>
+        {candidateEntry && <section className="candidate-record" aria-labelledby="candidate-record-heading"><h2 id="candidate-record-heading">Documentation-first candidate entry</h2><p>This record is a documentation-first candidate (status incomplete): access unknown, verification not live-verified, variable list unknown, and access steps documented-not-executed (tested false, executed false). Catalog membership is not payload access.</p><p><a href={candidateEntry.packetUrl} download={candidateEntry.packetFilename}>Download research evidence packet</a></p></section>}
         <DetailsShortlist recordId={record.record_id} title={dataset.title} sourceName={record.identity.source.name} detailsPath={dataset.detailsUrl} generation={discovery.result.corpus.publication?.generation ?? discovery.result.corpus.generation ?? `${discovery.result.corpus.corpus_id} ${discovery.result.corpus.corpus_version}`} />
         <ResearcherDecisionSummary dataset={dataset} />
 
