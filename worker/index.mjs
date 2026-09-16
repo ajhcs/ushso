@@ -38,6 +38,7 @@ const HTML_CSP_BASE = "default-src 'self'; base-uri 'self'; frame-ancestors 'non
 // The document then loads no JS/CSS and renders blank (Chromium/Firefox keep
 // localhost subresources on http). Only advertise the upgrade when the document
 // itself was requested over https (production); local http stays http.
+// Note: apps/web/public/_headers still advertises upgrade-insecure-requests for prod-https parity, but the worker overwrites document CSP per-request (http no-upgrade, https upgrade).
 function htmlContentSecurityPolicy(request) {
   try {
     if (new URL(request.url).protocol === 'https:') return `${HTML_CSP_BASE}; upgrade-insecure-requests`;
