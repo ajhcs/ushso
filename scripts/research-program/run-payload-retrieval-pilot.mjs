@@ -34,6 +34,26 @@ function gitHead(repoRoot = ROOT) {
   return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
 }
 
+// Strict execution-time authorization (branch-agnostic): exact candidate HEAD +
+// AUTH materialization + validity window. Branch name is intentionally NOT checked;
+// HEAD equality is the binding. Endpoints, frozen SHA, budget, and lock are
+// enforced separately before any fetch. Offline validation (validate-*.mjs) must
+// pass anywhere; this function must fail closed before any live HTTP.
+// Window uses wall-clock time (wallNow, default Date.now), not the mocked deadline
+// clock `now` used for request timeouts, so timeout tests with fake `now` still
+// enforce the real authorization window.
+function assertPilotExecutionAuthorized(entry, head, wallNow = Date.now) {
+  if (!entry || entry.authorized !== true) fail('PILOT_AUTH_NOT_MATERIALIZED');
+  if (entry.status && entry.status !== 'authorized') fail('PILOT_AUTH_NOT_MATERIALIZED');
+  if (entry.revoked === true) fail('PILOT_AUTH_REVOKED');
+  if (!entry.candidate_head || entry.candidate_head !== head) fail('PILOT_AUTH_NOT_MATERIALIZED');
+  const t = (typeof wallNow === 'function' ? wallNow() : wallNow);
+  if (entry.valid_from && !(Date.parse(entry.valid_from) <= t)) fail('PILOT_AUTH_NOT_YET_VALID');
+  if (entry.valid_until && !(t <= Date.parse(entry.valid_until))) fail('PILOT_AUTH_EXPIRED');
+}
+
+export { assertPilotExecutionAuthorized };
+
 function writeJsonAtomic(abs, value) {
   mkdirSync(path.dirname(abs), { recursive: true });
   const tmp = abs + '.tmp-' + randomUUID();
@@ -240,7 +260,7 @@ export async function runPayloadRetrievalPilot({
   const auth = JSON.parse(readFileSync(path.join(repoRoot, AUTH_REL), 'utf8'));
   const head = gitHead(repoRoot);
   const entry = (auth.entries ?? []).find((row) => row.id === 'AUTH-PAYLOAD-PILOT' && row.authorized === true);
-  if (!entry || entry.candidate_head !== head) fail('PILOT_AUTH_NOT_MATERIALIZED');
+  assertPilotExecutionAuthorized(entry, head, Date.now);
   if (sha256(readFileSync(path.join(repoRoot, 'evaluation/research-program/cohorts.json'))) !== EXPECTED_COHORTS) fail('FROZEN_COHORTS_CHANGED');
   mkdirSync(path.join(repoRoot, CAPTURE_DIR), { recursive: true });
   mkdirSync(path.join(repoRoot, ATTEMPT_DIR), { recursive: true });

@@ -5,8 +5,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { runMetadataCheck, loadLedger } from '../../scripts/research-program/run-metadata-check.mjs';
-import { validateMetadataCheck } from '../../scripts/research-program/validate-metadata-check.mjs';
+import { runMetadataCheck, loadLedger, assertMetadataExecutionAuthorized } from '../../scripts/research-program/run-metadata-check.mjs';
+import { validateMetadataCheck, METADATA_HISTORICAL_BRANCH } from '../../scripts/research-program/validate-metadata-check.mjs';
 import { payloadSampleCountsFromReceipts } from '../../scripts/research-program/qualify-core.mjs';
 import { loadCohort } from '../../packages/coverage/research-program/v1.0.0/src/core-readiness.mjs';
 
@@ -61,6 +61,11 @@ function isolateRepo({ ledger = true } = {}) {
   auth.entries[0].candidate_head = head;
   auth.entries[0].authorized = true;
   auth.entries[0].status = 'authorized';
+  auth.entries[0].revoked = false;
+  // Refresh validity window to cover wall-clock execution (offline validation is
+  // branch-agnostic; execution still enforces window before any fetch).
+  auth.entries[0].valid_from = new Date(Date.now() - 86400_000).toISOString();
+  auth.entries[0].valid_until = new Date(Date.now() + 86400_000).toISOString();
   writeFileSync(authPath, JSON.stringify(auth, null, 2) + '\n');
   if (ledger) seedLedger(dir, auth);
   return { dir, head, auth };
@@ -93,13 +98,85 @@ function jsonResponse(body, { status = 200, headers = { 'content-type': 'applica
   };
 }
 
-test('metadata packet is internally consistent on the track4 branch', () => {
+test('metadata packet is internally consistent offline on any branch (branch-agnostic)', () => {
   const out = validateMetadataCheck({ repoRoot: ROOT });
   assert.equal(out.branch, BRANCH);
+  assert.equal(out.packet_branch, BRANCH);
+  assert.equal(out.historical_branch, BRANCH);
+  assert.equal(METADATA_HISTORICAL_BRANCH, BRANCH);
+  assert.equal(out.branch_enforcement, 'execution-only');
   assert.deepEqual([...out.products], [HCRIS, PLACES]);
   assert.deepEqual([...out.endpoints], [HCRIS_URL, PLACES_URL]);
   assert.equal(out.frozen_cohorts_unmodified, true);
   assert.equal(out.authorized, false);
+  assert.equal(out.checkout_head, out.git_head);
+  assert.ok(out.checkout_branch === null || typeof out.checkout_branch === 'string');
+});
+
+test('metadata offline validation passes on integration branch (no dev-branch gate)', () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'ushso-meta-branch-'));
+  for (const rel of [
+    'evaluation/research-program/cohorts.json',
+    'verification/research-program/evidence/metadata-check-packet.json',
+    'verification/research-program/authorization/metadata-authorizations.json',
+    'verification/research-program/evidence/product-sample-requirements.json',
+    'verification/external-authorization/v1.0.0/register.json',
+    '.gitignore',
+  ]) copyNeeded(ROOT, dir, rel);
+  execFileSync('git', ['init', '-q'], { cwd: dir });
+  execFileSync('git', ['checkout', '-B', 'codex/ushso-corr2-gate-20260917'], { cwd: dir });
+  execFileSync('git', ['add', '.'], { cwd: dir });
+  execFileSync('git', ['-c', 'user.email=meta@example.test', '-c', 'user.name=meta', 'commit', '-qm', 'isolate'], { cwd: dir });
+  const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
+  const out = validateMetadataCheck({ repoRoot: dir });
+  assert.equal(out.packet_branch, BRANCH);
+  assert.equal(out.checkout_branch, 'codex/ushso-corr2-gate-20260917');
+  assert.equal(out.checkout_head, head);
+  assert.equal(out.branch_enforcement, 'execution-only');
+});
+
+test('metadata offline validation passes on detached HEAD (no detached workaround needed)', () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'ushso-meta-detached-'));
+  for (const rel of [
+    'evaluation/research-program/cohorts.json',
+    'verification/research-program/evidence/metadata-check-packet.json',
+    'verification/research-program/authorization/metadata-authorizations.json',
+    'verification/research-program/evidence/product-sample-requirements.json',
+    'verification/external-authorization/v1.0.0/register.json',
+    '.gitignore',
+  ]) copyNeeded(ROOT, dir, rel);
+  execFileSync('git', ['init', '-q'], { cwd: dir });
+  execFileSync('git', ['checkout', '-B', 'codex/ushso-corr2-gate-20260917'], { cwd: dir });
+  execFileSync('git', ['add', '.'], { cwd: dir });
+  execFileSync('git', ['-c', 'user.email=meta@example.test', '-c', 'user.name=meta', 'commit', '-qm', 'isolate'], { cwd: dir });
+  execFileSync('git', ['checkout', '--detach', 'HEAD'], { cwd: dir });
+  const head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8' }).trim();
+  const current = execFileSync('git', ['branch', '--show-current'], { cwd: dir, encoding: 'utf8' }).trim();
+  assert.equal(current, '');
+  const out = validateMetadataCheck({ repoRoot: dir });
+  assert.equal(out.checkout_branch, null);
+  assert.equal(out.checkout_head, head);
+  assert.equal(out.detached_head_allowed, true);
+});
+
+test('metadata execution authorization still binds exact HEAD + window before any fetch', () => {
+  const head = 'c'.repeat(40);
+  const base = {
+    id: 'AUTH-METADATA-CHECK',
+    authorized: true,
+    status: 'authorized',
+    revoked: false,
+    candidate_head: head,
+    valid_from: new Date(Date.now() - 3600_000).toISOString(),
+    valid_until: new Date(Date.now() + 3600_000).toISOString(),
+  };
+  assert.doesNotThrow(() => assertMetadataExecutionAuthorized(base, head, Date.now));
+  assert.throws(() => assertMetadataExecutionAuthorized(base, 'd'.repeat(40), Date.now), { code: 'METADATA_AUTH_NOT_MATERIALIZED' });
+  assert.throws(
+    () => assertMetadataExecutionAuthorized({ ...base, valid_until: new Date(Date.now() - 1000).toISOString() }, head, Date.now),
+    { code: 'METADATA_AUTH_EXPIRED' },
+  );
+  assert.throws(() => assertMetadataExecutionAuthorized({ ...base, revoked: true }, head, Date.now), { code: 'METADATA_AUTH_REVOKED' });
 });
 
 test('metadata check does not fetch unless execute is set', async () => {
@@ -112,6 +189,48 @@ test('missing ledger is not recovered (no live fetch)', async () => {
   await assert.rejects(
     () => runMetadataCheck({ execute: true, repoRoot: dir, fetchImpl: async () => { fetches += 1; return jsonResponse([{ stateabbr: 'AL' }]); } }),
     { code: 'METADATA_LEDGER_REQUIRED' },
+  );
+  assert.equal(fetches, 0);
+});
+
+test('stale candidate HEAD fails closed before any fetch (execution binds HEAD, not branch)', async () => {
+  const { dir } = isolateRepo();
+  const authPath = path.join(dir, 'verification/research-program/authorization/metadata-authorizations.json');
+  const stale = JSON.parse(readFileSync(authPath, 'utf8'));
+  stale.entries[0].candidate_head = 'e'.repeat(40);
+  writeFileSync(authPath, JSON.stringify(stale, null, 2) + '\n');
+  let fetches = 0;
+  await assert.rejects(
+    () => runMetadataCheck({ execute: true, repoRoot: dir, fetchImpl: async () => { fetches += 1; return jsonResponse([{ stateabbr: 'AL' }]); } }),
+    { code: 'METADATA_AUTH_NOT_MATERIALIZED' },
+  );
+  assert.equal(fetches, 0);
+});
+
+test('expired AUTH window fails closed before any fetch', async () => {
+  const { dir } = isolateRepo();
+  const authPath = path.join(dir, 'verification/research-program/authorization/metadata-authorizations.json');
+  const expired = JSON.parse(readFileSync(authPath, 'utf8'));
+  expired.entries[0].valid_until = new Date(Date.now() - 1000).toISOString();
+  writeFileSync(authPath, JSON.stringify(expired, null, 2) + '\n');
+  let fetches = 0;
+  await assert.rejects(
+    () => runMetadataCheck({ execute: true, repoRoot: dir, fetchImpl: async () => { fetches += 1; return jsonResponse([{ stateabbr: 'AL' }]); } }),
+    { code: 'METADATA_AUTH_EXPIRED' },
+  );
+  assert.equal(fetches, 0);
+});
+
+test('revoked AUTH fails closed before any fetch', async () => {
+  const { dir } = isolateRepo();
+  const authPath = path.join(dir, 'verification/research-program/authorization/metadata-authorizations.json');
+  const revoked = JSON.parse(readFileSync(authPath, 'utf8'));
+  revoked.entries[0].revoked = true;
+  writeFileSync(authPath, JSON.stringify(revoked, null, 2) + '\n');
+  let fetches = 0;
+  await assert.rejects(
+    () => runMetadataCheck({ execute: true, repoRoot: dir, fetchImpl: async () => { fetches += 1; return jsonResponse([{ stateabbr: 'AL' }]); } }),
+    { code: 'METADATA_AUTH_REVOKED' },
   );
   assert.equal(fetches, 0);
 });

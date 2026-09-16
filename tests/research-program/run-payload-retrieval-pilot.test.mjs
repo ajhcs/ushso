@@ -59,6 +59,11 @@ function isolateRepo({ ledger = true } = {}) {
   auth.entries[0].candidate_head = head;
   auth.entries[0].authorized = true;
   auth.entries[0].status = 'authorized';
+  auth.entries[0].revoked = false;
+  // Refresh validity window to cover wall-clock execution (offline validation is
+  // branch-agnostic; execution still enforces window before any fetch).
+  auth.entries[0].valid_from = new Date(Date.now() - 86400_000).toISOString();
+  auth.entries[0].valid_until = new Date(Date.now() + 86400_000).toISOString();
   writeFileSync(authPath, JSON.stringify(auth, null, 2) + '\n');
   if (ledger) seedLedger(dir, auth);
   return { dir, head, auth };
@@ -124,6 +129,49 @@ test('allowMissingLedger cannot recreate a zeroed ledger after spent requests', 
   const source = readFileSync(new URL('../../scripts/research-program/run-payload-retrieval-pilot.mjs', import.meta.url), 'utf8');
   assert.equal(source.includes('allowMissingLedger'), false);
   assert.equal(source.includes('emptyLedger'), false);
+});
+
+test('stale candidate HEAD fails closed before any fetch (execution binds HEAD, not branch)', async () => {
+  const { dir, auth } = isolateRepo();
+  const authPath = path.join(dir, 'verification/research-program/authorization/payload-authorizations.json');
+  const stale = JSON.parse(readFileSync(authPath, 'utf8'));
+  stale.entries[0].candidate_head = 'f'.repeat(40);
+  writeFileSync(authPath, JSON.stringify(stale, null, 2) + '\n');
+  let fetches = 0;
+  await assert.rejects(
+    () => runPayloadRetrievalPilot({ execute: true, repoRoot: dir, fetchImpl: async () => { fetches += 1; return jsonResponse([{ stateabbr: 'AL' }]); } }),
+    { code: 'PILOT_AUTH_NOT_MATERIALIZED' },
+  );
+  assert.equal(fetches, 0);
+  assert.equal(auth.entries[0].candidate_head.length, 40);
+});
+
+test('expired AUTH window fails closed before any fetch', async () => {
+  const { dir } = isolateRepo();
+  const authPath = path.join(dir, 'verification/research-program/authorization/payload-authorizations.json');
+  const expired = JSON.parse(readFileSync(authPath, 'utf8'));
+  expired.entries[0].valid_until = new Date(Date.now() - 1000).toISOString();
+  writeFileSync(authPath, JSON.stringify(expired, null, 2) + '\n');
+  let fetches = 0;
+  await assert.rejects(
+    () => runPayloadRetrievalPilot({ execute: true, repoRoot: dir, fetchImpl: async () => { fetches += 1; return jsonResponse([{ stateabbr: 'AL' }]); } }),
+    { code: 'PILOT_AUTH_EXPIRED' },
+  );
+  assert.equal(fetches, 0);
+});
+
+test('revoked AUTH fails closed before any fetch', async () => {
+  const { dir } = isolateRepo();
+  const authPath = path.join(dir, 'verification/research-program/authorization/payload-authorizations.json');
+  const revoked = JSON.parse(readFileSync(authPath, 'utf8'));
+  revoked.entries[0].revoked = true;
+  writeFileSync(authPath, JSON.stringify(revoked, null, 2) + '\n');
+  let fetches = 0;
+  await assert.rejects(
+    () => runPayloadRetrievalPilot({ execute: true, repoRoot: dir, fetchImpl: async () => { fetches += 1; return jsonResponse([{ stateabbr: 'AL' }]); } }),
+    { code: 'PILOT_AUTH_REVOKED' },
+  );
+  assert.equal(fetches, 0);
 });
 
 test('a redirect that duplicates a query parameter is rejected before follow', async () => {
