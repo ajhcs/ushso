@@ -1,0 +1,647 @@
+{
+  "format": "ushso.int2-journeys-browser-qa.v1",
+  "branch": "codex/ushso-int2-journeys-20260917",
+  "base_ref": "codex/ushso-integration-20260917 @ d5b8a8b5209d9165a38fe1da1f34ab6ec4490e06 (contains int2 metadata 0d08b04 + retained a4a6382 + buildmode 0e18183 merges on origin/codex/research-program-integration-20260910 @9035a81; origin/codex/ushso-integration-20260917 does not exist as remote ref, local branch used)",
+  "base_sha": "d5b8a8b5209d9165a38fe1da1f34ab6ec4490e06",
+  "generated_at": "2026-09-16T21:11:37.798Z",
+  "cohorts_json_sha256": "89130236f7a4c59d3d03a8c1c9aa3a3af93bef8289b1f337c2e52baca52fa543",
+  "corpus": {
+    "baseline": {
+      "corpus_version": "1.2.0",
+      "record_count": 3434,
+      "generation": "live-2026-09-03-85b50522b420",
+      "manifest_sha256": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e"
+    },
+    "candidate": {
+      "corpus_version": "1.3.0-candidate",
+      "record_count": 3436,
+      "generation": "candidate-2026-09-17-corr3-v1.3.0",
+      "parent_generation": "live-2026-09-03-85b50522b420",
+      "manifest_sha256": "24bae1d0530c28fd75285868942b1da063061a7384a3e075374b04dcecc983f4",
+      "additive_records": [
+        "obs:asset:candidate-ahrf-documentation-v1",
+        "obs:asset:candidate-sheps-closures-documentation-v1"
+      ],
+      "additive_count": 2
+    }
+  },
+  "bundles": {
+    "baseline_dist_js": "apps/web/dist/assets/index-CZlXmdye.js (npm run build, .env.production baseline)",
+    "candidate_dist_js": "apps/web/dist/assets/index-EKLtJD9p.js (USHSO_CATALOG_MODE=candidate stage-corpus + prepare-research-assets + build:candidate)",
+    "baseline_backup": "/mnt/d/tmp/plumbob/ushso-int2-qa/baseline-dist-backup (preserved before candidate build)"
+  },
+  "servers": {
+    "baseline": "http://127.0.0.1:48381 (node scripts/run-wrangler.mjs dev --local --port 48381; worker API + apps/web/dist; tested while serving baseline bundle, before candidate build overwrote dist)",
+    "candidate": "http://127.0.0.1:48382 (node scripts/run-wrangler.mjs dev --local --port 48382; worker API + apps/web/dist candidate bundle)",
+    "note": "Both servers share one worktree dist directory, so modes were verified sequentially: baseline QA completed before candidate build; candidate QA after. Baseline evidence bundles pinned by hash above."
+  },
+  "browsers": {
+    "chromium": "system python3 playwright 1.58, channel=chrome (/usr/bin/google-chrome 149.0.7827.155), headless",
+    "firefox": "system python3 playwright 1.58, executable_path /home/plumbob/.cache/ms-playwright/firefox-1532/firefox/firefox, headless",
+    "webkit": "PLAYWRIGHT_BROWSERS_PATH=/home/plumbob/.cache/ms-playwright /mnt/d/tmp/plumbob/pw-webkit-venv/bin/python playwright 1.61, webkit-2311, headless"
+  },
+  "queries": {
+    "hcris": "CMS HCRIS hospital cost reports",
+    "ahrf": "Find AHRF county workforce files",
+    "sheps": "Sheps rural hospital closures"
+  },
+  "results": {
+    "chromium/baseline": {
+      "engine": "chromium",
+      "mode": "baseline",
+      "base": "http://127.0.0.1:48381",
+      "pass": true,
+      "failures": [],
+      "console_errors": [],
+      "api_paths": [
+        "/api/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "/api/discover"
+      ],
+      "counts": {
+        "landing_indexed": 3434,
+        "landing_generation": "live-2026-09-03-85b50522b420",
+        "candidate_notice": 0,
+        "hcris_search_text": "1\nmatching record · page 1 of 1",
+        "hcris_cards": 1,
+        "hcris_first_title": "Hospital Provider Cost Report",
+        "hcris_result_ids": [
+          "cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+        ],
+        "hcris_details_h1": "Hospital Provider Cost Report",
+        "source_summary_len": 1138,
+        "hcris_candidate_section": 0,
+        "hcris_tech_details": 1,
+        "hcris_route_links": 1,
+        "back_text": "←\nReturn to these search results",
+        "return_focus": "A Hospital Provider Cost Report",
+        "baseline_ahrf_cards": 0,
+        "baseline_ahrf_text": "0\nmatching records · page 1 of 1",
+        "baseline_sheps_cards": 0,
+        "baseline_sheps_text": "0\nmatching records · page 1 of 1",
+        "keyboard_tab_sequence": [
+          "A.skip-link|",
+          "A.observatory-logo|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "INPUT.|Describe the question you’re trying to a"
+        ],
+        "keyboard_search_focused": true,
+        "keyboard_reached_result": true,
+        "bad_dataset_body": "Dataset record not found\n\nNo published record has this identifier in the current catalog generation. A missing record is not replaced with a silent stale-context page.",
+        "bad_page_body": "Page not found\n\nNo page exists at this address.",
+        "error_recovery_console_all": [
+          "error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "error: Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "error_recovery_js_errors": [],
+        "mobile_cards": 1,
+        "mobile_overflow_px": 0,
+        "mobile_console_errors": 0,
+        "console_error_count": 0
+      },
+      "urls": {
+        "landing": "http://127.0.0.1:48381/",
+        "hcris_search": "http://127.0.0.1:48381/search?q=CMS%20HCRIS%20hospital%20cost%20reports",
+        "hcris_first_href": "/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95IjowfQ",
+        "hcris_details": "http://127.0.0.1:48381/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95IjowfQ",
+        "hcris_route_hrefs": [
+          "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report"
+        ],
+        "back_href": "/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "returned_search": "http://127.0.0.1:48381/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+      },
+      "downloads": [
+        {
+          "kind": "search-receipt-hcris",
+          "file": "chromium-baseline-hcris-search-receipt.json",
+          "sha256": "25c42b4d43d000bfa80639a577551baf0a9f54a18aa767512d88562cefc8dfaa",
+          "record_count": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e"
+        },
+        {
+          "kind": "source-packet-hcris",
+          "file": "chromium-baseline-hcris-source-packet.json",
+          "sha256": "b4c6fc594b108b20caabb408f0cdb65b6f2f9c488ab9ae1f19b2618ba3d911ed"
+        }
+      ],
+      "usability_problems": []
+    },
+    "firefox/baseline": {
+      "engine": "firefox",
+      "mode": "baseline",
+      "base": "http://127.0.0.1:48381",
+      "pass": true,
+      "failures": [],
+      "console_errors": [],
+      "api_paths": [
+        "/api/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "/api/discover"
+      ],
+      "counts": {
+        "landing_indexed": 3434,
+        "landing_generation": "live-2026-09-03-85b50522b420",
+        "candidate_notice": 0,
+        "hcris_search_text": "1\nmatching record · page 1 of 1",
+        "hcris_cards": 1,
+        "hcris_first_title": "Hospital Provider Cost Report",
+        "hcris_result_ids": [
+          "cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+        ],
+        "hcris_details_h1": "Hospital Provider Cost Report",
+        "source_summary_len": 1138,
+        "hcris_candidate_section": 0,
+        "hcris_tech_details": 1,
+        "hcris_route_links": 1,
+        "back_text": "←\nReturn to these search results",
+        "return_focus": "A Hospital Provider Cost Report",
+        "baseline_ahrf_cards": 0,
+        "baseline_ahrf_text": "0\nmatching records · page 1 of 1",
+        "baseline_sheps_cards": 0,
+        "baseline_sheps_text": "0\nmatching records · page 1 of 1",
+        "keyboard_tab_sequence": [
+          "A.skip-link|",
+          "A.observatory-logo|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "INPUT.|Describe the question you’re trying to a"
+        ],
+        "keyboard_search_focused": true,
+        "keyboard_reached_result": true,
+        "bad_dataset_body": "Dataset record not found\n\nNo published record has this identifier in the current catalog generation. A missing record is not replaced with a silent stale-context page.",
+        "bad_page_body": "Page not found\n\nNo page exists at this address.",
+        "error_recovery_console_all": [],
+        "error_recovery_js_errors": [],
+        "mobile_cards": 1,
+        "mobile_overflow_px": 0,
+        "mobile_console_errors": 0,
+        "console_error_count": 0
+      },
+      "urls": {
+        "landing": "http://127.0.0.1:48381/",
+        "hcris_search": "http://127.0.0.1:48381/search?q=CMS%20HCRIS%20hospital%20cost%20reports",
+        "hcris_first_href": "/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95IjowfQ",
+        "hcris_details": "http://127.0.0.1:48381/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95IjowfQ",
+        "hcris_route_hrefs": [
+          "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report"
+        ],
+        "back_href": "/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "returned_search": "http://127.0.0.1:48381/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+      },
+      "downloads": [
+        {
+          "kind": "search-receipt-hcris",
+          "file": "firefox-baseline-hcris-search-receipt.json",
+          "sha256": "2a82cb3dd14b740429d6b3e008797725c07c9a3e1a9ebee010bd868c161b948e",
+          "record_count": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e"
+        },
+        {
+          "kind": "source-packet-hcris",
+          "file": "firefox-baseline-hcris-source-packet.json",
+          "sha256": "b4c6fc594b108b20caabb408f0cdb65b6f2f9c488ab9ae1f19b2618ba3d911ed"
+        }
+      ],
+      "usability_problems": []
+    },
+    "webkit/baseline": {
+      "engine": "webkit",
+      "mode": "baseline",
+      "base": "http://127.0.0.1:48381",
+      "pass": true,
+      "failures": [],
+      "console_errors": [],
+      "api_paths": [
+        "/api/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "/api/discover"
+      ],
+      "counts": {
+        "landing_indexed": 3434,
+        "landing_generation": "live-2026-09-03-85b50522b420",
+        "candidate_notice": 0,
+        "hcris_search_text": "1\nmatching record · page 1 of 1",
+        "hcris_cards": 1,
+        "hcris_first_title": "Hospital Provider Cost Report",
+        "hcris_result_ids": [
+          "cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+        ],
+        "hcris_details_h1": "Hospital Provider Cost Report",
+        "source_summary_len": 1138,
+        "hcris_candidate_section": 0,
+        "hcris_tech_details": 1,
+        "hcris_route_links": 1,
+        "back_text": "←\nReturn to these search results",
+        "return_focus": "BODY \n    Skip to main contentUnited StatesHealth Systems ObservatoryExploreLearnCove",
+        "baseline_ahrf_cards": 0,
+        "baseline_ahrf_text": "0\nmatching records · page 1 of 1",
+        "baseline_sheps_cards": 0,
+        "baseline_sheps_text": "0\nmatching records · page 1 of 1",
+        "keyboard_tab_sequence": [
+          "A.skip-link|",
+          "A.observatory-logo|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "INPUT.|Describe the question you’re trying to a"
+        ],
+        "keyboard_search_focused": true,
+        "keyboard_reached_result": true,
+        "bad_dataset_body": "Dataset record not found\n\nNo published record has this identifier in the current catalog generation. A missing record is not replaced with a silent stale-context page.",
+        "bad_page_body": "Page not found\n\nNo page exists at this address.",
+        "error_recovery_console_all": [
+          "error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "error: Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "error_recovery_js_errors": [],
+        "mobile_cards": 1,
+        "mobile_overflow_px": 0,
+        "mobile_console_errors": 0,
+        "console_error_count": 0
+      },
+      "urls": {
+        "landing": "http://127.0.0.1:48381/",
+        "hcris_search": "http://127.0.0.1:48381/search?q=CMS%20HCRIS%20hospital%20cost%20reports",
+        "hcris_first_href": "/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95IjowfQ",
+        "hcris_details": "http://127.0.0.1:48381/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95IjowfQ",
+        "hcris_route_hrefs": [
+          "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report"
+        ],
+        "back_href": "/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "returned_search": "http://127.0.0.1:48381/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+      },
+      "downloads": [
+        {
+          "kind": "search-receipt-hcris",
+          "file": "webkit-baseline-hcris-search-receipt.json",
+          "sha256": "38828e4984fb508826d32ffba7c76e56f6badaf567c32c6521d06320ebaeb63b",
+          "record_count": "85b50522b4209d25dba70ad389d14d8b7e4a640384eb3d0d2a413e920aa67a2e"
+        },
+        {
+          "kind": "source-packet-hcris",
+          "file": "webkit-baseline-hcris-source-packet.json",
+          "sha256": "b4c6fc594b108b20caabb408f0cdb65b6f2f9c488ab9ae1f19b2618ba3d911ed"
+        }
+      ],
+      "usability_problems": []
+    },
+    "chromium/candidate": {
+      "engine": "chromium",
+      "mode": "candidate",
+      "base": "http://127.0.0.1:48382",
+      "pass": true,
+      "failures": [],
+      "console_errors": [],
+      "api_paths": [
+        "/api/candidate/datasets/candidate-ahrf-documentation-v1",
+        "/api/candidate/datasets/candidate-sheps-closures-documentation-v1",
+        "/api/candidate/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "/api/candidate/discover"
+      ],
+      "counts": {
+        "landing_indexed": 3436,
+        "landing_generation": "candidate-2026-09-17-corr3-v1.3.0",
+        "candidate_notice": 1,
+        "hcris_search_text": "1\nmatching record · page 1 of 1",
+        "hcris_cards": 1,
+        "hcris_first_title": "Hospital Provider Cost Report",
+        "hcris_result_ids": [
+          "cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+        ],
+        "hcris_details_h1": "Hospital Provider Cost Report",
+        "source_summary_len": 1138,
+        "hcris_candidate_section": 0,
+        "hcris_tech_details": 1,
+        "hcris_route_links": 1,
+        "back_text": "←\nReturn to these search results",
+        "return_focus": "A Hospital Provider Cost Report",
+        "ahrf_cards": 1,
+        "ahrf_title": "HRSA Area Health Resources Files (AHRF): publisher documentation for county health workforce files (catalog entry; payload not verified)",
+        "ahrf_cand_len": 917,
+        "sheps_cards": 1,
+        "sheps_title": "Rural hospital closure tracking (Sheps Center): national closure list and methodology documentation (catalog entry; payload not verified)",
+        "sheps_cand_len": 818,
+        "keyboard_tab_sequence": [
+          "A.skip-link|",
+          "A.observatory-logo|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "INPUT.|Describe the question you’re trying to a"
+        ],
+        "keyboard_search_focused": true,
+        "keyboard_reached_result": true,
+        "bad_dataset_body": "Dataset record not found\n\nNo published record has this identifier in the current catalog generation. A missing record is not replaced with a silent stale-context page.",
+        "bad_page_body": "Page not found\n\nNo page exists at this address.",
+        "error_recovery_console_all": [
+          "error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "error: Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "error_recovery_js_errors": [],
+        "mobile_cards": 1,
+        "mobile_overflow_px": 0,
+        "mobile_console_errors": 0,
+        "console_error_count": 0
+      },
+      "urls": {
+        "landing": "http://127.0.0.1:48382/",
+        "hcris_search": "http://127.0.0.1:48382/search?q=CMS%20HCRIS%20hospital%20cost%20reports",
+        "hcris_first_href": "/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95IjowfQ",
+        "hcris_details": "http://127.0.0.1:48382/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95Ijo1Mjd9",
+        "hcris_route_hrefs": [
+          "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report"
+        ],
+        "back_href": "/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "returned_search": "http://127.0.0.1:48382/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "ahrf_search": "http://127.0.0.1:48382/search?q=Find%20AHRF%20county%20workforce%20files",
+        "ahrf_details": "http://127.0.0.1:48382/datasets/candidate-ahrf-documentation-v1?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUZpbmQlMjBBSFJGJTIwY291bnR5JTIwd29ya2ZvcmNlJTIwZmlsZXMiLCJzZWxlY3RlZF9yZWNvcmRfaWQiOiJjYW5kaWRhdGUtYWhyZi1kb2N1bWVudGF0aW9uLXYxIiwic2Nyb2xsX3kiOjU0OX0",
+        "ahrf_packet_href": "/corpus-candidate-v1.3.0/evidence-packets/hrsa-ahrf-evidence-packet.json",
+        "sheps_search": "http://127.0.0.1:48382/search?q=Sheps%20rural%20hospital%20closures",
+        "sheps_details": "http://127.0.0.1:48382/datasets/candidate-sheps-closures-documentation-v1?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPVNoZXBzJTIwcnVyYWwlMjBob3NwaXRhbCUyMGNsb3N1cmVzIiwic2VsZWN0ZWRfcmVjb3JkX2lkIjoiY2FuZGlkYXRlLXNoZXBzLWNsb3N1cmVzLWRvY3VtZW50YXRpb24tdjEiLCJzY3JvbGxfeSI6NTQ5fQ",
+        "sheps_packet_href": "/corpus-candidate-v1.3.0/evidence-packets/rural-hospital-closure-evidence-packet.json"
+      },
+      "downloads": [
+        {
+          "kind": "search-receipt-hcris",
+          "file": "chromium-candidate-hcris-search-receipt.json",
+          "sha256": "4576ee559e624352efdde1141aa28c9a55dfcdefc8b1d6da0722bb37d177c682",
+          "record_count": "24bae1d0530c28fd75285868942b1da063061a7384a3e075374b04dcecc983f4"
+        },
+        {
+          "kind": "source-packet-hcris",
+          "file": "chromium-candidate-hcris-source-packet.json",
+          "sha256": "d60cad98f7a6a26059f81dbdba0219d90adc130f3923fc622d29e0209bb2d8c3"
+        },
+        {
+          "kind": "source-packet-ahrf",
+          "file": "chromium-candidate-ahrf-source-packet.json",
+          "sha256": "60db12a766e69c7e718b63d38d0e016680fcb4cf4e5383ba4ba275fb0ce13ded"
+        },
+        {
+          "kind": "research-packet-ahrf",
+          "file": "chromium-candidate-ahrf-research-packet.json",
+          "sha256": "c8bab81f80148acd00569aa1f7520c3e5465cb6fd365efef87708b540aaafbcb"
+        },
+        {
+          "kind": "source-packet-sheps",
+          "file": "chromium-candidate-sheps-source-packet.json",
+          "sha256": "a7fc1d2645b665bae95a95e6db0571d58dbd7d9f329e7a11204f5c767f1179e4"
+        },
+        {
+          "kind": "research-packet-sheps",
+          "file": "chromium-candidate-sheps-research-packet.json",
+          "sha256": "1b449f1a5a4a9b1943bceb8466444b829178cfd7df1f2cdd07b39d322f89e029"
+        }
+      ],
+      "usability_problems": []
+    },
+    "firefox/candidate": {
+      "engine": "firefox",
+      "mode": "candidate",
+      "base": "http://127.0.0.1:48382",
+      "pass": true,
+      "failures": [],
+      "console_errors": [],
+      "api_paths": [
+        "/api/candidate/datasets/candidate-ahrf-documentation-v1",
+        "/api/candidate/datasets/candidate-sheps-closures-documentation-v1",
+        "/api/candidate/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "/api/candidate/discover"
+      ],
+      "counts": {
+        "landing_indexed": 3436,
+        "landing_generation": "candidate-2026-09-17-corr3-v1.3.0",
+        "candidate_notice": 1,
+        "hcris_search_text": "1\nmatching record · page 1 of 1",
+        "hcris_cards": 1,
+        "hcris_first_title": "Hospital Provider Cost Report",
+        "hcris_result_ids": [
+          "cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+        ],
+        "hcris_details_h1": "Hospital Provider Cost Report",
+        "source_summary_len": 1138,
+        "hcris_candidate_section": 0,
+        "hcris_tech_details": 1,
+        "hcris_route_links": 1,
+        "back_text": "←\nReturn to these search results",
+        "return_focus": "A Hospital Provider Cost Report",
+        "ahrf_cards": 1,
+        "ahrf_title": "HRSA Area Health Resources Files (AHRF): publisher documentation for county health workforce files (catalog entry; payload not verified)",
+        "ahrf_cand_len": 917,
+        "sheps_cards": 1,
+        "sheps_title": "Rural hospital closure tracking (Sheps Center): national closure list and methodology documentation (catalog entry; payload not verified)",
+        "sheps_cand_len": 818,
+        "keyboard_tab_sequence": [
+          "A.skip-link|",
+          "A.observatory-logo|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "INPUT.|Describe the question you’re trying to a"
+        ],
+        "keyboard_search_focused": true,
+        "keyboard_reached_result": true,
+        "bad_dataset_body": "Dataset record not found\n\nNo published record has this identifier in the current catalog generation. A missing record is not replaced with a silent stale-context page.",
+        "bad_page_body": "Page not found\n\nNo page exists at this address.",
+        "error_recovery_console_all": [],
+        "error_recovery_js_errors": [],
+        "mobile_cards": 1,
+        "mobile_overflow_px": 0,
+        "mobile_console_errors": 0,
+        "console_error_count": 0
+      },
+      "urls": {
+        "landing": "http://127.0.0.1:48382/",
+        "hcris_search": "http://127.0.0.1:48382/search?q=CMS%20HCRIS%20hospital%20cost%20reports",
+        "hcris_first_href": "/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95IjowfQ",
+        "hcris_details": "http://127.0.0.1:48382/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95Ijo1Mjh9",
+        "hcris_route_hrefs": [
+          "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report"
+        ],
+        "back_href": "/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "returned_search": "http://127.0.0.1:48382/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "ahrf_search": "http://127.0.0.1:48382/search?q=Find%20AHRF%20county%20workforce%20files",
+        "ahrf_details": "http://127.0.0.1:48382/datasets/candidate-ahrf-documentation-v1?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUZpbmQlMjBBSFJGJTIwY291bnR5JTIwd29ya2ZvcmNlJTIwZmlsZXMiLCJzZWxlY3RlZF9yZWNvcmRfaWQiOiJjYW5kaWRhdGUtYWhyZi1kb2N1bWVudGF0aW9uLXYxIiwic2Nyb2xsX3kiOjUyOH0",
+        "ahrf_packet_href": "/corpus-candidate-v1.3.0/evidence-packets/hrsa-ahrf-evidence-packet.json",
+        "sheps_search": "http://127.0.0.1:48382/search?q=Sheps%20rural%20hospital%20closures",
+        "sheps_details": "http://127.0.0.1:48382/datasets/candidate-sheps-closures-documentation-v1?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPVNoZXBzJTIwcnVyYWwlMjBob3NwaXRhbCUyMGNsb3N1cmVzIiwic2VsZWN0ZWRfcmVjb3JkX2lkIjoiY2FuZGlkYXRlLXNoZXBzLWNsb3N1cmVzLWRvY3VtZW50YXRpb24tdjEiLCJzY3JvbGxfeSI6NTI4fQ",
+        "sheps_packet_href": "/corpus-candidate-v1.3.0/evidence-packets/rural-hospital-closure-evidence-packet.json"
+      },
+      "downloads": [
+        {
+          "kind": "search-receipt-hcris",
+          "file": "firefox-candidate-hcris-search-receipt.json",
+          "sha256": "1faf23806534260a74f00a934040f2dd83957cfc7846a995587b745f0eabb936",
+          "record_count": "24bae1d0530c28fd75285868942b1da063061a7384a3e075374b04dcecc983f4"
+        },
+        {
+          "kind": "source-packet-hcris",
+          "file": "firefox-candidate-hcris-source-packet.json",
+          "sha256": "d60cad98f7a6a26059f81dbdba0219d90adc130f3923fc622d29e0209bb2d8c3"
+        },
+        {
+          "kind": "source-packet-ahrf",
+          "file": "firefox-candidate-ahrf-source-packet.json",
+          "sha256": "60db12a766e69c7e718b63d38d0e016680fcb4cf4e5383ba4ba275fb0ce13ded"
+        },
+        {
+          "kind": "research-packet-ahrf",
+          "file": "firefox-candidate-ahrf-research-packet.json",
+          "sha256": "c8bab81f80148acd00569aa1f7520c3e5465cb6fd365efef87708b540aaafbcb"
+        },
+        {
+          "kind": "source-packet-sheps",
+          "file": "firefox-candidate-sheps-source-packet.json",
+          "sha256": "a7fc1d2645b665bae95a95e6db0571d58dbd7d9f329e7a11204f5c767f1179e4"
+        },
+        {
+          "kind": "research-packet-sheps",
+          "file": "firefox-candidate-sheps-research-packet.json",
+          "sha256": "1b449f1a5a4a9b1943bceb8466444b829178cfd7df1f2cdd07b39d322f89e029"
+        }
+      ],
+      "usability_problems": []
+    },
+    "webkit/candidate": {
+      "engine": "webkit",
+      "mode": "candidate",
+      "base": "http://127.0.0.1:48382",
+      "pass": true,
+      "failures": [],
+      "console_errors": [],
+      "api_paths": [
+        "/api/candidate/datasets/candidate-ahrf-documentation-v1",
+        "/api/candidate/datasets/candidate-sheps-closures-documentation-v1",
+        "/api/candidate/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "/api/candidate/discover"
+      ],
+      "counts": {
+        "landing_indexed": 3436,
+        "landing_generation": "candidate-2026-09-17-corr3-v1.3.0",
+        "candidate_notice": 1,
+        "hcris_search_text": "1\nmatching record · page 1 of 1",
+        "hcris_cards": 1,
+        "hcris_first_title": "Hospital Provider Cost Report",
+        "hcris_result_ids": [
+          "cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17"
+        ],
+        "hcris_details_h1": "Hospital Provider Cost Report",
+        "source_summary_len": 1138,
+        "hcris_candidate_section": 0,
+        "hcris_tech_details": 1,
+        "hcris_route_links": 1,
+        "back_text": "←\nReturn to these search results",
+        "return_focus": "A Hospital Provider Cost Report",
+        "ahrf_cards": 1,
+        "ahrf_title": "HRSA Area Health Resources Files (AHRF): publisher documentation for county health workforce files (catalog entry; payload not verified)",
+        "ahrf_cand_len": 917,
+        "sheps_cards": 1,
+        "sheps_title": "Rural hospital closure tracking (Sheps Center): national closure list and methodology documentation (catalog entry; payload not verified)",
+        "sheps_cand_len": 818,
+        "keyboard_tab_sequence": [
+          "A.skip-link|",
+          "A.observatory-logo|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "A.|",
+          "INPUT.|Describe the question you’re trying to a"
+        ],
+        "keyboard_search_focused": true,
+        "keyboard_reached_result": true,
+        "bad_dataset_body": "Dataset record not found\n\nNo published record has this identifier in the current catalog generation. A missing record is not replaced with a silent stale-context page.",
+        "bad_page_body": "Page not found\n\nNo page exists at this address.",
+        "error_recovery_console_all": [
+          "error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+          "error: Failed to load resource: the server responded with a status of 404 (Not Found)"
+        ],
+        "error_recovery_js_errors": [],
+        "mobile_cards": 1,
+        "mobile_overflow_px": 0,
+        "mobile_console_errors": 0,
+        "console_error_count": 0
+      },
+      "urls": {
+        "landing": "http://127.0.0.1:48382/",
+        "hcris_search": "http://127.0.0.1:48382/search?q=CMS%20HCRIS%20hospital%20cost%20reports",
+        "hcris_first_href": "/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95IjowfQ",
+        "hcris_details": "http://127.0.0.1:48382/datasets/cms-data-catalog%3Adata.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUNNUyUyMEhDUklTJTIwaG9zcGl0YWwlMjBjb3N0JTIwcmVwb3J0cyIsInNlbGVjdGVkX3JlY29yZF9pZCI6ImNtcy1kYXRhLWNhdGFsb2c6ZGF0YS5jbXMuZ292LWRhdGEtYXBpLXYxLWRhdGFzZXQtNDQwNjAtMmQ5YjBlMDU3Y2FlZmExNyIsInNjcm9sbF95Ijo1Mjh9",
+        "hcris_route_hrefs": [
+          "https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report"
+        ],
+        "back_href": "/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "returned_search": "http://127.0.0.1:48382/search?q=CMS%20HCRIS%20hospital%20cost%20reports#search-result-cms-data-catalog-data-cms-gov-data-api-v1-dataset-44060-2d9b0e057caefa17",
+        "ahrf_search": "http://127.0.0.1:48382/search?q=Find%20AHRF%20county%20workforce%20files",
+        "ahrf_details": "http://127.0.0.1:48382/datasets/candidate-ahrf-documentation-v1?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPUZpbmQlMjBBSFJGJTIwY291bnR5JTIwd29ya2ZvcmNlJTIwZmlsZXMiLCJzZWxlY3RlZF9yZWNvcmRfaWQiOiJjYW5kaWRhdGUtYWhyZi1kb2N1bWVudGF0aW9uLXYxIiwic2Nyb2xsX3kiOjU1MH0",
+        "ahrf_packet_href": "/corpus-candidate-v1.3.0/evidence-packets/hrsa-ahrf-evidence-packet.json",
+        "sheps_search": "http://127.0.0.1:48382/search?q=Sheps%20rural%20hospital%20closures",
+        "sheps_details": "http://127.0.0.1:48382/datasets/candidate-sheps-closures-documentation-v1?return=eyJ2ZXJzaW9uIjoidXNoc28tcmV0dXJuLWNvbnRleHQudjEiLCJwYXRoIjoiL3NlYXJjaCIsInNlYXJjaCI6Ij9xPVNoZXBzJTIwcnVyYWwlMjBob3NwaXRhbCUyMGNsb3N1cmVzIiwic2VsZWN0ZWRfcmVjb3JkX2lkIjoiY2FuZGlkYXRlLXNoZXBzLWNsb3N1cmVzLWRvY3VtZW50YXRpb24tdjEiLCJzY3JvbGxfeSI6NTUwfQ",
+        "sheps_packet_href": "/corpus-candidate-v1.3.0/evidence-packets/rural-hospital-closure-evidence-packet.json"
+      },
+      "downloads": [
+        {
+          "kind": "search-receipt-hcris",
+          "file": "webkit-candidate-hcris-search-receipt.json",
+          "sha256": "b62828b5719b5544a73c8d7dc8783452368fe52676ff8d8c6fb35d403e623708",
+          "record_count": "24bae1d0530c28fd75285868942b1da063061a7384a3e075374b04dcecc983f4"
+        },
+        {
+          "kind": "source-packet-hcris",
+          "file": "webkit-candidate-hcris-source-packet.json",
+          "sha256": "d60cad98f7a6a26059f81dbdba0219d90adc130f3923fc622d29e0209bb2d8c3"
+        },
+        {
+          "kind": "source-packet-ahrf",
+          "file": "webkit-candidate-ahrf-source-packet.json",
+          "sha256": "60db12a766e69c7e718b63d38d0e016680fcb4cf4e5383ba4ba275fb0ce13ded"
+        },
+        {
+          "kind": "research-packet-ahrf",
+          "file": "webkit-candidate-ahrf-research-packet.json",
+          "sha256": "c8bab81f80148acd00569aa1f7520c3e5465cb6fd365efef87708b540aaafbcb"
+        },
+        {
+          "kind": "source-packet-sheps",
+          "file": "webkit-candidate-sheps-source-packet.json",
+          "sha256": "a7fc1d2645b665bae95a95e6db0571d58dbd7d9f329e7a11204f5c767f1179e4"
+        },
+        {
+          "kind": "research-packet-sheps",
+          "file": "webkit-candidate-sheps-research-packet.json",
+          "sha256": "1b449f1a5a4a9b1943bceb8466444b829178cfd7df1f2cdd07b39d322f89e029"
+        }
+      ],
+      "usability_problems": []
+    }
+  },
+  "download_hash_summary": {
+    "note": "Research packets are static and deterministic across engines; source packets and search receipts embed generation/timestamps so baseline vs candidate differ by design.",
+    "baseline_hcris_source_packet_sha256": "b4c6fc594b10... (full in per-engine results; identical across chromium/firefox/webkit baseline)",
+    "candidate_hcris_source_packet_sha256": "d60cad98f7a6... (identical across candidate engines; differs from baseline by generation field)",
+    "candidate_ahrf_source_packet_sha256": "60db12a766e6... (identical across candidate engines)",
+    "candidate_ahrf_research_packet_sha256": "c8bab81f80148acd00569aa1f7520c3e5465cb6fd365efef87708b540aaafbcb (static staged file, identical across engines)",
+    "candidate_sheps_source_packet_sha256": "a7fc1d2645b6... (identical across candidate engines)",
+    "candidate_sheps_research_packet_sha256": "1b449f1a5a4a9b1943bceb8466444b829178cfd7df1f2cdd07b39d322f89e029 (static, identical across engines)"
+  },
+  "console_error_policy": "Main-journey console errors must be zero (isolated error-recovery context excluded: intentional GET /datasets/bad-id-xyz-123 and /nonexistent-route-xyz-123 return HTTP 404 document responses with correct error UI; Chromium/WebKit log resource-404 console errors for those document loads, Firefox does not; zero JS pageerrors in all cases). All main journeys: 0 console errors.",
+  "api_policy": "Baseline requested only /api/discover + /api/datasets (+ /api/catalog where browsed); candidate requested only /api/candidate/discover + /api/candidate/datasets. No cross-mode mixing in any run.",
+  "usability_problems": [
+    "WebKit baseline return-to-results focus read as BODY in one run (candidate re-run showed correct link focus); likely harness timing (requestAnimationFrame focus) rather than app bug; context (URL hash #search-result-...) restored correctly in all runs.",
+    "Direct navigation to bad routes returns HTTP 404 status with correct error UI (Dataset record not found / Page not found); Chromium/WebKit log document-404 console errors for those intentional loads (expected server behavior; worker/index.mjs untouched per constraints). Client-side bad-route rendering shows same UI without extra errors.",
+    "Candidate server workerd exited once mid-QA (port 48382) during first WebKit candidate mobile step; restart recovered and re-run passed; no app failure (infra flake)."
+  ],
+  "copy_layout_fixes": "none - reviewed CandidateCatalogNotice, DatasetDetailsPage candidate-record, SourceSummary, SearchIdentityNote, ResultCard, LandingPage during journeys; plain-language answers (what it is / why it helps / what is documented / what USHSO checked / next steps) visible, unknowns stay unknown, no fabricated access claims, generation ids and frozen-baseline arithmetic already inside expandable technical-details; no blocking confusion found, so no apps/web edits made (see int2-journeys-copy-note.md).",
+  "tests": {
+    "apps_web_vitest": "46 files, 221 tests passed (pre-existing baseline; re-run after review with zero edits)"
+  },
+  "constraints": "No production deploy, no cf:deploy, no live publisher requests (route links verified as https hrefs without fetching; research packets parsed from local staged files via downloads); no scheduler/paid; untouched: scripts/research-program, verification ledgers/packets, qualify-*.mjs, evaluation cohorts (sha verified), worker/index.mjs, .env.production, root package.json/package-lock/.gitignore."
+}
