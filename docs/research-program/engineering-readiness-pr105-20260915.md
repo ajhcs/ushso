@@ -31,7 +31,9 @@ Do **not** integrate as if they were true:
 
 **Engineering merge-readiness of the draft, not production and not R01–R16.**
 
-Ask a named human: *May draft PR 105 stay draft but be treated as the research-branch collector/validator/site candidate after `af73b02` + this collector-hardening commit, with remaining publisher budget 2 unused and R04 unaccepted?*
+Ask a named human: *May draft PR 105 stay draft but be treated as the research-branch collector/validator/site candidate after `2a72184`, with remaining publisher budget 2 unused and R04 unaccepted?*
+
+**Owner answer 2026-09-16: YES.** Record: `docs/research-program/owner-yes-pr105-research-candidate-20260916.md`. PR 105 remains draft. Remaining budget unused. R04 unaccepted.
 
 Separate, later, not this decision:
 
