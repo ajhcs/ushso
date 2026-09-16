@@ -7,7 +7,7 @@ Baseline is the approved production default. Candidate is an explicit research p
 - Corpus v1.2.0, 3434 records, generation live-2026-09-03-85b50522b420
 - Search API path /api/discover, browse /api/catalog, details /api/datasets
 - Env file apps/web/.env.production selects baseline
-- Build with npm run build, which stages baseline assets and builds the web app in production mode
+- Build with npm run build, which stages research assets (stage-corpus default mode stages all static corpora including candidate files) and builds the web app in production mode; baseline purity is enforced at the app layer (baseline mode queries only /api/discover and shows 0 candidate cards), not by asset exclusion
 - Frozen evaluation and cohort files stay unchanged in both modes
 
     npm run build

@@ -48,6 +48,17 @@ export const CATALOG_MODE: CatalogMode = resolveCatalogMode(import.meta.env as M
 export const IS_CANDIDATE_MODE: boolean = CATALOG_MODE === 'candidate'
 export const DISCOVERY_API_PATH: string = discoveryApiPathForMode(CATALOG_MODE)
 
+// Sibling read routes share the discovery path prefix (/api or /api/candidate).
+// All three are derived here so docs pages cannot pin one mode while serving another.
+export function catalogApiPathForMode(mode: CatalogMode): string {
+  return discoveryApiPathForMode(mode).replace(/\/discover$/, '/catalog')
+}
+export function datasetApiPathPrefixForMode(mode: CatalogMode): string {
+  return discoveryApiPathForMode(mode).replace(/\/discover$/, '/datasets')
+}
+export const CATALOG_API_PATH: string = catalogApiPathForMode(CATALOG_MODE)
+export const DATASET_API_PATH_PREFIX: string = datasetApiPathPrefixForMode(CATALOG_MODE)
+
 type BaselineCorpus = {
   corpus_id: string
   corpus_version: string

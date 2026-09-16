@@ -3,7 +3,7 @@ import baselineCorpus from '../../../../packages/retrieval/versions/v1.2.0/corpu
 import candidateCorpus from '../../../../packages/retrieval/versions/v1.3.0/corpus/corpus.json'
 import { ApiDiscoveryProvider } from '../providers/discoveryProvider'
 import { CANDIDATE_ADDITIVE_RECORD_COUNT, CANDIDATE_BASELINE_RECORD_COUNT, CANDIDATE_CORPUS_VERSION, CANDIDATE_ENTRIES, CANDIDATE_GENERATION, CANDIDATE_PARENT_GENERATION, CANDIDATE_RECORD_COUNT, candidateEntryForRecordId, isCandidateRecordId } from './candidateCatalog'
-import { BASELINE_CORPUS_VERSION, BASELINE_GENERATION, BASELINE_RECORD_COUNT, CATALOG_GENERATION, CATALOG_MODE, CATALOG_RECORD_COUNT, CATALOG_VERSION, CANDIDATE_DISCOVERY_API_PATH, BASELINE_DISCOVERY_API_PATH, DISCOVERY_API_PATH, IS_CANDIDATE_MODE, discoveryApiPathForMode, resolveCatalogMode } from './catalogMode'
+import { BASELINE_CORPUS_VERSION, BASELINE_GENERATION, BASELINE_RECORD_COUNT, CATALOG_API_PATH, CATALOG_GENERATION, CATALOG_MODE, CATALOG_RECORD_COUNT, CATALOG_VERSION, CANDIDATE_DISCOVERY_API_PATH, BASELINE_DISCOVERY_API_PATH, DATASET_API_PATH_PREFIX, DISCOVERY_API_PATH, IS_CANDIDATE_MODE, catalogApiPathForMode, datasetApiPathPrefixForMode, discoveryApiPathForMode, resolveCatalogMode } from './catalogMode'
 
 describe('catalog build-mode single source', function () {
   it('defaults to approved baseline production', function () {
@@ -63,7 +63,21 @@ describe('catalog build-mode single source', function () {
     expect(isCandidateRecordId('obs:asset:cms-data-catalog:data')).toBe(false)
     expect(candidateEntryForRecordId('obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17')).toBeNull()
   })
-  it('uses the same catalog for notice, search, details, and exports', async function () {
+  it('keeps discover, catalog, and datasets routes on one mode prefix', function () {
+    for (const mode of ['baseline', 'candidate'] as const) {
+      const discover = discoveryApiPathForMode(mode)
+      const prefix = discover.replace(/\/discover$/, '')
+      expect(catalogApiPathForMode(mode)).toBe(prefix + '/catalog')
+      expect(datasetApiPathPrefixForMode(mode)).toBe(prefix + '/datasets')
+    }
+    expect(catalogApiPathForMode('baseline')).toBe('/api/catalog')
+    expect(datasetApiPathPrefixForMode('baseline')).toBe('/api/datasets')
+    expect(catalogApiPathForMode('candidate')).toBe('/api/candidate/catalog')
+    expect(datasetApiPathPrefixForMode('candidate')).toBe('/api/candidate/datasets')
+    expect(CATALOG_API_PATH).toBe(IS_CANDIDATE_MODE ? '/api/candidate/catalog' : '/api/catalog')
+    expect(DATASET_API_PATH_PREFIX).toBe(IS_CANDIDATE_MODE ? '/api/candidate/datasets' : '/api/datasets')
+  })
+  it('uses the same catalog for notice, search, details, agents docs, and exports', async function () {
     const provider = new ApiDiscoveryProvider()
     expect(provider).toBeDefined()
     const noticeSource = await readWebSource('src/components/CandidateCatalogNotice.tsx')
@@ -71,6 +85,11 @@ describe('catalog build-mode single source', function () {
     const sourcesSource = await readWebSource('src/pages/SourcesPage.tsx')
     const detailsSource = await readWebSource('src/pages/DatasetDetailsPage.tsx')
     const providerSource = await readWebSource('src/providers/discoveryProvider.ts')
+    const agentsSource = await readWebSource('src/pages/AgentsPage.tsx')
+    expect(agentsSource.indexOf('catalogMode') !== -1).toBe(true)
+    expect(agentsSource.indexOf('CATALOG_API_PATH') !== -1).toBe(true)
+    expect(agentsSource.indexOf('DATASET_API_PATH_PREFIX') !== -1).toBe(true)
+    expect(agentsSource.indexOf('/api/discover') === -1 || agentsSource.indexOf('DISCOVERY_API_PATH') !== -1).toBe(true)
     expect(noticeSource.indexOf('catalogMode') !== -1).toBe(true)
     expect(noticeSource.indexOf('IS_CANDIDATE_MODE') !== -1).toBe(true)
     expect(landingSource.indexOf('catalogMode') !== -1).toBe(true)

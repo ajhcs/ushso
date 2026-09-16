@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { PageTitle } from '../components/PageTitle'
-import { CATALOG_RECORD_COUNT, DISCOVERY_API_PATH } from '../data/catalogMode'
+import { CATALOG_API_PATH, CATALOG_RECORD_COUNT, DATASET_API_PATH_PREFIX, DISCOVERY_API_PATH } from '../data/catalogMode'
 import responseExample from '../data/generatedAgentsResponseExample.json'
 import webMcpContractJson from '../../../../packages/machine-toolkit/public-webmcp-tool.json'
 
-const curlExample = `curl -sS https://ushso.org/api/discover \\
+const curlExample = `curl -sS https://ushso.org${DISCOVERY_API_PATH} \\
   -H "content-type: application/json" \\
   --data '{"question":"CMS HCRIS hospital cost reports by state","limit":10}'`
 
@@ -57,8 +57,8 @@ export function AgentsPage() {
           <dl>
             <div><dt><a href="/api/contract">GET /api/contract</a></dt><dd>Published WebMCP and versioned machine-route activation contract.</dd></div>
             <div><dt>POST {DISCOVERY_API_PATH}</dt><dd>Question-to-source discovery. A zero-result response is not evidence that no source exists. <code>returned_count</code>, <code>total_matches</code>, and <code>has_more</code> describe the bounded response; they do not claim a complete catalog.</dd></div>
-            <div><dt><a href="/api/catalog">GET /api/catalog</a></dt><dd>Browse the published catalog without inventing a question.</dd></div>
-            <div><dt>GET /api/datasets/{'{record_id}'}</dt><dd>Dereference one published record independently of search results.</dd></div>
+            <div><dt><a href={CATALOG_API_PATH}>GET {CATALOG_API_PATH}</a></dt><dd>Browse the published catalog without inventing a question.</dd></div>
+            <div><dt>GET {DATASET_API_PATH_PREFIX + '/{record_id}'}</dt><dd>Dereference one published record independently of search results.</dd></div>
             <div><dt><a href="/api/health">GET or HEAD /api/health</a></dt><dd>Bounded service and corpus readiness check.</dd></div>
           </dl>
         </section>
