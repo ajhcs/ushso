@@ -222,10 +222,302 @@ export function assessFrozenCorpusEligibility(payload = {}, {
   });
 }
 
-export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
+// INT2-retained (2026-09-17): ONE validated retained-sample pathway for the
+// authoritative R04 count. payloadSampleCountsFromReceipts() previously called
+// only isR04EligiblePayload() (the Case-A live-sample predicate), so validated
+// reanalysis/corpus assessments never fed the count. This pathway supports all
+// four cases — live capture, local reanalysis of that capture, evidenced
+// frozen payload corpus, and insufficient-evidence — across six dimensions:
+// acquisition provenance+authorization, acquisition time/freshness,
+// retained-bytes integrity (SHA), frozen product identity, release identity,
+// and exact reproducible recipe.
+//
+// Eligibility is recomputed from receipt fields inside the counts function.
+// Caller-supplied eligibility flags and every underscore-prefixed
+// validator-derived field (all derived flags, release checks, file-sample
+// markers, reanalysis link flags, evidence-kind markers, product requirement
+// snapshots, scheduler markers, ...) are stripped before evaluation, as are
+// bare eligibility flags (eligible, r04_eligible, qualified, accepted, ...).
+// A forged-flag receipt therefore counts zero: only underlying receipt fields
+// plus explicit context evidence (integrity maps, frozen release verification,
+// corpus-manifest binding) can qualify.
+//
+// Reference resolution: live_http=false on a reanalysis never implies the
+// original capture was offline — the referenced original receipt is looked up
+// by receipt_id and its own live_http===true is required. A nonempty
+// reanalysis_of string alone never implies provenance — an unresolvable
+// reference fails as auth_chain_unresolved_reference.
+//
+// Counting: distinct frozen products, not receipts/releases/passes/requests.
+// A fully-evidenced retained sample counts once without refetch; a live
+// capture plus its eligible reanalysis of the same product counts once; two
+// eligible receipts with different release_id values for one product count
+// once (annual releases are not products).
+export const RETAINED_SAMPLE_QUALIFICATION_VERSION = 'ushso.retained-sample-qualification.v1';
+export const RETAINED_FRESHNESS_MAX_AGE_DAYS = 90;
+
+// Documented freshness rule (narrow reading of R04 recent).
+// AMBIGUITY A1 (kept excluded when unmet): the acceptance text says recent
+// successful bounded sample without a numeric threshold. Working rule: the
+// acquisition execution.ended_at must be within RETAINED_FRESHNESS_MAX_AGE_DAYS
+// before evaluation time now. Freshness follows the ORIGINAL capture for
+// reanalyses, never the later reanalysis timestamp. Missing, unparseable,
+// future-dated, or older-than-threshold acquisition time counts as stale and
+// the sample is excluded. This threshold is a documented interpretation, not
+// acceptance text; samples needing a looser reading stay excluded.
+export const RETAINED_FRESHNESS_RULE = freeze({
+  version: RETAINED_SAMPLE_QUALIFICATION_VERSION,
+  ambiguity: 'R04 says recent without a numeric threshold; any sample that needs a looser reading stays excluded.',
+  max_age_days: RETAINED_FRESHNESS_MAX_AGE_DAYS,
+  follows: 'original capture execution.ended_at for reanalyses, own execution.ended_at otherwise',
+  stale_when: 'missing/unparseable/future acquisition time, or age over max_age_days',
+});
+
+// Documented recipe rule (narrow reading of R04 exact technical recipe).
+// AMBIGUITY A2 (kept excluded when unmet): a non-empty recipe string is
+// necessary but its semantic re-executability (no tacit manual steps) cannot
+// be verified from string presence alone. Working rule: the receipt must carry
+// a non-empty recipe string; recipes referencing unrecorded manual work remain
+// excluded until a re-execution demonstration exists.
+export const RETAINED_RECIPE_RULE = freeze({
+  version: RETAINED_SAMPLE_QUALIFICATION_VERSION,
+  ambiguity: 'String presence does not prove re-executability; tacit-knowledge recipes stay excluded.',
+  requires: 'non-empty payload.recipe string naming the bounded operation',
+});
+
+const FORGED_ELIGIBILITY_KEYS = freeze([
+  'eligible', 'r04_eligible', 'qualified', 'accepted', 'approved', 'verified', 'passed',
+  'r04_accepted', 'scientific_approval', 'payload_eligible', 'sample_eligible',
+]);
+
+function stripDerivedAndForgedFlags(payload = {}) {
+  const clean = {};
+  for (const [key, value] of Object.entries(payload)) {
+    if (key.startsWith('_')) continue;
+    if (FORGED_ELIGIBILITY_KEYS.includes(key)) continue;
+    clean[key] = value;
+  }
+  return clean;
+}
+
+function isRfc3339Loose(value) {
+  return typeof value === 'string'
+    && /^\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})$/u.test(value)
+    && !Number.isNaN(Date.parse(value));
+}
+
+function isSha256Loose(value) {
+  return typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+}
+
+function isHttpsUrl(value) {
+  try {
+    return new URL(value).protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+function nowMsOf(now) {
+  if (now == null) return Date.now();
+  const ms = typeof now === 'number' ? now : Date.parse(now);
+  return Number.isFinite(ms) ? ms : NaN;
+}
+
+function acquisitionEndedAtOf(cleanPayload, receipt, receiptsById) {
+  const reanalysisOf = typeof cleanPayload.reanalysis_of === 'string' ? cleanPayload.reanalysis_of.trim() : '';
+  const isReanalysisCandidate = cleanPayload.live_http === false
+    && cleanPayload.execution?.kind === 'bounded_file_sample'
+    && reanalysisOf !== '';
+  if (isReanalysisCandidate) {
+    const original = receiptsById.get(reanalysisOf) ?? null;
+    const originalPayload = original?.payload ?? {};
+    const endedAt = originalPayload.execution?.ended_at ?? null;
+    return { endedAt, original, followsCapture: true };
+  }
+  return { endedAt: cleanPayload.execution?.ended_at ?? null, original: null, followsCapture: false };
+}
+
+// Single validated assessment for one receipt. Pure: no I/O, no fetch.
+// Context (all optional; missing evidence fails closed):
+//   productsByKey, receiptsById,
+//   integrityByReceiptId {bytesPresent, shaVerified, expectedSha256},
+//   releaseVerificationByProduct {status, field, reason},
+//   requirementsByProduct {required_record_id, required_native_id, row_fields, authorized_hosts, authorized_url_contains},
+//   acquisitionEvidenceByReceiptId {true when a corpus manifest binds bytes to an authorized capture},
+//   now, maxAgeDays.
+export function assessUnifiedRetainedSample(receipt = {}, context = {}) {
+  const reasons = [];
+  const receiptId = receipt.receipt_id ?? null;
+  const rawPayload = receipt.payload ?? {};
+  const payload = stripDerivedAndForgedFlags(rawPayload);
+  const productKey = typeof payload.product_key === 'string' ? payload.product_key : null;
+  const productsByKey = context.productsByKey ?? new Map();
+  const receiptsById = context.receiptsById ?? new Map();
+  const integrityByReceiptId = context.integrityByReceiptId ?? {};
+  const releaseVerificationByProduct = context.releaseVerificationByProduct ?? {};
+  const requirementsByProduct = context.requirementsByProduct ?? {};
+  const acquisitionEvidenceByReceiptId = context.acquisitionEvidenceByReceiptId ?? {};
+  const maxAgeDays = Number.isFinite(context.maxAgeDays) ? context.maxAgeDays : RETAINED_FRESHNESS_MAX_AGE_DAYS;
+  const nowMs = nowMsOf(context.now);
+
+  if (receipt.kind !== 'core_cell') {
+    return freeze({ version: RETAINED_SAMPLE_QUALIFICATION_VERSION, case: 'insufficient_evidence', eligible: false, reasons: freeze(['not_a_core_cell_receipt']), receipt_id: receiptId, product_key: productKey });
+  }
+  if (payload.field !== 'publisher_access') {
+    return freeze({ version: RETAINED_SAMPLE_QUALIFICATION_VERSION, case: 'insufficient_evidence', eligible: false, reasons: freeze(['not_a_publisher_access_cell']), receipt_id: receiptId, product_key: productKey });
+  }
+
+  // Shared structural gates recomputed from receipt fields (never flags).
+  if (payload.supported !== true) reasons.push('sample_not_supported');
+  if (payload.bounded_sample !== true) reasons.push('not_a_bounded_sample');
+  if (payload.payload_success !== true) reasons.push('payload_not_successful');
+  if (payload.fictional === true || payload.synthetic === true) reasons.push('fictional_or_synthetic');
+  if (payload.catalog_membership_as_sample === true) reasons.push('catalog_membership_is_not_sample');
+  if (payload.vintage_substitution === true) reasons.push('vintage_substitution');
+  if (typeof payload.recipe !== 'string' || payload.recipe.trim() === '') reasons.push('recipe_missing');
+  if (!Number.isSafeInteger(payload.row_count) || payload.row_count <= 0) reasons.push('row_count_not_positive');
+  if (payload.result_format !== 'json_array' && payload.result_format !== 'json_object') reasons.push('result_format_not_bounded_rows');
+  if (typeof payload.release_id !== 'string' || payload.release_id.trim() === '') reasons.push('release_claim_missing');
+  if (productKey == null || productKey === '') reasons.push('product_key_missing');
+  const frozenProduct = productKey != null ? productsByKey.get(productKey) : null;
+  if (productKey != null && productKey !== '' && !frozenProduct) reasons.push('product_not_in_frozen_cohort');
+  if (frozenProduct && frozenProduct.access_expectation !== 'public_sample_eligible') reasons.push('not_public_sample_eligible');
+
+  // Frozen product identity from receipt fields vs frozen cohort (+ frozen
+  // requirements when supplied).
+  const requirement = productKey != null ? requirementsByProduct[productKey] ?? null : null;
+  const frozenRecordId = frozenProduct?.anchor?.representative?.record_id ?? requirement?.required_record_id ?? null;
+  const frozenNativeId = frozenProduct?.anchor?.representative?.native_id ?? requirement?.required_native_id ?? null;
+  if (frozenProduct) {
+    if (typeof payload.record_id !== 'string' || payload.record_id === '' || (frozenRecordId != null && payload.record_id !== frozenRecordId)) reasons.push('identity_record_mismatch');
+    if (typeof payload.native_product_id !== 'string' || payload.native_product_id === '' || (frozenNativeId != null && payload.native_product_id !== frozenNativeId)) reasons.push('identity_native_mismatch');
+  }
+  if (requirement) {
+    if (payload.record_id !== requirement.required_record_id) reasons.push('identity_record_mismatch');
+    if (payload.native_product_id !== requirement.required_native_id) reasons.push('identity_native_mismatch');
+    const rowFields = Object.keys(requirement.row_fields ?? {});
+    if (rowFields.length === 0) reasons.push('identity_requirement_empty');
+  }
+
+  // Route the four cases from execution truth, not from flags.
+  const reanalysisOf = typeof payload.reanalysis_of === 'string' ? payload.reanalysis_of.trim() : '';
+  const executionKind = payload.execution?.kind ?? null;
+  let sampleCase = 'insufficient_evidence';
+  if (payload.live_http === true && executionKind === 'bounded_http_sample' && reanalysisOf === '') {
+    sampleCase = 'live_capture';
+  } else if (payload.live_http === false && executionKind === 'bounded_file_sample' && reanalysisOf !== '') {
+    sampleCase = 'reanalysis_of_retained_bytes';
+  } else if (payload.live_http === false && executionKind === 'bounded_file_sample' && reanalysisOf === '') {
+    sampleCase = 'frozen_local_payload_corpus';
+  } else {
+    reasons.push('execution_not_a_qualifying_sample_path');
+  }
+
+  // Acquisition provenance + authorization.
+  if (sampleCase === 'live_capture') {
+    const auth = payload.authorization ?? null;
+    if (!auth || typeof auth.id !== 'string' || auth.id === '' || auth.authorized !== true) reasons.push('authorization_missing_or_denied');
+    const execution = payload.execution ?? {};
+    if (!isRfc3339Loose(execution.started_at) || !isRfc3339Loose(execution.ended_at)) reasons.push('acquisition_time_unparseable');
+    else if (Date.parse(execution.ended_at) < Date.parse(execution.started_at)) reasons.push('acquisition_time_inverted');
+    if (typeof execution.request_url !== 'string' || !isHttpsUrl(execution.request_url)) reasons.push('acquisition_request_url_not_https');
+    if (typeof execution.final_url !== 'string' || !isHttpsUrl(execution.final_url)) reasons.push('acquisition_final_url_not_https');
+    if (!Number.isSafeInteger(execution.http_status) || execution.http_status < 200 || execution.http_status > 299) reasons.push('acquisition_http_status_not_success');
+    if (requirement) {
+      for (const url of [execution.request_url, execution.final_url]) {
+        if (typeof url !== 'string') continue;
+        let host = null;
+        try { host = new URL(url).host; } catch { host = null; }
+        if (host == null || !(requirement.authorized_hosts ?? []).includes(host)) reasons.push('acquisition_url_host_unauthorized');
+        if (requirement.authorized_url_contains && !url.includes(requirement.authorized_url_contains)) reasons.push('acquisition_url_scope_mismatch');
+      }
+    }
+  } else if (sampleCase === 'reanalysis_of_retained_bytes') {
+    if (payload.not_a_new_retrieval !== true) reasons.push('auth_chain_new_retrieval_claim');
+    const original = receiptsById.get(reanalysisOf) ?? null;
+    if (!original) {
+      reasons.push('auth_chain_unresolved_reference');
+    } else {
+      const originalPayload = original.payload ?? {};
+      if (originalPayload.live_http !== true) reasons.push('auth_chain_original_not_live');
+      const originalSha = original.evidence_sha256 ?? null;
+      const thisSha = receipt.evidence_sha256 ?? null;
+      if (isSha256Loose(originalSha) && isSha256Loose(thisSha) && thisSha !== originalSha) reasons.push('integrity_sha_mismatch');
+    }
+    if (!isRfc3339Loose(payload.execution?.started_at) || !isRfc3339Loose(payload.execution?.ended_at)) reasons.push('acquisition_time_unparseable');
+  } else if (sampleCase === 'frozen_local_payload_corpus') {
+    if (acquisitionEvidenceByReceiptId[receiptId] !== true) reasons.push('acquisition_provenance_unevidenced');
+    if (!isRfc3339Loose(payload.execution?.started_at) || !isRfc3339Loose(payload.execution?.ended_at)) reasons.push('acquisition_time_unparseable');
+  }
+
+  // Acquisition time / freshness (documented rule; follows original capture).
+  const endedInfo = acquisitionEndedAtOf(payload, receipt, receiptsById);
+  const endedAt = endedInfo.endedAt;
+  if (!isRfc3339Loose(endedAt)) {
+    if (!reasons.includes('acquisition_time_unparseable')) reasons.push('acquisition_time_unparseable');
+  } else if (!Number.isFinite(nowMs)) {
+    reasons.push('freshness_evaluation_time_unparseable');
+  } else {
+    const endedMs = Date.parse(endedAt);
+    if (endedMs > nowMs) reasons.push('acquisition_time_in_future');
+    else if ((nowMs - endedMs) > maxAgeDays * 86400000) reasons.push('freshness_stale');
+  }
+  if (!isRfc3339Loose(receipt.recorded_at)) reasons.push('recorded_at_unparseable');
+
+  // Retained-bytes integrity (SHA).
+  const receiptSha = receipt.evidence_sha256 ?? null;
+  if (!isSha256Loose(receiptSha)) reasons.push('integrity_sha_unbound');
+  if (typeof receipt.evidence_reference !== 'string' || receipt.evidence_reference.trim() === '') reasons.push('integrity_reference_missing');
+  const claimedSha = rawPayload.evidence_sha256 ?? payload.evidence_sha256 ?? null;
+  if (claimedSha != null && isSha256Loose(receiptSha) && isSha256Loose(claimedSha) && claimedSha !== receiptSha) reasons.push('integrity_sha_mismatch');
+  const integrity = integrityByReceiptId[receiptId] ?? null;
+  if (sampleCase === 'reanalysis_of_retained_bytes' || sampleCase === 'frozen_local_payload_corpus') {
+    if (integrity == null || integrity.bytesPresent !== true) reasons.push('integrity_bytes_absent');
+    if (integrity == null || integrity.shaVerified !== true) reasons.push('integrity_sha_unverified');
+    if (integrity?.expectedSha256 != null && isSha256Loose(receiptSha) && integrity.expectedSha256 !== receiptSha) reasons.push('integrity_sha_mismatch');
+    if (claimedSha != null && integrity?.expectedSha256 != null && isSha256Loose(claimedSha) && claimedSha !== integrity.expectedSha256) reasons.push('integrity_sha_mismatch');
+  } else if (sampleCase === 'live_capture' && integrity != null) {
+    if (integrity.bytesPresent === false) reasons.push('integrity_bytes_absent');
+    if (integrity.shaVerified === false) reasons.push('integrity_sha_unverified');
+    if (integrity.expectedSha256 != null && isSha256Loose(receiptSha) && integrity.expectedSha256 !== receiptSha) reasons.push('integrity_sha_mismatch');
+  }
+
+  // Release identity from explicit frozen verification (never release-check flags).
+  const releaseVerification = productKey != null ? releaseVerificationByProduct[productKey] ?? null : null;
+  const releaseStatus = releaseVerification?.status ?? 'missing';
+  if (releaseStatus !== 'verified') reasons.push('release_unverified:' + releaseStatus);
+
+  const eligible = reasons.length === 0;
+  return freeze({
+    version: RETAINED_SAMPLE_QUALIFICATION_VERSION,
+    case: eligible ? sampleCase : (sampleCase === 'insufficient_evidence' ? 'insufficient_evidence' : sampleCase),
+    eligible,
+    reasons: freeze([...new Set(reasons)]),
+    receipt_id: receiptId,
+    product_key: productKey,
+    release_status: releaseStatus,
+  });
+}
+
+export function payloadSampleCountsFromReceipts(receipts = [], products = [], options = {}) {
   const samples = new Set();
   const verifiedRoutes = new Set();
-  for (const receipt of receipts.filter((row) => row.kind === 'core_cell')) {
+  const productsByKey = new Map((products ?? []).map((product) => [product.product_key, product]));
+  const coreReceipts = (receipts ?? []).filter((row) => row.kind === 'core_cell');
+  const receiptsById = new Map(coreReceipts.map((row) => [row.receipt_id, row]));
+  const context = {
+    productsByKey,
+    receiptsById,
+    integrityByReceiptId: options.integrityByReceiptId ?? {},
+    releaseVerificationByProduct: options.releaseVerificationByProduct ?? {},
+    requirementsByProduct: options.requirementsByProduct ?? {},
+    acquisitionEvidenceByReceiptId: options.acquisitionEvidenceByReceiptId ?? {},
+    now: options.now,
+    maxAgeDays: options.maxAgeDays,
+  };
+  const assessments = [];
+  for (const receipt of coreReceipts) {
     const payload = receipt.payload ?? {};
     if (payload.field !== 'publisher_access') continue;
     if (payload.catalog_membership_as_sample === true) fail('CATALOG_MEMBERSHIP_IS_NOT_PAYLOAD_SAMPLE');
@@ -234,15 +526,16 @@ export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
       fail('FICTIONAL_WALKTHROUGH_IS_NOT_LIVE_SAMPLE');
     }
     if (payload.family_workflow_as_verified_route === true) fail('FAMILY_WORKFLOW_IS_NOT_VERIFIED_ROUTE');
-    const realSample = isR04EligiblePayload(payload);
+    const verdict = assessUnifiedRetainedSample(receipt, context);
+    assessments.push(verdict);
+    if (verdict.eligible && verdict.product_key != null) samples.add(verdict.product_key);
     const realRoute = payload.supported === true
       && payload.verified_route === true
       && typeof payload.route_evidence === 'string'
       && payload.family_workflow_as_verified_route !== true
       && payload.fictional !== true
       && payload._evidence_kind !== 'family_registry';
-    if (realSample) samples.add(payload.product_key);
-    if (realRoute) verifiedRoutes.add(payload.product_key);
+    if (realRoute && typeof payload.product_key === 'string') verifiedRoutes.add(payload.product_key);
   }
   const publicEligible = products.filter((product) => product.access_expectation === 'public_sample_eligible');
   const publicComplete = publicEligible.filter((product) => samples.has(product.product_key)).length;
@@ -256,6 +549,9 @@ export function payloadSampleCountsFromReceipts(receipts = [], products = []) {
     restricted_route_complete: restrictedComplete,
     r04_engineering_target_met: publicComplete >= PUBLIC_SAMPLE_TARGET,
     r05_restricted_routes_verified: restricted.length > 0 && restrictedComplete === restricted.length,
+    unified_pathway: RETAINED_SAMPLE_QUALIFICATION_VERSION,
+    samples_are_distinct_frozen_products: true,
+    assessments: freeze(assessments),
   });
 }
 

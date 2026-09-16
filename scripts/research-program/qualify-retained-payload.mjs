@@ -36,8 +36,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { packetIdentityCurrency } from './validate-payload-retrieval-pilot.mjs';
 import {
+  RETAINED_FRESHNESS_RULE,
+  RETAINED_RECIPE_RULE,
+  RETAINED_SAMPLE_QUALIFICATION_VERSION,
   assessFrozenCorpusEligibility,
   assessReanalysisEligibility,
+  assessUnifiedRetainedSample,
   isR04EligiblePayload,
   payloadSampleCountsFromReceipts,
 } from './qualify-core.mjs';
@@ -308,9 +312,65 @@ export function qualifyRetainedPayload({ repoRoot = ROOT, fetchImpl = null } = {
   ]);
 
   const acceptanceReceipts = [hcrisReceipt, placesReceipt, reanalysis];
-  const counts = payloadSampleCountsFromReceipts(acceptanceReceipts, cohorts.products ?? []);
+  // INT2-retained (2026-09-17): feed the validated retained-sample assessments
+  // into the authoritative count. Integrity comes from captureIntegrity above
+  // (bytes present + SHA verified where the original host disk is available,
+  // absent otherwise — no refetch to fill the gap). Release verification comes
+  // from the frozen product-sample requirements (both unresolved for the
+  // present HCRIS/PLACES pair). Requirements supply frozen record/native IDs,
+  // row fields, and authorized URL scope. The present pilot-r04 corpus has no
+  // manifest binding bytes to an authorized capture, so acquisition evidence
+  // stays empty (suitably-evidenced corpus fails closed). Freshness follows the
+  // original capture time. All derived/flag fields are stripped inside the
+  // unified pathway; only receipt fields plus this context evidence count.
+  const hcrisIntegrityRow = integrity.find((row) => row.product_key === HCRIS_PRODUCT);
+  const placesIntegrityRow = integrity.find((row) => row.product_key === PLACES_PRODUCT);
+  const unifiedContext = {
+    integrityByReceiptId: {
+      [hcrisReceipt.receipt_id]: {
+        bytesPresent: hcrisIntegrityRow.bytes_present,
+        shaVerified: hcrisIntegrityRow.sha_verified,
+        expectedSha256: HCRIS_SHA256,
+      },
+      [placesReceipt.receipt_id]: {
+        bytesPresent: placesIntegrityRow.bytes_present,
+        shaVerified: placesIntegrityRow.sha_verified,
+        expectedSha256: PLACES_SHA256,
+      },
+      [reanalysis.receipt_id]: {
+        bytesPresent: hcrisIntegrityRow.bytes_present,
+        shaVerified: hcrisIntegrityRow.sha_verified,
+        expectedSha256: HCRIS_SHA256,
+      },
+    },
+    releaseVerificationByProduct: {
+      [HCRIS_PRODUCT]: { status: hcrisReq.release_check?.status ?? 'missing', field: hcrisReq.release_check?.field ?? null, reason: hcrisReq.release_check?.reason ?? null },
+      [PLACES_PRODUCT]: { status: placesReq.release_check?.status ?? 'missing', field: placesReq.release_check?.field ?? null, reason: placesReq.release_check?.reason ?? null },
+    },
+    requirementsByProduct: {
+      [HCRIS_PRODUCT]: {
+        required_record_id: hcrisReq.required_record_id,
+        required_native_id: hcrisReq.required_native_id,
+        row_fields: hcrisReq.row_fields ?? {},
+        authorized_hosts: hcrisReq.authorized_hosts ?? [],
+        authorized_url_contains: hcrisReq.authorized_url_contains ?? null,
+      },
+      [PLACES_PRODUCT]: {
+        required_record_id: placesReq.required_record_id,
+        required_native_id: placesReq.required_native_id,
+        row_fields: placesReq.row_fields ?? {},
+        authorized_hosts: placesReq.authorized_hosts ?? [],
+        authorized_url_contains: placesReq.authorized_url_contains ?? null,
+      },
+    },
+    acquisitionEvidenceByReceiptId: {},
+    now: reanalysis.recorded_at,
+  };
+  const counts = payloadSampleCountsFromReceipts(acceptanceReceipts, cohorts.products ?? [], unifiedContext);
   if (counts.public_sample_complete !== 0) fail('RETAINED_COUNTS_MUST_BE_ZERO', String(counts.public_sample_complete));
   if (counts.r04_engineering_target_met !== false) fail('RETAINED_R04_MUST_NOT_BE_MET');
+  const unifiedAssessments = counts.assessments ?? [];
+  if (unifiedAssessments.some((row) => row.eligible === true)) fail('RETAINED_UNIFIED_MUST_NOT_YET_QUALIFY');
   const r04Checks = freeze(acceptanceReceipts.map((receipt) => freeze({
     receipt_id: receipt.receipt_id,
     product_key: receipt.payload?.product_key,
@@ -479,10 +539,24 @@ export function qualifyRetainedPayload({ repoRoot = ROOT, fetchImpl = null } = {
       case_analysis: caseAnalysis,
     }),
     acceptance_comparison: freeze({
-      contract: 'Case-A live-sample engineering predicate '
-        + '(scripts/research-program/qualify-core.mjs isR04EligiblePayload: live_http + '
-        + 'frozen-derivation + verified-release); receipt status strings never count. '
-        + 'Cases B/C are assessed in acceptance_grounding, not here.',
+      contract: 'Authoritative R04 count is the unified retained-sample pathway '
+        + '(scripts/research-program/qualify-core.mjs assessUnifiedRetainedSample, '
+        + RETAINED_SAMPLE_QUALIFICATION_VERSION + '): live capture, reanalysis of that '
+        + 'capture with resolved reference, evidenced frozen corpus, and '
+        + 'insufficient-evidence cases across provenance+authorization, freshness '
+        + '(follows original capture; rule ' + RETAINED_FRESHNESS_RULE.max_age_days + 'd), '
+        + 'SHA integrity, frozen product identity, frozen release verification, and '
+        + 'exact recipe. Derived/flag fields are stripped; receipt status strings '
+        + 'never count. Cases B/C can qualify without refetch when fully evidenced.',
+      unified_pathway: RETAINED_SAMPLE_QUALIFICATION_VERSION,
+      unified_freshness_rule: freeze({ max_age_days: RETAINED_FRESHNESS_RULE.max_age_days, follows: RETAINED_FRESHNESS_RULE.follows }),
+      unified_recipe_rule: freeze({ requires: RETAINED_RECIPE_RULE.requires }),
+      unified_context_evidence: freeze({
+        integrity_from: 'captureIntegrity (no refetch)',
+        release_from: 'frozen product-sample requirements (both unresolved)',
+        corpus_manifest_binding: 'absent for present pilot-r04 corpus',
+      }),
+      unified_assessments: unifiedAssessments,
       r04_target: 80,
       r04_eligible_retained_samples: 0,
       public_sample_complete: counts.public_sample_complete,
