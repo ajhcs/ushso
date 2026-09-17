@@ -35,7 +35,7 @@ Enrichment lands first-party dictionary / variable / access data (inventory URLs
 3. Available info (representative vars + dictionary link) — up to 5 representative variable/field names plus one Open variable dictionary / codebook link (enrichment dictionaryUrl). Today Variables fact text is kept as fallback until enrichment lands; no full dictionary inline.
 4. Access (concrete next step + restrictions) — per-source nextAction (concrete step) plus Access fact restrictions (cost/account/DUA/terms). Keeps Catalog membership is not payload access boundary.
 5. Limits (few material ones) — at most 3 bullets: coverageNote (if gap/candidate) plus joinLimitations plus product-specific caveat (for example BRFSS no-nationwide, SVI name collision, provisional revision). Today full joinLimitations paragraph moves here, trimmed.
-6. Evidence (readable publisher refs with resolvable links + precise locators) — one readable row per claim: publisher label plus short locator (for example CMS product page, CDC dossier section evidence e12c4273, Registry named-source-registry v1.0.0 section ahrq-hcup) each as an anchor with https href, plus precise locator (record_id plus evidence_id plus observed_at when retained). Technical IDs (record: plus registry: strings) move into details with summary Technical identifiers (expandable provenance). No opaque ID is the only reference.
+6. Evidence (readable publisher refs with resolvable links + precise locators) — one readable link list per source (repeated inside each fact details block): publisher label plus short locator (for example CMS product page, CDC dossier section evidence e12c4273, Registry named-source-registry v1.0.0 section ahrq-hcup) each as an anchor with https href, plus precise locator (record_id plus evidence_id; observed_at is not a retained field here and is not claimed). Technical IDs (record: plus registry: strings) move into details with summary Technical identifiers (expandable provenance). No opaque ID is the only reference.
 
 Cross-cutting: brief header keeps question, Why-matches, packet download, catalog-scope note, legend (collapsed). Per-source card gets data-brief-section useful-for, coverage, available-info, access, limits, evidence in this order; technical IDs get data-provenance technical-ids.
 
@@ -130,7 +130,7 @@ Use indented structure below. Packet contract unchanged (ushso-priority-research
 
 ## 6. Simplify-long-briefs plan
 
-Default-collapsed: full 10-row dl plus technical IDs behind Show all evidence-bound facts details; section 6 Evidence shows readable links only. Budgets: section 3 up to 5 vars, section 5 up to 3 limits, Coverage 4 rows. Header keeps packet plus details links above the fold. Results heading (Results in selected order) must remain reachable without scrolling past more than one viewport of brief on desktop and mobile (assert via markup order: brief before results is kept, but brief default height bounded by collapsed details).
+Default-collapsed: full 10-row dl plus technical IDs behind Show all evidence-bound facts details; section 6 Evidence shows readable links only. Budgets: section 3 up to 5 vars, section 5 up to 3 limits, Coverage 4 rows. Header keeps packet plus details links above the fold. Brief-before-results order is preserved and default height is bounded by collapsed details (assert via markup order plus collapsed defaults; no viewport-height property is measured or claimed).
 
 ## 7. Failing-first tests (this commit, expected-red)
 
