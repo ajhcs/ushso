@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { auditBrowserAccessibility } from './browser-accessibility.mjs';
+import { auditBrowserAccessibility, hasReturnFocusTargets } from './browser-accessibility.mjs';
 
 test('automated accessibility checks do not certify WCAG and keep AT untested', async () => {
   const result = await auditBrowserAccessibility();
@@ -15,4 +15,13 @@ test('automated accessibility checks do not certify WCAG and keep AT untested', 
   assert.ok(result.assistive_technology.combinations.every((row) => row.status === 'untested'));
   assert.ok(result.contrast_pairs.every((pair) => pair.ratio >= 4.5));
   assert.equal(result.findings.find((row) => row.id === 'assistive-technology')?.status, 'untested');
+});
+
+test('return-focus source audit requires both destinations and a focus call', () => {
+  assert.equal(hasReturnFocusTargets("target.querySelector<HTMLAnchorElement>('h2 a, [data-navigator-details]')?.focus({ preventScroll: true })"), true);
+  assert.equal(hasReturnFocusTargets('target.querySelector<HTMLAnchorElement>( "[data-navigator-details], h2 a" )?.focus()'), true);
+  assert.equal(hasReturnFocusTargets("target.querySelector<HTMLAnchorElement>('h2 a')?.focus()"), false);
+  assert.equal(hasReturnFocusTargets("target.querySelector<HTMLAnchorElement>('[data-navigator-details]')?.focus()"), false);
+  assert.equal(hasReturnFocusTargets("target.querySelector<HTMLAnchorElement>('h2 a, [data-navigator-details]')"), false);
+  assert.equal(hasReturnFocusTargets(''), false);
 });

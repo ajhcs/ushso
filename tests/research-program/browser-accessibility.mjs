@@ -40,6 +40,13 @@ function cssVar(css, name) {
   return match[1];
 }
 
+// Source-presence check only; browser journeys verify actual focus restoration.
+export function hasReturnFocusTargets(source) {
+  const match = source.match(/target\.querySelector<HTMLAnchorElement>\(\s*(['"])(.*?)\1\s*\)\?\.focus\(/);
+  const selectors = match?.[2].split(',').map((selector) => selector.trim()) ?? [];
+  return selectors.includes('h2 a') && selectors.includes('[data-navigator-details]');
+}
+
 export async function auditBrowserAccessibility({ repositoryRoot = root } = {}) {
   const files = {
     app: await readFile(path.join(repositoryRoot, 'apps/web/src/App.tsx'), 'utf8'),
@@ -71,7 +78,7 @@ export async function auditBrowserAccessibility({ repositoryRoot = root } = {}) 
   if (!files.header.includes('aria-expanded={menuOpen}') || !files.header.includes("event.key === 'Escape'")) fail('A11Y_MENU_ESCAPE', 'Primary navigation must expose expanded state and close on Escape');
   if (!files.searchBox.includes('role="combobox"') || !files.searchBox.includes("event.key === 'Escape'")) fail('A11Y_SEARCH_KEYBOARD', 'Search combobox must support arrow keys and Escape');
   if (!files.searchPage.includes("event.key === 'Escape'") || !files.searchPage.includes('filterTriggerRef.current?.focus()')) fail('A11Y_FILTER_FOCUS_RESTORE', 'Filter dialog must restore focus to its trigger');
-  if (!files.searchPage.includes("target.querySelector<HTMLAnchorElement>('h2 a')?.focus")) fail('A11Y_BACK_NAV_FOCUS', 'Returning from a source page must restore focus to the selected result');
+  if (!hasReturnFocusTargets(files.searchPage)) fail('A11Y_BACK_NAV_FOCUS', 'Returning from a source page must restore focus to the selected result or navigator brief');
   if (!files.facets.includes('aria-label="Close filters"') || !files.pagination.includes('aria-label="Search results pages"')) fail('A11Y_CONTROL_NAME', 'Filter close and pagination controls need accessible names');
   if (!files.variables.includes('aria-labelledby="variable-browser-heading"') || !files.workspace.includes('aria-live="polite"')) fail('A11Y_LIVE_OR_DICTIONARY', 'Dictionary region or shortlist live status is missing');
   if (!files.compare.includes('aria-label="Example comparisons"') || !files.workspace.includes('Download evidence packet')) fail('A11Y_COMPARE_EXPORT', 'Comparison presets or packet export controls are missing');

@@ -50,6 +50,11 @@ participant acceptance, all 20 journeys, or publisher endpoint availability.
 
 Task-owned receipts/screenshots and harness:
 `/mnt/d/tmp/plumbob/ushso-navigator-integration-20260917/`.
+Initial hosted CI exposed a stale source-text accessibility assertion after the
+focus selector gained navigator support. The audit now requires both destinations
+and a focus call; negative regressions reject either missing destination. Browser
+behavior was already verified. The original CI/gate failure is retained.
+
 Release gate is executed separately on the final committed candidate; its result
 must be read from `release-gate.json` there, not inferred from these focused checks.
 No production build or deployment is authorized by a passing research gate.
