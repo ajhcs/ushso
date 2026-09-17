@@ -7,6 +7,7 @@ import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { Pagination } from '../components/Pagination'
 import { PriorityResearchMatch } from '../components/PriorityResearchNavigator'
+import { findPriorityResearchQuestion } from '../data/researchNavigator'
 import { ResultCard } from '../components/ResultCard'
 import { buildCanonicalFacetSections, normalizeDiscoveryFacetSections } from '../data/facets'
 import { rememberLastSeenGeneration } from '../lib/shortlist'
@@ -122,7 +123,7 @@ export function SearchResultsPage() {
     cursorByPage.current.set(state.page + 1, discovery.result.pagination.next_cursor)
   }, [discovery, state.page])
   useEffect(() => {
-    if (discovery.status !== 'ready') return
+    if (discovery.status !== 'ready' && !findPriorityResearchQuestion(state.q)) return
     const context = parseReturnContext(location.state?.searchReturn)
     const matchedContext = context?.search === location.search ? context : null
     const anchor = matchedContext ? resultAnchorId(matchedContext.selected_record_id) : location.hash.slice(1)
@@ -135,7 +136,7 @@ export function SearchResultsPage() {
       else target.scrollIntoView({ block: 'start', behavior: 'instant' })
     })
     return () => cancelAnimationFrame(frame)
-  }, [discovery.status, location.hash, location.search, location.state])
+  }, [discovery.status, location.hash, location.search, location.state, state.q])
 
   useEffect(() => {
     if (!mobileFiltersOpen) return

@@ -13,7 +13,7 @@ import { SHORTLIST_CHANGED_EVENT, addShortlistItem, isOnShortlist, rememberLastS
 import { findDatasetInResponse } from '../lib/catalogAdapter'
 import { datasetDocumentTitle, setDocumentTitle } from '../lib/documentTitle'
 import { safeExternalHttpsUrl } from '../lib/externalUrls'
-import { parseReturnContext, resultAnchorId, safeReturnDestination } from '../lib/returnContext'
+import { briefOriginContext, parseReturnContext, resultAnchorId, safeReturnDestination } from '../lib/returnContext'
 import { assessmentGeneration, readSearchAssessment } from '../lib/searchAssessment'
 import { useDatasetResult } from '../providers/DiscoveryProviderContext'
 import type { DatasetFamily } from '../types/catalog'
@@ -173,6 +173,8 @@ export function DatasetDetailsPage() {
   const stopConditions = metadata?.retrieval_plan?.stop_conditions ?? record.retrieval.instructions.filter((step) => step.action === 'stop_and_report')
   const routeParams = new URLSearchParams(location.search)
   const returnContext = parseReturnContext(routeParams.get('return'))
+  const briefOrigin = briefOriginContext(routeParams.get('return'))
+  const navigatorQuestion = briefOrigin?.question ?? null
   const contextualQuestion = returnContext?.selected_record_id.replace(/^obs:asset:/, '') === record.record_id.replace(/^obs:asset:/, '') ? new URLSearchParams(returnContext.search).get('q') : null
   const searchAssessment = contextualQuestion ? readSearchAssessment(location.state?.searchAssessment, record.record_id, contextualQuestion, assessmentGeneration(discovery.result)) : null
   const safeBackDestination = `${safeReturnDestination(routeParams.get('return'))}${returnContext ? `#${resultAnchorId(returnContext.selected_record_id)}` : ''}`
@@ -204,6 +206,7 @@ export function DatasetDetailsPage() {
           {corrupted && <div className="text-quality-notice" role="note"><AlertTriangle aria-hidden="true" /><p><strong>Source text may contain encoding damage.</strong> The captured wording is preserved without guessing at missing symbols. {metadata?.description_quality?.authoritative_url && <a href={metadata.description_quality.authoritative_url} target="_blank" rel="noreferrer">Check the publisher’s current page <ExternalLink aria-hidden="true" /></a>}</p></div>}
         </header>
 
+         {navigatorQuestion && !contextualQuestion && <section className="context-relevance" aria-label="Research brief context"><strong>Originating research brief</strong><p>Question: “{navigatorQuestion}”</p><p>You arrived from a research brief, not a catalog ranking. Return to the brief with the back link above; no relevance rating is inferred.</p></section>}
          {contextualQuestion && <section className="context-relevance" aria-label="Search relevance context"><strong>{searchAssessment ? `${searchAssessment.relevance} relevance in the originating search` : 'Originating search context'}</strong><p>Question: “{contextualQuestion}”</p>{searchAssessment ? <><p>Ranking version: {searchAssessment.ranking_version}. Catalog generation: {searchAssessment.generation}.</p><ul>{searchAssessment.reasons.map((reason, index) => <li key={index}>{reason}</li>)}</ul><p>This is the assessment saved from the originating search, not a scientific-quality or fitness rating.</p></> : <p>No matching search assessment is available on this record lookup. Return to the search results to inspect relevance; no relevance rating is inferred.</p>}</section>}
 
         <p className="details-learn-link"><Link to="/learn#read-source">How to read a source page</Link>. Finding a source is not obtaining the data.</p>

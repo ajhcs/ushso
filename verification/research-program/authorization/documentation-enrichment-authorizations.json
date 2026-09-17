@@ -1,0 +1,43 @@
+{
+  "format": "ushso.documentation-enrichment-authorization-register.v1",
+  "policy": "Receipts cannot self-authorize. Only an owner-authorized entry that binds action, exact collector code revision, product identities, URL inventory, publisher hosts, limits, credential policy, and validity can grant documentation retrieval. Prior AUTH-04, AUTH-PAYLOAD-PILOT, AUTH-METADATA-CHECK and AUTH-METADATA-CHECK-CORRECTED-20260917 do not grant this operation.",
+  "entries": [
+    {
+      "id": "AUTH-DOC-ENRICH-20260917",
+      "authorized": true,
+      "status": "authorized",
+      "revoked": false,
+      "action": "documentation_enrichment",
+      "operation_id": "OP-DOC-ENRICH-20260917",
+      "candidate_branch": "codex/ushso-navigator-enrich-20260917",
+      "candidate_head": "a75bc8dbcaede88f20ff9ffb613c788dfcd46743",
+      "collector": "scripts/research-program/run-doc-enrichment.mjs",
+      "ledger": "verification/research-program/evidence/documentation-enrichment-ledger.json",
+      "product_keys": ["cms-hcris", "cms-chow", "cms-ltcf", "census-sahie", "cdc-places", "cdc-vsrr-maternal", "cdc-vsrr-infant", "cdc-brfss", "ahrq-hcup", "ahrq-meps", "ahrq-compendium", "cms-nppes", "hrsa-ahrf", "samhsa-nsumhss", "cms-tmsis-taf", "cdc-atsdr-svi", "state-apcd-programs", "state-facility-licensure", "rural-hospital-closure-tracking", "aha-annual-survey"],
+      "approved_hosts": ["data.cms.gov", "api.census.gov", "data.cdc.gov", "hcup-us.ahrq.gov", "meps.ahrq.gov", "www.ahrq.gov", "download.cms.gov", "data.hrsa.gov", "www.samhsa.gov", "www.medicaid.gov", "www.atsdr.cdc.gov", "www.apcdcouncil.org", "www.cms.gov", "www.shepscenter.unc.edu", "www.ahadata.com"],
+      "url_inventory_ref": "docs/research-program/documentation-enrichment-inventory-20260917.md",
+      "initial_url_count": 23,
+      "limits": {
+        "max_requests": 100,
+        "max_bytes": 104857600,
+        "max_bytes_per_response": 10485760,
+        "max_seconds_per_request": 30,
+        "max_concurrency": 2,
+        "max_per_host_concurrency": 1,
+        "max_redirect_hops_per_request": 2,
+        "max_retries_per_request": 1,
+        "charge_before_execution": true,
+        "redirects_and_retries_charged": true
+      },
+      "credentials": { "required": false, "kind": "none", "forbidden": ["account_creation", "login", "payment", "personal_data"] },
+      "eligible_content": ["official_product_pages", "dictionaries", "codebooks", "methodology", "release_notes", "archive_manifests", "api_schema_catalog_metadata", "access_instructions"],
+      "excluded_content": ["dataset_row_endpoints", "bulk_data_files", "repeat_hcris_places_payload"],
+      "valid_from": "2026-09-17T00:00:00Z",
+      "valid_until": "2026-09-24T00:00:00Z",
+      "basis": "Owner instruction 2026-09-17 (navigator increment): new separate documentation-enrichment operation, up to 100 requests / 100 MiB / 10 MiB per response / 30s per request / 2 concurrent (1 per host) / 2 redirect hops / 1 transient retry, no credentials, 7-day validity. This packet materializes that authorization. Routine code corrections may receive additive candidate bindings without resetting the ledger or increasing the budget.",
+      "redirect_policy": "Redirects must stay within the approved publisher scope. Reject unexpected hosts, private-network destinations, credentials, or out-of-scope content before following or parsing.",
+      "retention": "Retain document hashes, URLs, retrieval times, relevant excerpts or locators, and typed failures. Store source bytes according to repository evidence/storage rules.",
+      "note": "Separate from all previous operations. Prior ledgers (payload-retrieval-pilot-ledger, metadata-check-ledger, metadata-check-ledger-corrected) are preserved untouched. candidate_head names the research tip at materialization (a9cb514); rebind to the exact collector execution HEAD before live retrieval without resetting the ledger. Additive URL bindings for officially-navigated dictionary/methodology links are permitted without budget increase."
+    }
+  ]
+}
