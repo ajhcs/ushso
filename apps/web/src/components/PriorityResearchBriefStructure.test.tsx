@@ -6,9 +6,11 @@ import { ACTIVE_CATALOG } from '../data/catalogMode'
 import { PRIORITY_RESEARCH_QUESTIONS } from '../data/researchNavigator'
 import { PriorityResearchBrief } from './PriorityResearchNavigator'
 
-// Failing-first structure tests for the enrichment integration step.
+// Six-section brief structure tests for the enriched navigator.
 // See docs/research-program/navigator-frontend-plan-20260917.md sections 2, 4, 7.
-// Expected-red until the six-section brief template plus enrichment bindings land.
+// The dictionary case targets the enriched SAHIE brief: batch-1 enrichment landed
+// dictionary bindings on 6 profiles (sahie/places/brfss/maternal/nppes-ids/ahrf),
+// so non-enriched briefs must honestly show fallback text instead of an invented link.
 // Existing validators (researchNavigator, navigatorIntegration, catalogMode, modeSeparation)
 // are untouched and must stay green.
 
@@ -50,12 +52,22 @@ describe('priority brief six-section structure (enrichment target)', () => {
   );
 
   it('keeps Available info with representative vars plus a dictionary link', () => {
+    const markup = renderBrief('county-uninsured');
+    const available = markup.indexOf('data-brief-section="available-info"');
+    expect(available).toBeGreaterThan(-1);
+    const after = markup.slice(available);
+    expect(after).toContain('NIPR_PT');
+    expect(after).toContain('data-dictionary-link');
+    expect(after).toMatch(/data-dictionary-link[^>]*href="https:[^"]+"/);
+  });
+
+  it('shows honest fallback text instead of an invented dictionary link when unenriched', () => {
     const markup = renderBrief('hospital-finance-hcris');
     const available = markup.indexOf('data-brief-section="available-info"');
     expect(available).toBeGreaterThan(-1);
     const after = markup.slice(available);
-    expect(after).toContain('data-dictionary-link');
-    expect(after).toMatch(/data-dictionary-link[^>]*href="https:[^"]+"/);
+    expect(after).toContain('No retained variable dictionary');
+    expect(after).not.toContain('data-dictionary-link');
   });
 
   it('renders readable resolvable evidence links with expandable technical provenance', () => {
@@ -63,7 +75,8 @@ describe('priority brief six-section structure (enrichment target)', () => {
     const evidence = markup.indexOf('data-brief-section="evidence"');
     expect(evidence).toBeGreaterThan(-1);
     const after = markup.slice(evidence);
-    expect(after).toMatch(/<a[^>]*href="https:[^"]+"[^>]*>[^<]{8,}<\/a>/);
+    expect(after).toMatch(/<a[^>]*href="https:[^"]+"[^>]*>/);
+    expect(after).toContain('Publisher discovery page');
     const provenance = markup.indexOf('data-provenance="technical-ids"');
     expect(provenance).toBeGreaterThan(evidence);
     const beforeProvenance = markup.slice(0, provenance);

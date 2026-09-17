@@ -84,11 +84,28 @@ export function downloadSearchReceipt(receipt: SearchReceipt) {
   URL.revokeObjectURL(url)
 }
 
+function announceDownload(filename: string) {
+  if (typeof document === 'undefined') return
+  let announcer = document.getElementById('ushso-download-announcer')
+  if (!announcer) {
+    announcer = document.createElement('p')
+    announcer.id = 'ushso-download-announcer'
+    announcer.className = 'sr-only'
+    announcer.setAttribute('aria-live', 'polite')
+    document.body.appendChild(announcer)
+  }
+  announcer.textContent = 'Downloading ' + filename
+}
+
 export function downloadJsonPacket(value: unknown, filename: string) {
   const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' }))
   const link = document.createElement('a')
   link.href = url
   link.download = filename
+  link.title = filename
+  document.body.appendChild(link)
   link.click()
-  URL.revokeObjectURL(url)
+  link.remove()
+  announceDownload(filename)
+  window.setTimeout(() => URL.revokeObjectURL(url), 5000)
 }
