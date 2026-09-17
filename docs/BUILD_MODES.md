@@ -48,3 +48,5 @@ Root package.json intentionally carries no candidate scripts: the sealed attesta
 - Baseline: search a baseline source such as HCRIS, open details and export packet, confirm AHRF and Sheps are absent, confirm counts show 3434 and baseline generation, confirm network shows only /api/discover paths
 - Candidate: search HCRIS plus AHRF and Sheps, open details and export packet for each, confirm documented-not-verified framing, confirm counts show 3436 and candidate generation, confirm return-to-results keeps scroll and focus, confirm network shows only /api/candidate paths
 - Run web, worker, and build suites via with-dev-storage; never weaken assertions to make a mode pass
+
+The navigator uses `ACTIVE_CATALOG` derived from `catalogMode.ts`; it has no separate resolver. The `.env.research-candidate` Vite mode is a compatibility alias selecting the same `candidate` value and API paths as `.env.candidate`. Use the staged candidate build sequence above for either preview.

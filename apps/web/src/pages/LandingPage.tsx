@@ -7,6 +7,7 @@ import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { SearchBox } from '../components/SearchBox'
 import { PageTitle } from '../components/PageTitle'
+import { PriorityResearchCatalog } from '../components/PriorityResearchNavigator'
 
 export const CURRENT_GENERATION = CATALOG_GENERATION
 export const CURRENT_CORPUS_RECORD_COUNT = CATALOG_RECORD_COUNT
@@ -56,14 +57,14 @@ export function LandingPage() {
             <p>USHSO is a discovery and routing layer. It shows what sources exist, the evidence behind each preview, and the documented access route. It does not host the underlying datasets or fetch restricted files for you.</p>
             <SearchBox initialQuery={params.get('q') ?? ''} onSubmit={search} />
             <DiscoveryDimensions />
-            <p className="landing-scope">Current catalog generation <code>{CURRENT_GENERATION}</code> contains {CURRENT_CORPUS_RECORD_COUNT} indexed source identities. Catalog membership is not payload access. <Link to="/learn">Learn the difference</Link> or <Link to="/learn#first-search">start with a verified HCRIS search</Link>.</p>
+            <p className="landing-scope">Active catalog generation <code>{CATALOG_GENERATION}</code> contains {CATALOG_RECORD_COUNT} indexed source identities. Catalog membership is not payload access. <Link to="/learn">Learn the difference</Link> or <Link to="/learn#first-search">start with a verified HCRIS search</Link>.</p>
             <CandidateCatalogNotice compact />
           </div>
         </section>
         <section className="learning-journeys" aria-labelledby="journeys-title">
           <div className="learning-journeys__inner">
             <h2 id="journeys-title">Three tested example journeys</h2>
-            <p>These questions come from accepted example packets on generation {CURRENT_GENERATION}. They are metadata routes, not completed research tasks.</p>
+            <p>These questions are metadata routes on the active catalog generation {CATALOG_GENERATION}. They are not completed research tasks.</p>
             <ul>
               {journeys.map((journey) => (
                 <li key={journey.id}>
@@ -78,6 +79,7 @@ export function LandingPage() {
             </ul>
           </div>
         </section>
+        <PriorityResearchCatalog />
         <HowItWorks />
       </main>
       <ObservatoryFooter />
