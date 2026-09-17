@@ -8,9 +8,9 @@ import { PriorityResearchBrief } from './PriorityResearchNavigator'
 
 // Six-section brief structure tests for the enriched navigator.
 // See docs/research-program/navigator-frontend-plan-20260917.md sections 2, 4, 7.
-// The dictionary case targets the enriched SAHIE brief: batch-1 enrichment landed
-// dictionary bindings on 6 profiles (sahie/places/brfss/maternal/nppes-ids/ahrf),
-// so non-enriched briefs must honestly show fallback text instead of an invented link.
+// The dictionary case targets the enriched SAHIE brief: documentation enrichment landed
+// dictionary bindings on 10 profiles (sahie/places/brfss/maternal/infant/hcris/nppes/ahrf/meps/sheps-table),
+// so non-enriched briefs (for example hospital-ownership) must honestly show fallback text instead of an invented link.
 // Existing validators (researchNavigator, navigatorIntegration, catalogMode, modeSeparation)
 // are untouched and must stay green.
 
@@ -62,7 +62,8 @@ describe('priority brief six-section structure (enrichment target)', () => {
   });
 
   it('shows honest fallback text instead of an invented dictionary link when unenriched', () => {
-    const markup = renderBrief('hospital-finance-hcris');
+    // hospital-ownership (cms-chow) has no enrichment bindings; hcris gained a methodology link in batch 2.
+    const markup = renderBrief('hospital-ownership');
     const available = markup.indexOf('data-brief-section="available-info"');
     expect(available).toBeGreaterThan(-1);
     const after = markup.slice(available);
@@ -71,7 +72,8 @@ describe('priority brief six-section structure (enrichment target)', () => {
   });
 
   it('renders readable resolvable evidence links with expandable technical provenance', () => {
-    const markup = renderBrief('hospital-finance-hcris');
+    // hospital-ownership exercises the publisher-page fallback; enriched briefs render evidenceLinks instead.
+    const markup = renderBrief('hospital-ownership');
     const evidence = markup.indexOf('data-brief-section="evidence"');
     expect(evidence).toBeGreaterThan(-1);
     const after = markup.slice(evidence);
