@@ -21,6 +21,12 @@ export interface ResearchFact {
   evidenceRefs: readonly string[]
 }
 
+export interface ResearchEvidenceLink {
+  label: string
+  url: string
+  locator: string
+}
+
 export interface ResearchSourceProfile {
   id: string
   familyId: string
@@ -36,6 +42,10 @@ export interface ResearchSourceProfile {
   facts: readonly ResearchFact[]
   nextAction: string
   joinLimitations: string
+  dictionaryUrl?: string
+  dictionaryLabel?: string
+  representativeVars?: readonly string[]
+  evidenceLinks?: readonly ResearchEvidenceLink[]
 }
 
 export interface PriorityResearchQuestion {
@@ -79,6 +89,10 @@ export interface PriorityResearchEvidencePacket {
     facts: Array<ResearchFact>
     nextAction: string
     joinLimitations: string
+    dictionaryUrl?: string
+    dictionaryLabel?: string
+    representativeVars?: string[]
+    evidenceLinks?: ResearchEvidenceLink[]
   }>
   nextAction: string
   limitations: string[]
@@ -115,6 +129,10 @@ interface IndexedProfileInput {
   joins: string
   nextAction: string
   factStates?: Partial<Record<'Geography' | 'Period' | 'Grain' | 'Cadence' | 'Variables / dictionary', EvidenceState>>
+  dictionaryUrl?: string
+  dictionaryLabel?: string
+  representativeVars?: readonly string[]
+  evidenceLinks?: readonly ResearchEvidenceLink[]
 }
 
 function indexedProfile(input: IndexedProfileInput): ResearchSourceProfile {
@@ -145,6 +163,10 @@ function indexedProfile(input: IndexedProfileInput): ResearchSourceProfile {
     ],
     nextAction: input.nextAction,
     joinLimitations: input.joins,
+    ...(input.dictionaryUrl ? { dictionaryUrl: input.dictionaryUrl } : {}),
+    ...(input.dictionaryLabel ? { dictionaryLabel: input.dictionaryLabel } : {}),
+    ...(input.representativeVars ? { representativeVars: [...input.representativeVars] } : {}),
+    ...(input.evidenceLinks ? { evidenceLinks: input.evidenceLinks.map((link) => ({ ...link })) } : {}),
   }
 }
 
@@ -164,6 +186,12 @@ interface NamedGapInput {
   additionalFacts?: ResearchFact[]
   candidateRecordId?: string
   candidateEvidenceId?: string
+  factStateOverrides?: Partial<Record<string, EvidenceState>>
+  factValueOverrides?: Partial<Record<string, string>>
+  dictionaryUrl?: string
+  dictionaryLabel?: string
+  representativeVars?: readonly string[]
+  evidenceLinks?: readonly ResearchEvidenceLink[]
 }
 
 function namedGapProfile(input: NamedGapInput): ResearchSourceProfile {
@@ -198,9 +226,17 @@ function namedGapProfile(input: NamedGapInput): ResearchSourceProfile {
       fact('Access / cost / account', input.access, 'unknown', evidenceRefs),
       fact('IDs / joins', 'No retained source-native identifier, crosswalk, or compatible join route is established.', 'unknown', evidenceRefs),
       ...(input.additionalFacts ?? []),
-    ],
+    ].map((item) => {
+      const state = input.factStateOverrides?.[item.label] ?? item.state
+      const value = input.factValueOverrides?.[item.label] ?? item.value
+      return state === item.state && value === item.value ? item : fact(item.label, value, state, item.evidenceRefs)
+    }),
     nextAction: input.nextAction,
     joinLimitations: 'No join should be attempted until the publisher product, identifiers, grain, period, and access terms are verified.',
+    ...(input.dictionaryUrl ? { dictionaryUrl: input.dictionaryUrl } : {}),
+    ...(input.dictionaryLabel ? { dictionaryLabel: input.dictionaryLabel } : {}),
+    ...(input.representativeVars ? { representativeVars: [...input.representativeVars] } : {}),
+    ...(input.evidenceLinks ? { evidenceLinks: input.evidenceLinks.map((link) => ({ ...link })) } : {}),
   }
 }
 
@@ -267,7 +303,7 @@ const indexedProfiles: ResearchSourceProfile[] = [
   }),
   indexedProfile({
     id: 'census-sahie',
-    factStates: { Geography: 'publisher_documented', Period: 'publisher_documented', Cadence: 'publisher_documented', Grain: 'unknown' },
+    factStates: { Geography: 'publisher_documented', Period: 'publisher_documented', Cadence: 'publisher_documented', Grain: 'publisher_documented' },
     familyId: 'census-sahie',
     name: 'Census county health-insurance estimates',
     publisher: 'U.S. Census Bureau',
@@ -275,19 +311,27 @@ const indexedProfiles: ResearchSourceProfile[] = [
     officialDiscoveryUrl: 'https://api.census.gov/data/id/SAHIE',
     catalogRecordId: 'obs:asset:census-api:api.census.gov-data-id-sahie-6e4b062e3c39ea95',
     evidenceId: 'evidence:census-api:0eefa3911066b2b366a268a5',
-    population: 'People and households represented by selected economic and demographic characteristics.',
-    geography: 'Publisher documents single-year estimates for all U.S. counties; payload coverage has not been independently checked.',
-    period: '2006 through 2024 in the retained catalog metadata.',
-    grain: 'County estimates are described; exact API row shape and denominator fields require the source dictionary.',
+    population: 'Single-year health-insurance coverage estimates for all U.S. counties by selected economic and demographic characteristics; the program models combine ACS data with administrative records and Census 2020 data.',
+    geography: 'Publisher documents single-year estimates for all U.S. counties; county queries (FIPS 050) require a state predicate, with state (040) and national (010) levels and geography vintage reference 2020-01-01. Payload coverage has not been independently checked.',
+    period: '2006 through 2024 in the retained catalog metadata; the retrieved dictionary enumerates YEAR 2006–2024 and the catalog temporal is 2006/2024.',
+    grain: 'County, state, and national estimate records keyed by GEOID (State+County FIPS), STATE, COUNTY, US plus YEAR and AGECAT/IPRCAT/RACECAT/SEXCAT slices; the schema documents this grain vocabulary, and exact per-year row combinations require the year API response, which was not retrieved.',
     cadence: 'Publisher documents annual model-based estimates. Current release delivery has not been independently checked.',
-    variables: 'Health-insurance coverage status and selected economic and demographic characteristics are named; API variable labels and universes require source verification.',
-    access: 'Public catalog metadata observed. API authorization, rate limits, current terms, and payload retrieval were not tested.',
-    joins: 'County and Census geography identifiers may support joins only after vintage and geography definitions are aligned; no cross-source join is proven.',
-    nextAction: 'Open the SAHIE API metadata for the requested year and inspect variables, predicate geography, and release notes before retrieval.',
+    variables: 'A 39-variable dictionary was retrieved 2026-09-17: denominators NIPR_PT with NIC_PT (insured) / NUI_PT (uninsured) / PCTIC_PT / PCTUI_PT percents, each with MOE and 90% CI bounds, plus AGECAT, IPRCAT, RACECAT, SEXCAT descriptors and for/in/time predicates. Year-specific labels and universes still require the requested year\u2019s API.',
+    access: 'Public catalog metadata observed; the catalog asserts accessLevel public with a CC0 license. API authorization, rate limits, current terms, and payload retrieval were not tested.',
+    joins: 'GEOID (State+County FIPS), STATE, COUNTY, and STABREV are documented; joins require vintage and geography alignment and no cross-source join is proven.',
+    nextAction: 'Open the SAHIE timeseries endpoint for the requested YEAR with for/in predicates (not the /data/id/ landing page, which returned 404 on 2026-09-17), then inspect the variables and geography schema and re-verify current terms.',
+    dictionaryUrl: 'https://api.census.gov/data/timeseries/healthins/sahie/variables.json',
+    dictionaryLabel: 'SAHIE 39-variable dictionary (variables.json, retrieved 2026-09-17)',
+    representativeVars: ['NIPR_PT', 'NIC_PT', 'NUI_PT', 'PCTUI_PT', 'AGECAT'],
+    evidenceLinks: [
+      { label: 'Census API catalog entry for SAHIE (description, temporal, distribution)', url: 'https://api.census.gov/data.json', locator: 'dataset[329]: description, temporal 2006/2024, distribution timeseries endpoint; capture census-sahie-catalog-20260917-8af42774.json' },
+      { label: 'SAHIE variable dictionary (39 variables)', url: 'https://api.census.gov/data/timeseries/healthins/sahie/variables.json', locator: 'variables YEAR, GEOID, NIPR_PT/NIC_PT/NUI_PT, AGECAT/IPRCAT/RACECAT/SEXCAT; capture census-sahie-variables-20260917-f7437f89.json' },
+      { label: 'SAHIE geography predicates (county requires state)', url: 'https://api.census.gov/data/timeseries/healthins/sahie/geography.json', locator: 'fips us/010, state/040, county/050 requires state; capture census-sahie-geography-20260917-8c1b7a64.json' },
+    ],
   }),
   indexedProfile({
     id: 'cdc-places',
-    factStates: { Geography: 'publisher_documented', Period: 'publisher_documented' },
+    factStates: { Geography: 'publisher_documented', Period: 'publisher_documented', Grain: 'publisher_documented' },
     familyId: 'cdc-places',
     name: 'CDC local chronic-condition estimates',
     publisher: 'Centers for Disease Control and Prevention, Division of Population Health',
@@ -295,15 +339,22 @@ const indexedProfiles: ResearchSourceProfile[] = [
     officialDiscoveryUrl: 'https://data.cdc.gov/d/i46a-9kgh',
     catalogRecordId: 'obs:asset:cdc-socrata:i46a-9kgh-600dcc5024ae0d18',
     evidenceId: 'evidence:cdc-socrata:ea4ac0a83796354ba59bd088',
-    population: 'Local-area populations represented by model-based estimates across 40 measures.',
-    geography: 'Publisher description names county, place, census-tract, and ZCTA levels; this retained record is the county release.',
-    period: '2025 release; source observation period for each measure is not resolved in the catalog metadata.',
-    grain: 'County-level estimates in a GIS-friendly product; exact row keys and measure grain require the source dictionary.',
-    cadence: 'Release cadence is not independently tested.',
-    variables: 'Model-based estimates for 40 measures are named; measure definitions, denominators, and uncertainty fields require the source dictionary.',
-    access: 'Public catalog metadata observed. Payload, current terms, authorization, and rate limits were not tested.',
-    joins: 'County and boundary identifiers require release-vintage alignment; no cross-source join is proven.',
-    nextAction: 'Inspect the CDC release documentation and dictionary, then confirm the measure, denominator, geography vintage, and current payload route.',
+    population: 'Local-area populations represented by model-based estimates across 40 measures, built from BRFSS 2023 (35 measures) or 2022 (5 biennial measures) plus Census 2023 county population and ACS multi-year data.',
+    geography: 'Publisher description names county, place, census-tract, and ZCTA levels; this retained record is the county release. Join on CountyFIPS to the Census 2023 county boundaries.',
+    period: '2025 release (view published 2025-12-04); measure observations are 2023 for 35 measures and 2022 for 5 biennial measures (teeth lost, dental visits, mammograms, colorectal screening, short sleep). Release year and observation year must not be equated.',
+    grain: 'County-grain wide view with 168 columns: 6 geo/population keys (StateAbbr, StateDesc, CountyName, CountyFIPS, TotalPopulation, TotalPop18plus) plus 40 measures each with crude and age-adjusted prevalence and 95% CI fields. Row-key uniqueness was not payload-tested.',
+    cadence: 'Release cadence is not stated in the retrieved view metadata (rows updated 2025-12-04 observed).',
+    variables: 'A 168-column dictionary was retrieved 2026-09-17 with the <MEASURE>_{CrudePrev,AdjPrev,Crude95CI,Adj95CI} pattern (for example ACCESS2 lack of insurance 18–64, ARTHRITIS, COLON_SCREEN 45–75); denominators and age bounds live in column descriptions. Formal measure definitions require the CDC measure-definitions page, which was not fetched.',
+    access: 'Public catalog metadata observed; view metadata asserts PUBLIC_DOMAIN with contact places@cdc.gov. Payload, current terms, authorization, and rate limits were not tested.',
+    joins: 'CountyFIPS (plus StateAbbr) with 2023 boundary vintage required; no cross-source join is proven.',
+    nextAction: 'Inspect the captured 168-column dictionary and confirm the exact measure, denominator, and 2023 geography vintage, then verify the current payload route before retrieval.',
+    dictionaryUrl: 'https://data.cdc.gov/api/views/i46a-9kgh',
+    dictionaryLabel: 'PLACES 2025 county view metadata (168-column dictionary, retrieved 2026-09-17)',
+    representativeVars: ['ACCESS2_CrudePrev', 'ARTHRITIS_AdjPrev', 'COLON_SCREEN_CrudePrev', 'CountyFIPS', 'TotalPopulation'],
+    evidenceLinks: [
+      { label: 'CDC PLACES county product page', url: 'https://data.cdc.gov/d/i46a-9kgh', locator: '2025 county GIS-friendly release page; capture cdc-places-20260917-0aa0e46b.html' },
+      { label: 'PLACES county view metadata and column dictionary', url: 'https://data.cdc.gov/api/views/i46a-9kgh', locator: 'description, 168 columns, publicationDate/rowsUpdatedAt 2025-12-04; capture cdc-places-metadata-20260917-e4fe3f56.json' },
+    ],
   }),
   indexedProfile({
     id: 'cdc-maternal',
@@ -315,15 +366,22 @@ const indexedProfiles: ResearchSourceProfile[] = [
     officialDiscoveryUrl: 'https://data.cdc.gov/d/e2d5-ggg7',
     catalogRecordId: 'obs:asset:cdc-socrata:e2d5-ggg7-de73391d5d45d504',
     evidenceId: 'evidence:cdc-socrata:0221dc6e6e5715c056076445',
-    population: 'Maternal deaths and live births represented in the National Vital Statistics System flow.',
-    geography: 'Publisher documents national-level maternal mortality rates; payload coverage has not been independently checked.',
-    period: 'Current-flow provisional estimates; the exact observation period is not resolved in the retained metadata.',
-    grain: 'Publisher documents 12-month-ending rates overall, by age, and by race and Hispanic origin, per 100,000 live births. Exact API row keys remain unverified.',
-    cadence: 'Publisher documents quarterly updates and revisions as records arrive; USHSO has not monitored that schedule.',
-    variables: 'Maternal deaths and rates per 100,000 live births. Publisher suppresses counts of 1–9 and rates based on fewer than 20 deaths; provisional values can be revised.',
+    population: 'Maternal deaths and live births represented in the National Vital Statistics System flow. A maternal death is a death while pregnant or within 42 days of termination from causes related to or aggravated by pregnancy (ICD-10 A34, O00–O95, O98–O99), excluding accidental or incidental causes.',
+    geography: 'Publisher documents national-level maternal mortality rates with occurrence jurisdiction; payload coverage has not been independently checked.',
+    period: 'Provisional 12-month-ending periods with Data As Of dating (for example June 2020 covers July 2019–June 2020); compare year-to-year, not month-to-month, because windows overlap.',
+    grain: 'Publisher documents 12-month-ending estimate rows by jurisdiction and demographic group/subgroup carrying maternal deaths, 12-month-ending live births, rate per 100,000 live births, and footnote; the retrieved 12-column layout confirms this grain. Exact API row keys remain unverified.',
+    cadence: 'Publisher documents quarterly updates and revisions as records arrive (view rows updated 2026-07-16 observed); USHSO has not monitored that schedule.',
+    variables: 'Maternal deaths, live births, and mortality rate plus footnote in a 12-column layout retrieved 2026-09-17. Publisher suppresses counts of 1–9 and rates based on fewer than 20 deaths; provisional values can be revised. Suggested citation carries DOI 10.15620/cdc/20250305011; full technical notes were referenced but not fetched.',
     access: 'Public catalog metadata observed. Payload, current terms, authorization, and rate calculation inputs were not tested.',
     joins: 'Do not join to infant mortality or facility data without aligning denominator, period, geography, and revision status.',
-    nextAction: 'Read the technical notes for the requested release and preserve the provisional label and revision date in any downstream analysis.',
+    nextAction: 'Read the technical notes for the requested release and preserve the provisional label, Data As Of date, and revision caveat in any downstream analysis.',
+    dictionaryUrl: 'https://data.cdc.gov/api/views/e2d5-ggg7',
+    dictionaryLabel: 'Maternal VSRR view metadata (12-column layout, retrieved 2026-09-17)',
+    representativeVars: ['Maternal Deaths', 'Live Births', 'Maternal Mortality Rate', 'Footnote', 'Data As Of'],
+    evidenceLinks: [
+      { label: 'CDC maternal VSRR product page', url: 'https://data.cdc.gov/d/e2d5-ggg7', locator: 'VSRR provisional maternal death counts and rates page; capture cdc-maternal-20260917-76b85329.html' },
+      { label: 'Maternal VSRR view metadata and column layout', url: 'https://data.cdc.gov/api/views/e2d5-ggg7', locator: 'description, 12 columns, rowsUpdatedAt 2026-07-16; capture cdc-maternal-metadata-20260917-1cebff77.json' },
+    ],
   }),
   indexedProfile({
     id: 'cdc-infant',
@@ -347,7 +405,7 @@ const indexedProfiles: ResearchSourceProfile[] = [
   }),
   indexedProfile({
     id: 'cdc-brfss',
-    factStates: { Geography: 'publisher_documented' },
+    factStates: { Geography: 'publisher_documented', Grain: 'publisher_documented' },
     familyId: 'cdc-brfss',
     name: 'CDC adult behavioral-health survey indicators',
     publisher: 'Centers for Disease Control and Prevention',
@@ -355,15 +413,22 @@ const indexedProfiles: ResearchSourceProfile[] = [
     officialDiscoveryUrl: 'https://data.cdc.gov/d/5eh7-pjx8',
     catalogRecordId: 'obs:asset:cdc-socrata:5eh7-pjx8-656340c3c185411a',
     evidenceId: 'evidence:cdc-socrata:2cc75bcbdd79d96843c056eb',
-    population: 'U.S. adults responding to telephone interviews about behaviors, conditions, and preventive services.',
-    geography: 'Publisher describes the broader BRFSS system as covering all 50 states, D.C., and three territories. This mental-health product covers participating jurisdictions; nationwide estimates are not available.',
-    period: 'Mental-health indicator series period is not resolved in the retained catalog metadata.',
-    grain: 'Record unit tags include state, event, and survey response; exact estimate row grain requires the source dictionary.',
-    cadence: 'Continuous state-based surveillance is described; current publication cadence is not independently tested.',
-    variables: 'Mental-health indicators are named; survey questions, weighting, denominators, and suppression rules require the source documentation.',
-    access: 'Public catalog metadata observed. Payload, current terms, authorization, and rate limits were not tested.',
-    joins: 'Survey estimates must not be joined to facility directories without compatible geography, period, population, and weighting definitions.',
-    nextAction: 'Inspect the BRFSS methodology and indicator definitions, then select the exact year and estimate universe.',
+    population: 'U.S. adults responding to telephone interviews about behaviors, conditions, and preventive services; this product reports mental-health indicators for participating jurisdictions.',
+    geography: 'Publisher describes the broader BRFSS system as covering all 50 states, D.C., and three territories. This mental-health product covers participating jurisdictions; nationwide estimates are not available. The retrieved view metadata confirms state as the geographic unit of analysis.',
+    period: 'A Year column is present but series bounds are unresolved in the retrieved metadata (view created 2025-05-02, rows updated 2026-01-28); do not conflate view dates with observation years.',
+    grain: 'Estimate rows over Year, Question, Area and Area abbreviation, and Demographics_Type/Value carrying Percent with 95% CI bounds, formatted CI, data label, and percentile range (12 columns retrieved 2026-09-17); row-key uniqueness was not payload-tested.',
+    cadence: 'Continuous state-based surveillance is described; current publication cadence is not stated in the retrieved metadata.',
+    variables: 'A 12-column dictionary was retrieved 2026-09-17. Survey questions, weighting, denominators, and suppression rules live in BRFSS methodology, which was referenced but not fetched.',
+    access: 'Public catalog metadata observed, with contact mentalhealthdata@cdc.gov and a suggested citation in the view metadata. Payload, current terms, authorization, and rate limits were not tested.',
+    joins: 'Survey estimates (Area/Area_abbr state identifiers) must not be joined to facility directories without compatible geography, period, population, and weighting definitions.',
+    nextAction: 'Choose the indicator, year, and demographic slice, then inspect the BRFSS weighting, denominator, and suppression documentation before citing a prevalence.',
+    dictionaryUrl: 'https://data.cdc.gov/api/views/5eh7-pjx8',
+    dictionaryLabel: 'BRFSS mental-health view metadata (12-column dictionary, retrieved 2026-09-17)',
+    representativeVars: ['Year', 'Question', 'Area', 'Percent', 'Low_Confidence_Limit'],
+    evidenceLinks: [
+      { label: 'CDC BRFSS mental-health product page', url: 'https://data.cdc.gov/d/5eh7-pjx8', locator: 'BRFSS mental-health indicators page; capture cdc-brfss-20260917-2fa6728f.html' },
+      { label: 'BRFSS mental-health view metadata and columns', url: 'https://data.cdc.gov/api/views/5eh7-pjx8', locator: 'description, 12 columns, state unit, created 2025-05-02; capture cdc-brfss-metadata-20260917-4ed255dd.json' },
+    ],
   }),
 ]
 
@@ -396,18 +461,44 @@ const gapProfiles: ResearchSourceProfile[] = [
     id: 'cms-nppes', sourceId: 'cms-nppes', familyId: 'cms-nppes',
     name: 'National Plan and Provider Enumeration System', publisher: 'Centers for Medicare & Medicaid Services', product: 'NPPES NPI files and NPI Registry',
     officialDiscoveryUrl: 'https://download.cms.gov/nppes/NPI_Files.html', documented: true,
-    population: 'Individual and organizational health-care providers with NPI enumeration records.',
-    access: 'Official file route is retained. Current file terms, update package, rate limits, account requirements, and payload retrieval were not executed.',
-    nextAction: 'Inspect the current NPPES file layout and data dictionary, then confirm whether NPI, taxonomy, and address fields fit the requested entity join.',
+    population: 'Individual (Type 1) and organizational (Type 2) health-care providers with NPI enumeration records; the page names the NPI Downloadable File V2 family (monthly, weekly incremental, monthly deactivation) with 3 reference files per zip (other names, practice locations, endpoints).',
+    access: 'The public NPI Files page with direct V2 links was observed 2026-09-17; file terms, cost, account, and rate limits were not verified, and bulk zips were not retrieved under the documentation operation exclusion.',
+    nextAction: 'Open the NPI Files page, then obtain the Data Dissemination readme and file-layout terms through the documented CMS route before planning any NPI, taxonomy, or address join.',
+    factStateOverrides: { 'Population / entity': 'publisher_documented', Period: 'ushso_observed', Cadence: 'ushso_observed', 'Access / cost / account': 'ushso_observed' },
+    factValueOverrides: {
+      Period: 'Current-file dating observed 2026-09-17 (monthly files 2026-09-14; weekly window 090726–091326; V1 ends 03/03/2026); enumeration coverage window is unresolved.',
+      Cadence: 'Monthly plus weekly-incremental plus monthly-deactivation file rhythm observed on the page; schedule adherence was not tested.',
+      'Variables / dictionary': 'No dictionary retrieved: the readme ships inside the excluded bulk zips, so taxonomy, address, and identifier fields are unconfirmed.',
+      'IDs / joins': 'NPI enumeration for Type 1/2 is referenced, but taxonomy and address keys are unconfirmed; NPI-to-CCN style merges are unproven, so no join should be attempted.',
+    },
+    evidenceLinks: [
+      { label: 'CMS NPI Files product page (V2 family, reference files, readme note)', url: 'https://download.cms.gov/nppes/NPI_Files.html', locator: 'h1 NPI Files, V2 sections, reference-file list; capture cms-nppes-20260917-8309e853.html' },
+    ],
   }),
   namedGapProfile({
     id: 'hrsa-ahrf', sourceId: 'hrsa-ahrf', familyId: 'hrsa-ahrf',
     name: 'HRSA Area Health Resources Files', publisher: 'Health Resources and Services Administration', product: 'Area Health Resources Files (AHRF)',
-    officialDiscoveryUrl: 'https://data.hrsa.gov/topics/health-workforce/ahrf', documented: false,
+    officialDiscoveryUrl: 'https://data.hrsa.gov/topics/health-workforce/ahrf', documented: true,
     candidateRecordId: 'obs:asset:candidate-ahrf-documentation-v1', candidateEvidenceId: 'evidence:candidate-ahrf-documentation-v1',
-    population: 'County-level health-resource and workforce entities are a stated research lead; exact population and release are unresolved.',
-    access: 'Registry retains an official locator, but current access, cost, account, and download terms were not verified or executed.',
-    nextAction: 'Inspect the HRSA AHRF page and documentation, then verify the release, county fields, workforce definitions, and file access path.',
+    population: 'County, state, and national health-workforce and resources entities from 50+ sources: county files cover physicians, dentists, nurses, and PAs, while state files carry SOC-coded professions; the dashboard is a subset of the full files.',
+    access: 'The official AHRF page and download route were observed 2026-09-17; cost, account, and download terms were not verified or executed.',
+    nextAction: 'Open the AHRF page download route, identify the exact dated file plus technical documentation, and follow HRSA terms before citing any workforce count.',
+    factStateOverrides: { 'Population / entity': 'publisher_documented', Geography: 'publisher_documented', Period: 'publisher_documented', Grain: 'publisher_documented', Cadence: 'publisher_documented', 'Variables / dictionary': 'publisher_documented' },
+    factValueOverrides: {
+      Geography: 'County, state, and national levels; Connecticut carries a dual FIPS scheme (8 counties plus 9 planning regions) with mixed source usage.',
+      Period: 'Annual releases by Bureau fiscal year with per-variable data years differing within a release (2024–2025 example documented); dashboard shows calendar years with 2024–2019 observed.',
+      Grain: 'County-level file versus state-level file, plus dashboard slices by year, profession, population, and location; county sums do not equal state or national counts because sources differ.',
+      Cadence: 'Annual release by the Bureau of Health Workforce, fiscal-year dated.',
+      'Variables / dictionary': 'Profession definitions, the state SOC code table, the clinician rate formula (per 100,000), and suppression rules (state PRSE above 30% and unavailable county cells become NA) are documented in the retrieved definition PDF; full file technical documentation at the download route was not retrieved.',
+      'IDs / joins': 'County and state FIPS (both Connecticut schemes) are the documented geographic keys; county-to-state aggregation is explicitly invalid and no cross-source join is proven.',
+    },
+    dictionaryUrl: 'https://data.hrsa.gov/Content/Documents/topics/AHRF%20Definition.pdf',
+    dictionaryLabel: 'AHRF Methods and Definition (PDF, retrieved 2026-09-17)',
+    representativeVars: ['County physicians (AMA)', 'County dentists (ADA)', 'State SOC-coded professions', 'Clinician rate per 100,000', 'FIPS geography keys'],
+    evidenceLinks: [
+      { label: 'HRSA AHRF product and documentation page', url: 'https://data.hrsa.gov/topics/health-workforce/ahrf', locator: 'Description, county/state file labels, year select; capture hrsa-ahrf-20260917-ae2da48a.html' },
+      { label: 'AHRF definition and methods (PDF)', url: 'https://data.hrsa.gov/Content/Documents/topics/AHRF%20Definition.pdf', locator: 'pp.1–6: release years, Connecticut scheme, SOC table, suppression, rate formula; capture hrsa-ahrf-definition-20260917-958bfbce.pdf' },
+    ],
   }),
   namedGapProfile({
     id: 'samhsa-facility-services', sourceId: 'samhsa-facility-services', familyId: 'samhsa-facility-services',
@@ -587,6 +678,10 @@ export function buildPriorityResearchPacket(question: PriorityResearchQuestion):
       facts: source!.facts.map((item) => ({ ...item, evidenceRefs: [...item.evidenceRefs] })),
       nextAction: source!.nextAction,
       joinLimitations: source!.joinLimitations,
+      ...(source!.dictionaryUrl ? { dictionaryUrl: source!.dictionaryUrl } : {}),
+      ...(source!.dictionaryLabel ? { dictionaryLabel: source!.dictionaryLabel } : {}),
+      ...(source!.representativeVars ? { representativeVars: [...source!.representativeVars] } : {}),
+      ...(source!.evidenceLinks ? { evidenceLinks: source!.evidenceLinks.map((link) => ({ ...link })) } : {}),
     })),
     nextAction: question.nextAction,
     limitations: [
@@ -609,6 +704,11 @@ export function validatePriorityResearchNavigator() {
       for (const item of source.facts) {
         if (!item.label || !item.value || !EVIDENCE_STATES.includes(item.state) || item.evidenceRefs.length === 0) throw new Error(`Source profile ${sourceId} has an unbound fact.`)
       }
+      if (source.facts.some((item) => item.state === 'successfully_tested')) throw new Error(`Source profile ${sourceId} must not claim successfully tested payload access from documentation alone.`)
+      for (const link of source.evidenceLinks ?? []) {
+        if (!link.label || !link.url || !link.locator || !link.url.startsWith('https://')) throw new Error(`Source profile ${sourceId} has an unresolvable evidence link.`)
+      }
+      if (source.dictionaryUrl && !source.dictionaryUrl.startsWith('https://')) throw new Error(`Source profile ${sourceId} has an unresolvable dictionary link.`)
     }
   }
   return true
