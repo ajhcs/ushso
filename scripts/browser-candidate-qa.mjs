@@ -154,7 +154,7 @@ async function verifySortAndReceipt(sort, width, height) {
   await page.waitFor(`document.querySelectorAll('[data-result-id]').length === ${expectedIds.length}`, 30_000);
   const rendered = await page.evaluate(`({
     title: document.title,
-    cardTitles: [...document.querySelectorAll('[data-result-id] [data-result-region="title"]')].map(node => node.textContent.trim()),
+    cardTitles: [...document.querySelectorAll('[data-result-id] [data-result-region="title"] > a')].map(node => node.textContent.trim()),
     cardStates: [...document.querySelectorAll('[data-result-id] .result-status:first-child strong')].map(node => node.textContent.trim()),
     overlay: /vite|webpack|uncaught runtime error/i.test(document.body.innerText),
     overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth || document.body.scrollWidth > document.documentElement.clientWidth,

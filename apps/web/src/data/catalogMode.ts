@@ -78,3 +78,14 @@ export const CATALOG_GENERATION: string = IS_CANDIDATE_MODE ? CANDIDATE_GENERATI
 export const CATALOG_RECORD_COUNT: number = IS_CANDIDATE_MODE ? CANDIDATE_RECORD_COUNT : BASELINE_RECORD_COUNT
 
 export { CANDIDATE_ENTRIES, candidateEntryForRecordId, isCandidateRecordId }
+
+// Navigator briefs and exported packets use the same resolved mode as API calls.
+export const ACTIVE_CATALOG = {
+  mode: CATALOG_MODE,
+  isCandidate: IS_CANDIDATE_MODE,
+  corpusVersion: CATALOG_VERSION,
+  generation: CATALOG_GENERATION,
+  recordCount: CATALOG_RECORD_COUNT,
+  apiPath: DISCOVERY_API_PATH,
+  displayLabel: IS_CANDIDATE_MODE ? 'research candidate catalog' : 'published baseline catalog',
+} as const

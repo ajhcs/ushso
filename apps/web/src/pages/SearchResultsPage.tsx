@@ -6,6 +6,7 @@ import { FacetSidebar } from '../components/FacetSidebar'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { Pagination } from '../components/Pagination'
+import { PriorityResearchMatch } from '../components/PriorityResearchNavigator'
 import { ResultCard } from '../components/ResultCard'
 import { buildCanonicalFacetSections, normalizeDiscoveryFacetSections } from '../data/facets'
 import { rememberLastSeenGeneration } from '../lib/shortlist'
@@ -129,7 +130,7 @@ export function SearchResultsPage() {
     const target = document.getElementById(anchor)
     if (!target) return
     const frame = requestAnimationFrame(() => {
-      target.querySelector<HTMLAnchorElement>('h2 a')?.focus({ preventScroll: true })
+      target.querySelector<HTMLAnchorElement>('h2 a, [data-navigator-details]')?.focus({ preventScroll: true })
       if (matchedContext && !location.hash) window.scrollTo({ top: matchedContext.scroll_y, behavior: 'instant' })
       else target.scrollIntoView({ block: 'start', behavior: 'instant' })
     })
@@ -199,6 +200,7 @@ export function SearchResultsPage() {
 
           <aside className="catalog-scope-summary" aria-label="Catalog coverage"><strong>Searching a bounded published catalog</strong><span>Empty results do not establish that no source exists. Unknown geography is not a confirmed match. <Link to="/sources">Review indexed sources and major gaps</Link>.</span></aside>
           <CandidateCatalogNotice compact />
+          <PriorityResearchMatch query={state.q} />
 
           {discovery.status === 'ready' && catalog && <>
             <div className="results-overview">
