@@ -22,10 +22,10 @@ const journeys = [
   },
   {
     id: 'insurance-geography',
-    question: 'County uninsured estimates without inventing Census coverage',
-    source: 'CDC PLACES county estimates',
-    access: 'Documented county metadata. An explicit without-Census filter excludes Census sources.',
-    href: '/search?q=CDC%20PLACES%20county%20uninsured',
+    question: 'County uninsured estimates with verified Census coverage',
+    source: 'Census SAHIE county health-insurance estimates',
+    access: 'Single-year county estimates. Verify the year, denominator, and release notes before retrieval.',
+    href: '/search?q=county%20uninsured%20SAHIE',
   },
   {
     id: 'public-health',
