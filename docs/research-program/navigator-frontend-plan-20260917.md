@@ -143,6 +143,11 @@ New file: apps/web/src/components/PriorityResearchBriefStructure.test.tsx — of
 
 These fail on today markup (no sections, no dictionary link, opaque refs as plain text) and pass after the integration step implements the section-4 template plus enrichment bindings. Existing suites (researchNavigator.test.ts, navigatorIntegration.test.ts, catalogMode.test.ts, modeSeparation.test.ts, PriorityResearchNavigator.test.tsx) are untouched.
 
-## 8. Out of bounds
+## 8. Deferred follow-ups (documented, not fixed this increment)
+
+- F-06 matcher tie-break: `findPriorityResearchQuestion` still picks the single longest matching substring, so mixed-concept queries (for example `CDC PLACES county uninsured`, which contains both `cdc places county` len 17 and `county uninsured` len 16) route to the prevalence brief instead of SAHIE. Impact: a user asking about uninsured with PLACES vocabulary lands on the wrong brief. Repro: offline call, no HTTP. Concrete follow-up: score by number of matched terms plus family coherence with regression cases, keeping exact-question-first and astronomy-null behavior. The F-05 landing-journey fix removes the in-product occurrence.
+- F-12a/b brief loading and error boundary: the brief renders synchronously with no loading skeleton or error boundary; `buildPriorityResearchPacket` still throws route-level on unknown profiles (validator prevents it at build/test time). Impact: layout shift while discovery loads; a corrupt profile id would blank the brief. Concrete follow-up: presentational loading line tied to discovery status plus a route-level brief error boundary (`Brief unavailable … Revise search`), keeping the validator throwing.
+
+## 9. Out of bounds
 
 No live publisher requests (budget untouched), no request-ledger or frozen-cohort edits, no scientific acceptance, no production build or deploy, no corpus manifest edits, no validator weakening, no planner and browse mode mixing.
