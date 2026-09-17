@@ -76,12 +76,17 @@ export function searchReceiptFilename(receipt: SearchReceipt) {
 }
 
 export function downloadSearchReceipt(receipt: SearchReceipt) {
+  const filename = searchReceiptFilename(receipt)
   const url = URL.createObjectURL(new Blob([serializeSearchReceipt(receipt)], { type: 'application/json' }))
   const link = document.createElement('a')
   link.href = url
-  link.download = searchReceiptFilename(receipt)
+  link.download = filename
+  link.title = filename
+  document.body.appendChild(link)
   link.click()
-  URL.revokeObjectURL(url)
+  link.remove()
+  announceDownload(filename)
+  window.setTimeout(() => URL.revokeObjectURL(url), 5000)
 }
 
 function announceDownload(filename: string) {

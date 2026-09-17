@@ -74,3 +74,16 @@ export function datasetDetailsHref(recordId: string, context?: SearchReturnConte
 export function resultAnchorId(recordId: string) {
   return `search-result-${recordId.replace(/[^a-zA-Z0-9_-]+/g, '-')}`
 }
+
+export interface BriefOriginContext {
+  profileId: string
+  question: string | null
+}
+
+export function briefOriginContext(returnParam: string | null | undefined): BriefOriginContext | null {
+  const context = parseReturnContext(returnParam)
+  if (!context || !context.selected_record_id.startsWith('navigator-')) return null
+  const profileId = context.selected_record_id.slice('navigator-'.length)
+  if (!profileId) return null
+  return { profileId, question: new URLSearchParams(context.search).get('q') }
+}
