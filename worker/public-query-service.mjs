@@ -84,8 +84,23 @@ export class PublicQueryService {
     return { status: 'ok', service: 'ushso-discovery', contract_version: 'observatory-discovery-result.v1.0.0', compiler: intent.compiler };
   }
 
-  async browse(session, limit) {
+  async browse(session, options = 20) {
+    const traversal = typeof options === 'number' ? { page_size: Math.min(options, 200) } : options;
     const question = 'Browse published health systems data';
+    if (typeof options !== 'number' && typeof this.searchBackend.browseAssets === 'function') {
+      const result = await this.searchBackend.browseAssets({
+        publication: session.publication,
+        request: session.request,
+        env: session.env,
+        signal: session.signal,
+        query: { question, ...traversal }
+      });
+      if (result) {
+        result.query.filters = { ...result.query.filters, mode: 'catalog_browse' };
+        return result;
+      }
+    }
+    const limit = traversal.page_size ?? 20;
     const intent = await this.searchBackend.interpret({
       publication: session.publication,
       request: session.request,

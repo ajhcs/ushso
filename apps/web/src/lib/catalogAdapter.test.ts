@@ -49,7 +49,8 @@ describe('canonical discovery response adapter', () => {
   it('exposes scan-card grain and access status without inventing coverage', () => {
     const adapted = adaptDiscoveryResponse(acceptedResponse)
     const first = adapted.records[0]
-    expect(first.grain).toContain(first.reportingUnit)
+    expect(first.grain).toBe('Observation grain unresolved')
+    expect(first.reportingUnit).toBe('Observation grain unresolved')
     expect(first.accessStatusLabel).toBeTruthy()
     expect(first.categories.length).toBeGreaterThan(0)
   })

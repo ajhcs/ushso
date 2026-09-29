@@ -71,6 +71,29 @@ assert.equal(discovery.corpus.publication.all_public_records_live_verified, true
 assert.ok(discovery.results.length > 0);
 assert.ok(discovery.results.every(result => result.record.freshness_verification.verification_status === 'current_verified'));
 
+const repeatedDiscovery = [];
+for (let index = 0; index < 20; index += 1) {
+  const started = performance.now();
+  const { response, body } = await jsonResponse(`${base}/api/discover`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ question: 'hospital cost reports', limit: 10 })
+  });
+  assert.equal(response.status, 200, `repeated discovery request ${index + 1}`);
+  assert.equal(body.corpus.record_count, 3434, `repeated discovery request ${index + 1}`);
+  repeatedDiscovery.push(Math.round(performance.now() - started));
+}
+assert.equal((await fetch(`${base}/api/health`)).status, 200, 'Worker must remain alive after repeated discovery');
+
+const { response: quickStartResponse, body: quickStart } = await jsonResponse(base + '/api/discover', {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  body: JSON.stringify({ question: 'CMS HCRIS hospital cost reports by state', limit: 10 })
+});
+assert.equal(quickStartResponse.status, 200);
+assert.equal(quickStart.corpus.record_count, 3434);
+assert.equal(quickStart.results[0]?.record_id, 'obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17');
+
 const { response: zeroResponse, body: zero } = await jsonResponse(`${base}/api/discover`, {
   method: 'POST',
   headers: { 'content-type': 'application/json' },
@@ -83,7 +106,9 @@ assert.ok(zero.warnings.some(value => /not evidence that no source exists/i.test
 const { body: catalog } = await jsonResponse(`${base}/api/catalog?limit=2`);
 assert.equal(catalog.corpus.record_count, 3434);
 assert.equal(catalog.returned_count, 2);
-assert.equal(catalog.total_matches, 3434);
+assert.equal(Object.values(catalog.corpus.source_slices).reduce((sum, value) => sum + value, 0), catalog.corpus.record_count);
+assert.equal(catalog.partial_results.is_partial, true);
+assert.equal(catalog.total_matches + catalog.partial_results.invalid_item_count, catalog.corpus.record_count);
 const [first, second] = catalog.results.map(item => item.record_id);
 assert.ok(first && second);
 const generation = catalog.corpus.publication.generation;
@@ -170,6 +195,11 @@ const receipt = {
   machine_results: machineResults,
   planner_status: planner.status,
   zero_results: zero.result_count,
+  repeated_discovery: {
+    request_count: repeatedDiscovery.length,
+    maximum_ms: Math.max(...repeatedDiscovery),
+    mean_ms: Math.round(repeatedDiscovery.reduce((sum, value) => sum + value, 0) / repeatedDiscovery.length)
+  },
   guards: {
     invalid: invalid.status,
     media_type: wrongType.status,

@@ -1,4 +1,4 @@
-import { createRetrievalEngine } from './retrieval-core.mjs';
+import { createRetrievalEngine } from './retrieval-core-v1.2.mjs';
 import { DISCOVERY_QUERY_SCHEMA } from './query-schema.mjs';
 
 export const TOOL_NAME = 'observatory.discover_sources';
@@ -9,11 +9,12 @@ export async function registerObservatoryWebMcp({
   records,
   joinRoutes,
   vocabulary,
+  namedSourceRegistry,
   corpus,
   registrationSignal
 } = {}) {
   if (!modelContext || typeof modelContext.registerTool !== 'function') throw new TypeError('a WebMCP ModelContext with registerTool() is required');
-  const retrievalEngine = engine ?? createRetrievalEngine({ records, joinRoutes, vocabulary, corpus });
+  const retrievalEngine = engine ?? createRetrievalEngine({ records, joinRoutes, vocabulary, namedSourceRegistry, corpus });
   const controller = registrationSignal ? null : new AbortController();
   const signal = registrationSignal ?? controller.signal;
   await modelContext.registerTool({

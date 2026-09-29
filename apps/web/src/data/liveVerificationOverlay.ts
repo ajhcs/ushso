@@ -133,6 +133,7 @@ export function applyLiveVerificationOverlay(response: DiscoveryResult, receiptV
       verification_status: overlay.verification_status,
       verification_method: overlay.verification_method,
     }
+    result.record.access.infrastructure_state = 'available'
     result.record.variable_documentation = {
       ...structuredClone(overlay.variable_documentation),
       variables: overlay.variable_documentation.variables.map((variable) => ({

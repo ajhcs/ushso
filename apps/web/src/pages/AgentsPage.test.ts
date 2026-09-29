@@ -1,31 +1,23 @@
 import { describe, expect, it } from 'vitest'
-import responseFixtureJson from '../../../../packages/retrieval/fixtures/responses/q-hospital-ownership.json'
 import generatedExample from '../data/generatedAgentsResponseExample.json'
-import type { DiscoveryResult } from '../types/discovery'
 
 describe('agents response example', () => {
-  it('projects structured geography objects from an accepted response fixture', () => {
-    const fixture = responseFixtureJson as unknown as DiscoveryResult
-    const expected = {
-      contract_version: fixture.contract_version,
-      query: { interpretation: { geographies: fixture.query.interpretation.geographies } },
-      result_count: fixture.result_count,
-      results: fixture.results.slice(0, 1).map((result) => ({
-        record_id: result.record_id,
-        record: { authoritative_url: result.record.authoritative_url },
-      })),
-      warnings: fixture.warnings.slice(0, 1),
-    }
-
-    expect(generatedExample).toEqual(expected)
-    expect(generatedExample.query.interpretation.geographies[0]).toMatchObject({
-      id: 'US-PA',
-      kind: 'geography',
-      evidence: 'controlled_vocabulary',
+  it('is generated from the production v1.2 corpus and preserves the reviewed leading record', () => {
+    expect(generatedExample.corpus).toMatchObject({
+      corpus_version: '1.2.0',
+      record_count: 3434,
+      generation: 'live-2026-09-03-85b50522b420',
     })
-    expect(generatedExample.results[0]).toEqual({
-      record_id: fixture.results[0].record_id,
-      record: { authoritative_url: fixture.results[0].record.authoritative_url },
+    expect(generatedExample.query.question).toBe('CMS HCRIS hospital cost reports by state')
+    expect(generatedExample.results[0]).toMatchObject({
+      rank: 1,
+      record_id: 'obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17',
+      match_state: 'contextual',
+      record: {
+        title: 'Hospital Provider Cost Report',
+        authoritative_url: 'https://data.cms.gov/provider-compliance/cost-reports/hospital-provider-cost-report',
+      },
     })
+    expect(generatedExample.ranking.ordered_ids[0]).toBe(generatedExample.results[0].record_id)
   })
 })

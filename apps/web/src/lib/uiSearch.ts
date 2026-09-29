@@ -2,18 +2,37 @@ import type { DatasetFamily, SortMode } from '../types/catalog'
 
 export const DEMO_QUERY = 'hospital financial and utilization data for Pennsylvania'
 
-export const DEMO_SUGGESTIONS = [
-  'Hospital financial and utilization data in California',
-  'CMS HCRIS hospital cost reports by state',
-  'Hospital ownership changes and enrollments in Texas',
-  'Rural hospital classifications and closures in Kansas',
-  'Hospital quality and workforce data in New York',
-  'Medicare provider enrollment data by state',
-  'Hospital capacity and service availability in Florida',
-  'Pennsylvania hospital discharge and utilization data',
-  'HRSA workforce shortage areas by state',
-  'Census geography crosswalks for hospital service areas',
-]
+export const EXAMPLE_QUERY_SET_VERSION = 'example-research-questions.v1.1.0'
+
+export const EXAMPLE_RESEARCH_QUESTIONS = [
+  {
+    question: 'CMS HCRIS hospital cost reports by state',
+    usefulResultIds: ['obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17'],
+    rationale: 'Routes directly to the production CMS Hospital Provider Cost Report catalog record and its source documentation.',
+  },
+  {
+    question: 'CDC maternal mortality data',
+    usefulResultIds: ['obs:asset:cdc-socrata:e2d5-ggg7-de73391d5d45d504'],
+    rationale: 'Leads with the CDC provisional maternal death counts and rates record.',
+  },
+  {
+    question: 'What CMS sources describe hospital ownership in Pennsylvania?',
+    usefulResultIds: ['obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-60625-369694b51de508f8'],
+    rationale: 'Leads with the CMS Hospital Change of Ownership owner record while labeling Pennsylvania coverage as unknown.',
+  },
+  {
+    question: 'Public-use hospital utilization data',
+    usefulResultIds: ['obs:asset:cdc-socrata:tqpr-vcrm-4aa4061557d57dc8'],
+    rationale: 'Leads with the CDC National Hospital Ambulatory Medical Care Survey public-use record.',
+  },
+  {
+    question: 'CMS Medicare inpatient hospital utilization',
+    usefulResultIds: ['obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-1e1be-2e19bf0aa4756bb2'],
+    rationale: 'Leads with CMS Program Statistics for Medicare inpatient hospitals.',
+  },
+] as const
+
+export const DEMO_SUGGESTIONS = EXAMPLE_RESEARCH_QUESTIONS.map((example) => example.question)
 
 const SEARCH_CONCEPTS: Record<string, string[]> = {
   financial: ['financial', 'finance', 'cost', 'costs', 'hcris', 'revenue', 'expense'],
@@ -101,39 +120,29 @@ export function filterCatalog<T extends DatasetFamily>(items: T[], selectedFilte
   )
 }
 
-// "best" preserves the canonical engine rank. The other modes are explicit user-selected presentation orders.
-function catalogQueryScore(item: DatasetFamily, query: string) {
-  const { original, expanded } = expandedQueryTokens(query)
-  const fields = [
-    { weight: 12, text: item.title },
-    { weight: 8, text: item.categories.join(' ') },
-    { weight: 6, text: item.variablesCodebook },
-    { weight: 4, text: item.description },
-    { weight: 3, text: `${item.recordType} ${item.reportingUnit} ${item.sourceName}` },
-  ]
-  let score = 0
-  const matchedOriginal = new Set<string>()
-  fields.forEach(({ weight, text }) => {
-    const tokens = normalizeSearchText(text).split(' ')
-    original.forEach((token) => {
-      if (!matchedOriginal.has(token) && tokens.some((candidate) => isNearToken(token, candidate))) {
-        matchedOriginal.add(token)
-        score += weight
-      }
-    })
-    score += Math.min(3, expanded.filter((token) => tokens.includes(token)).length)
-  })
-  if (original.length > 1 && normalizeSearchText(item.title).includes(original.join(' '))) score += 18
-  score += Math.round(8 * matchedOriginal.size / Math.max(1, original.length))
-  return score
-}
-
-export function orderCatalogViews<T extends DatasetFamily>(items: T[], sort: SortMode, query = '') {
+// Canonical relevance always preserves the server's versioned rank. Alternate
+// sorts remain as a compatibility fallback for fixtures without server sorting.
+export function orderCatalogViews<T extends DatasetFamily>(items: T[], sort: SortMode, _query = '') {
   const copy = [...items]
-  if (sort === 'title') return copy.sort((a, b) => a.title.localeCompare(b.title))
-  if (sort === 'newest') return copy.sort((a, b) => b.latestVerifiedRelease.localeCompare(a.latestVerifiedRelease))
-  if (query.trim()) return copy.sort((a, b) => catalogQueryScore(b, query) - catalogQueryScore(a, query)
-    || a.canonicalResult.rank - b.canonicalResult.rank
-    || a.id.localeCompare(b.id))
+  if (sort === 'title_asc') return copy.sort((a, b) => a.title.localeCompare(b.title) || a.id.localeCompare(b.id))
+  if (sort === 'release_newest' || sort === 'observation_latest') {
+    const value = (item: T) => {
+      const dates = item.canonicalResult.metadata?.dates
+      const raw = sort === 'release_newest'
+        ? dates?.publisher_release_date
+        : dates?.observation_period?.end ?? dates?.observation_period?.start ?? item.canonicalResult.record.time_coverage.end ?? item.canonicalResult.record.time_coverage.start
+      const timestamp = Date.parse(raw ?? '')
+      if (Number.isFinite(timestamp)) return timestamp
+      const year = Number(raw?.match(/^\d{4}/)?.[0])
+      return Number.isInteger(year) ? Date.UTC(year, 0, 1) : null
+    }
+    return copy.sort((a, b) => {
+      const left = value(a)
+      const right = value(b)
+      if (left === null) return right === null ? a.canonicalResult.rank - b.canonicalResult.rank : 1
+      if (right === null) return -1
+      return right - left || a.canonicalResult.rank - b.canonicalResult.rank
+    })
+  }
   return copy.sort((a, b) => a.canonicalResult.rank - b.canonicalResult.rank)
 }

@@ -43,6 +43,17 @@ describe('DiscoveryProvider contract', () => {
     }))
   })
 
+  it('pins query traversal to cursor, generation, sort, filters, and page size', async () => {
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify(acceptedResponse), { status: 200 }))
+    const provider = new ApiDiscoveryProvider('/api/discover', fetchImpl)
+    await provider.discover(acceptedQuery, { traversal: {
+      cursor: 'opaque-cursor', generation: 'generation-1', pageSize: 25, sort: 'title_asc', filters: ['source:cms'],
+    } })
+    const call = fetchImpl.mock.calls[0] as unknown as [RequestInfo | URL, RequestInit]
+    const body = JSON.parse(String(call[1]?.body))
+    expect(body).toMatchObject({ cursor: 'opaque-cursor', generation: 'generation-1', page_size: 25, sort: 'title_asc', facet_filters: { source: ['cms'] } })
+  })
+
   it('uses dedicated catalog and stable-record GET routes', async () => {
     const fetchImpl = vi.fn(async () => new Response(JSON.stringify(acceptedResponse), {
       status: 200,
@@ -52,8 +63,14 @@ describe('DiscoveryProvider contract', () => {
     await provider.browse()
     await provider.dataset('obs:asset:example')
 
-    expect(fetchImpl).toHaveBeenNthCalledWith(1, '/api/catalog?limit=200&corpus=1.1.0', expect.objectContaining({ method: 'GET' }))
+    expect(fetchImpl).toHaveBeenNthCalledWith(1, '/api/catalog', expect.objectContaining({ method: 'GET' }))
     expect(fetchImpl).toHaveBeenNthCalledWith(2, '/api/datasets/obs%3Aasset%3Aexample', expect.objectContaining({ method: 'GET' }))
+  })
+
+  it('turns unavailable generation errors into a restartable provider state', async () => {
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ error: { code: 'generation_unavailable', message: 'old generation' } }), { status: 410 }))
+    const provider = new ApiDiscoveryProvider('/api/discover', fetchImpl)
+    await expect(provider.discover(acceptedQuery)).rejects.toMatchObject({ code: 'generation_unavailable' })
   })
 
   it('rejects a response that does not preserve the canonical result contract', () => {
@@ -69,6 +86,31 @@ describe('DiscoveryProvider contract', () => {
   ])('rejects an unsafe external %s at the canonical response boundary', (_label, mutate) => {
     const unsafe = structuredClone(acceptedResponse)
     mutate(unsafe)
+    expect(() => assertDiscoveryResult(unsafe)).toThrowError(DiscoveryProviderError)
+  })
+
+  it('accepts a safe HTTP source locator as preserved evidence without treating host agreement as navigation proof', () => {
+    const preserved = structuredClone(acceptedResponse)
+    const record = preserved.results[0].record
+    record.authoritative_url = 'http://data.cms.gov/provider/example'
+    record.retrieval.instructions[0].url = 'http://data.cms.gov/provider/example'
+    record.provenance[0].locator = 'https://data.cms.gov/data.json'
+    expect(() => assertDiscoveryResult(preserved)).not.toThrow()
+
+    record.provenance[0].locator = 'https://example.gov/data.json'
+    expect(() => assertDiscoveryResult(preserved)).not.toThrow()
+  })
+
+  it.each(['http://example.org/unverified', 'data:text/html,unsafe'])('rejects an unsafe derived navigation route: %s', (url) => {
+    const unsafe = structuredClone(acceptedResponse)
+    unsafe.results[0].metadata = {
+      description_quality: { authoritative_url: null },
+      retrieval_plan: {
+        access_routes: [{ action: 'open', url }],
+        unresolved_routes: [],
+        stop_conditions: [],
+      },
+    } as never
     expect(() => assertDiscoveryResult(unsafe)).toThrowError(DiscoveryProviderError)
   })
 })

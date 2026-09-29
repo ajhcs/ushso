@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
+import { PageTitle } from '../components/PageTitle'
 
 interface StandardPageProps {
   title: string
@@ -10,6 +11,7 @@ interface StandardPageProps {
 export function StandardPage({ title, copy }: StandardPageProps) {
   return (
     <div className="standard-page">
+      <PageTitle label={title} />
       <ObservatoryHeader compact />
       <main id="main-content" className="standard-page__main">
         <h1>{title}</h1>

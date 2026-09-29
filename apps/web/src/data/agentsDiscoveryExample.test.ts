@@ -26,13 +26,12 @@ describe('Agents page contract example', () => {
     expect(typeof generated.query.interpretation.geographies[0]).toBe('object')
   })
 
-  it('renders structured geography objects instead of postal-code strings', () => {
+  it('renders the generated production quick-start example', () => {
     const markup = renderToStaticMarkup(createElement(MemoryRouter, {}, createElement(AgentsPage)))
-    expect(markup).toContain('&quot;id&quot;: &quot;US-PA&quot;')
-    expect(markup).toContain('&quot;kind&quot;: &quot;geography&quot;')
-    expect(markup).not.toContain('[&quot;US-TX&quot;]')
-    expect(markup).not.toContain('&quot;geographies&quot;: [&quot;US-PA&quot;]')
-    expect(markup).toContain('hospital financial and utilization data for Pennsylvania')
+    expect(markup).toContain('&quot;corpus_version&quot;: &quot;1.2.0&quot;')
+    expect(markup).toContain('&quot;record_count&quot;: 3434')
+    expect(markup).toContain('CMS HCRIS hospital cost reports by state')
+    expect(markup).toContain('obs:asset:cms-data-catalog:data.cms.gov-data-api-v1-dataset-44060-2d9b0e057caefa17')
     expect(markup).toContain('registers 8 read-only inspection tools')
     expect(markup).toContain('observatory.search_assets')
     expect(markup).toContain('POST /api/machine/v1/search-assets')

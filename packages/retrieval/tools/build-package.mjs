@@ -33,6 +33,7 @@ const paths = {
   sourceRegistry: path.join(PROJECT_ROOT, 'discovery_financial_org/source_registry.json'),
   curatedAssets: path.join(PACKAGE_ROOT, 'fixtures/curated-assets.json'),
   vocabulary: path.join(PACKAGE_ROOT, 'fixtures/controlled-vocabulary.json'),
+  namedSourceRegistry: path.join(PACKAGE_ROOT, 'fixtures/named-source-registry.v1.0.0.json'),
   baseRoutes: path.join(PACKAGE_ROOT, 'fixtures/base-join-routes.jsonl'),
   extendedRoutes: path.join(PACKAGE_ROOT, 'fixtures/extended-join-routes.jsonl'),
   // The historical schema is unavailable locally. Keep its exact path/digest
@@ -49,6 +50,7 @@ const paths = {
 const algorithmPaths = [
   'tools/question-parser.mjs',
   'tools/intent-compiler.mjs',
+  'tools/catalog-contract.mjs',
   'tools/search-document.mjs',
   'tools/join-routes.mjs',
   'tools/retrieval-core.mjs',
@@ -66,6 +68,7 @@ const [
   sourceRegistry,
   curatedFixture,
   vocabulary,
+  namedSourceRegistry,
   baseRoutes,
   extendedRoutes
 ] = await Promise.all([
@@ -78,6 +81,7 @@ const [
   readJson(paths.sourceRegistry),
   readJson(paths.curatedAssets),
   readJson(paths.vocabulary),
+  readJson(paths.namedSourceRegistry),
   readJsonl(paths.baseRoutes),
   readJsonl(paths.extendedRoutes)
 ]);
@@ -174,7 +178,7 @@ const corpus = {
   }
 };
 
-const engine = createRetrievalEngine({ records, searchDocuments, joinRoutes: routes, vocabulary, corpus });
+const engine = createRetrievalEngine({ records, searchDocuments, joinRoutes: routes, vocabulary, namedSourceRegistry, corpus });
 const publishedQueries = [
   { query_id: 'q-pa-hospital-finance-utilization', query: { question: 'I need hospital financial and utilization data for Pennsylvania', limit: 15 } },
   { query_id: 'q-public-rural-closures-pa', query: { question: 'What public sources can I use to study rural hospital closures in Pennsylvania?', limit: 15 } },

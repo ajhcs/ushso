@@ -43,7 +43,10 @@ export class StaticAssetCatalogRepository {
     const bundle = await this.#bundle(options);
     return {
       ...bundle.corpus,
-      record_count: bundle.records.length,
+      // Preserve the immutable publication count. Invalid records are isolated
+      // from serving, but must not silently rewrite the 3,434-record corpus
+      // identity on direct dataset and repository-summary responses.
+      record_count: bundle.corpus.record_count,
       search_document_count: bundle.searchDocuments.length,
       join_route_count: bundle.joinRoutes.length
     };

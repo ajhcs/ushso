@@ -1,12 +1,13 @@
 import { Code2 } from 'lucide-react'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
+import { PageTitle } from '../components/PageTitle'
 import responseExample from '../data/generatedAgentsResponseExample.json'
 import webMcpContractJson from '../../../../packages/machine-toolkit/public-webmcp-tool.json'
 
 const curlExample = `curl -sS https://ushso.org/api/discover \\
   -H "content-type: application/json" \\
-  --data '{"question":"I need hospital financial and utilization data for Pennsylvania","limit":15}'`
+  --data '{"question":"CMS HCRIS hospital cost reports by state","limit":10}'`
 
 const jsonExample = JSON.stringify(responseExample, null, 2)
 const webMcpContract = webMcpContractJson as {
@@ -20,6 +21,7 @@ const webMcpContract = webMcpContractJson as {
 export function AgentsPage() {
   return (
     <div className="standard-page agents-page">
+      <PageTitle label="Agents and discovery API" />
       <ObservatoryHeader compact />
       <main id="main-content" className="standard-page__main agents-page__main">
         <Code2 className="standard-page__icon" aria-hidden="true" />
@@ -39,7 +41,7 @@ export function AgentsPage() {
 
         <section className="api-guide" aria-labelledby="api-quick-start">
           <h2 id="api-quick-start">Quick start</h2>
-          <p>Send a JSON question to the discovery endpoint. Requests are limited to 20 KiB. The response excerpt below is generated from the accepted published fixture, not a hand-maintained sketch.</p>
+          <p>Send a JSON question to the discovery endpoint. Requests are limited to 20 KiB. The response excerpt below is generated from the versioned 3,434-record production corpus and checked against its reviewed leading record.</p>
           <pre><code>{curlExample}</code></pre>
           <h3>Response shape</h3>
           <pre><code>{jsonExample}</code></pre>
