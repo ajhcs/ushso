@@ -18,12 +18,13 @@ export function ObservatoryFooter({ results = false }: ObservatoryFooterProps) {
       <div className="site-footer__bottom">
         <div className="site-footer__mission">
           <ObservatoryLogo footer />
-          <p>A public gateway to discover, understand, and access<br />the nation’s health systems data.</p>
+          <p>A public gateway to discover, understand, and access<br />{' '}the nation’s health systems data.</p>
         </div>
         <div className="site-footer__copyright">
           <span>© {year} United States Health Systems Observatory</span>
           <nav className="site-footer__links" aria-label="Footer navigation">
             <Link to="/about">About</Link>
+            <Link to="/methods">Methods</Link>
             <Link to="/sources">Sources</Link>
             <Link to="/agents">Agents & API</Link>
             <Link to="/privacy">Privacy</Link>

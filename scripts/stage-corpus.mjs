@@ -6,6 +6,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceRoot = path.join(root, 'packages/retrieval');
 const targetRoot = path.join(root, 'apps/web/public');
 const files = [
+  ['fixtures/named-source-registry.v1.0.0.json', 'corpus-v1.1.0/named-source-registry.json'],
   ['corpus/records.jsonl', 'corpus/records.jsonl'],
   ['corpus/search-documents.jsonl', 'corpus/search-documents.jsonl'],
   ['corpus/join-routes.jsonl', 'corpus/join-routes.jsonl'],

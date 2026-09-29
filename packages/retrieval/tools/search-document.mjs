@@ -1,4 +1,5 @@
 import { recordSearchText } from './question-parser.mjs';
+import { accessDimensions, dateDimensions, descriptionQuality, metadataDimensions } from './catalog-contract.mjs';
 
 function unique(values) {
   return [...new Set(values.filter(value => value !== null && value !== undefined && value !== ''))].sort();
@@ -46,6 +47,10 @@ export function projectSearchDocument(record, joinRoutes = []) {
       machine_actionable: record.retrieval.machine_actionable,
       preferred_interface: record.retrieval.preferred_interface
     },
+    metadata_dimensions: metadataDimensions(record),
+    date_dimensions: dateDimensions(record),
+    access_dimensions: accessDimensions(record),
+    description_quality: descriptionQuality(record),
     search_text: recordSearchText(record),
     facets: {
       geography: unique([record.geography.coverage_level, ...record.geography.jurisdictions]),

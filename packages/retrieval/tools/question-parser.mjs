@@ -78,13 +78,42 @@ function accessIntent(normalizedQuestion, query) {
     include_restricted: includeRestricted,
     public_only: !includeRestricted,
     accepts_restricted: includeRestricted && acceptsRestrictedPhrase,
-    match_basis: query.include_restricted === undefined ? 'question_or_default' : 'explicit_filter'
+    match_basis: query.include_restricted === undefined ? 'question_or_default' : 'explicit_filter',
+    payload_requirement: publicOnlyPhrase ? 'documented_public_payload' : 'unspecified',
+    interpretation_note: publicOnlyPhrase
+      ? 'Catalog visibility alone does not satisfy this request; only documented public payload access is a confirmed match.'
+      : null
   };
+}
+
+function exclusionIntent(normalizedQuestion, query) {
+  const explicit = query.exclusions.map(value => ({ phrase: value, normalized_phrase: normalizeText(value), match_basis: 'explicit_filter', support: 'supported' }));
+  const patterns = [...normalizedQuestion.matchAll(/\b(?:excluding|exclude|except|without)\s+([a-z0-9][a-z0-9 ]{1,80})/g)];
+  const inferred = patterns.map(match => {
+    const phrase = match[1].split(/\b(?:and|but|for|from|in|with)\b/)[0].trim();
+    const supported = ['nursing home', 'nursing homes', 'marketplace', 'medicare', 'medicaid'].includes(phrase);
+    return { phrase, normalized_phrase: phrase, match_basis: 'question_text', support: supported ? 'supported' : 'unsupported' };
+  }).filter(item => item.normalized_phrase);
+  return uniqueBy([...explicit, ...inferred], value => value.normalized_phrase);
+}
+
+function namedSourceIntent(normalizedQuestion, registry) {
+  return (registry?.sources ?? []).filter(source => [source.name, ...(source.acronyms ?? []), ...(source.aliases ?? [])]
+    .some(alias => phrasePresent(normalizedQuestion, alias)))
+    .map(source => ({
+      source_id: source.source_id,
+      name: source.name,
+      matched_aliases: [source.name, ...(source.acronyms ?? []), ...(source.aliases ?? [])]
+        .filter(alias => phrasePresent(normalizedQuestion, alias)).map(normalizeText),
+      indexed_record_ids: [...(source.indexed_record_ids ?? [])],
+      official_discovery_url: source.official_discovery_url ?? null,
+      registry_evidence_state: source.evidence_state ?? 'unresolved'
+    }));
 }
 
 export function validateQuery(rawQuery) {
   if (!rawQuery || typeof rawQuery !== 'object' || Array.isArray(rawQuery)) throw new TypeError('query must be an object');
-  const allowed = new Set(['question', 'geography', 'subjects', 'units_of_analysis', 'access_statuses', 'include_restricted', 'time_window', 'limit']);
+  const allowed = new Set(['question', 'geography', 'subjects', 'units_of_analysis', 'access_statuses', 'include_restricted', 'time_window', 'limit', 'page_size', 'cursor', 'generation', 'sort', 'facet_filters', 'exclusions']);
   for (const key of Object.keys(rawQuery)) if (!allowed.has(key)) throw new TypeError(`unknown query property: ${key}`);
   if (typeof rawQuery.question !== 'string' || rawQuery.question.trim().length < 3 || rawQuery.question.length > 500) {
     throw new TypeError('question must contain 3 to 500 characters');
@@ -97,7 +126,19 @@ export function validateQuery(rawQuery) {
     return value.map(item => item.trim());
   };
   if (rawQuery.include_restricted !== undefined && typeof rawQuery.include_restricted !== 'boolean') throw new TypeError('include_restricted must be boolean');
-  if (rawQuery.limit !== undefined && (!Number.isInteger(rawQuery.limit) || rawQuery.limit < 1 || rawQuery.limit > 50)) throw new TypeError('limit must be an integer from 1 to 50');
+  if (rawQuery.limit !== undefined && (!Number.isInteger(rawQuery.limit) || rawQuery.limit < 1 || rawQuery.limit > 200)) throw new TypeError('limit must be an integer from 1 to 200');
+  if (rawQuery.page_size !== undefined && (!Number.isInteger(rawQuery.page_size) || rawQuery.page_size < 1 || rawQuery.page_size > 200)) throw new TypeError('page_size must be an integer from 1 to 200');
+  if (rawQuery.limit !== undefined && rawQuery.page_size !== undefined && rawQuery.limit !== rawQuery.page_size) throw new TypeError('limit and page_size must match when both are supplied');
+  if (rawQuery.cursor !== undefined && rawQuery.cursor !== null && (typeof rawQuery.cursor !== 'string' || rawQuery.cursor.length < 8 || rawQuery.cursor.length > 512)) throw new TypeError('cursor must be null or an opaque string from 8 to 512 characters');
+  if (rawQuery.generation !== undefined && rawQuery.generation !== null && (typeof rawQuery.generation !== 'string' || !rawQuery.generation.trim() || rawQuery.generation.length > 160)) throw new TypeError('generation must be null or a non-empty string up to 160 characters');
+  const allowedSorts = new Set(['canonical_relevance', 'title_asc', 'release_newest', 'observation_latest']);
+  if (rawQuery.sort !== undefined && !allowedSorts.has(rawQuery.sort)) throw new TypeError(`sort must be one of: ${[...allowedSorts].join(', ')}`);
+  if (rawQuery.facet_filters !== undefined && (!rawQuery.facet_filters || typeof rawQuery.facet_filters !== 'object' || Array.isArray(rawQuery.facet_filters))) throw new TypeError('facet_filters must be an object');
+  const facetFilters = {};
+  for (const [key, value] of Object.entries(rawQuery.facet_filters ?? {})) {
+    if (!['source', 'geography', 'access_status', 'unit_of_analysis', 'capability'].includes(key)) throw new TypeError(`unknown facet filter: ${key}`);
+    facetFilters[key] = uniqueStrings(value, `facet_filters.${key}`);
+  }
   if (rawQuery.geography !== undefined && (!rawQuery.geography || typeof rawQuery.geography !== 'object' || Array.isArray(rawQuery.geography))) throw new TypeError('geography must be an object');
   const geography = rawQuery.geography ? {
     codes: uniqueStrings(rawQuery.geography.codes, 'geography.codes'),
@@ -122,11 +163,17 @@ export function validateQuery(rawQuery) {
     access_statuses: uniqueStrings(rawQuery.access_statuses, 'access_statuses'),
     include_restricted: rawQuery.include_restricted,
     time_window: timeWindow,
-    limit: rawQuery.limit ?? 10
+    limit: rawQuery.page_size ?? rawQuery.limit ?? 10,
+    page_size: rawQuery.page_size ?? rawQuery.limit ?? 10,
+    cursor: rawQuery.cursor ?? null,
+    generation: rawQuery.generation?.trim() ?? null,
+    sort: rawQuery.sort ?? 'canonical_relevance',
+    facet_filters: facetFilters,
+    exclusions: uniqueStrings(rawQuery.exclusions, 'exclusions')
   };
 }
 
-export function parseQuestion(rawQuery, vocabulary) {
+export function parseQuestion(rawQuery, vocabulary, namedSourceRegistry = null) {
   const query = validateQuery(rawQuery);
   const normalizedQuestion = normalizeText(query.question);
   const inferredGeographies = matchVocabulary(normalizedQuestion, vocabulary.geographies, 'geography', query.question);
@@ -168,6 +215,11 @@ export function parseQuestion(rawQuery, vocabulary) {
     end_year: query.time_window.end_year ?? null,
     match_basis: 'explicit_filter'
   } : null;
+  const exclusions = exclusionIntent(normalizedQuestion, query);
+  const namedSources = namedSourceIntent(normalizedQuestion, namedSourceRegistry);
+  const interpretationWarnings = exclusions
+    .filter(item => item.support === 'unsupported')
+    .map(item => `The exclusion "${item.phrase}" is not a supported structured filter and was not silently applied.`);
 
   return {
     raw: query,
@@ -178,7 +230,10 @@ export function parseQuestion(rawQuery, vocabulary) {
       subjects,
       units_of_analysis: units,
       time_window: explicitTime ?? inferredTime,
-      access_intent: accessIntent(normalizedQuestion, query)
+      access_intent: accessIntent(normalizedQuestion, query),
+      exclusions,
+      named_sources: namedSources,
+      interpretation_warnings: interpretationWarnings
     }
   };
 }

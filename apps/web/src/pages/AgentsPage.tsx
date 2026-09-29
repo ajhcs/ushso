@@ -1,6 +1,7 @@
 import { Code2 } from 'lucide-react'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
+import { PageTitle } from '../components/PageTitle'
 import agentsExampleSource from '../data/agents-discovery-example.json'
 import { agentsCurlExample } from '../data/agentsDiscoveryExample'
 
@@ -10,6 +11,7 @@ const jsonExample = JSON.stringify(agentsExampleSource.example, null, 2)
 export function AgentsPage() {
   return (
     <div className="standard-page agents-page">
+      <PageTitle label="Agents and discovery API" />
       <ObservatoryHeader compact />
       <main id="main-content" className="standard-page__main agents-page__main">
         <Code2 className="standard-page__icon" aria-hidden="true" />

@@ -1,11 +1,20 @@
 import { loadAcceptedDiscoveryFixture } from '../data/acceptedDiscoveryFixture'
-import type { DiscoveryQuery, DiscoveryResult } from '../types/discovery'
+import type { DiscoveryQuery, DiscoveryResult, DiscoverySort } from '../types/discovery'
 
 export type DiscoveryProviderKind = 'fixture' | 'api'
 export type DiscoveryProviderPromotionState = 'accepted' | 'unpromoted' | 'remote'
 
 export interface DiscoveryRequestOptions {
   signal?: AbortSignal
+  traversal?: DiscoveryTraversalRequest
+}
+
+export interface DiscoveryTraversalRequest {
+  cursor?: string
+  generation?: string
+  pageSize?: number
+  sort?: DiscoverySort
+  filters?: string[]
 }
 
 export interface DiscoveryProvider {
@@ -17,7 +26,7 @@ export interface DiscoveryProvider {
 }
 
 export class DiscoveryProviderError extends Error {
-  constructor(readonly code: 'aborted' | 'fixture_query_unavailable' | 'record_not_found' | 'http_error' | 'invalid_contract', message: string) {
+  constructor(readonly code: 'aborted' | 'fixture_query_unavailable' | 'record_not_found' | 'generation_unavailable' | 'cursor_invalid' | 'http_error' | 'invalid_contract', message: string) {
     super(message)
     this.name = 'DiscoveryProviderError'
   }
@@ -128,6 +137,73 @@ export function assertDiscoveryResult(value: unknown): asserts value is Discover
       throw new DiscoveryProviderError('invalid_contract', 'Discovery response has_more does not match total_matches and returned records.')
     }
   }
+  if (value.ranking !== undefined) {
+    if (!isObject(value.ranking) || !isNonEmptyString(value.ranking.version) || !isNonEmptyString(value.ranking.sort) || !isStringArray(value.ranking.ordered_ids)) {
+      throw new DiscoveryProviderError('invalid_contract', 'Discovery response ranking metadata is invalid.')
+    }
+    if (value.ranking.ordered_ids.length !== value.results.length || value.ranking.ordered_ids.some((id, index) => id !== (value.results as Array<Record<string, unknown>>)[index]?.record_id)) {
+      throw new DiscoveryProviderError('invalid_contract', 'Discovery response ranking order does not match its records.')
+    }
+  }
+  if (value.pagination !== undefined) {
+    const pagination = value.pagination
+    if (!isObject(pagination) || !isNonEmptyString(pagination.generation) || typeof pagination.has_more !== 'boolean'
+      || !Number.isInteger(pagination.page_size) || Number(pagination.page_size) < 1
+      || !Number.isInteger(pagination.total_matches) || Number(pagination.total_matches) < value.results.length
+      || (pagination.cursor !== null && typeof pagination.cursor !== 'string')
+      || (pagination.next_cursor !== null && typeof pagination.next_cursor !== 'string')) {
+      throw new DiscoveryProviderError('invalid_contract', 'Discovery response pagination metadata is invalid.')
+    }
+  }
+  if (value.facets !== undefined) {
+    const facets = value.facets
+    if (!isObject(facets) || !['records', 'families'].includes(String(facets.count_basis))
+      || !isNonEmptyString(facets.collection_scope) || typeof facets.approximate !== 'boolean' || !Array.isArray(facets.sections)) {
+      throw new DiscoveryProviderError('invalid_contract', 'Discovery response facet metadata is invalid.')
+    }
+    for (const section of facets.sections) {
+      if (!isObject(section) || !isNonEmptyString(section.id) || !isNonEmptyString(section.label) || !Array.isArray(section.options)) {
+        throw new DiscoveryProviderError('invalid_contract', 'Discovery response contains an invalid facet section.')
+      }
+      for (const option of section.options) {
+        if (!isObject(option) || !isNonEmptyString(option.value) || !isNonEmptyString(option.label) || !Number.isInteger(option.count) || Number(option.count) < 0) {
+          throw new DiscoveryProviderError('invalid_contract', `Discovery facet ${section.id} contains an invalid option.`)
+        }
+      }
+    }
+  }
+  const returnedIds = new Set((value.results as Array<Record<string, unknown>>).map((item) => String(item.record_id)))
+  if (value.sections !== undefined) {
+    if (!isObject(value.sections) || !isStringArray(value.sections.supported) || !isStringArray(value.sections.uncertain)
+      || (value.sections.contextual !== undefined && !isStringArray(value.sections.contextual))) {
+      throw new DiscoveryProviderError('invalid_contract', 'Discovery response result sections are invalid.')
+    }
+    const sectionIds = [...value.sections.supported, ...value.sections.uncertain, ...(value.sections.contextual ?? [])]
+    if (sectionIds.some((id) => !returnedIds.has(id)) || new Set(sectionIds).size !== sectionIds.length) {
+      throw new DiscoveryProviderError('invalid_contract', 'Discovery response sections do not uniquely partition returned records.')
+    }
+  }
+  if (value.partial_results !== undefined) {
+    const partial = value.partial_results
+    if (!isObject(partial) || typeof partial.is_partial !== 'boolean' || !Number.isInteger(partial.invalid_item_count)
+      || Number(partial.invalid_item_count) < 0 || !Array.isArray(partial.issues)
+      || partial.is_partial !== (Number(partial.invalid_item_count) > 0)) {
+      throw new DiscoveryProviderError('invalid_contract', 'Discovery partial-results metadata is invalid.')
+    }
+  }
+  if (value.receipt !== undefined) {
+    const receipt = value.receipt
+    if (!isObject(receipt) || receipt.manifest_version !== 'observatory-search-manifest.v1.0.0'
+      || receipt.scope !== 'current_page' || !isNonEmptyString(receipt.question) || !isObject(receipt.interpreted_constraints)
+      || !isObject(receipt.filters) || !isNonEmptyString(receipt.sort) || !isStringArray(receipt.displayed_ordered_ids)
+      || !isNonEmptyString(receipt.ranking_version) || !isNonEmptyString(receipt.catalog_generation)
+      || !isNonEmptyString(receipt.generated_at) || !Array.isArray(receipt.citations) || !isStringArray(receipt.limitations)) {
+      throw new DiscoveryProviderError('invalid_contract', 'Discovery response search manifest is invalid.')
+    }
+    if (receipt.displayed_ordered_ids.length !== value.results.length || receipt.displayed_ordered_ids.some((id, index) => id !== (value.results as Array<Record<string, unknown>>)[index]?.record_id)) {
+      throw new DiscoveryProviderError('invalid_contract', 'Discovery search manifest does not preserve displayed response order.')
+    }
+  }
   for (const item of value.results) {
     if (!isObject(item) || typeof item.rank !== 'number' || typeof item.score !== 'number' || typeof item.record_id !== 'string' || !isObject(item.relevance)) {
       throw new DiscoveryProviderError('invalid_contract', 'Discovery response contains an invalid ranked result.')
@@ -158,6 +234,28 @@ function normalizeQuestion(value: string) {
 
 function abortError() {
   return new DiscoveryProviderError('aborted', 'Discovery request was aborted.')
+}
+
+function queryWithTraversal(query: DiscoveryQuery, traversal?: DiscoveryTraversalRequest): DiscoveryQuery {
+  if (!traversal) return query
+  const facetFilters = traversal.filters?.reduce<Record<string, string[]>>((grouped, filter) => {
+    const separator = filter.indexOf(':')
+    if (separator <= 0 || separator === filter.length - 1) return grouped
+    const browserKey = filter.slice(0, separator)
+    const key = ({
+      'data-category': 'capability', access: 'access_status', 'reporting-unit': 'unit_of_analysis',
+    } as Record<string, string>)[browserKey] ?? browserKey
+    grouped[key] = [...(grouped[key] ?? []), filter.slice(separator + 1)]
+    return grouped
+  }, {})
+  return {
+    ...query,
+    ...(traversal.cursor ? { cursor: traversal.cursor } : {}),
+    ...(traversal.generation ? { generation: traversal.generation } : {}),
+    ...(traversal.pageSize ? { page_size: traversal.pageSize } : {}),
+    ...(traversal.sort ? { sort: traversal.sort } : {}),
+    ...(facetFilters && Object.keys(facetFilters).length > 0 ? { facet_filters: facetFilters } : {}),
+  }
 }
 
 export class FixtureDiscoveryProvider implements DiscoveryProvider {
@@ -255,8 +353,18 @@ export class ApiDiscoveryProvider implements DiscoveryProvider {
       throw new DiscoveryProviderError('http_error', 'The discovery service could not be reached.')
     }
     if (!response.ok) {
-      if (response.status === 404) throw new DiscoveryProviderError('record_not_found', 'No published record has this identifier.')
-      throw new DiscoveryProviderError('http_error', `The discovery service returned HTTP ${response.status}.`)
+      let body: unknown
+      try { body = await response.json() } catch { body = null }
+      const serviceCode = isObject(body) && isObject(body.error) && typeof body.error.code === 'string' ? body.error.code : ''
+      const serviceMessage = isObject(body) && isObject(body.error) && typeof body.error.message === 'string'
+        ? body.error.message
+        : `The discovery service returned HTTP ${response.status}.`
+      if (response.status === 404) throw new DiscoveryProviderError('record_not_found', serviceMessage)
+      if (response.status === 409 || response.status === 410 || serviceCode === 'generation_unavailable') {
+        throw new DiscoveryProviderError('generation_unavailable', 'This result traversal belongs to an unavailable catalog generation. Restart the search to use the current catalog.')
+      }
+      if (response.status === 400 && serviceCode.includes('cursor')) throw new DiscoveryProviderError('cursor_invalid', serviceMessage)
+      throw new DiscoveryProviderError('http_error', serviceMessage)
     }
     const value: unknown = await response.json()
     assertDiscoveryResult(value)
@@ -267,12 +375,19 @@ export class ApiDiscoveryProvider implements DiscoveryProvider {
     return this.requestJson(this.endpoint, {
         method: 'POST',
         headers: { 'content-type': 'application/json', accept: 'application/json' },
-        body: JSON.stringify(query),
+        body: JSON.stringify(queryWithTraversal(query, options.traversal)),
       }, options)
   }
 
   async browse(options: DiscoveryRequestOptions = {}) {
-    return this.requestJson(this.apiPath('catalog?limit=200&corpus=1.1.0'), { method: 'GET', headers: { accept: 'application/json' } }, options)
+    const params = new URLSearchParams({ corpus: '1.1.0' })
+    const traversal = options.traversal
+    if (traversal?.cursor) params.set('cursor', traversal.cursor)
+    if (traversal?.generation) params.set('generation', traversal.generation)
+    if (traversal?.pageSize) params.set('page_size', String(traversal.pageSize))
+    if (traversal?.sort) params.set('sort', traversal.sort)
+    traversal?.filters?.forEach((filter) => params.append('filter', filter))
+    return this.requestJson(this.apiPath(`catalog?${params}`), { method: 'GET', headers: { accept: 'application/json' } }, options)
   }
 
   async dataset(id: string, options: DiscoveryRequestOptions = {}) {

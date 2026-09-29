@@ -3,6 +3,7 @@ import { containsPhrase, normalizeText, parseQuestion, recordSearchText } from '
 import { selectJoinRoutes, validateJoinRoute } from '../packages/retrieval/tools/join-routes.mjs';
 import { compileDiscoveryIntent } from '../packages/retrieval/tools/intent-compiler.mjs';
 import { projectSearchDocuments } from '../packages/retrieval/tools/search-document.mjs';
+import { createRetrievalEngine as createCurrentRetrievalEngine } from '../packages/retrieval/tools/retrieval-core.mjs';
 
 const RESTRICTED = new Set(['registration_required', 'application_required', 'dua_required', 'licensed_paid', 'controlled']);
 const FITNESS_WEIGHT = { primary: 52, supporting: 32, context_only: 12, unknown: 4 };
@@ -308,7 +309,7 @@ function stableResultId(parsed, ranked, corpusId) {
   return `retrieval-${stableHash(seed)}`;
 }
 
-export function createRetrievalEngine({ records, searchDocuments, joinRoutes = [], vocabulary, corpus }) {
+function createLegacyRetrievalEngine({ records, searchDocuments, joinRoutes = [], vocabulary, corpus }) {
   if (!Array.isArray(records) || records.length === 0) throw new TypeError('records must be a non-empty array');
   if (!vocabulary || !Array.isArray(vocabulary.subjects) || !Array.isArray(vocabulary.geographies) || !Array.isArray(vocabulary.units)) throw new TypeError('vocabulary must define subjects, geographies, and units');
   const recordIds = new Set();
@@ -394,3 +395,8 @@ export function createRetrievalEngine({ records, searchDocuments, joinRoutes = [
     }
   });
 }
+
+// The Worker and offline package intentionally execute one retrieval module.
+// Keeping this compatibility file as a forwarding boundary prevents a staged
+// browser/API release from silently diverging in ordering or cursor semantics.
+export const createRetrievalEngine = createCurrentRetrievalEngine;

@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { semanticErrors } from '../../../index/v1.0.0/tools/semantics.mjs';
+import { semanticErrors } from './record-semantics.mjs';
 import { adaptCuratedAssets } from './curated-adapter.mjs';
 import { validateJoinRoute } from './join-routes.mjs';
 import {
@@ -33,9 +33,10 @@ const paths = {
   sourceRegistry: path.join(PROJECT_ROOT, 'discovery_financial_org/source_registry.json'),
   curatedAssets: path.join(PACKAGE_ROOT, 'fixtures/curated-assets.json'),
   vocabulary: path.join(PACKAGE_ROOT, 'fixtures/controlled-vocabulary.json'),
+  namedSourceRegistry: path.join(PACKAGE_ROOT, 'fixtures/named-source-registry.v1.0.0.json'),
   baseRoutes: path.join(PACKAGE_ROOT, 'fixtures/base-join-routes.jsonl'),
   extendedRoutes: path.join(PACKAGE_ROOT, 'fixtures/extended-join-routes.jsonl'),
-  recordSchema: path.join(PROJECT_ROOT, 'observatory/index/v1.0.0/schemas/observatory-record.schema.json'),
+  recordSchema: path.join(PACKAGE_ROOT, 'schemas/browser-record.schema.json'),
   joinSchema: path.join(PACKAGE_ROOT, 'schemas/join-route.schema.json'),
   querySchema: path.join(PACKAGE_ROOT, 'schemas/discovery-query.schema.json'),
   intentSchema: path.join(PACKAGE_ROOT, 'schemas/discovery-intent.schema.json'),
@@ -46,6 +47,7 @@ const paths = {
 const algorithmPaths = [
   'tools/question-parser.mjs',
   'tools/intent-compiler.mjs',
+  'tools/catalog-contract.mjs',
   'tools/search-document.mjs',
   'tools/join-routes.mjs',
   'tools/retrieval-core.mjs',
@@ -63,6 +65,7 @@ const [
   sourceRegistry,
   curatedFixture,
   vocabulary,
+  namedSourceRegistry,
   baseRoutes,
   extendedRoutes
 ] = await Promise.all([
@@ -75,6 +78,7 @@ const [
   readJson(paths.sourceRegistry),
   readJson(paths.curatedAssets),
   readJson(paths.vocabulary),
+  readJson(paths.namedSourceRegistry),
   readJsonl(paths.baseRoutes),
   readJsonl(paths.extendedRoutes)
 ]);
@@ -171,7 +175,7 @@ const corpus = {
   }
 };
 
-const engine = createRetrievalEngine({ records, searchDocuments, joinRoutes: routes, vocabulary, corpus });
+const engine = createRetrievalEngine({ records, searchDocuments, joinRoutes: routes, vocabulary, namedSourceRegistry, corpus });
 const publishedQueries = [
   { query_id: 'q-pa-hospital-finance-utilization', query: { question: 'I need hospital financial and utilization data for Pennsylvania', limit: 15 } },
   { query_id: 'q-public-rural-closures-pa', query: { question: 'What public sources can I use to study rural hospital closures in Pennsylvania?', limit: 15 } },

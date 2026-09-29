@@ -1,5 +1,6 @@
 import { createRetrievalEngine } from './retrieval-v1.1.0.mjs';
 import { applyLiveVerificationReceipt } from './live-verification.mjs';
+import { validateCatalogRecords } from '../packages/retrieval/tools/catalog-contract.mjs';
 
 const MAX_REQUEST_BYTES = 20 * 1024;
 const CORPUS_BASE = '/corpus-v1.1.0';
@@ -68,26 +69,32 @@ export async function loadCatalogFromAssets(request, env) {
   if (!env?.ASSETS || typeof env.ASSETS.fetch !== 'function') throw new Error('STATIC_ASSET_BINDING_REQUIRED');
   if (!catalogByAssets.has(env.ASSETS)) {
     catalogByAssets.set(env.ASSETS, (async () => {
-      const [recordsText, searchDocumentsText, routesText, vocabularyText, corpusText, verificationText] = await Promise.all([
+      const [recordsText, searchDocumentsText, routesText, vocabularyText, corpusText, verificationText, sourceRegistryText] = await Promise.all([
         assetText(request, env, `${CORPUS_BASE}/records.jsonl`),
         assetText(request, env, `${CORPUS_BASE}/search-documents.jsonl`),
         assetText(request, env, `${CORPUS_BASE}/join-routes.jsonl`),
         assetText(request, env, `${CORPUS_BASE}/controlled-vocabulary.json`),
         assetText(request, env, `${CORPUS_BASE}/corpus.json`),
-        assetText(request, env, LIVE_VERIFICATION_RECEIPT)
+        assetText(request, env, LIVE_VERIFICATION_RECEIPT),
+        assetText(request, env, `${CORPUS_BASE}/named-source-registry.json`)
       ]);
-      const records = applyLiveVerificationReceipt(parseJsonl(recordsText, 'records'), JSON.parse(verificationText));
+      const rawRecords = applyLiveVerificationReceipt(parseJsonl(recordsText, 'records'), JSON.parse(verificationText));
+      const catalogValidation = validateCatalogRecords(rawRecords);
+      const records = catalogValidation.valid;
       const searchDocuments = parseJsonl(searchDocumentsText, 'search-documents');
       const joinRoutes = parseJsonl(routesText, 'join-routes');
       const vocabulary = JSON.parse(vocabularyText);
       const corpus = JSON.parse(corpusText);
+      const namedSourceRegistry = JSON.parse(sourceRegistryText);
       return {
         records,
         searchDocuments,
         joinRoutes,
         vocabulary,
         corpus,
-        engine: createRetrievalEngine({ records, searchDocuments, joinRoutes, vocabulary, corpus })
+        catalogIssues: catalogValidation.invalid,
+        namedSourceRegistry,
+        engine: createRetrievalEngine({ records: rawRecords, searchDocuments, joinRoutes, vocabulary, corpus, namedSourceRegistry })
       };
     })());
   }
@@ -165,24 +172,189 @@ function resultBounds(totalMatches, returnedCount) {
   };
 }
 
-function browseResponse(bundle, limit) {
+function stableGeneration(bundle) {
+  return bundle.corpus.manifest_sha256 ?? `${bundle.corpus.corpus_id}@${bundle.corpus.corpus_version}`;
+}
+
+function stableScopeHash(value) {
+  return retrievalId(JSON.stringify(value)).slice('retrieval-'.length);
+}
+
+function encodeCursor(value) {
+  return btoa(JSON.stringify(value)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function decodeCursor(value) {
+  try {
+    if (!value || !/^[A-Za-z0-9_-]+$/.test(value) || value.length > 2048) throw new Error('invalid');
+    const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+    const parsed = JSON.parse(atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '=')));
+    if (!parsed || parsed.version !== 1 || !Number.isSafeInteger(parsed.offset) || parsed.offset < 0 || typeof parsed.scope !== 'string' || typeof parsed.generation !== 'string') throw new Error('invalid');
+    return parsed;
+  } catch {
+    const error = new TypeError('The pagination cursor is invalid. Restart traversal from the first page.');
+    error.code = 'invalid_cursor';
+    throw error;
+  }
+}
+
+function recordFacetValues(record) {
+  return {
+    source: [record.identity?.source?.source_id].filter(Boolean),
+    geography: [record.geography?.coverage_level, ...(record.geography?.jurisdictions ?? [])].filter(Boolean),
+    access_status: [record.access?.status].filter(Boolean),
+    unit_of_analysis: [...new Set(record.unit_of_analysis ?? [])],
+    capability: [...new Set([...(record.capabilities?.topics ?? []), ...(record.capabilities?.use_cases ?? [])].map(item => item.id).filter(Boolean))]
+  };
+}
+
+function parseFacetFilters(filters) {
+  const grouped = new Map();
+  for (const filter of filters) {
+    const separator = filter.indexOf(':');
+    if (separator <= 0 || separator === filter.length - 1) {
+      const error = new TypeError(`Invalid facet filter: ${filter}`);
+      error.code = 'invalid_filter';
+      throw error;
+    }
+    const section = filter.slice(0, separator);
+    const value = filter.slice(separator + 1);
+    grouped.set(section, [...(grouped.get(section) ?? []), value]);
+  }
+  return grouped;
+}
+
+function applyFacetFilters(records, filters) {
+  const grouped = parseFacetFilters(filters);
+  return records.filter(record => {
+    const facets = recordFacetValues(record);
+    return [...grouped].every(([section, selected]) => selected.some(value => (facets[section] ?? []).includes(value)));
+  });
+}
+
+const FACET_LABELS = {
+  source: 'Source', geography: 'Geography', access_status: 'Access status',
+  unit_of_analysis: 'Observation grain', capability: 'Research concept'
+};
+
+function completeFacets(records) {
+  const counts = new Map();
+  const sourceLabels = new Map(records.map(record => [record.identity?.source?.source_id, record.identity?.source?.name]));
+  for (const record of records) {
+    for (const [section, values] of Object.entries(recordFacetValues(record))) {
+      const sectionCounts = counts.get(section) ?? new Map();
+      for (const value of new Set(values)) sectionCounts.set(value, (sectionCounts.get(value) ?? 0) + 1);
+      counts.set(section, sectionCounts);
+    }
+  }
+  return {
+    count_basis: 'records',
+    collection_scope: 'all_matching_records_before_pagination',
+    approximate: false,
+    sections: [...counts].map(([id, options]) => ({
+      id,
+      label: FACET_LABELS[id] ?? id,
+      options: [...options].sort(([left], [right]) => left.localeCompare(right)).map(([value, count]) => ({ value, label: id === 'source' ? sourceLabels.get(value) ?? value : value, count }))
+    }))
+  };
+}
+
+function dateSortValue(record, field) {
+  const values = field === 'observation'
+    ? [record.time_coverage?.end, record.time_coverage?.start]
+    : [record.release_date, record.dates?.release_date, record.publication_date, record.identity?.asset?.release_date];
+  for (const value of values) {
+    const timestamp = Date.parse(String(value ?? ''));
+    if (Number.isFinite(timestamp)) return timestamp;
+    const year = Number(String(value ?? '').match(/^\d{4}/)?.[0]);
+    if (Number.isInteger(year)) return Date.UTC(year, 0, 1);
+  }
+  return null;
+}
+
+function sortBrowseRecords(records, sort) {
+  return [...records].sort((left, right) => {
+    if (sort === 'title_asc') return left.title.localeCompare(right.title) || left.record_id.localeCompare(right.record_id);
+    if (sort === 'release_newest' || sort === 'observation_latest') {
+      const field = sort === 'release_newest' ? 'release' : 'observation';
+      const leftDate = dateSortValue(left, field);
+      const rightDate = dateSortValue(right, field);
+      if (leftDate !== rightDate) {
+        if (leftDate === null) return 1;
+        if (rightDate === null) return -1;
+        return rightDate - leftDate;
+      }
+    }
+    return Number(right.record_id.startsWith('us-federal:')) - Number(left.record_id.startsWith('us-federal:')) || left.record_id.localeCompare(right.record_id);
+  });
+}
+
+export function browseResponse(bundle, options = {}) {
+  const pageSize = options.pageSize ?? 20;
+  const sort = options.sort ?? 'canonical_relevance';
+  const facetFilters = options.filters ?? [];
   const question = 'Browse published health systems data';
-  const intent = bundle.engine.interpret({ question, limit: Math.min(limit, 50) });
-  const sorted = [...bundle.records]
-    .sort((left, right) => Number(right.record_id.startsWith('us-federal:')) - Number(left.record_id.startsWith('us-federal:')) || left.record_id.localeCompare(right.record_id));
-  const records = sorted.slice(0, limit);
+  const intent = bundle.engine.interpret({ question, limit: Math.min(pageSize, 50) });
+  const generation = stableGeneration(bundle);
+  if (options.generation && options.generation !== generation) {
+    const error = new TypeError('The requested catalog generation is unavailable. Restart traversal with the current generation.');
+    error.code = 'generation_unavailable';
+    throw error;
+  }
+  const filtered = applyFacetFilters(bundle.records, facetFilters);
+  const sorted = sortBrowseRecords(filtered, sort);
+  const scope = stableScopeHash({ generation, question, facetFilters: [...facetFilters].sort(), sort });
+  const decoded = options.cursor ? decodeCursor(options.cursor) : null;
+  if (decoded && (decoded.generation !== generation || decoded.scope !== scope)) {
+    const error = new TypeError('The pagination cursor does not match this catalog generation, query, filters, and sort. Restart traversal from the first page.');
+    error.code = decoded.generation !== generation ? 'generation_unavailable' : 'invalid_cursor';
+    throw error;
+  }
+  const offset = decoded?.offset ?? 0;
+  if (offset > sorted.length) {
+    const error = new TypeError('The pagination cursor is beyond the result set. Restart traversal from the first page.');
+    error.code = 'invalid_cursor';
+    throw error;
+  }
+  const records = sorted.slice(offset, offset + pageSize);
+  const hasMore = offset + records.length < sorted.length;
+  const nextCursor = hasMore ? encodeCursor({ version: 1, generation, scope, offset: offset + records.length }) : null;
   return {
     contract_version: 'observatory-discovery-result.v1.0.0',
-    retrieval_id: retrievalId(`browse:${bundle.corpus.corpus_id}:${bundle.corpus.corpus_version}:${limit}`),
+    retrieval_id: retrievalId(`browse:${generation}:${scope}:${offset}:${pageSize}`),
     evidence_mode: 'published_offline_evidence',
-    corpus: corpusSummary(bundle),
-    query: queryFromIntent(intent, { mode: 'catalog_browse', limit }),
+    corpus: { ...corpusSummary(bundle), generation },
+    query: queryFromIntent(intent, { mode: 'catalog_browse', facet_filters: facetFilters, sort, page_size: pageSize }),
     ...resultBounds(sorted.length, records.length),
+    has_more: hasMore,
     results: records.map((record, index) => ({
       ...directResult(record, 'Included in the published catalog browse view.'),
-      rank: index + 1
+      rank: offset + index + 1
     })),
-    join_routes: bundle.joinRoutes,
+    ranking: { version: 'observatory-canonical-ranking.v1.1.0', sort, ordered_ids: records.map(record => record.record_id) },
+    pagination: { generation, cursor: options.cursor ?? null, next_cursor: nextCursor, has_more: hasMore, page_size: pageSize, total_matches: sorted.length },
+    facets: completeFacets(filtered),
+    sections: { supported: records.map(record => record.record_id), uncertain: [], contextual: [], incompatible: [] },
+    partial_results: {
+      is_partial: (bundle.catalogIssues?.length ?? 0) > 0,
+      invalid_item_count: bundle.catalogIssues?.length ?? 0,
+      issues: structuredClone(bundle.catalogIssues ?? [])
+    },
+    receipt: {
+      manifest_version: 'observatory-search-manifest.v1.0.0',
+      scope: 'current_page',
+      question,
+      interpreted_constraints: structuredClone(intent.interpretation),
+      filters: { mode: 'catalog_browse', facet_filters: facetFilters, sort, page_size: pageSize },
+      sort,
+      displayed_ordered_ids: records.map(record => record.record_id),
+      ranking_version: 'observatory-canonical-ranking.v1.1.0',
+      catalog_generation: generation,
+      generated_at: new Date(bundle.corpus.published_at ?? bundle.corpus.built_at ?? '1970-01-01T00:00:00.000Z').toISOString(),
+      citations: records.map(record => ({ record_id: record.record_id, title: record.title, source_url: record.authoritative_url ?? null, evidence_ids: (record.evidence ?? []).map(row => row.evidence_id) })),
+      limitations: ['Receipt covers the current page, not every match.', 'Source availability and authorization must be checked at use time.']
+    },
+    join_routes: bundle.joinRoutes.filter(route => records.some(record => route.from_record_id === record.record_id || route.to_record_id === record.record_id)),
     warnings: [
       'Browse mode shows the validated federal baseline first, then other published metadata; order does not imply question relevance or quality.',
       'Records describe indexed metadata and retrieval routes; they do not prove current endpoint availability or authorize access.'
@@ -211,10 +383,27 @@ function datasetResponse(bundle, record) {
   };
 }
 
-function parseLimit(url) {
-  const requested = Number(url.searchParams.get('limit') ?? 200);
-  if (!Number.isInteger(requested) || requested < 1) return 200;
-  return Math.min(requested, 200);
+function parsePageSize(value, fallback = 20) {
+  const requested = Number(value ?? fallback);
+  if (!Number.isInteger(requested) || requested < 1) return fallback;
+  return Math.min(requested, 100);
+}
+
+function catalogOptions(url) {
+  const sorts = new Set(['canonical_relevance', 'title_asc', 'release_newest', 'observation_latest']);
+  const requestedSort = url.searchParams.get('sort') ?? 'canonical_relevance';
+  if (!sorts.has(requestedSort)) {
+    const error = new TypeError(`Unsupported sort: ${requestedSort}`);
+    error.code = 'invalid_sort';
+    throw error;
+  }
+  return {
+    pageSize: parsePageSize(url.searchParams.get('page_size') ?? url.searchParams.get('limit')),
+    sort: requestedSort,
+    filters: url.searchParams.getAll('filter'),
+    cursor: url.searchParams.get('cursor') ?? undefined,
+    generation: url.searchParams.get('generation') ?? undefined
+  };
 }
 
 function isSpaPath(pathname) {
@@ -272,8 +461,10 @@ export function createWorker({ loadEngine = loadEngineFromAssets, loadCatalog = 
       if (url.pathname === '/api/catalog') {
         if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
         try {
-          return jsonResponse(browseResponse(await loadCatalog(request, env), parseLimit(url)), { cacheControl: 'public, max-age=300', head });
-        } catch {
+          return jsonResponse(browseResponse(await loadCatalog(request, env), catalogOptions(url)), { cacheControl: 'public, max-age=300', head });
+        } catch (error) {
+          if (error?.code === 'generation_unavailable') return errorResponse(410, 'generation_unavailable', error.message, { head });
+          if (error instanceof TypeError) return errorResponse(400, error.code ?? 'invalid_catalog_query', error.message, { head });
           return errorResponse(503, 'catalog_unavailable', 'The published discovery catalog could not be loaded.', { head });
         }
       }
@@ -309,7 +500,8 @@ export function createWorker({ loadEngine = loadEngineFromAssets, loadCatalog = 
           const engine = await loadEngine(request, env);
           return jsonResponse(engine.retrieve(input, { signal: request.signal }));
         } catch (error) {
-          if (error instanceof TypeError) return errorResponse(400, 'invalid_query', error.message);
+          if (error?.code === 'generation_unavailable') return errorResponse(410, 'generation_unavailable', error.message);
+          if (error instanceof TypeError) return errorResponse(400, error.code ?? 'invalid_query', error.message);
           return errorResponse(503, 'retrieval_unavailable', 'The published discovery corpus could not be queried.');
         }
       }

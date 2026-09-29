@@ -1,5 +1,5 @@
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react'
-import type { DiscoveryResult } from '../types/discovery'
+import type { DiscoveryQuery, DiscoveryResult } from '../types/discovery'
 import { createDefaultDiscoveryProvider, DiscoveryProviderError, type DiscoveryProvider } from './discoveryProvider'
 
 const defaultProvider = createDefaultDiscoveryProvider()
@@ -18,17 +18,28 @@ type DiscoveryLoadState =
   | { status: 'ready'; result: DiscoveryResult; error: null }
   | { status: 'error'; result: null; error: DiscoveryProviderError }
 
-export function useDiscoveryResult(question: string): DiscoveryLoadState {
+export function useDiscoveryResult(question: string, request: Omit<DiscoveryQuery, 'question'> = {}): DiscoveryLoadState {
   const provider = useDiscoveryProvider()
   const [state, setState] = useState<DiscoveryLoadState>({ status: 'loading', result: null, error: null })
+  const requestKey = JSON.stringify(request)
 
   useEffect(() => {
     const controller = new AbortController()
     setState({ status: 'loading', result: null, error: null })
-    const request = question.trim()
-      ? provider.discover({ question, limit: 50 }, { signal: controller.signal })
-      : provider.browse({ signal: controller.signal })
-    request.then(
+    const queryRequest = JSON.parse(requestKey) as Omit<DiscoveryQuery, 'question'>
+    const traversal = {
+      cursor: queryRequest.cursor,
+      generation: queryRequest.generation,
+      pageSize: queryRequest.page_size,
+      sort: queryRequest.sort,
+      filters: queryRequest.facet_filters
+        ? Object.entries(queryRequest.facet_filters).flatMap(([section, values]) => values.map((value) => `${section}:${value}`))
+        : undefined,
+    }
+    const pending = question.trim()
+      ? provider.discover({ question, ...queryRequest }, { signal: controller.signal, traversal })
+      : provider.browse({ signal: controller.signal, traversal })
+    pending.then(
       (result) => setState({ status: 'ready', result, error: null }),
       (error: unknown) => {
         if (controller.signal.aborted) return
@@ -39,7 +50,7 @@ export function useDiscoveryResult(question: string): DiscoveryLoadState {
       },
     )
     return () => controller.abort()
-  }, [provider, question])
+  }, [provider, question, requestKey])
 
   return state
 }

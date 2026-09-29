@@ -1,7 +1,7 @@
 import { parseQuestion } from './question-parser.mjs';
 
-export function compileDiscoveryIntent(rawQuery, vocabulary) {
-  const parsed = parseQuestion(rawQuery, vocabulary);
+export function compileDiscoveryIntent(rawQuery, vocabulary, namedSourceRegistry = null) {
+  const parsed = parseQuestion(rawQuery, vocabulary, namedSourceRegistry);
   const unknowns = [];
   if (!parsed.interpretation.geographies.length) unknowns.push('geography_not_resolved');
   if (!parsed.interpretation.subjects.length) unknowns.push('subject_not_resolved');
