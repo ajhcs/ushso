@@ -21,7 +21,7 @@ const RESTRICTED = new Set(['registration_required', 'application_required', 'du
 const FITNESS_WEIGHT = { primary: 52, supporting: 32, context_only: 12, unknown: 4 };
 const EVIDENCE_WEIGHT = { verified_first_party: 8, source_asserted: 5, inferred: 2, unresolved: 0, unavailable: 0 };
 const STOPWORDS = new Set(['a', 'about', 'an', 'and', 'are', 'by', 'can', 'data', 'dataset', 'datasets', 'describe', 'excluding', 'exclude', 'except', 'find', 'for', 'from', 'i', 'in', 'is', 'me', 'need', 'no', 'not', 'of', 'on', 'only', 'public', 'show', 'source', 'sources', 'study', 'the', 'to', 'use', 'what', 'which', 'with', 'without']);
-const RANKING_VERSION = 'observatory-canonical-ranking.v1.3.0';
+export const RANKING_VERSION = 'observatory-canonical-ranking.v1.3.0';
 const SORTS = new Set(['canonical_relevance', 'title_asc', 'release_newest', 'observation_latest']);
 const FACET_SOURCE_LABELS = {
   'cdc-socrata': 'Centers for Disease Control and Prevention Data Catalog',

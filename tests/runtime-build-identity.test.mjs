@@ -1,0 +1,20 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';import path from 'node:path';import {execFile} from 'node:child_process';import {promisify} from 'node:util';import {build} from 'esbuild';import os from 'node:os';
+import {createRuntimeBuildIdentity,writeRuntimeBuildReceipt,finalizeRuntimeBuildReceipt} from '../scripts/runtime-build-identity.mjs';
+const exec=promisify(execFile);
+test('runtime build identity is reproducible and changes with actual source or assets',async()=>{
+ const directory=await fs.mkdtemp(path.join(os.tmpdir(),'runtime-identity-'));
+ try{
+  await fs.mkdir(path.join(directory,'worker'));await fs.mkdir(path.join(directory,'dist'));await fs.writeFile(path.join(directory,'worker/index.mjs'),'export default {fetch(){return new Response("synthetic")}};');await fs.writeFile(path.join(directory,'package-lock.json'),'{}');await fs.writeFile(path.join(directory,'.gitignore'),'dist/\nreceipts/\n');await fs.writeFile(path.join(directory,'dist/index.html'),'synthetic HTML');
+  await exec('git',['init','-q'],{cwd:directory});await exec('git',['add','.'],{cwd:directory});await exec('git',['-c','user.name=Synthetic test','-c','user.email=synthetic@example.invalid','commit','-qm','synthetic fixture'],{cwd:directory});
+  const options={sourceRoot:directory,assetsDirectory:path.join(directory,'dist')};const first=await createRuntimeBuildIdentity(options),repeat=await createRuntimeBuildIdentity(options);assert.deepEqual(first,repeat);assert.equal(first.identity.source_dirty,false);
+  await fs.writeFile(path.join(directory,'dist/index.html'),'changed synthetic HTML');const assetsChanged=await createRuntimeBuildIdentity(options);assert.notEqual(assetsChanged.identity.build_id,first.identity.build_id);assert.equal(assetsChanged.identity.source_graph_sha256,first.identity.source_graph_sha256);
+  await fs.writeFile(path.join(directory,'worker/index.mjs'),'export default {fetch(){return new Response("changed")}};');const sourceChanged=await createRuntimeBuildIdentity(options);assert.notEqual(sourceChanged.identity.source_graph_sha256,first.identity.source_graph_sha256);assert.equal(sourceChanged.identity.source_dirty,true);
+  const receiptDir=path.join(directory,'receipts');const file=await writeRuntimeBuildReceipt(sourceChanged,{directory:receiptDir});assert.equal(await writeRuntimeBuildReceipt(sourceChanged,{directory:receiptDir}),file);assert.equal(JSON.parse(await fs.readFile(file)).identity.build_id,sourceChanged.identity.build_id);
+  const workerArtifact=path.join(receiptDir,'index.js');await fs.writeFile(workerArtifact,JSON.stringify(sourceChanged.identity));const finalized=await finalizeRuntimeBuildReceipt(sourceChanged,{...options,workerArtifact,directory:receiptDir});assert.match(finalized.receipt.worker_artifact_sha256,/^[a-f0-9]{64}$/);
+  await fs.writeFile(path.join(directory,'dist/index.html'),'changed during bundle');await assert.rejects(finalizeRuntimeBuildReceipt(sourceChanged,{...options,workerArtifact,directory:receiptDir}),/CHANGED_DURING_BUNDLE/);
+ }finally{await fs.rm(directory,{recursive:true,force:true})}
+});
+test('health identity constant names the actual prepared build and stays explicit when unconfigured',async()=>{
+ const identity={schema_version:'ushso.runtime-build-identity.v1',build_id:'a'.repeat(64),source_revision:'b'.repeat(40),source_graph_sha256:'c'.repeat(64),assets_manifest_sha256:'d'.repeat(64)};
+ const result=await build({entryPoints:['worker/runtime-build-identity.mjs'],bundle:true,write:false,format:'esm',platform:'browser',define:{USHSO_RUNTIME_BUILD_IDENTITY:JSON.stringify(identity)}});const module=await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].contents).toString('base64')}`);assert.deepEqual(module.runtimeBuildIdentity().identity,identity);assert.equal(module.runtimeBuildIdentity().state,'identified');assert.equal((await import('../worker/runtime-build-identity.mjs')).runtimeBuildIdentity().state,'not_configured');
+});

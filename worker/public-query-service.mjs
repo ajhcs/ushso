@@ -1,3 +1,4 @@
+import {runtimeBuildIdentity} from './runtime-build-identity.mjs';
 import { assertCoverageRepository } from '../packages/coverage/coverage-repository.mjs';
 import { assertPlannerRepository } from '../packages/planner/planner-repository.mjs';
 import { assertCatalogRepository } from '../packages/registry/catalog-repository.mjs';
@@ -137,7 +138,7 @@ export class PublicQueryService {
     const persistentCursorReady = keyBytes >= 32 && keyBytes <= 1024;
     return { status: 'ok', service: 'ushso-discovery', contract_version: 'observatory-discovery-result.v1.0.0', compiler: intent.compiler,
       catalog: { ...session.publication.corpus, index_generation: session.publication.index_generation, storage_mode: session.publication.storage_mode, absence_claim_permitted: false },
-      build: { identity: null, state: 'not_configured' },
+      build: runtimeBuildIdentity(),
       machine_cursor: { mode: signingKey === undefined ? 'ephemeral_instance' : persistentCursorReady ? 'configured_key' : 'invalid_key', persistent_key_ready: persistentCursorReady, cross_instance_requires_shared_key: true }
     };
   }

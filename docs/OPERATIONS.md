@@ -148,3 +148,11 @@ Source acceptance, intended-use observation, release authorization and commercia
 results remain different decisions. Start the 90-day operating review clock only
 at the focused public release. Review even with zero paid engagements; absent
 exposure means demand is unassessed, not disproven.
+
+## Runtime build identity
+
+Use the repository Wrangler wrapper for the release dry run (`npm run cf:dry-run`). It embeds `ushso.runtime-build-identity.v1` in the Worker: source Git revision and dirty state, complete bundled source-graph digest, lockfile digest, runtime-configuration and bundler-argument digests, staged-asset inventory digest and a deterministic `build_id`. Direct Wrangler invocations that omit this define remain explicitly `not_configured`; the health endpoint does not invent an identity from catalog dates or counts.
+
+The wrapper writes immutable preparation receipts to `.wrangler/runtime-build-identities/<build_id>.json`. After a successful dry run it rechecks source/configuration/assets, verifies the identity is present in the bundled Worker, and writes `<build_id>.compiled.json` with the exact Worker artifact SHA-256 and byte length. Changed inputs fail qualification. A second artifact with the same identity cannot overwrite a different compiled receipt. These files are local release evidence, not public API responses or deployment receipts.
+
+For promotion, retain the compiled receipt, exact dry-run Worker bytes and exact staged asset tree; upload that Worker with `--no-bundle`. Match live `/api/health` → `build.identity.build_id` and its source/assets digests to the retained receipt. Independently verify the uploaded artifact hash and Cloudflare version/deployment identifiers. The embedded build ID is not a Cloudflare deployment ID and does not cover runtime secret values. Commit and freeze source before final preparation so `source_dirty` is false; intermediate dirty builds are identified honestly and are not release approval.

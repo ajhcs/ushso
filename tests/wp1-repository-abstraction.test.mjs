@@ -208,12 +208,14 @@ test('public search forwards the request evaluation clock into retrieve without 
   assert.deepEqual(discovered, engine.retrieve(query));
 });
 
-test('Worker dependency injection preserves exact response bytes, fields, ordering, and cache headers', async () => {
+test('Worker dependency injection preserves response bytes and applies private cursor cache policy', async () => {
   const service = createStaticPublicQueryService({ loadCatalog, loadEngine });
   const worker = createWorker({ publicQueryService: service });
   const response = await worker.fetch(request('https://ushso.org/api/catalog?limit=7'), { ASSETS: { fetch: async () => new Response('{}') } });
   assert.equal(response.status, 200);
-  assert.equal(response.headers.get('cache-control'), 'public, max-age=300');
+  // Catalog responses can carry instance-scoped authenticated cursors; shared
+  // caches must not replay a token minted by another isolate.
+  assert.equal(response.headers.get('cache-control'), 'no-store');
   assert.equal(response.headers.get('content-type'), 'application/json; charset=utf-8');
   const body = JSON.parse(await response.text());
   assert.deepEqual(withoutResultMetadata(body), legacyBrowse(7));

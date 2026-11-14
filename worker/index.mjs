@@ -1,3 +1,4 @@
+import { createExternalDiscoveryCursor } from './external-discovery-cursor.mjs';
 import { loadAcceptedPublication, acceptedPublicationPin, compareAccepted } from './source-selection-publication.mjs';
 import { loadLexicalArtifact } from '../packages/retrieval/tools/lexical-artifact.mjs';
 import { createRetrievalEngine } from './retrieval-v1.2.0.mjs';
@@ -243,6 +244,11 @@ export function createWorker({
   publicQueryService = createStaticPublicQueryService({ loadEngine, loadCatalog })
 } = {}) {
   const localCursorSigner = createMachineCursorSigner();
+  const localExternalCursor = createExternalDiscoveryCursor();
+  const externalCursorFor = env => {
+    const key = env && 'USHSO_CURSOR_SIGNING_KEY' in env ? env.USHSO_CURSOR_SIGNING_KEY : undefined;
+    return key === undefined ? localExternalCursor : createExternalDiscoveryCursor({ signingKey: key });
+  };
   return {
     async fetch(request, env) {
       const url = new URL(request.url);
@@ -325,9 +331,13 @@ export function createWorker({
       if (url.pathname === '/api/catalog') {
         if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
         try {
+          const externalCursor = externalCursorFor(env);
+          const original = catalogOptions(url);
+          const input = await externalCursor.unwrap(original, 'GET /api/catalog');
           const session = await publicQueryService.openRequest({ request, env });
-          return jsonResponse(await publicQueryService.browse(session, catalogOptions(url)), { cacheControl: 'public, max-age=300', head });
+          return jsonResponse(await externalCursor.wrap(await publicQueryService.browse(session, input), original, 'GET /api/catalog'), { head });
         } catch (error) {
+          if (['invalid_cursor','cursor_query_mismatch','cursor_out_of_range'].includes(error?.code)) return jsonResponse({ error: { code: error.code, message: 'Restart catalog traversal from the first page.' }, restart_required: true }, { status: 409, head });
           if (error?.code === 'generation_unavailable') return errorResponse(410, 'generation_unavailable', error.message, { head });
           if (error instanceof TypeError) return errorResponse(400, error.code ?? 'invalid_catalog_query', error.message, { head });
           return errorResponse(503, 'catalog_unavailable', 'The published discovery catalog could not be loaded.', { head });
@@ -361,7 +371,9 @@ export function createWorker({
         try {
           const engine = await loadEngine(request, env);
           if (typeof engine.retrieveControlled !== 'function') return errorResponse(503, 'controlled_discovery_unavailable', 'Controlled discovery is unavailable in this runtime.');
-          return jsonResponse(await engine.retrieveControlled(input, { now: new Date() }));
+          const externalCursor = externalCursorFor(env);
+          const verified = await externalCursor.unwrap(input, 'POST /api/discovery-controls/v1/search');
+          return jsonResponse(await externalCursor.wrap(await engine.retrieveControlled(verified, { now: new Date() }), input, 'POST /api/discovery-controls/v1/search'));
         } catch (error) {
           if (error?.code === 'generation_unavailable') return jsonResponse({ error: { code: 'generation_unavailable', message: 'Restart discovery against the current generation.' }, restart_required: true }, { status: 410 });
           if (['invalid_cursor','cursor_query_mismatch'].includes(error?.code)) return jsonResponse({ error: { code: error.code, message: 'Restart controlled discovery from the first page.' }, restart_required: true }, { status: 409 });
@@ -399,9 +411,12 @@ export function createWorker({
           return errorResponse(400, 'invalid_json', 'The request body is not valid JSON.');
         }
         try {
+          const externalCursor = externalCursorFor(env);
+          const verified = await externalCursor.unwrap(input, 'POST /api/discover');
           const session = await publicQueryService.openRequest({ request, env });
-          return jsonResponse(await publicQueryService.discover(session, input));
+          return jsonResponse(await externalCursor.wrap(await publicQueryService.discover(session, verified), input, 'POST /api/discover'));
         } catch (error) {
+          if (['invalid_cursor','cursor_query_mismatch','cursor_out_of_range'].includes(error?.code)) return jsonResponse({ error: { code: error.code, message: 'Restart discovery from the first page.' }, restart_required: true }, { status: 409 });
           if (error?.code === 'generation_unavailable') return errorResponse(410, 'generation_unavailable', error.message);
           if (error instanceof TypeError) return errorResponse(400, 'invalid_query', error.message);
           return errorResponse(503, 'retrieval_unavailable', 'The published discovery corpus could not be queried.');
