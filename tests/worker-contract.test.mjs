@@ -124,11 +124,13 @@ test('HTTP catalog page limits remain bounded while preserving traversal options
     async openRequest(){return {};},
     async browse(_session, options){observed.push(options);return {ok:true};},
   }});
-  for (const query of ['limit=200','page_size=200&cursor=resume&generation=current','page_size=50','']) {
+  for (const query of ['limit=200','page_size=200&generation=current','page_size=50','']) {
     const response = await bounded.fetch(new Request('https://ushso.org/api/catalog?'+query),env);
     assert.equal(response.status,200);
   }
   assert.deepEqual(observed.map(row=>row.page_size),[100,100,50,20]);
-  assert.equal(observed[1].cursor,'resume');
+  assert.equal(observed[1].cursor,null);
+  const unsigned=await bounded.fetch(new Request('https://ushso.org/api/catalog?page_size=200&cursor=resume&generation=current'),env);
+  assert.equal(unsigned.status,409);assert.equal((await unsigned.json()).restart_required,true);
   assert.equal(observed[1].generation,'current');
 });

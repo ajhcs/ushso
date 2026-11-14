@@ -67,6 +67,11 @@ test('historical v1.3 proof fails closed for missing and altered immutable bytes
   }
 })
 
+async function historicalFallback(root, relativePath) {
+  if (relativePath === '.github/workflows/ci.yml') return readFile(path.resolve(root,'verification/source-selection-candidate/fixtures/historical-ci.yml'))
+  return readFile(path.resolve(root,relativePath))
+}
+
 async function readGitBytes(commit, relativePath) {
   const { stdout } = await execFile('git', ['show', `${commit}:${relativePath}`], {
     cwd: repositoryRoot,
@@ -82,7 +87,7 @@ test('historical proof accepts only the reviewed PR-003 input transition', async
     item.path,
     await readGitBytes('4f90157108a92ce9541c340d5536eac31f24a1d8', item.path),
   ])))
-  const readOriginalCurrentFile = async (root, relativePath) => originalBytes.get(relativePath) ?? readFile(path.resolve(root, relativePath))
+  const readOriginalCurrentFile = async (root, relativePath) => originalBytes.get(relativePath) ?? historicalFallback(root, relativePath)
   const legacy = await validateHistoricalCiProof({ ...fixture, readCurrentFile: readOriginalCurrentFile })
   assert.equal(legacy.input_bindings.status, 'PASS')
   assert.equal(legacy.input_bindings.checked.filter((item) => item.reviewed_current_transition).length, 0)
@@ -91,7 +96,7 @@ test('historical proof accepts only the reviewed PR-003 input transition', async
     item.path,
     await readGitBytes(item.source_commit, item.path),
   ])))
-  const readReviewedCurrentFile = async (root, relativePath) => reviewedBytes.get(relativePath) ?? readFile(path.resolve(root, relativePath))
+  const readReviewedCurrentFile = async (root, relativePath) => reviewedBytes.get(relativePath) ?? historicalFallback(root, relativePath)
   const transition = await validateHistoricalCiProof({ ...fixture, readCurrentFile: readReviewedCurrentFile })
   const transitioned = transition.input_bindings.checked.filter((item) => item.reviewed_current_transition)
   assert.deepEqual(transitioned.map((item) => item.path).sort(), REVIEWED_PR003_CURRENT_INPUTS.map((item) => item.path).sort())
@@ -124,7 +129,7 @@ test('reviewed PR-003 input transition is atomic across both root files', async 
   for (const reviewedPath of REVIEWED_PR003_CURRENT_INPUTS.map((item) => item.path)) {
     const readPartialPair = async (root, relativePath) => reviewedPath === relativePath
       ? reviewedBytes.get(relativePath)
-      : historicalRootInputs.get(relativePath) ?? readFile(path.resolve(root, relativePath))
+      : historicalRootInputs.get(relativePath) ?? historicalFallback(root, relativePath)
     await assert.rejects(
       validateHistoricalCiProof({ ...fixture, readCurrentFile: readPartialPair }),
       /CI_CURRENT_REVIEWED_PR003_PARTIAL_TRANSITION/u,

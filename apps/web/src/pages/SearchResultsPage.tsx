@@ -1,3 +1,6 @@
+import { StartingPoints } from '../components/StartingPoints'
+import { InterpretationConstraintsForm } from '../components/InterpretationConstraintsForm'
+import { constraintsRequest, controlsRequest } from '../lib/interpretationConstraints'
 import { Download, ExternalLink, Info, PanelLeftOpen, Search } from 'lucide-react'
 import { type FormEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
@@ -94,12 +97,13 @@ export function SearchResultsPage() {
   const cursorByPage = useRef(new Map<number, string | null>([[1, null]]))
   const facetFilters = useMemo(() => selectedFacetFilters(state.filters), [state.filters])
   const discovery = useDiscoveryResult(state.q, {
+    ...constraintsRequest(state.constraints),
     page_size: PAGE_SIZE,
     ...(state.cursor ? { cursor: state.cursor } : {}),
     ...(state.generation ? { generation: state.generation } : {}),
     sort: state.sort,
     ...(Object.keys(facetFilters).length > 0 ? { facet_filters: facetFilters } : {}),
-  })
+  }, controlsRequest(state.constraints))
   const catalog = useMemo(() => discovery.status === 'ready' ? adaptDiscoveryResponse(discovery.result) : null, [discovery])
 
   useEffect(() => setEditQuery(state.q), [state.q])
@@ -107,7 +111,7 @@ export function SearchResultsPage() {
   useEffect(() => {
     if (state.page === 1 && !state.cursor) cursorByPage.current = new Map([[1, null]])
     else cursorByPage.current.set(state.page, state.cursor)
-  }, [state.cursor, state.page, state.q, state.sort, state.filters.join('|')])
+  }, [state.cursor, state.page, state.q, state.sort, state.filters.join('|'), JSON.stringify(state.constraints ?? {})])
   useEffect(() => {
     if (discovery.status !== 'ready' || !discovery.result.pagination?.next_cursor) return
     cursorByPage.current.set(state.page + 1, discovery.result.pagination.next_cursor)
@@ -191,11 +195,14 @@ export function SearchResultsPage() {
 
           <aside className="catalog-scope-summary" aria-label="Catalog coverage"><strong>Searching a bounded published catalog</strong><span>Empty results do not establish that no source exists. <Link to="/sources">Review indexed sources and major gaps</Link>.</span></aside>
 
+          {!state.q && discovery.status === 'ready' && <StartingPoints generation={String(discovery.result.corpus.manifest_sha256 ?? discovery.result.corpus.generation ?? '')} />}
           {discovery.status === 'ready' && catalog && <>
             <div className="results-overview">
               <div><p className="results-count" aria-live="polite"><strong>{totalMatches}</strong> matching record{totalMatches === 1 ? '' : 's'} · page {state.page} of {pageCount}</p><p className="facet-helper"><Info aria-hidden="true" />Facet counts cover {discovery.result.facets?.collection_scope === 'all_matching_records_before_pagination' ? 'all matching records before pagination' : 'the documented response scope'}{discovery.result.facets?.approximate ? ' and are approximate' : ''}.</p></div>
               <div className="results-toolbar"><label>Sort by:<select value={state.sort} onChange={(event) => resetTraversal({ sort: event.target.value as SearchRouteState['sort'] })}><option value="canonical_relevance">Canonical relevance</option><option value="title_asc">Title A–Z</option><option value="release_newest">Newest publisher release</option><option value="observation_latest">Latest observation coverage</option></select></label><button className="receipt-button" type="button" onClick={() => downloadSearchReceipt(createSearchReceipt(discovery.result, { displayedIds }))}><Download aria-hidden="true" /> Download page receipt</button></div>
             </div>
+            {state.q && <InterpretationConstraintsForm key={JSON.stringify(state.constraints ?? {})} value={state.constraints} onApply={constraints => updateState({constraints, page:1, cursor:null, generation:null})} />}
+            {discovery.coverage && <p role="status">Coverage filter: {discovery.coverage.included_count} included of {discovery.coverage.before_count} matching records before pagination; {discovery.coverage.excluded_count} excluded. Verified: {discovery.coverage.verified_count}; unresolved: {discovery.coverage.unresolved_count}. {discovery.coverage.explanation}</p>}
             <div className="query-evidence" role="note"><p><strong>How this question was interpreted</strong></p><ul>{interpretationLines(discovery.result).map((line) => <li key={line}>{line}</li>)}{discovery.result.query.interpretation.interpretation_warnings?.map((warning) => <li key={warning}>{warning}</li>)}</ul></div>
             {discovery.result.partial_results?.is_partial && <div className="partial-results-notice" role="status"><strong>Partial results</strong><p>{discovery.result.partial_results.invalid_item_count} incompatible catalog record{discovery.result.partial_results.invalid_item_count === 1 ? ' was' : 's were'} omitted. Valid records remain available.</p></div>}
             {discovery.result.named_source_resolution?.filter((source) => source.state === 'coverage_gap').map((source) => <div className="source-gap" role="note" key={source.source_id}><strong>{source.name} is not indexed as a source.</strong><p>{source.message}</p>{source.official_discovery_url && <a href={source.official_discovery_url} target="_blank" rel="noreferrer">Open official discovery page <ExternalLink aria-hidden="true" /></a>}</div>)}

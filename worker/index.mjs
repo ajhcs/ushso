@@ -1,3 +1,5 @@
+import { createExternalDiscoveryCursor } from './external-discovery-cursor.mjs';
+import { loadAcceptedPublication, acceptedPublicationPin, compareAccepted } from './source-selection-publication.mjs';
 import { loadLexicalArtifact } from '../packages/retrieval/tools/lexical-artifact.mjs';
 import { createRetrievalEngine } from './retrieval-v1.2.0.mjs';
 import { createWorkerMachineToolkit } from './machine-toolkit-adapter.mjs';
@@ -21,8 +23,8 @@ const CORPUS_BASE = `${CORPUS_RESOURCE_BASE}/corpus`;
 const catalogByAssets = new WeakMap();
 const lexicalPinByAssets = new WeakMap();
 const LEXICAL_BUILD_PIN = typeof USHSO_LEXICAL_BUILD_PIN === "undefined" ? null : USHSO_LEXICAL_BUILD_PIN;
-const SPA_ROUTES = new Set(['/', '/search', '/agents', '/sources', '/about', '/methods', '/plan', '/privacy', '/terms', '/contact']);
-const STATIC_PATHS = new Set(['/favicon.svg', '/observatory-lighthouse.png', '/state-readiness-v0.1.0.json', '/_headers']);
+const SPA_ROUTES = new Set(['/', '/search', '/shortlist', '/compare', '/agents', '/sources', '/about', '/methods', '/plan', '/privacy', '/terms', '/contact']);
+const STATIC_PATHS = new Set(['/.well-known/security.txt', '/favicon.svg', '/observatory-lighthouse.png', '/state-readiness-v0.1.0.json', '/_headers']);
 
 function responseHeaders(init = {}) {
   const headers = new Headers(init.headers);
@@ -63,11 +65,23 @@ function corsPreflightResponse() {
   });
 }
 
+function transientAssetError(error) {
+  return Object.assign(new Error('CORPUS_ASSET_TRANSIENT', { cause: error }), { retryableAssetRead: true });
+}
+
+async function fetchAsset(env, request) {
+  let response;
+  try { response = await env.ASSETS.fetch(request); }
+  catch (error) { throw transientAssetError(error); }
+  if (response.status >= 500 && response.status <= 599) throw transientAssetError(new Error(`HTTP_${response.status}`));
+  return response;
+}
+
 async function assetText(request, env, pathname) {
   const url = new URL(pathname, request.url);
-  const response = await env.ASSETS.fetch(new Request(url, { method: 'GET' }));
+  const response = await fetchAsset(env, new Request(url, { method: 'GET' }));
   if (!response.ok) throw new Error(`CORPUS_ASSET_UNAVAILABLE:${pathname}:${response.status}`);
-  return response.text();
+  try { return await response.text(); } catch (error) { throw transientAssetError(error); }
 }
 
 function parseJsonl(value, label) {
@@ -87,7 +101,7 @@ export async function loadCatalogFromAssets(request, env, { diagnostic = null, l
   if (!env?.ASSETS || typeof env.ASSETS.fetch !== 'function') throw new Error('STATIC_ASSET_BINDING_REQUIRED');
   if (!catalogByAssets.has(env.ASSETS)) {
     lexicalPinByAssets.set(env.ASSETS, JSON.stringify(lexicalExpected));
-    catalogByAssets.set(env.ASSETS, (async () => {
+    const initialization = (async () => {
       const [routesText, vocabularyText, corpusText, namedSourceRegistryText] = await Promise.all([
         measuredAssetText(request, env, `${CORPUS_BASE}/join-routes.jsonl`),
         measuredAssetText(request, env, `${CORPUS_RESOURCE_BASE}/fixtures/controlled-vocabulary.json`),
@@ -104,7 +118,7 @@ export async function loadCatalogFromAssets(request, env, { diagnostic = null, l
       const rawRecords = recordShards.flatMap((text, index) => parseJsonl(text, `records:${corpus.record_files[index]}`));
       mark('jsonl_parse_complete');
       mark('catalog_validation_start');
-      const catalogValidation = validateCatalogRecords(rawRecords);
+      const catalogValidation = validateCatalogRecords(rawRecords, { allowEvidenceBoundMissingDescriptions: true });
       mark('catalog_validation_complete');
       const records = catalogValidation.valid;
       // Search-document projections duplicate most catalog strings and push the
@@ -128,11 +142,11 @@ export async function loadCatalogFromAssets(request, env, { diagnostic = null, l
           || await digest(recordShards.join('')) !== lexicalExpected.source_sha256
           || await digest(vocabularyText) !== lexicalExpected.vocabulary_sha256) throw new Error('LEXICAL_LOADER_SOURCE_MISMATCH');
         mark('lexical_asset_read_start');
-        const response = await env.ASSETS.fetch(new Request(new URL(`${CORPUS_BASE}/lexical-index.json`, request.url)));
+        const response = await fetchAsset(env, new Request(new URL(`${CORPUS_BASE}/lexical-index.json`, request.url)));
         if (!response.ok || !response.body) throw new Error('LEXICAL_ASSET_UNAVAILABLE');
         const reader = response.body.getReader(), chunks = []; let size = 0;
-        try { for (;;) { const {done, value} = await reader.read(); if(done) break; size += value.byteLength; if(size > 8*1024*1024) throw new Error('LEXICAL_SIZE_INVALID'); chunks.push(value); } }
-        finally { await reader.cancel(); reader.releaseLock(); }
+        try { for (;;) { const {done, value} = await reader.read().catch(error => { throw transientAssetError(error); }); if(done) break; size += value.byteLength; if(size > 8*1024*1024) throw new Error('LEXICAL_SIZE_INVALID'); chunks.push(value); } }
+        finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
         const bytes = new Uint8Array(size); let offset = 0; for(const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
         mark('lexical_asset_read_complete');
         lexicalArtifact = await loadLexicalArtifact(bytes, lexicalExpected, records.map(record => record.record_id));
@@ -150,7 +164,16 @@ export async function loadCatalogFromAssets(request, env, { diagnostic = null, l
         namedSourceRegistry,
         engine: createRetrievalEngine({ diagnostic, lexicalArtifact, records, searchDocuments: null, joinRoutes, vocabulary, corpus, namedSourceRegistry, catalogValidation })
       };
-    })());
+    })();
+    catalogByAssets.set(env.ASSETS, initialization);
+    // Integrity/configuration failures remain pinned to this binding. Transport
+    // failures permit a later request to retry without retaining request data.
+    initialization.catch(error => {
+      if (error?.retryableAssetRead && catalogByAssets.get(env.ASSETS) === initialization) {
+        catalogByAssets.delete(env.ASSETS);
+        lexicalPinByAssets.delete(env.ASSETS);
+      }
+    });
   }
   return catalogByAssets.get(env.ASSETS);
 }
@@ -208,7 +231,7 @@ function machineText(request, pathname) {
   }
   if (pathname === '/robots.txt') return `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`;
   if (pathname === '/sitemap.xml') {
-    const pages = ['/', '/search', '/agents', '/sources', '/about', '/privacy', '/terms', '/contact'];
+    const pages = ['/', '/search', '/shortlist', '/compare', '/agents', '/sources', '/about', '/privacy', '/terms', '/contact'];
     const urls = pages.map(page => `  <url><loc>${origin}${page}</loc></url>`).join('\n');
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
   }
@@ -221,6 +244,11 @@ export function createWorker({
   publicQueryService = createStaticPublicQueryService({ loadEngine, loadCatalog })
 } = {}) {
   const localCursorSigner = createMachineCursorSigner();
+  const localExternalCursor = createExternalDiscoveryCursor();
+  const externalCursorFor = env => {
+    const key = env && 'USHSO_CURSOR_SIGNING_KEY' in env ? env.USHSO_CURSOR_SIGNING_KEY : undefined;
+    return key === undefined ? localExternalCursor : createExternalDiscoveryCursor({ signingKey: key });
+  };
   return {
     async fetch(request, env) {
       const url = new URL(request.url);
@@ -258,6 +286,27 @@ export function createWorker({
         }
       }
 
+      if (url.pathname.startsWith('/api/source-selection/v1/assets/')) {
+        if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
+        return jsonResponse({ state: 'unmapped', reason: 'accepted_legacy_alias_required' }, { status: 404, head });
+      }
+      if (url.pathname === '/api/machine/v2/compare-assets') {
+        if (request.method !== 'POST') return errorResponse(405, 'method_not_allowed', 'Use POST for comparison.');
+        if (!(request.headers.get('content-type') ?? '').toLowerCase().startsWith('application/json')) return errorResponse(415, 'unsupported_media_type', 'Use application/json.');
+        let input;
+        try { input = JSON.parse(await readBoundedText(request, MAX_REQUEST_BYTES)); }
+        catch (error) { return errorResponse(error instanceof RequestBodyTooLargeError ? 413 : 400, 'invalid_request', 'The comparison request could not be decoded.'); }
+        const publication = await loadAcceptedPublication(request, env);
+        if (publication.status !== 'available') return jsonResponse(publication, { status: 503 });
+        const result = compareAccepted(publication, input);
+        return jsonResponse(result.body, { status: result.status });
+      }
+      if (url.pathname === '/api/source-selection/v1/publication') {
+        if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
+        const publication = await loadAcceptedPublication(request, env);
+        return jsonResponse(publication.status === 'available' ? { ...publication, pin: acceptedPublicationPin(publication), views: publication.bundle.views } : publication, { status: publication.status === 'available' ? 200 : 503, head });
+      }
+
       if (url.pathname === '/api/health') {
         if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
         try {
@@ -282,9 +331,13 @@ export function createWorker({
       if (url.pathname === '/api/catalog') {
         if (request.method !== 'GET' && !head) return errorResponse(405, 'method_not_allowed', 'Use GET or HEAD for this endpoint.');
         try {
+          const externalCursor = externalCursorFor(env);
+          const original = catalogOptions(url);
+          const input = await externalCursor.unwrap(original, 'GET /api/catalog');
           const session = await publicQueryService.openRequest({ request, env });
-          return jsonResponse(await publicQueryService.browse(session, catalogOptions(url)), { cacheControl: 'public, max-age=300', head });
+          return jsonResponse(await externalCursor.wrap(await publicQueryService.browse(session, input), original, 'GET /api/catalog'), { head });
         } catch (error) {
+          if (['invalid_cursor','cursor_query_mismatch','cursor_out_of_range'].includes(error?.code)) return jsonResponse({ error: { code: error.code, message: 'Restart catalog traversal from the first page.' }, restart_required: true }, { status: 409, head });
           if (error?.code === 'generation_unavailable') return errorResponse(410, 'generation_unavailable', error.message, { head });
           if (error instanceof TypeError) return errorResponse(400, error.code ?? 'invalid_catalog_query', error.message, { head });
           return errorResponse(503, 'catalog_unavailable', 'The published discovery catalog could not be loaded.', { head });
@@ -306,6 +359,26 @@ export function createWorker({
           return jsonResponse(result, { cacheControl: 'public, max-age=300', head });
         } catch {
           return errorResponse(503, 'dataset_unavailable', 'The published record could not be loaded.', { head });
+        }
+      }
+
+      if (url.pathname === '/api/discovery-controls/v1/search') {
+        if (request.method !== 'POST') return errorResponse(405, 'method_not_allowed', 'Use POST for controlled discovery.');
+        if (!(request.headers.get('content-type') ?? '').toLowerCase().startsWith('application/json')) return errorResponse(415, 'unsupported_media_type', 'Use application/json.');
+        let input;
+        try { input = JSON.parse(await readBoundedText(request, MAX_REQUEST_BYTES)); }
+        catch (error) { return errorResponse(error instanceof RequestBodyTooLargeError ? 413 : 400, 'invalid_request', 'The controlled discovery request could not be decoded.'); }
+        try {
+          const engine = await loadEngine(request, env);
+          if (typeof engine.retrieveControlled !== 'function') return errorResponse(503, 'controlled_discovery_unavailable', 'Controlled discovery is unavailable in this runtime.');
+          const externalCursor = externalCursorFor(env);
+          const verified = await externalCursor.unwrap(input, 'POST /api/discovery-controls/v1/search');
+          return jsonResponse(await externalCursor.wrap(await engine.retrieveControlled(verified, { now: new Date() }), input, 'POST /api/discovery-controls/v1/search'));
+        } catch (error) {
+          if (error?.code === 'generation_unavailable') return jsonResponse({ error: { code: 'generation_unavailable', message: 'Restart discovery against the current generation.' }, restart_required: true }, { status: 410 });
+          if (['invalid_cursor','cursor_query_mismatch'].includes(error?.code)) return jsonResponse({ error: { code: error.code, message: 'Restart controlled discovery from the first page.' }, restart_required: true }, { status: 409 });
+          if (error instanceof TypeError) return errorResponse(400, error.code ?? 'invalid_query', error.message);
+          return errorResponse(503, 'controlled_discovery_unavailable', 'The published discovery corpus could not be queried.');
         }
       }
 
@@ -338,9 +411,12 @@ export function createWorker({
           return errorResponse(400, 'invalid_json', 'The request body is not valid JSON.');
         }
         try {
+          const externalCursor = externalCursorFor(env);
+          const verified = await externalCursor.unwrap(input, 'POST /api/discover');
           const session = await publicQueryService.openRequest({ request, env });
-          return jsonResponse(await publicQueryService.discover(session, input));
+          return jsonResponse(await externalCursor.wrap(await publicQueryService.discover(session, verified), input, 'POST /api/discover'));
         } catch (error) {
+          if (['invalid_cursor','cursor_query_mismatch','cursor_out_of_range'].includes(error?.code)) return jsonResponse({ error: { code: error.code, message: 'Restart discovery from the first page.' }, restart_required: true }, { status: 409 });
           if (error?.code === 'generation_unavailable') return errorResponse(410, 'generation_unavailable', error.message);
           if (error instanceof TypeError) return errorResponse(400, 'invalid_query', error.message);
           return errorResponse(503, 'retrieval_unavailable', 'The published discovery corpus could not be queried.');
@@ -349,6 +425,22 @@ export function createWorker({
 
       if (url.pathname.startsWith('/api/')) return errorResponse(404, 'api_not_found', 'No API route exists at this path.', { head });
 
+      if ((request.method === 'GET' || head) && (url.pathname.startsWith('/datasets/') || ['/','/about','/methods','/sources','/sitemap.xml'].includes(url.pathname))) {
+        try {
+          const manifestResponse = await env.ASSETS.fetch(new Request(new URL('/public-pages.json', request.url)));
+          if (manifestResponse.ok) {
+            const manifest = JSON.parse(await readBoundedText(manifestResponse, 1024 * 1024));
+            if (manifest.schema_version === 'ushso-public-pages.v1' && Array.isArray(manifest.routes)) {
+              const page = manifest.routes.find(route => route.path === url.pathname && route.status === 200 && typeof route.file === 'string' && route.file.startsWith('/') && !route.file.includes('..'));
+              if (page || url.pathname === '/sitemap.xml') {
+                const asset = await env.ASSETS.fetch(new Request(new URL(page ? page.file.split('/').map(encodeURIComponent).join('/') : '/sitemap.xml', request.url), { method: request.method }));
+                if (asset.ok) { const headers = responseHeaders({ headers: asset.headers, cacheControl: 'public, max-age=0, must-revalidate' }); return new Response(head ? null : asset.body, { status: 200, headers }); }
+              }
+              if (url.pathname.startsWith('/datasets/')) return textResponse('Page not found.\n', 'text/plain; charset=utf-8', { status: 404, head });
+            }
+          }
+        } catch { /* Legacy bundles retain existing routes when no page manifest exists. */ }
+      }
       const machineBody = machineText(request, url.pathname);
       if (machineBody !== null) {
         if (request.method !== 'GET' && !head) return textResponse('Method not allowed.\n', 'text/plain; charset=utf-8', { status: 405 });
@@ -356,6 +448,22 @@ export function createWorker({
         return textResponse(machineBody, contentType, { cacheControl: 'public, max-age=300', head });
       }
 
+      if (url.pathname.startsWith('/datasets/')) {
+        let recordId;
+        try { recordId = decodeURIComponent(url.pathname.slice('/datasets/'.length)); }
+        catch { return textResponse('Page not found.\n', 'text/plain; charset=utf-8', { status: 404, head }); }
+        try {
+          const session = await publicQueryService.openRequest({ request, env });
+          if (!await publicQueryService.dataset(session, recordId)) return textResponse('Page not found.\n', 'text/plain; charset=utf-8', { status: 404, head });
+        } catch { return textResponse('Published catalog unavailable.\n', 'text/plain; charset=utf-8', { status: 503, head }); }
+      }
+      if (url.pathname === '/methods/archive/national-readiness') {
+        if (request.method !== 'GET' && !head) return textResponse('Method not allowed.\n', 'text/plain; charset=utf-8', { status: 405 });
+        const asset = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), { method: request.method }));
+        const headers = responseHeaders({ headers: asset.headers, cacheControl: 'public, max-age=0, must-revalidate' });
+        headers.set('x-robots-tag', 'noindex, nofollow');
+        return new Response(head ? null : asset.body, { status: asset.status, headers });
+      }
       if (url.pathname === '/favicon.ico') return Response.redirect(new URL('/observatory-lighthouse.png', request.url), 308);
       if (isSpaPath(url.pathname) || isStaticPath(url.pathname)) return env.ASSETS.fetch(request);
 

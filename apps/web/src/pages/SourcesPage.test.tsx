@@ -79,3 +79,13 @@ describe('historical readiness is not current coverage', () => {
     expect(overlayLabel(pa)).not.toBe('24 state records published')
   })
 })
+
+it('keeps current inventory ahead of the archived readiness route', async()=>{
+ const {createElement}=await import('react');const {renderToStaticMarkup}=await import('react-dom/server');const {MemoryRouter}=await import('react-router-dom');const {SourcesPage}=await import('./SourcesPage')
+ const markup=renderToStaticMarkup(createElement(MemoryRouter,{},createElement(SourcesPage)))
+ expect(markup).toContain('/methods/archive/national-readiness')
+ expect(markup.indexOf('Authoritative sources in the published corpus')).toBeLessThan(markup.indexOf('Archived national readiness (v1.1.0'))
+ expect(markup).not.toContain('readiness-table')
+ const archived=renderToStaticMarkup(createElement(MemoryRouter,{},createElement(SourcesPage,{archive:true})))
+ expect(archived).toContain('Archived national readiness');expect(archived).toContain('not current source coverage');expect(archived).not.toContain('Authoritative sources in the published corpus')
+})

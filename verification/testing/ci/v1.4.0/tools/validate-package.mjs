@@ -45,6 +45,8 @@ export async function buildTechnicalEvidence() {
       ...await listFiles(repositoryRoot, 'verification/testing/ci/v1.4.0'),
       'scripts/run-contract-suites.mjs',
       'scripts/verify-ci-attestation.mjs',
+      'scripts/source-selection-candidate-transition.mjs',
+      ...await listFiles(repositoryRoot, 'verification/source-selection-candidate'),
     ]),
     evidence_scope: 'structural CI v1.4 inventory; discovered suites have not been executed by this builder',
   }

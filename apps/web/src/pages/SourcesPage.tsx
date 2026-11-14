@@ -95,7 +95,7 @@ export function sourceGroupsFromResponse(response: DiscoveryResult, records: Dat
   return [...groups.entries()].map(([label, examples]) => ({ id: label, label, count: examples.length, examples }))
 }
 
-export function SourcesPage() {
+export function SourcesPage({ archive = false }: { archive?: boolean }) {
   const discovery = useDiscoveryResult('')
   const [readiness, setReadiness] = useState<NationalReadiness | null>(null)
   const [readinessError, setReadinessError] = useState(false)
@@ -106,6 +106,7 @@ export function SourcesPage() {
   }, [catalog, discovery])
 
   useEffect(() => {
+    if (!archive) return
     const controller = new AbortController()
     fetch('/state-readiness-v0.1.0.json', { signal: controller.signal }).then(async response => {
       if (!response.ok) throw new Error('readiness unavailable')
@@ -116,7 +117,7 @@ export function SourcesPage() {
       setReadinessError(true)
     })
     return () => controller.abort()
-  }, [])
+  }, [archive])
 
   return (
     <div className="sources-page">
@@ -125,15 +126,16 @@ export function SourcesPage() {
       <main id="main-content" className="sources-page__main">
         <header className="sources-page__heading">
           <p>Published source inventory</p>
-          <h1>What USHSO can route you to</h1>
+          <h1>{archive ? 'Archived national readiness' : 'What USHSO can route you to'}</h1>
           <p>The catalog describes authoritative sources and their access routes. “Published” means the metadata passed the integration gate; it does not mean USHSO hosts the data or that every endpoint is currently accessible.</p>
           <p className="coverage-boundary"><strong>Coverage boundary:</strong> this inventory is a bounded set of catalog entries, not a census of United States health data. Record counts below describe indexed metadata; they are not counts of sources assessed as usable for a research question.</p>
           <Link className="button-link" to="/search">Browse all records</Link>
         </header>
 
-        <LiveCatalogPositioning />
+        {archive && <p role="note">Archived corpus v1.1.0 readiness, published 2026. This is historical planning evidence, not current source coverage. <Link to="/sources">View current indexed coverage</Link>.</p>}
+        {!archive && <LiveCatalogPositioning />}
 
-        {readiness && (
+        {archive && readiness && (
           <section className="readiness" aria-labelledby="readiness-heading">
             <h2 id="readiness-heading">{readiness.historical_view ? 'Historical national readiness (archived)' : 'National readiness'}</h2>
             {readiness.historical_view && (
@@ -163,7 +165,7 @@ export function SourcesPage() {
         )}
         {readinessError && <p className="status-note" role="alert">The state-readiness artifact could not be loaded. The published catalog remains available below.</p>}
 
-        <section className="source-inventory" aria-labelledby="source-inventory-heading">
+        {!archive && <><section className="source-inventory" aria-labelledby="source-inventory-heading">
           <h2 id="source-inventory-heading">Authoritative sources in the published corpus</h2>
           {discovery.status === 'loading' && <p role="status">Loading the published source inventory…</p>}
           {discovery.status === 'error' && <p role="alert">{discovery.error.message}</p>}
@@ -192,8 +194,8 @@ export function SourcesPage() {
             </div>
           </div>
           <p>Named sources such as HCUP, MEPS, PHC4, or the AHRQ Compendium must be represented by their own records to count as indexed. A secondary citation does not stand in for the requested source.</p>
-          <p><Link to="/methods">Read the catalog and evaluation methods</Link>.</p>
-        </section>
+          <p><Link to="/methods">Read the catalog and evaluation methods</Link>. <Link to="/methods/archive/national-readiness">Archived national readiness (v1.1.0; not current coverage)</Link>.</p>
+        </section></>}
       </main>
       <ObservatoryFooter results />
     </div>

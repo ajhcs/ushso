@@ -1,3 +1,4 @@
+import {withSubjectSupportTransition} from './helpers/subject-support-transition.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -48,7 +49,7 @@ for(const [name,capabilities,description,publicLabels]of [
   const rows=['Zulu metadata','Alpha metadata','Middle metadata'].map((title,i)=>({...structuredClone(record),record_id:record.record_id+'-subject-'+i,title,description,capabilities:{topics:capabilities.map(c=>({...c,evidence_ids:record.capabilities.topics[0].evidence_ids})),use_cases:[]}}));
   const before=JSON.stringify(rows),args={records:rows,searchDocuments:null,vocabulary,corpus,catalogValidation:{valid:rows,invalid:[]}},a=control(args),b=candidate(args);
   for(const sort of ['canonical_relevance','title_asc','release_newest','observation_latest']){
-    const query={question:'mental health',sort,limit:10},expected=a.retrieve(query),actual=b.retrieve(query);
+    const query={question:'mental health',sort,limit:10},expected=withSubjectSupportTransition(a.retrieve(query)),actual=b.retrieve(query);
     assert.ok(expected.results.length>0,'fixture must produce actual subject matches');
     assert.deepEqual(facetLabelMap(expected),Object.fromEntries(Object.entries(facetLabelMap(expected)).map(([section,options])=>[section,Object.fromEntries(Object.keys(options).map(value=>[value,value]))])),'frozen control labels remain raw facet values');
     assert.deepEqual(facetLabelMap(actual),publicLabels,'candidate public facet labels remain independently expected');

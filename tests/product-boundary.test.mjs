@@ -225,7 +225,19 @@ test('public runtime contains no analytical execution primitive or explicit exte
     const source = await readFile(file, 'utf8');
     for (const pattern of [...executionPatterns, explicitExternalFetch]) {
       pattern.lastIndex = 0;
-      if (pattern.test(source)) violations.push(`${repositoryPath(file)}:${pattern.source}`);
+      if (pattern.test(source)) {
+        // CH-044 permits explicitly consented device-local shortlist storage.
+        // The broad SQL-word heuristic also matches the store's update helper;
+        // retain all logging/send/write checks and prohibit network APIs here.
+        const consentedLocalStore = repositoryPath(file) === 'apps/web/src/features/shortlist/store.ts'
+          && pattern === sinkPatterns[2];
+        if (consentedLocalStore) {
+          assert.doesNotMatch(source, /\b(?:fetch|XMLHttpRequest|WebSocket|sendBeacon)\b/u);
+          assert.match(source, /if \(includeQuestion\) list\.question = question/u);
+          assert.match(source, /delete list\.question/u);
+          assert.match(source, /list\?\.storage_consent/u);
+        } else violations.push(`${repositoryPath(file)}:${pattern.source}`);
+      }
     }
   }
   assert.deepEqual(violations, [], `public runtime product-boundary violations:\n${violations.join('\n')}`);
@@ -309,7 +321,19 @@ test('public runtime has no obvious raw-question logging or persistence sink', a
     const source = await readFile(file, 'utf8');
     for (const pattern of sinkPatterns) {
       pattern.lastIndex = 0;
-      if (pattern.test(source)) violations.push(`${repositoryPath(file)}:${pattern.source}`);
+      if (pattern.test(source)) {
+        // CH-044 permits explicitly consented device-local shortlist storage.
+        // The broad SQL-word heuristic also matches the store's update helper;
+        // retain all logging/send/write checks and prohibit network APIs here.
+        const consentedLocalStore = repositoryPath(file) === 'apps/web/src/features/shortlist/store.ts'
+          && pattern === sinkPatterns[2];
+        if (consentedLocalStore) {
+          assert.doesNotMatch(source, /\b(?:fetch|XMLHttpRequest|WebSocket|sendBeacon)\b/u);
+          assert.match(source, /if \(includeQuestion\) list\.question = question/u);
+          assert.match(source, /delete list\.question/u);
+          assert.match(source, /list\?\.storage_consent/u);
+        } else violations.push(`${repositoryPath(file)}:${pattern.source}`);
+      }
     }
   }
   assert.deepEqual(violations, [], `raw-query persistence/logging patterns:\n${violations.join('\n')}`);

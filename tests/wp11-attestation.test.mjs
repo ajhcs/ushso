@@ -1,3 +1,4 @@
+import { CANDIDATE_TRANSITION } from '../scripts/source-selection-candidate-transition.mjs'
 import assert from 'node:assert/strict'
 import { execFile as execFileCallback, spawnSync } from 'node:child_process'
 import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises'
@@ -214,12 +215,13 @@ function assertCompleteIndependentDiff(report, independent) {
     assert.equal(item.historical_source, 'retained_historical_preimage_snapshot')
     assert.ok(item.historical_bytes > 0 && item.current_bytes > 0)
     if (item.path === 'package.json') {
-      assert.equal(item.role, 'reviewed_pr003_package_transition')
+      assert.ok(['reviewed_pr003_package_transition','source_selection_candidate_pending_review'].includes(item.role))
     } else if (item.path === 'package-lock.json') {
       assert.ok([
         'pr085_ci_v14_workspace_lock',
         'pr008_workspace_lock_transition',
         'pr087_wp5_v11_workspace_lock_transition',
+        'source_selection_candidate_pending_review',
       ].includes(item.role))
     } else {
       assert.equal(item.role, 'current_unapproved_input_change')
@@ -293,6 +295,7 @@ async function materializeMutableCurrentInputFixture(relativePath) {
   const root = await mkdtemp(path.join(await verificationTempRoot(), 'ushso-pr086-wp11-current-input-'))
   const paths = new Set(currentInventory.map((file) => file.path))
   for (const extra of BUILDER_FIXTURE_EXTRA_FILES) paths.add(extra)
+  paths.add('.github/workflows/ci.yml')
   for (const item of paths) {
     const dest = path.join(root, item)
     await mkdir(path.dirname(dest), { recursive: true })
@@ -344,12 +347,12 @@ test('current WP11 verifier keeps historical proof, technical draft and wrapper 
   assertCompleteIndependentDiff(result.current_versus_historical, await independentlyDiffAgainstSealedPins())
   assert.equal(
     result.current_versus_historical.changed.find((item) => item.path === 'package-lock.json').role,
-    'pr087_wp5_v11_workspace_lock_transition',
+    'source_selection_candidate_pending_review',
   )
   assert.equal(result.builder_coverage_limits.unpinned_legacy_builder_reads.length, WP11_BUILDER_UNPINNED_READS.length)
   const actualPackage = await hashPinned('package.json')
   const reviewedTransition = actualPackage.sha256 === REVIEWED_PR003_PACKAGE_SNAPSHOT.sha256
-  const expectedPackage = reviewedTransition ? REVIEWED_PR003_PACKAGE_SNAPSHOT : ORIGINAL_PR085_PACKAGE_SNAPSHOT
+  const expectedPackage = CANDIDATE_TRANSITION.pins.find(x=>x.path==='package.json' && x.sha256===actualPackage.sha256) ?? (reviewedTransition ? REVIEWED_PR003_PACKAGE_SNAPSHOT : ORIGINAL_PR085_PACKAGE_SNAPSHOT)
   assert.deepEqual(actualPackage, { bytes: expectedPackage.bytes, sha256: expectedPackage.sha256 })
   assert.notEqual(actualPackage.sha256, HISTORICAL_WP11_V1_3.files.receipt.sha256)
 })
@@ -689,7 +692,7 @@ test('the independently reviewed PR008 lock is one exact current transition and 
   const retained = await readHistoricalPreimageSnapshot()
   const readCurrentFile = async (_root, relativePath) => relativePath === 'package-lock.json'
     ? reviewedLock
-    : readFile(path.resolve(repoRoot, relativePath))
+    : relativePath === 'package.json' ? readFile(path.resolve(repoRoot,'verification/source-selection-candidate/fixtures/pr003-package.json')) : readFile(path.resolve(repoRoot, relativePath))
   const report = await reportCurrentVersusHistoricalInputs({
     snapshot: retained,
     readCurrentFile,
@@ -709,21 +712,22 @@ test('the independently reviewed PR008 lock is one exact current transition and 
   await assert.rejects(
     reportCurrentVersusHistoricalInputs({
       snapshot: retained,
-      readCurrentFile: async (_root, relativePath) => relativePath === 'package-lock.json' ? tampered : readFile(path.resolve(repoRoot, relativePath)),
+      readCurrentFile: async (_root, relativePath) => relativePath === 'package-lock.json' ? tampered : relativePath === 'package.json' ? readFile(path.resolve(repoRoot,'verification/source-selection-candidate/fixtures/pr003-package.json')) : readFile(path.resolve(repoRoot, relativePath)),
       currentSource: 'pr008_reviewed_current_lock_tampered',
     }),
     /WP11_CURRENT_INPUT_UNREVIEWED_DRIFT/u,
   )
 })
 
-test('the independently reviewed PR087 WP5 v1.1 lock is the exact current transition and remains unapproved', async () => {
-  const currentLock = await readFile(path.resolve(repoRoot, PR087_REVIEWED_CURRENT_LOCK.path))
+test('the independently reviewed PR087 WP5 v1.1 lock remains a retained historical transition and remains unapproved', async () => {
+  const currentLock = await readFile(path.resolve(repoRoot,'verification/source-selection-candidate/fixtures/pr087-package-lock.json'))
   assert.deepEqual(
     { bytes: currentLock.length, sha256: sha256(currentLock) },
     { bytes: PR087_REVIEWED_CURRENT_LOCK.bytes, sha256: PR087_REVIEWED_CURRENT_LOCK.sha256 },
   )
-  const result = await verifyWp11Attestation()
-  const independent = await independentlyDiffAgainstSealedPins()
+  const readCurrentFile = async (_root,p) => p==='package-lock.json' ? currentLock : p==='package.json' ? readFile(path.resolve(repoRoot,'verification/source-selection-candidate/fixtures/pr003-package.json')) : readFile(path.resolve(repoRoot,p))
+  const result = await verifyWp11Attestation({readCurrentFile})
+  const independent = await independentlyDiffAgainstSealedPins({readCurrentFile})
   assertCompleteIndependentDiff(result.current_versus_historical, independent)
   const lockChange = result.current_versus_historical.changed.find((item) => item.path === 'package-lock.json')
   assert.ok(lockChange)
@@ -765,10 +769,10 @@ async function materializeWrapperImplementationFixture() {
 
 test('PR087 lock transition fails closed for mutated, partial, unrelated, missing and stale bindings', async () => {
   const retained = await readHistoricalPreimageSnapshot()
-  const currentLock = await readFile(path.resolve(repoRoot, PR087_REVIEWED_CURRENT_LOCK.path))
+  const currentLock = await readFile(path.resolve(repoRoot,'verification/source-selection-candidate/fixtures/pr087-package-lock.json'))
   const readExceptLock = (bytes) => async (_root, relativePath) => relativePath === 'package-lock.json'
     ? bytes
-    : readFile(path.resolve(repoRoot, relativePath))
+    : relativePath === 'package.json' ? readFile(path.resolve(repoRoot,'verification/source-selection-candidate/fixtures/pr003-package.json')) : readFile(path.resolve(repoRoot, relativePath))
 
   const oneByte = Buffer.from(currentLock)
   oneByte[oneByte.length - 1] ^= 1

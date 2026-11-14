@@ -26,8 +26,9 @@ export function ObservatoryHeader({ compact = false }: ObservatoryHeaderProps) {
           {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
         </button>
         <nav id="primary-navigation" className={menuOpen ? 'primary-nav primary-nav--open' : 'primary-nav'} aria-label="Primary navigation">
-          <Link to="/search" onClick={closeMenu}>Explore Data</Link>
-          <Link to="/sources" onClick={closeMenu}>Data Sources</Link>
+          <Link to="/search" onClick={closeMenu}>Find Sources</Link>
+          <Link to="/sources" onClick={closeMenu}>Source Catalog</Link>
+          <Link to="/shortlist" onClick={closeMenu}>Shortlist</Link>
           <Link to="/#how-it-works" onClick={closeMenu}>How it Works</Link>
         </nav>
       </div>

@@ -338,7 +338,10 @@ export function adaptDiscoveryResponse(response: DiscoveryResult): CatalogSearch
   const byFamily = new Map<string, DatasetFamily>()
   records.forEach((record) => {
     const familyId = record.canonicalResult.record.identity.family.family_id
-    if (!byFamily.has(familyId)) byFamily.set(familyId, record)
+    const current = byFamily.get(familyId)
+    const supportOrder = {supported: 0, uncertain: 1, contextual: 2, incompatible: 3}
+    const priority = (item: DatasetFamily) => supportOrder[item.canonicalResult.match_state ?? 'contextual']
+    if (!current || priority(record) < priority(current) || (priority(record) === priority(current) && (record.canonicalResult.score > current.canonicalResult.score || (record.canonicalResult.score === current.canonicalResult.score && record.canonicalResult.record_id.localeCompare(current.canonicalResult.record_id) < 0)))) byFamily.set(familyId, record)
   })
   const sources = new Set(response.results.map((result) => result.record.identity.source.source_id))
   return {

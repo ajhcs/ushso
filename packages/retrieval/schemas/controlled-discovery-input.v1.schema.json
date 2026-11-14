@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hackyard.local/observatory/retrieval/v1.3.0/controlled-discovery-input.schema.json",
+  "title": "Explicit discovery corrections and evidence-scoped coverage selection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "query"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "ushso.controlled-discovery.input.v1"
+    },
+    "query": {
+      "$ref": "https://hackyard.local/observatory/retrieval/v1.0.0/discovery-query.schema.json"
+    },
+    "intent_override": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subjects": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "behavioral_health",
+              "claims",
+              "community_benefit",
+              "costs_prices",
+              "facility_licensure",
+              "geography_access",
+              "hospital_capacity",
+              "hospital_financials",
+              "maternal_child_health",
+              "ownership",
+              "payer",
+              "provider_directory",
+              "public_health",
+              "quality",
+              "rural_hospital_closures",
+              "utilization",
+              "workforce"
+            ]
+          }
+        },
+        "geographies": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "US",
+              "US-AL",
+              "US-AK",
+              "US-AZ",
+              "US-AR",
+              "US-CA",
+              "US-CO",
+              "US-CT",
+              "US-DE",
+              "US-DC",
+              "US-FL",
+              "US-GA",
+              "US-HI",
+              "US-ID",
+              "US-IL",
+              "US-IN",
+              "US-IA",
+              "US-KS",
+              "US-KY",
+              "US-LA",
+              "US-ME",
+              "US-MD",
+              "US-MA",
+              "US-MI",
+              "US-MN",
+              "US-MS",
+              "US-MO",
+              "US-MT",
+              "US-NE",
+              "US-NV",
+              "US-NH",
+              "US-NJ",
+              "US-NM",
+              "US-NY",
+              "US-NC",
+              "US-ND",
+              "US-OH",
+              "US-OK",
+              "US-OR",
+              "US-PA",
+              "US-RI",
+              "US-SC",
+              "US-SD",
+              "US-TN",
+              "US-TX",
+              "US-UT",
+              "US-VT",
+              "US-VA",
+              "US-WA",
+              "US-WV",
+              "US-WI",
+              "US-WY"
+            ]
+          }
+        },
+        "observation_years": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "start",
+                "end"
+              ],
+              "properties": {
+                "start": {
+                  "type": "integer",
+                  "minimum": 1800,
+                  "maximum": 2200
+                },
+                "end": {
+                  "type": "integer",
+                  "minimum": 1800,
+                  "maximum": 2200
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "coverage_mode": {
+      "enum": [
+        "all",
+        "verified_only",
+        "unresolved_only"
+      ],
+      "default": "all"
+    }
+  }
+}

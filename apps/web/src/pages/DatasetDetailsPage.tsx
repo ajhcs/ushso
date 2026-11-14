@@ -166,7 +166,7 @@ export function DatasetDetailsPage() {
         <header className="details-page__heading">
           <p>{record.identity.source.name} · {sentenceCase(record.identity.asset.asset_type)}</p>
           <h1>{dataset.title}</h1>
-          <p>{displayedDescription}</p>
+          <p>{displayedDescription || 'Publisher description unavailable. Assess the source documentation before selecting this asset.'}</p>
           {corrupted && <div className="text-quality-notice" role="note"><AlertTriangle aria-hidden="true" /><p><strong>Source text may contain encoding damage.</strong> The captured wording is preserved without guessing at missing symbols. {metadata?.description_quality?.authoritative_url && <a href={metadata.description_quality.authoritative_url} target="_blank" rel="noreferrer">Check the publisher’s current page <ExternalLink aria-hidden="true" /></a>}</p></div>}
         </header>
 
