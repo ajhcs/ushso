@@ -6,12 +6,19 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const wrangler = path.join(root, 'node_modules', 'wrangler', 'bin', 'wrangler.js');
 const args = process.argv.slice(2);
+const deploymentIntent=args[0]==='deploy'?(await import('./release-source-selection/deploy-approved.mjs')).deploymentArguments(args):null;
+if(deploymentIntent&&!deploymentIntent.help)(await import('./release-source-selection/deploy-approved.mjs')).assertDeploymentEnvironment();
 let preparedBuild = null;
-if (['dev','deploy'].includes(args[0])&&!args.includes('--help')&&!args.includes('-h')) {
+if (['dev','deploy'].includes(args[0])&&!(deploymentIntent?.help)&&!args.includes('--help')&&!args.includes('-h')) {
   const {createRuntimeBuildIdentity,writeRuntimeBuildReceipt}=await import('./runtime-build-identity.mjs');
   const configIndex=args.indexOf('--config');
   const configurationPath=path.resolve(root,configIndex>=0?args[configIndex+1]:args.find(arg=>arg.startsWith('--config='))?.slice('--config='.length)??'wrangler.jsonc');
   const configuration=JSON.parse(await fs.readFile(configurationPath,'utf8'));
+  if(deploymentIntent&&!deploymentIntent.dryRun) {
+    const {assertOrdinaryDeployment,assertOrdinaryConfiguration}=await import('./release-source-selection/deploy-approved.mjs');
+    assertOrdinaryConfiguration(configuration);
+    await assertOrdinaryDeployment(path.resolve(path.dirname(configurationPath),configuration.assets?.directory??''));
+  }
   if(path.resolve(path.dirname(configurationPath),configuration.main)!==path.join(root,'worker/index.mjs')||typeof configuration.assets?.directory!=='string'||args.some(arg=>arg==='--no-bundle'||arg==='--assets'||arg.startsWith('--assets=')))throw new Error('BUILD_IDENTITY_UNSUPPORTED_ENTRY_OR_ASSETS_OVERRIDE');
   const receipt=await createRuntimeBuildIdentity({assetsDirectory:path.resolve(path.dirname(configurationPath),configuration.assets.directory),configurationPath,buildArguments:[...args]});
   await writeRuntimeBuildReceipt(receipt);

@@ -27,6 +27,12 @@ See [the four-layer architecture](docs/ARCHITECTURE.md), the
 
 ## Source-selection implementation candidate
 
+The November 14 follow-on adds accepted-publication recovery, gated deployment,
+and a disabled optional AI drafting runner. Start with the
+[engineering handoff](docs/source-selection/ENGINEERING-2026-11-14.md) and
+[source approval packet](docs/source-selection-approval/README.md). Human source
+decisions and paid AI approval remain outstanding.
+
 The source-selection implementation and its remaining acceptance obligations are
 summarized in [implementation status](docs/source-selection/IMPLEMENTATION.md)
 and tracked in [the execution ledger](docs/source-selection/README.md). Read the

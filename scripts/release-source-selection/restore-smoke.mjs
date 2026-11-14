@@ -8,14 +8,14 @@ import {resolve,join} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
 import {verifyRetainedRelease,workspacePath} from './restore-release.mjs';
-export async function smokeRestoredRelease({restoredDirectory,wranglerPath,runtimeDirectory,expectedInventoryHash,port=18790}) {
+export async function smokeRestoredRelease({restoredDirectory,wranglerPath,runtimeDirectory,expectedInventoryHash,port=18790,...authority}) {
  const root=await workspacePath(restoredDirectory),runtime=await workspacePath(runtimeDirectory);if(!runtime.startsWith('/workspace/')||runtime===root||runtime.startsWith(root+'/'))throw new Error('ISOLATED_WORKSPACE_RUNTIME_REQUIRED');
- const manifest=await verifyRetainedRelease(root,{expectedInventoryHash});
+ const manifest=await verifyRetainedRelease(root,{expectedInventoryHash,...authority});
  if(!Number.isInteger(port)||port<1024||port>65535)throw new Error('INVALID_LOCAL_PORT');
  await new Promise((accept,reject)=>{const probe=createServer();probe.once('error',()=>reject(new Error('RESTORE_PORT_ALREADY_IN_USE')));probe.listen(port,'127.0.0.1',()=>probe.close(accept));});
  await mkdir(runtime);await mkdir(join(runtime,'logs'));
  const retainedConfig=JSON.parse(await readFile(join(root,'wrangler.json'),'utf8'));
- const launchConfig={...retainedConfig,main:join(root,'worker/index.js'),assets:{...retainedConfig.assets,directory:join(root,'assets')}};
+ const launchConfig={...retainedConfig,vars:{...retainedConfig.vars,...(authority.expectedRightsHash?{USHSO_ACCEPTED_RIGHTS_HASH:authority.expectedRightsHash}:{})},main:join(root,'worker/index.js'),assets:{...retainedConfig.assets,directory:join(root,'assets')}};
  await writeFile(join(runtime,'wrangler.json'),JSON.stringify(launchConfig),{flag:'wx'});
  const server=spawn(process.execPath,[resolve(wranglerPath),'dev','--config',join(runtime,'wrangler.json'),'--local','--no-bundle','--port',String(port),'--ip','127.0.0.1','--persist-to',join(runtime,'state')],{cwd:runtime,stdio:['ignore','pipe','pipe'],detached:process.platform!=='win32',env:{...process.env,WRANGLER_SEND_METRICS:'false',WRANGLER_LOG_PATH:join(runtime,'logs','wrangler.log')}});
  let output='',childReady=false;for(const stream of [server.stdout,server.stderr])stream.on('data',chunk=>{output=(output+chunk.toString()).slice(-16000);childReady=childReady||output.includes(`Ready on http://127.0.0.1:${port}`);});
@@ -34,13 +34,13 @@ export async function smokeRestoredRelease({restoredDirectory,wranglerPath,runti
   const sitemap=await fetch(`${origin}/sitemap.xml`);assert.equal(sitemap.status,200);assert.ok(!(await sitemap.text()).includes('/methods/archive/'));
   const missing=await fetch(`${origin}/datasets/restore-rehearsal-unknown-fixture`);assert.equal(missing.status,404);
   const rawPublication=await fetch(`${origin}/source-selection/publication.json`);assert.equal(rawPublication.status,404);
-  const publication=await fetch(`${origin}/api/source-selection/v1/publication`);const publicationBody=await publication.json();assert.equal(publication.status,503);assert.equal(publicationBody.status,'unavailable');
+  const publication=await fetch(`${origin}/api/source-selection/v1/publication`);const publicationBody=await publication.json();const accepted=manifest.files.some(e=>e.path.startsWith('evidence/'));assert.equal(publication.status,accepted?200:503);assert.equal(publicationBody.status,accepted?'available':'unavailable');
   const ranking_parity=await checkWorkerRankingParity(origin);
   if(server.exitCode!==null||server.signalCode!==null)throw new Error('RESTORED_WORKER_EXITED_BEFORE_RECEIPT');
   receipt={schema_version:'ushso.local-restore-rehearsal.v1',status:'PASS',inventory_sha256:manifest.inventory_sha256,file_count:manifest.files.length,byte_count:manifest.byte_count,worker_source:'retained worker/index.js, no-bundle',launch_config:'Verified retained config copied into separate runtime; only Worker/assets paths made absolute',base:origin,health,catalog:{record_count:catalog.corpus.record_count,total_matches:catalog.total_matches,first_record_id:id},ranking_parity,no_javascript_home:true,no_javascript_detail:true,unknown_dataset_status:missing.status,accepted_publication:publicationBody,deployment_authorized:false,scope:'Local retained-byte restore only; no production activation or publisher payload access.'};
 
  } catch(error) {await writeFile(join(runtime,'restore-failure.json'),JSON.stringify({schema_version:'ushso.local-restore-failure.v1',status:'FAIL',inventory_sha256:manifest.inventory_sha256,base:origin,error:{name:error.name,message:error.message},deployment_authorized:false},null,2));throw error;} finally {stop('SIGTERM');await Promise.race([once(server,'exit'),delay(3000)]);stop('SIGKILL');await writeFile(join(runtime,'worker.log'),output);}
- try{await verifyRetainedRelease(root,{expectedInventoryHash});}catch(error){await writeFile(join(runtime,'restore-failure.json'),JSON.stringify({status:'FAIL',stage:'post_smoke_inventory',inventory_sha256:manifest.inventory_sha256,error:{name:error.name,message:error.message}},null,2));throw error;}
+ try{await verifyRetainedRelease(root,{expectedInventoryHash,...authority});}catch(error){await writeFile(join(runtime,'restore-failure.json'),JSON.stringify({status:'FAIL',stage:'post_smoke_inventory',inventory_sha256:manifest.inventory_sha256,error:{name:error.name,message:error.message}},null,2));throw error;}
  receipt.inventory_after_smoke_verified=true;await writeFile(join(runtime,'restore-smoke.json'),JSON.stringify(receipt,null,2));return receipt;
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){const [restoredDirectory,wranglerPath,runtimeDirectory,expectedInventoryHash,port]=process.argv.slice(2);console.log(JSON.stringify(await smokeRestoredRelease({restoredDirectory,wranglerPath,runtimeDirectory,expectedInventoryHash,port:port?Number(port):18790}),null,2));}
+if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){const [restoredDirectory,wranglerPath,runtimeDirectory,expectedInventoryHash,port,authorityPath]=process.argv.slice(2);const authority=authorityPath?JSON.parse(await readFile(authorityPath,'utf8')):{};console.log(JSON.stringify(await smokeRestoredRelease({restoredDirectory,wranglerPath,runtimeDirectory,expectedInventoryHash,port:port?Number(port):18790,...authority}),null,2));}
