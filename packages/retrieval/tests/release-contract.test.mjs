@@ -23,6 +23,8 @@ function cloneRecord(index, overrides = {}) {
   record.identity.asset.asset_id = record.record_id;
   record.identity.asset.name = `Hospital closure fixture ${index}`;
   record.title = `Hospital closure fixture ${String(index).padStart(3, '0')}`;
+  // Synthetic accepted subject capability: isolates geography/access behavior from lexical-only support.
+  record.capabilities.topics.push({id: 'rural_hospital_closures', label: 'Rural hospital closures', fitness: 'primary', evidence_state: 'source_asserted', evidence_ids: record.evidence.map(item => item.evidence_id), rationale: 'Synthetic fixture explicitly enumerates closure events.'});
   Object.assign(record, overrides);
   return record;
 }
@@ -213,7 +215,8 @@ test('public payload, exclusions, time uncertainty, and separate chronology rema
   for (const question of ['hospital public only', 'hospital public use data only']) {
     const publicOnly = engine([catalogOnly]).retrieve({ question, page_size: 10 });
     assert.equal(publicOnly.query.interpretation.access_intent.public_only, true, question);
-    assert.equal(publicOnly.results[0].match_state, 'uncertain', question);
+    assert.equal(publicOnly.results[0].match_state, 'contextual', question); // Generic hospital/unit text cannot establish subject support.
+    assert.ok(publicOnly.results[0].uncertainty_reasons.length > 0, question);
     assert.equal(publicOnly.results[0].metadata.access_compatibility, 'unknown', question);
   }
 });

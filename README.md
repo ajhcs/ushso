@@ -22,8 +22,17 @@ source objects + evidence + assertions + relationships
 The current `observatory-record.v1.0.0` records are compatibility inputs and discovery views. They are not the final source-truth abstraction. Search documents are explicitly labeled as denormalized, non-authoritative projections.
 
 See [the four-layer architecture](docs/ARCHITECTURE.md), the
-[published 60-question baseline](docs/EVALUATION.md), and the
+[historical evaluation fixtures](docs/EVALUATION.md), and the
 [UI/UX review](docs/UI_UX_REVIEW.md) of the public website for people and agents.
+
+## Source-selection implementation candidate
+
+The source-selection implementation and its remaining acceptance obligations are
+summarized in [implementation status](docs/source-selection/IMPLEMENTATION.md)
+and tracked in [the execution ledger](docs/source-selection/README.md). Read the
+[current public observation](docs/source-selection/production-observation.json)
+and [operating guide](docs/OPERATIONS.md) before release decisions. Historical
+go-live and provenance records do not identify the candidate as deployed.
 
 ## Local verification
 

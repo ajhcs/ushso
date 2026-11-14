@@ -50,6 +50,14 @@ function matchStatus(result: DatasetFamily) {
   }
 }
 
+export function readableMatchReason(reason: string | undefined, state: string | undefined) {
+  if (!reason) return 'No evidence-backed match explanation is available.'
+  if (/leading essential term|lexical|indexed token|Resolved subject concepts/i.test(reason)) return state === 'supported'
+    ? 'The source has documented subject support for this search. Review its coverage and access before selecting it.'
+    : 'Publisher metadata contains related search terms. Direct subject support remains unresolved.'
+  return reason.replace('appears in publisher text; subject support has not been established by an identity-bound capability.', 'appears in publisher text. Direct subject support remains unresolved.')
+}
+
 export function ResultCard({ result, id, displayRank, detailsHref = result.detailsUrl, onDetailsClick, uncertaintyReasons = [] }: ResultCardProps) {
   const categoryDetails = result.canonicalResult.record.capabilities.topics.filter((topic) => topic.label).slice(0, 3)
   const freshness = freshnessPresentation(result)
@@ -61,7 +69,7 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
   const observationTime = observationPeriod ? [observationPeriod.start, observationPeriod.end].filter(Boolean).join('–') || observationPeriod.state : result.availableYears
   const whyMatched = result.relevance === 'Browse'
     ? 'Published catalog browse; no research objective was inferred.'
-    : result.canonicalResult.relevance.why_relevant[0] ?? 'No evidence-backed match explanation is available.'
+    : readableMatchReason(result.canonicalResult.relevance.why_relevant[0], result.canonicalResult.match_state)
   const verificationTarget = result.verification.liveVerified
     ? 'Scoped metadata route checked'
     : result.verification.status === 'stale'
@@ -72,7 +80,7 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
     <article id={id} className="result-card" data-result-id={result.id} aria-label={displayRank ? `Result ${displayRank}: ${result.title}` : undefined}>
       <div className="result-card__main">
         <h2 data-result-region="title"><Link to={detailsHref} onClick={onDetailsClick}>{result.title}</Link></h2>
-        <p className="result-card__description" data-result-region="description">{description}</p>
+        <p className="result-card__description" data-result-region="description">{description || 'Publisher description unavailable. Subject and analytical suitability remain unresolved.'}</p>
         {metadata?.named_source_role === 'secondary_mention' && <p className="result-card__source-role">Secondary mention—not the requested source</p>}
         {corrupted && <p className="result-card__quality"><AlertTriangle aria-hidden="true" />Captured description may contain encoding damage; inspect the source.</p>}
         {uncertaintyReasons.length > 0 && <div className="result-card__uncertainty"><strong>Why this is uncertain</strong><ul>{uncertaintyReasons.map((reason) => <li key={reason}>{reason}</li>)}</ul></div>}
@@ -108,9 +116,9 @@ export function ResultCard({ result, id, displayRank, detailsHref = result.detai
               <strong>{verificationTarget}</strong>
               {freshness.overdue && <em>Review overdue</em>}
               {freshness.stale && <em>Historical metadata success is stale</em>}
-              <small>Last successful metadata check {freshness.lastSuccessfulText}</small>
+              <details className="result-card__check-history"><summary>Check history and payload status</summary><small>Last successful metadata check {freshness.lastSuccessfulText}</small>
               <small>Latest catalog-metadata attempt {freshness.latestAttemptText} ({freshness.latestAttemptOutcome})</small>
-              <small>Payload check {freshness.payloadCheckState}. {freshness.payloadCheck}</small>
+              <small>Payload check {freshness.payloadCheckState}. {freshness.payloadCheck}</small></details>
             </span>
           </p>
           <p className="result-status"><span><small>Access</small><strong>{result.accessStatusLabel}</strong></span></p>

@@ -73,7 +73,20 @@ function variableDocumentationErrors(value) {
 }
 
 /** The minimum canonical-record contract enforced by the browser provider. */
-export function browserRecordErrors(record) {
+export function hasEvidenceBoundMissingDescription(record) {
+  if (typeof record?.description !== 'string' || record.description.trim() !== '') return false;
+  const identity = record.identity;
+  const native = identity?.match_fields;
+  if (!nonEmpty(record.title) || !nonEmpty(record.record_id) || identity?.asset?.asset_id !== record.record_id
+    || !nonEmpty(native?.source_id) || !nonEmpty(native?.publisher) || !safeExternalHttpsUrl(native?.canonical_url)
+    || native.canonical_url !== record.authoritative_url) return false;
+  const captures = new Set(arrayOrEmpty(record.provenance).filter(row => row.capture_state === 'captured_hashed'
+    && /^[a-f0-9]{64}$/.test(row.content_sha256 ?? '') && isSafeEvidenceLocator(row.locator)).map(row => row.provenance_id));
+  return captures.size > 0 && arrayOrEmpty(record.evidence).some(row => ['source_asserted','verified_first_party'].includes(row.state)
+    && arrayOrEmpty(row.provenance_ids).some(id => captures.has(id)));
+}
+
+export function browserRecordErrors(record, { allowEvidenceBoundMissingDescriptions = false } = {}) {
   const errors = [];
   if (!object(record)) return ['record must be an object'];
   if (record.schema_version !== 'observatory-record.v1.0.0') errors.push('schema_version must be observatory-record.v1.0.0');
@@ -84,7 +97,7 @@ export function browserRecordErrors(record) {
   }
   for (const key of ['provenance', 'evidence', 'unit_of_analysis']) if (!Array.isArray(record[key])) errors.push(`${key} must be an array`);
   if (!nonEmpty(record.title)) errors.push('title must be a non-empty string');
-  if (!nonEmpty(record.description)) errors.push('description must be a non-empty string');
+  if (!nonEmpty(record.description) && !(allowEvidenceBoundMissingDescriptions && hasEvidenceBoundMissingDescription(record))) errors.push(allowEvidenceBoundMissingDescriptions ? 'description must be non-empty or explicitly missing with preserved native identity and captured evidence' : 'description must be a non-empty string');
   if (!nonEmpty(record.authoritative_url) || (!safeExternalHttpsUrl(record.authoritative_url) && !safePreservedHttpUrl(record.authoritative_url))) errors.push('authoritative_url must be a safe public HTTP or HTTPS source locator');
   const freshness = record.freshness_verification;
   if (object(freshness)) {
@@ -134,14 +147,14 @@ export function browserRecordErrors(record) {
   return [...new Set(errors)];
 }
 
-export function validateCatalogRecords(records) {
+export function validateCatalogRecords(records, options = {}) {
   const valid = [];
   const invalid = [];
   const seen = new Set();
   for (const [index, record] of records.entries()) {
     let errors;
     try {
-      errors = browserRecordErrors(record);
+      errors = browserRecordErrors(record, options);
     } catch (error) {
       errors = [`record validation could not complete: ${error instanceof Error ? error.message : String(error)}`];
     }
@@ -267,10 +280,10 @@ export function descriptionQuality(record) {
   const mojibake = /(?:Ã.|Â.|â€|ï¿½)/.test(raw);
   return {
     raw_description: raw,
-    state: replacementCharacter || mojibake ? 'suspected_encoding_corruption' : 'no_corruption_detected',
+    state: raw.trim() === '' ? 'missing' : replacementCharacter || mojibake ? 'suspected_encoding_corruption' : 'no_corruption_detected',
     indicators: [replacementCharacter ? 'replacement_character' : null, mojibake ? 'recognizable_mojibake' : null].filter(Boolean),
     display_description: raw,
-    repair_state: replacementCharacter || mojibake ? 'unresolved_no_verified_repair' : 'not_needed',
+    repair_state: raw.trim() === '' ? 'unavailable_no_source_description' : replacementCharacter || mojibake ? 'unresolved_no_verified_repair' : 'not_needed',
     authoritative_url: verifiedNavigationUrl(record, record.authoritative_url),
     original_authoritative_url: record.authoritative_url ?? null
   };

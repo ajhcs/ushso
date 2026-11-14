@@ -173,3 +173,17 @@ describe('canonical discovery response adapter', () => {
     expect(national?.facetValues.geography).not.toContain('pennsylvania')
   })
 })
+
+ it('selects a supported family representative regardless of source order without merging facts', () => {
+  const response = structuredClone(acceptedResponse)
+  const first = structuredClone(response.results[0])
+  const second = structuredClone(first)
+  first.record_id = 'synthetic:context'; first.record.record_id = first.record_id; first.match_state = 'contextual'; first.score = 999
+  second.record_id = 'synthetic:supported'; second.record.record_id = second.record_id; second.match_state = 'supported'; second.score = 1
+  response.results = [first, second]
+  const forward = adaptDiscoveryResponse(response).families[0]
+  response.results.reverse()
+  const reverse = adaptDiscoveryResponse(response).families[0]
+  expect(forward.canonicalResult.record_id).toBe(second.record_id)
+  expect(reverse.canonicalResult).toEqual(second)
+ })

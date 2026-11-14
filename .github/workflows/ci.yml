@@ -22,6 +22,8 @@ env:
 
 jobs:
   node22-compatibility:
+    env:
+      TMPDIR: /workspace/ushso-ci-tmp
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -33,11 +35,17 @@ jobs:
         with:
           node-version: '22.15.0'
           cache: npm
+      - name: Prepare isolated filesystem-test directory
+        run: |
+          sudo mkdir -p /workspace/ushso-ci-tmp
+          sudo chown "$USER" /workspace/ushso-ci-tmp
       - run: npm install --global npm@11.19.1 --ignore-scripts --no-audit --no-fund
       - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm ls ajv --all
       - run: npm run release:audit
       - run: npm test
+      - name: Accepted ledger and runtime contract integration
+        run: node --test tests/source-selection/*.test.mjs tests/runtime-source-selection.test.mjs
 
   build-and-dry-run:
     needs: node22-compatibility
@@ -57,3 +65,11 @@ jobs:
       - run: npm ls ajv --all
       - run: npm run build
       - run: npm run cf:dry-run:artifact
+      - name: Local Worker HTTP integration (no deployment)
+        run: node scripts/release-source-selection/check-local-integration.mjs
+      - name: Install browser test runtime
+        run: npx playwright install --with-deps chromium
+      - name: Real browser journeys (no deployment)
+        env:
+          USHSO_BROWSER_SKIP_BUILD: "1"
+        run: npm run test:e2e:browser

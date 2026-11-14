@@ -1,3 +1,4 @@
+import { candidatePinMatches, validateCandidateTransition } from './source-selection-candidate-transition.mjs'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
@@ -223,6 +224,7 @@ export async function validateHistoricalInputBindings({ root = repositoryRoot, r
   const seen = new Set()
   const checked = []
   const reviewedStates = new Map()
+  let candidateTransition = null
   for (const pin of pins) {
     const relativePath = safeRelativePath(pin.path, `${pin.source}_PIN`)
     const key = `${pin.source}:${relativePath}`
@@ -230,7 +232,14 @@ export async function validateHistoricalInputBindings({ root = repositoryRoot, r
     seen.add(key)
     const bytes = await readCurrentFile(root, relativePath)
     const reviewed = reviewedPr003InputsByPath.get(relativePath)
-    if (reviewed) {
+    if (candidatePinMatches(relativePath, bytes) && ['package.json', '.github/workflows/ci.yml'].includes(relativePath)) {
+      candidateTransition ??= await validateCandidateTransition(root, readCurrentFile)
+      const fixtureName = relativePath === 'package.json' ? 'pr003-package.json' : 'historical-ci.yml'
+      const prior = await readFile(path.resolve(root, 'verification/source-selection-candidate/fixtures', fixtureName))
+      if (reviewed) { validateReviewedPr003CurrentInput(reviewed, prior); reviewedStates.set(relativePath, 'reviewed_current') }
+      else verifyPin(pin, prior, `${pin.source.toUpperCase()}_${relativePath}`)
+      checked.push({path:relativePath,source:pin.source,historical_sha256:pin.sha256,historical_bytes:pin.bytes,current_sha256:sha256(bytes),current_bytes:bytes.length,current_drift_allowed:true,reviewed_current_transition:false,candidate_transition:'pending_independent_review',historical_approval_transferred:false})
+    } else if (reviewed) {
       assert.equal(pin.sha256, reviewed.historical_sha256, `CI_HISTORICAL_${relativePath}_PIN_MISMATCH`)
       if (sha256(bytes) === pin.sha256) {
         if (relativePath === 'package.json') {
@@ -263,10 +272,11 @@ export async function validateHistoricalInputBindings({ root = repositoryRoot, r
   return {
     status: 'PASS',
     source_commit: HISTORICAL_BASE_COMMIT,
+    candidate_transition: candidateTransition,
     allowed_current_drift: [...drift].sort(),
     reviewed_current_inputs: REVIEWED_PR003_CURRENT_INPUTS.map((item) => ({ ...item })),
-    reviewed_current_transition: transitionState === 'reviewed_current',
-    reviewed_current_transition_state: transitionState,
+    reviewed_current_transition: candidateTransition === null && transitionState === 'reviewed_current',
+    reviewed_current_transition_state: candidateTransition ? 'source_selection_candidate_pending_review' : transitionState,
     checked,
   }
 }

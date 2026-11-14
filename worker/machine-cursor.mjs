@@ -1,4 +1,4 @@
-import { canonicalJson, snapshotDigest } from '../packages/machine-toolkit/src/json.mjs';
+import { canonicalJson } from '../packages/machine-toolkit/src/json.mjs';
 
 const TTL_MS = 15 * 60 * 1000;
 const encoder = new TextEncoder();
@@ -27,7 +27,7 @@ export function createMachineCursorSigner({ signingKey, clock = () => Date.now()
   }
   return Object.freeze({
     ephemeral: signingKey === undefined,
-    async page({ capability, input, generation, manifest, items, section }) {
+    async page({ capability, input, generation, manifest, items, section, orderVersion = 'machine-order.v1' }) {
       const maximum=capability==='search_assets'?20:capability==='get_coverage_status'?100:capability==='dictionary_review'?1:0;
       if(!Number.isSafeInteger(input?.limit)||input.limit<1||input.limit>maximum||!Array.isArray(items))fail();
       const { cursor, ...query } = input;
@@ -35,7 +35,7 @@ export function createMachineCursorSigner({ signingKey, clock = () => Date.now()
       // Discovery and a subsequent explicit pin to its resolved generation are
       // the same traversal; conflicting pins must never reuse a cursor.
       query.expected_generation = generation;
-      const binding = await snapshotDigest({ version: 1, capability, generation, manifest, query });
+      const binding = 'sha256:' + [...new Uint8Array(await cryptoProvider.subtle.sign('HMAC', await key(), encoder.encode(canonicalJson({ domain: 'ushso.machine-cursor.query-binding.v1', capability, generation, manifest, orderVersion, query }))))].map(byte => byte.toString(16).padStart(2, '0')).join('');
       const now = clock();
       let offset = 0, issued = now, expires = now + TTL_MS;
       if (cursor) {

@@ -122,3 +122,61 @@ test("loaded index preserves lexical fixtures, ordering, cursor continuation and
     assert.throws(() => createRetrievalEngine({ ...args, searchDocuments: [], lexicalArtifact: token }), /LEXICAL_PROJECTION_MODE_MISMATCH/);
   }
 });
+
+test('transient asset failure shares one attempt then recovers on the same binding', async () => {
+  const f = setup(); let failed = false, attempts = 0;
+  const assets = { async fetch(request) {
+    if (new URL(request.url).pathname.endsWith('/corpus.json')) {
+      attempts++;
+      if (!failed) { failed = true; return new Response('temporary', { status: 503 }); }
+    }
+    return f.assets.fetch(request);
+  } };
+  const env = { ASSETS: assets };
+  const first = await Promise.allSettled([loadCatalogFromAssets(request, env, { lexicalExpected: f.pin }), loadCatalogFromAssets(request, env, { lexicalExpected: f.pin })]);
+  assert.ok(first.every(result => result.status === 'rejected' && result.reason.retryableAssetRead === true));
+  assert.equal(attempts, 1);
+  const catalog = await loadCatalogFromAssets(request, env, { lexicalExpected: f.pin });
+  assert.equal(catalog.records.length, 3);
+  assert.equal(attempts, 2);
+});
+
+test('transient pinned lexical stream failure retries but tampered bytes remain poisoned', async () => {
+  const f = setup(); let transient = true;
+  const assets = { async fetch(request) {
+    if (transient && new URL(request.url).pathname.endsWith('/lexical-index.json')) {
+      transient = false;
+      return new Response(new ReadableStream({ start(controller) { controller.error(new Error('read interrupted')); } }));
+    }
+    return f.assets.fetch(request);
+  } };
+  const env = { ASSETS: assets };
+  await assert.rejects(loadCatalogFromAssets(request, env, { lexicalExpected: f.pin }), /CORPUS_ASSET_TRANSIENT/);
+  assert.equal((await loadCatalogFromAssets(request, env, { lexicalExpected: f.pin })).records.length, 3);
+  const bad = setup(); bad.content.set('/corpus-v1.2.0/corpus/lexical-index.json', 'tampered');
+  const badEnv = { ASSETS: bad.assets };
+  await assert.rejects(loadCatalogFromAssets(request, badEnv, { lexicalExpected: bad.pin }), /LEXICAL_HASH_MISMATCH/);
+  const reads = bad.reads;
+  bad.content.set('/corpus-v1.2.0/corpus/lexical-index.json', bad.bytes);
+  await assert.rejects(loadCatalogFromAssets(request, badEnv, { lexicalExpected: bad.pin }), /LEXICAL_HASH_MISMATCH/);
+  assert.equal(bad.reads, reads);
+});
+
+test('indexed successor and ordinary loader admit identical evidence-bound missing descriptions',async()=>{
+ const f=setup();f.rows[1].description='';f.content.set('/corpus-v1.2.0/corpus/records.jsonl',f.rows.map(JSON.stringify).join('\n')+'\n');
+ const temporary=await fs.mkdtemp(path.join(os.tmpdir(),'ushso-indexed-successor-'));
+ try {
+  const assets=path.join(temporary,'assets');
+  for(const [relative,bytes] of f.content){const target=path.join(assets,relative);await fs.mkdir(path.dirname(target),{recursive:true});await fs.writeFile(target,bytes);}
+  const built=await buildIndexedWorker({assetsDirectory:assets,outputDirectory:path.join(temporary,'indexed')});
+  assert.equal(built.accepted_records,3);assert.equal(built.isolated_records,0);
+  f.content.set('/corpus-v1.2.0/corpus/lexical-index.json',await fs.readFile(path.join(temporary,'indexed/assets/corpus-v1.2.0/corpus/lexical-index.json')));
+  const indexed=await loadCatalogFromAssets(request,{ASSETS:f.assets},{lexicalExpected:built.pin});
+  const ordinary=await loadCatalogFromAssets(request,{ASSETS:{fetch:request=>f.assets.fetch(request)}});
+  assert.deepEqual(indexed.records.map(r=>r.record_id),ordinary.records.map(r=>r.record_id));assert.equal(indexed.records[1].description,'');
+  for(const question of ['hospital finances Pennsylvania','county life expectancy','Medicaid']) {
+   const a=indexed.engine.retrieve({question,limit:20}),b=ordinary.engine.retrieve({question,limit:20});
+   assert.deepEqual(a.results.map(r=>[r.record_id,r.score,r.match_state]),b.results.map(r=>[r.record_id,r.score,r.match_state]));
+  }
+ }finally{await fs.rm(temporary,{recursive:true,force:true});}
+});

@@ -1,3 +1,4 @@
+import { candidatePinMatches, validateCandidateTransition, CANDIDATE_MANIFEST_PATH } from './source-selection-candidate-transition.mjs'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
@@ -133,6 +134,9 @@ export const PR087_REVIEWED_CURRENT_LOCK = Object.freeze({
 export const WP11_WRAPPER_IMPLEMENTATION_FILES = Object.freeze([
   'scripts/verify-wp11-attestation.mjs',
   'scripts/run-contract-suites.mjs',
+  'scripts/source-selection-candidate-transition.mjs',
+  CANDIDATE_MANIFEST_PATH,
+  'verification/source-selection-candidate/fixtures/pr003-package.json',
   'tests/wp11-attestation.test.mjs',
   HISTORICAL_PREIMAGE_READER_PATH,
   HISTORICAL_PREIMAGE_INVENTORY_PATH,
@@ -372,6 +376,7 @@ export async function validateHistoricalInputBindings({
 }
 
 function currentInputRole(relativePath, bytes) {
+  if (candidatePinMatches(relativePath, bytes) && ['package.json','package-lock.json'].includes(relativePath)) return 'source_selection_candidate_pending_review'
   if (relativePath === 'package.json') {
     try {
       const provenance = packageProvenanceFor(bytes)
@@ -409,12 +414,14 @@ export async function reportCurrentVersusHistoricalInputs({
   const retained = snapshot ?? await readHistoricalPreimageSnapshot({ root })
   assert.equal(retained.file_count, SEALED_WP11_FILE_COUNT, 'WP11_SNAPSHOT_FILE_COUNT')
   const changed = []
+  let candidateTransition = null
   let unchangedCount = 0
   for (const pin of retained.files) {
     const relativePath = safeRelativePath(pin.path, 'CURRENT_INPUT')
     const bytes = await readCurrentFile(root, relativePath)
     assert.ok(bytes && bytes.length > 0, `WP11_CURRENT_${relativePath}_EMPTY`)
     const currentSha256 = sha256(bytes)
+    if (candidatePinMatches(relativePath,bytes) && ['package.json','package-lock.json'].includes(relativePath)) candidateTransition ??= await validateCandidateTransition(root,readCurrentFile)
     if (currentSha256 === pin.sha256 && bytes.length === pin.bytes) {
       unchangedCount += 1
       continue
@@ -440,6 +447,7 @@ export async function reportCurrentVersusHistoricalInputs({
   }
   return {
     status: 'PASS',
+    candidate_transition: candidateTransition,
     compared_file_count: SEALED_WP11_FILE_COUNT,
     changed_count: changed.length,
     unchanged_count: unchangedCount,
@@ -631,6 +639,12 @@ export async function assertCurrentWrapperPolicy({
     ? Buffer.from(JSON.stringify(policy))
     : await readFile(path.resolve(root, WP11_POLICY_PATH))
   const parsed = policy ?? parseJson(policyBytes, 'POLICY')
+  const candidatePolicy = parsed.pending_candidate_transition
+  assert.equal(candidatePolicy?.manifest,CANDIDATE_MANIFEST_PATH,'WP11_CANDIDATE_POLICY_MISSING')
+  assert.equal(candidatePolicy.status,'pending_independent_review','WP11_CANDIDATE_POLICY_STATUS')
+  assert.equal(candidatePolicy.approval,null,'WP11_CANDIDATE_APPROVAL_OVERCLAIM')
+  assert.equal(candidatePolicy.historical_approval_transferred,false,'WP11_CANDIDATE_HISTORY_TRANSFER')
+  assert.equal(candidatePolicy.release_qualified,false,'WP11_CANDIDATE_RELEASE_OVERCLAIM')
   const snapshotPin = parsed.historical_preimage_snapshot
   const readerPin = parsed.historical_preimage_reader
   assert.ok(snapshotPin && typeof snapshotPin === 'object', 'WP11_WRAPPER_SNAPSHOT_BINDING_MISSING')

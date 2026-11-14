@@ -176,7 +176,12 @@ export function assertDiscoveryResult(value: unknown): asserts value is Discover
     if (!isStringArray(item.relevance.matched_subjects) || !isStringArray(item.relevance.matched_geographies) || !isStringArray(item.relevance.matched_units) || !isStringArray(item.relevance.matched_terms) || !isStringArray(item.relevance.why_relevant) || !Array.isArray(item.relevance.score_components)) {
       throw new DiscoveryProviderError('invalid_contract', 'Discovery result relevance evidence is invalid.')
     }
-    const recordErrors = isObject(item.record) ? browserRecordErrors(item.record) : ['record must be an object']
+    let recordErrors = isObject(item.record) ? browserRecordErrors(item.record) : ['record must be an object']
+    // Keep the legacy validator first. Only its sole missing-description failure
+    // may enter the evidence-bound additive inventory compatibility lane.
+    if (isObject(item.record) && recordErrors.length === 1 && recordErrors[0] === 'description must be a non-empty string') {
+      recordErrors = browserRecordErrors(item.record, {allowEvidenceBoundMissingDescriptions:true})
+    }
     if (!isObject(item.record) || item.record.record_id !== item.record_id || recordErrors.length > 0) {
       throw new DiscoveryProviderError('invalid_contract', `Discovery result ${item.record_id} does not preserve a canonical Observatory record: ${recordErrors.join('; ') || 'record identifier mismatch'}.`)
     }

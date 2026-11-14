@@ -25,7 +25,7 @@ async function buildIndexedWorker({ assetsDirectory, outputDirectory }) {
   const sources = await sourceInventory();
   const { buildLexicalEntries } = await import("../packages/retrieval/tools/retrieval-core-v1.2.mjs");
   const { validateCatalogRecords } = await import("../packages/retrieval/tools/catalog-contract.mjs");
-  const validation = validateCatalogRecords(records);
+  const validation = validateCatalogRecords(records, { allowEvidenceBoundMissingDescriptions: true });
   if (typeof corpus.publication?.generation !== "string" || !corpus.publication.generation) throw Error("LEXICAL_BUILD_PUBLICATION_GENERATION_REQUIRED");
   const identity = { generation: corpus.publication.generation, corpus_sha256: sha(corpusBytes), source_sha256: sha(Buffer.concat(shards)), vocabulary_sha256: sha(vocabulary), tokenizer_sha256: sha(JSON.stringify(sources)) };
   const bytes = Buffer.from(JSON.stringify({ format: "ushso.lexical-index.v1", ...identity, entries: buildLexicalEntries(validation.valid) }));

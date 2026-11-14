@@ -1,3 +1,4 @@
+import { controlledIntent, coverageVerified } from './discovery-controls.mjs';
 import {consumeLexicalArtifact} from './lexical-artifact.mjs';
 import { containsNormalizedPhrase, normalizeText, parseQuestion, recordSearchText } from './question-parser-v1.2.mjs';
 import { selectJoinRoutes, validateJoinRoute } from './join-routes.mjs';
@@ -20,7 +21,7 @@ const RESTRICTED = new Set(['registration_required', 'application_required', 'du
 const FITNESS_WEIGHT = { primary: 52, supporting: 32, context_only: 12, unknown: 4 };
 const EVIDENCE_WEIGHT = { verified_first_party: 8, source_asserted: 5, inferred: 2, unresolved: 0, unavailable: 0 };
 const STOPWORDS = new Set(['a', 'about', 'an', 'and', 'are', 'by', 'can', 'data', 'dataset', 'datasets', 'describe', 'excluding', 'exclude', 'except', 'find', 'for', 'from', 'i', 'in', 'is', 'me', 'need', 'no', 'not', 'of', 'on', 'only', 'public', 'show', 'source', 'sources', 'study', 'the', 'to', 'use', 'what', 'which', 'with', 'without']);
-const RANKING_VERSION = 'observatory-canonical-ranking.v1.2.0';
+const RANKING_VERSION = 'observatory-canonical-ranking.v1.3.0';
 const SORTS = new Set(['canonical_relevance', 'title_asc', 'release_newest', 'observation_latest']);
 const FACET_SOURCE_LABELS = {
   'cdc-socrata': 'Centers for Disease Control and Prevention Data Catalog',
@@ -251,13 +252,13 @@ function subjectScore(record, preparedSubjects, searchText, recordScoring) {
         && ['primary', 'supporting'].includes(capability.fitness)
         && ['verified_first_party', 'source_asserted'].includes(capability.evidence_state);
     })?.capability;
-    if (directTextMatch || identityCapability) supportedSubjects.push(subjectMatch.id);
+    if (identityCapability) supportedSubjects.push(subjectMatch.id);
     if (identityCapability) {
       const best = identityCapability;
       const value = (FITNESS_WEIGHT[best.fitness] ?? 0) + (EVIDENCE_WEIGHT[best.evidence_state] ?? 0);
       components.push({ kind: 'subject_capability', value, reason: `${subjectMatch.label} matches identity-bound ${best.fitness} capability ${best.label}.`, evidence_state: best.evidence_state });
     } else if (directTextMatch) {
-      components.push({ kind: 'subject_direct_text', value: 28, reason: `${subjectMatch.label} is stated directly in publisher title or description text.`, evidence_state: 'source_asserted' });
+      components.push({ kind: 'subject_direct_text', value: 28, reason: `${subjectMatch.label} appears in publisher text; subject support has not been established by an identity-bound capability.`, evidence_state: 'inferred' });
     } else if (matchingCapabilities.length) {
       const best = matchingCapabilities.sort((a, b) => (FITNESS_WEIGHT[b.fitness] ?? 0) - (FITNESS_WEIGHT[a.fitness] ?? 0))[0];
       const value = Math.min(12, (FITNESS_WEIGHT[best.fitness] ?? 0) / 4);
@@ -450,6 +451,28 @@ function explain(record, scoreComponents, matchedSubjects) {
   return reasons;
 }
 
+function subjectSpecificity(record, parsed) {
+  const title = normalizeText(record.title);
+  // URLs identify routes, not measured subjects. Keep preserved source text untouched.
+  const description = String(record.description ?? '').replace(/https?:\/\/[^\s<>\"']+/gi, ' ');
+  const text = normalizeText(`${record.title} ${description}`);
+  const question = parsed.scoring_question ?? parsed.normalized_question;
+  const components = [];
+  const add = (reason) => components.push({kind: 'requested_subject_text', value: 48, reason, evidence_state: 'inferred'});
+  if (/\b(?:financials?|finances?)\b/.test(question) && parsed.interpretation.subjects.some(item => item.id === 'hospital_financials')
+    && /\bhospitals?\b/.test(title) && /\b(?:financial|financials|finances?|cost reports?)\b/.test(text)) {
+    add('Publisher title identifies hospitals and publisher text describes financial or cost-report content; analytical suitability remains unresolved.');
+  }
+  if (/\blife expectancy\b/.test(question) && /\blife expectancy\b/.test(title)) {
+    add('Publisher title explicitly identifies life expectancy; observation geography and analytical suitability require separate review.');
+  }
+  if (/\bmedicaid\b/.test(question)) {
+    const subjectText = text.replace(/centers for medicare (?:and )?medicaid(?: services)?(?: cms)?/g, ' ');
+    if (/\bmedicaid\b/.test(subjectText)) add('Publisher text names Medicaid outside the publisher agency name; coverage and access remain separately scoped.');
+  }
+  return components;
+}
+
 function scoreRecord(record, parsed, prepared, searchText, lexicalIndex, recordScoring) {
   const document = searchText ?? recordSearchText(record);
   const geography = geographyScore(record, parsed.interpretation);
@@ -473,15 +496,15 @@ function scoreRecord(record, parsed, prepared, searchText, lexicalIndex, recordS
   const namedSourceComponents = directNamedSources.map(source => ({ kind: 'named_source_direct', value: 120, reason: `This record directly represents requested source ${source.name}.`, evidence_state: source.registry_evidence_state }))
     .concat(mentionedNamedSources.map(source => ({ kind: 'named_source_mention', value: 2, reason: `Record text mentions ${source.name} but does not represent that source.`, evidence_state: 'inferred' })));
   if (namedSources.length && !directNamedSources.length && !mentionedNamedSources.length) return null;
-  const components = [...namedSourceComponents, ...subject.components, ...geography.components, ...unit.components, ...time.components, ...access.components, ...lexical.components];
+  const components = [...subjectSpecificity(record, parsed), ...namedSourceComponents, ...subject.components, ...geography.components, ...unit.components, ...time.components, ...access.components, ...lexical.components];
   const subjectRequired = parsed.interpretation.subjects.length > 0;
   if (subjectRequired && subject.matchedSubjects.length !== parsed.interpretation.subjects.length) return null;
   const explicitGeographyFilterMatched = parsed.raw.geography.codes.length > 0 && geography.matched.length > 0;
   if (!subjectRequired && !lexical.matched.length && !unit.matched.length && !explicitGeographyFilterMatched) return null;
-  const essentialConceptsSupported = prepared.essentialTerms.length > 0 && prepared.essentialTerms.every(term => normalizedPhrasePresent(recordScoring.directTokenBases, singularToken(term)));
+  const essentialConceptsSupported = prepared.essentialTerms.length ? prepared.essentialTerms.every(term => normalizedPhrasePresent(recordScoring.directTokenBases, singularToken(term))) : parsed.intent_override_applied === true;
   const subjectsSupported = !subjectRequired || subject.supportedSubjects.length === parsed.interpretation.subjects.length;
   const namedSourceSupported = !namedSources.length || directNamedSources.length === namedSources.length;
-  const semanticSupport = essentialConceptsSupported && subjectsSupported && namedSourceSupported && !parsed.interpretation.access_intent.ambiguity;
+  const semanticSupport = (subjectRequired || directNamedSources.length > 0) && essentialConceptsSupported && subjectsSupported && namedSourceSupported && !parsed.interpretation.access_intent.ambiguity;
   return {
     record,
     score: components.reduce((sum, component) => sum + component.value, 0),
@@ -608,12 +631,12 @@ function stableResultId(parsed, ranked, corpusId) {
   return `retrieval-${stableHash(seed)}`;
 }
 
-export function createRetrievalEngine({ lexicalArtifact = null, diagnostic = null, records, searchDocuments, joinRoutes = [], vocabulary, corpus, namedSourceRegistry = null, catalogValidation: suppliedCatalogValidation = null }) {
+export function createRetrievalEngine({ allowEvidenceBoundMissingDescriptions = false, lexicalArtifact = null, diagnostic = null, records, searchDocuments, joinRoutes = [], vocabulary, corpus, namedSourceRegistry = null, catalogValidation: suppliedCatalogValidation = null }) {
   const mark = stage => { if(typeof diagnostic === 'function') diagnostic({stage, wall_ms: performance.now()}); };
   mark('engine_start');
   if (!Array.isArray(records) || records.length === 0) throw new TypeError('records must be a non-empty array');
   if (!vocabulary || !Array.isArray(vocabulary.subjects) || !Array.isArray(vocabulary.geographies) || !Array.isArray(vocabulary.units)) throw new TypeError('vocabulary must define subjects, geographies, and units');
-  const catalogValidation = suppliedCatalogValidation ?? validateCatalogRecords(records);
+  const catalogValidation = suppliedCatalogValidation ?? validateCatalogRecords(records, { allowEvidenceBoundMissingDescriptions });
   if (!catalogValidation.valid.length) throw new TypeError('catalog contains no browser-compatible records');
   mark('validation_complete');
   if (lexicalArtifact && searchDocuments !== null) throw new TypeError('LEXICAL_PROJECTION_MODE_MISMATCH');
@@ -684,17 +707,47 @@ export function createRetrievalEngine({ lexicalArtifact = null, diagnostic = nul
     interpret(rawQuery) {
       return structuredClone(compileDiscoveryIntent(rawQuery, frozenVocabulary, frozenNamedSources));
     },
-    retrieve(rawQuery, { signal, now = null, browse = false } = {}) {
+    // Internal complete-order adapter for the machine surface. Reuses the exact
+    // canonical scorer/index and returns no duplicated record projections.
+    rankAssets({ question }, { signal } = {}) {
+      if (signal?.aborted) throw signal.reason ?? new DOMException('Aborted', 'AbortError');
+      const intent = compileDiscoveryIntent({ question }, frozenVocabulary, frozenNamedSources);
+      const parsed = { ...intent, raw: intent.filters };
+      const prepared = prepareScoring(parsed, frozenVocabulary);
+      const matches = frozenRecords.map(record => scoreRecord(record, parsed, prepared,
+        searchDocumentByRecord.get(record.record_id)?.search_text, lexicalIndexes.get(record.record_id), recordScoring.get(record.record_id)))
+        .filter(item => item && item.score > 0);
+      sortMatches(matches, 'canonical_relevance');
+      return {
+        ranking_version: RANKING_VERSION,
+        generation,
+        items: matches.map(item => ({record_id:item.record.record_id,score:item.score,
+          match_state:!item.semantic_support?'contextual':item.uncertainty_reasons.length?'uncertain':'supported',
+          why_relevant:explain(item.record,item.components,item.matched_subjects)}))
+      };
+    },
+    retrieveControlled(input, options = {}) {
+      if(input?.contract_version!=='ushso.controlled-discovery.input.v1'||Object.keys(input).some(key=>!['contract_version','query','intent_override','coverage_mode'].includes(key)))throw new TypeError('Invalid controlled discovery input.');
+      const mode=input.coverage_mode??'all';
+      if(!['all','verified_only','unresolved_only'].includes(mode))throw new TypeError('Invalid coverage mode.');
+      let coverage;
+      const discovery=this.retrieve(input.query,{...options,intentOverride:input.intent_override,coverageMode:mode,onCoverage:value=>{coverage=value}});
+      return {contract_version:'ushso.controlled-discovery.result.v1',discovery,interpretation_provenance:{original_question:input.query.question,override:input.intent_override??null,semantics:'Explicit lists replace inferred constraints; empty lists remove them.'},coverage_filter:coverage};
+    },
+    retrieve(rawQuery, { signal, now = null, browse = false, intentOverride, coverageMode = 'all', onCoverage } = {}) {
       const requestClockProvided = now != null && now !== '';
       if (signal?.aborted) throw signal.reason ?? new DOMException('Aborted', 'AbortError');
-      const intent = compileDiscoveryIntent(rawQuery, frozenVocabulary, frozenNamedSources);
+      const intent = controlledIntent(rawQuery, intentOverride, frozenVocabulary, frozenNamedSources);
       const parsed = { ...intent, raw: intent.filters };
       const preparedScoring = prepareScoring(parsed, frozenVocabulary);
       const effectiveNow = resolveObservationClock(now, frozenCorpus);
       if (!SORTS.has(parsed.raw.sort)) cursorError('unsupported_sort', 'The requested sort is not supported by this ranking release.');
       if (parsed.raw.generation && parsed.raw.generation !== generation) cursorError('generation_unavailable', 'The requested catalog generation is unavailable; restart against the published generation.');
       const cursorSignature = stableHash(JSON.stringify({
+        ranking_version: RANKING_VERSION,
         generation,
+        ...(intentOverride!==undefined?{intent_override:intentOverride}:{}),
+        ...(coverageMode!=='all'?{coverage_mode:coverageMode}:{}),
         question: parsed.normalized_question,
         geography: parsed.raw.geography,
         subjects: parsed.raw.subjects,
@@ -743,6 +796,13 @@ export function createRetrievalEngine({ lexicalArtifact = null, diagnostic = nul
               : capabilityRows(item.record).map(value => value.id);
       for (const [key, required] of Object.entries(parsed.raw.facet_filters)) {
         if (required.length) matches = matches.filter(item => required.some(value => facetValues(item, key).includes(value)));
+      }
+      if(coverageMode!=='all'||onCoverage) {
+      const coverageCounts={mode:coverageMode,before_count:matches.length,included_count:0,excluded_count:0,verified_count:matches.filter(item=>coverageVerified(item.record,parsed.interpretation)).length,unresolved_count:0,explanation:'Verified coverage requires dimension-scoped first-party geography evidence and explicit region compatibility; requested years also require verified observation-period evidence. Catalog membership and inferred geography do not qualify.'};
+      coverageCounts.unresolved_count=coverageCounts.before_count-coverageCounts.verified_count;
+      if(coverageMode!=='all')matches=matches.filter(item=>coverageVerified(item.record,parsed.interpretation)===(coverageMode==='verified_only'));
+      coverageCounts.included_count=matches.length;coverageCounts.excluded_count=coverageCounts.before_count-matches.length;
+      if(onCoverage)onCoverage(coverageCounts);
       }
       const facets = facetResponse(matches);
       sortMatches(matches, parsed.raw.sort);

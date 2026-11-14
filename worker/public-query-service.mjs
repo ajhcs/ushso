@@ -132,7 +132,14 @@ export class PublicQueryService {
       signal: session.signal,
       query: { question: 'health check' }
     });
-    return { status: 'ok', service: 'ushso-discovery', contract_version: 'observatory-discovery-result.v1.0.0', compiler: intent.compiler };
+    const signingKey = session.env?.USHSO_CURSOR_SIGNING_KEY;
+    const keyBytes = typeof signingKey === 'string' ? new TextEncoder().encode(signingKey).length : 0;
+    const persistentCursorReady = keyBytes >= 32 && keyBytes <= 1024;
+    return { status: 'ok', service: 'ushso-discovery', contract_version: 'observatory-discovery-result.v1.0.0', compiler: intent.compiler,
+      catalog: { ...session.publication.corpus, index_generation: session.publication.index_generation, storage_mode: session.publication.storage_mode, absence_claim_permitted: false },
+      build: { identity: null, state: 'not_configured' },
+      machine_cursor: { mode: signingKey === undefined ? 'ephemeral_instance' : persistentCursorReady ? 'configured_key' : 'invalid_key', persistent_key_ready: persistentCursorReady, cross_instance_requires_shared_key: true }
+    };
   }
 
   async browse(session, options = 20) {

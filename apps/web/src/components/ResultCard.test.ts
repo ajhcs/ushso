@@ -147,3 +147,9 @@ describe('result card six-region presentation contract', () => {
     expect(markup).not.toContain(new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(observedAt)))
   })
 })
+
+it('renders a source-assessment explanation without exposing lexical scoring mechanics', async () => {
+  const {readableMatchReason} = await import('./ResultCard')
+  expect(readableMatchReason('Publisher metadata directly states the leading essential term: hospital', 'contextual')).toBe('Publisher metadata contains related search terms. Direct subject support remains unresolved.')
+  expect(readableMatchReason('Documented geography includes Pennsylvania.', 'supported')).toBe('Documented geography includes Pennsylvania.')
+})

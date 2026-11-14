@@ -8,6 +8,7 @@ const disclosures = [
   ['Editorial responsibility', 'The site owner retains final approval of publication and research guidance. Automated checks and model-assisted reviews inform that decision; they do not replace it.'],
   ['Institutional affiliations', 'Not disclosed. The Observatory name does not imply affiliation with or endorsement by the United States government, a university, or any source publisher.'],
   ['Funding and conflicts', 'Funding sources, financial interests, and conflict-of-interest declarations have not been supplied for publication.'],
+  ['Ranking and inclusion policy', 'Payment must not determine search ranking, catalog inclusion or source approval. Relevant commercial relationships must be disclosed, and conflicts affecting a source decision require an independent reviewer.'],
 ] as const
 
 export function AboutPage() {

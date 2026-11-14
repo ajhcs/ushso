@@ -19,6 +19,7 @@ export function MethodsPage() {
           <h2 id="methods-inclusion-heading">Catalog inclusion</h2>
           <p>A record can be published when it has a stable technical identity, a source-native title, preserved provenance, a bounded access description, and validation against the public discovery contract. Inclusion means the metadata passed the catalog publication checks; it does not prove payload availability, authorization, schema compatibility, joinability, scientific quality, or fitness.</p>
           <p>Publisher pages, documentation, distributions, and access workflows remain distinct when the evidence supports that distinction. Similar titles and generated identifiers do not establish a dataset family.</p>
+          <p>The repository’s Apache-2.0 code license does not grant permission to reuse publisher datasets, descriptions, documentation or other source content. Check the rights and conditions for the specific material and intended use.</p>
         </section>
 
         <section aria-labelledby="methods-claims-heading">

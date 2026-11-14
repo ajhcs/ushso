@@ -1,3 +1,4 @@
+import {candidatePinMatches,validateCandidateTransition} from '../../../../../scripts/source-selection-candidate-transition.mjs'
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
@@ -39,13 +40,17 @@ test('v1.4 inventory retains structural discovery and locked workspace invariant
     { sha256: '25874c7d9464210794bd7a1467b117ef5fc71808fdf5e34726ea65181744561c', bytes: 3555, chain: 'original-root-chain', sequence: ORIGINAL_ROOT_TEST_SEQUENCE, declared: false },
     { sha256: 'b6c3469c7b10ecb90114199c18c3ebb293d801b8c8a3521cb25ded2fdba8d05e', bytes: 3666, chain: 'pr003-root-chain', sequence: EXTENDED_ROOT_TEST_SEQUENCE, declared: true },
   ].find((item) => item.sha256 === packageSha256 && item.bytes === packageBytes.length)
-  assert.ok(recognized, 'current manifest must be one of the exact reviewed original or PR003 inputs')
-  assert.equal(result.root_test_chain, recognized.chain)
-  assert.deepEqual(result.root_test_sequence, recognized.sequence)
+  if (!recognized && candidatePinMatches('package.json', packageBytes)) {
+    await validateCandidateTransition(new URL('../../../../../',import.meta.url).pathname)
+  }
+  const accepted = recognized ?? (candidatePinMatches('package.json',packageBytes) ? {chain:'pr003-root-chain',sequence:EXTENDED_ROOT_TEST_SEQUENCE,declared:true} : null)
+  assert.ok(accepted, 'current manifest must be an exact historical input or pinned unapproved candidate')
+  assert.equal(result.root_test_chain, accepted.chain)
+  assert.deepEqual(result.root_test_sequence, accepted.sequence)
   assert.deepEqual(result.root_test_research_program, {
-    declared: recognized.declared,
-    command: recognized.declared ? RESEARCH_PROGRAM_SCRIPT : null,
-    stage_count: recognized.declared ? 1 : 0,
+    declared: accepted.declared,
+    command: accepted.declared ? RESEARCH_PROGRAM_SCRIPT : null,
+    stage_count: accepted.declared ? 1 : 0,
   })
   assert.equal(result.external_requests, 0)
   assert.equal(result.external_mutations, 0)

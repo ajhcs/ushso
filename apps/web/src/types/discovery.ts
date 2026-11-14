@@ -307,10 +307,10 @@ export interface DiscoveryResultMetadata {
   }
   description_quality: {
     raw_description: string
-    state: 'suspected_encoding_corruption' | 'no_corruption_detected'
+    state: 'suspected_encoding_corruption' | 'no_corruption_detected' | 'missing'
     indicators: string[]
     display_description: string
-    repair_state: 'unresolved_no_verified_repair' | 'not_needed'
+    repair_state: 'unresolved_no_verified_repair' | 'not_needed' | 'unavailable_no_source_description'
     authoritative_url: string | null
     original_authoritative_url?: string | null
   }

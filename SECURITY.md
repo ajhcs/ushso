@@ -6,26 +6,28 @@ Please do not include credentials, protected health information, controlled
 data, raw acquisition payloads, private evidence, or unnecessarily detailed
 exploit instructions in issues or pull requests.
 
-Until a private reporting channel is published, do not disclose exploitable
-security details in a public issue. Contact the repository owner through GitHub
-profile channels and request a private reporting route.
+Send private vulnerability reports to info@ushso.org, the published project
+contact. Include affected routes, reproducible steps and impact without secrets
+or patient data. Do not post exploitable details publicly. A staffed response
+interval has not yet been established; this policy does not promise one.
 
 ## System and scope
 
 USHSO is a metadata-only research navigator. It recommends public authoritative
-sources, explains access and compatibility, and deterministically compiles
-research plans. It does not acquire underlying healthcare datasets, inspect
+sources, explains access and compatibility, and preserves explicit evidence and access limitations. The research planner
+remains disabled. It does not acquire underlying healthcare datasets, inspect
 their rows, execute analysis or retrieval recipes, calculate market share or
 financial benchmarks, grant source access, or silently merge identities.
 
 The currently deployable public surface is a Cloudflare Worker and static web
-application serving the versioned v1.1.0 metadata corpus, browser pages, and the
+application serving packaged versioned metadata, browser pages, and the
 `/api/health`, `/api/contract`, `/api/catalog`, `/api/datasets/*`, and
 `/api/discover` routes. The active Worker reads packaged static assets; it does
 not currently have production database, queue, workflow, R2 capture, harvester,
-or operations bindings. The current production/custom-domain release is pinned
-in `RELEASE_PROVENANCE.json`; any new deployment, route change, or domain change
-continues to require separate review and authorization.
+or operations bindings. Historical `RELEASE_PROVENANCE.json` is not proof of the currently deployed
+application or catalog. Check actual health, contract and release receipts
+before operational decisions. New deployment, route or domain changes require
+current authorization and exact-candidate verification.
 
 The target Research Navigator adds separately deployed public-query,
 scheduler/dispatcher, harvester, normalization/projector, and authenticated

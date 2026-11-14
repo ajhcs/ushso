@@ -49,7 +49,7 @@
     "test:verification": "node scripts/run-contract-suites.mjs --verification",
     "verify:research-navigator": "node scripts/run-contract-suites.mjs --all",
     "test": "npm run test:retrieval && npm run test:web && npm run test:worker && npm run test:research-program && npm run test:evaluation && npm run validate:evaluation && npm run verify:research-navigator",
-    "build:web": "npm run stage:corpus && npm run stage:research && npm run build --workspace @ushso/observatory-web",
+    "build:web": "npm run stage:corpus && npm run stage:research && npm run build --workspace @ushso/observatory-web && npm run stage:source-selection && node scripts/prerender-public-pages.mjs",
     "build": "npm run build:web",
     "cf:types": "node scripts/run-wrangler.mjs types",
     "cf:dry-run:artifact": "node scripts/run-wrangler.mjs deploy --dry-run --outdir .wrangler-dry-run",
@@ -57,13 +57,18 @@
     "cf:dev": "node scripts/run-wrangler.mjs dev --local --port 8787",
     "cf:deploy:staging": "npm run build && node scripts/run-wrangler.mjs deploy --config wrangler.staging.jsonc",
     "cf:deploy": "npm run build && node scripts/run-wrangler.mjs deploy",
-    "stage:research": "node scripts/prepare-research-assets.mjs"
+    "stage:research": "node scripts/prepare-research-assets.mjs",
+    "test:source-selection": "node --test tests/source-selection/*.test.mjs",
+    "test:source-selection-evaluation": "node --test tests/source-selection-evaluation/*.test.mjs",
+    "test:e2e:browser": "node scripts/browser-smoke.mjs",
+    "stage:source-selection": "node scripts/build-source-selection.mjs"
   },
   "overrides": {
     "ajv": "8.20.0",
     "sharp": "0.35.4"
   },
   "devDependencies": {
+    "@playwright/test": "1.56.1",
     "wrangler": "^4.0.0"
   }
 }

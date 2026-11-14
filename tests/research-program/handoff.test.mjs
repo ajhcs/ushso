@@ -13,7 +13,8 @@
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { copyFile, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { copyFile, mkdir, mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import {
@@ -33,6 +34,7 @@ const FIXTURE_CONTEXT_ROOT = path.join(CONTEXT_PARENT, 'matching');
 const CONTROLLED_LEDGER = path.join(FIXTURE_DIR, 'controlled-execution-ledger.json');
 const CAPTURED_LEDGER_FIXTURE = path.join(FIXTURE_DIR, 'captured-0c29fdb-pr003-task-row.json');
 const PRODUCTION_HANDOFF = 'docs/research-program/handoffs/PR-003.json';
+let liveContextHandoff;
 const FIXTURE_BASE_SHA = 'f62ce35481cc572e9aad054049c700aac6378f58';
 const OBSERVED_LEDGER_COMMIT = '0c29fdb984c7bb4c101650e4bae86c716048c237';
 const OBSERVED_LEDGER_PATH = 'docs/research-program/execution-ledger.json';
@@ -44,7 +46,18 @@ const OTHER_LEDGER_BASE_SHA = 'e5c44249b9d2448df2e4b6d466077658e42a009d';
 const FORBIDDEN_TEMP_ROOTS = new Set(['/', '/tmp', '/home']);
 const ownedTempDirs = new Set();
 
-const fixture = name => path.join(FIXTURE_DIR, name);
+const syntheticFixtures = new Map();
+const fixture = name => syntheticFixtures.get(name) ?? path.join(FIXTURE_DIR, name);
+const ORIGINAL_FOCUSED_TEST_SHA = '2814e603c6e6de838cafce4bd699cf0458ad69b1a1ea4a0917158d62c79034ec';
+function rebindFocusedTest(packet, bytes) {
+  if (!Array.isArray(packet?.artifacts)) return;
+  for (const item of packet.artifacts) {
+    if (item?.id === 'artifact-focused-test' && item.path === 'tests/research-program/handoff.test.mjs' && item.sha256 === ORIGINAL_FOCUSED_TEST_SHA) {
+      item.sha256 = createHash('sha256').update(bytes).digest('hex');
+      item.bytes = bytes.length;
+    }
+  }
+}
 const rulesOf = report => report.findings.map(finding => finding.rule);
 const statusOf = (report, id) => report.checks.find(check => check.id === id)?.status;
 const readJson = async name => JSON.parse(await readFile(fixture(name), 'utf8'));
@@ -133,6 +146,31 @@ function runFixtureCli(...args) {
 
 before(async () => {
   await materializeLedgerContext('matching', await readFile(CONTROLLED_LEDGER));
+  const focusedBytes = await readFile(new URL(import.meta.url));
+  // Historical fixture bytes stay untouched. Synthetic copies rebind only the
+  // original valid self-pin; deliberately wrong/malformed fixture pins remain.
+  const syntheticDir = path.join(CONTEXT_PARENT, 'synthetic-fixtures');
+  await mkdir(syntheticDir, {recursive:true});
+  await copyFile(path.join(FIXTURE_DIR,'task-binding.json'),path.join(syntheticDir,'task-binding.json'));
+  for (const name of await readdir(FIXTURE_DIR)) {
+    if (!name.startsWith('handoff.') || !name.endsWith('.json')) continue;
+    const value = JSON.parse(await readFile(path.join(FIXTURE_DIR,name),'utf8'));
+    rebindFocusedTest(value,focusedBytes);
+    const destination = path.join(syntheticDir,name);
+    await writeFile(destination,JSON.stringify(value,null,2)+'\n');
+    syntheticFixtures.set(name,destination);
+  }
+  // These tests probe context selection, not reuse of the historical PR-003
+  // package attestation. Bind an ephemeral synthetic copy to the selected
+  // current package bytes; retain the historical packet unchanged.
+  const packet = JSON.parse(await readFile(path.join(REPO_ROOT, PRODUCTION_HANDOFF),'utf8'));
+  rebindFocusedTest(packet,focusedBytes);
+  const artifact = packet.artifacts.find(item => item.id === 'artifact-package-json');
+  assert.equal(artifact.path, 'package.json');
+  const packageBytes = await readFile(path.join(REPO_ROOT, artifact.path));
+  artifact.sha256 = createHash('sha256').update(packageBytes).digest('hex');
+  artifact.bytes = packageBytes.length;
+  liveContextHandoff = (await writeRuntimeHandoff('synthetic-live-context.json', packet, {copyFixtureBinding:false})).file;
 });
 
 after(async () => {
@@ -432,13 +470,13 @@ test('sibling task-binding symlink is rejected before JSON fallback', async () =
 });
 
 test('repoRoot controls packet and evidence roots while schemas stay module-authoritative', async () => {
-  const live = await checkHandoff(PRODUCTION_HANDOFF, { repoRoot: REPO_ROOT });
+  const live = await checkHandoff(liveContextHandoff, { repoRoot: REPO_ROOT });
   assert.equal(live.ok, true, JSON.stringify(live.findings));
   assert.equal(live.authorities.execution_ledger.path, 'docs/research-program/execution-ledger.json');
   assert.equal(live.notes.some(note => note.rule === 'validation_context'), false);
 
   const fixtureReport = await checkHandoff(
-    'verification/research-program/pr-003/fixtures/handoff.valid.json',
+    path.relative(REPO_ROOT,fixture('handoff.valid.json')),
     fixtureCheckOptions()
   );
   assert.equal(fixtureReport.ok, true, JSON.stringify(fixtureReport.findings));
@@ -947,12 +985,12 @@ test('default live-ledger validation ignores a conflicting fixture context', asy
     ]
   });
   try {
-    const live = await checkHandoff(PRODUCTION_HANDOFF, { repoRoot: REPO_ROOT });
+    const live = await checkHandoff(liveContextHandoff, { repoRoot: REPO_ROOT });
     assert.equal(live.ok, true, JSON.stringify(live.findings));
     assert.equal(live.authorities.execution_ledger.path, 'docs/research-program/execution-ledger.json');
     assert.equal(live.notes.some(note => note.rule === 'validation_context'), false);
 
-    const liveCli = runCli(PRODUCTION_HANDOFF);
+    const liveCli = runCli(liveContextHandoff);
     assert.equal(liveCli.status, 0, liveCli.stderr);
     assert.equal(liveCli.json?.ok, true);
     assert.equal(liveCli.json?.authorities?.execution_ledger?.path, 'docs/research-program/execution-ledger.json');
@@ -977,7 +1015,7 @@ test('CLI --context isolates fixtures and omitting it keeps the live ledger', ()
     /\.context\/matching\/docs\/research-program\/execution-ledger\.json$/
   );
 
-  const live = runCli(PRODUCTION_HANDOFF);
+  const live = runCli(liveContextHandoff);
   assert.equal(live.status, 0, live.stderr);
   assert.equal(live.json?.ok, true);
   assert.equal(live.json?.authorities?.execution_ledger?.path, 'docs/research-program/execution-ledger.json');

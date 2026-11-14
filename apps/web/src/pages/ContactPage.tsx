@@ -1,3 +1,4 @@
+import { FeedbackDraft } from '../components/FeedbackDraft'
 import { ObservatoryFooter } from '../components/ObservatoryFooter'
 import { ObservatoryHeader } from '../components/ObservatoryHeader'
 import { PageTitle } from '../components/PageTitle'
@@ -18,6 +19,7 @@ export function ContactPage() {
           <a className="button-link" href="https://github.com/ajhcs/ushso/issues/new?title=USHSO%20catalog%20feedback" target="_blank" rel="noreferrer">Open a GitHub issue</a>
           <p>Dataset detail pages provide a correction link prefilled with the record ID, catalog generation, page URL, and an empty affected-field prompt. The research question is intentionally excluded.</p>
         </section>
+        <FeedbackDraft />
         <section aria-labelledby="contact-private-heading">
           <h2 id="contact-private-heading">Private contact</h2>
           <p><a className="button-link" href="mailto:info@ushso.org">Email info@ushso.org</a></p><p>Include the record ID, affected field, and a supporting publisher link. Do not send protected health information, credentials, or restricted datasets. An acknowledgement time has not yet been established.</p>

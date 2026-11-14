@@ -1,3 +1,4 @@
+import { projectFreshness } from '../packages/retrieval/tools/retrieval-core-v1.2.mjs';
 import {
   FALSE_TRUTH_BOUNDARY,
   createDomainErrorCore,
@@ -80,7 +81,13 @@ function timeIntervals(record) {
   }];
 }
 
-function recordEvidence(record) {
+function machineStaleness(record, now) {
+  const freshness = projectFreshness(record, now);
+  if (['review_overdue','stale_historical_success'].includes(freshness.stale_status)) return 'stale';
+  return freshness.freshness_state === 'within_review_window' && freshness.verification_status === 'current_verified' && freshness.failed_refresh_state === 'none_recorded' ? 'current' : 'unknown';
+}
+
+function recordEvidence(record, now) {
   const evidenceId = record.evidence?.[0]?.evidence_id ?? `evidence.catalog.${stableHash(record.record_id)}`;
   return {
     evidence_id: evidenceId,
@@ -88,7 +95,7 @@ function recordEvidence(record) {
     public_locator: record.authoritative_url ?? null,
     observed_at: record.freshness_verification.metadata_observed_at,
     evidence_state: 'observed',
-    staleness_state: record.freshness_verification.verification_status === 'current_verified' ? 'current' : 'unknown',
+    staleness_state: machineStaleness(record, now),
     derivation_reference: 'source.catalog-enumeration.v1',
     policy_reference: null,
   };
@@ -116,12 +123,12 @@ function warning(message = 'This response contains indexed first-party catalog m
   };
 }
 
-function uniqueEvidence(records, canonicalAsOf) {
-  const references = [policyEvidence(canonicalAsOf), ...records.map(recordEvidence)];
+function uniqueEvidence(records, canonicalAsOf, now) {
+  const references = [policyEvidence(canonicalAsOf), ...records.map(record => recordEvidence(record, now))];
   return references.filter((reference, index) => references.findIndex(candidate => candidate.evidence_id === reference.evidence_id) === index);
 }
 
-function successCore({ capability, context, result, records = [], resultState = 'complete', warnings = [warning()] }) {
+function successCoreAtClock({ capability, context, result, records = [], resultState = 'complete', warnings = [warning()], now }) {
   return {
     tool_contract_version: 'observatory-machine-toolkit.v1.1.0',
     capability,
@@ -134,7 +141,7 @@ function successCore({ capability, context, result, records = [], resultState = 
     result_state: resultState,
     result,
     error: null,
-    evidence_references: uniqueEvidence(records, context.canonical_as_of),
+    evidence_references: uniqueEvidence(records, context.canonical_as_of, now),
     warnings,
     truncated: false,
     omitted_sections: [],
@@ -156,7 +163,7 @@ function generationUnavailable(capability, input, context) {
   return unavailable(capability, input, context, 'generation_unavailable');
 }
 
-function summary(record, mode, whyRelevant = null) {
+function summary(record, mode, whyRelevant = null, canonicalRank = null, now = new Date()) {
   const evidenceId = record.evidence[0].evidence_id;
   const relevance = mode === 'search';
   return {
@@ -169,13 +176,13 @@ function summary(record, mode, whyRelevant = null) {
     machine_readiness: readiness(record),
     evidence_state: 'observed',
     observed_at: record.freshness_verification.metadata_observed_at,
-    staleness_state: record.freshness_verification.verification_status === 'current_verified' ? 'current' : 'unknown',
+    staleness_state: machineStaleness(record, now),
     evidence_ids: [evidenceId],
     role_candidates: relevance ? (record.capabilities?.topics ?? []).slice(0, 4).map(topic => `role.${topic.id}`) : null,
     why_relevant: relevance ? [sourceExcerpt(whyRelevant ?? 'The indexed title or metadata matches the stated research need.')] : null,
-    confidence: relevance ? 'moderate' : null,
-    derivation_references: relevance ? ['ranker.metadata-lexical.v1'] : null,
-    near_miss_reasons: relevance ? [] : null,
+    confidence: relevance ? canonicalRank?.match_state === 'contextual' ? 'low' : 'moderate' : null,
+    derivation_references: relevance ? [canonicalRank ? 'observatory-canonical-ranking.v1.3.0' : 'ranker.metadata-lexical.v1'] : null,
+    near_miss_reasons: relevance ? canonicalRank?.match_state === 'contextual' ? ['Contextual metadata match only; geographic coverage, access and analytical suitability remain separately unresolved.'] : [] : null,
   };
 }
 
@@ -251,6 +258,7 @@ function compareValue(record, dimension) {
 }
 
 export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), cursorSigner = createMachineCursorSigner() } = {}) {
+  const successCore = options => successCoreAtClock({ ...options, now });
   const canonicalAsOf = catalog.corpus.publication.observed_at;
   const context = Object.freeze({
     tool_contract_version: 'observatory-machine-toolkit.v1.1.0',
@@ -265,9 +273,9 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
     }),
   });
   const recordsById = new Map(catalog.records.map(record => [record.record_id, record]));
-  async function page(capability, input, items, section) {
+  async function page(capability, input, items, section, orderVersion = 'static-machine-toolkit-order.v2') {
     try {
-      return await cursorSigner.page({ capability, input, items, section, generation: context.index_generation, manifest: catalog.corpus.manifest_sha256 });
+      return await cursorSigner.page({ capability, input, items, section, orderVersion, generation: context.index_generation, manifest: catalog.corpus.manifest_sha256 });
     } catch (error) {
       if (error.message !== 'MACHINE_CURSOR_RESTART_REQUIRED') throw error;
       return { error: unavailable(capability, input, context, 'cursor_expired', { restartRequired: true }) };
@@ -300,8 +308,13 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
         return response;
       }
       let matched = filterRecords(catalog.records, input.filters);
-      let relevance = new Map();
-      if (input.mode === 'search') {
+      let relevance = new Map(), canonicalRanks = null;
+      if (input.mode === 'search' && typeof catalog.engine?.rankAssets === 'function') {
+        const ranking = await catalog.engine.rankAssets({ question: input.research_need });
+        canonicalRanks = new Map(ranking.items.map((item,index) => [item.record_id,{...item,order:index}]));
+        matched = matched.filter(record => canonicalRanks.has(record.record_id)).sort((a,b)=>canonicalRanks.get(a.record_id).order-canonicalRanks.get(b.record_id).order);
+        for (const record of matched) relevance.set(record.record_id,canonicalRanks.get(record.record_id).score);
+      } else if (input.mode === 'search') {
         const tokens = [...new Set(input.research_need.toLowerCase().match(/[a-z0-9]{3,}/gu) ?? [])];
         matched = matched.map(record => {
           const searchable = textFor(record);
@@ -321,18 +334,19 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
         matched.sort((left, right) => compareText(left.title, right.title) || compareText(left.record_id, right.record_id));
       }
       const grouped = groupRecords(matched, input.grouping);
-      const pagination = await page('search_assets', input, grouped, 'summaries');
+      const orderVersion = input.mode === 'search' ? canonicalRanks ? 'observatory-canonical-ranking.v1.3.0' : 'ranker.metadata-lexical.code-unit.v2' : 'sort.code-unit-total-order.v2';
+      const pagination = await page('search_assets', input, grouped, 'summaries', orderVersion);
       if (pagination.error) return pagination.error;
       const selected = pagination.selected;
       const evidenceIds = selected.length ? selected.map(record => record.evidence[0].evidence_id) : [POLICY_EVIDENCE_ID];
       const result = {
         mode: input.mode,
         sort: input.mode === 'search' ? 'frozen_rank_tuple' : input.sort,
-        ranker_version: input.mode === 'search' ? 'ranker.metadata-lexical.code-unit.v2' : 'sort.code-unit-total-order.v2',
+        ranker_version: input.mode === 'search' ? canonicalRanks ? 'observatory-canonical-ranking.v1.3.0' : 'ranker.metadata-lexical.code-unit.v2' : 'sort.code-unit-total-order.v2',
         grouping: input.grouping,
         cursor_binding_digest: pagination.binding,
         summaries: selected.map(record => summary(record, input.mode, input.mode === 'search'
-          ? `${relevance.get(record.record_id)} bounded metadata term(s) matched the stated research need.` : null)),
+          ? canonicalRanks ? canonicalRanks.get(record.record_id).why_relevant.join(' ') : `${relevance.get(record.record_id)} bounded metadata term(s) matched the stated research need.` : null, canonicalRanks?.get(record.record_id), now)),
         facet_counts: grainCounts(matched).map(([value, count]) => ({
           dimension: 'grain', value, count, count_state: 'exact',
           denominator_scope: 'Selected immutable generation and normalized filters before grouping.', evidence_ids: [evidenceIds[0]],
@@ -373,7 +387,7 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
       if (!record) return unavailable('get_access_plan', input, context);
       const response = unavailable('get_access_plan', input, context, 'route_not_documented', { resultState: 'unknown' });
       response.warnings = [warning('This generation has asset-level catalog metadata but no verified release, distribution or access-route identity. Supplied context identifiers are not validated or echoed as established routes. Inspect the asset publisher evidence instead.')];
-      response.evidence_references = uniqueEvidence([record], canonicalAsOf);
+      response.evidence_references = uniqueEvidence([record], canonicalAsOf, now);
       return response;
     },
 
@@ -384,7 +398,7 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
       if (!record) return unavailable('get_retrieval_recipe', input, context);
       const response = unavailable('get_retrieval_recipe', input, context, 'route_not_documented', { resultState: 'unknown' });
       response.warnings = [warning('This generation has asset-level catalog metadata but no verified release, distribution or access-route identity. Supplied context identifiers are not validated or echoed as established routes. Inspect the asset publisher evidence instead.')];
-      response.evidence_references = uniqueEvidence([record], canonicalAsOf);
+      response.evidence_references = uniqueEvidence([record], canonicalAsOf, now);
       return response;
     },
 
@@ -396,7 +410,7 @@ export function createStaticMachineToolkitRuntime(catalog, { now = new Date(), c
       if (!record) return unavailable('get_variables', input, context);
       const response = unavailable('get_variables', input, context, 'schema_context_required', { resultState: 'unknown' });
       response.warnings = [warning('This generation does not establish a verified release, distribution and schema identity for this asset. Supplied identifiers are not an established schema, and no fields or known-empty schema are asserted.')];
-      response.evidence_references = uniqueEvidence([record], canonicalAsOf);
+      response.evidence_references = uniqueEvidence([record], canonicalAsOf, now);
       return response;
     },
 

@@ -1,0 +1,5 @@
+# Candidate source inventory
+
+`candidate-ledger.json` validates against the local source-selection contract and projects inventory-only records. It has no accepted assertions or decisions. The rights entries are explicitly unresolved placeholders, not permissions; `reviewer: unassigned` records the absent rights reviewer. The CMS directory 403 and empty AHRQ 202 attempts have no capture. No publication is authorized by this file.
+
+`document-receipts.json` records bounded documentation response hashes and timestamps, including failed/empty responses. Hashes refer to observed response bodies; response bodies were not retained. The HTML shell for the CMS ownership API has no substantive field evidence. A receipt is not an accepted claim, and a 200 is not a rights decision. Interpret the source-specific research and field locators in `docs/source-selection-sources/pennsylvania-hospitals.md` as proposed, subject to human scientific and rights review. No payloads were fetched. The local publisher-URL request attempts were one per listed route; no accounts, requests to publishers for data, or fees were involved.
