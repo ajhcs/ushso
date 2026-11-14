@@ -7,17 +7,17 @@ import {createWorker} from '../worker/index.mjs';
 import {createRetrievalEngine} from '../packages/retrieval/tools/retrieval-core-v1.2.mjs';
 const key='synthetic-test-only-dedicated-key-not-production-123456';
 const route='POST /api/discover',input={question:'synthetic private query',limit:1};
-const inner=Buffer.from(JSON.stringify({v:1,generation:'g',signature:'offline-guessable-stable-digest',offset:1})).toString('base64url');
+const inner=Buffer.from(JSON.stringify({v:1,generation:'g',signature:'0123456789abcdef',offset:1})).toString('base64url');
 const generation='g';
 const fails=(promise,code)=>assert.rejects(promise,error=>error.code===code&&error.restart_required===true);
 
 test('opaque external cursor authenticates all bytes and hides internal query digest/offset',async()=>{
  const signer=createExternalDiscoveryCursor({signingKey:key}),token=await signer.seal(inner,input,route,generation);
  assert.equal(await signer.open(token,input,route),inner);
- assert.ok(!token.includes(input.question));assert.ok(!token.includes('offline-guessable'));assert.notEqual(token,await signer.seal(inner,input,route,generation));
+ assert.ok(!token.includes(input.question));assert.ok(!token.includes('0123456789abcdef'));assert.ok(token.length<=512);assert.notEqual(token,await signer.seal(inner,input,route,generation));
  const parts=token.split('.');assert.equal(parts.length,4);assert.equal(parts[0],'v2');
  for(const index of [1,2,3]){const changed=[...parts];changed[index]=(changed[index][0]==='A'?'B':'A')+changed[index].slice(1);await fails(signer.open(changed.join('.'),input,route),'invalid_cursor');}
- const edited=Buffer.from(JSON.stringify({v:1,generation:'g',signature:'offline-guessable-stable-digest',offset:9000})).toString('base64url');
+ const edited=Buffer.from(JSON.stringify({v:1,generation:'g',signature:'0123456789abcdef',offset:9000})).toString('base64url');
  await fails(signer.open(edited,input,route),'invalid_cursor');
  await fails(signer.open(inner,input,route),'invalid_cursor');
  await fails(signer.open(token,input,'GET /api/catalog'),'invalid_cursor');
@@ -77,4 +77,42 @@ test('actual Worker boundary wraps all browser/control cursors and permits same-
  const control=await post(a,'/api/discovery-controls/v1/search',controlInput);assert.equal(control.status,200);const controlled=await control.json();assert.ok(controlled.discovery.pagination.next_cursor);
  const next=await post(b,'/api/discovery-controls/v1/search',{...controlInput,query:{...query,cursor:controlled.discovery.pagination.next_cursor}});assert.equal(next.status,200);
  const wrongControls=await post(b,'/api/discovery-controls/v1/search',{...controlInput,coverage_mode:'verified_only',query:{...query,cursor:controlled.discovery.pagination.next_cursor}});assert.equal(wrongControls.status,409);
+});
+
+test('compact cursor fits the advertised schema at maximum ASCII generation and safe offset',async()=>{
+ const Ajv2020=(await import('ajv/dist/2020.js')).default;
+ const schema=JSON.parse(await readFile(new URL('../packages/retrieval/schemas/discovery-query.schema.json',import.meta.url),'utf8'));
+ const validate=new Ajv2020({strict:false}).compile(schema),generation='g'.repeat(160),offset=Number.MAX_SAFE_INTEGER;
+ const internal=Buffer.from(JSON.stringify({v:1,generation,signature:'fedcba9876543210',offset})).toString('base64url');
+ const signer=createExternalDiscoveryCursor({signingKey:key}),token=await signer.seal(internal,input,route,generation);
+ assert.ok(token.length<=512,`maximum ASCII cursor length ${token.length}`);
+ assert.equal(validate({...input,cursor:token,generation}),true,JSON.stringify(validate.errors));
+ assert.deepEqual(JSON.parse(Buffer.from(await signer.open(token,{...input,generation},route),'base64url').toString()),{v:1,generation,signature:'fedcba9876543210',offset});
+});
+
+test('full catalog emits schema-valid <=512 cursors on catalog, discovery and controlled routes',async()=>{
+ const Ajv2020=(await import('ajv/dist/2020.js')).default;
+ const {DISCOVERY_QUERY_SCHEMA}=await import('../packages/retrieval/tools/query-schema.mjs');
+ const schema=JSON.parse(await readFile(new URL('../packages/retrieval/schemas/discovery-query.schema.json',import.meta.url),'utf8'));
+ const controlledSchema=JSON.parse(await readFile(new URL('../packages/retrieval/schemas/controlled-discovery-input.v1.schema.json',import.meta.url),'utf8'));
+ const ajv=new Ajv2020({strict:false});ajv.addSchema(schema);const published=ajv.getSchema(schema.$id),runtime=ajv.compile(DISCOVERY_QUERY_SCHEMA),controlledValidator=ajv.compile(controlledSchema);
+ const base=new URL('../packages/retrieval/versions/v1.2.0/',import.meta.url),corpus=JSON.parse(await readFile(new URL('corpus/corpus.json',base),'utf8'));
+ const records=(await Promise.all(corpus.record_files.map(file=>readFile(new URL('corpus/'+file,base),'utf8')))).flatMap(text=>text.trim().split(/\r?\n/).filter(Boolean).map(JSON.parse));
+ assert.equal(records.length,3434);
+ const vocabulary=JSON.parse(await readFile(new URL('fixtures/controlled-vocabulary.json',base),'utf8'));
+ const engine=createRetrievalEngine({records,corpus,vocabulary,searchDocuments:[],allowEvidenceBoundMissingDescriptions:true});
+ const make=()=>createWorker({loadCatalog:async()=>({records,corpus,engine,joinRoutes:[],searchDocuments:[]}),loadEngine:async()=>engine});
+ const a=make(),b=make(),env={USHSO_CURSOR_SIGNING_KEY:key},query={question:'hospital finances in Pennsylvania',limit:1};
+ const post=(worker,path,body)=>worker.fetch(new Request('https://fixture.test'+path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}),env);
+ for(const path of ['/api/catalog','/api/discover','/api/discovery-controls/v1/search']){
+  const controls={contract_version:'ushso.controlled-discovery.input.v1',query,coverage_mode:'all'};
+  const response=path==='/api/catalog'?await a.fetch(new Request('https://fixture.test/api/catalog?limit=1'),env):await post(a,path,path==='/api/discover'?query:controls);
+  assert.equal(response.status,200,path);const body=await response.json(),discovery=body.discovery??body,token=discovery.pagination.next_cursor;
+  assert.ok(token&&token.length<=512,`${path}: ${token?.length}`);
+  const continuation={...query,generation:discovery.pagination.generation,cursor:token};
+  assert.equal(published(continuation),true,`${path}: ${JSON.stringify(published.errors)}`);assert.equal(runtime(continuation),true,`${path}: ${JSON.stringify(runtime.errors)}`);
+  if(path==='/api/discovery-controls/v1/search')assert.equal(controlledValidator({...controls,query:continuation}),true,JSON.stringify(controlledValidator.errors));
+  const next=path==='/api/catalog'?await b.fetch(new Request('https://fixture.test/api/catalog?limit=1&generation='+continuation.generation+'&cursor='+token),env):await post(b,path,path==='/api/discover'?continuation:{...controls,query:continuation});
+  assert.equal(next.status,200,path);const page=await next.json();assert.notEqual((page.discovery??page).results[0].record_id,discovery.results[0].record_id);
+ }
 });

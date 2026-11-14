@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import os from 'node:os';
 import { prerenderPublicPages } from '../scripts/prerender-public-pages.mjs';
 import { inventoryPage, renderInitialPage } from '../packages/web-discoverability/src/initial-pages.mjs';
 const shell = '<!doctype html><html><head><title>Old</title><meta name="description" content="Old"></head><body><div id="root"></div><script type="module" src="/assets/app.js"></script></body></html>';
@@ -23,7 +24,7 @@ test('malicious IDs cannot become files or canonical paths; origin rejects unsaf
   assert.doesNotMatch(inferred.body, /Captured/);
 });
 test('build produces inspectable per-source HTML, exact sitemap and bounded routing manifest', async () => {
-  const base = '/workspace/build/builderbob/ushso-implementation/tmp';
+  const base = os.tmpdir();
   await fs.mkdir(base, { recursive: true });
   const temporary = await fs.mkdtemp(path.join(base, 'prerender-test-'));
   try {
