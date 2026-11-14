@@ -1,9 +1,11 @@
-# Source-selection candidate operations
+# Source-selection operations
 
-This candidate is implemented on Builder Bob in an isolated checkout. It is not
-a record of production promotion. The recovery checkout and historical release
-receipts remain separate. Read `docs/source-selection/acceptance.json` and the
-80-item execution ledger before claiming program completion.
+Development runs on Builder Bob in the implementation checkout. The November 13
+technical release and subsequent Cloudflare fixes have their own retained
+production receipts. The November 14 publication/AI follow-on is a separate
+engineering change; its source and AI gates remain closed. The recovery checkout
+and historical receipts remain separate. Start with
+`docs/source-selection/ENGINEERING-2026-11-14.md` and the approval packet.
 
 ## Build and local qualification
 
@@ -128,14 +130,42 @@ runtime logs/state separately from production evidence. The Wrangler executable
 and Node runtime come from the current qualified toolchain; they are not an
 independently retained operating-system image.
 
-This lane supports only an explicit unavailable accepted-publication sentinel.
-It rejects an available publication or an unavailable wrapper containing views,
-a bundle or accepted pins. It does not copy a signing secret or independently
-current accepted-rights pin. The publication API must remain typed unavailable,
-and the raw publication asset must remain inaccessible. A rights-valid accepted
-publication needs a separately authorized restoration procedure with its current
-policy; this rehearsal does not establish one. No Plumbob fallback, DNS/tunnel
-change, deployment, service registration or production activation is performed.
+The original unavailable-publication lane remains supported. The accepted lane
+additionally requires an authority JSON containing `ledgerRoot`,
+`currentRightsPolicyPath`, `currentPublicationPath` and `expectedRightsHash`.
+The current policy contains `revoked_rights`, `checked_at` and
+`review_valid_until`. These external files must be independently maintained;
+copying an archived policy does not establish that it is current. Symlink and
+hardlink aliases into the retained evidence are rejected. Supply this authority
+file as the fifth argument to `retain`, fourth to `restore`, third to `verify`,
+and sixth to `restore-smoke` (after the port). The expected inventory hash stays
+external as before.
+
+Accepted retention packages private ledger/capture evidence under `evidence/`,
+outside served `assets/`. Verification recomputes projections, checks capture
+spans and current schema hashes, and rejects expired/revoked rights, stale or
+withdrawn publication pointers and changed bytes. The local smoke injects the
+current rights pin only after those checks. Raw publication assets remain 404.
+The local synthetic preparer exercises this path without granting any publisher
+rights: `node scripts/release-source-selection/rehearse-publication.mjs FRESH_ROOT`.
+Its fixtures are never production source approvals.
+
+`node scripts/source-selection/local.mjs withdraw LEDGER_ROOT EXPECTED_BUNDLE_HASH REASON`
+withdraws the local pointer and rotates its rights policy. Propagate the returned
+rights hash to the trusted serving configuration and maintain the current
+authority files; the static Worker cannot read local ledger changes. Before
+restoring an older artifact, recheck current authority. Changing the trusted
+rights pin makes stale assets fail closed; replacing an asset alone is not a
+completed withdrawal. No Plumbob fallback is established by these tools.
+
+Normal `cf:deploy` refuses an accepted publication. Use the approval packet's
+production handoff and `scripts/release-source-selection/deploy-approved.mjs`
+for that lane. It revalidates actual human records, current authority, the exact
+qualified Worker/assets and inventory-bound release approval. Preparation is
+the default; only explicit `--apply` calls Cloudflare. It deploys retained bytes
+with `--no-bundle`, records the command result, and checks the publication on
+both domains. Full browser/API release verification remains part of operational
+acceptance; a failed readback is not reported as deployment success.
 
 ## Promotion record
 
