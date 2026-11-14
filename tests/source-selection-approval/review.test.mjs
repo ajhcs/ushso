@@ -380,6 +380,17 @@ test("production handoff enforces human readiness exact ledger restore inventory
   const retainedManifest = { inventory_sha256: "a".repeat(64), files: [] };
   const restoreReceipt = {
     schema_version: "ushso.local-restore-rehearsal.v1",
+    health: {
+      build: {
+        state: "identified",
+        identity: {
+          schema_version: "ushso.runtime-build-identity.v1",
+          source_dirty: false,
+          source_revision: "a".repeat(40),
+          build_id: "b".repeat(64),
+        },
+      },
+    },
     status: "PASS",
     inventory_after_smoke_verified: true,
     inventory_sha256: retainedManifest.inventory_sha256,
@@ -461,8 +472,41 @@ test("production handoff enforces human readiness exact ledger restore inventory
     now,
   };
   assert.equal(buildProductionHandoff(args).status, "approved_handoff");
-  assert.throws(() => buildProductionHandoff({...args, approval: {...approval, approver: "Unknown reviewer"}}), e => e.code === "release_authorizer_not_appointed");
-  assert.throws(() => buildProductionHandoff({...args, approval: {...approval, issued_at: "2026-11-14T03:30:00Z"}}), e => e.code === "release_approval_precedes_evidence");
+  assert.throws(
+    () =>
+      buildProductionHandoff({
+        ...args,
+        restoreReceipt: {
+          ...restoreReceipt,
+          health: {
+            build: {
+              ...restoreReceipt.health.build,
+              identity: {
+                ...restoreReceipt.health.build.identity,
+                source_dirty: true,
+              },
+            },
+          },
+        },
+      }),
+    (e) => e.code === "clean_identified_restore_required",
+  );
+  assert.throws(
+    () =>
+      buildProductionHandoff({
+        ...args,
+        approval: { ...approval, approver: "Unknown reviewer" },
+      }),
+    (e) => e.code === "release_authorizer_not_appointed",
+  );
+  assert.throws(
+    () =>
+      buildProductionHandoff({
+        ...args,
+        approval: { ...approval, issued_at: "2026-11-14T03:30:00Z" },
+      }),
+    (e) => e.code === "release_approval_precedes_evidence",
+  );
 
   assert.throws(
     () =>

@@ -59,6 +59,15 @@ export function buildProductionHandoff({
   )
     fail("generation_rights_expired");
   const publication = restoreReceipt?.accepted_publication;
+  const build = restoreReceipt?.health?.build;
+  if (
+    build?.state !== "identified" ||
+    build.identity?.schema_version !== "ushso.runtime-build-identity.v1" ||
+    build.identity.source_dirty !== false ||
+    !/^[a-f0-9]{40}$/.test(build.identity.source_revision ?? "") ||
+    !/^[a-f0-9]{64}$/.test(build.identity.build_id ?? "")
+  )
+    fail("clean_identified_restore_required");
   if (
     !restoreReceipt ||
     restoreReceipt.schema_version !== "ushso.local-restore-rehearsal.v1" ||
@@ -90,10 +99,42 @@ export function buildProductionHandoff({
     fail("restore_receipt_attestation_mismatch");
   if (approval.inventory_sha256 !== retainedManifest.inventory_sha256)
     fail("approved_application_inventory_mismatch");
-  const appointment = records.operating_roles?.find(r => r.person === approval?.approver && r.role === approval?.role && r.capabilities?.includes("release_authorization"));
-  if (!appointment || appointment.accepted !== true || appointment.evidence_class !== "actual_human" || appointment.packet_digest !== digest(packet) || !appointment.attestation_ref || !appointment.capacity || !appointment.contact_private_ref || !Number.isFinite(Date.parse(appointment.accepted_at))) fail("release_authorizer_not_appointed");
-  const completed = [...records.claim_decisions, ...records.rights_decisions, ...records.release_reviews.independent_challenges, records.release_reviews.retrieval, records.release_reviews.usability, records.release_reviews.restore, records.release_reviews.operations];
-  if (!Number.isFinite(Date.parse(approval.issued_at)) || Date.parse(approval.issued_at) < Date.parse(appointment.accepted_at) || completed.some(r => !Number.isFinite(Date.parse(r.reviewed_at)) || Date.parse(approval.issued_at) < Date.parse(r.reviewed_at))) fail("release_approval_precedes_evidence");
+  const appointment = records.operating_roles?.find(
+    (r) =>
+      r.person === approval?.approver &&
+      r.role === approval?.role &&
+      r.capabilities?.includes("release_authorization"),
+  );
+  if (
+    !appointment ||
+    appointment.accepted !== true ||
+    appointment.evidence_class !== "actual_human" ||
+    appointment.packet_digest !== digest(packet) ||
+    !appointment.attestation_ref ||
+    !appointment.capacity ||
+    !appointment.contact_private_ref ||
+    !Number.isFinite(Date.parse(appointment.accepted_at))
+  )
+    fail("release_authorizer_not_appointed");
+  const completed = [
+    ...records.claim_decisions,
+    ...records.rights_decisions,
+    ...records.release_reviews.independent_challenges,
+    records.release_reviews.retrieval,
+    records.release_reviews.usability,
+    records.release_reviews.restore,
+    records.release_reviews.operations,
+  ];
+  if (
+    !Number.isFinite(Date.parse(approval.issued_at)) ||
+    Date.parse(approval.issued_at) < Date.parse(appointment.accepted_at) ||
+    completed.some(
+      (r) =>
+        !Number.isFinite(Date.parse(r.reviewed_at)) ||
+        Date.parse(approval.issued_at) < Date.parse(r.reviewed_at),
+    )
+  )
+    fail("release_approval_precedes_evidence");
   validateGenerationApproval(approval, expected, { now });
   return {
     schema_version: "ushso.production-handoff.v1",
